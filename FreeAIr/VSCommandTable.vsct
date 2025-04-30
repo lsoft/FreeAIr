@@ -1,0 +1,130 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CommandTable xmlns="http://schemas.microsoft.com/VisualStudio/2005-10-18/CommandTable" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+  <Extern href="stdidcmd.h"/>
+  <Extern href="vsshlids.h"/>
+  <Include href="KnownImageIds.vsct"/>
+  <Include href="VSGlobals.vsct"/>
+
+  <Commands package="FreeAIr">
+
+    <Menus>
+      
+      <Menu guid="FreeAIr" id="SourceCodeContextMenu" priority="0x0000" type="Menu">
+        <Parent guid="VSMainMenu" id="CodeWindow.LanguageGroupGroup" />
+        <Strings>
+          <ButtonText>FreeAIr actions</ButtonText>
+        </Strings>
+      </Menu>
+
+      <Menu guid="FreeAIr" id="SubExtensionMenu" priority="0x0100" type="Menu">
+        <Parent guid="FreeAIr" id="ExtensionMenuGroup" />
+        <Strings>
+          <ButtonText>FreeAIr</ButtonText>
+        </Strings>
+      </Menu>
+
+    </Menus>
+
+    <Groups>
+      
+      <Group guid="FreeAIr" id="SourceCodeContextGroup" priority="0x0600">
+        <Parent guid="FreeAIr" id="SourceCodeContextMenu" />
+      </Group>
+
+      <Group guid="FreeAIr" id="ExtensionMenuGroup" priority="0x0000">
+        <Parent guid="VSMainMenu" id="Extensions"/>
+      </Group>
+
+      <Group guid="FreeAIr" id="SubExtensionMenuGroup" priority="0x0000">
+        <Parent guid="FreeAIr" id="SubExtensionMenu" />
+      </Group>
+    
+    </Groups>
+
+    <Buttons>
+      <Button guid="FreeAIr" id="FreeAIrCommandId" priority="0x0100" type="Button">
+        <Parent guid="FreeAIr" id="SubExtensionMenuGroup" />
+        <Icon guid="ImageCatalogGuid" id="CodeReviewWizard" />
+        <CommandFlag>IconIsMoniker</CommandFlag>
+        <Strings>
+          <ButtonText>FreeAIr Some Command</ButtonText>
+        </Strings>
+      </Button>
+
+      <Button guid="FreeAIr" id="FreeAIrExplainCommandId" priority="0x0100" type="Button">
+        <Parent guid="FreeAIr" id="SourceCodeContextGroup" />
+        <Icon guid="ImageCatalogGuid" id="SQLServerObjectExplorer" />
+        <CommandFlag>IconIsMoniker</CommandFlag>
+        <Strings>
+          <ButtonText>Explain code</ButtonText>
+        </Strings>
+      </Button>
+      <Button guid="FreeAIr" id="FreeAIrNoteCommandId" priority="0x0100" type="Button">
+        <Parent guid="FreeAIr" id="SourceCodeContextGroup" />
+        <Icon guid="ImageCatalogGuid" id="CodeReviewWizard" />
+        <CommandFlag>IconIsMoniker</CommandFlag>
+        <Strings>
+          <ButtonText>Add comments</ButtonText>
+        </Strings>
+      </Button>
+      <Button guid="FreeAIr" id="FreeAIrOptimizeCommandId" priority="0x0100" type="Button">
+        <Parent guid="FreeAIr" id="SourceCodeContextGroup" />
+        <Icon guid="ImageCatalogGuid" id="CodeMetrics" />
+        <CommandFlag>IconIsMoniker</CommandFlag>
+        <Strings>
+          <ButtonText>Optimize code</ButtonText>
+        </Strings>
+      </Button>
+
+      <Button guid="FreeAIr" id="FreeAIrContinuationCodeCommandId" priority="0x0100" type="Button">
+        <Parent guid="FreeAIr" id="SourceCodeContextGroup" />
+        <Icon guid="ImageCatalogGuid" id="Writeable" />
+        <CommandFlag>IconIsMoniker</CommandFlag>
+        <Strings>
+          <ButtonText>Complete the code according to the comments</ButtonText>
+        </Strings>
+      </Button>
+
+      <!--<Button guid="FreeAIr" id="FreeAIrAddAskCommandId" priority="0x0100" type="Button">
+        <Parent guid="FreeAIr" id="SourceCodeContextGroup" />
+        <Icon guid="ImageCatalogGuid" id="AddButton" />
+        <CommandFlag>IconIsMoniker</CommandFlag>
+        <Strings>
+          <ButtonText>Add to chat list</ButtonText>
+        </Strings>
+      </Button>-->
+
+      <Button guid="FreeAIr" id="FreeAIrCodeGenCommandId" priority="0x0100" type="Button">
+        <Parent guid="FreeAIr" id="SourceCodeContextGroup"/>
+        <Icon guid="ImageCatalogGuid" id="AddButton" />
+        <CommandFlag>IconIsMoniker</CommandFlag>
+        <Strings>
+          <ButtonText>Generate code...</ButtonText>
+        </Strings>
+      </Button>
+    </Buttons>
+  </Commands>
+
+  <Symbols>
+    <GuidSymbol name="FreeAIr" value="{faec8da8-74ca-4afa-8b7d-64be3914fbac}">
+
+      <IDSymbol name="SourceCodeContextMenu" value="0x1001" />
+
+      <IDSymbol name="SourceCodeContextGroup" value="0x1011" />
+      <IDSymbol name="ExtensionMenuGroup" value="0x1012" />
+      <IDSymbol name="SubExtensionMenuGroup" value="0x1013" />
+
+      <IDSymbol name="SubExtensionMenu" value="0x1014" />
+
+      <IDSymbol name="FreeAIrExplainCommandId" value="0x1021" />
+      <IDSymbol name="FreeAIrNoteCommandId" value="0x1022" />
+      <IDSymbol name="FreeAIrOptimizeCommandId" value="0x1023" />
+      <!--<IDSymbol name="FreeAIrAddAskCommandId" value="0x1024" />-->
+      <IDSymbol name="FreeAIrContinuationCodeCommandId" value="0x1025" />
+      <IDSymbol name="FreeAIrCodeGenCommandId" value="0x1026"/>
+
+      <IDSymbol name="FreeAIrCommandId" value="0x2001" />
+    </GuidSymbol>
+  </Symbols>
+</CommandTable>
