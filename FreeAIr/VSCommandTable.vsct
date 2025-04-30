@@ -43,12 +43,12 @@
     </Groups>
 
     <Buttons>
-      <Button guid="FreeAIr" id="FreeAIrCommandId" priority="0x0100" type="Button">
+      <Button guid="FreeAIr" id="FreeAIrChooseModelCommandId" priority="0x0100" type="Button">
         <Parent guid="FreeAIr" id="SubExtensionMenuGroup" />
         <Icon guid="ImageCatalogGuid" id="CodeReviewWizard" />
         <CommandFlag>IconIsMoniker</CommandFlag>
         <Strings>
-          <ButtonText>FreeAIr Some Command</ButtonText>
+          <ButtonText>Choose OpenRouter model...</ButtonText>
         </Strings>
       </Button>
 
@@ -123,8 +123,8 @@
       <!--<IDSymbol name="FreeAIrAddAskCommandId" value="0x1024" />-->
       <IDSymbol name="FreeAIrContinuationCodeCommandId" value="0x1025" />
       <IDSymbol name="FreeAIrCodeGenCommandId" value="0x1026"/>
+      <IDSymbol name="FreeAIrChooseModelCommandId" value="0x1027" />
 
-      <IDSymbol name="FreeAIrCommandId" value="0x2001" />
     </GuidSymbol>
   </Symbols>
 </CommandTable>

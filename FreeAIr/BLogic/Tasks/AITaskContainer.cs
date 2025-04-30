@@ -19,7 +19,6 @@ namespace FreeAIr.BLogic.Tasks
     {
         private readonly object _locker = new();
 
-        private readonly ChatClient _chatClient;
         private readonly UIInformer _uIInformer;
         private readonly List<AITask> _tasks = new();
 
@@ -30,35 +29,15 @@ namespace FreeAIr.BLogic.Tasks
 
         [ImportingConstructor]
         public AITaskContainer(
-            //ChatClient chatClient,
             UIInformer uiInformer
             )
         {
-            //if (chatClient is null)
-            //{
-            //    throw new ArgumentNullException(nameof(chatClient));
-            //}
-
             if (uiInformer is null)
             {
                 throw new ArgumentNullException(nameof(uiInformer));
             }
 
-            //_chatClient = chatClient;
             _uIInformer = uiInformer;
-
-            _chatClient = new(
-                //model: "qwen/qwen3-235b-a22b:free",
-                model: "qwen/qwen3-14b:free",
-                new ApiKeyCredential(
-                    "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"
-                    ),
-                new OpenAIClientOptions
-                {
-                    Endpoint = new Uri("https://openrouter.ai/api/v1"),
-                }
-                );
-
         }
 
         public void StartTask(
@@ -67,7 +46,6 @@ namespace FreeAIr.BLogic.Tasks
             )
         {
             var task = new AITask(
-                _chatClient,
                 kind,
                 query
                 );

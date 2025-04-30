@@ -48,6 +48,7 @@
     <Compile Include="BLogic\Tasks\AITask.cs" />
     <Compile Include="BLogic\Tasks\AITaskContainer.cs" />
     <Compile Include="Commands\AddCommentsCommand.cs" />
+    <Compile Include="Commands\ChooseModelCommand.cs" />
     <Compile Include="Commands\ExplainCommand.cs" />
     <Compile Include="Helper\DocumentHelper.cs" />
     <Compile Include="Helper\EnumHelper.cs" />
@@ -56,6 +57,7 @@
     <Compile Include="Helper\ReflectionHelper.cs" />
     <Compile Include="Helper\RoslynDocumentHelper.cs" />
     <Compile Include="Helper\VisualStudioDocumentHelper.cs" />
+    <Compile Include="Options\ApiPage.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="FreeAIrPackage.cs" />
     <Compile Include="source.extension.cs">

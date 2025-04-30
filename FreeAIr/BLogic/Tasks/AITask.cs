@@ -1,8 +1,10 @@
 ﻿using EnvDTE;
 using FreeAIr.Helper;
 using Newtonsoft.Json.Linq;
+using OpenAI;
 using OpenAI.Chat;
 using System;
+using System.ClientModel;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -64,26 +66,34 @@ namespace FreeAIr.BLogic.Tasks
         }
 
         public AITask(
-            ChatClient chatClient,
             TaskKind kind,
             string query
             )
         {
-            if (chatClient is null)
-            {
-                throw new ArgumentNullException(nameof(chatClient));
-            }
-
             if (query is null)
             {
                 throw new ArgumentNullException(nameof(query));
             }
 
-            _chatClient = chatClient;
             Kind = kind;
             _query = query;
 
             _status = AITaskStatusEnum.NotStarted;
+
+            _chatClient = new(
+                //model: "qwen/qwen3-235b-a22b:free",
+                model: ApiPage.Instance.ChosenModel,
+                new ApiKeyCredential(
+                    ApiPage.Instance.Token
+                    //"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"
+                    ),
+                new OpenAIClientOptions
+                {
+                    Endpoint = new Uri(ApiPage.Instance.Endpoint),
+                    //Endpoint = new Uri("https://openrouter.ai/api/v1"),
+                }
+                );
+
         }
 
         public void Run()
@@ -133,6 +143,8 @@ namespace FreeAIr.BLogic.Tasks
 
         public void Dispose()
         {
+            _chatClient.CompleteChat();
+
             DeleteResultFile();
         }
 
