@@ -47,10 +47,12 @@
   <ItemGroup>
     <Compile Include="BLogic\Tasks\AITask.cs" />
     <Compile Include="BLogic\Tasks\AITaskContainer.cs" />
+    <Compile Include="Commands\AddCommentsCommand.cs" />
     <Compile Include="Commands\ExplainCommand.cs" />
     <Compile Include="Helper\DocumentHelper.cs" />
     <Compile Include="Helper\EnumHelper.cs" />
     <Compile Include="Helper\ListHelper.cs" />
+    <Compile Include="Helper\QueryBuilder.cs" />
     <Compile Include="Helper\ReflectionHelper.cs" />
     <Compile Include="Helper\RoslynDocumentHelper.cs" />
     <Compile Include="Helper\VisualStudioDocumentHelper.cs" />

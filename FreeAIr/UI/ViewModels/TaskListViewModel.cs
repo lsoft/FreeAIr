@@ -171,7 +171,7 @@ namespace FreeAIr.UI.ViewModels
 
             TaskList.Clear();
             TaskList.AddRange(
-                _taskContainer.Tasks.Select(t => new AITaskWrapper(t))
+                _taskContainer.Tasks.Reverse().Select(t => new AITaskWrapper(t))
                 );
         }
 

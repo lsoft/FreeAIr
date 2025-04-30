@@ -52,7 +52,22 @@ namespace FreeAIr
             var uii = componentModel.GetService<UIInformer>();
             uii.InitAsync()
                 .FileAndForget(nameof(UIInformer));
+
+            uii.DoubleClickEvent += UIDoubleClickEvent;
         }
 
+        private static async void UIDoubleClickEvent(object sender, EventArgs e)
+        {
+            try
+            {
+                await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+
+                _ = await TaskListToolWindow.ShowAsync();
+            }
+            catch (Exception excp)
+            {
+                //todo
+            }
+        }
     }
 }

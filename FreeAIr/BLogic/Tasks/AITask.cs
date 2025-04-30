@@ -176,7 +176,8 @@ namespace FreeAIr.BLogic.Tasks
                     if (completionUpdate.CompletionId is null)
                     {
                         File.AppendAllText(ResultFilePath, "Error reading answer (out of limit for free account?).");
-                        break;
+                        Status = AITaskStatusEnum.Failed;
+                        return;
                     }
 
                     foreach (ChatMessageContentPart contentPart in completionUpdate.ContentUpdate)
