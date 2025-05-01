@@ -24,8 +24,8 @@ namespace FreeAIr
         [Category("OpenAI compatible API requisites")]
         [DisplayName("Token")]
         [Description("A token of LLM API provider.")]
-        [DefaultValue("")]
-        public string Token { get; set; } = "";
+        [DefaultValue("place your token here")]
+        public string Token { get; set; } = "place your token here";
 
         [Category("OpenAI compatible API requisites")]
         [DisplayName("Chosen model")]
@@ -40,6 +40,11 @@ namespace FreeAIr
         [DefaultValue(LLMResultEnum.MD)]
         public LLMResultEnum Result  { get; set; } = LLMResultEnum.MD;
 
+        [Category("Response")]
+        [DisplayName("Switch to task window")]
+        [Description("Should FreeAIr switch to its window after dev asked a prompt.")]
+        [DefaultValue(true)]
+        public bool SwitchToTaskWindow { get; set; } = true;
 
     }
 

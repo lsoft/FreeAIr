@@ -30,7 +30,7 @@ namespace FreeAIr
         public const int FreeAIrExplainCommandId = 0x1021;
         public const int FreeAIrNoteCommandId = 0x1022;
         public const int FreeAIrOptimizeCommandId = 0x1023;
-        public const int FreeAIrContinuationCodeCommandId = 0x1025;
+        public const int FreeAIrCompleteCodeCommandId = 0x1025;
         public const int FreeAIrCodeGenCommandId = 0x1026;
         public const int FreeAIrChooseModelCommandId = 0x1027;
     }

@@ -1,29 +1,15 @@
 ﻿using EnvDTE;
-using EnvDTE80;
 using FreeAIr.BLogic.Tasks;
 using FreeAIr.Helper;
 using FreeAIr.UI.ToolWindows;
-using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.ComponentModelHost;
-using Microsoft.VisualStudio.Text;
-using OpenAI;
-using OpenAI.Chat;
-using System;
-using System.ClientModel;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Management.Instrumentation;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace FreeAIr.Commands
 {
-    [Command(PackageIds.FreeAIrExplainCommandId)]
-    internal sealed class ExplainCommand : BaseCommand<ExplainCommand>
+    [Command(PackageIds.FreeAIrCompleteCodeCommandId)]
+    internal sealed class CompleteCodeCommand : BaseCommand<CompleteCodeCommand>
     {
-        public ExplainCommand(
+        public CompleteCodeCommand(
             )
         {
         }
@@ -41,7 +27,7 @@ namespace FreeAIr.Commands
                 return;
             }
 
-            var kind = AITaskKindEnum.ExplainCode;
+            var kind = AITaskKindEnum.CompleteCodeAccordingComments;
 
             taskContainer.StartTask(
                 new TaskKind(
@@ -51,8 +37,12 @@ namespace FreeAIr.Commands
                 QueryBuilder.BuildQuery(kind, selectedCode)
                 );
 
-            _ = await TaskListToolWindow.ShowAsync();
+            if (ApiPage.Instance.SwitchToTaskWindow)
+            {
+                _ = await TaskListToolWindow.ShowAsync();
+            }
         }
 
     }
+
 }

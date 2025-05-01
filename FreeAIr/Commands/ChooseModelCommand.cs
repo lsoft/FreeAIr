@@ -1,4 +1,5 @@
-﻿
+﻿using FreeAIr.UI.ToolWindows;
+
 namespace FreeAIr.Commands
 {
     [Command(PackageIds.FreeAIrChooseModelCommandId)]
@@ -6,7 +7,7 @@ namespace FreeAIr.Commands
     {
         protected override async Task ExecuteAsync(OleMenuCmdEventArgs e)
         {
-            
+            _ = await ChooseModelToolWindow.ShowAsync();
         }
 
         protected override void BeforeQueryStatus(EventArgs e)

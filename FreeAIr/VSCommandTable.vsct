@@ -77,7 +77,7 @@
         </Strings>
       </Button>
 
-      <Button guid="FreeAIr" id="FreeAIrContinuationCodeCommandId" priority="0x0100" type="Button">
+      <Button guid="FreeAIr" id="FreeAIrCompleteCodeCommandId" priority="0x0100" type="Button">
         <Parent guid="FreeAIr" id="SourceCodeContextGroup" />
         <Icon guid="ImageCatalogGuid" id="Writeable" />
         <CommandFlag>IconIsMoniker</CommandFlag>
@@ -121,7 +121,7 @@
       <IDSymbol name="FreeAIrNoteCommandId" value="0x1022" />
       <IDSymbol name="FreeAIrOptimizeCommandId" value="0x1023" />
       <!--<IDSymbol name="FreeAIrAddAskCommandId" value="0x1024" />-->
-      <IDSymbol name="FreeAIrContinuationCodeCommandId" value="0x1025" />
+      <IDSymbol name="FreeAIrCompleteCodeCommandId" value="0x1025" />
       <IDSymbol name="FreeAIrCodeGenCommandId" value="0x1026"/>
       <IDSymbol name="FreeAIrChooseModelCommandId" value="0x1027" />
 

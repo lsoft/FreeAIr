@@ -20,10 +20,10 @@ using System.Threading.Tasks;
 
 namespace FreeAIr.Commands
 {
-    [Command(PackageIds.FreeAIrNoteCommandId)]
-    internal sealed class AddCommentsCommand : BaseCommand<AddCommentsCommand>
+    [Command(PackageIds.FreeAIrExplainCommandId)]
+    internal sealed class ExplainCodeCommand : BaseCommand<ExplainCodeCommand>
     {
-        public AddCommentsCommand(
+        public ExplainCodeCommand(
             )
         {
         }
@@ -41,7 +41,7 @@ namespace FreeAIr.Commands
                 return;
             }
 
-            var kind = AITaskKindEnum.AddComments;
+            var kind = AITaskKindEnum.ExplainCode;
 
             taskContainer.StartTask(
                 new TaskKind(
@@ -58,4 +58,5 @@ namespace FreeAIr.Commands
         }
 
     }
+
 }
