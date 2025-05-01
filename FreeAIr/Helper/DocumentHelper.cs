@@ -22,11 +22,11 @@ namespace FreeAIr.Helper
             var selectedSpan = selection.StreamSelectionSpan.SnapshotSpan;
             var selectedText = selectedSpan.GetText();
 
-            if (string.IsNullOrWhiteSpace(selectedText))
-            {
-                var line = selection.Start.Position.GetContainingLine();
-                selectedText = line.GetText();
-            }
+            //if (string.IsNullOrWhiteSpace(selectedText))
+            //{
+            //    var line = selection.Start.Position.GetContainingLine();
+            //    selectedText = line.GetText();
+            //}
 
             var fileName = new FileInfo(docView.FilePath).Name;
 

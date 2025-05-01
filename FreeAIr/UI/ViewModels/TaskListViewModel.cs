@@ -175,7 +175,6 @@ namespace FreeAIr.UI.ViewModels
                 );
         }
 
-
         public sealed class AITaskWrapper : BaseViewModel
         {
             public AITask Task

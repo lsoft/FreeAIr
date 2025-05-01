@@ -2,6 +2,7 @@
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.InteropServices;
+using System.Threading.Tasks;
 
 namespace FreeAIr
 {
@@ -15,6 +16,15 @@ namespace FreeAIr
 
     public class ApiPage : BaseOptionModel<ApiPage>
     {
+        private XshdProvider[] _xshdProviders =
+            [
+                new XshdProvider
+                {
+                    Alias = "cs,csharp",
+                    FilePath = @"Resources/xshd/csharp.xshd"
+                }
+            ];
+
         [Category("OpenAI compatible API requisites")]
         [DisplayName("Endpoint")]
         [Description("An endpoint of LLM API provider.")]
@@ -46,6 +56,60 @@ namespace FreeAIr
         [DefaultValue(true)]
         public bool SwitchToTaskWindow { get; set; } = true;
 
+        [Category("Response")]
+        [DisplayName("Code colorization schemas")]
+        [Description("Edit this list to provide custom colorization schemas for your programming languages. RESTART OF VISUAL STUDIO IS REQUIRED TO APPLY THIS OPTION.")]
+        [DefaultValue(true)]
+        public XshdProvider[] XshdProviders
+        {
+            get => _xshdProviders;
+            set
+            {
+                _xshdProviders = value;
+
+                LoadOrUpdateMarkdownStyles();
+            }
+        }
+
+        public static void LoadOrUpdateMarkdownStyles()
+        {
+            System.Windows.Application.Current.Resources.Remove("MdXamlPlugins");
+
+            var plugins = new MdXaml.Plugins.MdXamlPlugins();
+            foreach (var xshdProvider in ApiPage.Instance.XshdProviders)
+            {
+                var fullPath = System.IO.Path.IsPathRooted(xshdProvider.FilePath)
+                    ? xshdProvider.FilePath
+                    : System.IO.Path.GetFullPath(System.IO.Path.Combine(FreeAIrPackage.WorkingFolder, xshdProvider.FilePath))
+                    ;
+
+                plugins.Highlights.Add(
+                    new MdXaml.Plugins.Definition
+                    {
+                        Alias = xshdProvider.Alias,
+                        Resource = new Uri("file:///" + fullPath)
+                    }
+                );
+            }
+
+            System.Windows.Application.Current.Resources.Add("MdXamlPlugins", plugins);
+        }
+
+    }
+
+    public sealed class XshdProvider
+    {
+        public string Alias
+        {
+            get;
+            set;
+        }
+
+        public string FilePath
+        {
+            get;
+            set;
+        }
     }
 
     public enum LLMResultEnum

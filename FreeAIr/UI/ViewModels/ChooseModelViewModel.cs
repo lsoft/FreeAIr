@@ -156,7 +156,7 @@ namespace FreeAIr.UI.ViewModels
                 get;
             }
 
-            public string SelectedMark => _isSelected ? "(selected)" : string.Empty;
+            public string SelectedMark => _isSelected ? "(chosen)" : string.Empty;
 
             public bool IsSelected
             {

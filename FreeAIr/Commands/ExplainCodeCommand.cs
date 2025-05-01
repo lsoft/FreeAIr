@@ -36,8 +36,12 @@ namespace FreeAIr.Commands
             var taskContainer = componentModel.GetService<AITaskContainer>();
 
             var (fileName, selectedCode) = await DocumentHelper.GetSelectedTextAsync();
-            if (fileName is null || selectedCode is null)
+            if (fileName is null || string.IsNullOrEmpty(selectedCode))
             {
+                await VS.MessageBox.ShowWarningAsync(
+                    "Error",
+                    "Cannot obtain selected block of code"
+                    );
                 return;
             }
 

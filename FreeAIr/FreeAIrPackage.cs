@@ -6,6 +6,7 @@ using FreeAIr.UI.ToolWindows;
 using MessagePack.Formatters;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.ComponentModelHost;
+using Microsoft.VisualStudio.Shell.Interop;
 using SauronEye.UI.Informer;
 using System.Collections.Generic;
 using System.IO.Packaging;
@@ -29,6 +30,15 @@ namespace FreeAIr
     {
         public static FreeAIrPackage Instance = null;
 
+        public static readonly string WorkingFolder;
+
+        static FreeAIrPackage()
+        {
+            var eal = Assembly.GetExecutingAssembly().Location;
+            var exeFolderPath = new System.IO.FileInfo(eal).Directory.FullName;
+            WorkingFolder = exeFolderPath;
+        }
+
         public FreeAIrPackage(
             )
         {
@@ -40,6 +50,12 @@ namespace FreeAIr
             IProgress<ServiceProgressData> progress
             )
         {
+            //load MdXaml manually, for unknown reason this dll does not loaded automatically
+            Assembly assembly = Assembly.LoadFrom("MdXaml.dll");
+            AppDomain.CurrentDomain.Load(assembly.FullName);
+
+            ApiPage.LoadOrUpdateMarkdownStyles();
+
             await this.JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
 
             await this.RegisterCommandsAsync();

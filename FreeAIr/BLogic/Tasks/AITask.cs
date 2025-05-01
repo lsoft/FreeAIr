@@ -1,5 +1,6 @@
 ﻿using EnvDTE;
 using FreeAIr.Helper;
+using Microsoft.VisualStudio.Threading;
 using Newtonsoft.Json.Linq;
 using OpenAI;
 using OpenAI.Chat;
@@ -24,7 +25,7 @@ namespace FreeAIr.BLogic.Tasks
 
         private AITaskStatusEnum _status;
         
-        private Task? _task;
+        private JoinableTask? _task;
 
         public event TaskStatusChangedDelegate TaskStatusChangedEvent;
 
@@ -81,16 +82,13 @@ namespace FreeAIr.BLogic.Tasks
             _status = AITaskStatusEnum.NotStarted;
 
             _chatClient = new(
-                //model: "qwen/qwen3-235b-a22b:free",
                 model: ApiPage.Instance.ChosenModel,
                 new ApiKeyCredential(
                     ApiPage.Instance.Token
-                    //"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"
                     ),
                 new OpenAIClientOptions
                 {
                     Endpoint = new Uri(ApiPage.Instance.Endpoint),
-                    //Endpoint = new Uri("https://openrouter.ai/api/v1"),
                 }
                 );
 
@@ -103,7 +101,7 @@ namespace FreeAIr.BLogic.Tasks
                 Guid.NewGuid().ToString() + ".md"
                 );
 
-            _task = Task.Run(RunAsync);
+            _task = ThreadHelper.JoinableTaskFactory.RunAsync(RunAsync);
         }
         
         public string ReadResponse()
@@ -134,7 +132,7 @@ namespace FreeAIr.BLogic.Tasks
             {
                 return;
             }
-            if (_task.IsCanceled || _task.IsFaulted)
+            if (_task.IsCompleted)
             {
                 return;
             }
@@ -179,37 +177,62 @@ namespace FreeAIr.BLogic.Tasks
 
                 var cancellationToken = _cancellationTokenSource.Token;
 
-                var completionUpdates = _chatClient.CompleteChatStreamingAsync(
-                    messages: [_query],
-                    cancellationToken: cancellationToken
-                    );
-                await foreach (StreamingChatCompletionUpdate completionUpdate in completionUpdates)
+
+                File.AppendAllText(ResultFilePath, @"
+# Header
+
+Text.
+
+```csharp
+        //comment comment
+        //and again
+        public static int IndexOf<T>(this T[] array, T value)
+            where T : IComparable
+        {
+            for (var c = 0; c < array.Length; c++)
+            {
+                if (array[c].CompareTo(value) == 0)
                 {
-                    if (completionUpdate.CompletionId is null)
-                    {
-                        File.AppendAllText(ResultFilePath, "Error reading answer (out of limit for free account?).");
-                        Status = AITaskStatusEnum.Failed;
-                        return;
-                    }
-
-                    foreach (ChatMessageContentPart contentPart in completionUpdate.ContentUpdate)
-                    {
-                        if (string.IsNullOrEmpty(contentPart.Text))
-                        {
-                            continue;
-                        }
-
-                        File.AppendAllText(ResultFilePath, contentPart.Text);
-
-                        Status = AITaskStatusEnum.ReadAnswer;
-
-                        if (cancellationToken.IsCancellationRequested)
-                        {
-                            Status = AITaskStatusEnum.Cancelled;
-                            return;
-                        }
-                    }
+                    return c;
                 }
+            }
+
+            return -1;
+        }
+```
+");
+
+                //var completionUpdates = _chatClient.CompleteChatStreamingAsync(
+                //    messages: [_query],
+                //    cancellationToken: cancellationToken
+                //    );
+                //await foreach (StreamingChatCompletionUpdate completionUpdate in completionUpdates)
+                //{
+                //    if (completionUpdate.CompletionId is null)
+                //    {
+                //        File.AppendAllText(ResultFilePath, "Error reading answer (out of limit for free account?).");
+                //        Status = AITaskStatusEnum.Failed;
+                //        return;
+                //    }
+
+                //    foreach (ChatMessageContentPart contentPart in completionUpdate.ContentUpdate)
+                //    {
+                //        if (string.IsNullOrEmpty(contentPart.Text))
+                //        {
+                //            continue;
+                //        }
+
+                //        File.AppendAllText(ResultFilePath, contentPart.Text);
+
+                //        Status = AITaskStatusEnum.ReadAnswer;
+
+                //        if (cancellationToken.IsCancellationRequested)
+                //        {
+                //            Status = AITaskStatusEnum.Cancelled;
+                //            return;
+                //        }
+                //    }
+                //}
 
                 Status = AITaskStatusEnum.Completed;
             }
@@ -222,7 +245,7 @@ namespace FreeAIr.BLogic.Tasks
             {
                 Status = AITaskStatusEnum.Failed;
 
-                File.AppendAllText(ResultFilePath, excp.Message + Environment.NewLine + excp.StackTrace);
+                File.AppendAllText(ResultFilePath, excp.Message + Environment.NewLine + "```" + Environment.NewLine + excp.StackTrace + Environment.NewLine + "```");
 
                 //todo
             }
