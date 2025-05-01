@@ -1,7 +1,5 @@
-﻿using EnvDTE;
-using FreeAIr.BLogic.Tasks;
+﻿using FreeAIr.BLogic.Tasks;
 using FreeAIr.Helper;
-using Microsoft.VisualStudio.VCProjectEngine;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
@@ -203,8 +201,8 @@ namespace FreeAIr.UI.ViewModels
                 get
                 {
                     return Task.Started.HasValue
-                        ? Task.Started.Value.ToString()
-                        : string.Empty
+                        ? "Started: " + Task.Started.Value.ToString()
+                        : "Not started"
                         ;
                 }
             }

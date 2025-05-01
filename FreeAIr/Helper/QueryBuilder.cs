@@ -17,7 +17,7 @@ namespace FreeAIr.Helper
             )
         {
             string respondFormat;
-            switch (ApiPage.Instance.Result)
+            switch (ResponsePage.Instance.ResponseFormat)
             {
                 case LLMResultEnum.PlainText:
                     respondFormat = "plain text";

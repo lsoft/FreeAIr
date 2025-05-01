@@ -24,6 +24,7 @@ namespace FreeAIr
     [ProvideAutoLoad(VSConstants.UICONTEXT.NoSolution_string, PackageAutoLoadFlags.BackgroundLoad)]
     [ProvideAutoLoad(VSConstants.UICONTEXT.SolutionExistsAndFullyLoaded_string, PackageAutoLoadFlags.BackgroundLoad)]
     [ProvideOptionPage(typeof(OptionsProvider.ApiPageOptions), "FreeAIr", "Api", 0, 0, true, SupportsProfiles = true)]
+    [ProvideOptionPage(typeof(OptionsProvider.ResponsePageOptions), "FreeAIr", "Response", 0, 0, true, SupportsProfiles = true)]
     [ProvideToolWindow(typeof(TaskListToolWindow.Pane), Style = VsDockStyle.Tabbed, Window = WindowGuids.DocumentWell)]
     [ProvideToolWindow(typeof(ChooseModelToolWindow.Pane), Style = VsDockStyle.Tabbed, Window = WindowGuids.DocumentWell)]
     public sealed class FreeAIrPackage : ToolkitPackage
@@ -54,7 +55,7 @@ namespace FreeAIr
             Assembly assembly = Assembly.LoadFrom("MdXaml.dll");
             AppDomain.CurrentDomain.Load(assembly.FullName);
 
-            ApiPage.LoadOrUpdateMarkdownStyles();
+            ResponsePage.LoadOrUpdateMarkdownStyles();
 
             await this.JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
 

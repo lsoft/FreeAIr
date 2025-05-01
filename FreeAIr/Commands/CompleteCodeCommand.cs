@@ -41,7 +41,7 @@ namespace FreeAIr.Commands
                 QueryBuilder.BuildQuery(kind, selectedCode)
                 );
 
-            if (ApiPage.Instance.SwitchToTaskWindow)
+            if (ResponsePage.Instance.SwitchToTaskWindow)
             {
                 _ = await TaskListToolWindow.ShowAsync();
             }
