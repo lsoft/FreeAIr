@@ -18,7 +18,7 @@ namespace FreeAIr.UI.ViewModels
 
         private AITaskWrapper _selectedTask;
         
-        private ICommand _openAsMdCommand;
+        private ICommand _openInEditorCommand;
         private ICommand _removeCommand;
         private ICommand _stopCommand;
 
@@ -51,13 +51,13 @@ namespace FreeAIr.UI.ViewModels
             }
         }
 
-        public ICommand OpenAsMdCommand
+        public ICommand OpenInEditorCommand
         {
             get
             {
-                if (_openAsMdCommand == null)
+                if (_openInEditorCommand == null)
                 {
-                    _openAsMdCommand = new AsyncRelayCommand(
+                    _openInEditorCommand = new AsyncRelayCommand(
                         async a =>
                         {
                             await VS.Documents.OpenAsync(_selectedTask.Task.ResultFilePath);
@@ -66,7 +66,7 @@ namespace FreeAIr.UI.ViewModels
                         );
                 }
 
-                return _openAsMdCommand;
+                return _openInEditorCommand;
             }
         }
 

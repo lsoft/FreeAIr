@@ -24,6 +24,7 @@ namespace FreeAIr.UI.ViewModels
         private ModelWrapper _selectedModel;
 
         private ICommand _chooseCommand;
+        private ICommand _reloadListCommand;
 
         public ObservableCollection2<ModelWrapper> ModelList
         {
@@ -94,6 +95,25 @@ namespace FreeAIr.UI.ViewModels
                 return _chooseCommand;
             }
         }
+        public ICommand ReloadListCommand
+        {
+            get
+            {
+                if (_reloadListCommand == null)
+                {
+                    _reloadListCommand = new RelayCommand(
+                        a =>
+                        {
+                            Task.Run(LoadModelListAsync)
+                                .FileAndForget(nameof(LoadModelListAsync));
+                        }
+                        );
+                }
+
+                return _reloadListCommand;
+            }
+        }
+        
 
 
         [ImportingConstructor]
@@ -120,7 +140,7 @@ namespace FreeAIr.UI.ViewModels
                 var modelContainer = await _httpClient.GetFromJsonAsync<ModelResponse>(
                     "https://openrouter.ai/api/v1/models"
                     );
-                var freeModels = modelContainer.Models
+                var models = modelContainer.Models
                     .Where(m => !_loadFreeModels || (m.name.Contains("(free)")))
                     .Where(m => !_loadFreeModels || (m.pricing is null || m.pricing.IsFree))
                     .ToList()
@@ -129,7 +149,7 @@ namespace FreeAIr.UI.ViewModels
                 var chosenModel = ApiPage.Instance.ChosenModel;
                 
                 ModelList.AddRange(
-                    freeModels.ConvertAll(m => new ModelWrapper(m.id, m.name, m.id == chosenModel))
+                    models.ConvertAll(m => new ModelWrapper(m.id, m.name, m.id == chosenModel))
                     );
 
                 Message = string.Empty;

@@ -46,9 +46,9 @@
             <Button
                 Grid.Column="0"
                 Margin="2"
-                Content="Open as MD content..."
+                Content="Open in editor..."
                 x:Name="OpenAsMdButton"
-                Command="{Binding OpenAsMdCommand}"
+                Command="{Binding OpenInEditorCommand}"
                 />
             <Button
                 Grid.Column="1"

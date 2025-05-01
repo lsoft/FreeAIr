@@ -27,6 +27,7 @@ namespace FreeAIr
     [ProvideOptionPage(typeof(OptionsProvider.ResponsePageOptions), "FreeAIr", "Response", 0, 0, true, SupportsProfiles = true)]
     [ProvideToolWindow(typeof(TaskListToolWindow.Pane), Style = VsDockStyle.Tabbed, Window = WindowGuids.DocumentWell)]
     [ProvideToolWindow(typeof(ChooseModelToolWindow.Pane), Style = VsDockStyle.Tabbed, Window = WindowGuids.DocumentWell)]
+    //[ProvideBindingPath]
     public sealed class FreeAIrPackage : ToolkitPackage
     {
         public static FreeAIrPackage Instance = null;
@@ -51,9 +52,11 @@ namespace FreeAIr
             IProgress<ServiceProgressData> progress
             )
         {
-            //load MdXaml manually, for unknown reason this dll does not loaded automatically
-            Assembly assembly = Assembly.LoadFrom("MdXaml.dll");
-            AppDomain.CurrentDomain.Load(assembly.FullName);
+            //load dlls manually, for unknown reason these dlls does not loaded automatically
+            Assembly a1 = Assembly.LoadFrom("MdXaml.dll");
+            AppDomain.CurrentDomain.Load(a1.FullName);
+            Assembly a2 = Assembly.LoadFrom("Microsoft.Bcl.AsyncInterfaces.dll");
+            AppDomain.CurrentDomain.Load(a2.FullName);
 
             ResponsePage.LoadOrUpdateMarkdownStyles();
 

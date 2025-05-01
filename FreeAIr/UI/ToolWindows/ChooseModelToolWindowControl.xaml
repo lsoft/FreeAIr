@@ -24,12 +24,28 @@
             <RowDefinition Height="auto" />
         </Grid.RowDefinitions>
 
-        <CheckBox
+        <StackPanel
             Grid.Row="0"
             Margin="2"
-            Content="Load only free models"
-            IsChecked="{Binding LoadFreeModels}"
-            />
+            Orientation="Horizontal"
+            >
+
+            <Button
+                Margin="2"
+                Content="Reload..."
+                Command="{Binding ReloadListCommand}"
+                />
+
+            <CheckBox
+                Margin="2"
+                Content="Load only free models"
+                IsChecked="{Binding LoadFreeModels}"
+                VerticalAlignment="Center"
+                VerticalContentAlignment="Center"
+                />
+            
+        </StackPanel>
+        
 
         <ListBox
             Grid.Row="1"
