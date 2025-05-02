@@ -1,4 +1,4 @@
-﻿using FreeAIr.BLogic.Tasks;
+﻿using FreeAIr.BLogic;
 using FreeAIr.Helper;
 using System;
 using System.Collections.Generic;
@@ -11,43 +11,43 @@ using WpfHelpers;
 
 namespace FreeAIr.UI.ViewModels
 {
-    [Export(typeof(TaskListViewModel))]
-    public sealed class TaskListViewModel : BaseViewModel
+    [Export(typeof(ChatListViewModel))]
+    public sealed class ChatListViewModel : BaseViewModel
     {
-        private readonly AITaskContainer _taskContainer;
+        private readonly ChatContainer _chatContainer;
 
-        private AITaskWrapper _selectedTask;
+        private ChatWrapper _selectedChat;
         
         private ICommand _openInEditorCommand;
         private ICommand _removeCommand;
         private ICommand _stopCommand;
 
-        public ObservableCollection2<AITaskWrapper> TaskList
+        public ObservableCollection2<ChatWrapper> ChatList
         {
             get;
         }
 
-        public AITaskWrapper? SelectedTask
+        public ChatWrapper? SelectedChat
         {
-            get => _selectedTask;
+            get => _selectedChat;
             set
             {
-                _selectedTask = value;
+                _selectedChat = value;
 
                 OnPropertyChanged();
             }
         }
 
-        public string SelectedTaskResponse
+        public string SelectedChatResponse
         {
             get
             {
-                if (_selectedTask is null)
+                if (_selectedChat is null)
                 {
                     return string.Empty;
                 }
 
-                return _selectedTask.Task.ReadResponse();
+                return _selectedChat.Chat.ReadResponse();
             }
         }
 
@@ -60,9 +60,9 @@ namespace FreeAIr.UI.ViewModels
                     _openInEditorCommand = new AsyncRelayCommand(
                         async a =>
                         {
-                            await VS.Documents.OpenAsync(_selectedTask.Task.ResultFilePath);
+                            await VS.Documents.OpenAsync(_selectedChat.Chat.ResultFilePath);
                         },
-                        a => _selectedTask is not null && _selectedTask.Task.Status == AITaskStatusEnum.Completed
+                        a => _selectedChat is not null && _selectedChat.Chat.Status == ChatPromptStatusEnum.Completed
                         );
                 }
 
@@ -79,10 +79,10 @@ namespace FreeAIr.UI.ViewModels
                     _removeCommand = new RelayCommand(
                         a =>
                         {
-                            _taskContainer.RemoveTaskAsync(_selectedTask.Task)
-                                .FileAndForget(nameof(AITaskContainer.RemoveTaskAsync));
+                            _chatContainer.RemoveChatAsync(_selectedChat.Chat)
+                                .FileAndForget(nameof(ChatContainer.RemoveChatAsync));
                         },
-                        a => _selectedTask is not null && _selectedTask.Task.Status == AITaskStatusEnum.Completed
+                        a => _selectedChat is not null && _selectedChat.Chat.Status == ChatPromptStatusEnum.Completed
                         );
                 }
 
@@ -99,10 +99,10 @@ namespace FreeAIr.UI.ViewModels
                     _stopCommand = new RelayCommand(
                         a =>
                         {
-                            _taskContainer.StopTaskAsync(_selectedTask.Task)
-                                .FileAndForget(nameof(AITaskContainer.StopTaskAsync));
+                            _chatContainer.StopChatAsync(_selectedChat.Chat)
+                                .FileAndForget(nameof(ChatContainer.StopChatAsync));
                         },
-                        a => _selectedTask is not null && _selectedTask.Task.Status.In(AITaskStatusEnum.WaitForAnswer, AITaskStatusEnum.ReadAnswer)
+                        a => _selectedChat is not null && _selectedChat.Chat.Status.In(ChatPromptStatusEnum.WaitForAnswer, ChatPromptStatusEnum.ReadAnswer)
                         );
                 }
 
@@ -111,26 +111,26 @@ namespace FreeAIr.UI.ViewModels
         }
 
         [ImportingConstructor]
-        public TaskListViewModel(
-            AITaskContainer taskContainer
+        public ChatListViewModel(
+            ChatContainer chatContainer
             )
         {
-            if (taskContainer is null)
+            if (chatContainer is null)
             {
-                throw new ArgumentNullException(nameof(taskContainer));
+                throw new ArgumentNullException(nameof(chatContainer));
             }
 
-            _taskContainer = taskContainer;
+            _chatContainer = chatContainer;
 
-            taskContainer.TaskCollectionChangedEvent += TaskCollectionChanged;
-            taskContainer.TaskStatusChangedEvent += TaskStatusChanged;
+            chatContainer.ChatCollectionChangedEvent += ChatCollectionChanged;
+            chatContainer.ChatStatusChangedEvent += ChatStatusChanged;
 
-            TaskList = new ObservableCollection2<AITaskWrapper>();
+            ChatList = new ObservableCollection2<ChatWrapper>();
             UpdateControl();
 
         }
 
-        private async void TaskCollectionChanged(object sender, EventArgs e)
+        private async void ChatCollectionChanged(object sender, EventArgs e)
         {
             try
             {
@@ -144,15 +144,15 @@ namespace FreeAIr.UI.ViewModels
             }
         }
 
-        private async void TaskStatusChanged(object sender, TaskEventArgs e)
+        private async void ChatStatusChanged(object sender, ChatEventArgs e)
         {
             try
             {
                 await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
 
-                foreach (var task in TaskList)
+                foreach (var chat in ChatList)
                 {
-                    task.Update();
+                    chat.Update();
                 }
 
                 OnPropertyChanged();
@@ -165,17 +165,17 @@ namespace FreeAIr.UI.ViewModels
 
         private void UpdateControl()
         {
-            SelectedTask = null;
+            SelectedChat = null;
 
-            TaskList.Clear();
-            TaskList.AddRange(
-                _taskContainer.Tasks.Reverse().Select(t => new AITaskWrapper(t))
+            ChatList.Clear();
+            ChatList.AddRange(
+                _chatContainer.Chats.Reverse().Select(t => new ChatWrapper(t))
                 );
         }
 
-        public sealed class AITaskWrapper : BaseViewModel
+        public sealed class ChatWrapper : BaseViewModel
         {
-            public AITask Task
+            public Chat Chat
             {
                 get;
             }
@@ -184,7 +184,7 @@ namespace FreeAIr.UI.ViewModels
             {
                 get
                 {
-                    return Task.Kind.Kind.AsString();
+                    return Chat.Description.Kind.AsShortString();
                 }
             }
 
@@ -192,7 +192,7 @@ namespace FreeAIr.UI.ViewModels
             {
                 get
                 {
-                    return Task.Kind.FileName;
+                    return Chat.Description.FileName;
                 }
             }
 
@@ -200,8 +200,8 @@ namespace FreeAIr.UI.ViewModels
             {
                 get
                 {
-                    return Task.Started.HasValue
-                        ? "Started: " + Task.Started.Value.ToString()
+                    return Chat.Started.HasValue
+                        ? "Started: " + Chat.Started.Value.ToString()
                         : "Not started"
                         ;
                 }
@@ -211,20 +211,20 @@ namespace FreeAIr.UI.ViewModels
             {
                 get
                 {
-                    return Task.Status.AsString();
+                    return Chat.Status.AsString();
                 }
             }
 
-            public AITaskWrapper(
-                AITask task
+            public ChatWrapper(
+                Chat chat
                 )
             {
-                if (task is null)
+                if (chat is null)
                 {
-                    throw new ArgumentNullException(nameof(task));
+                    throw new ArgumentNullException(nameof(chat));
                 }
 
-                Task = task;
+                Chat = chat;
             }
 
             public void Update()

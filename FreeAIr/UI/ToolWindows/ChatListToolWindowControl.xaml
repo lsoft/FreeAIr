@@ -1,5 +1,5 @@
 ﻿<UserControl
-    x:Class="FreeAIr.UI.ToolWindows.TaskListToolWindowControl"
+    x:Class="FreeAIr.UI.ToolWindows.ChatListToolWindowControl"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -15,7 +15,7 @@
     mc:Ignorable="d"
     d:DesignHeight="300"
     d:DesignWidth="300"
-    Name="TaskListToolWindow"
+    Name="ChatListToolWindow"
     >
 
     <Grid
@@ -71,8 +71,8 @@
             Margin="2"
             HorizontalAlignment="Stretch"
             VerticalAlignment="Stretch"
-            ItemsSource="{Binding Path=TaskList}"
-            SelectedItem="{Binding Path=SelectedTask}"
+            ItemsSource="{Binding Path=ChatList}"
+            SelectedItem="{Binding Path=SelectedChat}"
             ScrollViewer.HorizontalScrollBarVisibility="Auto"
             ScrollViewer.VerticalScrollBarVisibility="Auto"
             >
@@ -81,7 +81,7 @@
                     <StackPanel
                         >
                         <StackPanel.InputBindings>
-                            <MouseBinding Gesture="LeftDoubleClick" Command="{Binding ElementName=TaskListToolWindow, Path=DataContext.OpenAsMdCommand}"/>
+                            <MouseBinding Gesture="LeftDoubleClick" Command="{Binding ElementName=ChatListToolWindow, Path=DataContext.OpenAsMdCommand}"/>
                         </StackPanel.InputBindings>
                         <TextBlock
                             Text="{Binding Path=FirstRow, Mode=OneWay}"
@@ -117,7 +117,7 @@
             VerticalAlignment="Stretch"
             HorizontalScrollBarVisibility="Auto"
             VerticalScrollBarVisibility="Auto"
-            Markdown="{Binding Path=SelectedTaskResponse, Mode=OneWay}"
+            Markdown="{Binding Path=SelectedChatResponse, Mode=OneWay}"
             >
             <mdxaml:MarkdownScrollViewer.MarkdownStyle>
                 <Style TargetType="FlowDocument">
@@ -129,9 +129,12 @@
                         <Style TargetType="Section">
                             <Style.Triggers>
                                 <Trigger Property="Tag" Value="Blockquote">
-                                    <Setter Property="Padding"         Value="10, 5"/>
-                                    <Setter Property="BorderBrush"     Value="#DEDEDE"/>
-                                    <Setter Property="BorderThickness" Value="5,0,0,0"/>
+                                    <Setter Property="Margin"          Value="0, 10, 0, 0"/>
+                                    <Setter Property="Padding"         Value="10, 1, 0, 1"/>
+                                    <Setter Property="BorderBrush"     Value="#FF000055"/>
+                                    <Setter Property="BorderThickness" Value="15,1,1,1"/>
+                                    <Setter Property="FontFamily"      Value="Cascadia Code"/>
+                                    <Setter Property="FontSize"        Value="20"/>
                                 </Trigger>
                             </Style.Triggers>
                         </Style>

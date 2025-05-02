@@ -1,5 +1,5 @@
 ﻿using EnvDTE;
-using FreeAIr.BLogic.Tasks;
+using FreeAIr.BLogic;
 using FreeAIr.Helper;
 using FreeAIr.UI.ToolWindows;
 using Microsoft.VisualStudio.ComponentModelHost;
@@ -19,7 +19,7 @@ namespace FreeAIr.Commands
             await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
 
             var componentModel = (IComponentModel)await FreeAIrPackage.Instance.GetServiceAsync(typeof(SComponentModel));
-            var taskContainer = componentModel.GetService<AITaskContainer>();
+            var taskContainer = componentModel.GetService<ChatContainer>();
 
             var (fileName, selectedCode) = await DocumentHelper.GetSelectedTextAsync();
             if (fileName is null || string.IsNullOrEmpty(selectedCode))
@@ -31,19 +31,19 @@ namespace FreeAIr.Commands
                 return;
             }
 
-            var kind = AITaskKindEnum.OptimizeCode;
+            var kind = ChatKindEnum.OptimizeCode;
 
-            taskContainer.StartTask(
-                new TaskKind(
+            taskContainer.StartChat(
+                new ChatDescription(
                     kind,
                     fileName
                     ),
-                QueryBuilder.BuildQuery(kind, selectedCode)
+                UserPrompt.CreateCodeBasedPrompt(kind, selectedCode)
                 );
 
             if (ResponsePage.Instance.SwitchToTaskWindow)
             {
-                _ = await TaskListToolWindow.ShowAsync();
+                _ = await ChatListToolWindow.ShowAsync();
             }
         }
 

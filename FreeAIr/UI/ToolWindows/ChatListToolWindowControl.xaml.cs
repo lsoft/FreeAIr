@@ -8,10 +8,10 @@ using System.Xml;
 
 namespace FreeAIr.UI.ToolWindows
 {
-    public partial class TaskListToolWindowControl : UserControl
+    public partial class ChatListToolWindowControl : UserControl
     {
-        public TaskListToolWindowControl(
-            TaskListViewModel viewModel
+        public ChatListToolWindowControl(
+            ChatListViewModel viewModel
             )
         {
             if (viewModel is null)

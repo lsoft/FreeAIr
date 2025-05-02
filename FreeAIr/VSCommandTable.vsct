@@ -51,7 +51,7 @@
           <ButtonText>Choose OpenRouter model...</ButtonText>
         </Strings>
       </Button>
-      <Button guid="FreeAIr" id="FreeAIrOpenTaskToolWindowCommandId" priority="0x0101" type="Button">
+      <Button guid="FreeAIr" id="OpenChatListToolWindowCommandId" priority="0x0101" type="Button">
         <Parent guid="FreeAIr" id="SubExtensionMenuGroup" />
         <Icon guid="ImageCatalogGuid" id="ComparePerformanceReports" />
         <CommandFlag>IconIsMoniker</CommandFlag>
@@ -132,7 +132,7 @@
       <IDSymbol name="FreeAIrCompleteCodeCommandId" value="0x1025" />
       <IDSymbol name="FreeAIrCodeGenCommandId" value="0x1026"/>
       <IDSymbol name="FreeAIrChooseModelCommandId" value="0x1027" />
-      <IDSymbol name="FreeAIrOpenTaskToolWindowCommandId" value="0x1028" />
+      <IDSymbol name="OpenChatListToolWindowCommandId" value="0x1028" />
       
     </GuidSymbol>
   </Symbols>

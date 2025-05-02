@@ -8,9 +8,9 @@ using System.Windows;
 
 namespace FreeAIr.UI.ToolWindows
 {
-    public class TaskListToolWindow : BaseToolWindow<TaskListToolWindow>
+    public class ChatListToolWindow : BaseToolWindow<ChatListToolWindow>
     {
-        public override string GetTitle(int toolWindowId) => "AI task list";
+        public override string GetTitle(int toolWindowId) => "AI chat list";
 
         public override Type PaneType => typeof(Pane);
 
@@ -18,9 +18,9 @@ namespace FreeAIr.UI.ToolWindows
         {
             var componentModel = (IComponentModel)await FreeAIrPackage.Instance.GetServiceAsync(typeof(SComponentModel));
 
-            var viewModel = componentModel.GetService<TaskListViewModel>();
+            var viewModel = componentModel.GetService<ChatListViewModel>();
 
-            var control = new TaskListToolWindowControl(viewModel);
+            var control = new ChatListToolWindowControl(viewModel);
 
             return control;
         }

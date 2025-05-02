@@ -1,4 +1,5 @@
-﻿using FreeAIr.BLogic.Tasks;
+﻿using EnvDTE;
+using FreeAIr.BLogic;
 using Microsoft.CodeAnalysis.Operations;
 using System;
 using System.Collections.Generic;
@@ -10,23 +11,65 @@ namespace FreeAIr.Helper
 {
     public static class EnumHelper
     {
+        public static string AsPromptString(
+            this ChatKindEnum kind
+            )
+        {
+            switch (kind)
+            {
+                case ChatKindEnum.ExplainCode:
+                    return "Explain the following code:";
+                case ChatKindEnum.AddComments:
+                    return "Add comments that match the following code:";
+                case ChatKindEnum.OptimizeCode:
+                    return "Optimize the following code:";
+                case ChatKindEnum.CompleteCodeAccordingComments:
+                    return "Complete the following code according its comments:";
+                case ChatKindEnum.GenerateCode:
+                    return "Generate code according to description:";
+                default:
+                    throw new InvalidOperationException($"Unknown kind {kind}");
+            }
+        }
+
+        public static string AsShortString(
+            this ChatKindEnum taskKind
+            )
+        {
+            switch (taskKind)
+            {
+                case ChatKindEnum.ExplainCode:
+                    return "Explain code";
+                case ChatKindEnum.AddComments:
+                    return "Add comments";
+                case ChatKindEnum.OptimizeCode:
+                    return "Opimize code";
+                case ChatKindEnum.CompleteCodeAccordingComments:
+                    return "Complete the code according to the comments";
+                case ChatKindEnum.GenerateCode:
+                    return "Generate code";
+                default:
+                    return taskKind.ToString();
+            }
+        }
+
         public static string AsString(
-            this AITaskStatusEnum status
+            this ChatPromptStatusEnum status
             )
         {
             switch (status)
             {
-                case AITaskStatusEnum.NotStarted:
+                case ChatPromptStatusEnum.NotStarted:
                     return "Not started";
-                case AITaskStatusEnum.WaitForAnswer:
+                case ChatPromptStatusEnum.WaitForAnswer:
                     return "Waiting for answer";
-                case AITaskStatusEnum.ReadAnswer:
+                case ChatPromptStatusEnum.ReadAnswer:
                     return "Reading answer";
-                case AITaskStatusEnum.Completed:
+                case ChatPromptStatusEnum.Completed:
                     return "Completed";
-                case AITaskStatusEnum.Cancelled:
+                case ChatPromptStatusEnum.Cancelled:
                     return "Cancelled";
-                case AITaskStatusEnum.Failed:
+                case ChatPromptStatusEnum.Failed:
                     return "Failed";
                 default:
                     return status.ToString();
@@ -34,25 +77,5 @@ namespace FreeAIr.Helper
         }
 
 
-        public static string AsString(
-            this AITaskKindEnum taskKind
-            )
-        {
-            switch (taskKind)
-            {
-                case AITaskKindEnum.ExplainCode:
-                    return "Explain code";
-                case AITaskKindEnum.AddComments:
-                    return "Add comments";
-                case AITaskKindEnum.OptimizeCode:
-                    return "Opimize code";
-                case AITaskKindEnum.CompleteCodeAccordingComments:
-                    return "Complete the code according to the comments";
-                case AITaskKindEnum.GenerateCode:
-                    return "Generate code";
-                default:
-                    return taskKind.ToString();
-            }
-        }
     }
 }

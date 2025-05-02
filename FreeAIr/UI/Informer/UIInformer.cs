@@ -23,7 +23,7 @@ namespace SauronEye.UI.Informer
 
         private Label _statusControl;
 
-        private TasksStatusEnum _status = TasksStatusEnum.Idle;
+        private ChatsStatusEnum _status = ChatsStatusEnum.Idle;
 
         public event DoubleClickDelegate DoubleClickEvent;
 
@@ -41,7 +41,7 @@ namespace SauronEye.UI.Informer
         }
 
         public async void UpdateUIStatusAsync(
-            TasksStatusEnum status
+            ChatsStatusEnum status
             )
         {
             try
@@ -71,11 +71,11 @@ namespace SauronEye.UI.Informer
 
             switch (_status)
             {
-                case TasksStatusEnum.Idle:
+                case ChatsStatusEnum.Idle:
                     sbs ="AI is getting colder, it nothing is asked about.";
                     title = "⏸";
                     break;
-                case TasksStatusEnum.Working:
+                case ChatsStatusEnum.Working:
                     sbs = "Some tasks are in progress.";
                     title = "▶";
                     break;
@@ -242,7 +242,7 @@ namespace SauronEye.UI.Informer
     }
 
 
-    public enum TasksStatusEnum
+    public enum ChatsStatusEnum
     {
         Working,
         Idle
