@@ -42,14 +42,7 @@ namespace FreeAIr.BLogic
         }
 
 
-        public string GetPromptFullQuery()
-        {
-            var rules = BuildRulesSection();
-
-            return rules + Environment.NewLine + PromptBody;
-        }
-
-        private static string BuildRulesSection()
+        public static string BuildRulesSection()
         {
             string respondFormat;
             switch (ResponsePage.Instance.ResponseFormat)
@@ -99,7 +92,7 @@ namespace FreeAIr.BLogic
 
             rules = string.Format(
                 rules,
-                ResponsePage.GetAnswerCulture(),
+                ResponsePage.GetAnswerCultureName(),
                 respondFormat
                 );
             return rules;

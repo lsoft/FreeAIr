@@ -1,6 +1,4 @@
-﻿using EnvDTE;
-using FreeAIr.BLogic;
-using Microsoft.CodeAnalysis.Operations;
+﻿using FreeAIr.BLogic;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,15 +16,13 @@ namespace FreeAIr.Helper
             switch (kind)
             {
                 case ChatKindEnum.ExplainCode:
-                    return "Explain the following code:";
                 case ChatKindEnum.AddComments:
-                    return "Add comments that match the following code:";
                 case ChatKindEnum.OptimizeCode:
-                    return "Optimize the following code:";
                 case ChatKindEnum.CompleteCodeAccordingComments:
-                    return "Complete the following code according its comments:";
-                case ChatKindEnum.GenerateCode:
-                    return "Generate code according to description:";
+                    return FreeAIr.Resources.Resources.ResourceManager.GetString(
+                        nameof(ChatKindEnum) + "_" + kind.ToString(),
+                        ResponsePage.GetAnswerCulture()
+                        );
                 case ChatKindEnum.Discussion:
                     return string.Empty;
                 default:
@@ -48,8 +44,6 @@ namespace FreeAIr.Helper
                     return "Optimize code";
                 case ChatKindEnum.CompleteCodeAccordingComments:
                     return "Complete the code according to the comments";
-                case ChatKindEnum.GenerateCode:
-                    return "Generate code";
                 case ChatKindEnum.Discussion:
                     return "Discussion";
                 default:
@@ -58,22 +52,22 @@ namespace FreeAIr.Helper
         }
 
         public static string AsString(
-            this ChatPromptStatusEnum status
+            this ChatStatusEnum status
             )
         {
             switch (status)
             {
-                case ChatPromptStatusEnum.NotStarted:
+                case ChatStatusEnum.NotStarted:
                     return "Not started";
-                case ChatPromptStatusEnum.WaitForAnswer:
+                case ChatStatusEnum.WaitForAnswer:
                     return "Waiting for answer";
-                case ChatPromptStatusEnum.ReadAnswer:
+                case ChatStatusEnum.ReadAnswer:
                     return "Reading answer";
-                case ChatPromptStatusEnum.Completed:
+                case ChatStatusEnum.Completed:
                     return "Completed";
-                case ChatPromptStatusEnum.Cancelled:
+                case ChatStatusEnum.Cancelled:
                     return "Cancelled";
-                case ChatPromptStatusEnum.Failed:
+                case ChatStatusEnum.Failed:
                     return "Failed";
                 default:
                     return status.ToString();

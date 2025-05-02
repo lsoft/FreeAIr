@@ -49,12 +49,22 @@ namespace FreeAIr
         [DefaultValue("")]
         public string OverriddenCulture { get; set; } = "";
 
-        public static string GetAnswerCulture()
+        public static CultureInfo GetAnswerCulture()
+        {
+            return
+                string.IsNullOrEmpty(ResponsePage.Instance.OverriddenCulture)
+                    ? CultureInfo.CurrentUICulture
+                    : CultureInfo.CreateSpecificCulture(ResponsePage.Instance.OverriddenCulture)
+                    ;
+        }
+
+        public static string GetAnswerCultureName()
         {
             return
                 string.IsNullOrEmpty(ResponsePage.Instance.OverriddenCulture)
                     ? CultureInfo.CurrentUICulture.Name
-                    : ResponsePage.Instance.OverriddenCulture;
+                    : ResponsePage.Instance.OverriddenCulture
+                    ;
         }
 
         public static void LoadOrUpdateMarkdownStyles()

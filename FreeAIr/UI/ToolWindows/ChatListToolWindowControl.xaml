@@ -313,6 +313,7 @@
                 VerticalAlignment="Stretch"
                 IsEnabled="{Binding IsEnabledPrompt, Mode=OneWay}"
                 Text="{Binding PromptText, UpdateSourceTrigger=PropertyChanged}"
+                FontSize="18"
                 >
                 <TextBox.InputBindings>
                     <KeyBinding Command="{Binding Path=CreatePromptCommand}" Key="Enter" />

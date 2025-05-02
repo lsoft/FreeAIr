@@ -19,12 +19,15 @@ namespace FreeAIr.BLogic
 {
     public sealed class Chat : IDisposable
     {
-        private readonly SemaphoreSlim _semaphore = new(1);
-
         private readonly ChatClient _chatClient;
-        private readonly List<ChatPrompt> _prompts = new();
+        private readonly List<UserPrompt> _prompts = new();
 
-        private ChatPromptStatusEnum _status;
+        private readonly CancellationTokenSource _cancellationTokenSource = new();
+
+        private Task? _task;
+
+
+        private ChatStatusEnum _status;
 
         public event ChatStatusChangedDelegate ChatStatusChangedEvent;
 
@@ -47,7 +50,7 @@ namespace FreeAIr.BLogic
         /// <summary>
         /// Status of last prompt in the chat = whole chat status.
         /// </summary>
-        public ChatPromptStatusEnum Status
+        public ChatStatusEnum Status
         {
             get => _status;
             private set
@@ -69,7 +72,7 @@ namespace FreeAIr.BLogic
 
             Description = description;
 
-            _status = ChatPromptStatusEnum.NotStarted;
+            _status = ChatStatusEnum.NotStarted;
 
             Started = DateTime.Now;
 
@@ -91,34 +94,17 @@ namespace FreeAIr.BLogic
         }
 
         public void AddPrompt(
-            UserPrompt prompt
+            UserPrompt userPrompt
             )
         {
-            if (prompt is null)
+            if (userPrompt is null)
             {
-                throw new ArgumentNullException(nameof(prompt));
+                throw new ArgumentNullException(nameof(userPrompt));
             }
 
-            var chatPrompt = new ChatPrompt(
-                _chatClient,
-                prompt,
-                ResultFilePath
-                );
+            _prompts.Add(userPrompt);
 
-            _semaphore.Wait();
-            try
-            {
-                UnsubscribeLastPrompt();
-
-                _prompts.Add(chatPrompt);
-            }
-            finally
-            {
-                _semaphore.Release();
-            }
-
-            chatPrompt.ChatPromptStatusChangedEvent += ChatPromptStatusChangedEvent;
-            chatPrompt.Ask();
+            _task = Task.Run(AskPromptAndReceiveAnswer);
         }
 
         public string ReadResponse()
@@ -129,74 +115,154 @@ namespace FreeAIr.BLogic
             }
 
             return "Chat is not started yet. Please wait for completion.";
-
-            //switch (Status)
-            //{
-            //    case PromptStatusEnum.NotStarted:
-            //        return "Chat is not started yet. Please wait for completion.";
-            //    case PromptStatusEnum.WaitForAnswer:
-            //        return "Chat is waiting for AI answer. Please wait for completion.";
-            //    case PromptStatusEnum.ReadAnswer:
-            //    case PromptStatusEnum.Completed:
-            //        return ReadResponseFile();
-            //    case PromptStatusEnum.Cancelled:
-            //        return "Chat is cancelled. No response exists.";
-            //    case PromptStatusEnum.Failed:
-            //        return "Chat is failed: " + Environment.NewLine + ReadResponseFile();
-            //    default:
-            //        return "Chat is in unknown status. Please fire an issue to the dev.";
-            //}
         }
 
         public async Task StopAsync()
         {
-            await _semaphore.WaitAsync();
-            try
+            _cancellationTokenSource.Cancel();
+
+            if (_task is null)
             {
-                if (_prompts.Count > 0)
-                {
-                    var lastPrompt = _prompts.Last();
-                    await lastPrompt.StopAsync();
-                }
+                return;
             }
-            finally
+            if (_task.IsCompleted)
             {
-                _semaphore.Release();
+                return;
             }
+            await _task;
         }
 
         public void Dispose()
         {
             _chatClient.CompleteChat();
 
-            _semaphore.Wait();
-            try
-            {
-                UnsubscribeLastPrompt();
-            }
-            finally
-            {
-                _semaphore.Release();
-            }
-
             DeleteResultFile();
         }
 
-        private void UnsubscribeLastPrompt()
-        {
-            if (_prompts.Count > 0)
-            {
-                var lastPrompt = _prompts.Last();
-                lastPrompt.ChatPromptStatusChangedEvent -= ChatPromptStatusChangedEvent;
-            }
-        }
 
-        private void ChatPromptStatusChangedEvent(
-            object sender,
-            ChatPromptEventArgs e
-            )
+        private void AskPromptAndReceiveAnswer()
         {
-            Status = e.ChatPrompt.Status;
+            try
+            {
+                File.AppendAllText(
+                    ResultFilePath,
+                    Environment.NewLine + Environment.NewLine
+                    );
+                File.AppendAllText(
+                    ResultFilePath,
+                    "> Prompt:" + Environment.NewLine
+                    );
+                File.AppendAllText(
+                    ResultFilePath,
+                    _prompts.Last().PromptBody + Environment.NewLine + Environment.NewLine
+                    );
+                File.AppendAllText(
+                    ResultFilePath,
+                    "> Answer:" + Environment.NewLine
+                    );
+
+                Status = ChatStatusEnum.WaitForAnswer;
+
+                var cancellationToken = _cancellationTokenSource.Token;
+
+
+                //                File.AppendAllText(_resultFilePath, @"
+                //> Prompt:
+                //>
+                //> Show me some C# code, please!
+
+
+                //sds;kjnhfndsglkjn
+
+                //as;fdfgkjhjfdjk
+
+                //alkfsjdghlkjfgh
+
+                //> Prompt:
+                //Show me some C# code, please!
+
+
+                //> Answer:
+                //# Header
+
+                //Text.
+
+                //```csharp
+                //        //comment comment
+                //        //and again
+                //        public static int IndexOf<T>(this T[] array, T value)
+                //            where T : IComparable
+                //        {
+                //            for (var c = 0; c < array.Length; c++)
+                //            {
+                //                if (array[c].CompareTo(value) == 0)
+                //                {
+                //                    return c;
+                //                }
+                //            }
+
+                //            return -1;
+                //        }
+                //```
+                //");
+                //                Status = ChatPromptStatusEnum.Completed;
+                //                return;
+
+
+                var chatMessages = new List<ChatMessage>(_prompts.Count + 1);
+                chatMessages.Add(new UserChatMessage(UserPrompt.BuildRulesSection()));
+                chatMessages.AddRange(
+                    _prompts
+                    .ConvertAll(p => new UserChatMessage(p.PromptBody))
+                    );
+
+                var completionUpdates = _chatClient.CompleteChatStreaming(
+                    messages: chatMessages,
+                    cancellationToken: cancellationToken
+                    );
+                foreach (StreamingChatCompletionUpdate completionUpdate in completionUpdates)
+                {
+                    if (completionUpdate.CompletionId is null)
+                    {
+                        File.AppendAllText(ResultFilePath, "Error reading answer (out of limit for free account?).");
+                        Status = ChatStatusEnum.Failed;
+                        return;
+                    }
+
+                    foreach (ChatMessageContentPart contentPart in completionUpdate.ContentUpdate)
+                    {
+                        if (string.IsNullOrEmpty(contentPart.Text))
+                        {
+                            continue;
+                        }
+
+                        File.AppendAllText(ResultFilePath, contentPart.Text);
+
+                        Status = ChatStatusEnum.ReadAnswer;
+
+                        if (cancellationToken.IsCancellationRequested)
+                        {
+                            Status = ChatStatusEnum.Cancelled;
+                            return;
+                        }
+                    }
+                }
+
+                Status = ChatStatusEnum.Completed;
+            }
+            catch (OperationCanceledException)
+            {
+                //this is OK
+                Status = ChatStatusEnum.Cancelled;
+            }
+            catch (Exception excp)
+            {
+                Status = ChatStatusEnum.Failed;
+
+                File.AppendAllText(ResultFilePath, excp.Message + Environment.NewLine + "```" + Environment.NewLine + excp.StackTrace + Environment.NewLine + "```");
+
+                //todo
+            }
         }
 
         private string ReadResponseFile()
@@ -237,7 +303,6 @@ namespace FreeAIr.BLogic
         AddComments,
         OptimizeCode,
         CompleteCodeAccordingComments,
-        GenerateCode,
         Discussion
     }
 
@@ -275,4 +340,13 @@ namespace FreeAIr.BLogic
         }
     }
 
+    public enum ChatStatusEnum
+    {
+        NotStarted,
+        WaitForAnswer,
+        ReadAnswer,
+        Completed,
+        Cancelled,
+        Failed
+    }
 }

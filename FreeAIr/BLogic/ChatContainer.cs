@@ -117,7 +117,7 @@ namespace FreeAIr.BLogic
 
         private void ChatStatusChanged(object sender, ChatEventArgs ea)
         {
-            var anyIsInProgress = _chats.Any(c => c.Status.In(ChatPromptStatusEnum.WaitForAnswer, ChatPromptStatusEnum.ReadAnswer));
+            var anyIsInProgress = _chats.Any(c => c.Status.In(ChatStatusEnum.WaitForAnswer, ChatStatusEnum.ReadAnswer));
             if (anyIsInProgress)
             {
                 _uIInformer.UpdateUIStatusAsync(ChatsStatusEnum.Working);

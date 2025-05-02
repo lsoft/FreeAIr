@@ -33,7 +33,7 @@ namespace FreeAIr.Commands
             await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
 
             var componentModel = (IComponentModel)await FreeAIrPackage.Instance.GetServiceAsync(typeof(SComponentModel));
-            var taskContainer = componentModel.GetService<ChatContainer>();
+            var chatContainer = componentModel.GetService<ChatContainer>();
 
             var (fileName, selectedCode) = await DocumentHelper.GetSelectedTextAsync();
             if (fileName is null || string.IsNullOrEmpty(selectedCode))
@@ -47,7 +47,7 @@ namespace FreeAIr.Commands
 
             var kind = ChatKindEnum.ExplainCode;
 
-            taskContainer.StartChat(
+            chatContainer.StartChat(
                 new ChatDescription(
                     kind,
                     fileName
