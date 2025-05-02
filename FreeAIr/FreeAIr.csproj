@@ -57,8 +57,10 @@
     <Compile Include="Dto\OpenRouter\Model.cs" />
     <Compile Include="Helper\DocumentHelper.cs" />
     <Compile Include="Helper\EnumHelper.cs" />
+    <Compile Include="Helper\LanguageHelper.cs" />
     <Compile Include="Helper\ListHelper.cs" />
     <Compile Include="BLogic\UserPrompt.cs" />
+    <Compile Include="Helper\MarkdownScrollViewerExtensions.cs" />
     <Compile Include="Helper\ReflectionHelper.cs" />
     <Compile Include="Helper\RoslynDocumentHelper.cs" />
     <Compile Include="Helper\VisualStudioDocumentHelper.cs" />

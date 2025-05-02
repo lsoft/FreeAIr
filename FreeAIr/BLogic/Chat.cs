@@ -237,7 +237,8 @@ namespace FreeAIr.BLogic
         AddComments,
         OptimizeCode,
         CompleteCodeAccordingComments,
-        GenerateCode
+        GenerateCode,
+        Discussion
     }
 
     public sealed class ChatDescription

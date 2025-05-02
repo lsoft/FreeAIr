@@ -56,7 +56,7 @@
         <Icon guid="ImageCatalogGuid" id="ComparePerformanceReports" />
         <CommandFlag>IconIsMoniker</CommandFlag>
         <Strings>
-          <ButtonText>Open task window...</ButtonText>
+          <ButtonText>Open chat list window...</ButtonText>
         </Strings>
       </Button>
 

@@ -1,10 +1,6 @@
-﻿using FreeAIr.UI.ViewModels;
-using ICSharpCode.AvalonEdit.Highlighting;
-using ICSharpCode.AvalonEdit.Highlighting.Xshd;
-using MdXaml.Plugins;
-using System.Windows;
+﻿using FreeAIr.Helper;
+using FreeAIr.UI.ViewModels;
 using System.Windows.Controls;
-using System.Xml;
 
 namespace FreeAIr.UI.ToolWindows
 {
@@ -22,7 +18,15 @@ namespace FreeAIr.UI.ToolWindows
             DataContext = viewModel;
 
             InitializeComponent();
+
+            viewModel.MarkdownReReadEvent += ViewModel_MarkdownReReadEvent;
         }
 
+        private void ViewModel_MarkdownReReadEvent(object sender, EventArgs e)
+        {
+            AnswerControl.ScrollToEnd();
+        }
     }
+
 }
+

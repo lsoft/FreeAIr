@@ -52,7 +52,7 @@ namespace FreeAIr.Commands
                     kind,
                     fileName
                     ),
-                UserPrompt.CreateCodeBasedPrompt(kind, selectedCode)
+                UserPrompt.CreateCodeBasedPrompt(kind, fileName, selectedCode)
                 );
 
             if (ResponsePage.Instance.SwitchToTaskWindow)

@@ -27,6 +27,8 @@ namespace FreeAIr.Helper
                     return "Complete the following code according its comments:";
                 case ChatKindEnum.GenerateCode:
                     return "Generate code according to description:";
+                case ChatKindEnum.Discussion:
+                    return string.Empty;
                 default:
                     throw new InvalidOperationException($"Unknown kind {kind}");
             }
@@ -43,11 +45,13 @@ namespace FreeAIr.Helper
                 case ChatKindEnum.AddComments:
                     return "Add comments";
                 case ChatKindEnum.OptimizeCode:
-                    return "Opimize code";
+                    return "Optimize code";
                 case ChatKindEnum.CompleteCodeAccordingComments:
                     return "Complete the code according to the comments";
                 case ChatKindEnum.GenerateCode:
                     return "Generate code";
+                case ChatKindEnum.Discussion:
+                    return "Discussion";
                 default:
                     return taskKind.ToString();
             }

@@ -1,4 +1,5 @@
-﻿using FreeAIr.BLogic;
+﻿using EnvDTE;
+using FreeAIr.BLogic;
 using FreeAIr.Helper;
 using System;
 using System.Collections.Generic;
@@ -21,6 +22,10 @@ namespace FreeAIr.UI.ViewModels
         private ICommand _openInEditorCommand;
         private ICommand _removeCommand;
         private ICommand _stopCommand;
+        private ICommand _createPromptCommand;
+        private string _promptText;
+
+        public event MarkdownReReadDelegate MarkdownReReadEvent;
 
         public ObservableCollection2<ChatWrapper> ChatList
         {
@@ -42,6 +47,8 @@ namespace FreeAIr.UI.ViewModels
         {
             get
             {
+                RaiseMarkdownReReadEvent();
+
                 if (_selectedChat is null)
                 {
                     return string.Empty;
@@ -110,6 +117,49 @@ namespace FreeAIr.UI.ViewModels
             }
         }
 
+        public bool IsEnabledPrompt
+        {
+            get
+            {
+                return
+                    _selectedChat is not null
+                    && _selectedChat.Chat.Status.In(ChatPromptStatusEnum.Completed)
+                    ;
+            }
+        }
+
+        public string PromptText
+        {
+            get => _promptText;
+            set => _promptText = value;
+        }
+
+        public ICommand CreatePromptCommand
+        {
+            get
+            {
+                if (_createPromptCommand == null)
+                {
+                    _createPromptCommand = new RelayCommand(
+                        a =>
+                        {
+                            _selectedChat.Chat.AddPrompt(
+                                UserPrompt.CreateTextBasedPrompt(
+                                    PromptText
+                                    )
+                                );
+
+                            PromptText = string.Empty;
+                            OnPropertyChanged();
+                        }
+                        );
+                }
+
+                return _createPromptCommand;
+            }
+        }
+
+
         [ImportingConstructor]
         public ChatListViewModel(
             ChatContainer chatContainer
@@ -173,6 +223,15 @@ namespace FreeAIr.UI.ViewModels
                 );
         }
 
+        private void RaiseMarkdownReReadEvent()
+        {
+            var e = MarkdownReReadEvent;
+            if (e is not null)
+            {
+                e(this, new EventArgs());
+            }
+        }
+
         public sealed class ChatWrapper : BaseViewModel
         {
             public Chat Chat
@@ -233,4 +292,6 @@ namespace FreeAIr.UI.ViewModels
             }
         }
     }
+
+    public delegate void MarkdownReReadDelegate(object sender, EventArgs e);
 }

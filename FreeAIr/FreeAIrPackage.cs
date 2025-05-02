@@ -55,8 +55,6 @@ namespace FreeAIr
             //load dlls manually, for unknown reason these dlls does not loaded automatically
             Assembly a1 = Assembly.LoadFrom("MdXaml.dll");
             AppDomain.CurrentDomain.Load(a1.FullName);
-            Assembly a2 = Assembly.LoadFrom("Microsoft.Bcl.AsyncInterfaces.dll");
-            AppDomain.CurrentDomain.Load(a2.FullName);
 
             ResponsePage.LoadOrUpdateMarkdownStyles();
 

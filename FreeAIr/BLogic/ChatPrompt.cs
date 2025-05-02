@@ -63,6 +63,10 @@ namespace FreeAIr.BLogic
         {
             File.AppendAllText(
                 _resultFilePath,
+                Environment.NewLine + Environment.NewLine
+                );
+            File.AppendAllText(
+                _resultFilePath,
                 "> Prompt:" + Environment.NewLine
                 );
             File.AppendAllText(

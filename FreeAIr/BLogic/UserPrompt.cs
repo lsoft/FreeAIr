@@ -4,6 +4,7 @@ using FreeAIr.Helper;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -37,7 +38,7 @@ namespace FreeAIr.BLogic
 
             Kind = kind;
             UserPromptBody = userPromptBody;
-            PromptBody = Kind.AsPromptString() + Environment.NewLine + UserPromptBody; ;
+            PromptBody = Kind.AsPromptString() + Environment.NewLine + UserPromptBody;
         }
 
 
@@ -86,7 +87,7 @@ namespace FreeAIr.BLogic
 #21 Then output the code in a single code block.
 #22 Minimize any other prose.
 #23 Keep your answers short and impersonal.
-#24 Make sure to include the programming language name at the start of the Markdown code blocks.
+#24 Make sure to include the programming language name at the start of the Markdown code blocks, if you is asked to answer in Markdown format.
 #25 Avoid wrapping the whole response in triple backticks.
 #26 The user works in an IDE called Visual Studio Code which has a concept for editors with open files, integrated unit test support, an output pane that shows the output of running the code as well as an integrated terminal.
 #27 The active document is the source code the user is looking at right now.
@@ -98,9 +99,7 @@ namespace FreeAIr.BLogic
 
             rules = string.Format(
                 rules,
-                string.IsNullOrEmpty(ResponsePage.Instance.OverriddenCulture)
-                    ? CultureInfo.CurrentUICulture.Name
-                    : ResponsePage.Instance.OverriddenCulture,
+                ResponsePage.GetAnswerCulture(),
                 respondFormat
                 );
             return rules;
@@ -108,22 +107,24 @@ namespace FreeAIr.BLogic
 
         public static UserPrompt CreateCodeBasedPrompt(
             ChatKindEnum kind,
+            string userCodeFileName,
             string userCode
             )
         {
+            var fi = new FileInfo(userCodeFileName);
+
             return new UserPrompt(
                 kind,
-                "```" + Environment.NewLine + userCode + Environment.NewLine + "```"
+                "```" + LanguageHelper.GetMarkdownLanguageCodeBlockNameBasedOnFileExtension(fi.Extension) + Environment.NewLine + userCode + Environment.NewLine + "```"
                 );
         }
 
         public static UserPrompt CreateTextBasedPrompt(
-            ChatKindEnum kind,
             string userPrompt
             )
         {
             return new UserPrompt(
-                kind,
+                ChatKindEnum.Discussion,
                 userPrompt
                 );
         }

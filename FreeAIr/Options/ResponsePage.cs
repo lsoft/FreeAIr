@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel;
+using System.Globalization;
 
 namespace FreeAIr
 {
@@ -37,7 +38,8 @@ namespace FreeAIr
             {
                 _xshdProviders = value;
 
-                LoadOrUpdateMarkdownStyles();
+                //Task.Run(LoadOrUpdateMarkdownStyles)
+                //    .FileAndForget(nameof(LoadOrUpdateMarkdownStyles));
             }
         }
 
@@ -46,6 +48,14 @@ namespace FreeAIr
         [Description("If your preferred AI answers culture is differ of your VS UI culture, then use this option to override AI answer culture.")]
         [DefaultValue("")]
         public string OverriddenCulture { get; set; } = "";
+
+        public static string GetAnswerCulture()
+        {
+            return
+                string.IsNullOrEmpty(ResponsePage.Instance.OverriddenCulture)
+                    ? CultureInfo.CurrentUICulture.Name
+                    : ResponsePage.Instance.OverriddenCulture;
+        }
 
         public static void LoadOrUpdateMarkdownStyles()
         {
