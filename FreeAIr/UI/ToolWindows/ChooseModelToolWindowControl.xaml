@@ -9,6 +9,7 @@
     xmlns:util="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Utilities"
     xmlns:catalog="clr-namespace:Microsoft.VisualStudio.Imaging;assembly=Microsoft.VisualStudio.ImageCatalog"
     xmlns:toolkit="clr-namespace:Community.VisualStudio.Toolkit;assembly=Community.VisualStudio.Toolkit"
+    xmlns:resources="clr-namespace:FreeAIr.Resources"
     toolkit:Themes.UseVsTheme="True"
     mc:Ignorable="d"
     d:DesignHeight="300"
@@ -32,13 +33,13 @@
 
             <Button
                 Margin="2"
-                Content="Reload..."
+                Content="{x:Static resources:Resources.UI_Reload}"
                 Command="{Binding ReloadListCommand}"
                 />
 
             <CheckBox
                 Margin="2"
-                Content="Load only free models"
+                Content="{x:Static resources:Resources.UI_LoadOnlyFreeModels}"
                 IsChecked="{Binding LoadFreeModels}"
                 VerticalAlignment="Center"
                 VerticalContentAlignment="Center"
@@ -81,7 +82,7 @@
 
             <Button
                 Margin="2"
-                Content="Choose"
+                Content="{x:Static resources:Resources.UI_Choose}"
                 Command="{Binding ChooseCommand}"
                 />
 

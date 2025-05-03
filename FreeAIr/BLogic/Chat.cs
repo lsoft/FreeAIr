@@ -114,7 +114,7 @@ namespace FreeAIr.BLogic
                 return ReadResponseFile();
             }
 
-            return "Chat is not started yet. Please wait for completion.";
+            return "Chat is not started yet.";
         }
 
         public async Task StopAsync()
@@ -161,52 +161,36 @@ namespace FreeAIr.BLogic
                     "> Answer:" + Environment.NewLine
                     );
 
-                Status = ChatStatusEnum.WaitForAnswer;
+                Status = ChatStatusEnum.WaitingForAnswer;
 
                 var cancellationToken = _cancellationTokenSource.Token;
 
 
-                //                File.AppendAllText(_resultFilePath, @"
-                //> Prompt:
-                //>
-                //> Show me some C# code, please!
+//                File.AppendAllText(ResultFilePath, @"
+//# Header
 
+//Text.
 
-                //sds;kjnhfndsglkjn
+//```csharp
+//        //comment comment
+//        //and again
+//        public static int IndexOf<T>(this T[] array, T value)
+//            where T : IComparable
+//        {
+//            for (var c = 0; c < array.Length; c++)
+//            {
+//                if (array[c].CompareTo(value) == 0)
+//                {
+//                    return c;
+//                }
+//            }
 
-                //as;fdfgkjhjfdjk
-
-                //alkfsjdghlkjfgh
-
-                //> Prompt:
-                //Show me some C# code, please!
-
-
-                //> Answer:
-                //# Header
-
-                //Text.
-
-                //```csharp
-                //        //comment comment
-                //        //and again
-                //        public static int IndexOf<T>(this T[] array, T value)
-                //            where T : IComparable
-                //        {
-                //            for (var c = 0; c < array.Length; c++)
-                //            {
-                //                if (array[c].CompareTo(value) == 0)
-                //                {
-                //                    return c;
-                //                }
-                //            }
-
-                //            return -1;
-                //        }
-                //```
-                //");
-                //                Status = ChatPromptStatusEnum.Completed;
-                //                return;
+//            return -1;
+//        }
+//```
+//");
+//                Status = ChatStatusEnum.Ready;
+//                return;
 
 
                 var chatMessages = new List<ChatMessage>(_prompts.Count + 1);
@@ -238,7 +222,7 @@ namespace FreeAIr.BLogic
 
                         File.AppendAllText(ResultFilePath, contentPart.Text);
 
-                        Status = ChatStatusEnum.ReadAnswer;
+                        Status = ChatStatusEnum.ReadingAnswer;
 
                         if (cancellationToken.IsCancellationRequested)
                         {
@@ -248,7 +232,7 @@ namespace FreeAIr.BLogic
                     }
                 }
 
-                Status = ChatStatusEnum.Completed;
+                Status = ChatStatusEnum.Ready;
             }
             catch (OperationCanceledException)
             {
@@ -313,12 +297,12 @@ namespace FreeAIr.BLogic
             get;
         }
 
-        public string FileName
+        public string? FileName
         {
             get;
         }
 
-        public ChatDescription(ChatKindEnum kind, string fileName)
+        public ChatDescription(ChatKindEnum kind, string? fileName)
         {
             Kind = kind;
             FileName = fileName;
@@ -343,9 +327,9 @@ namespace FreeAIr.BLogic
     public enum ChatStatusEnum
     {
         NotStarted,
-        WaitForAnswer,
-        ReadAnswer,
-        Completed,
+        WaitingForAnswer,
+        ReadingAnswer,
+        Ready,
         Cancelled,
         Failed
     }

@@ -111,6 +111,16 @@
           <ButtonText>Generate code...</ButtonText>
         </Strings>
       </Button>-->
+
+      <Button guid="FreeAIr" id="StartDiscussionCommandId" priority="0x0100" type="Button">
+        <Parent guid="FreeAIr" id="SourceCodeContextGroup" />
+        <Icon guid="ImageCatalogGuid" id="UserTask" />
+        <CommandFlag>IconIsMoniker</CommandFlag>
+        <Strings>
+          <ButtonText>Start discussion...</ButtonText>
+        </Strings>
+      </Button>
+
     </Buttons>
   </Commands>
 
@@ -133,7 +143,8 @@
       <!--<IDSymbol name="FreeAIrCodeGenCommandId" value="0x1026"/>-->
       <IDSymbol name="FreeAIrChooseModelCommandId" value="0x1027" />
       <IDSymbol name="OpenChatListToolWindowCommandId" value="0x1028" />
-      
+      <IDSymbol name="StartDiscussionCommandId" value="0x1029" />
+
     </GuidSymbol>
   </Symbols>
 </CommandTable>

@@ -1,5 +1,6 @@
 ﻿using EnvDTE;
 using FreeAIr.BLogic;
+using FreeAIr.Commands;
 using FreeAIr.Helper;
 using System;
 using System.Collections.Generic;
@@ -23,6 +24,8 @@ namespace FreeAIr.UI.ViewModels
         private ICommand _removeCommand;
         private ICommand _stopCommand;
         private ICommand _createPromptCommand;
+        private ICommand _startDiscussionCommand;
+
         private string _promptText;
 
         public event MarkdownReReadDelegate MarkdownReReadEvent;
@@ -69,7 +72,7 @@ namespace FreeAIr.UI.ViewModels
                         {
                             await VS.Documents.OpenAsync(_selectedChat.Chat.ResultFilePath);
                         },
-                        a => _selectedChat is not null && _selectedChat.Chat.Status == ChatStatusEnum.Completed
+                        a => _selectedChat is not null && _selectedChat.Chat.Status == ChatStatusEnum.Ready
                         );
                 }
 
@@ -89,7 +92,7 @@ namespace FreeAIr.UI.ViewModels
                             _chatContainer.RemoveChatAsync(_selectedChat.Chat)
                                 .FileAndForget(nameof(ChatContainer.RemoveChatAsync));
                         },
-                        a => _selectedChat is not null && _selectedChat.Chat.Status == ChatStatusEnum.Completed
+                        a => _selectedChat is not null && _selectedChat.Chat.Status.In(ChatStatusEnum.Failed, ChatStatusEnum.NotStarted, ChatStatusEnum.Cancelled, ChatStatusEnum.Ready)
                         );
                 }
 
@@ -109,11 +112,33 @@ namespace FreeAIr.UI.ViewModels
                             _chatContainer.StopChatAsync(_selectedChat.Chat)
                                 .FileAndForget(nameof(ChatContainer.StopChatAsync));
                         },
-                        a => _selectedChat is not null && _selectedChat.Chat.Status.In(ChatStatusEnum.WaitForAnswer, ChatStatusEnum.ReadAnswer)
+                        a => _selectedChat is not null && _selectedChat.Chat.Status.In(ChatStatusEnum.WaitingForAnswer, ChatStatusEnum.ReadingAnswer)
                         );
                 }
 
                 return _stopCommand;
+            }
+        }
+        
+
+        public ICommand StartDiscussionCommand
+        {
+            get
+            {
+                if (_startDiscussionCommand == null)
+                {
+                    _startDiscussionCommand = new RelayCommand(
+                        a =>
+                        {
+                            _chatContainer.StartChat(
+                                new ChatDescription(ChatKindEnum.Discussion, null),
+                                null
+                                );
+                        }
+                        );
+                }
+
+                return _startDiscussionCommand;
             }
         }
 
@@ -123,7 +148,7 @@ namespace FreeAIr.UI.ViewModels
             {
                 return
                     _selectedChat is not null
-                    && _selectedChat.Chat.Status.In(ChatStatusEnum.Completed)
+                    && _selectedChat.Chat.Status.In(ChatStatusEnum.NotStarted, ChatStatusEnum.Ready)
                     ;
             }
         }
@@ -215,12 +240,12 @@ namespace FreeAIr.UI.ViewModels
 
         private void UpdateControl()
         {
-            SelectedChat = null;
-
             ChatList.Clear();
             ChatList.AddRange(
                 _chatContainer.Chats.Reverse().Select(t => new ChatWrapper(t))
                 );
+
+            SelectedChat = ChatList.FirstOrDefault();
         }
 
         private void RaiseMarkdownReReadEvent()
@@ -251,7 +276,7 @@ namespace FreeAIr.UI.ViewModels
             {
                 get
                 {
-                    return Chat.Description.FileName;
+                    return Chat.Description?.FileName ?? string.Empty;
                 }
             }
 

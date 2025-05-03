@@ -1,4 +1,6 @@
-﻿using FreeAIr.BLogic;
+﻿using EnvDTE;
+using EnvDTE80;
+using FreeAIr.BLogic;
 using FreeAIr.Helper;
 using OpenAI;
 using OpenAI.Chat;
@@ -22,6 +24,8 @@ namespace FreeAIr.BLogic
 
         private readonly UIInformer _uIInformer;
         private readonly List<Chat> _chats = new();
+        
+        private readonly DTEEvents _dteEvents;
 
         public IReadOnlyList<Chat> Chats => _chats;
 
@@ -39,13 +43,22 @@ namespace FreeAIr.BLogic
             }
 
             _uIInformer = uiInformer;
+
+            var dte = AsyncPackage.GetGlobalService(typeof(EnvDTE.DTE)) as DTE2;
+            _dteEvents = ((Events2)dte.Events).DTEEvents;
+            _dteEvents.OnBeginShutdown += DTEEvents_OnBeginShutdown;
         }
 
         public void StartChat(
             ChatDescription kind,
-            UserPrompt prompt
+            UserPrompt? prompt
             )
         {
+            if (kind is null)
+            {
+                throw new ArgumentNullException(nameof(kind));
+            }
+
             var chat = new Chat(
                 kind
                 );
@@ -54,13 +67,18 @@ namespace FreeAIr.BLogic
             lock (_locker)
             {
                 _chats.Add(chat);
-                FireChatCollection();
+                FireChatCollectionChanged();
             }
 
-            chat.AddPrompt(prompt);
+            if (prompt is not null)
+            {
+                chat.AddPrompt(prompt);
+            }
         }
 
-        public async Task RemoveChatAsync(Chat chat)
+        public async Task RemoveChatAsync(
+            Chat chat
+            )
         {
             if (chat is null)
             {
@@ -79,10 +97,23 @@ namespace FreeAIr.BLogic
             lock (_locker)
             {
                 _chats.Remove(chat);
-                FireChatCollection();
+                FireChatCollectionChanged();
             }
 
             chat.Dispose();
+        }
+
+
+        private void RemoveAllChats()
+        {
+            ThreadHelper.JoinableTaskFactory.RunAsync(
+                async () =>
+                {
+                    while (_chats.Count > 0)
+                    {
+                        await RemoveChatAsync(_chats[0]);
+                    }
+                }).FileAndForget(nameof(RemoveAllChats));
         }
 
         public async Task StopChatAsync(
@@ -117,7 +148,7 @@ namespace FreeAIr.BLogic
 
         private void ChatStatusChanged(object sender, ChatEventArgs ea)
         {
-            var anyIsInProgress = _chats.Any(c => c.Status.In(ChatStatusEnum.WaitForAnswer, ChatStatusEnum.ReadAnswer));
+            var anyIsInProgress = _chats.Any(c => c.Status.In(ChatStatusEnum.WaitingForAnswer, ChatStatusEnum.ReadingAnswer));
             if (anyIsInProgress)
             {
                 _uIInformer.UpdateUIStatusAsync(ChatsStatusEnum.Working);
@@ -127,10 +158,10 @@ namespace FreeAIr.BLogic
                 _uIInformer.UpdateUIStatusAsync(ChatsStatusEnum.Idle);
             }
 
-            FireChatEvent(ea);
+            FireChatStatusChanged(ea);
         }
 
-        private void FireChatCollection()
+        private void FireChatCollectionChanged()
         {
             var e = ChatCollectionChangedEvent;
             if (e is not null)
@@ -139,13 +170,18 @@ namespace FreeAIr.BLogic
             }
         }
         
-        private void FireChatEvent(ChatEventArgs ea)
+        private void FireChatStatusChanged(ChatEventArgs ea)
         {
             var e = ChatStatusChangedEvent;
             if (e is not null)
             {
                 e(this, ea);
             }
+        }
+
+        private void DTEEvents_OnBeginShutdown()
+        {
+            RemoveAllChats();
         }
 
     }

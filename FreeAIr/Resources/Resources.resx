@@ -129,4 +129,25 @@
   <data name="ChatKindEnum_OptimizeCode" xml:space="preserve">
     <value>Optimize the following code:</value>
   </data>
+  <data name="UI_Choose" xml:space="preserve">
+    <value>Choose</value>
+  </data>
+  <data name="UI_LoadOnlyFreeModels" xml:space="preserve">
+    <value>Load only free models</value>
+  </data>
+  <data name="UI_OpenInEditor" xml:space="preserve">
+    <value>Open in main editor...</value>
+  </data>
+  <data name="UI_Reload" xml:space="preserve">
+    <value>Reload...</value>
+  </data>
+  <data name="UI_RemoveChat" xml:space="preserve">
+    <value>Remove chat</value>
+  </data>
+  <data name="UI_StartDiscussion" xml:space="preserve">
+    <value>Start chat...</value>
+  </data>
+  <data name="UI_StopWaiting" xml:space="preserve">
+    <value>Stop</value>
+  </data>
 </root>

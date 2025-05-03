@@ -22,7 +22,7 @@ namespace FreeAIr.Resources {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    internal class Resources {
+    public class Resources {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
@@ -36,7 +36,7 @@ namespace FreeAIr.Resources {
         ///   Returns the cached ResourceManager instance used by this class.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Resources.ResourceManager ResourceManager {
+        public static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
                     global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("FreeAIr.Resources.Resources", typeof(Resources).Assembly);
@@ -51,7 +51,7 @@ namespace FreeAIr.Resources {
         ///   resource lookups using this strongly typed resource class.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Globalization.CultureInfo Culture {
+        public static global::System.Globalization.CultureInfo Culture {
             get {
                 return resourceCulture;
             }
@@ -63,7 +63,7 @@ namespace FreeAIr.Resources {
         /// <summary>
         ///   Looks up a localized string similar to Add comments that match the following code:.
         /// </summary>
-        internal static string ChatKindEnum_AddComments {
+        public static string ChatKindEnum_AddComments {
             get {
                 return ResourceManager.GetString("ChatKindEnum_AddComments", resourceCulture);
             }
@@ -72,7 +72,7 @@ namespace FreeAIr.Resources {
         /// <summary>
         ///   Looks up a localized string similar to Complete the following code according its comments:.
         /// </summary>
-        internal static string ChatKindEnum_CompleteCodeAccordingComments {
+        public static string ChatKindEnum_CompleteCodeAccordingComments {
             get {
                 return ResourceManager.GetString("ChatKindEnum_CompleteCodeAccordingComments", resourceCulture);
             }
@@ -81,7 +81,7 @@ namespace FreeAIr.Resources {
         /// <summary>
         ///   Looks up a localized string similar to Explain the following code:.
         /// </summary>
-        internal static string ChatKindEnum_ExplainCode {
+        public static string ChatKindEnum_ExplainCode {
             get {
                 return ResourceManager.GetString("ChatKindEnum_ExplainCode", resourceCulture);
             }
@@ -90,9 +90,72 @@ namespace FreeAIr.Resources {
         /// <summary>
         ///   Looks up a localized string similar to Optimize the following code:.
         /// </summary>
-        internal static string ChatKindEnum_OptimizeCode {
+        public static string ChatKindEnum_OptimizeCode {
             get {
                 return ResourceManager.GetString("ChatKindEnum_OptimizeCode", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Choose.
+        /// </summary>
+        public static string UI_Choose {
+            get {
+                return ResourceManager.GetString("UI_Choose", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Load only free models.
+        /// </summary>
+        public static string UI_LoadOnlyFreeModels {
+            get {
+                return ResourceManager.GetString("UI_LoadOnlyFreeModels", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Open in main editor....
+        /// </summary>
+        public static string UI_OpenInEditor {
+            get {
+                return ResourceManager.GetString("UI_OpenInEditor", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Reload....
+        /// </summary>
+        public static string UI_Reload {
+            get {
+                return ResourceManager.GetString("UI_Reload", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Remove chat.
+        /// </summary>
+        public static string UI_RemoveChat {
+            get {
+                return ResourceManager.GetString("UI_RemoveChat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Start chat....
+        /// </summary>
+        public static string UI_StartDiscussion {
+            get {
+                return ResourceManager.GetString("UI_StartDiscussion", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Stop.
+        /// </summary>
+        public static string UI_StopWaiting {
+            get {
+                return ResourceManager.GetString("UI_StopWaiting", resourceCulture);
             }
         }
     }

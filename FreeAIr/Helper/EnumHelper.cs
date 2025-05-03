@@ -59,11 +59,11 @@ namespace FreeAIr.Helper
             {
                 case ChatStatusEnum.NotStarted:
                     return "Not started";
-                case ChatStatusEnum.WaitForAnswer:
+                case ChatStatusEnum.WaitingForAnswer:
                     return "Waiting for answer";
-                case ChatStatusEnum.ReadAnswer:
+                case ChatStatusEnum.ReadingAnswer:
                     return "Reading answer";
-                case ChatStatusEnum.Completed:
+                case ChatStatusEnum.Ready:
                     return "Completed";
                 case ChatStatusEnum.Cancelled:
                     return "Cancelled";

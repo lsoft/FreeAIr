@@ -9,6 +9,7 @@
     xmlns:util="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Utilities"
     xmlns:catalog="clr-namespace:Microsoft.VisualStudio.Imaging;assembly=Microsoft.VisualStudio.ImageCatalog"
     xmlns:toolkit="clr-namespace:Community.VisualStudio.Toolkit;assembly=Community.VisualStudio.Toolkit"
+    xmlns:resources="clr-namespace:FreeAIr.Resources"
     xmlns:mdxaml="https://github.com/whistyun/MdXaml"
     xmlns:plugins="clr-namespace:MdXaml.Plugins;assembly=MdXaml.Plugins"
     toolkit:Themes.UseVsTheme="True"
@@ -35,34 +36,42 @@
             Grid.Row="0"
             Grid.Column="0"
             Grid.ColumnSpan="3"
-            HorizontalAlignment="Left"
+            HorizontalAlignment="Stretch"
             >
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="auto"/>
                 <ColumnDefinition Width="auto"/>
                 <ColumnDefinition Width="auto"/>
+                <ColumnDefinition />
             </Grid.ColumnDefinitions>
 
             <Button
                 Grid.Column="0"
                 Margin="2"
-                Content="Open in editor..."
+                Content="{x:Static resources:Resources.UI_OpenInEditor}"
                 x:Name="OpenAsMdButton"
                 Command="{Binding OpenInEditorCommand}"
                 />
             <Button
                 Grid.Column="1"
                 Margin="2"
-                Content="Remove"
+                Content="{x:Static resources:Resources.UI_RemoveChat}"
                 Command="{Binding RemoveCommand}"
                 />
             <Button
                 Grid.Column="2"
                 Margin="2"
-                Content="Stop"
+                Content="{x:Static resources:Resources.UI_StopWaiting}"
                 Command="{Binding StopCommand}"
                 />
 
+            <Button
+                Grid.Column="3"
+                Margin="2"
+                Content="{x:Static resources:Resources.UI_StartDiscussion}"
+                HorizontalAlignment="Right"
+                Command="{Binding StartDiscussionCommand}"
+                />
         </Grid>
 
         <ListBox
@@ -81,7 +90,7 @@
                     <StackPanel
                         >
                         <StackPanel.InputBindings>
-                            <MouseBinding Gesture="LeftDoubleClick" Command="{Binding ElementName=ChatListToolWindow, Path=DataContext.OpenAsMdCommand}"/>
+                            <MouseBinding Gesture="LeftDoubleClick" Command="{Binding ElementName=ChatListToolWindow, Path=DataContext.OpenInEditorCommand}"/>
                         </StackPanel.InputBindings>
                         <TextBlock
                             Text="{Binding Path=FirstRow, Mode=OneWay}"

@@ -33,5 +33,6 @@ namespace FreeAIr
         public const int FreeAIrCompleteCodeCommandId = 0x1025;
         public const int FreeAIrChooseModelCommandId = 0x1027;
         public const int OpenChatListToolWindowCommandId = 0x1028;
+        public const int StartDiscussionCommandId = 0x1029;
     }
 }
