@@ -129,6 +129,15 @@
   <data name="ChatKindEnum_OptimizeCode" xml:space="preserve">
     <value>Optimize the following code:</value>
   </data>
+  <data name="Code_NoSelectedCode" xml:space="preserve">
+    <value>Cannot obtain selected block of code.</value>
+  </data>
+  <data name="Code_NoToken" xml:space="preserve">
+    <value>Please setup API endpoint and access token in Tools -&gt; Options -&gt; FreeAIr page.</value>
+  </data>
+  <data name="Error" xml:space="preserve">
+    <value>Error</value>
+  </data>
   <data name="UI_Choose" xml:space="preserve">
     <value>Choose</value>
   </data>

@@ -129,6 +129,15 @@
   <data name="ChatKindEnum_OptimizeCode" xml:space="preserve">
     <value>Оптимизируй следующий код:</value>
   </data>
+  <data name="Code_NoSelectedCode" xml:space="preserve">
+    <value>Не могу получить выделенный блок кода.</value>
+  </data>
+  <data name="Code_NoToken" xml:space="preserve">
+    <value>Пожалуйста, задайте ендпоинт API и токен доступа в настройках Visual Studio на странице FreeAIr.</value>
+  </data>
+  <data name="Error" xml:space="preserve">
+    <value>Ошибка</value>
+  </data>
   <data name="UI_Choose" xml:space="preserve">
     <value>Выбрать</value>
   </data>

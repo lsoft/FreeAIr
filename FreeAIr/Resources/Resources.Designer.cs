@@ -97,6 +97,33 @@ namespace FreeAIr.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Cannot obtain selected block of code..
+        /// </summary>
+        public static string Code_NoSelectedCode {
+            get {
+                return ResourceManager.GetString("Code_NoSelectedCode", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Please setup API endpoint and access token in Tools -&gt; Options -&gt; FreeAIr page..
+        /// </summary>
+        public static string Code_NoToken {
+            get {
+                return ResourceManager.GetString("Code_NoToken", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Error.
+        /// </summary>
+        public static string Error {
+            get {
+                return ResourceManager.GetString("Error", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Choose.
         /// </summary>
         public static string UI_Choose {

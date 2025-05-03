@@ -32,15 +32,24 @@ namespace FreeAIr.Commands
         {
             await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
 
+            if (string.IsNullOrEmpty(ApiPage.Instance.Token))
+            {
+                await VS.MessageBox.ShowErrorAsync(
+                    Resources.Resources.Error,
+                    Resources.Resources.Code_NoToken
+                    );
+                return;
+            }
+
             var componentModel = (IComponentModel)await FreeAIrPackage.Instance.GetServiceAsync(typeof(SComponentModel));
             var chatContainer = componentModel.GetService<ChatContainer>();
 
             var (fileName, selectedCode) = await DocumentHelper.GetSelectedTextAsync();
             if (fileName is null || string.IsNullOrEmpty(selectedCode))
             {
-                await VS.MessageBox.ShowWarningAsync(
-                    "Error",
-                    "Cannot obtain selected block of code"
+                await VS.MessageBox.ShowErrorAsync(
+                    Resources.Resources.Error,
+                    Resources.Resources.Code_NoSelectedCode
                     );
                 return;
             }
