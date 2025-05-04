@@ -126,6 +126,9 @@
   <data name="ChatKindEnum_ExplainCode" xml:space="preserve">
     <value>Объясни как работает следующий код:</value>
   </data>
+  <data name="ChatKindEnum_GenerateCommitMessage" xml:space="preserve">
+    <value>Создай описание камита по нижеследующим правкам. Дай в своем ответе только commit message без дополнительной информации. Не оборачивай весь свой ответ в любые кавычки.</value>
+  </data>
   <data name="ChatKindEnum_OptimizeCode" xml:space="preserve">
     <value>Оптимизируй следующий код:</value>
   </data>
@@ -138,6 +141,9 @@
   <data name="Error" xml:space="preserve">
     <value>Ошибка</value>
   </data>
+  <data name="UI_Answer" xml:space="preserve">
+    <value>Ответ</value>
+  </data>
   <data name="UI_Choose" xml:space="preserve">
     <value>Выбрать</value>
   </data>
@@ -146,6 +152,9 @@
   </data>
   <data name="UI_OpenInEditor" xml:space="preserve">
     <value>Открыть в основном редакторе...</value>
+  </data>
+  <data name="UI_Prompt" xml:space="preserve">
+    <value>Запрос</value>
   </data>
   <data name="UI_Reload" xml:space="preserve">
     <value>Перезагрузить...</value>

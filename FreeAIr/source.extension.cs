@@ -12,7 +12,7 @@ namespace FreeAIr
         public const string Name = "FreeAIr";
         public const string Description = @"Access for AI for free for anyone.";
         public const string Language = "en-US";
-        public const string Version = "1.0.1";
+        public const string Version = "1.1";
         public const string Author = "lsoft";
         public const string Tags = "ai llm";
         public const bool IsPreview = false;

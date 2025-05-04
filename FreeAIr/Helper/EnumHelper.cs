@@ -19,6 +19,7 @@ namespace FreeAIr.Helper
                 case ChatKindEnum.AddComments:
                 case ChatKindEnum.OptimizeCode:
                 case ChatKindEnum.CompleteCodeAccordingComments:
+                case ChatKindEnum.GenerateCommitMessage:
                     return FreeAIr.Resources.Resources.ResourceManager.GetString(
                         nameof(ChatKindEnum) + "_" + kind.ToString(),
                         ResponsePage.GetAnswerCulture()
@@ -46,6 +47,8 @@ namespace FreeAIr.Helper
                     return "Complete the code according to the comments";
                 case ChatKindEnum.Discussion:
                     return "Discussion";
+                case ChatKindEnum.GenerateCommitMessage:
+                    return "Commit message";
                 default:
                     return taskKind.ToString();
             }

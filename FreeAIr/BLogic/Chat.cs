@@ -2,7 +2,6 @@
 using FreeAIr.BLogic;
 using FreeAIr.Helper;
 using Microsoft.VisualStudio.Threading;
-using Newtonsoft.Json.Linq;
 using OpenAI;
 using OpenAI.Chat;
 using System;
@@ -23,7 +22,7 @@ namespace FreeAIr.BLogic
         private readonly List<UserPrompt> _prompts = new();
 
         private readonly CancellationTokenSource _cancellationTokenSource = new();
-
+        private readonly Action<Chat, Answer> _promptAnsweredCallBack;
         private Task? _task;
 
 
@@ -62,7 +61,8 @@ namespace FreeAIr.BLogic
         }
 
         public Chat(
-            ChatDescription description
+            ChatDescription description,
+            Action<Chat, Answer> promptAnsweredCallBack = null
             )
         {
             if (description is null)
@@ -71,6 +71,7 @@ namespace FreeAIr.BLogic
             }
 
             Description = description;
+            _promptAnsweredCallBack = promptAnsweredCallBack;
 
             _status = ChatStatusEnum.NotStarted;
 
@@ -104,7 +105,7 @@ namespace FreeAIr.BLogic
 
             _prompts.Add(userPrompt);
 
-            _task = Task.Run(AskPromptAndReceiveAnswer);
+            _task = Task.Run(() => AskPromptAndReceiveAnswer(userPrompt));
         }
 
         public string ReadResponse()
@@ -140,8 +141,22 @@ namespace FreeAIr.BLogic
         }
 
 
-        private void AskPromptAndReceiveAnswer()
+        private void AskPromptAndReceiveAnswer(UserPrompt userPrompt)
         {
+            var answer = AskAndWaitForAnswerInternal(userPrompt);
+
+            if (_promptAnsweredCallBack is not null)
+            {
+                _promptAnsweredCallBack(this, answer);
+            }
+        }
+
+        private Answer AskAndWaitForAnswerInternal(UserPrompt userPrompt)
+        {
+            var cancellationToken = _cancellationTokenSource.Token;
+
+            var answer = new Answer(ResultFilePath);
+
             try
             {
                 File.AppendAllText(
@@ -150,7 +165,7 @@ namespace FreeAIr.BLogic
                     );
                 File.AppendAllText(
                     ResultFilePath,
-                    "> Prompt:" + Environment.NewLine
+                    $"> {Resources.Resources.ResourceManager.GetString("UI_Prompt", ResponsePage.GetAnswerCulture())}:" + Environment.NewLine
                     );
                 File.AppendAllText(
                     ResultFilePath,
@@ -158,47 +173,17 @@ namespace FreeAIr.BLogic
                     );
                 File.AppendAllText(
                     ResultFilePath,
-                    "> Answer:" + Environment.NewLine
+                    $"> {Resources.Resources.ResourceManager.GetString("UI_Answer", ResponsePage.GetAnswerCulture())}:" + Environment.NewLine
                     );
 
                 Status = ChatStatusEnum.WaitingForAnswer;
 
-                var cancellationToken = _cancellationTokenSource.Token;
-
-
-//                File.AppendAllText(ResultFilePath, @"
-//# Header
-
-//Text.
-
-//```csharp
-//        //comment comment
-//        //and again
-//        public static int IndexOf<T>(this T[] array, T value)
-//            where T : IComparable
-//        {
-//            for (var c = 0; c < array.Length; c++)
-//            {
-//                if (array[c].CompareTo(value) == 0)
-//                {
-//                    return c;
-//                }
-//            }
-
-//            return -1;
-//        }
-//```
-//");
-//                Status = ChatStatusEnum.Ready;
-//                return;
-
-
                 var chatMessages = new List<ChatMessage>(_prompts.Count + 1);
-                chatMessages.Add(new UserChatMessage(UserPrompt.BuildRulesSection()));
+                chatMessages.Add(new UserChatMessage(userPrompt.BuildRulesSection()));
                 chatMessages.AddRange(
-                    _prompts
-                    .ConvertAll(p => new UserChatMessage(p.PromptBody))
+                    _prompts.ConvertAll(p => new UserChatMessage(p.PromptBody))
                     );
+                //chatMessages.Add(new UserChatMessage("You must respond in ru-RU culture"));
 
                 var completionUpdates = _chatClient.CompleteChatStreaming(
                     messages: chatMessages,
@@ -208,9 +193,9 @@ namespace FreeAIr.BLogic
                 {
                     if (completionUpdate.CompletionId is null)
                     {
-                        File.AppendAllText(ResultFilePath, "Error reading answer (out of limit for free account?).");
+                        answer.Append("Error reading answer (out of limit for free account?).");
                         Status = ChatStatusEnum.Failed;
-                        return;
+                        return answer;
                     }
 
                     foreach (ChatMessageContentPart contentPart in completionUpdate.ContentUpdate)
@@ -220,14 +205,14 @@ namespace FreeAIr.BLogic
                             continue;
                         }
 
-                        File.AppendAllText(ResultFilePath, contentPart.Text);
+                        answer.Append(contentPart.Text);
 
                         Status = ChatStatusEnum.ReadingAnswer;
 
                         if (cancellationToken.IsCancellationRequested)
                         {
                             Status = ChatStatusEnum.Cancelled;
-                            return;
+                            return answer;
                         }
                     }
                 }
@@ -241,12 +226,14 @@ namespace FreeAIr.BLogic
             }
             catch (Exception excp)
             {
-                Status = ChatStatusEnum.Failed;
+                answer.Append(excp.Message + Environment.NewLine + "```" + Environment.NewLine + excp.StackTrace + Environment.NewLine + "```");
 
-                File.AppendAllText(ResultFilePath, excp.Message + Environment.NewLine + "```" + Environment.NewLine + excp.StackTrace + Environment.NewLine + "```");
+                Status = ChatStatusEnum.Failed;
 
                 //todo
             }
+
+            return answer;
         }
 
         private string ReadResponseFile()
@@ -287,7 +274,35 @@ namespace FreeAIr.BLogic
         AddComments,
         OptimizeCode,
         CompleteCodeAccordingComments,
-        Discussion
+        Discussion,
+        GenerateCommitMessage
+    }
+
+    public sealed class Answer
+    {
+        private readonly StringBuilder _result = new();
+
+        public string ResultFilePath
+        {
+            get;
+        }
+
+        public Answer(string resultFilePath)
+        {
+            ResultFilePath = resultFilePath;
+        }
+
+        public void Append(string contentPart)
+        {
+            _result.Append(contentPart);
+            File.AppendAllText(ResultFilePath, contentPart);
+
+        }
+
+        public string GetAnswer()
+        {
+            return _result.ToString();
+        }
     }
 
     public sealed class ChatDescription

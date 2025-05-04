@@ -2,7 +2,7 @@
 
 [Эта страница на русском языке](https://translate.google.com/translate?sl=en&tl=ru&hl=en&u=https://github.com/lsoft/FreeAIr&client=webapp)
 
-Access for AI for free for anyone.
+Access to AI for free for anyone.
 
 ![logo](https://raw.githubusercontent.com/lsoft/FreeAIr/main/logo.png)
 
@@ -29,6 +29,7 @@ FreeAIr is not a political subject and provides no artificial barriers.
 - Optimize the code
 - Continue writing code according to the comments
 - Chat
+- Composing commit message
 
 Main menu:
 
@@ -51,6 +52,10 @@ OpenRouter.ai choose model window:
 Chat window:
 
 ![Chat window](https://raw.githubusercontent.com/lsoft/FreeAIr/main/chatwindow.png)
+
+Composing commit message:
+
+![Composing commit message](https://raw.githubusercontent.com/lsoft/FreeAIr/main/commitmessage.png)
 
 
 # How I can access to AI if my country is banned from Copilot?

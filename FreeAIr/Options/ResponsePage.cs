@@ -11,7 +11,12 @@ namespace FreeAIr
                 {
                     LanguageAlias = "cs,csharp",
                     XshdFilePath = @"Resources/xshd/csharp.xshd"
-                }
+                },
+                new XshdProvider
+                {
+                    LanguageAlias = "patch,diff",
+                    XshdFilePath = @"Resources/xshd/patch.xshd"
+                },
             ];
 
         [Category("Response")]
@@ -45,7 +50,7 @@ namespace FreeAIr
 
         [Category("Response")]
         [DisplayName("Custom culture of AI responses")]
-        [Description("If your preferred AI answers culture is differ of your VS UI culture, then use this option to override AI answer culture.")]
+        [Description("If your preferred AI answers culture is differ of your VS UI culture, then use this option to override AI answer culture. For example set ru-RU to get answers in Russian.")]
         [DefaultValue("")]
         public string OverriddenCulture { get; set; } = "";
 

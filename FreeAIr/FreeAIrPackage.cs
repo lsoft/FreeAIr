@@ -2,6 +2,7 @@
 global using Microsoft.VisualStudio.Shell;
 global using System;
 global using Task = System.Threading.Tasks.Task;
+using FreeAIr.BLogic;
 using FreeAIr.UI.ToolWindows;
 using MessagePack.Formatters;
 using Microsoft.VisualStudio;
@@ -72,6 +73,9 @@ namespace FreeAIr
             IComponentModel componentModel
             )
         {
+            var cmb = componentModel.GetService<CommitMessageBuilder>();
+            cmb.RunAsync()
+                .FileAndForget(nameof(CommitMessageBuilder));
 
             var uii = componentModel.GetService<UIInformer>();
             uii.InitAsync()

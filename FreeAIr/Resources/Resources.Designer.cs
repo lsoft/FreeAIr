@@ -88,6 +88,15 @@ namespace FreeAIr.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Generate commit message according the following git patch. Give in your reply only the commit message without additional information. Do not wrap the whole answer in any quotes..
+        /// </summary>
+        public static string ChatKindEnum_GenerateCommitMessage {
+            get {
+                return ResourceManager.GetString("ChatKindEnum_GenerateCommitMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Optimize the following code:.
         /// </summary>
         public static string ChatKindEnum_OptimizeCode {
@@ -124,6 +133,15 @@ namespace FreeAIr.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Answer.
+        /// </summary>
+        public static string UI_Answer {
+            get {
+                return ResourceManager.GetString("UI_Answer", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Choose.
         /// </summary>
         public static string UI_Choose {
@@ -147,6 +165,15 @@ namespace FreeAIr.Resources {
         public static string UI_OpenInEditor {
             get {
                 return ResourceManager.GetString("UI_OpenInEditor", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Prompt.
+        /// </summary>
+        public static string UI_Prompt {
+            get {
+                return ResourceManager.GetString("UI_Prompt", resourceCulture);
             }
         }
         

@@ -15,8 +15,6 @@ namespace SauronEye.UI.Informer
     [Export(typeof(UIInformer))]
     public sealed class UIInformer
     {
-        //private static readonly ILogger _log = SerilogLogger.Logger.ForContext<UIInformer>();
-
         private readonly System.Windows.Window _mainWindow;
         private readonly DTEEvents _dteEvents;
         private readonly CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();

@@ -126,6 +126,9 @@
   <data name="ChatKindEnum_ExplainCode" xml:space="preserve">
     <value>Explain the following code:</value>
   </data>
+  <data name="ChatKindEnum_GenerateCommitMessage" xml:space="preserve">
+    <value>Generate commit message according the following git patch. Give in your reply only the commit message without additional information. Do not wrap the whole answer in any quotes.</value>
+  </data>
   <data name="ChatKindEnum_OptimizeCode" xml:space="preserve">
     <value>Optimize the following code:</value>
   </data>
@@ -138,6 +141,9 @@
   <data name="Error" xml:space="preserve">
     <value>Error</value>
   </data>
+  <data name="UI_Answer" xml:space="preserve">
+    <value>Answer</value>
+  </data>
   <data name="UI_Choose" xml:space="preserve">
     <value>Choose</value>
   </data>
@@ -146,6 +152,9 @@
   </data>
   <data name="UI_OpenInEditor" xml:space="preserve">
     <value>Open in main editor...</value>
+  </data>
+  <data name="UI_Prompt" xml:space="preserve">
+    <value>Prompt</value>
   </data>
   <data name="UI_Reload" xml:space="preserve">
     <value>Reload...</value>

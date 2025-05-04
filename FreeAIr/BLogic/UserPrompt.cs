@@ -38,22 +38,29 @@ namespace FreeAIr.BLogic
 
             Kind = kind;
             UserPromptBody = userPromptBody;
-            PromptBody = Kind.AsPromptString() + Environment.NewLine + UserPromptBody;
+            PromptBody = Kind.AsPromptString() + Environment.NewLine + Environment.NewLine + UserPromptBody;
         }
 
 
-        public static string BuildRulesSection()
+        public string BuildRulesSection()
         {
             string respondFormat;
-            switch (ResponsePage.Instance.ResponseFormat)
+            if (Kind == ChatKindEnum.GenerateCommitMessage)
             {
-                case LLMResultEnum.PlainText:
-                    respondFormat = "plain text";
-                    break;
-                case LLMResultEnum.MD:
-                default:
-                    respondFormat = "markdown";
-                    break;
+                respondFormat = "plain text";
+            }
+            else
+            {
+                switch (ResponsePage.Instance.ResponseFormat)
+                {
+                    case LLMResultEnum.PlainText:
+                        respondFormat = "plain text";
+                        break;
+                    case LLMResultEnum.MD:
+                    default:
+                        respondFormat = "markdown";
+                        break;
+                }
             }
 
             var rules = @"
@@ -82,12 +89,11 @@ namespace FreeAIr.BLogic
 #23 Keep your answers short and impersonal.
 #24 Make sure to include the programming language name at the start of the Markdown code blocks, if you is asked to answer in Markdown format.
 #25 Avoid wrapping the whole response in triple backticks.
-#26 The user works in an IDE called Visual Studio Code which has a concept for editors with open files, integrated unit test support, an output pane that shows the output of running the code as well as an integrated terminal.
-#27 The active document is the source code the user is looking at right now.
-#28 You can only give one reply for each conversation turn.
-#29 You should always generate short suggestions for the next user turns that are relevant to the conversation and not offensive.
-#30 Respond in {0} culture and in {1} format.
-#31 If you see drawbacks or vulnerabilities in the user's code, you should provide description and suggested fixes.
+#26 The active document is the source code the user is looking at right now.
+#27 You can only give one reply for each conversation turn.
+#28 You should generate short suggestions for the next user turns that are relevant to the conversation and not offensive.
+#29 If you see drawbacks or vulnerabilities in the user's code, you should provide its description and suggested fixes.
+#30 You must respond in {0} culture and in {1} format.
 ";
 
             rules = string.Format(
@@ -119,6 +125,16 @@ namespace FreeAIr.BLogic
             return new UserPrompt(
                 ChatKindEnum.Discussion,
                 userPrompt
+                );
+        }
+
+        public static UserPrompt CreateCommitMessagePrompt(
+            string gitPatch
+            )
+        {
+            return new UserPrompt(
+                ChatKindEnum.GenerateCommitMessage,
+                "```patch"  + Environment.NewLine + gitPatch + Environment.NewLine + "```"
                 );
         }
     }

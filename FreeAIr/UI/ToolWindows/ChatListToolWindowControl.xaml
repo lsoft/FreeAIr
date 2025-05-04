@@ -323,6 +323,7 @@
                 IsEnabled="{Binding IsEnabledPrompt, Mode=OneWay}"
                 Text="{Binding PromptText, UpdateSourceTrigger=PropertyChanged}"
                 FontSize="18"
+                AcceptsReturn="True"
                 >
                 <TextBox.InputBindings>
                     <KeyBinding Command="{Binding Path=CreatePromptCommand}" Key="Enter" />

@@ -105,6 +105,92 @@ namespace WpfHelpers
 
         public static FrameworkElement GetRecursiveByName(
             this DependencyObject root,
+            string childTypeName,
+            string name
+            )
+        {
+            if (root == null)
+            {
+                throw new ArgumentNullException(nameof(root));
+            }
+
+            if (name == null)
+            {
+                throw new ArgumentNullException(nameof(name));
+            }
+
+            var childrenCount = VisualTreeHelper.GetChildrenCount(root);
+
+            for (var cc = 0; cc < childrenCount; cc++)
+            {
+                var control = VisualTreeHelper.GetChild(
+                    root,
+                    cc
+                    );
+
+                if (control.GetType().Name == childTypeName)
+                {
+                    var fe = control as FrameworkElement;
+                    if (fe.Name == name)
+                    {
+                        return fe;
+                    }
+                }
+
+                var result = control.GetRecursiveByName(childTypeName, name);
+                if (result != null)
+                {
+                    return result;
+                }
+            }
+
+            return null;
+        }
+
+        public static TChildType GetRecursiveByName<TChildType>(
+            this DependencyObject root,
+            string name
+            ) where TChildType : FrameworkElement
+        {
+            if (root == null)
+            {
+                throw new ArgumentNullException(nameof(root));
+            }
+
+            if (name == null)
+            {
+                throw new ArgumentNullException(nameof(name));
+            }
+
+            var childrenCount = VisualTreeHelper.GetChildrenCount(root);
+
+            for (var cc = 0; cc < childrenCount; cc++)
+            {
+                var control = VisualTreeHelper.GetChild(
+                    root,
+                    cc
+                    );
+
+                if (control is TChildType fe)
+                {
+                    if (fe.Name == name)
+                    {
+                        return fe;
+                    }
+                }
+
+                var result = control.GetRecursiveByName<TChildType>(name);
+                if (result != null)
+                {
+                    return result;
+                }
+            }
+
+            return null;
+        }
+
+        public static FrameworkElement GetRecursiveByName(
+            this DependencyObject root,
             string name
             )
         {

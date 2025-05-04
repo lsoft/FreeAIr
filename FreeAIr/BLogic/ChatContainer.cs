@@ -51,7 +51,8 @@ namespace FreeAIr.BLogic
 
         public void StartChat(
             ChatDescription kind,
-            UserPrompt? prompt
+            UserPrompt? prompt,
+            Action<Chat, Answer> promptAnsweredCallBack = null
             )
         {
             if (kind is null)
@@ -60,7 +61,8 @@ namespace FreeAIr.BLogic
             }
 
             var chat = new Chat(
-                kind
+                kind,
+                promptAnsweredCallBack
                 );
             chat.ChatStatusChangedEvent += ChatStatusChanged;
 
