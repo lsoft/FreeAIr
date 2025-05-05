@@ -124,7 +124,7 @@
     <value>Дополните следующий код в соответствии с комментариями в нём:</value>
   </data>
   <data name="ChatKindEnum_ExplainCode" xml:space="preserve">
-    <value>Объясни как работает следующий код:</value>
+    <value>Объясни, как работает следующий код:</value>
   </data>
   <data name="ChatKindEnum_GenerateCommitMessage" xml:space="preserve">
     <value>Создай описание камита по нижеследующим правкам. Дай в своем ответе только commit message без дополнительной информации. Не оборачивай весь свой ответ в любые кавычки.</value>

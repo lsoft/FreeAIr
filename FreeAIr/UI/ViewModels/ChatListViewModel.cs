@@ -230,7 +230,10 @@ namespace FreeAIr.UI.ViewModels
                     chat.Update();
                 }
 
-                OnPropertyChanged();
+                if (ReferenceEquals(SelectedChat.Chat, e.Chat))
+                {
+                    OnPropertyChanged();
+                }
             }
             catch (Exception excp)
             {
@@ -268,7 +271,7 @@ namespace FreeAIr.UI.ViewModels
             {
                 get
                 {
-                    return Chat.Description.Kind.AsShortString();
+                    return Chat.Description.Kind.AsUIString();
                 }
             }
 
@@ -295,7 +298,7 @@ namespace FreeAIr.UI.ViewModels
             {
                 get
                 {
-                    return Chat.Status.AsString();
+                    return Chat.Status.AsUIString();
                 }
             }
 

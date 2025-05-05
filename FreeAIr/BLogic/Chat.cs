@@ -196,7 +196,6 @@ namespace FreeAIr.BLogic
                 chatMessages.AddRange(
                     _prompts.ConvertAll(p => new UserChatMessage(p.PromptBody))
                     );
-                //chatMessages.Add(new UserChatMessage("You must respond in ru-RU culture"));
 
                 var completionUpdates = _chatClient.CompleteChatStreaming(
                     messages: chatMessages,

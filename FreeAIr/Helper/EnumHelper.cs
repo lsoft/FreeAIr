@@ -41,7 +41,7 @@ namespace FreeAIr.Helper
             }
         }
 
-        public static string AsShortString(
+        public static string AsUIString(
             this ChatKindEnum taskKind
             )
         {
@@ -66,7 +66,7 @@ namespace FreeAIr.Helper
             }
         }
 
-        public static string AsString(
+        public static string AsUIString(
             this ChatStatusEnum status
             )
         {
@@ -79,7 +79,7 @@ namespace FreeAIr.Helper
                 case ChatStatusEnum.ReadingAnswer:
                     return "Reading answer";
                 case ChatStatusEnum.Ready:
-                    return "Completed";
+                    return "Ready";
                 case ChatStatusEnum.Cancelled:
                     return "Cancelled";
                 case ChatStatusEnum.Failed:

@@ -6,7 +6,7 @@ Access to AI for free for anyone.
 
 ![logo](https://raw.githubusercontent.com/lsoft/FreeAIr/main/logo.png)
 
-FreeAIr is a Visual Studio extension which allows you to interact with any LLM which have OpenAI-compatible API. No artificial|political barrier included in FreeAIr code.
+FreeAIr is a Visual Studio extension which allows you to interact with any LLM which have OpenAI-compatible API. Even with local LLM! No artificial | political barrier included in FreeAIr code.
 
 [Download VSIX](https://marketplace.visualstudio.com/items?itemName=lsoft.FreeAIr)
 
@@ -20,6 +20,14 @@ A: Yes, yet another LLM VSIX :)
 Q: Why? There is a fantastic Copilot!
 
 A: Because Copilot is a subject of politics. Today you are enjoying Copilot, tomorrow your country has been banned from it. FreeAIr is not a political subject and provides no artificial barriers.
+
+
+Q1: I have NO access to any LLM in Internet via public API.
+
+Q2: I have NO rights to use any remote LLM because of license of the code I'm writing.
+
+A: No problem! You can use local LLM, for example via KoboldCpp. Local LLM sends nothing to remote servers. See details below.
+
 
 # Features
 
@@ -66,7 +74,9 @@ Put cursor in the place of your source code where you need an autocompletion and
 ![Whole line completion](https://raw.githubusercontent.com/lsoft/FreeAIr/main/wholelinecompletion.png)
 
 
-# How I can access to AI if my country is banned from Copilot?
+# How I can access to AI if my country is banned from Copilot and from any other LLM provider?
+
+This is possible. If you are banned only for Copilot:
 
 0. Install this VSIX into your Visual Studio. You will need to have Visual Studio 2022 v.17.10 at least.
 1. Register on [openrouter.ai](openrouter.ai). This is easily can be done via github.com account. Also, you can obtain access to any LLM with OpenAI compatible API. FreeAIr itself does not include any LLM.
@@ -76,8 +86,11 @@ Put cursor in the place of your source code where you need an autocompletion and
 
 FreeAIr itself has no restrictions, you are able to switch another OpenAI compatible API.
 
+If you are banned from any remote LLM then run LLM locally, for example with KoboldCpp: run KoboldCpp, choose the model, wait for KoboldCpp starts (it opens browser), and then use correct OpenAI compatible endpoint like `http://localhost:5001/v1`.
+
 # Thanks
 
 - [openrouter.ai](openrouter.ai) for free access.
 - [CCodeAI](https://github.com/TimChen44/CCodeAI) for inspiration.
 - [L.AI](https://github.com/cntseesharp/L.AI) for inspiration.
+- [KoboldCpp](https://github.com/LostRuins/koboldcpp/) for testing without daily limits.
