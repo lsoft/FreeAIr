@@ -28,6 +28,8 @@ namespace FreeAIr.BLogic
 
         private ChatStatusEnum _status;
 
+        public IReadOnlyList<IUserPrompt> Prompts => _prompts;
+
         public event ChatStatusChangedDelegate ChatStatusChangedEvent;
 
         public ChatDescription Description
@@ -108,6 +110,11 @@ namespace FreeAIr.BLogic
             _task = Task.Run(() => AskPromptAndReceiveAnswer(userPrompt));
         }
 
+        public Task WaitForPromptResultAsync()
+        {
+            return WaitForTaskAsync();
+        }
+
         public string ReadResponse()
         {
             if (File.Exists(ResultFilePath))
@@ -122,6 +129,18 @@ namespace FreeAIr.BLogic
         {
             _cancellationTokenSource.Cancel();
 
+            await WaitForTaskAsync();
+        }
+
+        public void Dispose()
+        {
+            _chatClient.CompleteChat();
+
+            DeleteResultFile();
+        }
+
+        private async Task WaitForTaskAsync()
+        {
             if (_task is null)
             {
                 return;
@@ -133,17 +152,11 @@ namespace FreeAIr.BLogic
             await _task;
         }
 
-        public void Dispose()
-        {
-            _chatClient.CompleteChat();
-
-            DeleteResultFile();
-        }
-
-
         private void AskPromptAndReceiveAnswer(UserPrompt userPrompt)
         {
             var answer = AskAndWaitForAnswerInternal(userPrompt);
+
+            userPrompt.SetAnswer(answer.GetAnswer());
 
             if (_promptAnsweredCallBack is not null)
             {
@@ -275,7 +288,8 @@ namespace FreeAIr.BLogic
         OptimizeCode,
         CompleteCodeAccordingComments,
         Discussion,
-        GenerateCommitMessage
+        GenerateCommitMessage,
+        SuggestWholeLine
     }
 
     public sealed class Answer

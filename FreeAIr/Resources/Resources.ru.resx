@@ -132,6 +132,12 @@
   <data name="ChatKindEnum_OptimizeCode" xml:space="preserve">
     <value>Оптимизируй следующий код:</value>
   </data>
+  <data name="ChatKindEnum_SuggestWholeLine" xml:space="preserve">
+    <value>Предложи заполнение целой строки в то месте, где написано `{0}` в следующем коде. Дай в своем ответе только код без дополнительной информации. Не оборачивай весь свой ответ в любые кавычки.</value>
+  </data>
+  <data name="ChatKindEnum_SuggestWholeLine_Anchor" xml:space="preserve">
+    <value>&lt;｜fim▁hole｜&gt;</value>
+  </data>
   <data name="Code_NoSelectedCode" xml:space="preserve">
     <value>Не могу получить выделенный блок кода.</value>
   </data>

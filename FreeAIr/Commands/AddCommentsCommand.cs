@@ -20,7 +20,7 @@ using System.Threading.Tasks;
 
 namespace FreeAIr.Commands
 {
-    [Command(PackageIds.FreeAIrNoteCommandId)]
+    [Command(PackageIds.AddCommentsCommandId)]
     internal sealed class AddCommentsCommand : BaseCommand<AddCommentsCommand>
     {
         public AddCommentsCommand(

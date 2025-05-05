@@ -106,6 +106,24 @@ namespace FreeAIr.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Suggest filling the whole line where `{0}` is written in the following code. Give in your reply only piece of code without additional information. Do not wrap the whole answer in any quotes..
+        /// </summary>
+        public static string ChatKindEnum_SuggestWholeLine {
+            get {
+                return ResourceManager.GetString("ChatKindEnum_SuggestWholeLine", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &lt;｜fim▁hole｜&gt;.
+        /// </summary>
+        public static string ChatKindEnum_SuggestWholeLine_Anchor {
+            get {
+                return ResourceManager.GetString("ChatKindEnum_SuggestWholeLine_Anchor", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Cannot obtain selected block of code..
         /// </summary>
         public static string Code_NoSelectedCode {

@@ -53,7 +53,7 @@ namespace FreeAIr
             )
         {
             //load dlls manually, for unknown reason these dlls does not loaded automatically
-            Assembly a1 = Assembly.LoadFrom("MdXaml.dll");
+            Assembly a1 = Assembly.LoadFrom(System.IO.Path.Combine(WorkingFolder, "MdXaml.dll"));
             AppDomain.CurrentDomain.Load(a1.FullName);
 
             ResponsePage.LoadOrUpdateMarkdownStyles();

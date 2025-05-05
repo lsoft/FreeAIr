@@ -23,22 +23,22 @@ namespace FreeAIr
         [Category("OpenAI compatible API requisites")]
         [DisplayName("Token")]
         [Description("A token of LLM API provider.")]
-        [DefaultValue("place your token here")]
-        public string Token { get; set; } = "place your token here";
+        [DefaultValue("")]
+        public string Token { get; set; } = "";
 
         [Category("OpenAI compatible API requisites")]
         [DisplayName("Chosen model")]
         [Description("A token of LLM API provider.")]
-        [DefaultValue("qwen/qwen3-14b:free")]
-        public string ChosenModel { get; set; } = "qwen/qwen3-14b:free";
+        [DefaultValue("qwen/qwen3-32b:free")]
+        public string ChosenModel { get; set; } = "qwen/qwen3-32b:free";
 
 
         //[Category("OpenAI compatible API requisites")]
         //[DisplayName("ChosenModel1")]
         //[Description("A token of LLM API provider.")]
         //[TypeConverter(typeof(ModelConverter))]
-        ////[DefaultValue(new ChosenModelType("qwen/qwen3-14b:free"))]
-        //public AvailableModel ChosenModel1 { get; set; } = new AvailableModel("qwen/qwen3-14b:free");
+        ////[DefaultValue(new ChosenModelType("qwen/qwen3-32b:free"))]
+        //public AvailableModel ChosenModel1 { get; set; } = new AvailableModel("qwen/qwen3-32b:free");
 
 
         //protected override string SerializeValue(object value, Type type, string propertyName)

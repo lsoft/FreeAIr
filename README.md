@@ -6,7 +6,7 @@ Access to AI for free for anyone.
 
 ![logo](https://raw.githubusercontent.com/lsoft/FreeAIr/main/logo.png)
 
-FreeAIr is a Visual Studio extension which allows you to interact with LLM without barriers via any LLM which has OpenAI-compatible API.
+FreeAIr is a Visual Studio extension which allows you to interact with any LLM which have OpenAI-compatible API. No artificial|political barrier included in FreeAIr code.
 
 [Download VSIX](https://marketplace.visualstudio.com/items?itemName=lsoft.FreeAIr)
 
@@ -18,11 +18,12 @@ A: Yes, yet another LLM VSIX :)
 
 
 Q: Why? There is a fantastic Copilot!
-A: Because Copilot is a subject of politics. Today you are enjoying Copilot, tomorrow your country has been banned from it.
 
-FreeAIr is not a political subject and provides no artificial barriers.
+A: Because Copilot is a subject of politics. Today you are enjoying Copilot, tomorrow your country has been banned from it. FreeAIr is not a political subject and provides no artificial barriers.
 
 # Features
+
+Source's context menu commands are available:
 
 - Explain the code
 - Comment the code
@@ -30,14 +31,23 @@ FreeAIr is not a political subject and provides no artificial barriers.
 - Continue writing code according to the comments
 - Chat
 - Composing commit message
-
-Main menu:
-
-![Main Menu](https://raw.githubusercontent.com/lsoft/FreeAIr/main/mainmenu.png)
+- Whole line completion
 
 Context menu:
 
 ![Context Menu](https://raw.githubusercontent.com/lsoft/FreeAIr/main/contextmenu.png)
+
+Chat window:
+
+![Chat window](https://raw.githubusercontent.com/lsoft/FreeAIr/main/chatwindow.png)
+
+Composing commit message:
+
+![Composing commit message](https://raw.githubusercontent.com/lsoft/FreeAIr/main/commitmessage.png)
+
+Main menu:
+
+![Main Menu](https://raw.githubusercontent.com/lsoft/FreeAIr/main/mainmenu.png)
 
 Options:
 
@@ -49,21 +59,19 @@ OpenRouter.ai choose model window:
 
 ![OpenRouter Model](https://raw.githubusercontent.com/lsoft/FreeAIr/main/openroutermodelpng.png)
 
-Chat window:
+Whole line completion: 
 
-![Chat window](https://raw.githubusercontent.com/lsoft/FreeAIr/main/chatwindow.png)
+Put cursor in the place of your source code where you need an autocompletion and press Alt+A:
 
-Composing commit message:
-
-![Composing commit message](https://raw.githubusercontent.com/lsoft/FreeAIr/main/commitmessage.png)
+![Whole line completion](https://raw.githubusercontent.com/lsoft/FreeAIr/main/wholelinecompletion.png)
 
 
 # How I can access to AI if my country is banned from Copilot?
 
-0. Install this VSIX into your Visual Studio. You will need to have v. 17.10 at least.
-1. Register on [openrouter.ai](openrouter.ai). This is easily can be done via github.com account.
+0. Install this VSIX into your Visual Studio. You will need to have Visual Studio 2022 v.17.10 at least.
+1. Register on [openrouter.ai](openrouter.ai). This is easily can be done via github.com account. Also, you can obtain access to any LLM with OpenAI compatible API. FreeAIr itself does not include any LLM.
 2. Choose any `free` model at [openrouter.ai](openrouter.ai) and create an access token.
-3. Put your token into options page (see screenshot below).
+3. Put your token into options page (see screenshot above).
 4. That's all, enjoy! But remember: for a free LLM [openrouter.ai](openrouter.ai) has daily limits (50 prompts per day, if I remember correctly).
 
 FreeAIr itself has no restrictions, you are able to switch another OpenAI compatible API.
@@ -72,3 +80,4 @@ FreeAIr itself has no restrictions, you are able to switch another OpenAI compat
 
 - [openrouter.ai](openrouter.ai) for free access.
 - [CCodeAI](https://github.com/TimChen44/CCodeAI) for inspiration.
+- [L.AI](https://github.com/cntseesharp/L.AI) for inspiration.

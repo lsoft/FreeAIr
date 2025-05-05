@@ -60,7 +60,7 @@
         </Strings>
       </Button>
 
-      <Button guid="FreeAIr" id="FreeAIrExplainCommandId" priority="0x0100" type="Button">
+      <Button guid="FreeAIr" id="ExplainCommandId" priority="0x0100" type="Button">
         <Parent guid="FreeAIr" id="SourceCodeContextGroup" />
         <Icon guid="ImageCatalogGuid" id="SQLServerObjectExplorer" />
         <CommandFlag>IconIsMoniker</CommandFlag>
@@ -68,7 +68,7 @@
           <ButtonText>Explain code</ButtonText>
         </Strings>
       </Button>
-      <Button guid="FreeAIr" id="FreeAIrNoteCommandId" priority="0x0100" type="Button">
+      <Button guid="FreeAIr" id="AddCommentsCommandId" priority="0x0100" type="Button">
         <Parent guid="FreeAIr" id="SourceCodeContextGroup" />
         <Icon guid="ImageCatalogGuid" id="CodeReviewWizard" />
         <CommandFlag>IconIsMoniker</CommandFlag>
@@ -84,8 +84,7 @@
           <ButtonText>Optimize code</ButtonText>
         </Strings>
       </Button>
-
-      <Button guid="FreeAIr" id="FreeAIrCompleteCodeCommandId" priority="0x0100" type="Button">
+      <Button guid="FreeAIr" id="CompleteCodeByCommentsCommandId" priority="0x0100" type="Button">
         <Parent guid="FreeAIr" id="SourceCodeContextGroup" />
         <Icon guid="ImageCatalogGuid" id="Writeable" />
         <CommandFlag>IconIsMoniker</CommandFlag>
@@ -93,7 +92,6 @@
           <ButtonText>Complete the code according to the comments</ButtonText>
         </Strings>
       </Button>
-
       <!--<Button guid="FreeAIr" id="FreeAIrAddAskCommandId" priority="0x0100" type="Button">
         <Parent guid="FreeAIr" id="SourceCodeContextGroup" />
         <Icon guid="ImageCatalogGuid" id="AddButton" />
@@ -111,7 +109,6 @@
           <ButtonText>Generate code...</ButtonText>
         </Strings>
       </Button>-->
-
       <Button guid="FreeAIr" id="StartDiscussionCommandId" priority="0x0100" type="Button">
         <Parent guid="FreeAIr" id="SourceCodeContextGroup" />
         <Icon guid="ImageCatalogGuid" id="UserTask" />
@@ -120,9 +117,24 @@
           <ButtonText>Start discussion...</ButtonText>
         </Strings>
       </Button>
+      <Button guid="FreeAIr" id="GenerateWholeLineSuggestionCommand" priority="0x0100" type="Button">
+        <Parent guid="FreeAIr" id="SourceCodeContextGroup" />
+        <Icon guid="ImageCatalogGuid" id="UserTask" />
+        <CommandFlag>IconIsMoniker</CommandFlag>
+        <Strings>
+          <ButtonText>Generate whole line suggestion...</ButtonText>
+        </Strings>
+      </Button>
 
     </Buttons>
   </Commands>
+
+  <KeyBindings>
+    <KeyBinding guid="FreeAIr" id="ExplainCommandId" key1="L" mod1="ALT" editor="guidVSStd97" />
+    <KeyBinding guid="FreeAIr" id="AddCommentsCommandId" key1="C" mod1="ALT" editor="guidVSStd97" />
+    <KeyBinding guid="FreeAIr" id="CompleteCodeByCommentsCommandId" key1="M" mod1="ALT" editor="guidVSStd97" />
+    <KeyBinding guid="FreeAIr" id="GenerateWholeLineSuggestionCommand" key1="A" mod1="ALT" editor="guidVSStd97" />
+  </KeyBindings>
 
   <Symbols>
     <GuidSymbol name="FreeAIr" value="{faec8da8-74ca-4afa-8b7d-64be3914fbac}">
@@ -135,15 +147,16 @@
 
       <IDSymbol name="SubExtensionMenu" value="0x1014" />
 
-      <IDSymbol name="FreeAIrExplainCommandId" value="0x1021" />
-      <IDSymbol name="FreeAIrNoteCommandId" value="0x1022" />
+      <IDSymbol name="ExplainCommandId" value="0x1021" />
+      <IDSymbol name="AddCommentsCommandId" value="0x1022" />
       <IDSymbol name="FreeAIrOptimizeCommandId" value="0x1023" />
       <!--<IDSymbol name="FreeAIrAddAskCommandId" value="0x1024" />-->
-      <IDSymbol name="FreeAIrCompleteCodeCommandId" value="0x1025" />
+      <IDSymbol name="CompleteCodeByCommentsCommandId" value="0x1025" />
       <!--<IDSymbol name="FreeAIrCodeGenCommandId" value="0x1026"/>-->
       <IDSymbol name="FreeAIrChooseModelCommandId" value="0x1027" />
       <IDSymbol name="OpenChatListToolWindowCommandId" value="0x1028" />
       <IDSymbol name="StartDiscussionCommandId" value="0x1029" />
+      <IDSymbol name="GenerateWholeLineSuggestionCommand" value="0x1030" />
 
     </GuidSymbol>
   </Symbols>

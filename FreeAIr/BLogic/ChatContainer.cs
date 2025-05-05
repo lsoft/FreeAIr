@@ -49,7 +49,7 @@ namespace FreeAIr.BLogic
             _dteEvents.OnBeginShutdown += DTEEvents_OnBeginShutdown;
         }
 
-        public void StartChat(
+        public Chat StartChat(
             ChatDescription kind,
             UserPrompt? prompt,
             Action<Chat, Answer> promptAnsweredCallBack = null
@@ -76,6 +76,8 @@ namespace FreeAIr.BLogic
             {
                 chat.AddPrompt(prompt);
             }
+
+            return chat;
         }
 
         public async Task RemoveChatAsync(

@@ -54,6 +54,13 @@ namespace FreeAIr
         [DefaultValue("")]
         public string OverriddenCulture { get; set; } = "";
 
+        [Category("Response")]
+        [DisplayName("Implicit whole line completion")]
+        [Description("If you are using a free model, it means slow response (a few seconds) and daily limit for prompt count. In this case you do not want FreeAIr make whole line completion prompts automatically. If so, keep this in 'False', you still able to invoke this explicitly with Alt+A.")]
+        [DefaultValue(false)]
+        public bool IsImplicitWholeLineCompletionEnabled { get; set; } = false;
+
+
         public static CultureInfo GetAnswerCulture()
         {
             return

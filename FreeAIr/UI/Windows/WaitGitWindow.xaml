@@ -14,6 +14,7 @@
     ResizeMode="NoResize"
     Loaded="Window_Loaded"
     Closing="Window_Closing"
+    Keyboard.KeyUp="Window_KeyUp"
     >
     <Grid>
         <Grid.RowDefinitions>

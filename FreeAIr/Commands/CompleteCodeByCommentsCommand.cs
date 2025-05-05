@@ -6,10 +6,10 @@ using Microsoft.VisualStudio.ComponentModelHost;
 
 namespace FreeAIr.Commands
 {
-    [Command(PackageIds.FreeAIrCompleteCodeCommandId)]
-    internal sealed class CompleteCodeCommand : BaseCommand<CompleteCodeCommand>
+    [Command(PackageIds.CompleteCodeByCommentsCommandId)]
+    internal sealed class CompleteCodeByCommentsCommand : BaseCommand<CompleteCodeByCommentsCommand>
     {
-        public CompleteCodeCommand(
+        public CompleteCodeByCommentsCommand(
             )
         {
         }

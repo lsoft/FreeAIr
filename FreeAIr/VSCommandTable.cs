@@ -27,12 +27,13 @@ namespace FreeAIr
         public const int ExtensionMenuGroup = 0x1012;
         public const int SubExtensionMenuGroup = 0x1013;
         public const int SubExtensionMenu = 0x1014;
-        public const int FreeAIrExplainCommandId = 0x1021;
-        public const int FreeAIrNoteCommandId = 0x1022;
+        public const int ExplainCommandId = 0x1021;
+        public const int AddCommentsCommandId = 0x1022;
         public const int FreeAIrOptimizeCommandId = 0x1023;
-        public const int FreeAIrCompleteCodeCommandId = 0x1025;
+        public const int CompleteCodeByCommentsCommandId = 0x1025;
         public const int FreeAIrChooseModelCommandId = 0x1027;
         public const int OpenChatListToolWindowCommandId = 0x1028;
         public const int StartDiscussionCommandId = 0x1029;
+        public const int GenerateWholeLineSuggestionCommand = 0x1030;
     }
 }

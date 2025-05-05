@@ -20,7 +20,7 @@ using System.Threading.Tasks;
 
 namespace FreeAIr.Commands
 {
-    [Command(PackageIds.FreeAIrExplainCommandId)]
+    [Command(PackageIds.ExplainCommandId)]
     internal sealed class ExplainCodeCommand : BaseCommand<ExplainCodeCommand>
     {
         public ExplainCodeCommand(
@@ -73,11 +73,10 @@ namespace FreeAIr.Commands
     }
 
 
-
-    [Command(PackageIds.StartDiscussionCommandId)]
-    internal sealed class StartDiscussionCommand : BaseCommand<StartDiscussionCommand>
+    [Command(PackageIds.GenerateWholeLineSuggestionCommand)]
+    internal sealed class GenerateWholeLineSuggestionCommand : BaseCommand<GenerateWholeLineSuggestionCommand>
     {
-        public StartDiscussionCommand(
+        public GenerateWholeLineSuggestionCommand(
             )
         {
         }
@@ -86,20 +85,43 @@ namespace FreeAIr.Commands
         {
             await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
 
-            var componentModel = (IComponentModel)await FreeAIrPackage.Instance.GetServiceAsync(typeof(SComponentModel));
-            var chatContainer = componentModel.GetService<ChatContainer>();
+            if (string.IsNullOrEmpty(ApiPage.Instance.Token))
+            {
+                await VS.MessageBox.ShowErrorAsync(
+                    Resources.Resources.Error,
+                    Resources.Resources.Code_NoToken
+                    );
+                return;
+            }
 
-            var kind = ChatKindEnum.Discussion;
+            var documentView = await VS.Documents.GetActiveDocumentViewAsync();
+            if (documentView == null)
+            {
+                //not a text window
+                return;
+            }
 
-            chatContainer.StartChat(
-                new ChatDescription(
-                    kind,
-                    null
-                    ),
-                null
+            var textView = documentView.TextView;
+            if (textView == null)
+            {
+                //not a text window
+                return;
+            }
+
+            var proposalSource = new FreeAIrProposalSource(
+                textView
                 );
 
-            _ = await ChatListToolWindow.ShowAsync();
+            var caretPosition = textView.Caret.Position.BufferPosition;
+
+            var proposalCollection = await proposalSource.CreateProposalSourceAsync(
+                caretPosition
+                );
+
+            await SuggestionHijackHelper.ShowAutocompleteAsync(
+                textView,
+                proposalCollection
+                );
         }
 
     }

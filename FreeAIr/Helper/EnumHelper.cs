@@ -26,6 +26,16 @@ namespace FreeAIr.Helper
                         );
                 case ChatKindEnum.Discussion:
                     return string.Empty;
+                case ChatKindEnum.SuggestWholeLine:
+                    var prompt = FreeAIr.Resources.Resources.ResourceManager.GetString(
+                        "ChatKindEnum_SuggestWholeLine",
+                        ResponsePage.GetAnswerCulture()
+                        );
+                    var anchor = FreeAIr.Resources.Resources.ResourceManager.GetString(
+                        "ChatKindEnum_SuggestWholeLine_Anchor",
+                        ResponsePage.GetAnswerCulture()
+                        );
+                    return string.Format(prompt, anchor);
                 default:
                     throw new InvalidOperationException($"Unknown kind {kind}");
             }
@@ -49,6 +59,8 @@ namespace FreeAIr.Helper
                     return "Discussion";
                 case ChatKindEnum.GenerateCommitMessage:
                     return "Commit message";
+                case ChatKindEnum.SuggestWholeLine:
+                    return "Suggest whole line";
                 default:
                     return taskKind.ToString();
             }

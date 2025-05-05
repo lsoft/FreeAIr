@@ -164,12 +164,6 @@ namespace SauronEye.UI.Informer
                 VerticalContentAlignment = VerticalAlignment.Center,
                 HorizontalAlignment = HorizontalAlignment.Left,
                 Padding = new Thickness(0),
-                //ToolTip = new ToolTip
-                //{
-                //    HasDropShadow = true,
-                //    StaysOpen = false,
-                //    Content = string.Empty
-                //},
             };
             UpdateControlText();
 

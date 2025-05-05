@@ -132,6 +132,12 @@
   <data name="ChatKindEnum_OptimizeCode" xml:space="preserve">
     <value>Optimize the following code:</value>
   </data>
+  <data name="ChatKindEnum_SuggestWholeLine" xml:space="preserve">
+    <value>Suggest filling the whole line where `{0}` is written in the following code. Give in your reply only piece of code without additional information. Do not wrap the whole answer in any quotes.</value>
+  </data>
+  <data name="ChatKindEnum_SuggestWholeLine_Anchor" xml:space="preserve">
+    <value>&lt;｜fim▁hole｜&gt;</value>
+  </data>
   <data name="Code_NoSelectedCode" xml:space="preserve">
     <value>Cannot obtain selected block of code.</value>
   </data>

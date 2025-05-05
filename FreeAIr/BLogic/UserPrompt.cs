@@ -11,7 +11,30 @@ using System.Threading.Tasks;
 
 namespace FreeAIr.BLogic
 {
-    public sealed class UserPrompt
+    public interface IUserPrompt
+    {
+        ChatKindEnum Kind
+        {
+            get;
+        }
+
+        string PromptBody
+        {
+            get;
+        }
+
+        string UserPromptBody
+        {
+            get;
+        }
+
+        string Answer
+        {
+            get;
+        }
+    }
+
+    public sealed class UserPrompt : IUserPrompt
     {
         public ChatKindEnum Kind
         {
@@ -24,6 +47,13 @@ namespace FreeAIr.BLogic
         public string PromptBody
         {
             get;
+        }
+
+
+        public string? Answer
+        {
+            get;
+            private set;
         }
 
         private UserPrompt(
@@ -42,10 +72,25 @@ namespace FreeAIr.BLogic
         }
 
 
+        public void SetAnswer(string answer)
+        {
+            if (answer is null)
+            {
+                throw new ArgumentNullException(nameof(answer));
+            }
+
+            if (Answer is not null)
+            {
+                throw new ArgumentNullException(nameof(Answer));
+            }
+
+            Answer = answer;
+        }
+
         public string BuildRulesSection()
         {
             string respondFormat;
-            if (Kind == ChatKindEnum.GenerateCommitMessage)
+            if (Kind.In(ChatKindEnum.GenerateCommitMessage, ChatKindEnum.SuggestWholeLine))
             {
                 respondFormat = "plain text";
             }
@@ -93,7 +138,8 @@ namespace FreeAIr.BLogic
 #27 You can only give one reply for each conversation turn.
 #28 You should generate short suggestions for the next user turns that are relevant to the conversation and not offensive.
 #29 If you see drawbacks or vulnerabilities in the user's code, you should provide its description and suggested fixes.
-#30 You must respond in {0} culture and in {1} format.
+#30 You must respond in {0} culture.
+#31 You must respond in {1} format.
 ";
 
             rules = string.Format(
@@ -134,9 +180,31 @@ namespace FreeAIr.BLogic
         {
             return new UserPrompt(
                 ChatKindEnum.GenerateCommitMessage,
-                "```patch"  + Environment.NewLine + gitPatch + Environment.NewLine + "```"
+                "```patch" + Environment.NewLine + gitPatch + Environment.NewLine + "```"
                 );
         }
+
+        public static UserPrompt CreateSuggestWholeLine(
+            string userCodeFileName,
+            string documentText,
+            int caretPosition
+            )
+        {
+            var fi = new FileInfo(userCodeFileName);
+
+            var anchor = FreeAIr.Resources.Resources.ResourceManager.GetString(
+                "ChatKindEnum_SuggestWholeLine_Anchor",
+                ResponsePage.GetAnswerCulture()
+                );
+
+            documentText = documentText.Insert(caretPosition, anchor);
+
+            return new UserPrompt(
+                ChatKindEnum.SuggestWholeLine,
+                "```" + LanguageHelper.GetMarkdownLanguageCodeBlockNameBasedOnFileExtension(fi.Extension) + Environment.NewLine + documentText + Environment.NewLine + "```"
+                );
+        }
+
     }
 
 }
