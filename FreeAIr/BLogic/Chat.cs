@@ -134,9 +134,9 @@ namespace FreeAIr.BLogic
 
         public void Dispose()
         {
-            _chatClient.CompleteChat();
-
             DeleteResultFile();
+
+            Description.Dispose();
         }
 
         private async Task WaitForTaskAsync()
@@ -318,22 +318,29 @@ namespace FreeAIr.BLogic
         }
     }
 
-    public sealed class ChatDescription
+    public sealed class ChatDescription : IDisposable
     {
         public ChatKindEnum Kind
         {
             get;
         }
-
-        public string? FileName
+        public SelectedTextDescriptor? SelectedTextDescriptor
         {
             get;
         }
 
-        public ChatDescription(ChatKindEnum kind, string? fileName)
+        public ChatDescription(
+            ChatKindEnum kind,
+            SelectedTextDescriptor? selectedTextDescriptor
+            )
         {
             Kind = kind;
-            FileName = fileName;
+            SelectedTextDescriptor = selectedTextDescriptor;
+        }
+
+        public void Dispose()
+        {
+            SelectedTextDescriptor?.Dispose();
         }
     }
 

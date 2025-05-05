@@ -30,8 +30,8 @@ namespace FreeAIr.Commands
             var componentModel = (IComponentModel)await FreeAIrPackage.Instance.GetServiceAsync(typeof(SComponentModel));
             var chatContainer = componentModel.GetService<ChatContainer>();
 
-            var (fileName, selectedCode) = await DocumentHelper.GetSelectedTextAsync();
-            if (fileName is null || string.IsNullOrEmpty(selectedCode))
+            var std = await DocumentHelper.GetSelectedTextAsync();
+            if (std is null)
             {
                 await VS.MessageBox.ShowErrorAsync(
                     Resources.Resources.Error,
@@ -45,9 +45,9 @@ namespace FreeAIr.Commands
             chatContainer.StartChat(
                 new ChatDescription(
                     kind,
-                    fileName
+                    std
                     ),
-                UserPrompt.CreateCodeBasedPrompt(kind, fileName, selectedCode)
+                UserPrompt.CreateCodeBasedPrompt(kind, std.FileName, std.SelectedText)
                 );
 
             if (ResponsePage.Instance.SwitchToTaskWindow)

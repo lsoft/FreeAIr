@@ -1,36 +1,124 @@
-﻿using System;
+﻿using Community.VisualStudio.Toolkit;
+using Microsoft.CodeAnalysis.Editing;
+using Microsoft.CodeAnalysis.Text;
+using Microsoft.VisualStudio.Text;
+using Microsoft.VisualStudio.Text.Editor;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace FreeAIr.Helper
 {
     public static class DocumentHelper
     {
-        public static async Task<(string?, string?)> GetSelectedTextAsync()
+        public static async Task<SelectedTextDescriptor?> GetSelectedTextAsync()
         {
             var docView = await VS.Documents.GetActiveDocumentViewAsync();
             if (docView?.TextView == null)
             {
                 //not a text window
-                return (null, null);
+                return null;
             }
 
-            var selection = docView?.TextView.Selection;
+            return new SelectedTextDescriptor(
+                docView
+                );
+        }
+    }
+
+    public sealed class SelectedTextDescriptor : IDisposable
+    {
+        private int _disposed = 0;
+
+        private DocumentView? _documentView;
+        private Span _span;
+
+        public string FileName
+        {
+            get;
+        }
+
+        public string SelectedText
+        {
+            get;
+        }
+
+        public bool IsAbleToManipulate => _documentView is not null;
+
+        public SelectedTextDescriptor(
+            DocumentView documentView
+            )
+        {
+            if (documentView is null)
+            {
+                throw new ArgumentNullException(nameof(documentView));
+            }
+
+            var selection = documentView?.TextView.Selection;
             var selectedSpan = selection.StreamSelectionSpan.SnapshotSpan;
+            _span = selectedSpan.Span;
             var selectedText = selectedSpan.GetText();
 
-            //if (string.IsNullOrWhiteSpace(selectedText))
-            //{
-            //    var line = selection.Start.Position.GetContainingLine();
-            //    selectedText = line.GetText();
-            //}
+            var fileName = new FileInfo(documentView.FilePath).Name;
 
-            var fileName = new FileInfo(docView.FilePath).Name;
+            documentView.TextView.Closed += TextView_Closed;
 
-            return (fileName, selectedText);
+            FileName = fileName;
+            SelectedText = selectedText;
+            _documentView = documentView;
+        }
+
+        private void TextView_Closed(object sender, EventArgs e)
+        {
+            Dispose();
+        }
+
+        public void Dispose()
+        {
+            if (Interlocked.Exchange(ref _disposed, 1) != 0)
+            {
+                return;
+            }
+
+            _documentView.TextView.Closed -= TextView_Closed;
+
+            _documentView = null;
+        }
+
+        public async Task ReplaceSelectedTextWithAsync(
+            string newText
+            )
+        {
+            if (newText is null)
+            {
+                throw new ArgumentNullException(nameof(newText));
+            }
+
+            var documentView = _documentView;
+            if (documentView is null)
+            {
+                await VS.MessageBox.ShowErrorAsync(
+                    Resources.Resources.Error,
+                    "Cannot edit the document. Please copy-paste the text manually."
+                    );
+                return;
+            }
+
+            Microsoft.VisualStudio.Text.ITextDocument document = documentView.Document;
+
+            using var documentEdit = documentView.TextBuffer.CreateEdit();
+            if (documentEdit.Replace(
+                _span,
+                newText
+                ))
+            {
+                documentEdit.Apply();
+                //document.Save();
+            }
         }
     }
 }

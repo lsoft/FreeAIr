@@ -8,6 +8,7 @@ using System.ComponentModel.Composition;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Input;
 using WpfHelpers;
 
@@ -25,6 +26,8 @@ namespace FreeAIr.UI.ViewModels
         private ICommand _stopCommand;
         private ICommand _createPromptCommand;
         private ICommand _startDiscussionCommand;
+        private ICommand _copyCodeBlockCommand;
+        private ICommand _replaceSelectedTextCommand;
 
         private string _promptText;
 
@@ -139,6 +142,138 @@ namespace FreeAIr.UI.ViewModels
                 }
 
                 return _startDiscussionCommand;
+            }
+        }
+
+
+        public ICommand CopyCodeBlockCommand
+        {
+            get
+            {
+                if (_copyCodeBlockCommand == null)
+                {
+                    _copyCodeBlockCommand = new AsyncRelayCommand(
+                        async a =>
+                        {
+                            var textArea = a as ICSharpCode.AvalonEdit.Editing.TextArea;
+                            if (textArea is null)
+                            {
+                                await VS.MessageBox.ShowErrorAsync(
+                                    "Resources.Resources.Error",
+                                    "Cannot copy code block. Please copy manually."
+                                    );
+                                return;
+                            }
+
+                            var codeText = textArea?.Document?.Text ?? string.Empty;
+                            Clipboard.SetText(codeText);
+                        }
+                        );
+                }
+
+                return _copyCodeBlockCommand;
+            }
+        }
+
+        public ICommand ReplaceSelectedTextCommand
+        {
+            get
+            {
+                if (_replaceSelectedTextCommand == null)
+                {
+                    _replaceSelectedTextCommand = new AsyncRelayCommand(
+                        async a =>
+                        {
+                            var textArea = a as ICSharpCode.AvalonEdit.Editing.TextArea;
+                            if (textArea is null)
+                            {
+                                await VS.MessageBox.ShowErrorAsync(
+                                    "Resources.Resources.Error",
+                                    "Cannot replace selected text. Please replace the selected text manually."
+                                    );
+                                return;
+                            }
+
+                            var codeText = textArea?.Document?.Text;
+                            if (codeText is null)
+                            {
+                                await VS.MessageBox.ShowErrorAsync(
+                                    "Resources.Resources.Error",
+                                    "Cannot replace selected text. Please replace the selected text manually."
+                                    );
+                                return;
+                            }
+
+                            var chat = SelectedChat?.Chat;
+                            if (chat is null)
+                            {
+                                await VS.MessageBox.ShowErrorAsync(
+                                    "Resources.Resources.Error",
+                                    "Cannot replace selected text. Please replace the selected text manually."
+                                    );
+                                return;
+                            }
+
+                            var std = chat.Description.SelectedTextDescriptor;
+                            if (std is null)
+                            {
+                                await VS.MessageBox.ShowErrorAsync(
+                                    "Resources.Resources.Error",
+                                    "Cannot replace selected text. Please replace the selected text manually."
+                                    );
+                                return;
+                            }
+
+                            if (!std.IsAbleToManipulate)
+                            {
+                                await VS.MessageBox.ShowErrorAsync(
+                                    "Resources.Resources.Error",
+                                    "Cannot replace selected text. Please replace the selected text manually."
+                                    );
+                                return;
+                            }
+
+                            await std.ReplaceSelectedTextWithAsync(
+                                codeText
+                                );
+                        },
+                        a =>
+                        {
+                            var textArea = a as ICSharpCode.AvalonEdit.Editing.TextArea;
+                            if (textArea is null)
+                            {
+                                return false;
+                            }
+
+                            var codeText = textArea?.Document?.Text;
+                            if (string.IsNullOrEmpty(codeText))
+                            {
+                                return false;
+                            }
+
+                            var chat = SelectedChat?.Chat;
+                            if (chat is null)
+                            {
+                                return false;
+                            }
+
+                            var std = chat.Description.SelectedTextDescriptor;
+                            if (std is null)
+                            {
+                                return false;
+                            }
+
+                            if (!std.IsAbleToManipulate)
+                            {
+                                return false;
+                            }
+
+                            return true;
+                        }
+                        );
+                }
+
+                return _replaceSelectedTextCommand;
             }
         }
 
@@ -279,7 +414,7 @@ namespace FreeAIr.UI.ViewModels
             {
                 get
                 {
-                    return Chat.Description?.FileName ?? string.Empty;
+                    return Chat.Description?.SelectedTextDescriptor?.FileName ?? string.Empty;
                 }
             }
 

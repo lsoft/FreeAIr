@@ -53,6 +53,7 @@
     <Compile Include="Commands\ChooseModelCommand.cs" />
     <Compile Include="Commands\CompleteCodeByCommentsCommand.cs" />
     <Compile Include="Commands\ExplainCodeCommand.cs" />
+    <Compile Include="Commands\GenerateWholeLineSuggestionCommand.cs" />
     <Compile Include="Commands\OpenChatListToolWindowCommand.cs" />
     <Compile Include="Commands\OptimizeCodeCommand.cs" />
     <Compile Include="Commands\StartDiscussionCommand.cs" />

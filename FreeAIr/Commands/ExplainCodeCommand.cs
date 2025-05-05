@@ -44,8 +44,8 @@ namespace FreeAIr.Commands
             var componentModel = (IComponentModel)await FreeAIrPackage.Instance.GetServiceAsync(typeof(SComponentModel));
             var chatContainer = componentModel.GetService<ChatContainer>();
 
-            var (fileName, selectedCode) = await DocumentHelper.GetSelectedTextAsync();
-            if (fileName is null || string.IsNullOrEmpty(selectedCode))
+            var std = await DocumentHelper.GetSelectedTextAsync();
+            if (std is null)
             {
                 await VS.MessageBox.ShowErrorAsync(
                     Resources.Resources.Error,
@@ -59,69 +59,15 @@ namespace FreeAIr.Commands
             chatContainer.StartChat(
                 new ChatDescription(
                     kind,
-                    fileName
+                    std
                     ),
-                UserPrompt.CreateCodeBasedPrompt(kind, fileName, selectedCode)
+                UserPrompt.CreateCodeBasedPrompt(kind, std.FileName, std.SelectedText)
                 );
 
             if (ResponsePage.Instance.SwitchToTaskWindow)
             {
                 _ = await ChatListToolWindow.ShowAsync();
             }
-        }
-
-    }
-
-
-    [Command(PackageIds.GenerateWholeLineSuggestionCommand)]
-    internal sealed class GenerateWholeLineSuggestionCommand : BaseCommand<GenerateWholeLineSuggestionCommand>
-    {
-        public GenerateWholeLineSuggestionCommand(
-            )
-        {
-        }
-
-        protected override async Task ExecuteAsync(OleMenuCmdEventArgs e)
-        {
-            await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
-
-            if (string.IsNullOrEmpty(ApiPage.Instance.Token))
-            {
-                await VS.MessageBox.ShowErrorAsync(
-                    Resources.Resources.Error,
-                    Resources.Resources.Code_NoToken
-                    );
-                return;
-            }
-
-            var documentView = await VS.Documents.GetActiveDocumentViewAsync();
-            if (documentView == null)
-            {
-                //not a text window
-                return;
-            }
-
-            var textView = documentView.TextView;
-            if (textView == null)
-            {
-                //not a text window
-                return;
-            }
-
-            var proposalSource = new FreeAIrProposalSource(
-                textView
-                );
-
-            var caretPosition = textView.Caret.Position.BufferPosition;
-
-            var proposalCollection = await proposalSource.CreateProposalSourceAsync(
-                caretPosition
-                );
-
-            await SuggestionHijackHelper.ShowAutocompleteAsync(
-                textView,
-                proposalCollection
-                );
         }
 
     }
