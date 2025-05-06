@@ -44,6 +44,7 @@ Main functions:
 - Chat
 - Composing commit message
 - Whole line completion
+- Generate unit tests
 
 Context menu:
 

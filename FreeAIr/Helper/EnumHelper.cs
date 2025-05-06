@@ -27,15 +27,26 @@ namespace FreeAIr.Helper
                 case ChatKindEnum.Discussion:
                     return string.Empty;
                 case ChatKindEnum.SuggestWholeLine:
-                    var prompt = FreeAIr.Resources.Resources.ResourceManager.GetString(
-                        "ChatKindEnum_SuggestWholeLine",
-                        ResponsePage.GetAnswerCulture()
-                        );
-                    var anchor = FreeAIr.Resources.Resources.ResourceManager.GetString(
-                        "ChatKindEnum_SuggestWholeLine_Anchor",
-                        ResponsePage.GetAnswerCulture()
-                        );
-                    return string.Format(prompt, anchor);
+                    {
+                        var prompt = FreeAIr.Resources.Resources.ResourceManager.GetString(
+                            "ChatKindEnum_SuggestWholeLine",
+                            ResponsePage.GetAnswerCulture()
+                            );
+                        var anchor = FreeAIr.Resources.Resources.ResourceManager.GetString(
+                            "ChatKindEnum_SuggestWholeLine_Anchor",
+                            ResponsePage.GetAnswerCulture()
+                            );
+                        return string.Format(prompt, anchor);
+                    }
+                case ChatKindEnum.GenerateUnitTests:
+                    {
+                        var prompt = FreeAIr.Resources.Resources.ResourceManager.GetString(
+                            "ChatKindEnum_GenerateUnitTests",
+                            ResponsePage.GetAnswerCulture()
+                            );
+                        var anchor = ResponsePage.Instance.PreferredUnitTestFramework;
+                        return string.Format(prompt, anchor);
+                    }
                 default:
                     throw new InvalidOperationException($"Unknown kind {kind}");
             }

@@ -61,6 +61,12 @@ namespace FreeAIr
         public bool IsImplicitWholeLineCompletionEnabled { get; set; } = false;
 
 
+        [Category("Response")]
+        [DisplayName("Preferred unit test framework")]
+        [Description("Set your preferred unit test framework. This is used for unit tests generation.")]
+        [DefaultValue("XUnit")]
+        public string PreferredUnitTestFramework { get; set; } = "XUnit";
+
         public static CultureInfo GetAnswerCulture()
         {
             return

@@ -53,7 +53,7 @@
     </Groups>
 
     <Buttons>
-      <Button guid="FreeAIr" id="FreeAIrChooseModelCommandId" priority="0x0100" type="Button">
+      <Button guid="FreeAIr" id="ChooseModelCommandId" priority="0x0100" type="Button">
         <Parent guid="FreeAIr" id="SubExtensionMenuGroup" />
         <Icon guid="ImageCatalogGuid" id="CodeReviewWizard" />
         <CommandFlag>IconIsMoniker</CommandFlag>
@@ -86,7 +86,7 @@
           <ButtonText>Add comments</ButtonText>
         </Strings>
       </Button>
-      <Button guid="FreeAIr" id="FreeAIrOptimizeCommandId" priority="0x0100" type="Button">
+      <Button guid="FreeAIr" id="OptimizeCommandId" priority="0x0100" type="Button">
         <Parent guid="FreeAIr" id="SourceCodeContextGroup" />
         <Icon guid="ImageCatalogGuid" id="CodeMetrics" />
         <CommandFlag>IconIsMoniker</CommandFlag>
@@ -116,6 +116,14 @@
         <CommandFlag>IconIsMoniker</CommandFlag>
         <Strings>
           <ButtonText>Generate whole line suggestion...</ButtonText>
+        </Strings>
+      </Button>
+        <Button guid="FreeAIr" id="GenerateUnitTestsCommandId" priority="0x0100" type="Button">
+        <Parent guid="FreeAIr" id="SourceCodeContextGroup" />
+        <Icon guid="ImageCatalogGuid" id="TestGroup" />
+        <CommandFlag>IconIsMoniker</CommandFlag>
+        <Strings>
+          <ButtonText>Generate unit tests</ButtonText>
         </Strings>
       </Button>
 
@@ -154,6 +162,7 @@
     <KeyBinding guid="FreeAIr" id="AddCommentsCommandId" key1="C" mod1="ALT" editor="guidVSStd97" />
     <KeyBinding guid="FreeAIr" id="CompleteCodeByCommentsCommandId" key1="M" mod1="ALT" editor="guidVSStd97" />
     <KeyBinding guid="FreeAIr" id="GenerateWholeLineSuggestionCommand" key1="A" mod1="ALT" editor="guidVSStd97" />
+    <KeyBinding guid="FreeAIr" id="GenerateUnitTestsCommandId" key1="U" mod1="ALT" editor="guidVSStd97" />
   </KeyBindings>
 
   <Symbols>
@@ -169,11 +178,9 @@
 
       <IDSymbol name="ExplainCommandId" value="0x1021" />
       <IDSymbol name="AddCommentsCommandId" value="0x1022" />
-      <IDSymbol name="FreeAIrOptimizeCommandId" value="0x1023" />
-      <!--<IDSymbol name="FreeAIrAddAskCommandId" value="0x1024" />-->
+      <IDSymbol name="OptimizeCommandId" value="0x1023" />
       <IDSymbol name="CompleteCodeByCommentsCommandId" value="0x1025" />
-      <!--<IDSymbol name="FreeAIrCodeGenCommandId" value="0x1026"/>-->
-      <IDSymbol name="FreeAIrChooseModelCommandId" value="0x1027" />
+      <IDSymbol name="ChooseModelCommandId" value="0x1027" />
       <IDSymbol name="OpenChatListToolWindowCommandId" value="0x1028" />
       <IDSymbol name="StartDiscussionCommandId" value="0x1029" />
       <IDSymbol name="GenerateWholeLineSuggestionCommand" value="0x1030" />
@@ -183,6 +190,7 @@
       <IDSymbol name="ExplainFileCommandId" value="0x1033" />
       <IDSymbol name="AddCommentsToFileCommandId" value="0x1034" />
 
+      <IDSymbol name="GenerateUnitTestsCommandId" value="0x1035" />
     </GuidSymbol>
   </Symbols>
 </CommandTable>

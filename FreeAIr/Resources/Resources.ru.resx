@@ -118,7 +118,7 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="ChatKindEnum_AddComments" xml:space="preserve">
-    <value>Добавь к следующему коду комментарии, которые описывают, что код делает:</value>
+    <value>Добавь к следующему коду XML комментарии, которые описывают, что код делает. Не сокращай исходный код.</value>
   </data>
   <data name="ChatKindEnum_CompleteCodeAccordingComments" xml:space="preserve">
     <value>Дополните следующий код в соответствии с комментариями в нём:</value>
@@ -131,6 +131,9 @@
   </data>
   <data name="ChatKindEnum_OptimizeCode" xml:space="preserve">
     <value>Оптимизируй следующий код:</value>
+  </data>
+  <data name="ChatKindEnum_GenerateUnitTests" xml:space="preserve">
+    <value>Сгенерируй набор юнит тестов для следующего кода. Приведи в ответе только один фрагмент кода без дополнительной информации. Добавь комментарии для каждого теста, в котором описывается,что тест проверяет. Напиши код для тестового фреймворка {0}.</value>
   </data>
   <data name="ChatKindEnum_SuggestWholeLine" xml:space="preserve">
     <value>Предложи заполнение целой строки в то месте, где написано `{0}` в следующем коде. Дай в своем ответе только код без дополнительной информации. Не оборачивай весь свой ответ в любые кавычки.</value>

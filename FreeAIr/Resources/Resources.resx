@@ -118,7 +118,7 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="ChatKindEnum_AddComments" xml:space="preserve">
-    <value>Add comments that match the following code:</value>
+    <value>Add XML comments that match the following code. Do not shorten the source code.</value>
   </data>
   <data name="ChatKindEnum_CompleteCodeAccordingComments" xml:space="preserve">
     <value>Complete the following code according its comments:</value>
@@ -131,6 +131,9 @@
   </data>
   <data name="ChatKindEnum_OptimizeCode" xml:space="preserve">
     <value>Optimize the following code:</value>
+  </data>
+  <data name="ChatKindEnum_GenerateUnitTests" xml:space="preserve">
+    <value>Generate a set of unit tests for the following code. Provide only one code snippet in your answer, without any additional information. Add comments for each test that describe what the test checks. Write code for the {0} test framework.</value>
   </data>
   <data name="ChatKindEnum_SuggestWholeLine" xml:space="preserve">
     <value>Suggest filling the whole line where `{0}` is written in the following code. Give in your reply only piece of code without additional information. Do not wrap the whole answer in any quotes.</value>

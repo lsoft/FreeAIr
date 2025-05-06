@@ -61,7 +61,7 @@ namespace FreeAIr.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Add comments that match the following code:.
+        ///   Looks up a localized string similar to Add XML comments that match the following code. Do not shorten the source code..
         /// </summary>
         public static string ChatKindEnum_AddComments {
             get {
@@ -93,6 +93,15 @@ namespace FreeAIr.Resources {
         public static string ChatKindEnum_GenerateCommitMessage {
             get {
                 return ResourceManager.GetString("ChatKindEnum_GenerateCommitMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Generate a set of unit tests for the following code. Provide only one code snippet in your answer, without any additional information. Add comments for each test that describe what the test checks. Write code for the {0} test framework..
+        /// </summary>
+        public static string ChatKindEnum_GenerateUnitTests {
+            get {
+                return ResourceManager.GetString("ChatKindEnum_GenerateUnitTests", resourceCulture);
             }
         }
         

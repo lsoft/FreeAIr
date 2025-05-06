@@ -288,7 +288,8 @@ namespace FreeAIr.BLogic
         CompleteCodeAccordingComments,
         Discussion,
         GenerateCommitMessage,
-        SuggestWholeLine
+        SuggestWholeLine,
+        GenerateUnitTests
     }
 
     public sealed class Answer

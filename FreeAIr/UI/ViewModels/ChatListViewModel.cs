@@ -2,10 +2,13 @@
 using FreeAIr.BLogic;
 using FreeAIr.Commands;
 using FreeAIr.Helper;
+using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
+using System.IO;
 using System.Linq;
+using System.Net.Mail;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -28,6 +31,7 @@ namespace FreeAIr.UI.ViewModels
         private ICommand _startDiscussionCommand;
         private ICommand _copyCodeBlockCommand;
         private ICommand _replaceSelectedTextCommand;
+        private ICommand _createNewFileCommand;
 
         private string _promptText;
 
@@ -274,6 +278,69 @@ namespace FreeAIr.UI.ViewModels
                 }
 
                 return _replaceSelectedTextCommand;
+            }
+        }
+
+        public ICommand CreateNewFileCommand
+        {
+            get
+            {
+                if (_createNewFileCommand == null)
+                {
+                    _createNewFileCommand = new AsyncRelayCommand(
+                        async a =>
+                        {
+                            var textArea = a as ICSharpCode.AvalonEdit.Editing.TextArea;
+                            if (textArea is null)
+                            {
+                                await VS.MessageBox.ShowErrorAsync(
+                                    "Resources.Resources.Error",
+                                    "Cannot create a new file. Please create the file manually."
+                                    );
+                                return;
+                            }
+
+                            var codeText = textArea?.Document?.Text;
+                            if (codeText is null)
+                            {
+                                await VS.MessageBox.ShowErrorAsync(
+                                    "Resources.Resources.Error",
+                                    "Cannot create a new file. Please create the file manually."
+                                    );
+                                return;
+                            }
+
+                            var solution = await VS.Solutions.GetCurrentSolutionAsync();
+                            if (solution is null)
+                            {
+                                await VS.MessageBox.ShowErrorAsync(
+                                    "Resources.Resources.Error",
+                                    "Cannot create a new file. Please create the file manually."
+                                    );
+                                return;
+                            }
+
+                            var sfi = new FileInfo(solution.FullPath);
+
+                            var sfd = new SaveFileDialog();
+                            sfd.InitialDirectory = sfi.Directory.FullName;
+                            sfd.FileName = "_.cs";
+                            var r = sfd.ShowDialog();
+                            if (!r.HasValue || !r.Value)
+                            {
+                                return;
+                            }
+
+                            var targetFilePath = sfd.FileName;
+                            File.WriteAllText(
+                                targetFilePath,
+                                codeText
+                                );
+                        }
+                        );
+                }
+
+                return _createNewFileCommand;
             }
         }
 

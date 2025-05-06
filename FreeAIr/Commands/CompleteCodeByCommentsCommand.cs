@@ -7,52 +7,14 @@ using Microsoft.VisualStudio.ComponentModelHost;
 namespace FreeAIr.Commands
 {
     [Command(PackageIds.CompleteCodeByCommentsCommandId)]
-    internal sealed class CompleteCodeByCommentsCommand : BaseCommand<CompleteCodeByCommentsCommand>
+    internal sealed class CompleteCodeByCommentsCommand : InvokeLLMCommand<CompleteCodeByCommentsCommand>
     {
         public CompleteCodeByCommentsCommand(
             )
         {
         }
 
-        protected override async Task ExecuteAsync(OleMenuCmdEventArgs e)
-        {
-            await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
-
-            if (string.IsNullOrEmpty(ApiPage.Instance.Token))
-            {
-                await VS.MessageBox.ShowErrorAsync(
-                    Resources.Resources.Error,
-                    Resources.Resources.Code_NoToken
-                    );
-                return;
-            }
-
-            var componentModel = (IComponentModel)await FreeAIrPackage.Instance.GetServiceAsync(typeof(SComponentModel));
-            var chatContainer = componentModel.GetService<ChatContainer>();
-
-            var std = await DocumentHelper.GetSelectedTextAsync();
-            if (std is null)
-            {
-                await VS.MessageBox.ShowErrorAsync(
-                    Resources.Resources.Error,
-                    Resources.Resources.Code_NoSelectedCode
-                    );
-                return;
-            }
-
-            var kind = ChatKindEnum.CompleteCodeAccordingComments;
-
-            chatContainer.StartChat(
-                new ChatDescription(
-                    kind,
-                    std
-                    ),
-                UserPrompt.CreateCodeBasedPrompt(kind, std.FileName, std.OriginalText)
-                );
-
-            await ChatListToolWindow.ShowIfEnabledAsync();
-        }
-
+        protected override ChatKindEnum GetChatKind() => ChatKindEnum.CompleteCodeAccordingComments;
     }
 
 }

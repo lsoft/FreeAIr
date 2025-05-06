@@ -2,7 +2,7 @@
 
 namespace FreeAIr.Commands
 {
-    [Command(PackageIds.FreeAIrChooseModelCommandId)]
+    [Command(PackageIds.ChooseModelCommandId)]
     internal sealed class ChooseModelCommand : BaseCommand<ChooseModelCommand>
     {
         protected override async Task ExecuteAsync(OleMenuCmdEventArgs e)
