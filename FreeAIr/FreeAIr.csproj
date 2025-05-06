@@ -50,9 +50,11 @@
     <Compile Include="BLogic\CommitMessageBuilder.cs" />
     <Compile Include="BLogic\CompletionProposal.cs" />
     <Compile Include="Commands\AddCommentsCommand.cs" />
+    <Compile Include="Commands\AddCommentsToFileCommand.cs" />
     <Compile Include="Commands\ChooseModelCommand.cs" />
     <Compile Include="Commands\CompleteCodeByCommentsCommand.cs" />
     <Compile Include="Commands\ExplainCodeCommand.cs" />
+    <Compile Include="Commands\ExplainFileCommand.cs" />
     <Compile Include="Commands\GenerateWholeLineSuggestionCommand.cs" />
     <Compile Include="Commands\OpenChatListToolWindowCommand.cs" />
     <Compile Include="Commands\OptimizeCodeCommand.cs" />

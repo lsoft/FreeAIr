@@ -142,7 +142,7 @@
     <value>Не могу получить выделенный блок кода.</value>
   </data>
   <data name="Code_NoToken" xml:space="preserve">
-    <value>Пожалуйста, задайте ендпоинт API и токен доступа в настройках Visual Studio на странице FreeAIr.</value>
+    <value>Пожалуйста, задайте ендпоинт API и токен доступа в настройках Visual Studio на странице FreeAIr. Если Вы используете локальную LLM и токен не нужен, введите в его поле произвольную строку.</value>
   </data>
   <data name="Error" xml:space="preserve">
     <value>Ошибка</value>

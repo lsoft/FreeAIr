@@ -15,7 +15,7 @@ namespace FreeAIr.Helper
 {
     public static class DocumentHelper
     {
-        public static async Task<SelectedTextDescriptor?> GetSelectedTextAsync()
+        public static async Task<IOriginalTextDescriptor?> GetSelectedTextAsync()
         {
             var docView = await VS.Documents.GetActiveDocumentViewAsync();
             if (docView?.TextView == null)
@@ -30,7 +30,76 @@ namespace FreeAIr.Helper
         }
     }
 
-    public sealed class SelectedTextDescriptor : IDisposable
+    public interface IOriginalTextDescriptor : IDisposable
+    {
+        string FileName
+        {
+            get;
+        }
+        
+        bool IsAbleToManipulate
+        {
+            get;
+        }
+
+        string OriginalText
+        {
+            get;
+        }
+
+        Task ReplaceOriginalTextWithNewAsync(string newText);
+    }
+
+    public sealed class WholeFileTextDescriptor : IOriginalTextDescriptor
+    {
+        private readonly string _filePath;
+
+        public string FileName
+        {
+            get;
+        }
+
+        public bool IsAbleToManipulate => File.Exists(_filePath);
+
+        public string OriginalText
+        {
+            get;
+        }
+
+        public WholeFileTextDescriptor(
+            string filePath
+            )
+        {
+            if (filePath is null)
+            {
+                throw new ArgumentNullException(nameof(filePath));
+            }
+
+            _filePath = filePath;
+            FileName = new FileInfo(filePath).Name;
+            OriginalText = File.ReadAllText(_filePath);
+        }
+
+
+        public void Dispose()
+        {
+            //nothing to do
+        }
+
+        public Task ReplaceOriginalTextWithNewAsync(string newText)
+        {
+            if (newText is null)
+            {
+                throw new ArgumentNullException(nameof(newText));
+            }
+
+            File.WriteAllText(_filePath, newText);
+
+            return Task.CompletedTask;
+        }
+    }
+
+    public sealed class SelectedTextDescriptor : IOriginalTextDescriptor
     {
         private int _disposed = 0;
 
@@ -42,7 +111,7 @@ namespace FreeAIr.Helper
             get;
         }
 
-        public string SelectedText
+        public string OriginalText
         {
             get;
         }
@@ -68,7 +137,7 @@ namespace FreeAIr.Helper
             documentView.TextView.Closed += TextView_Closed;
 
             FileName = fileName;
-            SelectedText = selectedText;
+            OriginalText = selectedText;
             _documentView = documentView;
         }
 
@@ -89,7 +158,7 @@ namespace FreeAIr.Helper
             _documentView = null;
         }
 
-        public async Task ReplaceSelectedTextWithAsync(
+        public async Task ReplaceOriginalTextWithNewAsync(
             string newText
             )
         {

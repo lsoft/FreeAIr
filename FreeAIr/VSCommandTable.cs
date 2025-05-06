@@ -35,5 +35,9 @@ namespace FreeAIr
         public const int OpenChatListToolWindowCommandId = 0x1028;
         public const int StartDiscussionCommandId = 0x1029;
         public const int GenerateWholeLineSuggestionCommand = 0x1030;
+        public const int SolutionContextMenu = 0x1031;
+        public const int SolutionContextGroup = 0x1032;
+        public const int ExplainFileCommandId = 0x1033;
+        public const int AddCommentsToFileCommandId = 0x1034;
     }
 }

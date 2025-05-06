@@ -24,6 +24,13 @@
         </Strings>
       </Menu>
 
+      <Menu guid="FreeAIr" id="SolutionContextMenu" priority="0x0000" type="Menu">
+        <Parent guid="VSMainMenu" id="ItemNode.OpenGroup" />
+        <Strings>
+          <ButtonText>FreeAIr actions</ButtonText>
+        </Strings>
+      </Menu>
+
     </Menus>
 
     <Groups>
@@ -39,7 +46,10 @@
       <Group guid="FreeAIr" id="SubExtensionMenuGroup" priority="0x0000">
         <Parent guid="FreeAIr" id="SubExtensionMenu" />
       </Group>
-    
+
+      <Group guid="FreeAIr" id="SolutionContextGroup" priority="0x0600">
+        <Parent guid="FreeAIr" id="SolutionContextMenu" />
+      </Group>
     </Groups>
 
     <Buttons>
@@ -92,23 +102,6 @@
           <ButtonText>Complete the code according to the comments</ButtonText>
         </Strings>
       </Button>
-      <!--<Button guid="FreeAIr" id="FreeAIrAddAskCommandId" priority="0x0100" type="Button">
-        <Parent guid="FreeAIr" id="SourceCodeContextGroup" />
-        <Icon guid="ImageCatalogGuid" id="AddButton" />
-        <CommandFlag>IconIsMoniker</CommandFlag>
-        <Strings>
-          <ButtonText>Add to chat list</ButtonText>
-        </Strings>
-      </Button>-->
-
-      <!--<Button guid="FreeAIr" id="FreeAIrCodeGenCommandId" priority="0x0100" type="Button">
-        <Parent guid="FreeAIr" id="SourceCodeContextGroup"/>
-        <Icon guid="ImageCatalogGuid" id="AddButton" />
-        <CommandFlag>IconIsMoniker</CommandFlag>
-        <Strings>
-          <ButtonText>Generate code...</ButtonText>
-        </Strings>
-      </Button>-->
       <Button guid="FreeAIr" id="StartDiscussionCommandId" priority="0x0100" type="Button">
         <Parent guid="FreeAIr" id="SourceCodeContextGroup" />
         <Icon guid="ImageCatalogGuid" id="UserTask" />
@@ -125,6 +118,33 @@
           <ButtonText>Generate whole line suggestion...</ButtonText>
         </Strings>
       </Button>
+
+      <!--<Button guid="FreeAIr" id="MyCommand" priority="0x0100" type="Button">
+        <Parent guid="FreeAIr" id="SolutionContextGroup" />
+        <Icon guid="ImageCatalogGuid" id="UserTask" />
+        <Strings>
+          <ButtonText>pss...</ButtonText>
+        </Strings>
+      </Button>-->
+      <Button guid="FreeAIr" id="ExplainFileCommandId" priority="0x0100" type="Button">
+        <Parent guid="FreeAIr" id="SolutionContextGroup" />
+        <Icon guid="ImageCatalogGuid" id="SQLServerObjectExplorer" />
+        <CommandFlag>IconIsMoniker</CommandFlag>
+        <Strings>
+          <ButtonText>Explain code in the file</ButtonText>
+        </Strings>
+      </Button>
+      <Button guid="FreeAIr" id="AddCommentsToFileCommandId" priority="0x0100" type="Button">
+        <Parent guid="FreeAIr" id="SolutionContextGroup" />
+        <Icon guid="ImageCatalogGuid" id="CodeReviewWizard" />
+        <CommandFlag>IconIsMoniker</CommandFlag>
+        <Strings>
+          <ButtonText>Add comments to the code of the file</ButtonText>
+        </Strings>
+      </Button>
+
+
+
 
     </Buttons>
   </Commands>
@@ -157,6 +177,11 @@
       <IDSymbol name="OpenChatListToolWindowCommandId" value="0x1028" />
       <IDSymbol name="StartDiscussionCommandId" value="0x1029" />
       <IDSymbol name="GenerateWholeLineSuggestionCommand" value="0x1030" />
+
+      <IDSymbol name="SolutionContextMenu" value="0x1031" />
+      <IDSymbol name="SolutionContextGroup" value="0x1032" />
+      <IDSymbol name="ExplainFileCommandId" value="0x1033" />
+      <IDSymbol name="AddCommentsToFileCommandId" value="0x1034" />
 
     </GuidSymbol>
   </Symbols>

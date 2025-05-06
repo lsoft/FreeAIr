@@ -3,13 +3,15 @@ using FreeAIr.BLogic;
 using FreeAIr.Helper;
 using FreeAIr.UI.ToolWindows;
 using Microsoft.VisualStudio.ComponentModelHost;
+using System.IO;
+using System.Linq;
 
 namespace FreeAIr.Commands
 {
-    [Command(PackageIds.CompleteCodeByCommentsCommandId)]
-    internal sealed class CompleteCodeByCommentsCommand : BaseCommand<CompleteCodeByCommentsCommand>
+    [Command(PackageIds.AddCommentsToFileCommandId)]
+    internal sealed class AddCommentsToFileCommand : BaseCommand<AddCommentsToFileCommand>
     {
-        public CompleteCodeByCommentsCommand(
+        public AddCommentsToFileCommand(
             )
         {
         }
@@ -30,29 +32,41 @@ namespace FreeAIr.Commands
             var componentModel = (IComponentModel)await FreeAIrPackage.Instance.GetServiceAsync(typeof(SComponentModel));
             var chatContainer = componentModel.GetService<ChatContainer>();
 
-            var std = await DocumentHelper.GetSelectedTextAsync();
-            if (std is null)
+            var sew = await VS.Windows.GetSolutionExplorerWindowAsync();
+            var selections = (await sew.GetSelectionAsync()).ToList();
+            if (selections.Count != 1)
             {
                 await VS.MessageBox.ShowErrorAsync(
                     Resources.Resources.Error,
-                    Resources.Resources.Code_NoSelectedCode
+                    "Please select only one item."
                     );
                 return;
             }
 
-            var kind = ChatKindEnum.CompleteCodeAccordingComments;
+            var selectedFile = selections[0];
+            if (selectedFile.Type != SolutionItemType.PhysicalFile)
+            {
+                await VS.MessageBox.ShowErrorAsync(
+                    Resources.Resources.Error,
+                    "Selected item is not a physical file."
+                    );
+                return;
+            }
+
+            var kind = ChatKindEnum.AddComments;
+
+            var wfd = new WholeFileTextDescriptor(selectedFile.FullPath);
 
             chatContainer.StartChat(
                 new ChatDescription(
                     kind,
-                    std
+                    wfd
                     ),
-                UserPrompt.CreateCodeBasedPrompt(kind, std.FileName, std.OriginalText)
+                UserPrompt.CreateCodeBasedPrompt(kind, wfd.FileName, wfd.OriginalText)
                 );
 
             await ChatListToolWindow.ShowIfEnabledAsync();
         }
-
     }
 
 }

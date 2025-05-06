@@ -324,14 +324,14 @@ namespace FreeAIr.BLogic
         {
             get;
         }
-        public SelectedTextDescriptor? SelectedTextDescriptor
+        public IOriginalTextDescriptor? SelectedTextDescriptor
         {
             get;
         }
 
         public ChatDescription(
             ChatKindEnum kind,
-            SelectedTextDescriptor? selectedTextDescriptor
+            IOriginalTextDescriptor? selectedTextDescriptor
             )
         {
             Kind = kind;

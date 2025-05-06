@@ -185,10 +185,7 @@ namespace FreeAIr.BLogic
                     }
                     );
 
-                if (ResponsePage.Instance.SwitchToTaskWindow)
-                {
-                    _ = await ChatListToolWindow.ShowAsync();
-                }
+                await ChatListToolWindow.ShowIfEnabledAsync();
             }
             catch (Exception excp)
             {

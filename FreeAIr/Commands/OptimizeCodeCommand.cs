@@ -47,13 +47,10 @@ namespace FreeAIr.Commands
                     kind,
                     std
                     ),
-                UserPrompt.CreateCodeBasedPrompt(kind, std.FileName, std.SelectedText)
+                UserPrompt.CreateCodeBasedPrompt(kind, std.FileName, std.OriginalText)
                 );
 
-            if (ResponsePage.Instance.SwitchToTaskWindow)
-            {
-                _ = await ChatListToolWindow.ShowAsync();
-            }
+            await ChatListToolWindow.ShowIfEnabledAsync();
         }
 
     }

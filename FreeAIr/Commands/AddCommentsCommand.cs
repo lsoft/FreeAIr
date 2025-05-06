@@ -11,8 +11,6 @@ using OpenAI.Chat;
 using System;
 using System.ClientModel;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using System.Management.Instrumentation;
 using System.Text;
 using System.Threading;
@@ -61,14 +59,12 @@ namespace FreeAIr.Commands
                     kind,
                     std
                     ),
-                UserPrompt.CreateCodeBasedPrompt(kind, std.FileName, std.SelectedText)
+                UserPrompt.CreateCodeBasedPrompt(kind, std.FileName, std.OriginalText)
                 );
 
-            if (ResponsePage.Instance.SwitchToTaskWindow)
-            {
-                _ = await ChatListToolWindow.ShowAsync();
-            }
+            await ChatListToolWindow.ShowIfEnabledAsync();
         }
 
     }
+
 }

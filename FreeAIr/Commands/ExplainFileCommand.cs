@@ -1,27 +1,16 @@
 ﻿using EnvDTE;
-using EnvDTE80;
 using FreeAIr.BLogic;
-using FreeAIr.Helper;
 using FreeAIr.UI.ToolWindows;
-using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.ComponentModelHost;
-using Microsoft.VisualStudio.Text;
-using OpenAI;
-using OpenAI.Chat;
-using System;
-using System.ClientModel;
-using System.Collections.Generic;
-using System.Management.Instrumentation;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
+using System.IO;
+using System.Linq;
 
 namespace FreeAIr.Commands
 {
-    [Command(PackageIds.ExplainCommandId)]
-    internal sealed class ExplainCodeCommand : BaseCommand<ExplainCodeCommand>
+    [Command(PackageIds.ExplainFileCommandId)]
+    internal sealed class ExplainFileCommand : BaseCommand<ExplainFileCommand>
     {
-        public ExplainCodeCommand(
+        public ExplainFileCommand(
             )
         {
         }
@@ -42,24 +31,47 @@ namespace FreeAIr.Commands
             var componentModel = (IComponentModel)await FreeAIrPackage.Instance.GetServiceAsync(typeof(SComponentModel));
             var chatContainer = componentModel.GetService<ChatContainer>();
 
-            var std = await DocumentHelper.GetSelectedTextAsync();
-            if (std is null)
+            var sew = await VS.Windows.GetSolutionExplorerWindowAsync();
+            var selections = (await sew.GetSelectionAsync()).ToList();
+            if (selections.Count != 1)
             {
                 await VS.MessageBox.ShowErrorAsync(
                     Resources.Resources.Error,
-                    Resources.Resources.Code_NoSelectedCode
+                    "Please select only one item."
                     );
                 return;
             }
+
+            var selectedFile = selections[0];
+            if (selectedFile.Type != SolutionItemType.PhysicalFile)
+            {
+                await VS.MessageBox.ShowErrorAsync(
+                    Resources.Resources.Error,
+                    "Selected item is not a physical file."
+                    );
+                return;
+            }
+
+            var code = File.ReadAllText(selectedFile.FullPath);
+            if (string.IsNullOrEmpty(code))
+            {
+                await VS.MessageBox.ShowErrorAsync(
+                    Resources.Resources.Error,
+                    "File is empty"
+                    );
+                return;
+            }
+
+            var fileName = new FileInfo(selectedFile.FullPath).Name;
 
             var kind = ChatKindEnum.ExplainCode;
 
             chatContainer.StartChat(
                 new ChatDescription(
                     kind,
-                    std
+                    null
                     ),
-                UserPrompt.CreateCodeBasedPrompt(kind, std.FileName, std.OriginalText)
+                UserPrompt.CreateCodeBasedPrompt(kind, fileName, code)
                 );
 
             await ChatListToolWindow.ShowIfEnabledAsync();

@@ -26,6 +26,15 @@ namespace FreeAIr.UI.ToolWindows
         }
 
 
+        public static async Task ShowIfEnabledAsync()
+        {
+            if (ResponsePage.Instance.SwitchToTaskWindow)
+            {
+                _ = await ChatListToolWindow.ShowAsync();
+            }
+        }
+
+
         [Guid("ff949254-e51d-40a2-afa6-ad4482f5e54d")]
         internal class Pane : ToolkitToolWindowPane
         {

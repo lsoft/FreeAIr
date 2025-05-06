@@ -177,38 +177,12 @@
                                                 Margin="0,5,0,0"
                                                 >
                                                 <Grid.RowDefinitions>
-                                                    <RowDefinition Height="auto" />
                                                     <RowDefinition />
+                                                    <RowDefinition Height="auto" />
                                                 </Grid.RowDefinitions>
 
-                                                <StackPanel
-                                                    Grid.Row="0"
-                                                    Orientation="Horizontal"
-                                                    HorizontalAlignment="Right"
-                                                    >
-                                                    <Button
-                                                        HorizontalAlignment="Right"
-                                                        Margin="5,0,5,0"
-                                                        Content="Copy"
-                                                        Style="{Binding ElementName=OpenAsMdButton, Path=Style}"
-                                                        Command="{Binding ElementName=ChatListToolWindow, Path=DataContext.CopyCodeBlockCommand}"
-                                                        CommandParameter="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=TextArea}"
-                                                        ToolTip="Copy this code part to clipboard"
-                                                        />
-                                                    <Button
-                                                        HorizontalAlignment="Right"
-                                                        Margin="5,0,5,0"
-                                                        Content="Replace selected text"
-                                                        Style="{Binding ElementName=OpenAsMdButton, Path=Style}"
-                                                        Command="{Binding ElementName=ChatListToolWindow, Path=DataContext.ReplaceSelectedTextCommand}"
-                                                        CommandParameter="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=TextArea}"
-                                                        ToolTip="Replace the selected block of the code in the VS document with this code part"
-                                                        />
-
-                                                </StackPanel>
-
                                                 <ScrollViewer
-                                                    Grid.Row="1"
+                                                    Grid.Row="0"
                                                     Focusable="False"
                                                     Name="PART_ScrollViewer"
                                                     CanContentScroll="True"
@@ -219,6 +193,33 @@
                                                     HorizontalContentAlignment="Left"
                                                     Padding="{TemplateBinding Padding}"
                                                     />
+
+                                                <StackPanel
+                                                    Grid.Row="1"
+                                                    Orientation="Horizontal"
+                                                    HorizontalAlignment="Right"
+                                                    >
+                                                    <Button
+                                                        HorizontalAlignment="Right"
+                                                        Margin="5,0,5,0"
+                                                        Content="↑ Copy"
+                                                        Style="{Binding ElementName=OpenAsMdButton, Path=Style}"
+                                                        Command="{Binding ElementName=ChatListToolWindow, Path=DataContext.CopyCodeBlockCommand}"
+                                                        CommandParameter="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=TextArea}"
+                                                        ToolTip="Copy this code part to clipboard"
+                                                        />
+                                                    <Button
+                                                        HorizontalAlignment="Right"
+                                                        Margin="5,0,5,0"
+                                                        Content="↑ Replace original text"
+                                                        Style="{Binding ElementName=OpenAsMdButton, Path=Style}"
+                                                        Command="{Binding ElementName=ChatListToolWindow, Path=DataContext.ReplaceSelectedTextCommand}"
+                                                        CommandParameter="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=TextArea}"
+                                                        ToolTip="Replace the selected block of the code in the VS document with this code part"
+                                                        />
+
+                                                </StackPanel>
+
                                             </Grid>
                                         </ControlTemplate>
                                     </Setter.Value>

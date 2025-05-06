@@ -31,10 +31,14 @@ A: No problem! You can use local LLM, for example via KoboldCpp. Local LLM sends
 
 # Features
 
-Source's context menu commands are available:
+Main functions:
 
 - Explain the code
+  - selected piece of the code
+  - whole file
 - Comment the code
+  - selected piece of the code
+  - whole file
 - Optimize the code
 - Continue writing code according to the comments
 - Chat
@@ -52,6 +56,10 @@ Chat window:
 Composing commit message:
 
 ![Composing commit message](https://raw.githubusercontent.com/lsoft/FreeAIr/main/commitmessage.png)
+
+Whole file commands:
+
+![Whole file commands](https://raw.githubusercontent.com/lsoft/FreeAIr/main/wholefilecommand.png)
 
 Main menu:
 
@@ -76,7 +84,7 @@ Put cursor in the place of your source code where you need an autocompletion and
 
 # How I can access to AI if my country is banned from Copilot and from any other LLM provider?
 
-This is possible. If you are banned only for Copilot:
+This is possible. If you are banned only from Copilot:
 
 0. Install this VSIX into your Visual Studio. You will need to have Visual Studio 2022 v.17.10 at least.
 1. Register on [openrouter.ai](openrouter.ai). This is easily can be done via github.com account. Also, you can obtain access to any LLM with OpenAI compatible API. FreeAIr itself does not include any LLM.
@@ -86,7 +94,7 @@ This is possible. If you are banned only for Copilot:
 
 FreeAIr itself has no restrictions, you are able to switch another OpenAI compatible API.
 
-If you are banned from any remote LLM then run LLM locally, for example with KoboldCpp: run KoboldCpp, choose the model, wait for KoboldCpp starts (it opens browser), and then use correct OpenAI compatible endpoint like `http://localhost:5001/v1`.
+If you are banned from any remote LLM then run LLM locally, which is very easy, for example with KoboldCpp: run KoboldCpp, choose the model, wait for KoboldCpp starts (it opens browser), and then use correct OpenAI compatible endpoint like `http://localhost:5001/v1`.
 
 # Thanks
 
@@ -94,3 +102,4 @@ If you are banned from any remote LLM then run LLM locally, for example with Kob
 - [CCodeAI](https://github.com/TimChen44/CCodeAI) for inspiration.
 - [L.AI](https://github.com/cntseesharp/L.AI) for inspiration.
 - [KoboldCpp](https://github.com/LostRuins/koboldcpp/) for testing without daily limits.
+- to you, visitor. Thanks for reading this. If you are enjoying it please consider give it a star in the github repo and ★★★★★ rating on the Visual Studio Marketplace.

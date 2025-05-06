@@ -233,7 +233,7 @@ namespace FreeAIr.UI.ViewModels
                                 return;
                             }
 
-                            await std.ReplaceSelectedTextWithAsync(
+                            await std.ReplaceOriginalTextWithNewAsync(
                                 codeText
                                 );
                         },
