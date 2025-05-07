@@ -39,7 +39,7 @@ namespace FreeAIr.Commands
                 return;
             }
 
-            var proposalSource = new FreeAIrProposalSource(
+            var proposalSource = new ProposalSource(
                 textView
                 );
 

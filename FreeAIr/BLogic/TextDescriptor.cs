@@ -1,10 +1,4 @@
-﻿using Community.VisualStudio.Toolkit;
-using EnvDTE80;
-using Microsoft.CodeAnalysis.Editing;
-using Microsoft.CodeAnalysis.Text;
-using Microsoft.VisualStudio.Text;
-using Microsoft.VisualStudio.Text.Editor;
-using Microsoft.VisualStudio.TextManager.Interop;
+﻿using Microsoft.VisualStudio.Text;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -13,132 +7,15 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace FreeAIr.Helper
+namespace FreeAIr.BLogic
 {
-    public static class DocumentHelper
-    {
-        public static string OpenDocumentAndGetLineEnding(
-            string filePath
-            )
-        {
-            ThreadHelper.ThrowIfNotOnUIThread();
-
-            try
-            {
-                var dte = AsyncPackage.GetGlobalService(typeof(EnvDTE.DTE)) as DTE2;
-
-                var w = dte.ItemOperations.OpenFile(filePath);
-                var openDoc = w.Document;
-
-                var lineEnding = GetDocumentLineEnding(openDoc);
-                return lineEnding;
-            }
-            catch (Exception excp)
-            {
-                //todo log
-            }
-
-            return Environment.NewLine;
-        }
-
-        public static string GetOpenedDocumentLineEnding(
-            string filePath
-            )
-        {
-            ThreadHelper.ThrowIfNotOnUIThread();
-
-            try
-            {
-                var dte = AsyncPackage.GetGlobalService(typeof(EnvDTE.DTE)) as DTE2;
-
-                foreach (EnvDTE.Document document in dte.Documents)
-                {
-                    if (string.Compare(
-                        document.FullName,
-                        filePath,
-                        true) == 0)
-                    {
-                        var lineEnding = GetDocumentLineEnding(document);
-                        return lineEnding;
-                    }
-                }
-            }
-            catch (Exception excp)
-            {
-                //todo log
-            }
-
-            return Environment.NewLine;
-        }
-
-        public static string GetActiveDocumentLineEnding()
-        {
-            ThreadHelper.ThrowIfNotOnUIThread();
-
-            try
-            {
-                var dte = AsyncPackage.GetGlobalService(typeof(EnvDTE.DTE)) as DTE2;
-
-                var activeDoc = dte.ActiveDocument;
-                if (activeDoc is null || activeDoc.ReadOnly)
-                {
-                    return Environment.NewLine;
-                }
-
-                var lineEnding = GetDocumentLineEnding(activeDoc);
-                return lineEnding;
-            }
-            catch (Exception excp)
-            {
-                //todo log
-            }
-
-            return Environment.NewLine;
-        }
-
-        private static string GetDocumentLineEnding(
-            EnvDTE.Document activeDoc
-            )
-        {
-            ThreadHelper.ThrowIfNotOnUIThread();
-
-            if (activeDoc.Object("TextDocument") is EnvDTE.TextDocument textDoc)
-            {
-                var ep = textDoc.CreateEditPoint();
-                ep.EndOfLine();
-
-                var lineEnding = ep.GetText(null);
-                return lineEnding;
-            }
-
-            return Environment.NewLine;
-        }
-
-        public static async Task<IOriginalTextDescriptor?> GetSelectedTextAsync()
-        {
-            var docView = await VS.Documents.GetActiveDocumentViewAsync();
-            if (docView?.TextView == null)
-            {
-                //not a text window
-                return null;
-            }
-
-            var lineEnding = DocumentHelper.GetActiveDocumentLineEnding();
-
-            return new SelectedTextDescriptor(
-                docView,
-                lineEnding
-                );
-        }
-    }
-
     public interface IOriginalTextDescriptor : IDisposable
     {
         string FileName
         {
             get;
         }
-        
+
         bool IsAbleToManipulate
         {
             get;

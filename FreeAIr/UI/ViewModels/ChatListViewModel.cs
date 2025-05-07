@@ -332,9 +332,12 @@ namespace FreeAIr.UI.ViewModels
                             }
 
                             var targetFilePath = sfd.FileName;
+
+                            var lineEndings = LineEndingHelper.EditorConfig.GetLineEndingFor(targetFilePath);
+
                             File.WriteAllText(
                                 targetFilePath,
-                                codeText
+                                codeText.WithLineEnding(lineEndings)
                                 );
                         }
                         );

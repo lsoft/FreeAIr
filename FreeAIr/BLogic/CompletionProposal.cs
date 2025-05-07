@@ -27,18 +27,18 @@ using static FreeAIr.Helper.SuggestionHijackHelper;
 #nullable enable
 namespace FreeAIr.BLogic
 {
-    [Export(typeof(FreeAIrProposalSource))]
+    [Export(typeof(ProposalSource))]
     [Name("FreeAIrProposalSource")]
     [Order(Before = "InlineCSharpProposalSourceProvider")]
     [Order(Before = "Highest Priority")]
     [ContentType("any")]
-    public sealed class FreeAIrProposalSource : ProposalSourceBase
+    public sealed class ProposalSource : ProposalSourceBase
     {
         private const int MinDelayBeforeRequestsMsec = 500;
 
         private readonly ITextView _textView;
 
-        public FreeAIrProposalSource(
+        public ProposalSource(
             ITextView textView
             )
         {
@@ -104,7 +104,7 @@ namespace FreeAIr.BLogic
                     caretPosition
                     );
 
-                var lineEnding = DocumentHelper.GetOpenedDocumentLineEnding(documentFilePath);
+                var lineEnding = LineEndingHelper.Actual.GetOpenedDocumentLineEnding(documentFilePath);
 
                 var chatContainer = componentModel.GetService<ChatContainer>();
 
@@ -148,24 +148,24 @@ namespace FreeAIr.BLogic
         }
     }
 
-    [Export(typeof(FreeAIrProposalSourceProvider))]
+    [Export(typeof(ProposalSourceProvider))]
     [Export(typeof(ProposalSourceProviderBase))]
     [Name("FreeAIrProposalSourceProvider")]
     [Order(Before = "InlineCSharpProposalSourceProvider")]
     [Order(Before = "IntelliCodeCSharpProposalSource")]
     [Order(Before = "Highest Priority")]
     [ContentType("any")]
-    public sealed class FreeAIrProposalSourceProvider : ProposalSourceProviderBase, IDisposable
+    public sealed class ProposalSourceProvider : ProposalSourceProviderBase, IDisposable
     {
         private readonly ITextDocumentFactoryService _textDocumentFactoryService;
         private readonly IAsyncServiceProvider _serviceProvider;
 
-        internal FreeAIrProposalSourceProvider()
+        internal ProposalSourceProvider()
         {
         }
 
         [ImportingConstructor]
-        internal FreeAIrProposalSourceProvider(
+        internal ProposalSourceProvider(
           ITextDocumentFactoryService textDocumentFactoryService,
           SuggestionServiceBase suggestionServiceBase,
           [Import(typeof(SAsyncServiceProvider))] IAsyncServiceProvider serviceProvider,
@@ -213,7 +213,7 @@ namespace FreeAIr.BLogic
                 return null;
             }
 
-            return new FreeAIrProposalSource(view);
+            return new ProposalSource(view);
         }
     }
 }

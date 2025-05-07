@@ -32,7 +32,7 @@ namespace FreeAIr.Commands
             var componentModel = (IComponentModel)await FreeAIrPackage.Instance.GetServiceAsync(typeof(SComponentModel));
             var chatContainer = componentModel.GetService<ChatContainer>();
 
-            var std = await DocumentHelper.GetSelectedTextAsync();
+            var std = await TextDescriptorHelper.GetSelectedTextAsync();
             if (std is null)
             {
                 await VS.MessageBox.ShowErrorAsync(

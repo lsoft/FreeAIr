@@ -55,7 +55,7 @@ namespace FreeAIr.Commands
 
             var kind = ChatKindEnum.AddComments;
 
-            var lineEnding = DocumentHelper.OpenDocumentAndGetLineEnding(
+            var lineEnding = LineEndingHelper.Actual.OpenDocumentAndGetLineEnding(
                 selectedFile.FullPath
                 );
 
