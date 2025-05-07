@@ -271,11 +271,13 @@
                                         <Setter Property="Margin"          Value="5,0,5,0"/>
                                     </Trigger>
 
+                                    <!-- here is a style for xml node name -->
                                     <Trigger Property="Tag" Value="Note">
-                                        <Setter Property="Margin"          Value="5,0,5,0"/>
+                                        <Setter Property="Margin"          Value="20,0,20,0"/>
                                         <Setter Property="Padding"         Value="10, 5"/>
-                                        <Setter Property="BorderBrush"     Value="#DEDEDE"/>
-                                        <Setter Property="BorderThickness" Value="3,3,3,3"/>
+                                        <Setter Property="BorderBrush"     Value="DarkRed"/>
+                                        <Setter Property="BorderThickness" Value="0,0,0,1"/>
+                                        <Setter Property="Foreground"      Value="DarkRed"/>
                                         <Setter Property="Background"      Value="Transparent"/>
                                     </Trigger>
 
@@ -309,8 +311,7 @@
                             </Style>
 
                             <Style TargetType="Image">
-                                <Setter Property="RenderOptions.BitmapScalingMode"
-                                Value="NearestNeighbor" />
+                                <Setter Property="RenderOptions.BitmapScalingMode" Value="NearestNeighbor" />
                                 <Style.Triggers>
                                     <Trigger Property="Tag" Value="imageright">
                                         <Setter Property="Margin"  Value="20,0,0,0" />

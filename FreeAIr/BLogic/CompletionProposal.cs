@@ -120,7 +120,7 @@ namespace FreeAIr.BLogic
                     var lastPrompt = chat.Prompts.Last();
                     if (!string.IsNullOrEmpty(lastPrompt.Answer))
                     {
-                        var cleanAnswer = lastPrompt.Answer.CleanupFromQuotes();
+                        var cleanAnswer = lastPrompt.Answer.CleanupFromQuotesAndThinks();
                         if (!string.IsNullOrEmpty(cleanAnswer))
                         {
                             var proposalCollection = ProposalFactory.CreateCollectionFromText(

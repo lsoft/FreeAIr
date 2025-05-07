@@ -13,10 +13,23 @@ namespace FreeAIr.Helper
             @"```\S*"
             );
 
-        public static string CleanupFromQuotes(
+        private const string ThinkStart = "<think>";
+        private const string ThinkEnd = "</think>";
+
+        public static string CleanupFromQuotesAndThinks(
             this string answer
             )
         {
+            var tsi = answer.IndexOf(ThinkStart);
+            var tei = answer.IndexOf(ThinkEnd);
+            if (tsi >= 0 && tei >= 0 && tei > tsi)
+            {
+                answer = answer.Remove(
+                    tsi,
+                    tei - tsi + ThinkEnd.Length
+                    );
+            }
+
             answer = string.Join(
                 Environment.NewLine,
                 answer.Split('\r', '\n')
