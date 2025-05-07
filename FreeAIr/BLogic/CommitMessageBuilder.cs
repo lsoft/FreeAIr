@@ -5,7 +5,6 @@ using FreeAIr.UI.ToolWindows;
 using FreeAIr.UI.Windows;
 using Microsoft.VisualStudio.ComponentModelHost;
 using Microsoft.VisualStudio.Imaging;
-using Microsoft.VisualStudio.TeamFoundation.Git.Extensibility;
 using RunProcessAsTask;
 using SauronEye.UI.Informer;
 using System.ComponentModel.Composition;
@@ -166,7 +165,9 @@ namespace FreeAIr.BLogic
                         {
                             if (answer is not null)
                             {
-                                var commitMessage = answer.GetAnswer().CleanupFromQuotesAndThinks();
+                                var commitMessage = answer.GetAnswer().CleanupFromQuotesAndThinks(
+                                    Environment.NewLine
+                                    );
                                 if (!string.IsNullOrEmpty(commitMessage))
                                 {
                                     ThreadHelper.JoinableTaskFactory.RunAsync(

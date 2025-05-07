@@ -1,4 +1,5 @@
-﻿using FreeAIr.Helper;
+﻿using EnvDTE;
+using FreeAIr.Helper;
 using Microsoft.VisualStudio.ComponentModelHost;
 using Microsoft.VisualStudio.Language;
 using Microsoft.VisualStudio.Language.Intellisense;
@@ -103,6 +104,8 @@ namespace FreeAIr.BLogic
                     caretPosition
                     );
 
+                var lineEnding = DocumentHelper.GetOpenedDocumentLineEnding(documentFilePath);
+
                 var chatContainer = componentModel.GetService<ChatContainer>();
 
                 var chat = chatContainer.StartChat(
@@ -120,7 +123,9 @@ namespace FreeAIr.BLogic
                     var lastPrompt = chat.Prompts.Last();
                     if (!string.IsNullOrEmpty(lastPrompt.Answer))
                     {
-                        var cleanAnswer = lastPrompt.Answer.CleanupFromQuotesAndThinks();
+                        var cleanAnswer = lastPrompt.Answer.CleanupFromQuotesAndThinks(
+                            lineEnding
+                            );
                         if (!string.IsNullOrEmpty(cleanAnswer))
                         {
                             var proposalCollection = ProposalFactory.CreateCollectionFromText(

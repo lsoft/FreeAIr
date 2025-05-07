@@ -1,8 +1,10 @@
 ﻿using Community.VisualStudio.Toolkit;
+using EnvDTE80;
 using Microsoft.CodeAnalysis.Editing;
 using Microsoft.CodeAnalysis.Text;
 using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Editor;
+using Microsoft.VisualStudio.TextManager.Interop;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -15,6 +17,103 @@ namespace FreeAIr.Helper
 {
     public static class DocumentHelper
     {
+        public static string OpenDocumentAndGetLineEnding(
+            string filePath
+            )
+        {
+            ThreadHelper.ThrowIfNotOnUIThread();
+
+            try
+            {
+                var dte = AsyncPackage.GetGlobalService(typeof(EnvDTE.DTE)) as DTE2;
+
+                var w = dte.ItemOperations.OpenFile(filePath);
+                var openDoc = w.Document;
+
+                var lineEnding = GetDocumentLineEnding(openDoc);
+                return lineEnding;
+            }
+            catch (Exception excp)
+            {
+                //todo log
+            }
+
+            return Environment.NewLine;
+        }
+
+        public static string GetOpenedDocumentLineEnding(
+            string filePath
+            )
+        {
+            ThreadHelper.ThrowIfNotOnUIThread();
+
+            try
+            {
+                var dte = AsyncPackage.GetGlobalService(typeof(EnvDTE.DTE)) as DTE2;
+
+                foreach (EnvDTE.Document document in dte.Documents)
+                {
+                    if (string.Compare(
+                        document.FullName,
+                        filePath,
+                        true) == 0)
+                    {
+                        var lineEnding = GetDocumentLineEnding(document);
+                        return lineEnding;
+                    }
+                }
+            }
+            catch (Exception excp)
+            {
+                //todo log
+            }
+
+            return Environment.NewLine;
+        }
+
+        public static string GetActiveDocumentLineEnding()
+        {
+            ThreadHelper.ThrowIfNotOnUIThread();
+
+            try
+            {
+                var dte = AsyncPackage.GetGlobalService(typeof(EnvDTE.DTE)) as DTE2;
+
+                var activeDoc = dte.ActiveDocument;
+                if (activeDoc is null || activeDoc.ReadOnly)
+                {
+                    return Environment.NewLine;
+                }
+
+                var lineEnding = GetDocumentLineEnding(activeDoc);
+                return lineEnding;
+            }
+            catch (Exception excp)
+            {
+                //todo log
+            }
+
+            return Environment.NewLine;
+        }
+
+        private static string GetDocumentLineEnding(
+            EnvDTE.Document activeDoc
+            )
+        {
+            ThreadHelper.ThrowIfNotOnUIThread();
+
+            if (activeDoc.Object("TextDocument") is EnvDTE.TextDocument textDoc)
+            {
+                var ep = textDoc.CreateEditPoint();
+                ep.EndOfLine();
+
+                var lineEnding = ep.GetText(null);
+                return lineEnding;
+            }
+
+            return Environment.NewLine;
+        }
+
         public static async Task<IOriginalTextDescriptor?> GetSelectedTextAsync()
         {
             var docView = await VS.Documents.GetActiveDocumentViewAsync();
@@ -24,8 +123,11 @@ namespace FreeAIr.Helper
                 return null;
             }
 
+            var lineEnding = DocumentHelper.GetActiveDocumentLineEnding();
+
             return new SelectedTextDescriptor(
-                docView
+                docView,
+                lineEnding
                 );
         }
     }
@@ -43,6 +145,11 @@ namespace FreeAIr.Helper
         }
 
         string OriginalText
+        {
+            get;
+        }
+
+        string LineEnding
         {
             get;
         }
@@ -65,9 +172,14 @@ namespace FreeAIr.Helper
         {
             get;
         }
+        public string LineEnding
+        {
+            get;
+        }
 
         public WholeFileTextDescriptor(
-            string filePath
+            string filePath,
+            string lineEnding
             )
         {
             if (filePath is null)
@@ -75,7 +187,13 @@ namespace FreeAIr.Helper
                 throw new ArgumentNullException(nameof(filePath));
             }
 
+            if (lineEnding is null)
+            {
+                throw new ArgumentNullException(nameof(lineEnding));
+            }
+
             _filePath = filePath;
+            LineEnding = lineEnding;
             FileName = new FileInfo(filePath).Name;
             OriginalText = File.ReadAllText(_filePath);
         }
@@ -118,13 +236,24 @@ namespace FreeAIr.Helper
 
         public bool IsAbleToManipulate => _documentView is not null;
 
+        public string LineEnding
+        {
+            get;
+        }
+
         public SelectedTextDescriptor(
-            DocumentView documentView
+            DocumentView documentView,
+            string lineEnding
             )
         {
             if (documentView is null)
             {
                 throw new ArgumentNullException(nameof(documentView));
+            }
+
+            if (lineEnding is null)
+            {
+                throw new ArgumentNullException(nameof(lineEnding));
             }
 
             var selection = documentView?.TextView.Selection;
@@ -139,6 +268,7 @@ namespace FreeAIr.Helper
             FileName = fileName;
             OriginalText = selectedText;
             _documentView = documentView;
+            LineEnding = lineEnding;
         }
 
         private void TextView_Closed(object sender, EventArgs e)
@@ -177,7 +307,7 @@ namespace FreeAIr.Helper
                 return;
             }
 
-            Microsoft.VisualStudio.Text.ITextDocument document = documentView.Document;
+            //Microsoft.VisualStudio.Text.ITextDocument document = documentView.Document;
 
             using var documentEdit = documentView.TextBuffer.CreateEdit();
             if (documentEdit.Replace(

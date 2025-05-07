@@ -72,7 +72,6 @@
     <Compile Include="Helper\ReflectionHelper.cs" />
     <Compile Include="Helper\RoslynDocumentHelper.cs" />
     <Compile Include="Helper\SuggestionHijackHelper.cs" />
-    <Compile Include="Helper\VisualStudioDocumentHelper.cs" />
     <Compile Include="Options\ApiPage.cs" />
     <Compile Include="Options\OptionsProvider.cs" />
     <Compile Include="Options\ResponsePage.cs" />

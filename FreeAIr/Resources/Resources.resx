@@ -136,7 +136,7 @@
     <value>Generate a set of unit tests for the following code. Provide only one code snippet in your answer, without any additional information. Add comments for each test that describe what the test checks. Write code for the {0} test framework.</value>
   </data>
   <data name="ChatKindEnum_SuggestWholeLine" xml:space="preserve">
-    <value>Suggest filling the whole line where `{0}` is written in the following code. Give in your reply only piece of code without additional information. Do not wrap the whole answer in any quotes.</value>
+    <value>Suggest filling the whole line where `{0}` is written in the following code. Give in your reply only new piece of code without additional information and without the code I provide you.</value>
   </data>
   <data name="ChatKindEnum_SuggestWholeLine_Anchor" xml:space="preserve">
     <value>&lt;｜fim▁hole｜&gt;</value>

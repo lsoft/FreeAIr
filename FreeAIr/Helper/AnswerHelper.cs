@@ -16,8 +16,21 @@ namespace FreeAIr.Helper
         private const string ThinkStart = "<think>";
         private const string ThinkEnd = "</think>";
 
+        public static string WithLineEnding(
+            this string answer,
+            string lineEnding
+            )
+        {
+            var lines = answer
+                .Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.None)
+                ;
+            var result = string.Join(lineEnding, lines);
+            return result;
+        }
+
         public static string CleanupFromQuotesAndThinks(
-            this string answer
+            this string answer,
+            string lineEnding
             )
         {
             var tsi = answer.IndexOf(ThinkStart);
@@ -85,7 +98,7 @@ namespace FreeAIr.Helper
                 }
             }
 
-            return answer;
+            return answer.WithLineEnding(lineEnding);
         }
     }
 }

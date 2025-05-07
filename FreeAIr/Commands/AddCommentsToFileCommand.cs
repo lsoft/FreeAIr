@@ -55,7 +55,14 @@ namespace FreeAIr.Commands
 
             var kind = ChatKindEnum.AddComments;
 
-            var wfd = new WholeFileTextDescriptor(selectedFile.FullPath);
+            var lineEnding = DocumentHelper.OpenDocumentAndGetLineEnding(
+                selectedFile.FullPath
+                );
+
+            var wfd = new WholeFileTextDescriptor(
+                selectedFile.FullPath,
+                lineEnding
+                );
 
             chatContainer.StartChat(
                 new ChatDescription(

@@ -115,7 +115,7 @@ namespace FreeAIr.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Suggest filling the whole line where `{0}` is written in the following code. Give in your reply only piece of code without additional information. Do not wrap the whole answer in any quotes..
+        ///   Looks up a localized string similar to Suggest filling the whole line where `{0}` is written in the following code. Give in your reply only new piece of code without additional information and without the code I provide you..
         /// </summary>
         public static string ChatKindEnum_SuggestWholeLine {
             get {
