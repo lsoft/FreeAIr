@@ -63,9 +63,9 @@ namespace FreeAIr.Resources {
         /// <summary>
         ///   Looks up a localized string similar to Add XML comments that match the following code. Do not shorten the source code..
         /// </summary>
-        public static string ChatKindEnum_AddComments {
+        public static string ChatKindEnum_AddXmlComments {
             get {
-                return ResourceManager.GetString("ChatKindEnum_AddComments", resourceCulture);
+                return ResourceManager.GetString("ChatKindEnum_AddXmlComments", resourceCulture);
             }
         }
         

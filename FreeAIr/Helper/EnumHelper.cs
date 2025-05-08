@@ -16,7 +16,7 @@ namespace FreeAIr.Helper
             switch (kind)
             {
                 case ChatKindEnum.ExplainCode:
-                case ChatKindEnum.AddComments:
+                case ChatKindEnum.AddXmlComments:
                 case ChatKindEnum.OptimizeCode:
                 case ChatKindEnum.CompleteCodeAccordingComments:
                 case ChatKindEnum.GenerateCommitMessage:
@@ -60,7 +60,7 @@ namespace FreeAIr.Helper
             {
                 case ChatKindEnum.ExplainCode:
                     return "Explain code";
-                case ChatKindEnum.AddComments:
+                case ChatKindEnum.AddXmlComments:
                     return "Add comments";
                 case ChatKindEnum.OptimizeCode:
                     return "Optimize code";

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace FreeAIr.Helper
+namespace FreeAIr.Shared.Helper
 {
     public static class ListHelper
     {

@@ -117,64 +117,7 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="ChatKindEnum_AddXmlComments" xml:space="preserve">
-    <value>Добавь к следующему коду XML комментарии, которые описывают, что код делает. Не сокращай исходный код.</value>
-  </data>
-  <data name="ChatKindEnum_CompleteCodeAccordingComments" xml:space="preserve">
-    <value>Дополните следующий код в соответствии с комментариями в нём:</value>
-  </data>
-  <data name="ChatKindEnum_ExplainCode" xml:space="preserve">
-    <value>Объясни, как работает следующий код:</value>
-  </data>
-  <data name="ChatKindEnum_GenerateCommitMessage" xml:space="preserve">
-    <value>Создай описание камита по нижеследующим правкам. Дай в своем ответе только commit message без дополнительной информации. Не оборачивай весь свой ответ в любые кавычки.</value>
-  </data>
-  <data name="ChatKindEnum_OptimizeCode" xml:space="preserve">
-    <value>Оптимизируй следующий код:</value>
-  </data>
-  <data name="ChatKindEnum_GenerateUnitTests" xml:space="preserve">
-    <value>Сгенерируй набор юнит тестов для следующего кода. Приведи в ответе только один фрагмент кода без дополнительной информации. Добавь комментарии для каждого теста, в котором описывается,что тест проверяет. Напиши код для тестового фреймворка {0}.</value>
-  </data>
-  <data name="ChatKindEnum_SuggestWholeLine" xml:space="preserve">
-    <value>Предложи дополнение целой строки в том месте, где написано `{0}` в следующем коде. Дай в своем ответе только новый код без дополнительной информации и без того кода, что дал я.</value>
-  </data>
-  <data name="ChatKindEnum_SuggestWholeLine_Anchor" xml:space="preserve">
-    <value>&lt;｜fim▁hole｜&gt;</value>
-  </data>
-  <data name="Code_NoSelectedCode" xml:space="preserve">
-    <value>Не могу получить выделенный блок кода.</value>
-  </data>
-  <data name="Code_NoToken" xml:space="preserve">
-    <value>Пожалуйста, задайте ендпоинт API и токен доступа в настройках Visual Studio на странице FreeAIr. Если Вы используете локальную LLM и токен не нужен, введите в его поле произвольную строку.</value>
-  </data>
-  <data name="Error" xml:space="preserve">
-    <value>Ошибка</value>
-  </data>
-  <data name="UI_Answer" xml:space="preserve">
-    <value>Ответ</value>
-  </data>
-  <data name="UI_Choose" xml:space="preserve">
-    <value>Выбрать</value>
-  </data>
-  <data name="UI_LoadOnlyFreeModels" xml:space="preserve">
-    <value>Загружать только бесплатные модели</value>
-  </data>
-  <data name="UI_OpenInEditor" xml:space="preserve">
-    <value>Открыть в основном редакторе...</value>
-  </data>
-  <data name="UI_Prompt" xml:space="preserve">
-    <value>Запрос</value>
-  </data>
-  <data name="UI_Reload" xml:space="preserve">
-    <value>Перезагрузить...</value>
-  </data>
-  <data name="UI_RemoveChat" xml:space="preserve">
-    <value>Удалить чат</value>
-  </data>
-  <data name="UI_StartDiscussion" xml:space="preserve">
-    <value>Начать чат...</value>
-  </data>
-  <data name="UI_StopWaiting" xml:space="preserve">
-    <value>Остановить ожидание ответа</value>
+  <data name="FreeAIrCodeLensProvider" xml:space="preserve">
+    <value>FreeAIr support</value>
   </data>
 </root>

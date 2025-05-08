@@ -78,12 +78,12 @@
           <ButtonText>Explain code</ButtonText>
         </Strings>
       </Button>
-      <Button guid="FreeAIr" id="AddCommentsCommandId" priority="0x0100" type="Button">
+      <Button guid="FreeAIr" id="AddXmlCommentsCommandId" priority="0x0100" type="Button">
         <Parent guid="FreeAIr" id="SourceCodeContextGroup" />
         <Icon guid="ImageCatalogGuid" id="CodeReviewWizard" />
         <CommandFlag>IconIsMoniker</CommandFlag>
         <Strings>
-          <ButtonText>Add comments</ButtonText>
+          <ButtonText>Add XML comments</ButtonText>
         </Strings>
       </Button>
       <Button guid="FreeAIr" id="OptimizeCommandId" priority="0x0100" type="Button">
@@ -107,7 +107,7 @@
         <Icon guid="ImageCatalogGuid" id="UserTask" />
         <CommandFlag>IconIsMoniker</CommandFlag>
         <Strings>
-          <ButtonText>Start discussion...</ButtonText>
+          <ButtonText>Start discussion with...</ButtonText>
         </Strings>
       </Button>
       <Button guid="FreeAIr" id="GenerateWholeLineSuggestionCommand" priority="0x0100" type="Button">
@@ -152,14 +152,36 @@
       </Button>
 
 
+      
+      <Buttons>
+        <Button guid="FreeAIr" id="CodeLens_AddXmlCommentCommandId" priority="0x0000" type="Button">
+          <Strings>
+            <LocCanonicalName>FreeAIr.AddXmlComment</LocCanonicalName>
+            <ButtonText>AddXmlComment</ButtonText>
+          </Strings>
+        </Button>
+      </Buttons>
+      <Buttons>
+        <Button guid="FreeAIr" id="CodeLens_GenerateUnitTestsCommandId" priority="0x0000" type="Button">
+          <Strings>
+            <LocCanonicalName>FreeAIr.GenerateUnitTests</LocCanonicalName>
+            <ButtonText>GenerateUnitTests</ButtonText>
+          </Strings>
+        </Button>
+      </Buttons>
 
 
     </Buttons>
+
+    <Bitmaps>
+      <Bitmap guid="FreeAIrImages16" href="Resources\Icon16.png" usedList="Icon16" />
+      <Bitmap guid="FreeAIrImages32" href="Resources\Icon32.png" usedList="Icon32" />
+    </Bitmaps>
   </Commands>
 
   <KeyBindings>
     <KeyBinding guid="FreeAIr" id="ExplainCommandId" key1="L" mod1="ALT" editor="guidVSStd97" />
-    <KeyBinding guid="FreeAIr" id="AddCommentsCommandId" key1="C" mod1="ALT" editor="guidVSStd97" />
+    <KeyBinding guid="FreeAIr" id="AddXmlCommentsCommandId" key1="C" mod1="ALT" editor="guidVSStd97" />
     <KeyBinding guid="FreeAIr" id="CompleteCodeByCommentsCommandId" key1="M" mod1="ALT" editor="guidVSStd97" />
     <KeyBinding guid="FreeAIr" id="GenerateWholeLineSuggestionCommand" key1="A" mod1="ALT" editor="guidVSStd97" />
     <KeyBinding guid="FreeAIr" id="GenerateUnitTestsCommandId" key1="U" mod1="ALT" editor="guidVSStd97" />
@@ -177,7 +199,7 @@
       <IDSymbol name="SubExtensionMenu" value="0x1014" />
 
       <IDSymbol name="ExplainCommandId" value="0x1021" />
-      <IDSymbol name="AddCommentsCommandId" value="0x1022" />
+      <IDSymbol name="AddXmlCommentsCommandId" value="0x1022" />
       <IDSymbol name="OptimizeCommandId" value="0x1023" />
       <IDSymbol name="CompleteCodeByCommentsCommandId" value="0x1025" />
       <IDSymbol name="ChooseModelCommandId" value="0x1027" />
@@ -191,6 +213,18 @@
       <IDSymbol name="AddCommentsToFileCommandId" value="0x1034" />
 
       <IDSymbol name="GenerateUnitTestsCommandId" value="0x1035" />
+
+      <IDSymbol name="CodeLens_AddXmlCommentCommandId" value="0x1036" />
+      <IDSymbol name="CodeLens_GenerateUnitTestsCommandId" value="0x1037" />
+
     </GuidSymbol>
+
+    <GuidSymbol name="FreeAIrImages16" value="{83BCC0EB-7C0F-41EA-88E4-DC07CB510FAF}" >
+      <IDSymbol name="Icon16" value="1" />
+    </GuidSymbol>
+    <GuidSymbol name="FreeAIrImages32" value="{93BCC0EB-7C0F-41EA-88E4-DC07CB510FAF}" >
+      <IDSymbol name="Icon32" value="1" />
+    </GuidSymbol>
+
   </Symbols>
 </CommandTable>

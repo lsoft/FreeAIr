@@ -2,6 +2,7 @@
 using FreeAIr.BLogic;
 using FreeAIr.Commands;
 using FreeAIr.Helper;
+using FreeAIr.Shared.Helper;
 using Microsoft.Win32;
 using System;
 using System.Collections.Generic;

@@ -3,6 +3,7 @@ global using Microsoft.VisualStudio.Shell;
 global using System;
 global using Task = System.Threading.Tasks.Task;
 using FreeAIr.BLogic;
+using FreeAIr.Extension.CodeLens;
 using FreeAIr.UI.ToolWindows;
 using MessagePack.Formatters;
 using Microsoft.VisualStudio;
@@ -63,6 +64,12 @@ namespace FreeAIr
             await this.RegisterCommandsAsync();
 
             this.RegisterToolWindows();
+
+            //refresh codelenses
+            //we do not wait it for its completion.
+            CodeLensConnectionHandler.AcceptCodeLensConnectionsAsync()
+                .FileAndForget(nameof(CodeLensConnectionHandler.AcceptCodeLensConnectionsAsync))
+                ;
 
             var componentModel = (IComponentModel)await this.GetServiceAsync(typeof(SComponentModel));
             StartServices(componentModel);

@@ -2,6 +2,7 @@
 using EnvDTE80;
 using FreeAIr.BLogic;
 using FreeAIr.Helper;
+using FreeAIr.Shared.Helper;
 using OpenAI;
 using OpenAI.Chat;
 using SauronEye.UI.Informer;

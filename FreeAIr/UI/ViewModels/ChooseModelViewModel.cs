@@ -1,5 +1,6 @@
 ﻿using FreeAIr.Dto.OpenRouter;
 using FreeAIr.Helper;
+using FreeAIr.Shared.Helper;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;

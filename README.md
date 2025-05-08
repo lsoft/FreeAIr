@@ -62,6 +62,16 @@ Whole file commands:
 
 ![Whole file commands](https://raw.githubusercontent.com/lsoft/FreeAIr/main/wholefilecommand.png)
 
+Also, FreeAIr actions available via codelens:
+
+![Code lens](https://raw.githubusercontent.com/lsoft/FreeAIr/main/codelens.png)
+
+Whole line completion: 
+
+Put cursor in the place of your source code where you need an autocompletion and press Alt+A:
+
+![Whole line completion](https://raw.githubusercontent.com/lsoft/FreeAIr/main/wholelinecompletion.png)
+
 Main menu:
 
 ![Main Menu](https://raw.githubusercontent.com/lsoft/FreeAIr/main/mainmenu.png)
@@ -75,12 +85,6 @@ Options:
 OpenRouter.ai choose model window:
 
 ![OpenRouter Model](https://raw.githubusercontent.com/lsoft/FreeAIr/main/openroutermodelpng.png)
-
-Whole line completion: 
-
-Put cursor in the place of your source code where you need an autocompletion and press Alt+A:
-
-![Whole line completion](https://raw.githubusercontent.com/lsoft/FreeAIr/main/wholelinecompletion.png)
 
 
 # How I can access to AI if my country is banned from Copilot and from any other LLM provider?

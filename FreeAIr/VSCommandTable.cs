@@ -15,6 +15,12 @@ namespace FreeAIr
     {
         public const string FreeAIrString = "faec8da8-74ca-4afa-8b7d-64be3914fbac";
         public static Guid FreeAIr = new Guid(FreeAIrString);
+
+        public const string FreeAIrImages16String = "83bcc0eb-7c0f-41ea-88e4-dc07cb510faf";
+        public static Guid FreeAIrImages16 = new Guid(FreeAIrImages16String);
+
+        public const string FreeAIrImages32String = "93bcc0eb-7c0f-41ea-88e4-dc07cb510faf";
+        public static Guid FreeAIrImages32 = new Guid(FreeAIrImages32String);
     }
 
     /// <summary>
@@ -28,7 +34,7 @@ namespace FreeAIr
         public const int SubExtensionMenuGroup = 0x1013;
         public const int SubExtensionMenu = 0x1014;
         public const int ExplainCommandId = 0x1021;
-        public const int AddCommentsCommandId = 0x1022;
+        public const int AddXmlCommentsCommandId = 0x1022;
         public const int OptimizeCommandId = 0x1023;
         public const int CompleteCodeByCommentsCommandId = 0x1025;
         public const int ChooseModelCommandId = 0x1027;
@@ -40,5 +46,9 @@ namespace FreeAIr
         public const int ExplainFileCommandId = 0x1033;
         public const int AddCommentsToFileCommandId = 0x1034;
         public const int GenerateUnitTestsCommandId = 0x1035;
+        public const int CodeLens_AddXmlCommentCommandId = 0x1036;
+        public const int CodeLens_GenerateUnitTestsCommandId = 0x1037;
+        public const int Icon16 = 0x0001;
+        public const int Icon32 = 0x0001;
     }
 }

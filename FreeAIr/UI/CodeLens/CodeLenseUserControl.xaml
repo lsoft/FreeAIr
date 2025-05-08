@@ -1,0 +1,119 @@
+﻿<UserControl 
+    x:Class="FreeAIr.UI.CodeLens.CodeLenseUserControl"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+    xmlns:local="clr-namespace:SyncToAsync.Extension"
+    xmlns:ui="clr-namespace:FreeAIr.UI"
+    xmlns:imaging="clr-namespace:Microsoft.VisualStudio.Imaging;assembly=Microsoft.VisualStudio.Imaging"
+    xmlns:freeair="clr-namespace:FreeAIr"
+    xmlns:platformui="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Shell.15.0"
+    mc:Ignorable="d" 
+    d:DesignHeight="450" d:DesignWidth="800"
+    ui:VsTheme.UseVsTheme="True"
+    >
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto"/>
+            <RowDefinition />
+        </Grid.RowDefinitions>
+
+        <StackPanel
+            Grid.Row="0"
+            Orientation="Horizontal"
+            Margin="2,2,2,2"
+            >
+
+            <Image
+                Source="/FreeAIr;component/Resources/Icon32.png"
+                RenderOptions.BitmapScalingMode="HighQuality"
+                SnapsToDevicePixels="True"
+                />
+
+            <Label
+                FontSize="20"
+                FontWeight="Bold"
+                VerticalAlignment="Center"
+                Margin="2,0,0,0"
+                Content="FreeAIr available support"
+                />
+
+        </StackPanel>
+
+        <StackPanel
+            Grid.Row="1"
+            Orientation="Vertical"
+            Margin="2,2,2,2"
+            >
+            <Label
+                Margin="5,2,0,2"
+                Content="✓   Explain the code of chosen code block"
+                Foreground="#569CD6"
+                Cursor="Hand"
+                FontFamily="Cascadia Code"
+                >
+                <Label.InputBindings>
+                    <MouseBinding Command="{Binding ExplainCodeCommand}" MouseAction="LeftClick" />
+                </Label.InputBindings>
+            </Label>
+            <Label
+                Margin="5,2,0,2"
+                Content="✓   Add XML comments to the code of chosen code block"
+                Foreground="#569CD6"
+                Cursor="Hand"
+                FontFamily="Cascadia Code"
+                >
+                <Label.InputBindings>
+                    <MouseBinding Command="{Binding AddXmlCommentsCommand}" MouseAction="LeftClick" />
+                </Label.InputBindings>
+            </Label>
+            <Label
+                Margin="5,2,0,2"
+                Content="✓   Optimize code of the chosen code block"
+                Foreground="#569CD6"
+                Cursor="Hand"
+                FontFamily="Cascadia Code"
+                >
+                <Label.InputBindings>
+                    <MouseBinding Command="{Binding OptimizeCodeCommand}" MouseAction="LeftClick" />
+                </Label.InputBindings>
+            </Label>
+            <Label
+                Margin="5,2,0,2"
+                Content="✓   Generate unit tests for chose code block"
+                Foreground="#569CD6"
+                Cursor="Hand"
+                FontFamily="Cascadia Code"
+                >
+                <Label.InputBindings>
+                    <MouseBinding Command="{Binding GenerateUnitTestsCommand}" MouseAction="LeftClick" />
+                </Label.InputBindings>
+            </Label>
+            <Label
+                Margin="5,2,0,2"
+                Content="✓   Complete the code of chosen code block according to its comments"
+                Foreground="#569CD6"
+                Cursor="Hand"
+                FontFamily="Cascadia Code"
+                >
+                <Label.InputBindings>
+                    <MouseBinding Command="{Binding CompleteCodeByCommentsCommand}" MouseAction="LeftClick" />
+                </Label.InputBindings>
+            </Label>
+            <Label
+                Margin="5,2,0,2"
+                Content="✓   Start discussion with the code of the chosen code block"
+                Foreground="#569CD6"
+                Cursor="Hand"
+                FontFamily="Cascadia Code"
+                >
+                <Label.InputBindings>
+                    <MouseBinding Command="{Binding StartDiscussionCommand}" MouseAction="LeftClick" />
+                </Label.InputBindings>
+            </Label>
+
+        </StackPanel>
+
+    </Grid>
+</UserControl>

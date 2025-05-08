@@ -50,7 +50,9 @@
     <Compile Include="BLogic\CommitMessageBuilder.cs" />
     <Compile Include="BLogic\CompletionProposal.cs" />
     <Compile Include="BLogic\TextDescriptor.cs" />
-    <Compile Include="Commands\AddCommentsCommand.cs" />
+    <Compile Include="CodeLens\CodeLensConnectionHandler.cs" />
+    <Compile Include="CodeLens\CodeLensListener.cs" />
+    <Compile Include="Commands\AddXmlCommentsCommand.cs" />
     <Compile Include="Commands\AddCommentsToFileCommand.cs" />
     <Compile Include="Commands\ChooseModelCommand.cs" />
     <Compile Include="Commands\CompleteCodeByCommentsCommand.cs" />
@@ -68,12 +70,11 @@
     <Compile Include="Helper\EnumHelper.cs" />
     <Compile Include="Helper\LanguageHelper.cs" />
     <Compile Include="Helper\LineEndingHelper.cs" />
-    <Compile Include="Helper\ListHelper.cs" />
     <Compile Include="BLogic\UserPrompt.cs" />
     <Compile Include="Helper\MarkdownScrollViewerExtensions.cs" />
-    <Compile Include="Helper\ReflectionHelper.cs" />
     <Compile Include="Helper\RoslynDocumentHelper.cs" />
     <Compile Include="Helper\SuggestionHijackHelper.cs" />
+    <Compile Include="ImageMonikers.cs" />
     <Compile Include="Options\ApiPage.cs" />
     <Compile Include="Options\OptionsProvider.cs" />
     <Compile Include="Options\ResponsePage.cs" />
@@ -89,6 +90,11 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>source.extension.vsixmanifest</DependentUpon>
     </Compile>
+    <Compile Include="UI\CodeLens\CodeLenseUserControl.xaml.cs">
+      <DependentUpon>CodeLenseUserControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\CodeLens\CodeLenseUserControlViewModel.cs" />
+    <Compile Include="UI\CodeLens\ViewElementFactory.cs" />
     <Compile Include="UI\Theme.cs" />
     <Compile Include="UI\ToolWindows\ChooseModelToolWindow.cs" />
     <Compile Include="UI\ToolWindows\ChooseModelToolWindowControl.xaml.cs">
@@ -108,6 +114,7 @@
     <Compile Include="UI\Windows\WaitGitWindow.xaml.cs">
       <DependentUpon>WaitGitWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="ViewElementFactory.cs" />
     <Compile Include="VSCommandTable.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -115,12 +122,17 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <Resource Include="Resources\Icon16.png" />
+    <Resource Include="Resources\Icon32.png" />
     <Content Include="Resources\xshd\csharp.xshd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
     <Content Include="Resources\xshd\patch.xshd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Monikers.imagemanifest">
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
     <None Include="source.extension.vsixmanifest">
@@ -212,12 +224,24 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\CodeLens\FreeAIr.CodeLens.csproj">
+      <Project>{12fb1b96-34e8-7f37-782d-4e07363c95d9}</Project>
+      <Name>FreeAIr.CodeLens</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Shared\FreeAIr.Shared.csproj">
+      <Project>{e2646cf6-c92f-94ee-f875-5a7c18451b93}</Project>
+      <Name>FreeAIr.Shared</Name>
+    </ProjectReference>
     <ProjectReference Include="..\WpfHelpers\WpfHelpers.csproj">
       <Project>{ce2249a8-82a0-426f-9211-7cb0065f1a93}</Project>
       <Name>WpfHelpers</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Page Include="UI\CodeLens\CodeLenseUserControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="UI\ToolWindows\ChooseModelToolWindowControl.xaml">
       <SubType>Designer</SubType>
       <Generator>XamlIntelliSenseFileGenerator</Generator>

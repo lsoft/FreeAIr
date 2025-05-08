@@ -283,7 +283,7 @@ namespace FreeAIr.BLogic
     public enum ChatKindEnum
     {
         ExplainCode,
-        AddComments,
+        AddXmlComments,
         OptimizeCode,
         CompleteCodeAccordingComments,
         Discussion,

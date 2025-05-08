@@ -53,7 +53,7 @@ namespace FreeAIr.Commands
                 return;
             }
 
-            var kind = ChatKindEnum.AddComments;
+            var kind = ChatKindEnum.AddXmlComments;
 
             var lineEnding = LineEndingHelper.Actual.OpenDocumentAndGetLineEnding(
                 selectedFile.FullPath

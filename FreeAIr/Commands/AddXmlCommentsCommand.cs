@@ -18,15 +18,14 @@ using System.Threading.Tasks;
 
 namespace FreeAIr.Commands
 {
-    [Command(PackageIds.AddCommentsCommandId)]
-    internal sealed class AddCommentsCommand : InvokeLLMCommand<AddCommentsCommand>
+    [Command(PackageIds.AddXmlCommentsCommandId)]
+    internal sealed class AddXmlCommentsCommand : InvokeLLMCommand<AddXmlCommentsCommand>
     {
-        public AddCommentsCommand(
+        public AddXmlCommentsCommand(
             )
         {
         }
 
-        protected override ChatKindEnum GetChatKind() => ChatKindEnum.AddComments;
+        protected override ChatKindEnum GetChatKind() => ChatKindEnum.AddXmlComments;
     }
-
 }

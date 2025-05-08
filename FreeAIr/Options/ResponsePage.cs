@@ -42,9 +42,6 @@ namespace FreeAIr
             set
             {
                 _xshdProviders = value;
-
-                //Task.Run(LoadOrUpdateMarkdownStyles)
-                //    .FileAndForget(nameof(LoadOrUpdateMarkdownStyles));
             }
         }
 
