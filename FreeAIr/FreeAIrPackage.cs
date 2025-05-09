@@ -9,7 +9,7 @@ using MessagePack.Formatters;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.ComponentModelHost;
 using Microsoft.VisualStudio.Shell.Interop;
-using SauronEye.UI.Informer;
+using FreeAIr.UI.Informer;
 using System.Collections.Generic;
 using System.IO.Packaging;
 using System.Linq;

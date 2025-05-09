@@ -7,8 +7,8 @@
     <ProjectGuid>{E2646CF6-C92F-94EE-F875-5A7C18451B93}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>SyncToAsync.Shared</RootNamespace>
-    <AssemblyName>SyncToAsync.Shared</AssemblyName>
+    <RootNamespace>FreeAIr.Shared</RootNamespace>
+    <AssemblyName>FreeAIr.Shared</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <LangVersion>9</LangVersion>
     <Nullable>enable</Nullable>

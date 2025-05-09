@@ -108,6 +108,7 @@
     <Compile Include="UI\Embedillo\EnterKeyBehavior.cs" />
     <Compile Include="UI\Embedillo\MentionVisualLineGenerator.cs" />
     <Compile Include="UI\Embedillo\TextChangeModeEnum.cs" />
+    <Compile Include="UI\Embedillo\VisualLine\Command\CommandVisualLineGeneratorFactory.cs" />
     <Compile Include="UI\Embedillo\VisualLine\SourceFile\SourceFileVisualLineGeneratorFactory.cs" />
     <Compile Include="UI\Theme.cs" />
     <Compile Include="UI\ToolWindows\ChooseModelToolWindow.cs" />

@@ -10,7 +10,7 @@ using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using WpfHelpers;
 
-namespace SauronEye.UI.Informer
+namespace FreeAIr.UI.Informer
 {
     [Export(typeof(UIInformer))]
     public sealed class UIInformer

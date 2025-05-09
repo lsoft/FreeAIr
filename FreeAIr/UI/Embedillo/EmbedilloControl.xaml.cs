@@ -178,7 +178,7 @@ namespace FreeAIr.UI.Embedillo
             
             completionWindow.StartOffset = startPosition + 1;
             completionWindow.EndOffset = AvalonTextEditor.CaretOffset;
-            completionWindow.Width = suggestions.Max(s => s.PublicData.Length) * 7;
+            completionWindow.Width = 50 + suggestions.Max(s => s.PublicData.Length) * 7;
 
             foreach (var suggestion in suggestions)
             {
@@ -189,29 +189,38 @@ namespace FreeAIr.UI.Embedillo
 
             void KeyUpMethod(object sender, KeyEventArgs e)
             {
-                if (AvalonTextEditor.CaretOffset < startPosition)
+                try
                 {
-                    //курсор ушел левее текста, для которого показаны подсказки
-                    //убираем окно подсказок
-                    AvalonTextEditor.KeyUp -= KeyUpMethod;
-                    completionWindow.Close();
-                    return;
+                    if (AvalonTextEditor.CaretOffset < startPosition)
+                    {
+                        //курсор ушел левее текста, для которого показаны подсказки
+                        //убираем окно подсказок
+                        AvalonTextEditor.KeyUp -= KeyUpMethod;
+                        completionWindow.Close();
+                        return;
+                    }
+
+                    var text = AvalonTextEditor.Text.Substring(
+                        startPosition + 1,
+                        AvalonTextEditor.CaretOffset - startPosition - 1
+                        );
+
+                    //MainWindow.HelpLabel1Static.Content = text;
+
+                    var ltext = text.ToLower();
+
+                    if (suggestions.All(j => !j.PublicData.ToLower().Contains(ltext)))
+                    {
+                        AvalonTextEditor.KeyUp -= KeyUpMethod;
+                        completionWindow.Close();
+                        return;
+                    }
                 }
-
-                var text = AvalonTextEditor.Text.Substring(
-                    startPosition + 1,
-                    AvalonTextEditor.CaretOffset - startPosition - 1
-                    );
-
-                //MainWindow.HelpLabel1Static.Content = text;
-
-                var ltext = text.ToLower();
-
-                if (suggestions.All(j => !j.PublicData.ToLower().Contains(ltext)))
+                catch (Exception excp)
                 {
+                    //todo log
                     AvalonTextEditor.KeyUp -= KeyUpMethod;
                     completionWindow.Close();
-                    return;
                 }
             }
 

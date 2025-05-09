@@ -1,5 +1,6 @@
 ﻿using FreeAIr.Helper;
 using FreeAIr.UI.Embedillo;
+using FreeAIr.UI.Embedillo.VisualLine.Command;
 using FreeAIr.UI.Embedillo.VisualLine.SourceFile;
 using FreeAIr.UI.ViewModels;
 using System.Collections.Generic;
@@ -27,6 +28,9 @@ namespace FreeAIr.UI.ToolWindows
 
             PromptControl.AddVisualLineGeneratorFactory(
                 new SourceFileVisualLineGeneratorFactory()
+                );
+            PromptControl.AddVisualLineGeneratorFactory(
+                new CommandVisualLineGeneratorFactory()
                 );
 
             viewModel.MarkdownReReadEvent += ViewModel_MarkdownReReadEvent;

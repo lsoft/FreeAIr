@@ -6,7 +6,7 @@ using FreeAIr.UI.Windows;
 using Microsoft.VisualStudio.ComponentModelHost;
 using Microsoft.VisualStudio.Imaging;
 using RunProcessAsTask;
-using SauronEye.UI.Informer;
+using FreeAIr.UI.Informer;
 using System.ComponentModel.Composition;
 using System.Diagnostics;
 using System.Text;
