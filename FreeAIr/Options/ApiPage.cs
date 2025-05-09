@@ -20,6 +20,36 @@ namespace FreeAIr
         [DefaultValue("https://openrouter.ai/api/v1")]
         public string Endpoint { get; set; } = "https://openrouter.ai/api/v1";
 
+        public async Task<bool> VerifyUriAndShowErrorIfNotAsync()
+        {
+            var endpointUri = ApiPage.Instance.TryBuildEndpointUri();
+            if (endpointUri is null)
+            {
+                await VS.MessageBox.ShowErrorAsync(
+                    Resources.Resources.Error,
+                    "Invalid endpoint Uri. Please make sure it is correct uri. For example, the uri must contain a protocol prefix, like http, https."
+                    );
+                return false;
+            }
+
+            return true;
+        }
+
+        public Uri? TryBuildEndpointUri()
+        {
+            try
+            {
+                return new Uri(ApiPage.Instance.Endpoint);
+            }
+            catch (Exception excp)
+            {
+                //todo log
+            }
+
+            return null;
+        }
+
+
         [Category("OpenAI compatible API requisites")]
         [DisplayName("Token")]
         [Description("A token of LLM API provider.")]

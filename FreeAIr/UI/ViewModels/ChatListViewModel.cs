@@ -135,9 +135,14 @@ namespace FreeAIr.UI.ViewModels
             {
                 if (_startDiscussionCommand == null)
                 {
-                    _startDiscussionCommand = new RelayCommand(
-                        a =>
+                    _startDiscussionCommand = new AsyncRelayCommand(
+                        async a =>
                         {
+                            if (!await ApiPage.Instance.VerifyUriAndShowErrorIfNotAsync())
+                            {
+                                return;
+                            }
+
                             _chatContainer.StartChat(
                                 new ChatDescription(ChatKindEnum.Discussion, null),
                                 null
@@ -348,23 +353,6 @@ namespace FreeAIr.UI.ViewModels
             }
         }
 
-        public bool IsEnabledPrompt
-        {
-            get
-            {
-                return
-                    _selectedChat is not null
-                    && _selectedChat.Chat.Status.In(ChatStatusEnum.NotStarted, ChatStatusEnum.Ready)
-                    ;
-            }
-        }
-
-        public string PromptText
-        {
-            get => _promptText;
-            set => _promptText = value;
-        }
-
         public ICommand CreatePromptCommand
         {
             get
@@ -374,14 +362,63 @@ namespace FreeAIr.UI.ViewModels
                     _createPromptCommand = new RelayCommand(
                         a =>
                         {
-                            _selectedChat.Chat.AddPrompt(
+                            if (_selectedChat is null)
+                            {
+                                return;
+                            }
+                            if (_selectedChat.Chat is null)
+                            {
+                                return;
+                            }
+
+                            var chat = _selectedChat.Chat;
+
+                            if (chat.Status.NotIn(ChatStatusEnum.NotStarted, ChatStatusEnum.Ready))
+                            {
+                                return;
+                            }
+
+                            var promptText = a as string;
+                            if (string.IsNullOrEmpty(promptText))
+                            {
+                                return;
+                            }
+
+
+                            chat.AddPrompt(
                                 UserPrompt.CreateTextBasedPrompt(
-                                    PromptText
+                                    promptText
                                     )
                                 );
 
-                            PromptText = string.Empty;
                             OnPropertyChanged();
+                        },
+                        (a) =>
+                        {
+                            if (_selectedChat is null)
+                            {
+                                return false;
+                            }
+                            if (_selectedChat.Chat is null)
+                            {
+                                return false;
+                            }
+
+                            var chat = _selectedChat.Chat;
+
+                            if (chat.Status.NotIn(ChatStatusEnum.NotStarted, ChatStatusEnum.Ready))
+                            {
+                                return false;
+                            }
+
+
+                            var promptText = a as string;
+                            if (string.IsNullOrEmpty(promptText))
+                            {
+                                return false;
+                            }
+
+                            return true;
                         }
                         );
                 }

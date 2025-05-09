@@ -11,7 +11,7 @@
     xmlns:toolkit="clr-namespace:Community.VisualStudio.Toolkit;assembly=Community.VisualStudio.Toolkit"
     xmlns:resources="clr-namespace:FreeAIr.Resources"
     xmlns:mdxaml="https://github.com/whistyun/MdXaml"
-    xmlns:plugins="clr-namespace:MdXaml.Plugins;assembly=MdXaml.Plugins"
+    xmlns:plugins="clr-namespace:MdXaml.Plugins;assembly=MdXaml.Plugins" xmlns:embedillo="clr-namespace:FreeAIr.UI.Embedillo"
     toolkit:Themes.UseVsTheme="True"
     mc:Ignorable="d"
     d:DesignHeight="300"
@@ -46,10 +46,17 @@
             </Grid.ColumnDefinitions>
 
             <Button
+                Grid.Column="2"
+                Margin="2,0,2,0"
+                Width="0"
+                IsEnabled="True"
+                x:Name="ForegroundButton"
+                />
+
+            <Button
                 Grid.Column="0"
                 Margin="2"
                 Content="{x:Static resources:Resources.UI_OpenInEditor}"
-                x:Name="OpenAsMdButton"
                 Command="{Binding OpenInEditorCommand}"
                 />
             <Button
@@ -160,7 +167,7 @@
 
                             <!-- here is a style for ```block``` -->
                             <Style TargetType="avalonEdit:TextEditor" xmlns:avalonEdit="http://icsharpcode.net/sharpdevelop/avalonedit">
-                                <Setter Property="Foreground"      Value="{Binding ElementName=OpenAsMdButton, Path=Foreground}"/>
+                                <Setter Property="Foreground"      Value="{Binding ElementName=ForegroundButton, Path=Foreground}"/>
                                 <Setter Property="Background"      Value="Transparent"/>
                                 <Setter Property="FontFamily"      Value="Cascadia Code"/>
                                 <Setter Property="FontSize"        Value="14"/>
@@ -203,7 +210,7 @@
                                                         HorizontalAlignment="Right"
                                                         Margin="2,0,2,0"
                                                         Content="↑ Copy"
-                                                        Style="{Binding ElementName=OpenAsMdButton, Path=Style}"
+                                                        Style="{Binding ElementName=ForegroundButton, Path=Style}"
                                                         Command="{Binding ElementName=ChatListToolWindow, Path=DataContext.CopyCodeBlockCommand}"
                                                         CommandParameter="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=TextArea}"
                                                         ToolTip="Copy this code part to clipboard"
@@ -212,7 +219,7 @@
                                                         HorizontalAlignment="Right"
                                                         Margin="2,0,2,0"
                                                         Content="↑ Replace original text"
-                                                        Style="{Binding ElementName=OpenAsMdButton, Path=Style}"
+                                                        Style="{Binding ElementName=ForegroundButton, Path=Style}"
                                                         Command="{Binding ElementName=ChatListToolWindow, Path=DataContext.ReplaceSelectedTextCommand}"
                                                         CommandParameter="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=TextArea}"
                                                         ToolTip="Replace the selected block of the code in the VS document with this code part"
@@ -221,7 +228,7 @@
                                                         HorizontalAlignment="Right"
                                                         Margin="2,0,2,0"
                                                         Content="↑ Create new file..."
-                                                        Style="{Binding ElementName=OpenAsMdButton, Path=Style}"
+                                                        Style="{Binding ElementName=ForegroundButton, Path=Style}"
                                                         Command="{Binding ElementName=ChatListToolWindow, Path=DataContext.CreateNewFileCommand}"
                                                         CommandParameter="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=TextArea}"
                                                         ToolTip="Create new file with this code part"
@@ -239,32 +246,32 @@
                                 <Style.Triggers>
                                     <Trigger Property="Tag" Value="Heading1">
                                         <Setter Property="FontSize"    Value="42" />
-                                        <Setter Property="Foreground"  Value="{Binding ElementName=OpenAsMdButton, Path=Foreground}" />
+                                        <Setter Property="Foreground"  Value="{Binding ElementName=ForegroundButton, Path=Foreground}" />
                                         <Setter Property="FontWeight"  Value="Light" />
                                     </Trigger>
 
                                     <Trigger Property="Tag" Value="Heading2">
                                         <Setter Property="FontSize"    Value="36" />
-                                        <Setter Property="Foreground"  Value="{Binding ElementName=OpenAsMdButton, Path=Foreground}" />
+                                        <Setter Property="Foreground"  Value="{Binding ElementName=ForegroundButton, Path=Foreground}" />
                                         <Setter Property="FontWeight"  Value="Light" />
                                     </Trigger>
 
                                     <Trigger Property="Tag" Value="Heading3">
                                         <Setter Property="FontSize"    Value="30" />
-                                        <Setter Property="Foreground"  Value="{Binding ElementName=OpenAsMdButton, Path=Foreground}" />
+                                        <Setter Property="Foreground"  Value="{Binding ElementName=ForegroundButton, Path=Foreground}" />
                                         <Setter Property="FontWeight"  Value="Light" />
                                     </Trigger>
 
                                     <Trigger Property="Tag" Value="Heading4">
                                         <Setter Property="FontSize"    Value="24" />
-                                        <Setter Property="Foreground"  Value="{Binding ElementName=OpenAsMdButton, Path=Foreground}" />
+                                        <Setter Property="Foreground"  Value="{Binding ElementName=ForegroundButton, Path=Foreground}" />
                                         <Setter Property="FontWeight"  Value="Light" />
                                     </Trigger>
 
                                     <Trigger Property="Tag" Value="CodeBlock">
                                         <Setter Property="FontFamily"      Value="Cascadia Code"/>
                                         <Setter Property="FontSize"        Value="14"/>
-                                        <Setter Property="Foreground"  Value="{Binding ElementName=OpenAsMdButton, Path=Foreground}" />
+                                        <Setter Property="Foreground"      Value="{Binding ElementName=ForegroundButton, Path=Foreground}" />
                                         <Setter Property="Background"      Value="Transparent"/>
                                         <Setter Property="BorderBrush"     Value="#DEDEDE"/>
                                         <Setter Property="BorderThickness" Value="0,5,0,5"/>
@@ -382,24 +389,22 @@
                 HorizontalAlignment="Stretch"
                 />
 
-            <TextBox
+            <embedillo:EmbedilloControl
                 Grid.Row="2"
                 VerticalAlignment="Stretch"
-                IsEnabled="{Binding IsEnabledPrompt, Mode=OneWay}"
-                Text="{Binding PromptText, UpdateSourceTrigger=PropertyChanged}"
+                Foreground="{Binding ElementName=ForegroundButton, Path=Foreground}"
+                Background="Transparent"
                 FontSize="18"
-                AcceptsReturn="True"
+                x:Name="PromptControl"
+                EnterCommand="{Binding CreatePromptCommand}"
                 >
-                <TextBox.InputBindings>
-                    <KeyBinding Command="{Binding Path=CreatePromptCommand}" Key="Enter" />
-                </TextBox.InputBindings>
-            </TextBox>
+            </embedillo:EmbedilloControl>
 
             <Label
                 Grid.Row="2"
                 VerticalAlignment="Bottom"
                 HorizontalAlignment="Right"
-                Content="Enter - send prompt. Shift+Enter: new line."
+                Content="Ctrl + Enter - send prompt."
                 />
 
         </Grid>

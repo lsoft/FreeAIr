@@ -91,7 +91,7 @@ namespace FreeAIr.BLogic
                     ),
                 new OpenAIClientOptions
                 {
-                    Endpoint = new Uri(ApiPage.Instance.Endpoint),
+                    Endpoint = ApiPage.Instance.TryBuildEndpointUri(),
                 }
                 );
         }
