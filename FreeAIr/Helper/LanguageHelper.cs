@@ -8,6 +8,12 @@ namespace FreeAIr.Helper
 {
     public static  class LanguageHelper
     {
+        /// <summary>
+        /// Определяет язык программирования на основе расширения файла.
+        /// </summary>
+        /// <param name="fileExtension">Расширение файла.</param>
+        /// <returns>Название языка программирования в формате Markdown.</returns>
+        /// 
         public static string GetMarkdownLanguageCodeBlockNameBasedOnFileExtension(
             string fileExtension
             )
@@ -39,6 +45,18 @@ namespace FreeAIr.Helper
             if (string.Compare(fileExtension, ".cpp", true) == 0)
             {
                 return "cpp";
+            }
+            if (string.Compare(fileExtension, ".js", true) == 0)
+            {
+                return "javascript";
+            }
+            if (string.Compare(fileExtension, ".py", true) == 0)
+            {
+                return "python";
+            }
+            if (string.Compare(fileExtension, ".rb", true) == 0)
+            {
+                return "ruby";
             }
 
             return string.Empty;

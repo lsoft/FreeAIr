@@ -8,7 +8,7 @@ using Microsoft.VisualStudio.Utilities;
 using FreeAIr.Shared.Dto;
 using FreeAIr.UI.CodeLens;
 
-namespace SyncToAsync.Extension
+namespace FreeAIr
 {
     [Export(typeof(IViewElementFactory))]
     [Name("FreeAIr bind details UI factory")]

@@ -9,7 +9,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("ls")]
-[assembly: AssemblyProduct("SyncToAsync.Shared")]
+[assembly: AssemblyProduct("FreeAIr.Shared")]
 [assembly: AssemblyCopyright("FreeAIr © ls 2025")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]

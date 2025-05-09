@@ -102,7 +102,7 @@ namespace FreeAIr.BLogic
                                 HorizontalContentAlignment = HorizontalAlignment.Center,
                                 Margin = new System.Windows.Thickness(0),
                                 Style = dcButton.Style,
-                                ToolTip = "Generate commit message via FreeAIr..."
+                                ToolTip = "FreeAIr support: generate commit message"
                             };
 
                             buildCommitMessageButton.Click += BuildCommitMessageButton_Click;

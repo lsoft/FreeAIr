@@ -13,7 +13,7 @@
       <Menu guid="FreeAIr" id="SourceCodeContextMenu" priority="0x0000" type="Menu">
         <Parent guid="VSMainMenu" id="CodeWindow.LanguageGroupGroup" />
         <Strings>
-          <ButtonText>FreeAIr actions</ButtonText>
+          <ButtonText>FreeAIr support</ButtonText>
         </Strings>
       </Menu>
 
@@ -27,7 +27,7 @@
       <Menu guid="FreeAIr" id="SolutionContextMenu" priority="0x0000" type="Menu">
         <Parent guid="VSMainMenu" id="ItemNode.OpenGroup" />
         <Strings>
-          <ButtonText>FreeAIr actions</ButtonText>
+          <ButtonText>FreeAIr support</ButtonText>
         </Strings>
       </Menu>
 

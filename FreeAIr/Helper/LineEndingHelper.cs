@@ -7,6 +7,11 @@ namespace FreeAIr.Helper
     {
         public static class EditorConfig
         {
+            /// <summary>
+            /// Получает символ окончания строки для указанного файла.
+            /// </summary>
+            /// <param name="filePath">Путь к файлу.</param>
+            /// <returns>Строку, содержащую символ окончания строки.</returns>
             public static string GetLineEndingFor(
                 string filePath
                 )
@@ -31,6 +36,11 @@ namespace FreeAIr.Helper
 
         public static class Actual
         {
+            /// <summary>
+            /// Открывает документ по указанному пути и получает символ окончания строки.
+            /// </summary>
+            /// <param name="filePath">Путь к файлу.</param>
+            /// <returns>Строку, содержащую символ окончания строки.</returns>
             public static string OpenDocumentAndGetLineEnding(
                 string filePath
                 )
@@ -55,6 +65,11 @@ namespace FreeAIr.Helper
                 return Environment.NewLine;
             }
 
+            /// <summary>
+            /// Получает символ окончания строки для открытого документа по указанному пути.
+            /// </summary>
+            /// <param name="filePath">Путь к файлу.</param>
+            /// <returns>Строку, содержащую символ окончания строки.</returns>
             public static string GetOpenedDocumentLineEnding(
                 string filePath
                 )
@@ -85,6 +100,10 @@ namespace FreeAIr.Helper
                 return Environment.NewLine;
             }
 
+            /// <summary>
+            /// Получает символ окончания строки для активного документа.
+            /// </summary>
+            /// <returns>Строку, содержащую символ окончания строки.</returns>
             public static string GetActiveDocumentLineEnding()
             {
                 ThreadHelper.ThrowIfNotOnUIThread();

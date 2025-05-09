@@ -6,7 +6,7 @@ Access to AI for free for anyone.
 
 ![logo](https://raw.githubusercontent.com/lsoft/FreeAIr/main/logo.png)
 
-FreeAIr is a Visual Studio extension which allows you to interact with any LLM which have OpenAI-compatible API. Even with local LLM! No artificial | political barrier included in FreeAIr code.
+FreeAIr is a Visual Studio extension which allows you to interact with any LLM which have OpenAI-compatible API. Even with local LLM! No artificial | political barrier injected in FreeAIr code.
 
 [Download VSIX](https://marketplace.visualstudio.com/items?itemName=lsoft.FreeAIr)
 

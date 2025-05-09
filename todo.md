@@ -1,4 +1,4 @@
-- codelenses
+OK - codelenses
 - fix all warning/error in build log
 - add specific file with `@file` possibility in prompt
 - for prompts: c# additional context by roslyn references
