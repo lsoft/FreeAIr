@@ -3,6 +3,7 @@ using FreeAIr.BLogic;
 using FreeAIr.Commands;
 using FreeAIr.Helper;
 using FreeAIr.Shared.Helper;
+using FreeAIr.UI.Embedillo.Answer.Parser;
 using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
@@ -33,8 +34,9 @@ namespace FreeAIr.UI.ViewModels
         private ICommand _copyCodeBlockCommand;
         private ICommand _replaceSelectedTextCommand;
         private ICommand _createNewFileCommand;
-
-        private string _promptText;
+        private ICommand _deleteItemFromContextCommand;
+        private ICommand _openContextItemCommand;
+        private ICommand _addItemToContextCommand;
 
         public event MarkdownReReadDelegate MarkdownReReadEvent;
 
@@ -68,6 +70,11 @@ namespace FreeAIr.UI.ViewModels
                 return _selectedChat.Chat.ReadResponse();
             }
         }
+
+        public ObservableCollection2<ChatContextItemViewModel> ChatContextItems
+        {
+            get;
+        } = new();
 
         public ICommand OpenInEditorCommand
         {
@@ -378,16 +385,21 @@ namespace FreeAIr.UI.ViewModels
                                 return;
                             }
 
-                            var promptText = a as string;
-                            if (string.IsNullOrEmpty(promptText))
+                            var parsedAnswer = a as ParsedAnswer;
+                            if (parsedAnswer is null)
                             {
                                 return;
                             }
 
+                            var parsedRepresentation = parsedAnswer.ComposeStringRepresentation();
+                            if (string.IsNullOrEmpty(parsedRepresentation))
+                            {
+                                return;
+                            }
 
                             chat.AddPrompt(
                                 UserPrompt.CreateTextBasedPrompt(
-                                    promptText
+                                    parsedRepresentation
                                     )
                                 );
 
@@ -411,12 +423,18 @@ namespace FreeAIr.UI.ViewModels
                                 return false;
                             }
 
-
-                            var promptText = a as string;
-                            if (string.IsNullOrEmpty(promptText))
+                            var parsedAnswer = a as ParsedAnswer;
+                            if (parsedAnswer is null)
                             {
                                 return false;
                             }
+
+                            var parsedRepresentation = parsedAnswer.ComposeStringRepresentation();
+                            if (string.IsNullOrEmpty(parsedRepresentation))
+                            {
+                                return false;
+                            }
+
 
                             return true;
                         }
@@ -424,6 +442,148 @@ namespace FreeAIr.UI.ViewModels
                 }
 
                 return _createPromptCommand;
+            }
+        }
+
+
+        public ICommand OpenContextItemCommand
+        {
+            get
+            {
+                if (_openContextItemCommand == null)
+                {
+                    _openContextItemCommand = new AsyncRelayCommand(
+                        async a =>
+                        {
+                            if (a is not ChatContextItemViewModel item)
+                            {
+                                return;
+                            }
+
+                            await item.AnswerPart.OpenInNewWindowAsync();
+
+                            OnPropertyChanged();
+                        }
+                        );
+                }
+
+                return _openContextItemCommand;
+            }
+        }
+
+        public ICommand DeleteItemFromContextCommand
+        {
+            get
+            {
+                if (_deleteItemFromContextCommand == null)
+                {
+                    _deleteItemFromContextCommand = new RelayCommand(
+                        a =>
+                        {
+                            if (a is not ChatContextItemViewModel item)
+                            {
+                                return;
+                            }
+
+                            ChatContextItems.Remove(item);
+
+                            OnPropertyChanged();
+                        }
+                        );
+                }
+
+                return _deleteItemFromContextCommand;
+            }
+        }
+
+        public ICommand AddItemToContextCommand
+        {
+            get
+            {
+                if (_addItemToContextCommand == null)
+                {
+                    _addItemToContextCommand = new RelayCommand(
+                        a =>
+                        {
+                            if (_selectedChat is null)
+                            {
+                                return;
+                            }
+                            if (_selectedChat.Chat is null)
+                            {
+                                return;
+                            }
+
+                            var chat = _selectedChat.Chat;
+
+                            if (chat.Status.NotIn(ChatStatusEnum.NotStarted, ChatStatusEnum.Ready))
+                            {
+                                return;
+                            }
+
+                            var parsedAnswer = a as ParsedAnswer;
+                            if (parsedAnswer is null)
+                            {
+                                return;
+                            }
+
+                            var parsedRepresentation = parsedAnswer.ComposeStringRepresentation();
+                            if (string.IsNullOrEmpty(parsedRepresentation))
+                            {
+                                return;
+                            }
+
+                            foreach (var part in parsedAnswer.Parts)
+                            {
+                                if (part is not SourceFileAnswerPart filePart)
+                                {
+                                    continue;
+                                }
+
+                                ChatContextItems.Add(
+                                    new ChatContextItemViewModel(part)
+                                    );
+                            }
+
+                            OnPropertyChanged();
+                        },
+                        (a) =>
+                        {
+                            if (_selectedChat is null)
+                            {
+                                return false;
+                            }
+                            if (_selectedChat.Chat is null)
+                            {
+                                return false;
+                            }
+
+                            var chat = _selectedChat.Chat;
+
+                            if (chat.Status.NotIn(ChatStatusEnum.NotStarted, ChatStatusEnum.Ready))
+                            {
+                                return false;
+                            }
+
+                            var parsedAnswer = a as ParsedAnswer;
+                            if (parsedAnswer is null)
+                            {
+                                return false;
+                            }
+
+                            var parsedRepresentation = parsedAnswer.ComposeStringRepresentation();
+                            if (string.IsNullOrEmpty(parsedRepresentation))
+                            {
+                                return false;
+                            }
+
+
+                            return true;
+                        }
+                        );
+                }
+
+                return _addItemToContextCommand;
             }
         }
 
@@ -437,6 +597,18 @@ namespace FreeAIr.UI.ViewModels
             {
                 throw new ArgumentNullException(nameof(chatContainer));
             }
+
+            ChatContextItems = new ObservableCollection2<ChatContextItemViewModel>();
+            ChatContextItems.Add(
+                new ChatContextItemViewModel(
+                    new SourceFileAnswerPart(@"C:\projects\github\SlnfUpdater\SlnfUpdater\Helper\ArrayHelper.cs")
+                    )
+                );
+            ChatContextItems.Add(
+                new ChatContextItemViewModel(
+                    new SourceFileAnswerPart(@"c:\temp\1.txt")
+                    )
+                );
 
             _chatContainer = chatContainer;
 
@@ -563,6 +735,29 @@ namespace FreeAIr.UI.ViewModels
             }
         }
     }
+
+    public sealed class ChatContextItemViewModel : BaseViewModel
+    {
+        public IAnswerPart AnswerPart
+        {
+            get;
+        }
+
+        public string ChatContextDescription => AnswerPart.ContextUIDescription;
+
+        public ChatContextItemViewModel(
+            IAnswerPart answerPart
+            )
+        {
+            if (answerPart is null)
+            {
+                throw new ArgumentNullException(nameof(answerPart));
+            }
+
+            AnswerPart = answerPart;
+        }
+    }
+
 
     public delegate void MarkdownReReadDelegate(object sender, EventArgs e);
 }

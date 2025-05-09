@@ -34,6 +34,12 @@ namespace FreeAIr.UI.Embedillo
             AssociatedObject.KeyDown -= OnKeyDown;
         }
 
+        public UIElement ParentControl
+        {
+            get;
+            set;
+        }
+
         private void OnKeyDown(object sender, KeyEventArgs e)
         {
             var textEditor = sender as TextEditor;
@@ -47,13 +53,23 @@ namespace FreeAIr.UI.Embedillo
             if (
                 e.KeyboardDevice.Modifiers.HasFlag(ModifierKeys.Control)
                 && e.Key == Key.Enter
-                && Command?.CanExecute(text) == true
                 )
             {
-                Command.Execute(text);
+                if (ParentControl is EmbedilloControl parentControl)
+                {
+                    var parsedAnswer = parentControl.ParseAnswer();
 
-                textEditor.Clear();
+                    if (
+                        Command?.CanExecute(parsedAnswer) == true
+                        )
+                    {
+                        Command.Execute(parsedAnswer);
 
+                        textEditor.Clear();
+                    }
+
+                }
+                
                 e.Handled = true; // Предотвратить стандартное поведение Enter
             }
         }

@@ -1,23 +1,12 @@
 ﻿using FreeAIr.Helper;
-using ICSharpCode.AvalonEdit;
+using FreeAIr.UI.Embedillo.Answer.Parser;
 using ICSharpCode.AvalonEdit.CodeCompletion;
 using ICSharpCode.AvalonEdit.Rendering;
-using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
-using System.Reflection.Emit;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace FreeAIr.UI.Embedillo
 {
@@ -388,6 +377,22 @@ namespace FreeAIr.UI.Embedillo
                 default:
                     throw new InvalidOperationException("Unexpected branch!");
             }
+        }
+
+        public ParsedAnswer ParseAnswer()
+        {
+            var receiver = new AnswerPartReceiver(
+                _generators
+                );
+
+            foreach (var symbol in AvalonTextEditor.Text)
+            {
+                receiver.AcceptPart(symbol);
+            }
+            receiver.AcceptPart('\0');
+
+            var parsedAnswer = receiver.GetParsedAnswer();
+            return parsedAnswer;
         }
     }
 }

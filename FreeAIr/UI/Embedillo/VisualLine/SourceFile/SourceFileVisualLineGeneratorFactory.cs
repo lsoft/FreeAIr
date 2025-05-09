@@ -1,4 +1,5 @@
 ﻿using FreeAIr.Helper;
+using FreeAIr.UI.Embedillo.Answer.Parser;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -29,6 +30,11 @@ namespace FreeAIr.UI.Embedillo.VisualLine.SourceFile
             ControlPositionManager controlPositionManager
             ) : base(Anchor, controlPositionManager)
         {
+        }
+
+        public override IAnswerPart CreatePart(string partPayload)
+        {
+            return new SourceFileAnswerPart(partPayload);
         }
 
         public override async System.Threading.Tasks.Task<List<Suggestion>> GetSuggestionsAsync()

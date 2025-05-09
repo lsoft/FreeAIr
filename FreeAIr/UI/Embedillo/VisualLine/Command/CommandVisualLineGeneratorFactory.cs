@@ -1,4 +1,6 @@
-﻿using FreeAIr.Helper;
+﻿using FreeAIr.BLogic;
+using FreeAIr.Helper;
+using FreeAIr.UI.Embedillo.Answer.Parser;
 using Microsoft.VisualStudio.Imaging;
 using System;
 using System.Collections.Generic;
@@ -29,6 +31,12 @@ namespace FreeAIr.UI.Embedillo.VisualLine.Command
             ControlPositionManager controlPositionManager
             ) : base(Anchor, controlPositionManager)
         {
+        }
+
+        public override IAnswerPart CreatePart(string partPayload)
+        {
+            var kind = (ChatKindEnum)Enum.Parse(typeof(ChatKindEnum), partPayload);
+            return new CommandAnswerPart(kind);
         }
 
         public override System.Threading.Tasks.Task<List<Suggestion>> GetSuggestionsAsync()

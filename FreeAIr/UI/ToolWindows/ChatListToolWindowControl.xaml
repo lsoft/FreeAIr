@@ -11,7 +11,9 @@
     xmlns:toolkit="clr-namespace:Community.VisualStudio.Toolkit;assembly=Community.VisualStudio.Toolkit"
     xmlns:resources="clr-namespace:FreeAIr.Resources"
     xmlns:mdxaml="https://github.com/whistyun/MdXaml"
-    xmlns:plugins="clr-namespace:MdXaml.Plugins;assembly=MdXaml.Plugins" xmlns:embedillo="clr-namespace:FreeAIr.UI.Embedillo"
+    xmlns:plugins="clr-namespace:MdXaml.Plugins;assembly=MdXaml.Plugins"
+    xmlns:embedillo="clr-namespace:FreeAIr.UI.Embedillo"
+    xmlns:viewmodels="clr-namespace:FreeAIr.UI.ViewModels"
     toolkit:Themes.UseVsTheme="True"
     mc:Ignorable="d"
     d:DesignHeight="300"
@@ -130,13 +132,155 @@
             Grid.Column="2"
             >
             <Grid.RowDefinitions>
+                <RowDefinition Height="auto" />
                 <RowDefinition Height="10*" />
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="3*" />
             </Grid.RowDefinitions>
 
-            <mdxaml:MarkdownScrollViewer 
+            <!-- chat context section -->
+            <Border
                 Grid.Row="0"
+                BorderThickness="1"
+                CornerRadius="0"
+                BorderBrush="#569CD6"
+                >
+                <Grid
+                    >
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="auto"/>
+                        <RowDefinition />
+                        <RowDefinition Height="auto"/>
+                    </Grid.RowDefinitions>
+
+                    <Label
+                        Grid.Row="0"
+                        Margin="2"
+                        Content="Chat context:"
+                        FontFamily="Cascadia Code"
+                        />
+
+                    <!-- context item list -->
+                    <ItemsControl
+                        Grid.Row="1"
+                        Margin="2"
+                        ItemsSource="{Binding ChatContextItems}"
+                    >
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="auto" />
+                                        <ColumnDefinition />
+                                    </Grid.ColumnDefinitions>
+
+                                    <Label
+                                        Grid.Column="0"
+                                        Content="❌"
+                                        Foreground="Red"
+                                        Cursor="Hand"
+                                        FontFamily="Cascadia Code"
+                                        ToolTip="Delete from context"
+                                        >
+                                        <Label.InputBindings>
+                                            <MouseBinding
+                                                Command="{Binding ElementName=ChatListToolWindow, Path=DataContext.DeleteItemFromContextCommand}"
+                                                CommandParameter="{Binding .}"
+                                                MouseAction="LeftClick"
+                                                />
+                                        </Label.InputBindings>
+                                    </Label>
+                                    <Label
+                                        Grid.Column="1"
+                                        Margin="20,0,0,0"
+                                        Content="{Binding ChatContextDescription}"
+                                        HorizontalAlignment="Left"
+                                        HorizontalContentAlignment="Left"
+                                        Foreground="#569CD6"
+                                        Cursor="Hand"
+                                        FontFamily="Cascadia Code"
+                                        ToolTip="Open item in new window"
+                                        >
+                                        <Label.InputBindings>
+                                            <MouseBinding
+                                                Command="{Binding ElementName=ChatListToolWindow, Path=DataContext.OpenContextItemCommand}"
+                                                CommandParameter="{Binding .}"
+                                                MouseAction="LeftClick"
+                                                />
+                                        </Label.InputBindings>
+                                    </Label>
+                                </Grid>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+
+                    <!-- add item to context section -->
+                    <Border
+                        Grid.Row="2"
+                        CornerRadius="0"
+                        BorderBrush="#569CD6"
+                        BorderThickness="0,1,0,0"
+                        >
+
+                        <Grid
+                            >
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="auto"/>
+                                <ColumnDefinition Width="auto"/>
+                                <ColumnDefinition />
+                            </Grid.ColumnDefinitions>
+
+                            <Label
+                                Grid.Column="0"
+                                Margin="2"
+                                Content="➕"
+                                VerticalAlignment="Center"
+                                HorizontalAlignment="Left"
+                                HorizontalContentAlignment="Left"
+                                Foreground="Green"
+                                FontFamily="Cascadia Code"
+                                ToolTip="Add new item to context"
+                                />
+
+                            <Label
+                                Grid.Column="1"
+                                Margin="20,5,2,5"
+                                Content="Add new item to context:"
+                                VerticalAlignment="Center"
+                                HorizontalAlignment="Left"
+                                HorizontalContentAlignment="Left"
+                                FontSize="14"
+                                FontFamily="Cascadia Code"
+                                ToolTip="Add new item to context"
+                                />
+
+                            <embedillo:EmbedilloControl
+                                Grid.Column="2"
+                                Margin="2"
+                                VerticalAlignment="Center"
+                                VerticalContentAlignment="Center"
+                                HorizontalAlignment="Stretch"
+                                HorizontalContentAlignment="Stretch"
+                                Foreground="{Binding ElementName=ForegroundButton, Path=Foreground}"
+                                Background="Transparent"
+                                FontSize="14"
+                                FontFamily="Cascadia Code"
+                                x:Name="AddToContextControl"
+                                EnterCommand="{Binding AddItemToContextCommand}"
+                                >
+                            </embedillo:EmbedilloControl>
+
+                        </Grid>
+
+                    </Border>
+
+                </Grid>
+
+            </Border>
+            
+            
+            <mdxaml:MarkdownScrollViewer 
+                Grid.Row="1"
                 Margin="2"
                 HorizontalAlignment="Stretch"
                 VerticalAlignment="Stretch"
@@ -382,7 +526,7 @@
             </mdxaml:MarkdownScrollViewer>
 
             <GridSplitter
-                Grid.Row="1"
+                Grid.Row="2"
                 ResizeDirection="Rows"
                 Height="2"
                 VerticalAlignment="Center"
@@ -390,7 +534,8 @@
                 />
 
             <embedillo:EmbedilloControl
-                Grid.Row="2"
+                Grid.Row="3"
+                Margin="2"
                 VerticalAlignment="Stretch"
                 Foreground="{Binding ElementName=ForegroundButton, Path=Foreground}"
                 Background="Transparent"
@@ -401,7 +546,7 @@
             </embedillo:EmbedilloControl>
 
             <Label
-                Grid.Row="2"
+                Grid.Row="3"
                 VerticalAlignment="Bottom"
                 HorizontalAlignment="Right"
                 Content="Ctrl + Enter - send prompt."

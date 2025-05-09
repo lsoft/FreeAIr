@@ -4,6 +4,7 @@ using System.Windows;
 using System.Linq;
 using FreeAIr.Helper;
 using System.Collections.Generic;
+using FreeAIr.UI.Embedillo.Answer.Parser;
 
 namespace FreeAIr.UI.Embedillo
 {
@@ -18,12 +19,12 @@ namespace FreeAIr.UI.Embedillo
     {
         private readonly Regex _targetRegex;
 
-        private static readonly Regex _threeTildaRegex = new Regex(
+        private static readonly Regex _threeSlashRegex = new Regex(
             @"\`\`\`[\s\S]*?\`\`\`",
             RegexOptions.Compiled
             );
 
-        private static readonly Regex _oneTildaRegex = new Regex(
+        private static readonly Regex _oneSlashRegex = new Regex(
             @"\`[\s\S]*?\`",
             RegexOptions.Compiled
             );
@@ -64,7 +65,7 @@ namespace FreeAIr.UI.Embedillo
             //```
             //тут
             //```
-            foreach (Match match in _threeTildaRegex.Matches(text))
+            foreach (Match match in _threeSlashRegex.Matches(text))
             {
                 foreach (var capture in match.Captures.OrderBy(c => c.Index))
                 {
@@ -76,7 +77,7 @@ namespace FreeAIr.UI.Embedillo
             }
 
             //не обрабатывать собак внутри `тут`
-            foreach (Match match in _oneTildaRegex.Matches(text))
+            foreach (Match match in _oneSlashRegex.Matches(text))
             {
                 foreach (var capture in match.Captures.OrderBy(c => c.Index))
                 {
@@ -120,7 +121,8 @@ namespace FreeAIr.UI.Embedillo
         protected abstract UIElement CreateControl(string mentionText);
 
         public abstract System.Threading.Tasks.Task<List<Suggestion>> GetSuggestionsAsync();
-
+        
+        public abstract IAnswerPart CreatePart(string partPayload);
     }
 
     public sealed class Suggestion

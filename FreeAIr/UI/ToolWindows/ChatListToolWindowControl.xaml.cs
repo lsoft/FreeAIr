@@ -33,6 +33,10 @@ namespace FreeAIr.UI.ToolWindows
                 new CommandVisualLineGeneratorFactory()
                 );
 
+            AddToContextControl.AddVisualLineGeneratorFactory(
+                new SourceFileVisualLineGeneratorFactory()
+                );
+
             viewModel.MarkdownReReadEvent += ViewModel_MarkdownReReadEvent;
         }
 

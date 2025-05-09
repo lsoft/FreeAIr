@@ -11,16 +11,51 @@
     d:DesignHeight="450" d:DesignWidth="800"
     x:Name="EmbedilloInternalName"
     >
-    <avalonEdit:TextEditor
-        x:Name="AvalonTextEditor"
-        Foreground="{Binding ElementName=EmbedilloInternalName, Path=Foreground}"
-        Background="{Binding ElementName=EmbedilloInternalName, Path=Background}"
+    <Border
+        CornerRadius="0"
+        BorderThickness="0,0,0,1"
+        BorderBrush="{Binding ElementName=EmbedilloInternalName, Path=Foreground}"
+        Margin="0"
+        x:Name="BorderName"
+        VerticalAlignment="{Binding ElementName=EmbedilloInternalName, Path=VerticalAlignment}"
+        HorizontalAlignment="{Binding ElementName=EmbedilloInternalName, Path=HorizontalAlignment}"
         >
-        <Behaviors:Interaction.Behaviors>
-            <local:EnterKeyBehavior
-                Command="{Binding EnterCommand, ElementName=EmbedilloInternalName}"
-                />
-        </Behaviors:Interaction.Behaviors>
-        
-    </avalonEdit:TextEditor>
+        <avalonEdit:TextEditor
+            x:Name="AvalonTextEditor"
+            Foreground="{Binding ElementName=EmbedilloInternalName, Path=Foreground}"
+            Background="{Binding ElementName=EmbedilloInternalName, Path=Background}"
+            FontFamily="{Binding ElementName=EmbedilloInternalName, Path=FontFamily}"
+            FontSize="{Binding ElementName=EmbedilloInternalName, Path=FontSize}"
+            Height="{Binding ElementName=BorderName, Path=Height}"
+            Margin="0,0,0,2"
+            HorizontalScrollBarVisibility="Auto"
+            VerticalScrollBarVisibility="Auto"
+            HorizontalAlignment="Stretch"
+            HorizontalContentAlignment="Stretch"
+            VerticalAlignment="Stretch"
+            VerticalContentAlignment="Stretch"
+            >
+            <!--
+            Foreground="{Binding ElementName=EmbedilloInternalName, Path=Foreground}"
+            Background="{Binding ElementName=EmbedilloInternalName, Path=Background}"
+            Width="{Binding ElementName=EmbedilloInternalName, Path=Width}"
+            Height="{Binding ElementName=EmbedilloInternalName, Path=Height}"
+            FontFamily="{Binding ElementName=EmbedilloInternalName, Path=FontFamily}"
+            FontSize="{Binding ElementName=EmbedilloInternalName, Path=FontSize}"
+            VerticalAlignment="{Binding ElementName=EmbedilloInternalName, Path=VerticalAlignment}"
+            HorizontalAlignment="{Binding ElementName=EmbedilloInternalName, Path=HorizontalAlignment}"
+            VerticalContentAlignment="{Binding ElementName=EmbedilloInternalName, Path=VerticalContentAlignment}"
+            HorizontalContentAlignment="{Binding ElementName=EmbedilloInternalName, Path=HorizontalContentAlignment}"
+            HorizontalScrollBarVisibility="Auto"
+            VerticalScrollBarVisibility="Auto"
+            -->
+            <Behaviors:Interaction.Behaviors>
+                <local:EnterKeyBehavior
+                    ParentControl="{x:Reference Name=EmbedilloInternalName}"
+                    Command="{Binding EnterCommand, ElementName=EmbedilloInternalName}"
+                    />
+            </Behaviors:Interaction.Behaviors>
+
+        </avalonEdit:TextEditor>
+    </Border>
 </UserControl>
