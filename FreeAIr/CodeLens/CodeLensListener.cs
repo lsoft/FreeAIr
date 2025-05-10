@@ -1,18 +1,10 @@
 ﻿using FreeAIr.Shared;
 using FreeAIr.Shared.Dto;
-using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Microsoft.CodeAnalysis.Text;
 using Microsoft.VisualStudio.ComponentModelHost;
 using Microsoft.VisualStudio.Language.CodeLens;
-using Microsoft.VisualStudio.LanguageServices;
-using Microsoft.VisualStudio.Threading;
 using Microsoft.VisualStudio.Utilities;
-using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Diagnostics;
-using System.Linq;
-using System.Reflection;
 using System.Threading.Tasks;
 
 namespace FreeAIr.Extension

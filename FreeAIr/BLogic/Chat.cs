@@ -1,18 +1,12 @@
-﻿using EnvDTE;
-using FreeAIr.BLogic;
-using FreeAIr.Helper;
-using Microsoft.VisualStudio.Threading;
+﻿using FreeAIr.Helper;
 using OpenAI;
 using OpenAI.Chat;
-using System;
 using System.ClientModel;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace FreeAIr.BLogic
 {
@@ -187,7 +181,7 @@ namespace FreeAIr.BLogic
                     );
                 File.AppendAllText(
                     ResultFilePath,
-                    $"> {Resources.Resources.ResourceManager.GetString("UI_Prompt", ResponsePage.GetAnswerCulture())}:" + Environment.NewLine
+                    $"> {"UI_Prompt".GetLocalizedResourceByName()}:" + Environment.NewLine
                     );
                 File.AppendAllText(
                     ResultFilePath,
@@ -195,14 +189,14 @@ namespace FreeAIr.BLogic
                     );
                 File.AppendAllText(
                     ResultFilePath,
-                    $"> {Resources.Resources.ResourceManager.GetString("UI_Answer", ResponsePage.GetAnswerCulture())}:" + Environment.NewLine
+                    $"> {"UI_Answer".GetLocalizedResourceByName()}:" + Environment.NewLine
                     );
 
                 Status = ChatStatusEnum.WaitingForAnswer;
 
                 var chatMessages = new List<ChatMessage>(_prompts.Count + 1);
                 chatMessages.Add(
-                    new UserChatMessage(userPrompt.BuildRulesSection())
+                    new SystemChatMessage(userPrompt.BuildRulesSection())
                     );
                 chatMessages.AddRange(
                     _prompts.ConvertAll(p => new UserChatMessage(p.PromptBody))

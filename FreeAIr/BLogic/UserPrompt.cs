@@ -1,14 +1,6 @@
-﻿using EnvDTE;
-using FreeAIr.BLogic;
-using FreeAIr.Helper;
+﻿using FreeAIr.Helper;
 using FreeAIr.Shared.Helper;
-using System;
-using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace FreeAIr.BLogic
 {
@@ -214,10 +206,7 @@ namespace FreeAIr.BLogic
         public static UserPrompt CreateSuggestWholeLine(string userCodeFileName, string documentText, int caretPosition)
         {
             var fi = new FileInfo(userCodeFileName);
-            var anchor = FreeAIr.Resources.Resources.ResourceManager.GetString(
-                "ChatKindEnum_SuggestWholeLine_Anchor",
-                ResponsePage.GetAnswerCulture()
-            );
+            var anchor = "ChatKindEnum_SuggestWholeLine_Anchor".GetLocalizedResourceByName();
 
             documentText = documentText.Insert(caretPosition, anchor);
 

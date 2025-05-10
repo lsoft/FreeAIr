@@ -1,12 +1,7 @@
 ﻿using FreeAIr.Helper;
-using System;
-using System.CodeDom;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace FreeAIr.BLogic
 {
@@ -181,7 +176,15 @@ namespace FreeAIr.BLogic
                 throw new ArgumentNullException(nameof(body));
             }
 
-            File.WriteAllText(FilePath, body);
+            var lineEnding = LineEndingHelper.Actual.OpenDocumentAndGetLineEnding(
+                FilePath
+                );
+
+
+            File.WriteAllText(
+                FilePath,
+                body.WithLineEnding(lineEnding)
+                );
         }
     }
 

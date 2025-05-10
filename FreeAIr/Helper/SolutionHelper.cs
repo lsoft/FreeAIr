@@ -1,16 +1,6 @@
-﻿using EnvDTE;
-using Microsoft.Internal.VisualStudio.Shell;
-using Microsoft.VisualStudio.OLE.Interop;
-using Microsoft.VisualStudio;
-using Microsoft.VisualStudio.Shell;
-using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Microsoft.VisualStudio.Shell.Interop;
 using System.Threading.Tasks;
-using Microsoft.CodeAnalysis;
-using Microsoft.VisualStudio.LanguageServices;
-using System.Linq;
-using System.IO;
 using Microsoft.Internal.VisualStudio.PlatformUI;
 
 namespace FreeAIr.Helper

@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-
-namespace FreeAIr.Shared.Dto
+﻿namespace FreeAIr.Shared.Dto
 {
     public class CodeLensUnitInfo
     {

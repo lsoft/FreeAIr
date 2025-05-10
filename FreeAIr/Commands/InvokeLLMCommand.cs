@@ -1,5 +1,4 @@
-﻿using EnvDTE80;
-using FreeAIr.BLogic;
+﻿using FreeAIr.BLogic;
 using FreeAIr.Helper;
 using FreeAIr.UI.ToolWindows;
 using Microsoft.VisualStudio.ComponentModelHost;

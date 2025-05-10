@@ -1,9 +1,7 @@
-﻿using System;
-using System.Collections.Concurrent;
+﻿using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.IO.Pipes;
 using System.Linq;
-using System.Threading.Tasks;
 using FreeAIr.Shared;
 using StreamJsonRpc;
 

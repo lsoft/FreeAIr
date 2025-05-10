@@ -1,9 +1,7 @@
 ﻿using EnvDTE;
 using EnvDTE80;
-using FreeAIr.UI.Informer;
 using System.ComponentModel.Composition;
 using System.Reflection;
-using System.Text;
 using System.Threading;
 using System.Windows;
 using System.Windows.Controls;

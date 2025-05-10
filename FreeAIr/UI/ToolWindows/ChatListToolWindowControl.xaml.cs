@@ -1,13 +1,9 @@
 ﻿using FreeAIr.Helper;
-using FreeAIr.UI.Embedillo;
 using FreeAIr.UI.Embedillo.VisualLine.Command;
 using FreeAIr.UI.Embedillo.VisualLine.SourceFile;
 using FreeAIr.UI.ViewModels;
-using System.Collections.Generic;
-using System.IO;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Media;
 
 namespace FreeAIr.UI.ToolWindows
 {

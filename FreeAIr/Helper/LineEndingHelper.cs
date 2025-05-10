@@ -1,5 +1,4 @@
 ﻿using EnvDTE80;
-using FreeAIr.BLogic;
 
 namespace FreeAIr.Helper
 {

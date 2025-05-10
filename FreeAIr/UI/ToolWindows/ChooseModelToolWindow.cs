@@ -1,5 +1,4 @@
-﻿using FreeAIr.UI.ToolWindows;
-using FreeAIr.UI.ViewModels;
+﻿using FreeAIr.UI.ViewModels;
 using Microsoft.VisualStudio.ComponentModelHost;
 using Microsoft.VisualStudio.Imaging;
 using System.Runtime.InteropServices;

@@ -1,12 +1,9 @@
 ﻿using FreeAIr.BLogic;
 using FreeAIr.Helper;
-using Microsoft.CodeAnalysis.Elfie.Model;
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace FreeAIr.UI.Embedillo.Answer.Parser
 {

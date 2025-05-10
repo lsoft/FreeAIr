@@ -1,20 +1,12 @@
-﻿using EnvDTE;
-using FreeAIr.BLogic;
-using FreeAIr.Commands;
+﻿using FreeAIr.BLogic;
 using FreeAIr.Helper;
 using FreeAIr.Shared.Helper;
 using FreeAIr.UI.Embedillo.Answer.Parser;
 using ICSharpCode.AvalonEdit.Editing;
 using Microsoft.Win32;
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.ComponentModel.Composition;
 using System.IO;
 using System.Linq;
-using System.Net.Mail;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using WpfHelpers;
@@ -174,7 +166,7 @@ namespace FreeAIr.UI.ViewModels
                             if (textArea is null)
                             {
                                 await VS.MessageBox.ShowErrorAsync(
-                                    "Resources.Resources.Error",
+                                    "Error".GetLocalizedResourceByName(),
                                     "Cannot copy code block. Please copy manually."
                                     );
                                 return;
@@ -203,7 +195,7 @@ namespace FreeAIr.UI.ViewModels
                             if (textArea is null)
                             {
                                 await VS.MessageBox.ShowErrorAsync(
-                                    "Resources.Resources.Error",
+                                    "Error".GetLocalizedResourceByName(),
                                     "Cannot replace selected text. Please replace the selected text manually."
                                     );
                                 return;
@@ -213,7 +205,7 @@ namespace FreeAIr.UI.ViewModels
                             if (codeText is null)
                             {
                                 await VS.MessageBox.ShowErrorAsync(
-                                    "Resources.Resources.Error",
+                                    "Error".GetLocalizedResourceByName(),
                                     "Cannot replace selected text. Please replace the selected text manually."
                                     );
                                 return;
@@ -223,7 +215,7 @@ namespace FreeAIr.UI.ViewModels
                             if (chat is null)
                             {
                                 await VS.MessageBox.ShowErrorAsync(
-                                    "Resources.Resources.Error",
+                                    "Error".GetLocalizedResourceByName(),
                                     "Cannot replace selected text. Please replace the selected text manually."
                                     );
                                 return;
@@ -233,7 +225,7 @@ namespace FreeAIr.UI.ViewModels
                             if (std is null)
                             {
                                 await VS.MessageBox.ShowErrorAsync(
-                                    "Resources.Resources.Error",
+                                    "Error".GetLocalizedResourceByName(),
                                     "Cannot replace selected text. Please replace the selected text manually."
                                     );
                                 return;
@@ -242,7 +234,7 @@ namespace FreeAIr.UI.ViewModels
                             if (!std.IsAbleToManipulate)
                             {
                                 await VS.MessageBox.ShowErrorAsync(
-                                    "Resources.Resources.Error",
+                                    "Error".GetLocalizedResourceByName(),
                                     "Cannot replace selected text. Please replace the selected text manually."
                                     );
                                 return;
@@ -305,7 +297,7 @@ namespace FreeAIr.UI.ViewModels
                             if (textArea is null)
                             {
                                 await VS.MessageBox.ShowErrorAsync(
-                                    "Resources.Resources.Error",
+                                    "Error".GetLocalizedResourceByName(),
                                     "Cannot create a new file. Please create the file manually."
                                     );
                                 return;
@@ -315,7 +307,7 @@ namespace FreeAIr.UI.ViewModels
                             if (codeText is null)
                             {
                                 await VS.MessageBox.ShowErrorAsync(
-                                    "Resources.Resources.Error",
+                                    "Error".GetLocalizedResourceByName(),
                                     "Cannot create a new file. Please create the file manually."
                                     );
                                 return;
@@ -325,7 +317,7 @@ namespace FreeAIr.UI.ViewModels
                             if (solution is null)
                             {
                                 await VS.MessageBox.ShowErrorAsync(
-                                    "Resources.Resources.Error",
+                                    "Error".GetLocalizedResourceByName(),
                                     "Cannot create a new file. Please create the file manually."
                                     );
                                 return;
@@ -663,7 +655,7 @@ namespace FreeAIr.UI.ViewModels
                             if (vm is null)
                             {
                                 await VS.MessageBox.ShowErrorAsync(
-                                    "Resources.Resources.Error",
+                                    "Error".GetLocalizedResourceByName(),
                                     "Cannot replace context document body. Please replace manually."
                                     );
                                 return;
@@ -673,7 +665,7 @@ namespace FreeAIr.UI.ViewModels
                             if (textArea is null)
                             {
                                 await VS.MessageBox.ShowErrorAsync(
-                                    "Resources.Resources.Error",
+                                    "Error".GetLocalizedResourceByName(),
                                     "Cannot replace context document body. Please replace manually."
                                     );
                                 return;
@@ -683,7 +675,7 @@ namespace FreeAIr.UI.ViewModels
                             if (codeText is null)
                             {
                                 await VS.MessageBox.ShowErrorAsync(
-                                    "Resources.Resources.Error",
+                                    "Error".GetLocalizedResourceByName(),
                                     "Cannot replace context document body. Please replace manually."
                                     );
                                 return;

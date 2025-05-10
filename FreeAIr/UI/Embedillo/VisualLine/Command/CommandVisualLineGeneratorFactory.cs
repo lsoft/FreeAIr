@@ -1,12 +1,8 @@
 ﻿using FreeAIr.BLogic;
-using FreeAIr.Helper;
 using FreeAIr.UI.Embedillo.Answer.Parser;
 using Microsoft.VisualStudio.Imaging;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -133,16 +129,20 @@ namespace FreeAIr.UI.Embedillo.VisualLine.Command
 
             suggestions.Add(
                 new Suggestion(
-                    //EnumHelper.AsPromptString(BLogic.ChatKindEnum.ExplainCode),
                     "ExplainCode",
                     "ExplainCode"
                     )
                 );
             suggestions.Add(
                 new Suggestion(
-                    //EnumHelper.AsPromptString(BLogic.ChatKindEnum.AddXmlComments),
                     "AddXmlComments",
                     "AddXmlComments"
+                    )
+                );
+            suggestions.Add(
+                new Suggestion(
+                    "GenerateUnitTests",
+                    "GenerateUnitTests"
                     )
                 );
 

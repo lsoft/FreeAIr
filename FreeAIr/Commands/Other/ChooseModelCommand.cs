@@ -1,6 +1,6 @@
 ﻿using FreeAIr.UI.ToolWindows;
 
-namespace FreeAIr.Commands
+namespace FreeAIr.Commands.Other
 {
     [Command(PackageIds.ChooseModelCommandId)]
     internal sealed class ChooseModelCommand : BaseCommand<ChooseModelCommand>

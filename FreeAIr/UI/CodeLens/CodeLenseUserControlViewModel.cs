@@ -1,11 +1,7 @@
-﻿using Community.VisualStudio.Toolkit;
-using FreeAIr.Commands;
-using FreeAIr.Shared.Dto;
+﻿using FreeAIr.Shared.Dto;
 using Microsoft.VisualStudio.Text;
-using Microsoft.VisualStudio.Text.Editor;
 using System.ComponentModel.Design;
 using System.Threading.Tasks;
-using System.Windows;
 using System.Windows.Input;
 using WpfHelpers;
 

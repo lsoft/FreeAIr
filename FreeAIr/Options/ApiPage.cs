@@ -1,14 +1,5 @@
-﻿using FreeAIr.Dto.OpenRouter;
-using System.Collections;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Globalization;
-using System.Linq;
-using System.Net.Http;
-using System.Net.Http.Json;
+﻿using System.ComponentModel;
 using System.Threading.Tasks;
-using static FreeAIr.UI.ViewModels.ChooseModelViewModel;
 
 namespace FreeAIr
 {

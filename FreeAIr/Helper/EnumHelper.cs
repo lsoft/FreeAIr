@@ -1,9 +1,4 @@
 ﻿using FreeAIr.BLogic;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace FreeAIr.Helper
 {
@@ -28,22 +23,13 @@ namespace FreeAIr.Helper
                     return string.Empty;
                 case ChatKindEnum.SuggestWholeLine:
                     {
-                        var prompt = FreeAIr.Resources.Resources.ResourceManager.GetString(
-                            "ChatKindEnum_SuggestWholeLine",
-                            ResponsePage.GetAnswerCulture()
-                            );
-                        var anchor = FreeAIr.Resources.Resources.ResourceManager.GetString(
-                            "ChatKindEnum_SuggestWholeLine_Anchor",
-                            ResponsePage.GetAnswerCulture()
-                            );
+                        var prompt = "ChatKindEnum_SuggestWholeLine".GetLocalizedResourceByName();
+                        var anchor = "ChatKindEnum_SuggestWholeLine_Anchor".GetLocalizedResourceByName();
                         return string.Format(prompt, anchor);
                     }
                 case ChatKindEnum.GenerateUnitTests:
                     {
-                        var prompt = FreeAIr.Resources.Resources.ResourceManager.GetString(
-                            "ChatKindEnum_GenerateUnitTests",
-                            ResponsePage.GetAnswerCulture()
-                            );
+                        var prompt = "ChatKindEnum_GenerateUnitTests".GetLocalizedResourceByName();
                         var anchor = ResponsePage.Instance.PreferredUnitTestFramework;
                         return string.Format(prompt, anchor);
                     }

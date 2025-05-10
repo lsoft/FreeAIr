@@ -1,6 +1,6 @@
 ﻿using FreeAIr.UI.ToolWindows;
 
-namespace FreeAIr.Commands
+namespace FreeAIr.Commands.Other
 {
     [Command(PackageIds.OpenChatListToolWindowCommandId)]
     internal sealed class OpenChatListToolWindowCommand : BaseCommand<OpenChatListToolWindowCommand>

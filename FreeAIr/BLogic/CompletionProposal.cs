@@ -1,27 +1,18 @@
-﻿using EnvDTE;
-using FreeAIr.Helper;
+﻿using FreeAIr.Helper;
 using Microsoft.VisualStudio.ComponentModelHost;
-using Microsoft.VisualStudio.Language;
 using Microsoft.VisualStudio.Language.Intellisense;
 using Microsoft.VisualStudio.Language.Intellisense.AsyncCompletion;
 using Microsoft.VisualStudio.Language.Proposals;
 using Microsoft.VisualStudio.Language.Suggestions;
-using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Editor;
-using Microsoft.VisualStudio.Text.Logic.TextModel;
-using Microsoft.VisualStudio.Threading;
 using Microsoft.VisualStudio.Utilities;
-using System;
-using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.ComponentModel.Composition;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Windows.Media;
 using static FreeAIr.Helper.SuggestionHijackHelper;
 
 #nullable enable

@@ -158,6 +158,7 @@
                         <RowDefinition Height="auto"/>
                         <RowDefinition />
                         <RowDefinition Height="auto"/>
+                        <RowDefinition Height="auto"/>
                     </Grid.RowDefinitions>
 
                     <Label
@@ -222,65 +223,66 @@
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>
 
-                    <!-- add item to context section -->
                     <Border
                         Grid.Row="2"
                         CornerRadius="0"
                         BorderBrush="#569CD6"
                         BorderThickness="0,1,0,0"
+                        Margin="30,0,30,0"
+                        />
+
+                    <!-- add item to context section -->
+
+                    <Grid
+                        Grid.Row="3"
                         >
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="auto"/>
+                            <ColumnDefinition Width="auto"/>
+                            <ColumnDefinition />
+                        </Grid.ColumnDefinitions>
 
-                        <Grid
+                        <Label
+                            Grid.Column="0"
+                            Margin="2"
+                            Content="➕"
+                            VerticalAlignment="Center"
+                            HorizontalAlignment="Left"
+                            HorizontalContentAlignment="Left"
+                            Foreground="Green"
+                            FontFamily="Cascadia Code"
+                            ToolTip="Add new item to context"
+                            />
+
+                        <Label
+                            Grid.Column="1"
+                            Margin="20,5,2,5"
+                            Content="Add new item to context:"
+                            VerticalAlignment="Center"
+                            HorizontalAlignment="Left"
+                            HorizontalContentAlignment="Left"
+                            FontSize="14"
+                            FontFamily="Cascadia Code"
+                            ToolTip="Add new item to context"
+                            />
+
+                        <embedillo:EmbedilloControl
+                            Grid.Column="2"
+                            Margin="2"
+                            VerticalAlignment="Center"
+                            VerticalContentAlignment="Center"
+                            HorizontalAlignment="Stretch"
+                            HorizontalContentAlignment="Stretch"
+                            Foreground="{Binding ElementName=ForegroundButton, Path=Foreground}"
+                            Background="Transparent"
+                            FontSize="14"
+                            FontFamily="Cascadia Code"
+                            x:Name="AddToContextControl"
+                            EnterCommand="{Binding AddItemToContextCommand}"
                             >
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="auto"/>
-                                <ColumnDefinition Width="auto"/>
-                                <ColumnDefinition />
-                            </Grid.ColumnDefinitions>
+                        </embedillo:EmbedilloControl>
 
-                            <Label
-                                Grid.Column="0"
-                                Margin="2"
-                                Content="➕"
-                                VerticalAlignment="Center"
-                                HorizontalAlignment="Left"
-                                HorizontalContentAlignment="Left"
-                                Foreground="Green"
-                                FontFamily="Cascadia Code"
-                                ToolTip="Add new item to context"
-                                />
-
-                            <Label
-                                Grid.Column="1"
-                                Margin="20,5,2,5"
-                                Content="Add new item to context:"
-                                VerticalAlignment="Center"
-                                HorizontalAlignment="Left"
-                                HorizontalContentAlignment="Left"
-                                FontSize="14"
-                                FontFamily="Cascadia Code"
-                                ToolTip="Add new item to context"
-                                />
-
-                            <embedillo:EmbedilloControl
-                                Grid.Column="2"
-                                Margin="2"
-                                VerticalAlignment="Center"
-                                VerticalContentAlignment="Center"
-                                HorizontalAlignment="Stretch"
-                                HorizontalContentAlignment="Stretch"
-                                Foreground="{Binding ElementName=ForegroundButton, Path=Foreground}"
-                                Background="Transparent"
-                                FontSize="14"
-                                FontFamily="Cascadia Code"
-                                x:Name="AddToContextControl"
-                                EnterCommand="{Binding AddItemToContextCommand}"
-                                >
-                            </embedillo:EmbedilloControl>
-
-                        </Grid>
-
-                    </Border>
+                    </Grid>
 
                 </Grid>
 
@@ -624,7 +626,7 @@
                 Grid.Row="3"
                 VerticalAlignment="Bottom"
                 HorizontalAlignment="Right"
-                Content="Ctrl + Enter - send prompt."
+                Content="Use / to open commands. Use # to choose solution item. Ctrl + Enter - send prompt."
                 />
 
         </Grid>

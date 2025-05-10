@@ -1,20 +1,10 @@
 ﻿using EnvDTE;
 using EnvDTE80;
-using FreeAIr.BLogic;
-using FreeAIr.Helper;
 using FreeAIr.Shared.Helper;
 using FreeAIr.UI.Informer;
-using OpenAI;
-using OpenAI.Chat;
-using System;
-using System.ClientModel;
-using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
-using System.Diagnostics;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace FreeAIr.BLogic
 {

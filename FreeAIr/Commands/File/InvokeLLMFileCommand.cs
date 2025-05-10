@@ -1,20 +1,21 @@
-﻿using EnvDTE;
-using FreeAIr.BLogic;
+﻿using FreeAIr.BLogic;
 using FreeAIr.Helper;
 using FreeAIr.UI.ToolWindows;
 using Microsoft.VisualStudio.ComponentModelHost;
 using System.IO;
 using System.Linq;
 
-namespace FreeAIr.Commands
+namespace FreeAIr.Commands.File
 {
-    [Command(PackageIds.AddCommentsToFileCommandId)]
-    internal sealed class AddCommentsToFileCommand : BaseCommand<AddCommentsToFileCommand>
+    public abstract class InvokeLLMFileCommand<T> : BaseCommand<T>
+        where T : InvokeLLMFileCommand<T>, new()
     {
-        public AddCommentsToFileCommand(
+        public InvokeLLMFileCommand(
             )
         {
         }
+
+        protected abstract ChatKindEnum GetChatKind();
 
         protected override async Task ExecuteAsync(OleMenuCmdEventArgs e)
         {
@@ -53,7 +54,9 @@ namespace FreeAIr.Commands
                 return;
             }
 
-            var kind = ChatKindEnum.AddXmlComments;
+            var fileName = new FileInfo(selectedFile.FullPath).Name;
+
+            var kind = GetChatKind();
 
             var lineEnding = LineEndingHelper.Actual.OpenDocumentAndGetLineEnding(
                 selectedFile.FullPath
@@ -64,16 +67,25 @@ namespace FreeAIr.Commands
                 lineEnding
                 );
 
-            chatContainer.StartChat(
+            var chat = chatContainer.StartChat(
                 new ChatDescription(
                     kind,
                     wfd
                     ),
-                UserPrompt.CreateCodeBasedPrompt(kind, wfd.FileName, wfd.OriginalText)
+                null
+                );
+
+            chat.ChatContext.AddItem(
+                new DiskFileChatContextItem(selectedFile.FullPath)
+                );
+
+            chat.AddPrompt(
+                UserPrompt.CreateCodeBasedPrompt(kind, fileName, selectedFile.FullPath)
                 );
 
             await ChatListToolWindow.ShowIfEnabledAsync();
         }
+
     }
 
 }

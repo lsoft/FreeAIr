@@ -1,5 +1,4 @@
 ﻿using FreeAIr.Shared.Dto;
-using System;
 using System.Threading.Tasks;
 
 namespace FreeAIr.Shared

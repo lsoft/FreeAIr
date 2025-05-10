@@ -1,8 +1,5 @@
 ﻿using EnvDTE;
 using FreeAIr.BLogic;
-using FreeAIr.Helper;
-using FreeAIr.UI.ToolWindows;
-using Microsoft.VisualStudio.ComponentModelHost;
 
 namespace FreeAIr.Commands
 {
