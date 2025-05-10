@@ -45,11 +45,18 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Antlr\AnswerParser.cs" />
+    <Compile Include="Antlr\ErrorListener.cs" />
+    <Compile Include="Antlr\MarkdownListener.cs" />
     <Compile Include="BLogic\Chat.cs" />
     <Compile Include="BLogic\ChatContainer.cs" />
     <Compile Include="BLogic\CommitMessageBuilder.cs" />
     <Compile Include="BLogic\CompletionProposal.cs" />
-    <Compile Include="BLogic\ChatContext.cs" />
+    <Compile Include="BLogic\Context\ChatContext.cs" />
+    <Compile Include="BLogic\Context\ChatContextEventArgs.cs" />
+    <Compile Include="BLogic\Context\IChatContext.cs" />
+    <Compile Include="BLogic\Context\IChatContextItem.cs" />
+    <Compile Include="BLogic\Context\SolutionItemChatContextItem.cs" />
     <Compile Include="BLogic\TextDescriptor.cs" />
     <Compile Include="CodeLens\CodeLensConnectionHandler.cs" />
     <Compile Include="CodeLens\CodeLensListener.cs" />
@@ -103,7 +110,11 @@
     <Compile Include="UI\CodeLens\CodeLenseUserControlViewModel.cs" />
     <Compile Include="UI\CodeLens\ViewElementFactory.cs" />
     <Compile Include="UI\CombinedParameterConverter.cs" />
-    <Compile Include="UI\Embedillo\Answer\Parser\Acceptor.cs" />
+    <Compile Include="UI\Embedillo\Answer\Parser\CommandAnswerPart.cs" />
+    <Compile Include="UI\Embedillo\Answer\Parser\IAnswerPart.cs" />
+    <Compile Include="UI\Embedillo\Answer\Parser\ParsedAnswer.cs" />
+    <Compile Include="UI\Embedillo\Answer\Parser\SolutionItemAnswerPart.cs" />
+    <Compile Include="UI\Embedillo\Answer\Parser\StringAnswerPart.cs" />
     <Compile Include="UI\Embedillo\CompletionData.cs" />
     <Compile Include="UI\Embedillo\ControlPositionInfo.cs" />
     <Compile Include="UI\Embedillo\ControlPositionManager.cs" />
@@ -114,7 +125,7 @@
     <Compile Include="UI\Embedillo\MentionVisualLineGenerator.cs" />
     <Compile Include="UI\Embedillo\TextChangeModeEnum.cs" />
     <Compile Include="UI\Embedillo\VisualLine\Command\CommandVisualLineGeneratorFactory.cs" />
-    <Compile Include="UI\Embedillo\VisualLine\SourceFile\SourceFileVisualLineGeneratorFactory.cs" />
+    <Compile Include="UI\Embedillo\VisualLine\SolutionItem\SolutionItemVisualLineGeneratorFactory.cs" />
     <Compile Include="UI\OpenContextMenuOnLeftClickBehavior.cs" />
     <Compile Include="UI\Theme.cs" />
     <Compile Include="UI\ToolWindows\ChooseModelToolWindow.cs" />
@@ -156,6 +167,13 @@
     <Content Include="Monikers.imagemanifest">
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
+    <Antlr4 Include="Antlr\MD.g4">
+      <Listener>true</Listener>
+      <Visitor>true</Visitor>
+      <GAtn>true</GAtn>
+      <Error>true</Error>
+      <Package>FreeAIr.Antlr</Package>
+    </Antlr4>
     <None Include="source.extension.vsixmanifest">
       <SubType>Designer</SubType>
       <Generator>VsixManifestGenerator</Generator>
@@ -184,6 +202,12 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="Antlr4.Runtime.Standard">
+      <Version>4.13.1</Version>
+    </PackageReference>
+    <PackageReference Include="Antlr4BuildTasks">
+      <Version>12.10.0</Version>
+    </PackageReference>
     <PackageReference Include="Community.VisualStudio.VSCT" Version="16.0.29.6" PrivateAssets="all" />
     <PackageReference Include="Community.VisualStudio.Toolkit.17" Version="17.0.533" ExcludeAssets="Runtime">
       <IncludeAssets>compile; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>

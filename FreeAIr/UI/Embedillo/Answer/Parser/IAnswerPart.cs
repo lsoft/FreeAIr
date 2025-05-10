@@ -1,0 +1,21 @@
+﻿using FreeAIr.BLogic.Context;
+
+namespace FreeAIr.UI.Embedillo.Answer.Parser
+{
+    public interface IAnswerPart
+    {
+        /// <summary>
+        /// Как должен выглядеть этот парт непосредственно
+        /// в теле промпта.
+        /// например, файловый парт в теле промпта должен выглядеть просто
+        /// как путь до файла (контекст даст LLM полный текст файла).
+        /// </summary>
+        string AsPromptString();
+
+        /// <summary>
+        /// Создает итем для контекста чата.
+        /// </summary>
+        /// <returns>null если этот парт неприменим к созданию итемов контекста чата.</returns>
+        IChatContextItem? TryCreateChatContextItem();
+    }
+}

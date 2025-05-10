@@ -1,4 +1,5 @@
 ﻿using FreeAIr.BLogic;
+using FreeAIr.BLogic.Context;
 using FreeAIr.Helper;
 using FreeAIr.UI.ToolWindows;
 using Microsoft.VisualStudio.ComponentModelHost;
@@ -76,7 +77,7 @@ namespace FreeAIr.Commands.File
                 );
 
             chat.ChatContext.AddItem(
-                new DiskFileChatContextItem(selectedFile.FullPath)
+                new SolutionItemChatContextItem(selectedFile.FullPath)
                 );
 
             chat.AddPrompt(

@@ -1,4 +1,5 @@
-﻿using FreeAIr.Helper;
+﻿using FreeAIr.Antlr;
+using FreeAIr.Helper;
 using FreeAIr.UI.Embedillo.Answer.Parser;
 using ICSharpCode.AvalonEdit.CodeCompletion;
 using ICSharpCode.AvalonEdit.Rendering;
@@ -138,17 +139,20 @@ namespace FreeAIr.UI.Embedillo
         }
 
         public void AddVisualLineGeneratorFactory(
-            IMentionVisualLineGeneratorFactory generatorFactory
+            params IMentionVisualLineGeneratorFactory[] generatorFactories
             )
         {
-            if (generatorFactory is null)
+            if (generatorFactories is null)
             {
-                throw new ArgumentNullException(nameof(generatorFactory));
+                throw new ArgumentNullException(nameof(generatorFactories));
             }
 
-            var generator = generatorFactory.Create(_controlManager);
-            _generators.Add(generator);
-            AvalonTextEditor.TextArea.TextView.ElementGenerators.Add(generator);
+            foreach (var generatorFactory in generatorFactories)
+            {
+                var generator = generatorFactory.Create(_controlManager);
+                _generators.Add(generator);
+                AvalonTextEditor.TextArea.TextView.ElementGenerators.Add(generator);
+            }
 
         }
 
@@ -381,17 +385,13 @@ namespace FreeAIr.UI.Embedillo
 
         public ParsedAnswer ParseAnswer()
         {
-            var receiver = new AnswerPartReceiver(
+            var parser = new AnswerParser(
                 _generators
                 );
 
-            foreach (var symbol in AvalonTextEditor.Text)
-            {
-                receiver.AcceptPart(symbol);
-            }
-            receiver.AcceptPart('\0');
-
-            var parsedAnswer = receiver.GetParsedAnswer();
+            var parsedAnswer = parser.Parse(
+                AvalonTextEditor.Text
+                );
             return parsedAnswer;
         }
     }

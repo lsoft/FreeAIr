@@ -1,10 +1,12 @@
 ﻿using FreeAIr.BLogic;
+using FreeAIr.BLogic.Context;
 using FreeAIr.Helper;
 using FreeAIr.Shared.Helper;
 using FreeAIr.UI.Embedillo.Answer.Parser;
 using ICSharpCode.AvalonEdit.Editing;
 using Microsoft.Win32;
 using System.ComponentModel.Composition;
+using System.Diagnostics.Contracts;
 using System.IO;
 using System.Linq;
 using System.Windows;
@@ -710,17 +712,14 @@ namespace FreeAIr.UI.ViewModels
 
             foreach (var part in parsedAnswer.Parts)
             {
-                if (part is not SourceFileAnswerPart filePart)
-                {
-                    continue;
-                }
-                if (!filePart.IsFileExists())
+                var contextItem = part.TryCreateChatContextItem();
+                if (contextItem is null)
                 {
                     continue;
                 }
 
                 chat.ChatContext.AddItem(
-                    new DiskFileChatContextItem(filePart.FilePath)
+                    contextItem
                     );
             }
         }
@@ -773,7 +772,7 @@ namespace FreeAIr.UI.ViewModels
                     chat.Update();
                 }
 
-                if (ReferenceEquals(SelectedChat.Chat, e.Chat))
+                if (SelectedChat is null || ReferenceEquals(SelectedChat.Chat, e.Chat))
                 {
                     OnPropertyChanged();
                 }

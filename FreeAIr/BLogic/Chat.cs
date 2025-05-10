@@ -1,4 +1,5 @@
-﻿using FreeAIr.Helper;
+﻿using FreeAIr.BLogic.Context;
+using FreeAIr.Helper;
 using OpenAI;
 using OpenAI.Chat;
 using System.ClientModel;

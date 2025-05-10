@@ -6,23 +6,23 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 
-namespace FreeAIr.UI.Embedillo.VisualLine.SourceFile
+namespace FreeAIr.UI.Embedillo.VisualLine.SolutionItem
 {
-    public sealed class SourceFileVisualLineGeneratorFactory : IMentionVisualLineGeneratorFactory
+    public sealed class SolutionItemVisualLineGeneratorFactory : IMentionVisualLineGeneratorFactory
     {
         public MentionVisualLineGenerator Create(ControlPositionManager positionManager)
         {
-            return new SourceFileVisualLineGenerator(
+            return new SolutionItemVisualLineGenerator(
                 positionManager
                 );
         }
     }
 
-    public sealed class SourceFileVisualLineGenerator : MentionVisualLineGenerator
+    public sealed class SolutionItemVisualLineGenerator : MentionVisualLineGenerator
     {
         public const char Anchor = '#';
 
-        public SourceFileVisualLineGenerator(
+        public SolutionItemVisualLineGenerator(
             ControlPositionManager controlPositionManager
             ) : base(Anchor, controlPositionManager)
         {
@@ -30,7 +30,7 @@ namespace FreeAIr.UI.Embedillo.VisualLine.SourceFile
 
         public override IAnswerPart CreatePart(string partPayload)
         {
-            return new SourceFileAnswerPart(partPayload);
+            return new SolutionItemAnswerPart(partPayload);
         }
 
         public override async System.Threading.Tasks.Task<List<Suggestion>> GetSuggestionsAsync()
