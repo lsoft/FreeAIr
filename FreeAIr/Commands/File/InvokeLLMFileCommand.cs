@@ -77,7 +77,12 @@ namespace FreeAIr.Commands.File
                 );
 
             chat.ChatContext.AddItem(
-                new SolutionItemChatContextItem(selectedFile.FullPath)
+                new SolutionItemChatContextItem(
+                    new UI.Embedillo.Answer.Parser.SelectedIdentifier(
+                        selectedFile.FullPath,
+                        null
+                        )
+                    )
                 );
 
             chat.AddPrompt(

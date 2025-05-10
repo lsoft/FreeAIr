@@ -1,7 +1,5 @@
 ﻿using Antlr4.Runtime;
 using Antlr4.Runtime.Misc;
-using EnvDTE;
-using FreeAIr.Shared.Helper;
 using FreeAIr.UI.Embedillo;
 using FreeAIr.UI.Embedillo.Answer.Parser;
 using System;

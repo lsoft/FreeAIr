@@ -8,6 +8,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace FreeAIr.BLogic
 {
@@ -106,7 +107,7 @@ namespace FreeAIr.BLogic
 
             _prompts.Add(userPrompt);
 
-            _task = Task.Run(() => AskPromptAndReceiveAnswer(userPrompt));
+            _task = Task.Run(async () => await AskPromptAndReceiveAnswerAsync(userPrompt));
         }
 
         public Task WaitForPromptResultAsync()
@@ -156,9 +157,9 @@ namespace FreeAIr.BLogic
             StatusChanged();
         }
 
-        private void AskPromptAndReceiveAnswer(UserPrompt userPrompt)
+        private async Task AskPromptAndReceiveAnswerAsync(UserPrompt userPrompt)
         {
-            var answer = AskAndWaitForAnswerInternal(userPrompt);
+            var answer = await AskAndWaitForAnswerInternalAsync(userPrompt);
 
             userPrompt.SetAnswer(answer.GetAnswer());
 
@@ -168,7 +169,7 @@ namespace FreeAIr.BLogic
             }
         }
 
-        private Answer AskAndWaitForAnswerInternal(UserPrompt userPrompt)
+        private async Task<Answer> AskAndWaitForAnswerInternalAsync(UserPrompt userPrompt)
         {
             var cancellationToken = _cancellationTokenSource.Token;
 
@@ -205,7 +206,7 @@ namespace FreeAIr.BLogic
                 foreach (var contextItem in _chatContext.Items)
                 {
                     chatMessages.Add(
-                        new UserChatMessage(contextItem.AsContextPromptText())
+                        new UserChatMessage(await contextItem.AsContextPromptTextAsync())
                         );
                 }
 

@@ -1,4 +1,5 @@
 ﻿using FreeAIr.BLogic;
+using FreeAIr.BLogic.Context;
 using FreeAIr.Helper;
 using FreeAIr.UI.ToolWindows;
 using Microsoft.VisualStudio.ComponentModelHost;
@@ -32,7 +33,7 @@ namespace FreeAIr.Commands
             var chatContainer = componentModel.GetService<ChatContainer>();
 
             var std = await TextDescriptorHelper.GetSelectedTextAsync();
-            if (std is null)
+            if (std is null || std.SelectedSpan is null)
             {
                 await VS.MessageBox.ShowErrorAsync(
                     Resources.Resources.Error,
@@ -43,12 +44,26 @@ namespace FreeAIr.Commands
 
             var kind = GetChatKind();
 
-            chatContainer.StartChat(
+            var chat = chatContainer.StartChat(
                 new ChatDescription(
                     kind,
-                    std
+                    null
                     ),
-                UserPrompt.CreateCodeBasedPrompt(kind, std.FileName, std.OriginalText)
+                null
+                );
+
+            chat.ChatContext.AddItem(
+                new SolutionItemChatContextItem(
+                    std.CreateSelectedIdentifier()
+                    )
+                );
+
+            chat.AddPrompt(
+                UserPrompt.CreateCodeBasedPrompt(
+                    kind,
+                    std.FileName,
+                    std.FilePath + std.SelectedSpan.ToString()
+                    )
                 );
 
             await ChatListToolWindow.ShowIfEnabledAsync();

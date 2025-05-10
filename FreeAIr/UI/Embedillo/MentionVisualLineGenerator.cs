@@ -43,8 +43,7 @@ namespace FreeAIr.UI.Embedillo
             _controlPositionManager = controlPositionManager;
 
             _targetRegex = new Regex(
-                @"(?<!\S)" + anchorSymbol + @"([\p{L}\p{M}0-9_:\\.@\-~\[\]]+)",
-                RegexOptions.Compiled
+                @"(?<!\S)" + anchorSymbol + @"([\p{L}\p{M}0-9_:\\.@\-~\[\]]+)"
                 );
         }
 
@@ -120,40 +119,21 @@ namespace FreeAIr.UI.Embedillo
 
         protected abstract UIElement CreateControl(string mentionText);
 
-        public abstract System.Threading.Tasks.Task<List<Suggestion>> GetSuggestionsAsync();
+        public abstract System.Threading.Tasks.Task<List<ISuggestion>> GetSuggestionsAsync();
         
         public abstract IAnswerPart CreatePart(string partPayload);
     }
 
-    public sealed class Suggestion
+    public interface ISuggestion
     {
-        public string FullData
-        {
-            get;
-        }
-        public string PublicData
+        string FullData
         {
             get;
         }
 
-        public Suggestion(
-            string fullData,
-            string publicData
-            )
+        string PublicData
         {
-            if (string.IsNullOrEmpty(fullData))
-            {
-                throw new ArgumentException($"'{nameof(fullData)}' cannot be null or empty.", nameof(fullData));
-            }
-
-            if (string.IsNullOrEmpty(publicData))
-            {
-                throw new ArgumentException($"'{nameof(publicData)}' cannot be null or empty.", nameof(publicData));
-            }
-
-            FullData = fullData;
-            PublicData = publicData;
+            get;
         }
-
     }
 }

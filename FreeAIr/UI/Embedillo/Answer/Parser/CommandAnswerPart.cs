@@ -1,6 +1,7 @@
 ﻿using FreeAIr.BLogic;
 using FreeAIr.BLogic.Context;
 using FreeAIr.Helper;
+using System.Threading.Tasks;
 
 namespace FreeAIr.UI.Embedillo.Answer.Parser
 {
@@ -18,9 +19,11 @@ namespace FreeAIr.UI.Embedillo.Answer.Parser
             Kind = kind;
         }
 
-        public string AsPromptString()
+        public Task<string> AsPromptStringAsync()
         {
-            return Kind.AsPromptString();
+            return Task.FromResult(
+                Kind.AsPromptString()
+                );
         }
 
         public IChatContextItem TryCreateChatContextItem()

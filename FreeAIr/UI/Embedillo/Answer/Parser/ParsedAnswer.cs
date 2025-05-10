@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace FreeAIr.UI.Embedillo.Answer.Parser
 {
@@ -19,7 +20,7 @@ namespace FreeAIr.UI.Embedillo.Answer.Parser
             _parts.Add(part);
         }
 
-        public string ComposeStringRepresentation()
+        public async Task<string> ComposeStringRepresentationAsync()
         {
             if (_parts.Count == 0)
             {
@@ -29,7 +30,7 @@ namespace FreeAIr.UI.Embedillo.Answer.Parser
             var sb = new StringBuilder();
             foreach (var part in _parts)
             {
-                var stringPart = part.AsPromptString();
+                var stringPart = await part.AsPromptStringAsync();
                 sb.Append(stringPart);
             }
 

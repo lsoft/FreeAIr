@@ -1,4 +1,5 @@
 ﻿using FreeAIr.BLogic.Context;
+using System.Threading.Tasks;
 
 namespace FreeAIr.UI.Embedillo.Answer.Parser
 {
@@ -10,7 +11,7 @@ namespace FreeAIr.UI.Embedillo.Answer.Parser
         /// например, файловый парт в теле промпта должен выглядеть просто
         /// как путь до файла (контекст даст LLM полный текст файла).
         /// </summary>
-        string AsPromptString();
+        Task<string> AsPromptStringAsync();
 
         /// <summary>
         /// Создает итем для контекста чата.

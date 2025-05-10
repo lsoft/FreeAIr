@@ -1,35 +1,39 @@
 ﻿using FreeAIr.BLogic.Context;
+using FreeAIr.Helper;
 using System.IO;
+using System.Linq;
+using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 
 namespace FreeAIr.UI.Embedillo.Answer.Parser
 {
     public sealed class SolutionItemAnswerPart : IAnswerPart
     {
-        public string FilePath
+        public SelectedIdentifier SelectedIdentifier
         {
             get;
         }
 
         public SolutionItemAnswerPart(
-            string filePath
+            string solutionItemText
             )
         {
-            if (filePath is null)
+            if (solutionItemText is null)
             {
-                throw new ArgumentNullException(nameof(filePath));
+                throw new ArgumentNullException(nameof(solutionItemText));
             }
 
-            FilePath = filePath;
+            SelectedIdentifier = SelectedIdentifier.Parse(solutionItemText);
         }
 
-        public string AsPromptString()
+        public Task<string> AsPromptStringAsync()
         {
-            return FilePath;
+            return Task.FromResult(SelectedIdentifier.FilePath + SelectedIdentifier?.ToString());
         }
 
         public bool IsFileExists()
         {
-            return File.Exists(FilePath);
+            return File.Exists(SelectedIdentifier.FilePath);
         }
 
         public IChatContextItem? TryCreateChatContextItem()
@@ -40,7 +44,11 @@ namespace FreeAIr.UI.Embedillo.Answer.Parser
             }
 
             return
-                new SolutionItemChatContextItem(FilePath);
+                new SolutionItemChatContextItem(
+                    SelectedIdentifier
+                    );
         }
+
+
     }
 }

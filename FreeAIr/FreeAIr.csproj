@@ -80,6 +80,7 @@
     <Compile Include="Helper\PathHelper.cs" />
     <Compile Include="Helper\ResourceHelper.cs" />
     <Compile Include="Helper\SolutionHelper.cs" />
+    <Compile Include="Helper\StringHelper.cs" />
     <Compile Include="Helper\TextDescriptorHelper.cs" />
     <Compile Include="Helper\EnumHelper.cs" />
     <Compile Include="Helper\LanguageHelper.cs" />
@@ -113,6 +114,7 @@
     <Compile Include="UI\Embedillo\Answer\Parser\CommandAnswerPart.cs" />
     <Compile Include="UI\Embedillo\Answer\Parser\IAnswerPart.cs" />
     <Compile Include="UI\Embedillo\Answer\Parser\ParsedAnswer.cs" />
+    <Compile Include="UI\Embedillo\Answer\Parser\SelectedSpan.cs" />
     <Compile Include="UI\Embedillo\Answer\Parser\SolutionItemAnswerPart.cs" />
     <Compile Include="UI\Embedillo\Answer\Parser\StringAnswerPart.cs" />
     <Compile Include="UI\Embedillo\CompletionData.cs" />
@@ -124,7 +126,9 @@
     <Compile Include="UI\Embedillo\EnterKeyBehavior.cs" />
     <Compile Include="UI\Embedillo\MentionVisualLineGenerator.cs" />
     <Compile Include="UI\Embedillo\TextChangeModeEnum.cs" />
+    <Compile Include="UI\Embedillo\VisualLine\Command\CommandSuggestion.cs" />
     <Compile Include="UI\Embedillo\VisualLine\Command\CommandVisualLineGeneratorFactory.cs" />
+    <Compile Include="UI\Embedillo\VisualLine\SolutionItem\SolutionItemSuggestion.cs" />
     <Compile Include="UI\Embedillo\VisualLine\SolutionItem\SolutionItemVisualLineGeneratorFactory.cs" />
     <Compile Include="UI\OpenContextMenuOnLeftClickBehavior.cs" />
     <Compile Include="UI\Theme.cs" />

@@ -7,11 +7,11 @@ namespace FreeAIr.UI.Embedillo
 {
     public class CompletionData : ICompletionData
     {
-        private readonly Suggestion _suggestion;
+        private readonly ISuggestion _suggestion;
 
         public string Text => _suggestion.PublicData;
 
-        public CompletionData(Suggestion suggestion)
+        public CompletionData(ISuggestion suggestion)
         {
             if (suggestion is null)
             {

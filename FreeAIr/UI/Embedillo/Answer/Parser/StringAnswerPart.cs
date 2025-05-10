@@ -1,4 +1,5 @@
 ﻿using FreeAIr.BLogic.Context;
+using System.Threading.Tasks;
 
 namespace FreeAIr.UI.Embedillo.Answer.Parser
 {
@@ -14,9 +15,9 @@ namespace FreeAIr.UI.Embedillo.Answer.Parser
             Text = text;
         }
 
-        public string AsPromptString()
+        public Task<string> AsPromptStringAsync()
         {
-            return Text;
+            return Task.FromResult(Text);
         }
 
         public IChatContextItem TryCreateChatContextItem()

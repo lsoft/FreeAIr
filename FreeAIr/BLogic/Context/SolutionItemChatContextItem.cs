@@ -1,27 +1,30 @@
 ﻿using FreeAIr.Helper;
+using FreeAIr.UI.Embedillo.Answer.Parser;
 using System.IO;
+using System.IO.Packaging;
+using System.Threading.Tasks;
 
 namespace FreeAIr.BLogic.Context
 {
     public sealed class SolutionItemChatContextItem : IChatContextItem
     {
-        public string FilePath
+        public SelectedIdentifier SelectedIdentifier
         {
             get;
         }
 
-        public string ContextUIDescription => FilePath;
+        public string ContextUIDescription => SelectedIdentifier.FilePath + SelectedIdentifier.Selection?.ToString();
 
         public SolutionItemChatContextItem(
-            string filePath
+            SelectedIdentifier selectedIdentifier
             )
         {
-            if (filePath is null)
+            if (selectedIdentifier is null)
             {
-                throw new ArgumentNullException(nameof(filePath));
+                throw new ArgumentNullException(nameof(selectedIdentifier));
             }
 
-            FilePath = Path.GetFullPath(filePath);
+            SelectedIdentifier = selectedIdentifier;
         }
 
         public bool IsSame(IChatContextItem other)
@@ -42,8 +45,8 @@ namespace FreeAIr.BLogic.Context
             }
 
             var result = StringComparer.CurrentCultureIgnoreCase.Compare(
-                FilePath,
-                otherDisk.FilePath
+                SelectedIdentifier.FilePath,
+                otherDisk.SelectedIdentifier.FilePath
                 ) == 0;
 
             return result;
@@ -51,31 +54,55 @@ namespace FreeAIr.BLogic.Context
 
         public async Task OpenInNewWindowAsync()
         {
-            await VS.Documents.OpenAsync(FilePath);
+            await VS.Documents.OpenAsync(SelectedIdentifier.FilePath);
         }
 
 
-        public string AsContextPromptText()
+        public async Task<string> AsContextPromptTextAsync()
         {
-            if (!File.Exists(FilePath))
+            if (!File.Exists(SelectedIdentifier.FilePath))
             {
-                return $"`File {FilePath} does not found`";
+                return $"`File {SelectedIdentifier.FilePath} does not found`";
             }
 
-            var fi = new FileInfo(FilePath);
+            var fi = new FileInfo(SelectedIdentifier.FilePath);
 
-            return
-                Environment.NewLine
-                + $"Source code of the file `{FilePath}`:"
-                + Environment.NewLine
-                + Environment.NewLine
-                + "```"
-                + LanguageHelper.GetMarkdownLanguageCodeBlockNameBasedOnFileExtension(fi.Extension)
-                + Environment.NewLine
-                + System.IO.File.ReadAllText(FilePath)
-                + Environment.NewLine
-                + "```"
-                + Environment.NewLine;
+            if (SelectedIdentifier.Selection is not null)
+            {
+                await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+
+                var documentView = await VS.Documents.GetDocumentViewAsync(SelectedIdentifier.FilePath);
+                var body = documentView.TextView.TextSnapshot.GetText(
+                    SelectedIdentifier.Selection.GetVisualStudioSpan()
+                    );
+
+                return
+                    Environment.NewLine
+                    + "```"
+                    + LanguageHelper.GetMarkdownLanguageCodeBlockNameBasedOnFileExtension(fi.Extension)
+                    + Environment.NewLine
+                    + body
+                    + Environment.NewLine
+                    + "```"
+                    + Environment.NewLine
+                    ;
+            }
+            else
+            {
+                return
+                    Environment.NewLine
+                    + $"Source code of the file `{SelectedIdentifier.FilePath}`:"
+                    + Environment.NewLine
+                    + Environment.NewLine
+                    + "```"
+                    + LanguageHelper.GetMarkdownLanguageCodeBlockNameBasedOnFileExtension(fi.Extension)
+                    + Environment.NewLine
+                    + System.IO.File.ReadAllText(SelectedIdentifier.FilePath)
+                    + Environment.NewLine
+                    + "```"
+                    + Environment.NewLine
+                    ;
+            }
         }
 
         public void ReplaceWithText(string body)
@@ -86,12 +113,12 @@ namespace FreeAIr.BLogic.Context
             }
 
             var lineEnding = LineEndingHelper.Actual.OpenDocumentAndGetLineEnding(
-                FilePath
+                SelectedIdentifier.FilePath
                 );
 
 
             File.WriteAllText(
-                FilePath,
+                SelectedIdentifier.FilePath,
                 body.WithLineEnding(lineEnding)
                 );
         }

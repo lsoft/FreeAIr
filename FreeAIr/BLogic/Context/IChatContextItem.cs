@@ -1,4 +1,6 @@
-﻿namespace FreeAIr.BLogic.Context
+﻿using System.Threading.Tasks;
+
+namespace FreeAIr.BLogic.Context
 {
     public interface IChatContextItem
     {
@@ -30,7 +32,7 @@
         /// {{тут тело файла}}
         /// ```
         /// </summary>
-        string AsContextPromptText();
+        Task<string> AsContextPromptTextAsync();
 
     }
 

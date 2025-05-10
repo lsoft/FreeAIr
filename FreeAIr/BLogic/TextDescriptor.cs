@@ -1,4 +1,6 @@
-﻿using Microsoft.VisualStudio.Text;
+﻿using FreeAIr.UI.Embedillo.Answer.Parser;
+using Microsoft.VisualStudio.Text;
+using SharpCompress.Common;
 using System.IO;
 using System.Threading;
 
@@ -6,7 +8,17 @@ namespace FreeAIr.BLogic
 {
     public interface IOriginalTextDescriptor : IDisposable
     {
+        string FilePath
+        {
+            get;
+        }
+
         string FileName
+        {
+            get;
+        }
+
+        FreeAIr.UI.Embedillo.Answer.Parser.SelectedSpan? SelectedSpan
         {
             get;
         }
@@ -26,19 +38,26 @@ namespace FreeAIr.BLogic
             get;
         }
 
+        SelectedIdentifier CreateSelectedIdentifier();
+
         Task ReplaceOriginalTextWithNewAsync(string newText);
     }
 
     public sealed class WholeFileTextDescriptor : IOriginalTextDescriptor
     {
-        private readonly string _filePath;
+        public string FilePath
+        {
+            get;
+        }
 
         public string FileName
         {
             get;
         }
 
-        public bool IsAbleToManipulate => File.Exists(_filePath);
+        public FreeAIr.UI.Embedillo.Answer.Parser.SelectedSpan? SelectedSpan => null;
+
+        public bool IsAbleToManipulate => File.Exists(FilePath);
 
         public string OriginalText
         {
@@ -64,10 +83,10 @@ namespace FreeAIr.BLogic
                 throw new ArgumentNullException(nameof(lineEnding));
             }
 
-            _filePath = filePath;
+            FilePath = filePath;
             LineEnding = lineEnding;
             FileName = new FileInfo(filePath).Name;
-            OriginalText = File.ReadAllText(_filePath);
+            OriginalText = File.ReadAllText(FilePath);
         }
 
 
@@ -83,9 +102,14 @@ namespace FreeAIr.BLogic
                 throw new ArgumentNullException(nameof(newText));
             }
 
-            File.WriteAllText(_filePath, newText);
+            File.WriteAllText(FilePath, newText);
 
             return Task.CompletedTask;
+        }
+
+        public SelectedIdentifier CreateSelectedIdentifier()
+        {
+            return new(FilePath, null);
         }
     }
 
@@ -94,9 +118,18 @@ namespace FreeAIr.BLogic
         private int _disposed = 0;
 
         private DocumentView? _documentView;
-        private Span _span;
+
+        public string FilePath
+        {
+            get;
+        }
 
         public string FileName
+        {
+            get;
+        }
+
+        public FreeAIr.UI.Embedillo.Answer.Parser.SelectedSpan? SelectedSpan
         {
             get;
         }
@@ -128,24 +161,25 @@ namespace FreeAIr.BLogic
                 throw new ArgumentNullException(nameof(lineEnding));
             }
 
+            var filePath = documentView.FilePath;
+
             var selection = documentView?.TextView.Selection;
             var selectedSpan = selection.StreamSelectionSpan.SnapshotSpan;
-            _span = selectedSpan.Span;
+            SelectedSpan = new UI.Embedillo.Answer.Parser.SelectedSpan(
+                selectedSpan.Span.Start,
+                selectedSpan.Span.Length
+                );
             var selectedText = selectedSpan.GetText();
 
-            var fileName = new FileInfo(documentView.FilePath).Name;
+            var fileName = new FileInfo(filePath).Name;
 
             documentView.TextView.Closed += TextView_Closed;
 
+            FilePath = filePath;
             FileName = fileName;
             OriginalText = selectedText;
             _documentView = documentView;
             LineEnding = lineEnding;
-        }
-
-        private void TextView_Closed(object sender, EventArgs e)
-        {
-            Dispose();
         }
 
         public void Dispose()
@@ -179,17 +213,37 @@ namespace FreeAIr.BLogic
                 return;
             }
 
-            //Microsoft.VisualStudio.Text.ITextDocument document = documentView.Document;
+            if (SelectedSpan is null)
+            {
+                await VS.MessageBox.ShowErrorAsync(
+                    FreeAIr.Resources.Resources.Error,
+                    "Cannot edit the document. Please copy-paste the text manually."
+                    );
+                return;
+            }
 
             using var documentEdit = documentView.TextBuffer.CreateEdit();
             if (documentEdit.Replace(
-                _span,
+                new Span(
+                    SelectedSpan.StartPosition,
+                    SelectedSpan.Length
+                    ),
                 newText
                 ))
             {
                 documentEdit.Apply();
-                //document.Save();
             }
         }
+
+        public SelectedIdentifier CreateSelectedIdentifier()
+        {
+            return new(FilePath, SelectedSpan);
+        }
+
+        private void TextView_Closed(object sender, EventArgs e)
+        {
+            Dispose();
+        }
+
     }
 }

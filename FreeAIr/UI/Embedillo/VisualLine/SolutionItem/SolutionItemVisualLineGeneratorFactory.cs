@@ -33,31 +33,37 @@ namespace FreeAIr.UI.Embedillo.VisualLine.SolutionItem
             return new SolutionItemAnswerPart(partPayload);
         }
 
-        public override async System.Threading.Tasks.Task<List<Suggestion>> GetSuggestionsAsync()
+        public override async System.Threading.Tasks.Task<List<ISuggestion>> GetSuggestionsAsync()
         {
             var solution = await VS.Solutions.GetCurrentSolutionAsync();
             if (solution == null)
             {
-                return new List<Suggestion>();
+                return new List<ISuggestion>();
             }
 
             var solutionFolderPath = new FileInfo(solution.FullPath).Directory.FullName;
 
-            var files = await solution.ProcessDownRecursivelyForAsync(SolutionItemType.PhysicalFile, null);
+            List<(Community.VisualStudio.Toolkit.SolutionItem solutionItem, SelectedSpan Selection)> solutionItems = await solution.ProcessDownRecursivelyForAsync(
+                SolutionItemType.PhysicalFile,
+                null
+                );
 
-            var suggestions = files.ConvertAll(f =>
-                new Suggestion(
-                f.FullPath,
-                f.FullPath.MakeRelativeAgainst(solutionFolderPath)
-                )
+            var suggestions = solutionItems.ConvertAll(si =>
+                (ISuggestion)new SolutionItemSuggestion(
+                    si.solutionItem.FullPath,
+                    si.solutionItem.FullPath.MakeRelativeAgainst(solutionFolderPath),
+                    si.Selection
+                    )
             );
 
             return suggestions;
         }
 
-        protected override UIElement CreateControl(string filePath)
+        protected override UIElement CreateControl(string combinedFilePath)
         {
-            filePath = filePath.TrimStart(Anchor);
+            var selectedIdentifier = SelectedIdentifier.Parse(combinedFilePath);
+
+            var filePath = selectedIdentifier.FilePath.TrimStart(Anchor);
 
             var fileExists = System.IO.File.Exists(filePath);
 
@@ -65,6 +71,8 @@ namespace FreeAIr.UI.Embedillo.VisualLine.SolutionItem
                 ? new System.IO.FileInfo(filePath).Name
                 : filePath
                 ;
+            
+            fileName += selectedIdentifier.Selection?.ToString();
 
             UIElement child;
             if (fileExists)

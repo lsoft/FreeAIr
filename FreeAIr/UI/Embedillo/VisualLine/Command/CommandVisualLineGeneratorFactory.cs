@@ -35,7 +35,7 @@ namespace FreeAIr.UI.Embedillo.VisualLine.Command
             return new CommandAnswerPart(kind);
         }
 
-        public override System.Threading.Tasks.Task<List<Suggestion>> GetSuggestionsAsync()
+        public override System.Threading.Tasks.Task<List<ISuggestion>> GetSuggestionsAsync()
         {
             var suggestions = GenerateSuggestions();
 
@@ -123,24 +123,24 @@ namespace FreeAIr.UI.Embedillo.VisualLine.Command
             return border;
         }
 
-        private static List<Suggestion> GenerateSuggestions()
+        private static List<ISuggestion> GenerateSuggestions()
         {
-            var suggestions = new List<Suggestion>();
+            var suggestions = new List<ISuggestion>();
 
             suggestions.Add(
-                new Suggestion(
+                new CommandSuggestion(
                     "ExplainCode",
                     "ExplainCode"
                     )
                 );
             suggestions.Add(
-                new Suggestion(
+                new CommandSuggestion(
                     "AddXmlComments",
                     "AddXmlComments"
                     )
                 );
             suggestions.Add(
-                new Suggestion(
+                new CommandSuggestion(
                     "GenerateUnitTests",
                     "GenerateUnitTests"
                     )
