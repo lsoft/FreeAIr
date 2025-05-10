@@ -20,11 +20,13 @@ namespace FreeAIr.BLogic
     {
         private readonly ChatClient _chatClient;
         private readonly List<UserPrompt> _prompts = new();
+        private readonly ChatContext _chatContext = new();
 
         private readonly CancellationTokenSource _cancellationTokenSource = new();
         private readonly Action<Chat, Answer> _promptAnsweredCallBack;
         private Task? _task;
 
+        public IChatContext ChatContext => _chatContext;
 
         private ChatStatusEnum _status;
 
@@ -94,6 +96,8 @@ namespace FreeAIr.BLogic
                     Endpoint = ApiPage.Instance.TryBuildEndpointUri(),
                 }
                 );
+
+            _chatContext.ChatContextChangedEvent += ChatContextChangedRaised;
         }
 
         public void AddPrompt(
@@ -152,6 +156,11 @@ namespace FreeAIr.BLogic
             await _task;
         }
 
+        private void ChatContextChangedRaised(object sender, ChatContextEventArgs e)
+        {
+            StatusChanged();
+        }
+
         private void AskPromptAndReceiveAnswer(UserPrompt userPrompt)
         {
             var answer = AskAndWaitForAnswerInternal(userPrompt);
@@ -192,10 +201,18 @@ namespace FreeAIr.BLogic
                 Status = ChatStatusEnum.WaitingForAnswer;
 
                 var chatMessages = new List<ChatMessage>(_prompts.Count + 1);
-                chatMessages.Add(new UserChatMessage(userPrompt.BuildRulesSection()));
+                chatMessages.Add(
+                    new UserChatMessage(userPrompt.BuildRulesSection())
+                    );
                 chatMessages.AddRange(
                     _prompts.ConvertAll(p => new UserChatMessage(p.PromptBody))
                     );
+                foreach (var contextItem in _chatContext.Items)
+                {
+                    chatMessages.Add(
+                        new UserChatMessage(contextItem.AsContextPromptText())
+                        );
+                }
 
                 var completionUpdates = _chatClient.CompleteChatStreaming(
                     messages: chatMessages,

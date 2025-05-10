@@ -4,9 +4,11 @@ using FreeAIr.Commands;
 using FreeAIr.Helper;
 using FreeAIr.Shared.Helper;
 using FreeAIr.UI.Embedillo.Answer.Parser;
+using ICSharpCode.AvalonEdit.Editing;
 using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel.Composition;
 using System.IO;
 using System.Linq;
@@ -37,6 +39,7 @@ namespace FreeAIr.UI.ViewModels
         private ICommand _deleteItemFromContextCommand;
         private ICommand _openContextItemCommand;
         private ICommand _addItemToContextCommand;
+        private ICommand _updateContextItemCommand;
 
         public event MarkdownReReadDelegate MarkdownReReadEvent;
 
@@ -70,11 +73,6 @@ namespace FreeAIr.UI.ViewModels
                 return _selectedChat.Chat.ReadResponse();
             }
         }
-
-        public ObservableCollection2<ChatContextItemViewModel> ChatContextItems
-        {
-            get;
-        } = new();
 
         public ICommand OpenInEditorCommand
         {
@@ -391,6 +389,10 @@ namespace FreeAIr.UI.ViewModels
                                 return;
                             }
 
+                            //добавляем в корзину итемы, которые пользователь перечислил
+                            //в промпте, но которых нет в контексте
+                            AddContextItemsFromPrompt(chat, parsedAnswer);
+
                             var parsedRepresentation = parsedAnswer.ComposeStringRepresentation();
                             if (string.IsNullOrEmpty(parsedRepresentation))
                             {
@@ -446,6 +448,30 @@ namespace FreeAIr.UI.ViewModels
         }
 
 
+        #region chat context
+
+        public ObservableCollection2<ChatContextItemViewModel> ChatContextItems
+        {
+            get
+            {
+                if (SelectedChat is null)
+                {
+                    return new ObservableCollection2<ChatContextItemViewModel>();
+                }
+                if (SelectedChat.Chat is null)
+                {
+                    return new ObservableCollection2<ChatContextItemViewModel>();
+                }
+
+                var r = new ObservableCollection2<ChatContextItemViewModel>();
+                r.AddRange(
+                    SelectedChat.Chat.ChatContext.Items.ConvertAll(c => new ChatContextItemViewModel(c))
+                    );
+
+                return r;
+            }
+        }
+
         public ICommand OpenContextItemCommand
         {
             get
@@ -460,7 +486,7 @@ namespace FreeAIr.UI.ViewModels
                                 return;
                             }
 
-                            await item.AnswerPart.OpenInNewWindowAsync();
+                            await item.ContextItem.OpenInNewWindowAsync();
 
                             OnPropertyChanged();
                         }
@@ -480,14 +506,55 @@ namespace FreeAIr.UI.ViewModels
                     _deleteItemFromContextCommand = new RelayCommand(
                         a =>
                         {
-                            if (a is not ChatContextItemViewModel item)
+                            if (_selectedChat is null)
+                            {
+                                return;
+                            }
+                            if (_selectedChat.Chat is null)
                             {
                                 return;
                             }
 
-                            ChatContextItems.Remove(item);
+                            var chat = _selectedChat.Chat;
+
+                            if (chat.Status.NotIn(ChatStatusEnum.NotStarted, ChatStatusEnum.Ready))
+                            {
+                                return;
+                            }
+
+                            if (a is not ChatContextItemViewModel itemViewModel)
+                            {
+                                return;
+                            }
+
+                            chat.ChatContext.RemoveItem(itemViewModel.ContextItem);
 
                             OnPropertyChanged();
+                        },
+                        a =>
+                        {
+                            if (_selectedChat is null)
+                            {
+                                return false;
+                            }
+                            if (_selectedChat.Chat is null)
+                            {
+                                return false;
+                            }
+
+                            var chat = _selectedChat.Chat;
+
+                            if (chat.Status.NotIn(ChatStatusEnum.NotStarted, ChatStatusEnum.Ready))
+                            {
+                                return false;
+                            }
+
+                            if (a is not ChatContextItemViewModel itemViewModel)
+                            {
+                                return false;
+                            }
+
+                            return true;
                         }
                         );
                 }
@@ -533,17 +600,7 @@ namespace FreeAIr.UI.ViewModels
                                 return;
                             }
 
-                            foreach (var part in parsedAnswer.Parts)
-                            {
-                                if (part is not SourceFileAnswerPart filePart)
-                                {
-                                    continue;
-                                }
-
-                                ChatContextItems.Add(
-                                    new ChatContextItemViewModel(part)
-                                    );
-                            }
+                            AddContextItemsFromPrompt(chat, parsedAnswer);
 
                             OnPropertyChanged();
                         },
@@ -587,6 +644,97 @@ namespace FreeAIr.UI.ViewModels
             }
         }
 
+        
+        public ICommand UpdateContextItemCommand
+        {
+            get
+            {
+                if (_updateContextItemCommand == null)
+                {
+                    _updateContextItemCommand = new AsyncRelayCommand(
+                        async a =>
+                        {
+                            if (a is not Tuple<object, object> tuple)
+                            {
+                                return;
+                            }
+
+                            var vm = tuple.Item1 as ChatContextItemViewModel;
+                            if (vm is null)
+                            {
+                                await VS.MessageBox.ShowErrorAsync(
+                                    "Resources.Resources.Error",
+                                    "Cannot replace context document body. Please replace manually."
+                                    );
+                                return;
+                            }
+
+                            var textArea = tuple.Item2 as TextArea;
+                            if (textArea is null)
+                            {
+                                await VS.MessageBox.ShowErrorAsync(
+                                    "Resources.Resources.Error",
+                                    "Cannot replace context document body. Please replace manually."
+                                    );
+                                return;
+                            }
+
+                            var codeText = textArea?.Document?.Text;
+                            if (codeText is null)
+                            {
+                                await VS.MessageBox.ShowErrorAsync(
+                                    "Resources.Resources.Error",
+                                    "Cannot replace context document body. Please replace manually."
+                                    );
+                                return;
+                            }
+
+                            vm.ContextItem.ReplaceWithText(
+                                codeText
+                                );
+
+                            OnPropertyChanged();
+                        }
+                        );
+                }
+
+                return _updateContextItemCommand;
+            }
+        }
+        private void AddContextItemsFromPrompt(
+            Chat chat,
+            ParsedAnswer parsedAnswer
+            )
+        {
+            if (chat is null)
+            {
+                throw new ArgumentNullException(nameof(chat));
+            }
+
+            if (parsedAnswer is null)
+            {
+                throw new ArgumentNullException(nameof(parsedAnswer));
+            }
+
+            foreach (var part in parsedAnswer.Parts)
+            {
+                if (part is not SourceFileAnswerPart filePart)
+                {
+                    continue;
+                }
+                if (!filePart.IsFileExists())
+                {
+                    continue;
+                }
+
+                chat.ChatContext.AddItem(
+                    new DiskFileChatContextItem(filePart.FilePath)
+                    );
+            }
+        }
+
+        #endregion
+
 
         [ImportingConstructor]
         public ChatListViewModel(
@@ -597,18 +745,6 @@ namespace FreeAIr.UI.ViewModels
             {
                 throw new ArgumentNullException(nameof(chatContainer));
             }
-
-            ChatContextItems = new ObservableCollection2<ChatContextItemViewModel>();
-            ChatContextItems.Add(
-                new ChatContextItemViewModel(
-                    new SourceFileAnswerPart(@"C:\projects\github\SlnfUpdater\SlnfUpdater\Helper\ArrayHelper.cs")
-                    )
-                );
-            ChatContextItems.Add(
-                new ChatContextItemViewModel(
-                    new SourceFileAnswerPart(@"c:\temp\1.txt")
-                    )
-                );
 
             _chatContainer = chatContainer;
 
@@ -738,24 +874,25 @@ namespace FreeAIr.UI.ViewModels
 
     public sealed class ChatContextItemViewModel : BaseViewModel
     {
-        public IAnswerPart AnswerPart
+        public IChatContextItem ContextItem
         {
             get;
         }
 
-        public string ChatContextDescription => AnswerPart.ContextUIDescription;
+        public string ChatContextDescription => ContextItem.ContextUIDescription;
 
         public ChatContextItemViewModel(
-            IAnswerPart answerPart
+            IChatContextItem contextItem
             )
         {
-            if (answerPart is null)
+            if (contextItem is null)
             {
-                throw new ArgumentNullException(nameof(answerPart));
+                throw new ArgumentNullException(nameof(contextItem));
             }
 
-            AnswerPart = answerPart;
+            ContextItem = contextItem;
         }
+
     }
 
 

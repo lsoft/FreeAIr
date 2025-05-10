@@ -14,13 +14,20 @@
     xmlns:plugins="clr-namespace:MdXaml.Plugins;assembly=MdXaml.Plugins"
     xmlns:embedillo="clr-namespace:FreeAIr.UI.Embedillo"
     xmlns:viewmodels="clr-namespace:FreeAIr.UI.ViewModels"
+    xmlns:toolwindows="clr-namespace:FreeAIr.UI.ToolWindows" xmlns:b="http://schemas.microsoft.com/xaml/behaviors" xmlns:ui="clr-namespace:FreeAIr.UI"
     toolkit:Themes.UseVsTheme="True"
     mc:Ignorable="d"
     d:DesignHeight="300"
     d:DesignWidth="300"
     Name="ChatListToolWindow"
     >
-
+    <UserControl.Resources>
+        <!-- Прокси для передачи контекста в ContextMenu -->
+        <toolwindows:BindingProxy x:Key="DataContextProxy" Data="{Binding}" />
+        <toolwindows:BindingProxy x:Key="ForegroundButtonProxy" Data="{Binding ElementName=ForegroundButton}" />
+        <ui:CombinedParameterConverter x:Key="CombinedParameterConverter" />
+    </UserControl.Resources>
+    
     <Grid
         Margin="2"
         >
@@ -157,15 +164,16 @@
                         Grid.Row="0"
                         Margin="2"
                         Content="Chat context:"
+                        FontSize="14"
                         FontFamily="Cascadia Code"
                         />
 
-                    <!-- context item list -->
+                    <!-- chat context item list -->
                     <ItemsControl
                         Grid.Row="1"
                         Margin="2"
                         ItemsSource="{Binding ChatContextItems}"
-                    >
+                        >
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
                                 <Grid>
@@ -357,6 +365,7 @@
                                                         Style="{Binding ElementName=ForegroundButton, Path=Style}"
                                                         Command="{Binding ElementName=ChatListToolWindow, Path=DataContext.CopyCodeBlockCommand}"
                                                         CommandParameter="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=TextArea}"
+                                                        FontSize="12"
                                                         ToolTip="Copy this code part to clipboard"
                                                         />
                                                     <Button
@@ -366,6 +375,7 @@
                                                         Style="{Binding ElementName=ForegroundButton, Path=Style}"
                                                         Command="{Binding ElementName=ChatListToolWindow, Path=DataContext.ReplaceSelectedTextCommand}"
                                                         CommandParameter="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=TextArea}"
+                                                        FontSize="12"
                                                         ToolTip="Replace the selected block of the code in the VS document with this code part"
                                                         />
                                                     <Button
@@ -375,9 +385,74 @@
                                                         Style="{Binding ElementName=ForegroundButton, Path=Style}"
                                                         Command="{Binding ElementName=ChatListToolWindow, Path=DataContext.CreateNewFileCommand}"
                                                         CommandParameter="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=TextArea}"
+                                                        FontSize="12"
                                                         ToolTip="Create new file with this code part"
                                                         />
+                                                    <Button
+                                                        HorizontalAlignment="Right"
+                                                        Margin="2,0,2,0"
+                                                        Style="{Binding ElementName=ForegroundButton, Path=Style}"
+                                                        Content="↑ Replace context file..."
+                                                        FontSize="12"
+                                                        ToolTip="Choose context file to replace its content with this code part"
+                                                        >
+                                                        <Button.ContextMenu>
+                                                            <ContextMenu 
+                                                                ItemsSource="{Binding Source={StaticResource DataContextProxy}, Path=Data.ChatContextItems}"
+                                                                Background="{Binding Source={StaticResource ForegroundButtonProxy}, Path=Data.Background}"
+                                                                >
+                                                                <ContextMenu.Template>
+                                                                    <ControlTemplate TargetType="ContextMenu">
+                                                                        <Border
+                                                                            BorderBrush="{Binding Source={StaticResource ForegroundButtonProxy}, Path=Data.Foreground}"
+                                                                            BorderThickness="1"
+                                                                            Margin="2"
+                                                                            Background="{Binding Source={StaticResource ForegroundButtonProxy}, Path=Data.Background}"
+                                                                            >
+                                                                            <ItemsPresenter
+                                                                                />
+                                                                        </Border>
+                                                                    </ControlTemplate>
+                                                                </ContextMenu.Template>
+                                                                <ContextMenu.ItemTemplate>
+                                                                    <DataTemplate>
+                                                                        <Label
+                                                                            x:Name="ChatContextItem"
+                                                                            Content="{Binding Path=ChatContextDescription}"
+                                                                            Foreground="#569CD6"
+                                                                            Background="Transparent"
+                                                                            HorizontalAlignment="Stretch"
+                                                                            HorizontalContentAlignment="Stretch"
+                                                                            VerticalAlignment="Stretch"
+                                                                            Cursor="Hand"
+                                                                            >
+                                                                            <Label.InputBindings>
+                                                                                <MouseBinding
+                                                                                    Command="{Binding Source={StaticResource DataContextProxy}, Path=Data.UpdateContextItemCommand}"
+                                                                                    MouseAction="LeftClick"
+                                                                                    >
+                                                                                    <MouseBinding.CommandParameter>
+                                                                                        <MultiBinding Converter="{StaticResource CombinedParameterConverter}">
+                                                                                            <!-- 1. Текущий элемент (ChatContextItem) -->
+                                                                                            <Binding />
 
+                                                                                            <!-- 2. TextArea из TextEditor -->
+                                                                                            <Binding 
+                                                                                                RelativeSource="{RelativeSource AncestorType={x:Type avalonEdit:TextEditor}}" 
+                                                                                                Path="TextArea" />
+                                                                                        </MultiBinding>
+                                                                                    </MouseBinding.CommandParameter>
+                                                                                </MouseBinding>
+                                                                            </Label.InputBindings>
+                                                                        </Label>
+                                                                    </DataTemplate>
+                                                                </ContextMenu.ItemTemplate>
+                                                            </ContextMenu>
+                                                        </Button.ContextMenu>
+                                                        <b:Interaction.Behaviors>
+                                                            <ui:OpenContextMenuOnLeftClickBehavior />
+                                                        </b:Interaction.Behaviors>
+                                                    </Button>
                                                 </StackPanel>
 
                                             </Grid>

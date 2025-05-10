@@ -208,14 +208,13 @@ namespace FreeAIr.UI.Embedillo.Answer.Parser
 
     public interface IAnswerPart
     {
-        string? ContextUIDescription
-        {
-            get;
-        }
-
+        /// <summary>
+        /// Как должен выглядеть этот парт непосредственно
+        /// в теле промпта.
+        /// например, файловый парт в теле промпта должен выглядеть просто
+        /// как путь до файла (контекст даст LLM полный текст файла).
+        /// </summary>
         string AsPromptString();
-
-        Task OpenInNewWindowAsync();
     }
 
     public sealed class StringAnswerPart : IAnswerPart
@@ -224,8 +223,6 @@ namespace FreeAIr.UI.Embedillo.Answer.Parser
         {
             get;
         }
-
-        public string? ContextUIDescription => null;
 
         public StringAnswerPart(string text)
         {
@@ -237,10 +234,6 @@ namespace FreeAIr.UI.Embedillo.Answer.Parser
             return Text;
         }
 
-        public Task OpenInNewWindowAsync()
-        {
-            throw new InvalidOperationException("Not supported for this part");
-        }
     }
 
     public sealed class SourceFileAnswerPart : IAnswerPart
@@ -249,8 +242,6 @@ namespace FreeAIr.UI.Embedillo.Answer.Parser
         {
             get;
         }
-
-        public string? ContextUIDescription => FilePath;
 
         public SourceFileAnswerPart(
             string filePath
@@ -266,29 +257,13 @@ namespace FreeAIr.UI.Embedillo.Answer.Parser
 
         public string AsPromptString()
         {
-            if (!File.Exists(FilePath))
-            {
-                return $"`File {FilePath} does not found`";
-            }
-
-            var fi = new FileInfo(FilePath);
-
-            return
-                Environment.NewLine
-                + "```"
-                + LanguageHelper.GetMarkdownLanguageCodeBlockNameBasedOnFileExtension(fi.Extension)
-                + Environment.NewLine
-                + System.IO.File.ReadAllText(FilePath)
-                + Environment.NewLine
-                + "```"
-                + Environment.NewLine;
+            return FilePath;
         }
 
-        public async Task OpenInNewWindowAsync()
+        public bool IsFileExists()
         {
-            await VS.Documents.OpenAsync(FilePath);
+            return File.Exists(FilePath);
         }
-
     }
 
     public sealed class CommandAnswerPart : IAnswerPart
@@ -297,8 +272,6 @@ namespace FreeAIr.UI.Embedillo.Answer.Parser
         {
             get;
         }
-
-        public string? ContextUIDescription => null;
 
         public CommandAnswerPart(
             ChatKindEnum kind
@@ -312,9 +285,5 @@ namespace FreeAIr.UI.Embedillo.Answer.Parser
             return Kind.AsPromptString();
         }
 
-        public Task OpenInNewWindowAsync()
-        {
-            throw new InvalidOperationException("Not supported for this part");
-        }
     }
 }

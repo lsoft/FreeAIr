@@ -5,3 +5,4 @@ OK - codelenses
 - integration with static code tools (viva64?)
 - start discussion with presetted selected code in promt TextBox
 - custom prompt text (add to new option page)
+- автоперевод комментов, текстов (через adornments) на язык, выбранный как язык ответов LLM

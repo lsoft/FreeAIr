@@ -49,7 +49,7 @@
     <Compile Include="BLogic\ChatContainer.cs" />
     <Compile Include="BLogic\CommitMessageBuilder.cs" />
     <Compile Include="BLogic\CompletionProposal.cs" />
-    <Compile Include="BLogic\Context\ChatContext.cs" />
+    <Compile Include="BLogic\ChatContext.cs" />
     <Compile Include="BLogic\TextDescriptor.cs" />
     <Compile Include="CodeLens\CodeLensConnectionHandler.cs" />
     <Compile Include="CodeLens\CodeLensListener.cs" />
@@ -100,6 +100,7 @@
     </Compile>
     <Compile Include="UI\CodeLens\CodeLenseUserControlViewModel.cs" />
     <Compile Include="UI\CodeLens\ViewElementFactory.cs" />
+    <Compile Include="UI\CombinedParameterConverter.cs" />
     <Compile Include="UI\Embedillo\Answer\Parser\Acceptor.cs" />
     <Compile Include="UI\Embedillo\CompletionData.cs" />
     <Compile Include="UI\Embedillo\ControlPositionInfo.cs" />
@@ -112,6 +113,7 @@
     <Compile Include="UI\Embedillo\TextChangeModeEnum.cs" />
     <Compile Include="UI\Embedillo\VisualLine\Command\CommandVisualLineGeneratorFactory.cs" />
     <Compile Include="UI\Embedillo\VisualLine\SourceFile\SourceFileVisualLineGeneratorFactory.cs" />
+    <Compile Include="UI\OpenContextMenuOnLeftClickBehavior.cs" />
     <Compile Include="UI\Theme.cs" />
     <Compile Include="UI\ToolWindows\ChooseModelToolWindow.cs" />
     <Compile Include="UI\ToolWindows\ChooseModelToolWindowControl.xaml.cs">
