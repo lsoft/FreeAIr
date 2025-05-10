@@ -156,6 +156,11 @@ namespace FreeAIr.UI.Embedillo
 
         }
 
+        public void MakeFocused()
+        {
+            AvalonTextEditor.Focus();
+        }
+
         private async Task ShowCompletionWindowAsync(
             MentionVisualLineGenerator generator
             )

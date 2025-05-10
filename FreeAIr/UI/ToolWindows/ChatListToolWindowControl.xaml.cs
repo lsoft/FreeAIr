@@ -4,6 +4,7 @@ using FreeAIr.UI.Embedillo.VisualLine.SolutionItem;
 using FreeAIr.UI.ViewModels;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 
 namespace FreeAIr.UI.ToolWindows
 {
@@ -39,6 +40,30 @@ namespace FreeAIr.UI.ToolWindows
             AnswerControl.ScrollToEnd();
         }
 
+        private void ChatListToolWindow_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
+        {
+            try
+            {
+                if (e.NewValue is bool)
+                {
+                    var visible = (bool)e.NewValue;
+                    if (visible)
+                    {
+                        _ = Dispatcher.BeginInvoke(() =>
+                        {
+                            PromptControl.MakeFocused();
+                        });
+
+                        //await Task.Delay(100);
+                        //PromptControl.MakeFocused();
+                    }
+                }
+            }
+            catch (Exception excp)
+            {
+                //todo log
+            }
+        }
     }
 
     public class BindingProxy : Freezable

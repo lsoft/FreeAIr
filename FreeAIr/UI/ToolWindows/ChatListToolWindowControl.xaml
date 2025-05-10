@@ -20,6 +20,7 @@
     d:DesignHeight="300"
     d:DesignWidth="300"
     Name="ChatListToolWindow"
+    IsVisibleChanged="ChatListToolWindow_IsVisibleChanged"
     >
     <UserControl.Resources>
         <!-- Прокси для передачи контекста в ContextMenu -->

@@ -10,6 +10,7 @@
     mc:Ignorable="d" 
     d:DesignHeight="450" d:DesignWidth="800"
     x:Name="EmbedilloInternalName"
+    Focusable="True"
     >
     <Border
         CornerRadius="0"
@@ -19,6 +20,7 @@
         x:Name="BorderName"
         VerticalAlignment="{Binding ElementName=EmbedilloInternalName, Path=VerticalAlignment}"
         HorizontalAlignment="{Binding ElementName=EmbedilloInternalName, Path=HorizontalAlignment}"
+        Focusable="True"
         >
         <avalonEdit:TextEditor
             x:Name="AvalonTextEditor"
@@ -34,21 +36,8 @@
             HorizontalContentAlignment="Stretch"
             VerticalAlignment="Stretch"
             VerticalContentAlignment="Stretch"
+            Focusable="True"
             >
-            <!--
-            Foreground="{Binding ElementName=EmbedilloInternalName, Path=Foreground}"
-            Background="{Binding ElementName=EmbedilloInternalName, Path=Background}"
-            Width="{Binding ElementName=EmbedilloInternalName, Path=Width}"
-            Height="{Binding ElementName=EmbedilloInternalName, Path=Height}"
-            FontFamily="{Binding ElementName=EmbedilloInternalName, Path=FontFamily}"
-            FontSize="{Binding ElementName=EmbedilloInternalName, Path=FontSize}"
-            VerticalAlignment="{Binding ElementName=EmbedilloInternalName, Path=VerticalAlignment}"
-            HorizontalAlignment="{Binding ElementName=EmbedilloInternalName, Path=HorizontalAlignment}"
-            VerticalContentAlignment="{Binding ElementName=EmbedilloInternalName, Path=VerticalContentAlignment}"
-            HorizontalContentAlignment="{Binding ElementName=EmbedilloInternalName, Path=HorizontalContentAlignment}"
-            HorizontalScrollBarVisibility="Auto"
-            VerticalScrollBarVisibility="Auto"
-            -->
             <Behaviors:Interaction.Behaviors>
                 <local:EnterKeyBehavior
                     ParentControl="{x:Reference Name=EmbedilloInternalName}"
