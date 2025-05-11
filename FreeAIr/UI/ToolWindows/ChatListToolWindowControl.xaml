@@ -395,9 +395,9 @@
                                                         HorizontalAlignment="Right"
                                                         Margin="2,0,2,0"
                                                         Style="{Binding ElementName=ForegroundButton, Path=Style}"
-                                                        Content="↑ Replace context file..."
+                                                        Content="↑ Replace context item..."
                                                         FontSize="12"
-                                                        ToolTip="Choose context file to replace its content with this code part"
+                                                        ToolTip="Choose context item to replace its content with this code part"
                                                         >
                                                         <Button.ContextMenu>
                                                             <ContextMenu 

@@ -1,5 +1,6 @@
 ﻿
 using FreeAIr.Helper;
+using Microsoft.VisualStudio.Text;
 using System.Text.RegularExpressions;
 
 namespace FreeAIr.UI.Embedillo.Answer.Parser
@@ -39,6 +40,42 @@ namespace FreeAIr.UI.Embedillo.Answer.Parser
             Selection = selection;
         }
 
+        public async Task OpenInNewWindowAsync()
+        {
+            await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+            try
+            {
+                var documentView = await VS.Documents.OpenAsync(FilePath);
+                if (documentView is null)
+                {
+                    return;
+                }
+
+                if (Selection is not null)
+                {
+                    var textView = documentView.TextView;
+
+                    textView.Selection.Select(
+                        Selection.GetSnapshotSpan(textView.TextSnapshot),
+                        false
+                        );
+                }
+            }
+            catch (Exception excp)
+            {
+                await VS.MessageBox.ShowErrorAsync(
+                    Resources.Resources.Error,
+                    "Error: "
+                    + Environment.NewLine
+                    + excp.Message
+                    + Environment.NewLine
+                    + Environment.NewLine
+                    + excp.StackTrace
+                    );
+
+                //todo log
+            }
+        }
 
         public override string ToString()
         {
@@ -111,5 +148,31 @@ namespace FreeAIr.UI.Embedillo.Answer.Parser
         {
             return $":{StartPosition}-{StartPosition + Length}";
         }
+
+        public SnapshotSpan GetSnapshotSpan(
+            ITextSnapshot textSnapshot
+            )
+        {
+            return new SnapshotSpan(textSnapshot, StartPosition, Length);
+        }
+
+        #region equality
+
+        public override bool Equals(object obj)
+        {
+            return obj is SelectedSpan span &&
+                   StartPosition == span.StartPosition &&
+                   Length == span.Length;
+        }
+
+        public override int GetHashCode()
+        {
+            var hashCode = -789397647;
+            hashCode = hashCode * -1521134295 + StartPosition;
+            hashCode = hashCode * -1521134295 + Length;
+            return hashCode;
+        }
+
+        #endregion
     }
 }

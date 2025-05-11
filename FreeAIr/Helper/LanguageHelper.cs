@@ -3,15 +3,31 @@
     public static  class LanguageHelper
     {
         /// <summary>
-        /// Определяет язык программирования на основе расширения файла.
+        /// Определяет префикс для разметки markdown на основе расширения файла.
         /// </summary>
         /// <param name="fileExtension">Расширение файла.</param>
-        /// <returns>Название языка программирования в формате Markdown.</returns>
+        /// <returns>Название префикса для разметки markdown.</returns>
         /// 
         public static string GetMarkdownLanguageCodeBlockNameBasedOnFileExtension(
             string fileExtension
             )
         {
+            if (string.Compare(fileExtension, ".sln", true) == 0)
+            {
+                return string.Empty;
+            }
+            if (string.Compare(fileExtension, ".slnx", true) == 0)
+            {
+                return "xml";
+            }
+            if (string.Compare(fileExtension, ".csproj", true) == 0)
+            {
+                return "xml";
+            }
+            if (string.Compare(fileExtension, ".slnf", true) == 0)
+            {
+                return "json";
+            }
             if (string.Compare(fileExtension, ".cs", true) == 0)
             {
                 return "csharp";

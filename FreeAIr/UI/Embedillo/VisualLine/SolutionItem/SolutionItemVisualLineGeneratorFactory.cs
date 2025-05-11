@@ -43,15 +43,15 @@ namespace FreeAIr.UI.Embedillo.VisualLine.SolutionItem
 
             var solutionFolderPath = new FileInfo(solution.FullPath).Directory.FullName;
 
-            List<(Community.VisualStudio.Toolkit.SolutionItem solutionItem, SelectedSpan Selection)> solutionItems = await solution.ProcessDownRecursivelyForAsync(
-                SolutionItemType.PhysicalFile,
+            var solutionItems = await solution.ProcessDownRecursivelyForAsync(
+                [SolutionItemType.Solution, SolutionItemType.Project, SolutionItemType.PhysicalFile],
                 null
                 );
 
             var suggestions = solutionItems.ConvertAll(si =>
                 (ISuggestion)new SolutionItemSuggestion(
-                    si.solutionItem.FullPath,
-                    si.solutionItem.FullPath.MakeRelativeAgainst(solutionFolderPath),
+                    si.SolutionItem.FullPath,
+                    si.SolutionItem.FullPath.MakeRelativeAgainst(solutionFolderPath),
                     si.Selection
                     )
             );

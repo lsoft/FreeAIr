@@ -54,7 +54,7 @@ namespace FreeAIr.BLogic.Context
 
         public async Task OpenInNewWindowAsync()
         {
-            await VS.Documents.OpenAsync(SelectedIdentifier.FilePath);
+            await SelectedIdentifier.OpenInNewWindowAsync();
         }
 
 
