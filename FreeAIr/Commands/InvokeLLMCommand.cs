@@ -57,9 +57,8 @@ namespace FreeAIr.Commands
                 return;
             }
 
-            var contextResult = await ContextComposer.ComposeFromActiveDocumentAsync(
-                TimeSpan.FromMilliseconds(500)
-                );
+            var contextItems = (await ContextComposer.ComposeFromActiveDocumentAsync(
+                )).ConvertToChatContextItem();
 
             var kind = GetChatKind();
 
@@ -71,15 +70,9 @@ namespace FreeAIr.Commands
                 null
                 );
 
-            foreach (var identifier in contextResult.FoundIdentifiers)
-            {
-                chat.ChatContext.AddItem(
-                    new SolutionItemChatContextItem(
-                        identifier.SelectedIdentifier,
-                        identifier.IsAutoFound
-                        )
-                    );
-            }
+            chat.ChatContext.AddItems(
+                contextItems
+                );
 
             chat.AddPrompt(
                 UserPrompt.CreateCodeBasedPrompt(

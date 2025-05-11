@@ -1,4 +1,5 @@
 ﻿using FreeAIr.BLogic;
+using FreeAIr.Helper;
 using Microsoft.VisualStudio.TeamFoundation.Git.Extensibility;
 using System.Text;
 using System.Threading;
@@ -113,7 +114,7 @@ namespace FreeAIr.UI.Windows
             }
             summaryDiff.AppendLine(diffIndex);
 
-            var lsFiles = await ProcessProcess.RunSilentlyAsync(
+            var lsFiles = await ProcessHelper.RunSilentlyAsync(
                 repositoryFolder,
                 "git.exe",
                 @"ls-files --others --exclude-standard",

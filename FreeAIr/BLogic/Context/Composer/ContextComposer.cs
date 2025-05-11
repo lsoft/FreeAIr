@@ -13,10 +13,18 @@ namespace FreeAIr.BLogic.Context.Composer
 {
     public class ContextComposer
     {
-        public static async Task<ContextComposeResult> ComposeFromActiveDocumentAsync(
-            TimeSpan timeout
+        public static async Task<ContextComposeResult> ComposeFromFilePathAsync(
+            string filePath,
+            TimeSpan? ntimeout = null
             )
         {
+            if (filePath is null)
+            {
+                throw new ArgumentNullException(nameof(filePath));
+            }
+
+            var timeout = ntimeout.GetValueOrDefault(TimeSpan.FromMilliseconds(ResponsePage.Instance.AutomaticSearchForContextItemsTimeoutMsec));
+
             var context = new ContextComposeResult(
                 );
 
@@ -28,7 +36,85 @@ namespace FreeAIr.BLogic.Context.Composer
 
 
                 var componentModel = (IComponentModel)await FreeAIrPackage.Instance.GetServiceAsync(typeof(SComponentModel));
+                var workspace = (Workspace)componentModel.GetService<VisualStudioWorkspace>();
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    return context;
+                }
+                if (workspace is null)
+                {
+                    return context;
+                }
 
+                var documentIds = workspace.CurrentSolution.GetDocumentIdsWithFilePath(
+                    filePath
+                    );
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    return context;
+                }
+                if (documentIds.Length == 0)
+                {
+                    return context;
+                }
+
+                var documentId = documentIds.First();
+                var document = workspace.CurrentSolution.GetDocument(documentId);
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    return context;
+                }
+                if (document is null)
+                {
+                    return context;
+                }
+
+                var root = await document.GetSyntaxRootAsync(cancellationToken);
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    return context;
+                }
+                if (root is null)
+                {
+                    return context;
+                }
+
+                await ScanForContextAsync(
+                    context,
+                    document,
+                    root,
+                    cancellationToken
+                    );
+            }
+            catch (OperationCanceledException)
+            {
+                //this is ok
+            }
+            catch (Exception excp)
+            {
+                //todo log
+            }
+
+            return context;
+        }
+
+        public static async Task<ContextComposeResult> ComposeFromActiveDocumentAsync(
+            TimeSpan? ntimeout = null
+            )
+        {
+            var timeout = ntimeout.GetValueOrDefault(TimeSpan.FromMilliseconds(ResponsePage.Instance.AutomaticSearchForContextItemsTimeoutMsec));
+
+            var context = new ContextComposeResult(
+                );
+
+            try
+            {
+                using var cancellationTokenSource = new CancellationTokenSource();
+                cancellationTokenSource.CancelAfter(timeout);
+                var cancellationToken = cancellationTokenSource.Token;
+
+
+                var componentModel = (IComponentModel)await FreeAIrPackage.Instance.GetServiceAsync(typeof(SComponentModel));
                 var workspace = (Workspace)componentModel.GetService<VisualStudioWorkspace>();
                 if (cancellationToken.IsCancellationRequested)
                 {

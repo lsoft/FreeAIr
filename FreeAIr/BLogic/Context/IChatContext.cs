@@ -10,7 +10,9 @@ namespace FreeAIr.BLogic.Context
         }
 
         void AddItem(IChatContextItem item);
-        
+
+        void AddItems(IReadOnlyList<IChatContextItem> items);
+
         void RemoveAutomaticItems();
         
         void RemoveItem(IChatContextItem item);

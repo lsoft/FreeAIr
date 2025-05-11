@@ -1,5 +1,7 @@
-﻿using FreeAIr.Helper;
+﻿using FreeAIr.BLogic.Context.Composer;
+using FreeAIr.Helper;
 using FreeAIr.UI.Embedillo.Answer.Parser;
+using System.Collections.Generic;
 using System.IO;
 using System.IO.Packaging;
 using System.Threading.Tasks;
@@ -51,12 +53,15 @@ namespace FreeAIr.BLogic.Context
                 return false;
             }
 
-            var result = StringComparer.CurrentCultureIgnoreCase.Compare(
-                SelectedIdentifier.FilePath,
-                otherDisk.SelectedIdentifier.FilePath
-                ) == 0;
+            if (!SelectedIdentifier.Equals(
+                    otherDisk.SelectedIdentifier
+                    )
+                )
+            {
+                return false;
+            }
 
-            return result;
+            return true;
         }
 
         public async Task OpenInNewWindowAsync()
@@ -128,6 +133,14 @@ namespace FreeAIr.BLogic.Context
                 SelectedIdentifier.FilePath,
                 body.WithLineEnding(lineEnding)
                 );
+        }
+
+        public async Task<IReadOnlyList<IChatContextItem>> SearchRelatedContextItemsAsync()
+        {
+            var contextItems = (await ContextComposer.ComposeFromFilePathAsync(
+                SelectedIdentifier.FilePath
+                )).ConvertToChatContextItem();
+            return contextItems;
         }
     }
 

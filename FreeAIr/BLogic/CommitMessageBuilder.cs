@@ -216,7 +216,7 @@ namespace FreeAIr.BLogic
             //int skipLineCount;
             if (string.IsNullOrEmpty(nonVersionedFile))
             {
-                diff = await ProcessProcess.RunWithTimeoutAsync(
+                diff = await ProcessHelper.RunWithTimeoutAsync(
                     new ProcessStartInfo
                     {
                         WorkingDirectory = workingDirectory,
@@ -232,7 +232,7 @@ namespace FreeAIr.BLogic
             }
             else
             {
-                diff = await ProcessProcess.RunWithTimeoutAsync(
+                diff = await ProcessHelper.RunWithTimeoutAsync(
                     new ProcessStartInfo
                     {
                         WorkingDirectory = workingDirectory,
@@ -275,41 +275,6 @@ namespace FreeAIr.BLogic
                 Environment.NewLine,
                 diff.StandardOutput
                 );
-        }
-    }
-
-    public static class ProcessProcess
-    {
-        public static Task<ProcessResults> RunSilentlyAsync(
-            string workingDirectory,
-            string exeName,
-            string arguments,
-            CancellationToken cancellationToken
-            )
-        {
-            return RunWithTimeoutAsync(
-                    new ProcessStartInfo
-                    {
-                        WorkingDirectory = workingDirectory,
-                        FileName = exeName,
-                        Arguments = arguments,
-                        CreateNoWindow = true,
-                        WindowStyle = ProcessWindowStyle.Hidden
-                    },
-                    cancellationToken
-                    );
-        }
-
-        public static Task<ProcessResults> RunWithTimeoutAsync(
-            ProcessStartInfo psi,
-            CancellationToken cancellationToken
-            )
-        {
-            return 
-                ProcessEx.RunAsync(
-                    psi,
-                    cancellationToken
-                    );
         }
     }
 }

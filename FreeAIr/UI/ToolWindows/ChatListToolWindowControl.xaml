@@ -206,34 +206,47 @@
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="auto" />
                                         <ColumnDefinition Width="auto" />
+                                        <ColumnDefinition Width="auto" />
                                         <ColumnDefinition />
                                     </Grid.ColumnDefinitions>
 
-                                    <Label
+                                    <imaging:CrispImage
                                         Grid.Column="0"
-                                        Content="❌"
-                                        Foreground="Red"
-                                        Cursor="Hand"
-                                        FontFamily="Cascadia Code"
+                                        Moniker="{x:Static catalog:KnownMonikers.Cancel}"
                                         ToolTip="Delete from context"
+                                        Cursor="Hand"
                                         >
-                                        <Label.InputBindings>
+                                        <imaging:CrispImage.InputBindings>
                                             <MouseBinding
                                                 Command="{Binding ElementName=ChatListToolWindow, Path=DataContext.DeleteItemFromContextCommand}"
                                                 CommandParameter="{Binding .}"
                                                 MouseAction="LeftClick"
                                                 />
-                                        </Label.InputBindings>
-                                    </Label>
+                                        </imaging:CrispImage.InputBindings>
+                                    </imaging:CrispImage>
                                     <imaging:CrispImage
                                         Grid.Column="1"
+                                        Margin="5,0,0,0"
+                                        Moniker="{x:Static catalog:KnownMonikers.ZoomIn}"
+                                        ToolTip="Search and add related context items"
+                                        Cursor="Hand"
+                                        >
+                                        <imaging:CrispImage.InputBindings>
+                                            <MouseBinding
+                                                Command="{Binding ElementName=ChatListToolWindow, Path=DataContext.AddRelatedItemsToContextCommand}"
+                                                CommandParameter="{Binding .}"
+                                                MouseAction="LeftClick"
+                                                />
+                                        </imaging:CrispImage.InputBindings>
+                                    </imaging:CrispImage>
+                                    <imaging:CrispImage
+                                        Grid.Column="2"
                                         Margin="20,0,0,0"
                                         Moniker="{Binding Moniker}"
                                         ToolTip="{Binding Tooltip}"
-                                        >
-                                    </imaging:CrispImage>
+                                        />
                                     <Label
-                                        Grid.Column="2"
+                                        Grid.Column="3"
                                         Margin="0,0,0,0"
                                         Content="{Binding ChatContextDescription}"
                                         HorizontalAlignment="Left"
@@ -261,7 +274,7 @@
                         CornerRadius="0"
                         BorderBrush="#569CD6"
                         BorderThickness="0,1,0,0"
-                        Margin="30,0,30,0"
+                        Margin="50,0,50,0"
                         />
 
                     <!-- add item to context section -->

@@ -95,7 +95,7 @@ namespace FreeAIr.UI.Embedillo.Answer.Parser
             return 
                 obj is SelectedIdentifier identifier
                 && FilePath == identifier.FilePath
-                && Selection.Equals(identifier.Selection)
+                && (ReferenceEquals(Selection, identifier.Selection) || Selection.Equals(identifier.Selection))
                 ;
         }
 

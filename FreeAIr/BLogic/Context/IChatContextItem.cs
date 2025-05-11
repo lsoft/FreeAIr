@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace FreeAIr.BLogic.Context
 {
@@ -41,7 +42,8 @@ namespace FreeAIr.BLogic.Context
         /// ```
         /// </summary>
         Task<string> AsContextPromptTextAsync();
-
+        
+        Task<IReadOnlyList<IChatContextItem>> SearchRelatedContextItemsAsync();
     }
 
 }

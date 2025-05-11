@@ -27,6 +27,28 @@ namespace FreeAIr.BLogic.Context
             }
         }
 
+        public void AddItems(
+            IReadOnlyList<IChatContextItem> items
+            )
+        {
+            if (items is null)
+            {
+                throw new ArgumentNullException(nameof(items));
+            }
+
+            foreach (var item in items)
+            {
+                if (_items.Any(i => i.IsSame(item)))
+                {
+                    continue;
+                }
+
+                _items.Add(item);
+            }
+
+            RaiseChatContextChanged();
+        }
+
         public void AddItem(
             IChatContextItem item
             )

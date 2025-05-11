@@ -65,6 +65,7 @@
     <Compile Include="BLogic\Context\IChatContext.cs" />
     <Compile Include="BLogic\Context\IChatContextItem.cs" />
     <Compile Include="BLogic\Context\SolutionItemChatContextItem.cs" />
+    <Compile Include="Helper\ProcessHelper.cs" />
     <Compile Include="BLogic\TextDescriptor.cs" />
     <Compile Include="CodeLens\CodeLensConnectionHandler.cs" />
     <Compile Include="CodeLens\CodeLensListener.cs" />

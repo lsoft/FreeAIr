@@ -1,5 +1,6 @@
 ﻿using FreeAIr.BLogic;
 using FreeAIr.BLogic.Context;
+using FreeAIr.BLogic.Context.Composer;
 using FreeAIr.Helper;
 using FreeAIr.Shared.Helper;
 using FreeAIr.UI.Embedillo.Answer.Parser;
@@ -37,6 +38,7 @@ namespace FreeAIr.UI.ViewModels
         private ICommand _addItemToContextCommand;
         private ICommand _updateContextItemCommand;
         private ICommand _removeAllAutomaticItemsFromContextCommand;
+        private ICommand _addRelatedItemsToContextCommand;
 
         public event MarkdownReReadDelegate MarkdownReReadEvent;
 
@@ -739,6 +741,79 @@ namespace FreeAIr.UI.ViewModels
                 return _updateContextItemCommand;
             }
         }
+
+        
+        public ICommand AddRelatedItemsToContextCommand
+        {
+            get
+            {
+                if (_addRelatedItemsToContextCommand == null)
+                {
+                    _addRelatedItemsToContextCommand = new AsyncRelayCommand(
+                        async a =>
+                        {
+                            if (_selectedChat is null)
+                            {
+                                return;
+                            }
+                            if (_selectedChat.Chat is null)
+                            {
+                                return;
+                            }
+
+                            var chat = _selectedChat.Chat;
+
+                            if (chat.Status.NotIn(ChatStatusEnum.NotStarted, ChatStatusEnum.Ready))
+                            {
+                                return;
+                            }
+
+                            if (a is not ChatContextItemViewModel itemViewModel)
+                            {
+                                return;
+                            }
+
+                            var contextItems = await itemViewModel.ContextItem.SearchRelatedContextItemsAsync();
+
+                            chat.ChatContext.AddItems(
+                                contextItems
+                                );
+
+                            OnPropertyChanged();
+                        },
+                        (a) =>
+                        {
+                            if (_selectedChat is null)
+                            {
+                                return false;
+                            }
+                            if (_selectedChat.Chat is null)
+                            {
+                                return false;
+                            }
+
+                            var chat = _selectedChat.Chat;
+
+                            if (chat.Status.NotIn(ChatStatusEnum.NotStarted, ChatStatusEnum.Ready))
+                            {
+                                return false;
+                            }
+
+                            if (a is not ChatContextItemViewModel itemViewModel)
+                            {
+                                return false;
+                            }
+
+                            return true;
+                        }
+                        );
+                }
+
+                return _addRelatedItemsToContextCommand;
+            }
+        }
+
+
         private void AddContextItemsFromPrompt(
             Chat chat,
             ParsedAnswer parsedAnswer

@@ -1,6 +1,7 @@
 ﻿using FreeAIr.UI.Embedillo.Answer.Parser;
 using Microsoft.CodeAnalysis;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace FreeAIr.BLogic.Context.Composer
 {
@@ -64,6 +65,17 @@ namespace FreeAIr.BLogic.Context.Composer
             {
                 _types.Add(type);
             }
+        }
+
+        public IReadOnlyList<IChatContextItem> ConvertToChatContextItem()
+        {
+            return FoundIdentifiers
+                .Select(i => new SolutionItemChatContextItem(
+                    i.SelectedIdentifier,
+                    i.IsAutoFound
+                    )
+                )
+                .ToList();
         }
     }
 }
