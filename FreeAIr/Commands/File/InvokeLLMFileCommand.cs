@@ -1,5 +1,6 @@
 ﻿using FreeAIr.BLogic;
 using FreeAIr.BLogic.Context;
+using FreeAIr.BLogic.Context.Composer;
 using FreeAIr.Helper;
 using FreeAIr.UI.ToolWindows;
 using Microsoft.VisualStudio.ComponentModelHost;
@@ -68,13 +69,21 @@ namespace FreeAIr.Commands.File
                 lineEnding
                 );
 
-            var chat = chatContainer.StartChat(
+            var contextItems = (await ContextComposer.ComposeFromFilePathAsync(
+                selectedFile.FullPath
+                )).ConvertToChatContextItem();
+
+            var chat = await chatContainer.StartChatAsync(
                 new ChatDescription(
                     kind,
                     wfd
                     ),
                 null
                 );
+            if (chat is null)
+            {
+                return;
+            }
 
             chat.ChatContext.AddItem(
                 new SolutionItemChatContextItem(
@@ -84,6 +93,10 @@ namespace FreeAIr.Commands.File
                         ),
                     false
                     )
+                );
+
+            chat.ChatContext.AddItems(
+                contextItems
                 );
 
             chat.AddPrompt(

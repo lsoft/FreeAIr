@@ -147,7 +147,7 @@ namespace FreeAIr.UI.ViewModels
                                 return;
                             }
 
-                            _chatContainer.StartChat(
+                            _ = await _chatContainer.StartChatAsync(
                                 new ChatDescription(ChatKindEnum.Discussion, null),
                                 null
                                 );

@@ -68,7 +68,8 @@ namespace FreeAIr.BLogic
         /// <inheritdoc />
         public string? Answer
         {
-            get; private set;
+            get;
+            private set;
         }
 
         /// <summary>
@@ -215,6 +216,24 @@ namespace FreeAIr.BLogic
                 "```" + LanguageHelper.GetMarkdownLanguageCodeBlockNameBasedOnFileExtension(fi.Extension) +
                     Environment.NewLine + documentText + Environment.NewLine + "```"
             );
+        }
+
+        public static UserPrompt CreateFixBuildErrorPrompt(
+            string errorDescription,
+            string fileName,
+            string filePath
+            )
+        {
+            var fi = new FileInfo(filePath);
+
+            return new UserPrompt(
+                ChatKindEnum.FixBuildError,
+                "```"
+                + Environment.NewLine
+                + errorDescription
+                + Environment.NewLine
+                + "```"
+                );
         }
     }
 }

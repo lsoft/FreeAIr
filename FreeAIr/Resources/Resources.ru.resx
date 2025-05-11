@@ -177,4 +177,7 @@
   <data name="UI_StopWaiting" xml:space="preserve">
     <value>Остановить ожидание ответа</value>
   </data>
+  <data name="ChatKindEnum_FixBuildError" xml:space="preserve">
+    <value>Компилятор сообщил об ошибке в исходном коде. Помоги исправить код. Ошибка: </value>
+  </data>
 </root>

@@ -17,8 +17,9 @@ namespace FreeAIr.BLogic
         private readonly List<UserPrompt> _prompts = new();
         private readonly ChatContext _chatContext = new();
 
-        private readonly CancellationTokenSource _cancellationTokenSource = new();
         private readonly Action<Chat, Answer> _promptAnsweredCallBack;
+
+        private CancellationTokenSource _cancellationTokenSource = new();
         private Task? _task;
 
         public IChatContext ChatContext => _chatContext;
@@ -129,6 +130,8 @@ namespace FreeAIr.BLogic
             _cancellationTokenSource.Cancel();
 
             await WaitForTaskAsync();
+
+            _cancellationTokenSource = new CancellationTokenSource();
         }
 
         public void Dispose()

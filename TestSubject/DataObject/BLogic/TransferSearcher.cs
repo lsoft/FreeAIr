@@ -34,7 +34,7 @@ namespace DataObject.BLogic
             allVoyagesAtDate.Remove(firstVoyage);
 
             var allowedVoyages = allVoyagesAtDate
-                .FindAll(v => v.Route.StationList[0] == firstVoyage.Route.StationList.Last())
+                .FindAll(v => v.Route.StationLit[0] == firstVoyage.Route.StationList.Last())
                 ;
 
             return allowedVoyages;

@@ -99,13 +99,17 @@ namespace FreeAIr.BLogic
 
                 var chatContainer = componentModel.GetService<ChatContainer>();
 
-                var chat = chatContainer.StartChat(
+                var chat = await chatContainer.StartChatAsync(
                     new ChatDescription(
                         ChatKindEnum.SuggestWholeLine,
                         null
                         ),
                     userPrompt
                     );
+                if (chat is null)
+                {
+                    return null;
+                }
 
                 await chat.WaitForPromptResultAsync();
 

@@ -88,6 +88,15 @@ namespace FreeAIr.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The compiler reported an error in the source code. Help fix the code. Error: .
+        /// </summary>
+        public static string ChatKindEnum_FixBuildError {
+            get {
+                return ResourceManager.GetString("ChatKindEnum_FixBuildError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Generate commit message according the following git patch. Give in your reply only the commit message without additional information. Do not wrap the whole answer in any quotes..
         /// </summary>
         public static string ChatKindEnum_GenerateCommitMessage {

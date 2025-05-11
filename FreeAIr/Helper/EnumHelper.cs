@@ -15,6 +15,7 @@ namespace FreeAIr.Helper
                 case ChatKindEnum.OptimizeCode:
                 case ChatKindEnum.CompleteCodeAccordingComments:
                 case ChatKindEnum.GenerateCommitMessage:
+                case ChatKindEnum.FixBuildError:
                     return FreeAIr.Resources.Resources.ResourceManager.GetString(
                         nameof(ChatKindEnum) + "_" + kind.ToString(),
                         ResponsePage.GetAnswerCulture()
@@ -58,6 +59,8 @@ namespace FreeAIr.Helper
                     return "Commit message";
                 case ChatKindEnum.SuggestWholeLine:
                     return "Suggest whole line";
+                case ChatKindEnum.FixBuildError:
+                    return "Fix build error";
                 default:
                     return taskKind.ToString();
             }

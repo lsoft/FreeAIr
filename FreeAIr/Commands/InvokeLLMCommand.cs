@@ -62,13 +62,17 @@ namespace FreeAIr.Commands
 
             var kind = GetChatKind();
 
-            var chat = chatContainer.StartChat(
+            var chat = await chatContainer.StartChatAsync(
                 new ChatDescription(
                     kind,
                     null
                     ),
                 null
                 );
+            if (chat is null)
+            {
+                return;
+            }
 
             chat.ChatContext.AddItems(
                 contextItems

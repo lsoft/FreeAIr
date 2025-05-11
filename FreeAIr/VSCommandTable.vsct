@@ -50,6 +50,10 @@
       <Group guid="FreeAIr" id="SolutionContextGroup" priority="0x0600">
         <Parent guid="FreeAIr" id="SolutionContextMenu" />
       </Group>
+
+      <Group guid="FreeAIr" id="BuildErrorWindowGroup" priority="0x0600">
+        <Parent guid="guidSHLMainMenu" id="IDM_VS_CTXT_ERRORLIST" />
+      </Group>
     </Groups>
 
     <Buttons>
@@ -153,23 +157,27 @@
 
 
       
-      <Buttons>
-        <Button guid="FreeAIr" id="CodeLens_AddXmlCommentCommandId" priority="0x0000" type="Button">
-          <Strings>
-            <LocCanonicalName>FreeAIr.AddXmlComment</LocCanonicalName>
-            <ButtonText>AddXmlComment</ButtonText>
-          </Strings>
-        </Button>
-      </Buttons>
-      <Buttons>
-        <Button guid="FreeAIr" id="CodeLens_GenerateUnitTestsCommandId" priority="0x0000" type="Button">
-          <Strings>
-            <LocCanonicalName>FreeAIr.GenerateUnitTests</LocCanonicalName>
-            <ButtonText>GenerateUnitTests</ButtonText>
-          </Strings>
-        </Button>
-      </Buttons>
+      <Button guid="FreeAIr" id="CodeLens_AddXmlCommentCommandId" priority="0x0000" type="Button">
+        <Strings>
+          <LocCanonicalName>FreeAIr.AddXmlComment</LocCanonicalName>
+          <ButtonText>AddXmlComment</ButtonText>
+        </Strings>
+      </Button>
+      <Button guid="FreeAIr" id="CodeLens_GenerateUnitTestsCommandId" priority="0x0000" type="Button">
+        <Strings>
+          <LocCanonicalName>FreeAIr.GenerateUnitTests</LocCanonicalName>
+          <ButtonText>GenerateUnitTests</ButtonText>
+        </Strings>
+      </Button>
 
+      <Button guid="FreeAIr" id="BuildErrorWindowFixErrorCommandId" priority="0x0100" type="Button">
+        <Parent guid="FreeAIr" id="BuildErrorWindowGroup" />
+        <Icon guid="ImageCatalogGuid" id="LogPopulationError" />
+        <CommandFlag>IconIsMoniker</CommandFlag>
+        <Strings>
+          <ButtonText>FreeAIr try to fix...</ButtonText>
+        </Strings>
+      </Button>
 
     </Buttons>
 
@@ -217,6 +225,9 @@
       <IDSymbol name="CodeLens_AddXmlCommentCommandId" value="0x1036" />
       <IDSymbol name="CodeLens_GenerateUnitTestsCommandId" value="0x1037" />
 
+      <IDSymbol name="BuildErrorWindowGroup" value="0x1039" />
+      <IDSymbol name="BuildErrorWindowFixErrorCommandId" value="0x1040" />
+
     </GuidSymbol>
 
     <GuidSymbol name="FreeAIrImages16" value="{83BCC0EB-7C0F-41EA-88E4-DC07CB510FAF}" >
@@ -225,6 +236,7 @@
     <GuidSymbol name="FreeAIrImages32" value="{93BCC0EB-7C0F-41EA-88E4-DC07CB510FAF}" >
       <IDSymbol name="Icon32" value="1" />
     </GuidSymbol>
+    
 
   </Symbols>
 </CommandTable>

@@ -150,7 +150,7 @@ namespace FreeAIr.BLogic
                 var componentModel = (IComponentModel)await FreeAIrPackage.Instance.GetServiceAsync(typeof(SComponentModel));
                 var chatContainer = componentModel.GetService<ChatContainer>();
 
-                chatContainer.StartChat(
+                _ = await chatContainer.StartChatAsync(
                     new ChatDescription(
                         ChatKindEnum.GenerateCommitMessage,
                         null

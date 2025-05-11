@@ -9,6 +9,7 @@
         Discussion,
         GenerateCommitMessage,
         SuggestWholeLine,
-        GenerateUnitTests
+        GenerateUnitTests,
+        FixBuildError
     }
 }

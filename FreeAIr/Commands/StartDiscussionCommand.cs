@@ -34,13 +34,17 @@ namespace FreeAIr.Commands
 
             var kind = ChatKindEnum.Discussion;
 
-            var chat = chatContainer.StartChat(
+            var chat = await chatContainer.StartChatAsync(
                 new ChatDescription(
                     kind,
                     null
                     ),
                 null
                 );
+            if (chat is null)
+            {
+                return;
+            }
 
             chat.ChatContext.AddItem(
                 new SolutionItemChatContextItem(

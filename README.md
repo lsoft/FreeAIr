@@ -45,6 +45,7 @@ Main functions:
 - Composing commit message
 - Whole line completion
 - Generate unit tests
+- Fix build errors
 
 Context menu:
 
@@ -71,6 +72,10 @@ Whole line completion:
 Put cursor in the place of your source code where you need an autocompletion and press Alt+A:
 
 ![Whole line completion](https://raw.githubusercontent.com/lsoft/FreeAIr/main/wholelinecompletion.png)
+
+Fix build error:
+
+![Fix build error](https://raw.githubusercontent.com/lsoft/FreeAIr/main/fixbuilderror.png)
 
 Main menu:
 

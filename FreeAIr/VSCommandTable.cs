@@ -48,6 +48,8 @@ namespace FreeAIr
         public const int GenerateUnitTestsCommandId = 0x1035;
         public const int CodeLens_AddXmlCommentCommandId = 0x1036;
         public const int CodeLens_GenerateUnitTestsCommandId = 0x1037;
+        public const int BuildErrorWindowGroup = 0x1039;
+        public const int BuildErrorWindowFixErrorCommandId = 0x1040;
         public const int Icon16 = 0x0001;
         public const int Icon32 = 0x0001;
     }

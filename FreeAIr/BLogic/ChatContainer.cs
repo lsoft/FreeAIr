@@ -5,6 +5,7 @@ using FreeAIr.UI.Informer;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace FreeAIr.BLogic
 {
@@ -40,7 +41,7 @@ namespace FreeAIr.BLogic
             _dteEvents.OnBeginShutdown += DTEEvents_OnBeginShutdown;
         }
 
-        public Chat StartChat(
+        public async Task<Chat?> StartChatAsync(
             ChatDescription kind,
             UserPrompt? prompt,
             Action<Chat, Answer> promptAnsweredCallBack = null
@@ -49,6 +50,11 @@ namespace FreeAIr.BLogic
             if (kind is null)
             {
                 throw new ArgumentNullException(nameof(kind));
+            }
+
+            if (!await ApiPage.Instance.VerifyUriAndShowErrorIfNotAsync())
+            {
+                return null;
             }
 
             var chat = new Chat(
