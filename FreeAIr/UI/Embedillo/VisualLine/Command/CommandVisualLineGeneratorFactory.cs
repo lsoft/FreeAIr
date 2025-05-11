@@ -129,18 +129,21 @@ namespace FreeAIr.UI.Embedillo.VisualLine.Command
 
             suggestions.Add(
                 new CommandSuggestion(
+                    KnownMonikers.SQLServerObjectExplorer,
                     "ExplainCode",
                     "ExplainCode"
                     )
                 );
             suggestions.Add(
                 new CommandSuggestion(
+                    KnownMonikers.CodeReviewWizard,
                     "AddXmlComments",
                     "AddXmlComments"
                     )
                 );
             suggestions.Add(
                 new CommandSuggestion(
+                    KnownMonikers.TestGroup,
                     "GenerateUnitTests",
                     "GenerateUnitTests"
                     )

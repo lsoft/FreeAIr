@@ -5,6 +5,7 @@ using System.Linq;
 using FreeAIr.Helper;
 using System.Collections.Generic;
 using FreeAIr.UI.Embedillo.Answer.Parser;
+using Microsoft.VisualStudio.Imaging.Interop;
 
 namespace FreeAIr.UI.Embedillo
 {
@@ -60,7 +61,7 @@ namespace FreeAIr.UI.Embedillo
 
         public static string PrepareTextForSearchingAnchor(string text)
         {
-            //обрабатывать собак внутри
+            //не обрабатывать anchor внутри
             //```
             //тут
             //```
@@ -75,7 +76,7 @@ namespace FreeAIr.UI.Embedillo
                 }
             }
 
-            //не обрабатывать собак внутри `тут`
+            //не обрабатывать anchor внутри `тут`
             foreach (Match match in _oneSlashRegex.Matches(text))
             {
                 foreach (var capture in match.Captures.OrderBy(c => c.Index))
@@ -126,6 +127,11 @@ namespace FreeAIr.UI.Embedillo
 
     public interface ISuggestion
     {
+        ImageMoniker Image
+        {
+            get;
+        }
+
         string FullData
         {
             get;

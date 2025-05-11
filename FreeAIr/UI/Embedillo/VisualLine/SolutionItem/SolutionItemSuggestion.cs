@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.VisualStudio.Imaging.Interop;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,6 +13,11 @@ namespace FreeAIr.UI.Embedillo.VisualLine.SolutionItem
         private readonly string _relativePath;
         private readonly Answer.Parser.SelectedSpan _selection;
 
+        public ImageMoniker Image
+        {
+            get;
+        }
+
         public string FullData
         {
             get;
@@ -23,6 +29,7 @@ namespace FreeAIr.UI.Embedillo.VisualLine.SolutionItem
         }
 
         public SolutionItemSuggestion(
+            ImageMoniker image,
             string fullPath,
             string relativePath,
             Answer.Parser.SelectedSpan? selection
@@ -38,6 +45,7 @@ namespace FreeAIr.UI.Embedillo.VisualLine.SolutionItem
                 throw new ArgumentException($"'{nameof(relativePath)}' cannot be null or empty.", nameof(relativePath));
             }
 
+            Image = image;
             _fullPath = fullPath;
             _relativePath = relativePath;
             _selection = selection;

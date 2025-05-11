@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.VisualStudio.Imaging.Interop;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,6 +9,11 @@ namespace FreeAIr.UI.Embedillo.VisualLine.Command
 {
     public sealed class CommandSuggestion : ISuggestion
     {
+        public ImageMoniker Image
+        {
+            get;
+        }
+
         public string FullData
         {
             get;
@@ -18,7 +24,9 @@ namespace FreeAIr.UI.Embedillo.VisualLine.Command
             get;
         }
 
+
         public CommandSuggestion(
+            ImageMoniker image,
             string fullData,
             string publicData
             )
@@ -33,6 +41,7 @@ namespace FreeAIr.UI.Embedillo.VisualLine.Command
                 throw new ArgumentException($"'{nameof(publicData)}' cannot be null or empty.", nameof(publicData));
             }
 
+            Image = image;
             FullData = fullData;
             PublicData = publicData;
         }

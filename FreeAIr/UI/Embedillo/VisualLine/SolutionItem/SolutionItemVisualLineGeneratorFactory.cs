@@ -1,7 +1,10 @@
 ﻿using FreeAIr.Helper;
 using FreeAIr.UI.Embedillo.Answer.Parser;
+using Microsoft.VisualStudio.Imaging;
+using Microsoft.VisualStudio.Imaging.Interop;
 using System.Collections.Generic;
 using System.IO;
+using System.Runtime.Remoting.Channels;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -48,13 +51,38 @@ namespace FreeAIr.UI.Embedillo.VisualLine.SolutionItem
                 null
                 );
 
+
             var suggestions = solutionItems.ConvertAll(si =>
-                (ISuggestion)new SolutionItemSuggestion(
-                    si.SolutionItem.FullPath,
-                    si.SolutionItem.FullPath.MakeRelativeAgainst(solutionFolderPath),
-                    si.Selection
-                    )
-            );
+            {
+                ImageMoniker im = KnownMonikers.QuestionMark;
+                switch (si.SolutionItem.Type)
+                {
+                    case SolutionItemType.Solution:
+                        im = KnownMonikers.Solution;
+                        break;
+                    case SolutionItemType.Project:
+                        im = KnownMonikers.Application;
+                        break;
+                    case SolutionItemType.PhysicalFile:
+                        if (si.Selection is null)
+                        {
+                            im = KnownMonikers.VBSourceFile;
+                        }
+                        else
+                        {
+                            im = KnownMonikers.FormatSelection;
+                        }
+                        break;
+                }
+
+                return
+                    (ISuggestion) new SolutionItemSuggestion(
+                        im,
+                        si.SolutionItem.FullPath,
+                        si.SolutionItem.FullPath.MakeRelativeAgainst(solutionFolderPath),
+                        si.Selection
+                        );
+            });
 
             return suggestions;
         }
