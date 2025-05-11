@@ -1,8 +1,23 @@
-﻿using FreeAIr.BLogic;
+﻿using Community.VisualStudio.Toolkit;
+using FreeAIr.BLogic;
 using FreeAIr.BLogic.Context;
+using FreeAIr.BLogic.Context.Composer;
 using FreeAIr.Helper;
+using FreeAIr.Shared.Helper;
+using FreeAIr.UI.Embedillo.Answer.Parser;
 using FreeAIr.UI.ToolWindows;
+using Microsoft.Build.Utilities;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.VisualStudio.ComponentModelHost;
+using Microsoft.VisualStudio.LanguageServices;
+using System.Collections.Generic;
+using System.Linq;
+using System.Runtime.Remoting.Contexts;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace FreeAIr.Commands
 {
@@ -42,6 +57,10 @@ namespace FreeAIr.Commands
                 return;
             }
 
+            var contextResult = await ContextComposer.ComposeFromActiveDocumentAsync(
+                TimeSpan.FromMilliseconds(500)
+                );
+
             var kind = GetChatKind();
 
             var chat = chatContainer.StartChat(
@@ -52,11 +71,15 @@ namespace FreeAIr.Commands
                 null
                 );
 
-            chat.ChatContext.AddItem(
-                new SolutionItemChatContextItem(
-                    std.CreateSelectedIdentifier()
-                    )
-                );
+            foreach (var identifier in contextResult.FoundIdentifiers)
+            {
+                chat.ChatContext.AddItem(
+                    new SolutionItemChatContextItem(
+                        identifier.SelectedIdentifier,
+                        identifier.IsAutoFound
+                        )
+                    );
+            }
 
             chat.AddPrompt(
                 UserPrompt.CreateCodeBasedPrompt(
@@ -70,5 +93,4 @@ namespace FreeAIr.Commands
         }
 
     }
-
 }

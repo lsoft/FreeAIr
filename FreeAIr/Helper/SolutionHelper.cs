@@ -59,20 +59,24 @@ namespace FreeAIr.Helper
                 }
 
                 var selection = documentView?.TextView?.Selection;
-                if (selection is not null && selection.SelectedSpans.Count == 1)
+                if (selection is not null
+                    && selection.SelectedSpans.Count == 1
+                    )
                 {
                     var sspan = selection.SelectedSpans[0];
-
-                    foundItems.Insert(
-                        0,
-                        new (
-                            item,
-                            new UI.Embedillo.Answer.Parser.SelectedSpan(
-                                sspan.Span.Start,
-                                sspan.Span.Length
+                    if (!sspan.IsEmpty)
+                    {
+                        foundItems.Insert(
+                            0,
+                            new(
+                                item,
+                                new UI.Embedillo.Answer.Parser.SelectedSpan(
+                                    sspan.Span.Start,
+                                    sspan.Span.Length
+                                    )
                                 )
-                            )
-                        );
+                            );
+                    }
                 }
             }
 

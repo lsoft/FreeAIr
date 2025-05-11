@@ -1,6 +1,7 @@
 ﻿
 using FreeAIr.Helper;
 using Microsoft.VisualStudio.Text;
+using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
 namespace FreeAIr.UI.Embedillo.Answer.Parser
@@ -87,6 +88,27 @@ namespace FreeAIr.UI.Embedillo.Answer.Parser
             return $"{FilePath}:{Selection.StartPosition}-{Selection.StartPosition + Selection.Length}";
         }
 
+        #region equality
+
+        public override bool Equals(object obj)
+        {
+            return 
+                obj is SelectedIdentifier identifier
+                && FilePath == identifier.FilePath
+                && Selection.Equals(identifier.Selection)
+                ;
+        }
+
+        public override int GetHashCode()
+        {
+            var hashCode = 121304889;
+            hashCode = hashCode * -1521134295 + FilePath.GetHashCode();
+            hashCode = hashCode * -1521134295 + (Selection?.GetHashCode() ?? 0);
+            return hashCode;
+        }
+
+        #endregion
+
         public static SelectedIdentifier Parse(string solutionItemText)
         {
             var reversed = solutionItemText.ReverseString();
@@ -115,7 +137,6 @@ namespace FreeAIr.UI.Embedillo.Answer.Parser
 
             return new(solutionItemText, null);
         }
-
     }
 
     public sealed class SelectedSpan
@@ -160,9 +181,11 @@ namespace FreeAIr.UI.Embedillo.Answer.Parser
 
         public override bool Equals(object obj)
         {
-            return obj is SelectedSpan span &&
-                   StartPosition == span.StartPosition &&
-                   Length == span.Length;
+            return
+                obj is SelectedSpan span
+                && StartPosition == span.StartPosition
+                && Length == span.Length
+                ;
         }
 
         public override int GetHashCode()

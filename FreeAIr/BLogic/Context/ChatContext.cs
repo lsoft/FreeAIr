@@ -46,6 +46,15 @@ namespace FreeAIr.BLogic.Context
             RaiseChatContextChanged();
         }
 
+        public void RemoveAutomaticItems()
+        {
+            var removedCount = _items.RemoveAll(i => i.IsAutoFound);
+            if (removedCount > 0)
+            {
+                RaiseChatContextChanged();
+            }
+        }
+
         private void RaiseChatContextChanged()
         {
             var e = ChatContextChangedEvent;
@@ -54,6 +63,7 @@ namespace FreeAIr.BLogic.Context
                 e(this, new ChatContextEventArgs(this));
             }
         }
+
     }
 
     public delegate void ChatContextChangedDelegate(object sender, ChatContextEventArgs e);

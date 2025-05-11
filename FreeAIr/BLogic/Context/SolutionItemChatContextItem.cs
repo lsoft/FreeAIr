@@ -15,8 +15,14 @@ namespace FreeAIr.BLogic.Context
 
         public string ContextUIDescription => SelectedIdentifier.FilePath + SelectedIdentifier.Selection?.ToString();
 
+        public bool IsAutoFound
+        {
+            get;
+        }
+
         public SolutionItemChatContextItem(
-            SelectedIdentifier selectedIdentifier
+            SelectedIdentifier selectedIdentifier,
+            bool isAutoFound
             )
         {
             if (selectedIdentifier is null)
@@ -25,6 +31,7 @@ namespace FreeAIr.BLogic.Context
             }
 
             SelectedIdentifier = selectedIdentifier;
+            IsAutoFound = isAutoFound;
         }
 
         public bool IsSame(IChatContextItem other)

@@ -37,6 +37,7 @@
             VerticalAlignment="Stretch"
             VerticalContentAlignment="Stretch"
             Focusable="True"
+            WordWrap="True"
             >
             <Behaviors:Interaction.Behaviors>
                 <local:EnterKeyBehavior

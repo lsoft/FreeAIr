@@ -81,7 +81,8 @@ namespace FreeAIr.Commands.File
                     new UI.Embedillo.Answer.Parser.SelectedIdentifier(
                         selectedFile.FullPath,
                         null
-                        )
+                        ),
+                    false
                     )
                 );
 

@@ -44,7 +44,8 @@ namespace FreeAIr.Commands
 
             chat.ChatContext.AddItem(
                 new SolutionItemChatContextItem(
-                    std.CreateSelectedIdentifier()
+                    std.CreateSelectedIdentifier(),
+                    false
                     )
                 );
 

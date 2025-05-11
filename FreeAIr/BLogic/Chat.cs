@@ -6,7 +6,6 @@ using System.ClientModel;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -163,9 +162,10 @@ namespace FreeAIr.BLogic
 
             userPrompt.SetAnswer(answer.GetAnswer());
 
-            if (_promptAnsweredCallBack is not null)
+            var e = _promptAnsweredCallBack;
+            if (e is not null)
             {
-                _promptAnsweredCallBack(this, answer);
+                e(this, answer);
             }
         }
 
@@ -236,7 +236,7 @@ namespace FreeAIr.BLogic
 
                         if (cancellationToken.IsCancellationRequested)
                         {
-                            Status = ChatStatusEnum.Cancelled;
+                            Status = ChatStatusEnum.Ready;
                             return answer;
                         }
                     }
@@ -247,7 +247,7 @@ namespace FreeAIr.BLogic
             catch (OperationCanceledException)
             {
                 //this is OK
-                Status = ChatStatusEnum.Cancelled;
+                Status = ChatStatusEnum.Ready;
             }
             catch (Exception excp)
             {
@@ -293,71 +293,6 @@ namespace FreeAIr.BLogic
         }
     }
 
-    public enum ChatKindEnum
-    {
-        ExplainCode,
-        AddXmlComments,
-        OptimizeCode,
-        CompleteCodeAccordingComments,
-        Discussion,
-        GenerateCommitMessage,
-        SuggestWholeLine,
-        GenerateUnitTests
-    }
-
-    public sealed class Answer
-    {
-        private readonly StringBuilder _result = new();
-
-        public string ResultFilePath
-        {
-            get;
-        }
-
-        public Answer(string resultFilePath)
-        {
-            ResultFilePath = resultFilePath;
-        }
-
-        public void Append(string contentPart)
-        {
-            _result.Append(contentPart);
-            File.AppendAllText(ResultFilePath, contentPart);
-
-        }
-
-        public string GetAnswer()
-        {
-            return _result.ToString();
-        }
-    }
-
-    public sealed class ChatDescription : IDisposable
-    {
-        public ChatKindEnum Kind
-        {
-            get;
-        }
-        public IOriginalTextDescriptor? SelectedTextDescriptor
-        {
-            get;
-        }
-
-        public ChatDescription(
-            ChatKindEnum kind,
-            IOriginalTextDescriptor? selectedTextDescriptor
-            )
-        {
-            Kind = kind;
-            SelectedTextDescriptor = selectedTextDescriptor;
-        }
-
-        public void Dispose()
-        {
-            SelectedTextDescriptor?.Dispose();
-        }
-    }
-
     public delegate void ChatStatusChangedDelegate(object sender, ChatEventArgs e);
 
     public sealed class ChatEventArgs : EventArgs
@@ -371,15 +306,5 @@ namespace FreeAIr.BLogic
         {
             Chat = chat;
         }
-    }
-
-    public enum ChatStatusEnum
-    {
-        NotStarted,
-        WaitingForAnswer,
-        ReadingAnswer,
-        Ready,
-        Cancelled,
-        Failed
     }
 }

@@ -12,6 +12,14 @@ namespace FreeAIr.BLogic.Context
             get;
         }
 
+        /// <summary>
+        /// Итем найден автоматически, сканнером.
+        /// </summary>
+        bool IsAutoFound
+        {
+            get;
+        }
+
         bool IsSame(IChatContextItem other);
 
         Task OpenInNewWindowAsync();

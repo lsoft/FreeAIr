@@ -4,6 +4,8 @@ using FreeAIr.Helper;
 using FreeAIr.Shared.Helper;
 using FreeAIr.UI.Embedillo.Answer.Parser;
 using ICSharpCode.AvalonEdit.Editing;
+using Microsoft.VisualStudio.Imaging;
+using Microsoft.VisualStudio.Imaging.Interop;
 using Microsoft.Win32;
 using System.ComponentModel.Composition;
 using System.Diagnostics.Contracts;
@@ -34,6 +36,7 @@ namespace FreeAIr.UI.ViewModels
         private ICommand _openContextItemCommand;
         private ICommand _addItemToContextCommand;
         private ICommand _updateContextItemCommand;
+        private ICommand _removeAllAutomaticItemsFromContextCommand;
 
         public event MarkdownReReadDelegate MarkdownReReadEvent;
 
@@ -99,7 +102,7 @@ namespace FreeAIr.UI.ViewModels
                             _chatContainer.RemoveChatAsync(_selectedChat.Chat)
                                 .FileAndForget(nameof(ChatContainer.RemoveChatAsync));
                         },
-                        a => _selectedChat is not null && _selectedChat.Chat.Status.In(ChatStatusEnum.Failed, ChatStatusEnum.NotStarted, ChatStatusEnum.Cancelled, ChatStatusEnum.Ready)
+                        a => _selectedChat is not null && _selectedChat.Chat.Status.In(ChatStatusEnum.Failed, ChatStatusEnum.NotStarted, ChatStatusEnum.Ready)
                         );
                 }
 
@@ -624,7 +627,62 @@ namespace FreeAIr.UI.ViewModels
             }
         }
 
-        
+        public ICommand RemoveAllAutomaticItemsFromContextCommand
+        {
+            get
+            {
+                if (_removeAllAutomaticItemsFromContextCommand == null)
+                {
+                    _removeAllAutomaticItemsFromContextCommand = new RelayCommand(
+                        a =>
+                        {
+                            if (_selectedChat is null)
+                            {
+                                return;
+                            }
+                            if (_selectedChat.Chat is null)
+                            {
+                                return;
+                            }
+
+                            var chat = _selectedChat.Chat;
+
+                            if (chat.Status.NotIn(ChatStatusEnum.NotStarted, ChatStatusEnum.Ready))
+                            {
+                                return;
+                            }
+
+                            chat.ChatContext.RemoveAutomaticItems();
+
+                            OnPropertyChanged();
+                        },
+                        a =>
+                        {
+                            if (_selectedChat is null)
+                            {
+                                return false;
+                            }
+                            if (_selectedChat.Chat is null)
+                            {
+                                return false;
+                            }
+
+                            var chat = _selectedChat.Chat;
+
+                            if (chat.Status.NotIn(ChatStatusEnum.NotStarted, ChatStatusEnum.Ready))
+                            {
+                                return false;
+                            }
+
+                            return true;
+                        }
+                        );
+                }
+
+                return _removeAllAutomaticItemsFromContextCommand;
+            }
+        }
+
         public ICommand UpdateContextItemCommand
         {
             get
@@ -857,6 +915,18 @@ namespace FreeAIr.UI.ViewModels
         }
 
         public string ChatContextDescription => ContextItem.ContextUIDescription;
+
+        public ImageMoniker Moniker =>
+            ContextItem.IsAutoFound
+                ? KnownMonikers.Computer
+                : KnownMonikers.User
+                ;
+
+        public string Tooltip =>
+            ContextItem.IsAutoFound
+                ? "This item is came from automatic scanner"
+                : "This item is came from user"
+                ;
 
         public ChatContextItemViewModel(
             IChatContextItem contextItem

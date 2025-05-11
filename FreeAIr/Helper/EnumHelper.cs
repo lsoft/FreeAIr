@@ -77,8 +77,6 @@ namespace FreeAIr.Helper
                     return "Reading answer";
                 case ChatStatusEnum.Ready:
                     return "Ready";
-                case ChatStatusEnum.Cancelled:
-                    return "Cancelled";
                 case ChatStatusEnum.Failed:
                     return "Failed";
                 default:

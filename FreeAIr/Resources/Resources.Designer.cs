@@ -97,7 +97,7 @@ namespace FreeAIr.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Generate a set of unit tests for the following code. Provide only one code snippet in your answer, without any additional information. Add comments for each test that describe what the test checks. Write code for the {0} test framework..
+        ///   Looks up a localized string similar to Generate a set of unit tests for the following code. Provide only one code snippet in your answer, without any additional information. Add XML comments for each test that describe what the test checks. Write code for the {0} test framework..
         /// </summary>
         public static string ChatKindEnum_GenerateUnitTests {
             get {

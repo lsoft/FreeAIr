@@ -162,13 +162,37 @@
                         <RowDefinition Height="auto"/>
                     </Grid.RowDefinitions>
 
-                    <Label
+                    <Grid
                         Grid.Row="0"
-                        Margin="2"
-                        Content="Chat context:"
-                        FontSize="14"
-                        FontFamily="Cascadia Code"
-                        />
+                        HorizontalAlignment="Stretch"
+                        >
+
+                        <Label
+                            Margin="2"
+                            Content="Chat context:"
+                            HorizontalAlignment="Left"
+                            FontSize="14"
+                            FontFamily="Cascadia Code"
+                            />
+
+                        <Label
+                            Content="Remove all automatic found items"
+                            Cursor="Hand"
+                            Foreground="#569CD6"
+                            HorizontalAlignment="Right"
+                            VerticalAlignment="Bottom"
+                            FontFamily="Cascadia Code"
+                            ToolTip="Remove all automatic found items from chat context"
+                            >
+                            <Label.InputBindings>
+                                <MouseBinding
+                                    Command="{Binding ElementName=ChatListToolWindow, Path=DataContext.RemoveAllAutomaticItemsFromContextCommand}"
+                                    MouseAction="LeftClick"
+                                    />
+                            </Label.InputBindings>
+                        </Label>
+
+                    </Grid>
 
                     <!-- chat context item list -->
                     <ItemsControl
@@ -180,6 +204,7 @@
                             <DataTemplate>
                                 <Grid>
                                     <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="auto" />
                                         <ColumnDefinition Width="auto" />
                                         <ColumnDefinition />
                                     </Grid.ColumnDefinitions>
@@ -200,9 +225,16 @@
                                                 />
                                         </Label.InputBindings>
                                     </Label>
-                                    <Label
+                                    <imaging:CrispImage
                                         Grid.Column="1"
                                         Margin="20,0,0,0"
+                                        Moniker="{Binding Moniker}"
+                                        ToolTip="{Binding Tooltip}"
+                                        >
+                                    </imaging:CrispImage>
+                                    <Label
+                                        Grid.Column="2"
+                                        Margin="0,0,0,0"
                                         Content="{Binding ChatContextDescription}"
                                         HorizontalAlignment="Left"
                                         HorizontalContentAlignment="Left"
@@ -613,7 +645,7 @@
 
             <embedillo:EmbedilloControl
                 Grid.Row="3"
-                Margin="2"
+                Margin="2,2,2,20"
                 VerticalAlignment="Stretch"
                 Foreground="{Binding ElementName=ForegroundButton, Path=Foreground}"
                 Background="Transparent"
@@ -627,7 +659,7 @@
                 Grid.Row="3"
                 VerticalAlignment="Bottom"
                 HorizontalAlignment="Right"
-                Content="Use / to open commands. Use # to choose solution item. Ctrl + Enter - send prompt."
+                Content="Press / to open commands. Press # to choose solution item. Press Ctrl + Enter to send your prompt."
                 />
 
         </Grid>
