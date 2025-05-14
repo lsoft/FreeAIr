@@ -37,7 +37,7 @@ namespace FreeAIr.UI.Embedillo.Answer.Parser
                 throw new ArgumentNullException(nameof(filePath));
             }
 
-            FilePath = filePath;
+            FilePath = filePath.Trim();
             Selection = selection;
         }
 

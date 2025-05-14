@@ -175,23 +175,46 @@
                             FontFamily="Cascadia Code"
                             />
 
-                        <Label
-                            Content="Remove all automatic found items"
-                            Cursor="Hand"
-                            Foreground="#569CD6"
+                        <StackPanel
+                            Orientation="Horizontal"
                             HorizontalAlignment="Right"
                             VerticalAlignment="Bottom"
-                            FontFamily="Cascadia Code"
-                            ToolTip="Remove all automatic found items from chat context"
                             >
-                            <Label.InputBindings>
-                                <MouseBinding
-                                    Command="{Binding ElementName=ChatListToolWindow, Path=DataContext.RemoveAllAutomaticItemsFromContextCommand}"
-                                    MouseAction="LeftClick"
-                                    />
-                            </Label.InputBindings>
-                        </Label>
+                        
+                            <Label
+                                Margin="5,0,5,0"
+                                Content="Add custom file..."
+                                Foreground="#569CD6"
+                                Cursor="Hand"
+                                FontFamily="Cascadia Code"
+                                ToolTip="Add custom file to chat context"
+                                >
+                                <Label.InputBindings>
+                                    <MouseBinding
+                                        Command="{Binding ElementName=ChatListToolWindow, Path=DataContext.AddCustomFileToContextCommand}"
+                                        MouseAction="LeftClick"
+                                        />
+                                </Label.InputBindings>
+                            </Label>
 
+                            <Label
+                                Margin="5,0,5,0"
+                                Content="Remove all automatic found items"
+                                Cursor="Hand"
+                                Foreground="#569CD6"
+                                FontFamily="Cascadia Code"
+                                ToolTip="Remove all automatic found items from chat context"
+                                >
+                                <Label.InputBindings>
+                                    <MouseBinding
+                                        Command="{Binding ElementName=ChatListToolWindow, Path=DataContext.RemoveAllAutomaticItemsFromContextCommand}"
+                                        MouseAction="LeftClick"
+                                        />
+                                </Label.InputBindings>
+                            </Label>
+
+
+                        </StackPanel>
                     </Grid>
 
                     <!-- chat context item list -->
@@ -297,19 +320,19 @@
                             HorizontalContentAlignment="Left"
                             Foreground="Green"
                             FontFamily="Cascadia Code"
-                            ToolTip="Add new item to context"
+                            ToolTip="Add new items to context"
                             />
 
                         <Label
                             Grid.Column="1"
                             Margin="20,5,2,5"
-                            Content="Add new item to context:"
+                            Content="Add new items to context:"
                             VerticalAlignment="Center"
                             HorizontalAlignment="Left"
                             HorizontalContentAlignment="Left"
                             FontSize="14"
                             FontFamily="Cascadia Code"
-                            ToolTip="Add new item to context"
+                            ToolTip="Add new items to context"
                             />
 
                         <embedillo:EmbedilloControl

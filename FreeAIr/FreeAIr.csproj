@@ -64,7 +64,8 @@
     <Compile Include="BLogic\Context\Composer\TypeReferenceWalker.cs" />
     <Compile Include="BLogic\Context\IChatContext.cs" />
     <Compile Include="BLogic\Context\IChatContextItem.cs" />
-    <Compile Include="BLogic\Context\SolutionItemChatContextItem.cs" />
+    <Compile Include="BLogic\Context\Item\CustomFileContextItem.cs" />
+    <Compile Include="BLogic\Context\Item\SolutionItemChatContextItem.cs" />
     <Compile Include="Commands\BuildError\BuildErrorWindowFixErrorCommand.cs" />
     <Compile Include="Commands\BuildError\ErrorInformation.cs" />
     <Compile Include="Helper\ProcessHelper.cs" />

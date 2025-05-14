@@ -1,6 +1,7 @@
 ﻿using FreeAIr.BLogic;
 using FreeAIr.BLogic.Context;
 using FreeAIr.BLogic.Context.Composer;
+using FreeAIr.BLogic.Context.Item;
 using FreeAIr.Helper;
 using FreeAIr.Shared.Helper;
 using FreeAIr.UI.Embedillo.Answer.Parser;
@@ -39,6 +40,7 @@ namespace FreeAIr.UI.ViewModels
         private ICommand _updateContextItemCommand;
         private ICommand _removeAllAutomaticItemsFromContextCommand;
         private ICommand _addRelatedItemsToContextCommand;
+        private ICommand _addCustomFileToContextCommand;
 
         public event MarkdownReReadDelegate MarkdownReReadEvent;
 
@@ -813,6 +815,78 @@ namespace FreeAIr.UI.ViewModels
             }
         }
 
+        
+        public ICommand AddCustomFileToContextCommand
+        {
+            get
+            {
+                if (_addCustomFileToContextCommand == null)
+                {
+                    _addCustomFileToContextCommand = new RelayCommand(
+                        a =>
+                        {
+                            if (_selectedChat is null)
+                            {
+                                return;
+                            }
+                            if (_selectedChat.Chat is null)
+                            {
+                                return;
+                            }
+
+                            var chat = _selectedChat.Chat;
+
+                            if (chat.Status.NotIn(ChatStatusEnum.NotStarted, ChatStatusEnum.Ready))
+                            {
+                                return;
+                            }
+
+                            var ofd = new OpenFileDialog();
+                            ofd.CheckFileExists = true;
+                            ofd.CheckPathExists = true;
+                            ofd.Filter = "TXT Files(*.txt;)|*.txt;|Other Files(*.*)|*.*";
+                            var sw = ofd.ShowDialog();
+                            if (!sw.GetValueOrDefault(false))
+                            {
+                                return;
+                            }
+
+                            var contextItem = new CustomFileContextItem(
+                                ofd.FileName
+                                );
+
+                            chat.ChatContext.AddItem(
+                                contextItem
+                                );
+
+                            OnPropertyChanged();
+                        },
+                        (a) =>
+                        {
+                            if (_selectedChat is null)
+                            {
+                                return false;
+                            }
+                            if (_selectedChat.Chat is null)
+                            {
+                                return false;
+                            }
+
+                            var chat = _selectedChat.Chat;
+
+                            if (chat.Status.NotIn(ChatStatusEnum.NotStarted, ChatStatusEnum.Ready))
+                            {
+                                return false;
+                            }
+
+                            return true;
+                        }
+                        );
+                }
+
+                return _addCustomFileToContextCommand;
+            }
+        }
 
         private void AddContextItemsFromPrompt(
             Chat chat,

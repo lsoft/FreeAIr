@@ -6,7 +6,7 @@ using System.IO;
 using System.IO.Packaging;
 using System.Threading.Tasks;
 
-namespace FreeAIr.BLogic.Context
+namespace FreeAIr.BLogic.Context.Item
 {
     public sealed class SolutionItemChatContextItem : IChatContextItem
     {

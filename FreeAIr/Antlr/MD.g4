@@ -1,17 +1,26 @@
 ﻿grammar MD;
 
 markdownFile
-   : (code_block | line)+ EOF
+   : paragraph+ EOF
+   ;
+
+paragraph
+   : code_block
+   | not_a_code_block
+   | newline
+   ;
+
+newline
+   : NEWLINE
    ;
 
 code_block
    : CODE_BLOCK
    ;
 
-line
-   : paragraph
-   | heading
-   | TEXT_NEWLINE
+not_a_code_block
+   : heading
+   | sentence
    ;
 
 heading
@@ -23,24 +32,12 @@ heading
    | H6
    ;
 
-paragraph
-   : sentence+
-   ;
-
 sentence
-   : code_line
-   | freeair_command
-   | freeair_solution_item
-   | url
-   | TEXT
-   ;
+  : (xml_block | code_line | url | freeair_command | freeair_solution_item | word)+
+  ;
 
-url
-   : URL
-   ;
-
-code_line
-   : CODE_LINE
+xml_block
+   : XML_BLOCK
    ;
 
 freeair_command
@@ -51,46 +48,63 @@ freeair_solution_item
    : FREEAIR_SOLUTION_ITEM
    ;
 
+code_line
+   : CODE_LINE
+   ;
+
+url
+   : URL
+   ;
+
+word
+   : WORD
+   ;
+
+
 // Lexer rules
 
 H1
-   : '#' WHITESPACE TEXT
+   : '#' WHITESPACE WORD+
    ;
 
 H2
-   : '##' WHITESPACE TEXT
+   : '##' WHITESPACE WORD+
    ;
 
 H3
-   : '###' WHITESPACE TEXT
+   : '###' WHITESPACE WORD+
    ;
 
 H4
-   : '####' WHITESPACE TEXT
+   : '####' WHITESPACE WORD+
    ;
 
 H5
-   : '#####' WHITESPACE TEXT
+   : '#####' WHITESPACE WORD+
    ;
 
 H6
-   : '######' WHITESPACE TEXT
+   : '######' WHITESPACE WORD+
+   ;
+
+XML_BLOCK
+   : XML_HEAD WORD XML_TAIL
+   ;
+
+XML_HEAD
+   : '<' WORD '>'
+   ;
+
+XML_TAIL
+   : '</' WORD '>'
    ;
 
 CODE_LINE
-   : '`' (~[\r\n`])+ '`'
-   ;
-
-TEXT_NEWLINE
-   : '\r\n'
-   ;
-
-TEXT
-   : (~[\r\n#`<>/[])+
+   : '`' (~[\r\n`])+ '`' WHITESPACE?
    ;
 
 URL
-   : '[' TEXT ']' '(' TEXT ')'
+   : '[' WORD ']' '(' WORD ')'
    ;
 
 CODE_BLOCK
@@ -98,13 +112,25 @@ CODE_BLOCK
    ;
 
 FREEAIR_COMMAND
-   : '/' (~[\t/ \r\n\u000C])+
+   : '/' WORD
    ;
 
 FREEAIR_SOLUTION_ITEM
-   : '#' (~[\t/ \r\n\u000C])+
+   : '#' WORD
    ;
 
+WORD
+  : NOT_A_WHITESPACE+ WHITESPACE?
+  ;
+
+NOT_A_WHITESPACE
+  : ~[\t \r\n\u000C]
+  ;
+
 WHITESPACE
-   : ( '\t' | ' ' | '\r' | '\n' | '\u000C' )
+  : [\t \u000C]
+  ;
+
+NEWLINE
+   : '\r\n'
    ;

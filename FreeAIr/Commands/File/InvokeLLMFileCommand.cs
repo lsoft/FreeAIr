@@ -1,6 +1,7 @@
 ﻿using FreeAIr.BLogic;
 using FreeAIr.BLogic.Context;
 using FreeAIr.BLogic.Context.Composer;
+using FreeAIr.BLogic.Context.Item;
 using FreeAIr.Helper;
 using FreeAIr.UI.ToolWindows;
 using Microsoft.VisualStudio.ComponentModelHost;
