@@ -1,5 +1,6 @@
 ﻿using FreeAIr.BLogic.Context;
 using FreeAIr.Helper;
+using ICSharpCode.AvalonEdit.Utils;
 using OpenAI;
 using OpenAI.Chat;
 using System.ClientModel;
@@ -213,8 +214,16 @@ namespace FreeAIr.BLogic
                         );
                 }
 
+                //new ChatCompletionOptions
+                //{
+                //    ResponseFormat = ChatResponseFormat.CreateTextFormat(),
+                //    //Metadata = { [""] => "" }
+                //    Temperature = ...
+                //};
+
                 var completionUpdates = _chatClient.CompleteChatStreaming(
                     messages: chatMessages,
+                    
                     cancellationToken: cancellationToken
                     );
                 foreach (StreamingChatCompletionUpdate completionUpdate in completionUpdates)

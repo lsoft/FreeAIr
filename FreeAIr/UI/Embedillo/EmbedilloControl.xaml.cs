@@ -5,6 +5,7 @@ using ICSharpCode.AvalonEdit.CodeCompletion;
 using ICSharpCode.AvalonEdit.Rendering;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection.Emit;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -13,15 +14,15 @@ namespace FreeAIr.UI.Embedillo
 {
     public partial class EmbedilloControl : UserControl
     {
-        private readonly ControlPositionManager _controlManager;
         private readonly List<MentionVisualLineGenerator> _generators = new();
+        private IAnswerParser? _answerParser;
 
         public static readonly DependencyProperty EnterCommandProperty =
             DependencyProperty.Register(
                 nameof(EnterCommand),
                 typeof(ICommand),
                 typeof(EmbedilloControl));
-
+        
         public ICommand EnterCommand
         {
             get => (ICommand)GetValue(EnterCommandProperty);
@@ -30,8 +31,6 @@ namespace FreeAIr.UI.Embedillo
 
         public EmbedilloControl()
         {
-            _controlManager = new ControlPositionManager();
-
             InitializeComponent();
 
             AvalonTextEditor.TextArea.TextEntered += (object sender, TextCompositionEventArgs e) =>
@@ -40,31 +39,8 @@ namespace FreeAIr.UI.Embedillo
                 if (generator is not null)
                 {
                     ShowCompletionWindowAsync(generator)
-                        .FileAndForget(nameof(ShowCompletionWindowAsync));
-                }
-            };
-
-            AvalonTextEditor.Document.Changed += (sender, e) =>
-            {
-                foreach (var change in e.OffsetChangeMap)
-                {
-                    //смещение изменений влияет на позиции контроллов
-                    int offsetDelta = change.RemovalLength - change.InsertionLength;
-
-                    for (int i = 0; i < _controlManager.Positions.Count; i++)
-                    {
-                        var info = _controlManager.Positions[i];
-
-                        //обновляем позиции после изменений в документе
-                        if (info.Offset >= change.Offset + change.RemovalLength)
-                        {
-                            _controlManager.ReplaceControl(
-                                info,
-                                info.Offset - offsetDelta,
-                                info.Length
-                                );
-                        }
-                    }
+                        .FileAndForget(nameof(ShowCompletionWindowAsync))
+                        ;
                 }
             };
 
@@ -76,20 +52,6 @@ namespace FreeAIr.UI.Embedillo
                     return;
                 }
 
-                if (e.KeyboardDevice.Modifiers.HasFlag(ModifierKeys.Control) && e.Key == Key.Back)
-                {
-                    //ctrl + backspace не будем обрабатывать
-                    //TODO: но неплохо бы сделать
-                    e.Handled = true;
-                    return;
-                }
-                if (e.KeyboardDevice.Modifiers.HasFlag(ModifierKeys.Control) && e.Key == Key.Delete)
-                {
-                    //ctrl + delete не будем обрабатывать
-                    //TODO: но неплохо бы сделать
-                    e.Handled = true;
-                    return;
-                }
                 if (e.KeyboardDevice.Modifiers.HasFlag(ModifierKeys.Shift) && e.Key == Key.Delete)
                 {
                     //shift + delete не будем обрабатывать
@@ -105,13 +67,33 @@ namespace FreeAIr.UI.Embedillo
                     return;
                 }
 
+                var selectedText = AvalonTextEditor.SelectedText;
+
                 //если действие пользователя связано с копированием В буфер обмена
                 //сразу обработаем эту операцию
                 ki.PostProcessCopyToClipboard(
-                    AvalonTextEditor.SelectedText
+                    selectedText
                     );
 
-                if (e.Key == Key.Back)
+                if (e.KeyboardDevice.Modifiers.HasFlag(ModifierKeys.Control) && e.Key == Key.Back)
+                {
+                    //ctrl + backspace
+                    ProcessLogic(
+                        TextChangeModeEnum.CtrlBackspace,
+                        ki.EnteredText
+                        );
+                    e.Handled = true; //блокируем стандартную обработку
+                }
+                if (e.KeyboardDevice.Modifiers.HasFlag(ModifierKeys.Control) && e.Key == Key.Delete)
+                {
+                    //ctrl + delete
+                    ProcessLogic(
+                        TextChangeModeEnum.CtrlDelete,
+                        ki.EnteredText
+                        );
+                    e.Handled = true; //блокируем стандартную обработку
+                }
+                else if (e.Key == Key.Back)
                 {
                     ProcessLogic(
                         TextChangeModeEnum.Backspace,
@@ -138,18 +120,19 @@ namespace FreeAIr.UI.Embedillo
             };
         }
 
-        public void AddVisualLineGeneratorFactory(
-            params IMentionVisualLineGeneratorFactory[] generatorFactories
+        public void Setup(
+            IAnswerParser answerParser
             )
         {
-            if (generatorFactories is null)
+            if (answerParser is null)
             {
-                throw new ArgumentNullException(nameof(generatorFactories));
+                throw new ArgumentNullException(nameof(answerParser));
             }
 
-            foreach (var generatorFactory in generatorFactories)
+            _answerParser = answerParser;
+
+            foreach (var generator in answerParser.Generators)
             {
-                var generator = generatorFactory.Create(_controlManager);
                 _generators.Add(generator);
                 AvalonTextEditor.TextArea.TextView.ElementGenerators.Add(generator);
             }
@@ -240,16 +223,6 @@ namespace FreeAIr.UI.Embedillo
             {
                 //текст был выделен
 
-                //удаляем контролы, которые попали в выделение
-                for (var offset = selectionStart; offset < (selectionStart + selectionLength); offset++)
-                {
-                    var info = _controlManager.TryGetNearControl(offset);
-                    if (info is not null)
-                    {
-                        _controlManager.RemoveControlWithOffset(info.Offset);
-                    }
-                }
-
                 //удаляем текст
                 document.Replace(selectionStart, selectionLength, insertText);
 
@@ -258,6 +231,8 @@ namespace FreeAIr.UI.Embedillo
 
                 //переводим каретку ЗА введенный символ
                 AvalonTextEditor.CaretOffset = AvalonTextEditor.CaretOffset + insertText.Length;
+
+                AvalonTextEditor.TextArea.TextView.InvalidateLayer(KnownLayer.Background);
             }
             else
             {
@@ -265,73 +240,18 @@ namespace FreeAIr.UI.Embedillo
                 var caretOffset = AvalonTextEditor.CaretOffset;
 
                 //проверить, затрагивает ли правка какой-нибудь контрол
-                var info = _controlManager.TryGetNearControl(caretOffset);
-                if (info is not null)
+                var (deleteOffset, deleteCount) = CalculateDeleteCharCount(changeMode, document.Text, caretOffset);
+                if (deleteCount > 0)
                 {
-                    //да, затрагивает
-                    //удаляем символ из контрола
-                    switch (changeMode)
-                    {
-                        case TextChangeModeEnum.Backspace:
-                            if (document.TextLength >= caretOffset)
-                            {
-                                var charDeleteCount = CalculateDeleteCharCount(changeMode, document.Text, caretOffset);
-                                if (charDeleteCount > 0)
-                                {
-                                    document.Replace(caretOffset - charDeleteCount, charDeleteCount, string.Empty);
-                                    _controlManager.RemoveControlWithOffset(info.Offset);
-                                    AvalonTextEditor.TextArea.TextView.InvalidateLayer(KnownLayer.Background);
-                                }
-                            }
-                            break;
-                        case TextChangeModeEnum.Delete:
-                            if (document.TextLength > caretOffset)
-                            {
-                                var charDeleteCount = CalculateDeleteCharCount(changeMode, document.Text, caretOffset);
-                                if (charDeleteCount > 0)
-                                {
-                                    document.Replace(caretOffset, charDeleteCount, string.Empty);
-                                    _controlManager.RemoveControlWithOffset(info.Offset);
-                                    AvalonTextEditor.TextArea.TextView.InvalidateLayer(KnownLayer.Background);
-                                }
-                            }
-                            break;
-                    }
-                }
-                else
-                {
-                    //правка не затрагивает контрол
-                    //удаляем символ из текста
-                    switch (changeMode)
-                    {
-                        case TextChangeModeEnum.Backspace:
-                            if (caretOffset > 0 && document.TextLength >= caretOffset)
-                            {
-                                var charDeleteCount = CalculateDeleteCharCount(changeMode, document.Text, caretOffset);
-                                if (charDeleteCount > 0)
-                                {
-                                    document.Replace(caretOffset - charDeleteCount, charDeleteCount, string.Empty);
-                                    AvalonTextEditor.TextArea.TextView.InvalidateLayer(KnownLayer.Background);
-                                }
-                            }
-                            break;
-                        case TextChangeModeEnum.Delete:
-                            if (document.TextLength > caretOffset)
-                            {
-                                var charDeleteCount = CalculateDeleteCharCount(changeMode, document.Text, caretOffset);
-                                if (charDeleteCount > 0)
-                                {
-                                    document.Replace(caretOffset, charDeleteCount, string.Empty);
-                                    AvalonTextEditor.TextArea.TextView.InvalidateLayer(KnownLayer.Background);
-                                }
-                            }
-                            break;
-                    }
+                    //удаляем текст
+                    document.Replace(deleteOffset, deleteCount, string.Empty);
+
+                    AvalonTextEditor.TextArea.TextView.InvalidateLayer(KnownLayer.Background);
                 }
             }
         }
 
-        private static int CalculateDeleteCharCount(
+        private static (int leftOffset, int length) CalculateDeleteCharCount(
             TextChangeModeEnum changeMode,
             string documentText,
             int caretOffset
@@ -341,46 +261,159 @@ namespace FreeAIr.UI.Embedillo
             {
                 case TextChangeModeEnum.Backspace:
                     {
+                        if (documentText.Length == 0)
+                        {
+                            return (caretOffset, 0);
+                        }
                         if (caretOffset == 0)
                         {
-                            return 0;
+                            return (caretOffset, 0);
                         }
 
                         var charDeleteCount = 1;
+                        var currentPosition = caretOffset - 1;
 
-                        var deletedChar = documentText.Substring(caretOffset - 1, 1);
-                        if (deletedChar == "\n")
+                        if (documentText[currentPosition] == '\n')
                         {
-                            var previousChar = documentText.Substring(caretOffset - 2, 1);
-                            if (previousChar == "\r")
+                            if (currentPosition > 0)
                             {
-                                charDeleteCount = 2;
-                            }
-                        }
-
-                        return charDeleteCount;
-                    }
-                case TextChangeModeEnum.Delete:
-                    {
-                        if (documentText.Length == caretOffset - 1)
-                        {
-                            return 0;
-                        }
-
-                        var charDeleteCount = 1;
-                        var deletedChar = documentText.Substring(caretOffset, 1);
-                        if (deletedChar == "\r")
-                        {
-                            if (documentText.Length > caretOffset + 1)
-                            {
-                                var nextChar = documentText.Substring(caretOffset + 1, 1);
-                                if (nextChar == "\n")
+                                if (documentText[currentPosition - 1] == '\r')
                                 {
-                                    charDeleteCount = 2;
+                                    currentPosition--;
+                                    charDeleteCount++;
                                 }
                             }
                         }
-                        return charDeleteCount;
+
+                        return (currentPosition, charDeleteCount);
+                    }
+                case TextChangeModeEnum.CtrlBackspace:
+                    {
+                        if (documentText.Length == 0)
+                        {
+                            return (caretOffset, 0);
+                        }
+                        if (caretOffset == 0)
+                        {
+                            return (caretOffset, 0);
+                        }
+
+                        var charDeleteCount = 0;
+
+                        caretOffset = caretOffset - 1;
+                        while (caretOffset > 0)
+                        {
+                            if (!char.IsWhiteSpace(documentText[caretOffset]))
+                            {
+                                break;
+                            }
+
+                            charDeleteCount++;
+                            caretOffset--;
+                        }
+                        while (caretOffset > 0)
+                        {
+                            if (char.IsWhiteSpace(documentText[caretOffset]))
+                            {
+                                break;
+                            }
+
+                            charDeleteCount++;
+                            caretOffset--;
+                        }
+
+                        if (caretOffset > 0)
+                        {
+                            if (documentText[caretOffset] == '\n')
+                            {
+                                if (caretOffset > 1)
+                                {
+                                    if (documentText[caretOffset - 1] == '\r')
+                                    {
+                                        caretOffset--;
+                                        charDeleteCount++;
+                                    }
+                                }
+                            }
+                        }
+                        return (caretOffset, charDeleteCount);
+                    }
+                case TextChangeModeEnum.Delete:
+                    {
+                        if (documentText.Length == 0)
+                        {
+                            return (caretOffset, 0);
+                        }
+                        if (documentText.Length == caretOffset)
+                        {
+                            return (caretOffset, 0);
+                        }
+
+                        var charDeleteCount = 1;
+
+                        if (documentText[caretOffset] == '\r')
+                        {
+                            if (documentText.Length > caretOffset + 1)
+                            {
+                                if (documentText[caretOffset + 1] == '\n')
+                                {
+                                    charDeleteCount++;
+                                }
+                            }
+                        }
+
+                        return (caretOffset, charDeleteCount);
+                    }
+                case TextChangeModeEnum.CtrlDelete:
+                    {
+                        if (documentText.Length == 0)
+                        {
+                            return (caretOffset, 0);
+                        }
+                        if (documentText.Length == caretOffset)
+                        {
+                            return (caretOffset, 0);
+                        }
+
+                        var charDeleteCount = 1;
+
+                        var currentPosition = caretOffset + 1;
+                        while (currentPosition < documentText.Length)
+                        {
+                            if (char.IsWhiteSpace(documentText[currentPosition]))
+                            {
+                                break;
+                            }
+
+                            charDeleteCount++;
+                            currentPosition++;
+                        }
+                        while (currentPosition < documentText.Length)
+                        {
+                            if (!char.IsWhiteSpace(documentText[currentPosition]))
+                            {
+                                break;
+                            }
+
+                            charDeleteCount++;
+                            currentPosition++;
+                        }
+
+                        if (documentText.Length > currentPosition)
+                        {
+                            if (documentText[currentPosition] == '\r')
+                            {
+                                if (documentText.Length > currentPosition + 1)
+                                {
+                                    if (documentText[currentPosition + 1] == '\n')
+                                    {
+                                        charDeleteCount++;
+                                    }
+                                }
+                            }
+                        }
+
+                        return (caretOffset, charDeleteCount);
                     }
                 case TextChangeModeEnum.SelectionReplace:
                 default:
@@ -390,11 +423,11 @@ namespace FreeAIr.UI.Embedillo
 
         public ParsedAnswer ParseAnswer()
         {
-            var parser = new AnswerParser(
-                _generators
-                );
-
-            var parsedAnswer = parser.Parse(
+            if (_answerParser is null)
+            {
+                throw new InvalidOperationException("Setup this control before.");
+            }
+            var parsedAnswer = _answerParser.Parse(
                 AvalonTextEditor.Text
                 );
             return parsedAnswer;

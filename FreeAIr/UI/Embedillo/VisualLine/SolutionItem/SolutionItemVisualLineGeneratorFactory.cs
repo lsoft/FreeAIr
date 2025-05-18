@@ -13,10 +13,14 @@ namespace FreeAIr.UI.Embedillo.VisualLine.SolutionItem
 {
     public sealed class SolutionItemVisualLineGeneratorFactory : IMentionVisualLineGeneratorFactory
     {
-        public MentionVisualLineGenerator Create(ControlPositionManager positionManager)
+        public SolutionItemVisualLineGeneratorFactory(
+            )
+        {
+        }
+
+        public MentionVisualLineGenerator Create()
         {
             return new SolutionItemVisualLineGenerator(
-                positionManager
                 );
         }
     }
@@ -26,8 +30,7 @@ namespace FreeAIr.UI.Embedillo.VisualLine.SolutionItem
         public const char Anchor = '#';
 
         public SolutionItemVisualLineGenerator(
-            ControlPositionManager controlPositionManager
-            ) : base(Anchor, controlPositionManager)
+            ) : base(Anchor)
         {
         }
 

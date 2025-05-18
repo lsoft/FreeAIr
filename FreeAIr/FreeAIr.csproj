@@ -45,9 +45,11 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="Antlr\AnswerParser.cs" />
+    <Compile Include="Antlr\Context\ContextParser.cs" />
     <Compile Include="Antlr\ErrorListener.cs" />
+    <Compile Include="Antlr\IAnswerParser.cs" />
     <Compile Include="Antlr\MarkdownListener.cs" />
+    <Compile Include="Antlr\Prompt\PromptParser.cs" />
     <Compile Include="BLogic\Answer.cs" />
     <Compile Include="BLogic\Chat.cs" />
     <Compile Include="BLogic\ChatContainer.cs" />
@@ -131,8 +133,6 @@
     <Compile Include="UI\Embedillo\Answer\Parser\SolutionItemAnswerPart.cs" />
     <Compile Include="UI\Embedillo\Answer\Parser\StringAnswerPart.cs" />
     <Compile Include="UI\Embedillo\CompletionData.cs" />
-    <Compile Include="UI\Embedillo\ControlPositionInfo.cs" />
-    <Compile Include="UI\Embedillo\ControlPositionManager.cs" />
     <Compile Include="UI\Embedillo\EmbedilloControl.xaml.cs">
       <DependentUpon>EmbedilloControl.xaml</DependentUpon>
     </Compile>
@@ -184,12 +184,15 @@
     <Content Include="Monikers.imagemanifest">
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
-    <Antlr4 Include="Antlr\MD.g4">
+    <Antlr4 Include="Antlr\Prompt\PromptMarkdown.g4">
       <Listener>true</Listener>
       <Visitor>true</Visitor>
       <GAtn>true</GAtn>
       <Error>true</Error>
       <Package>FreeAIr.Antlr</Package>
+    </Antlr4>
+    <Antlr4 Include="Antlr\Context\ContextMarkdown.g4">
+      <Generator>MSBuild:Compile</Generator>
     </Antlr4>
     <None Include="source.extension.vsixmanifest">
       <SubType>Designer</SubType>

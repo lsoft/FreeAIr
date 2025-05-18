@@ -12,7 +12,6 @@ namespace FreeAIr.UI.Embedillo
     public interface IMentionVisualLineGeneratorFactory
     {
         MentionVisualLineGenerator Create(
-            ControlPositionManager positionManager
             );
     }
 
@@ -31,17 +30,13 @@ namespace FreeAIr.UI.Embedillo
             );
 
         private readonly char _anchorSymbol;
-        private readonly ControlPositionManager _controlPositionManager;
-
         public char AnchorSymbol => _anchorSymbol;
 
         public MentionVisualLineGenerator(
-            char anchorSymbol,
-            ControlPositionManager controlPositionManager
+            char anchorSymbol
             )
         {
             _anchorSymbol = anchorSymbol;
-            _controlPositionManager = controlPositionManager;
 
             _targetRegex = new Regex(
                 @"(?<!\S)" + anchorSymbol + @"([\p{L}\p{M}0-9_:\\.@\-~\[\]]+)"
@@ -112,8 +107,6 @@ namespace FreeAIr.UI.Embedillo
                 mentionText.Length,
                 control
                 );
-
-            _controlPositionManager.AddControl(offset, mentionText.Length);
 
             return element;
         }

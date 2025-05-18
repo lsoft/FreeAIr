@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace FreeAIr.Antlr
 {
-    public class MarkdownListener : MDBaseListener
+    public class MarkdownListener : PromptMarkdownBaseListener
     {
         private readonly List<MentionVisualLineGenerator> _generators;
         private readonly ParsedAnswer _parsedAnswer;

@@ -9,12 +9,23 @@ namespace FreeAIr.Antlr
 {
     public class ErrorListener<S> : ConsoleErrorListener<S>
     {
-        public bool had_error;
-
-        public override void SyntaxError(TextWriter output, IRecognizer recognizer, S offendingSymbol, int line,
-            int col, string msg, RecognitionException e)
+        public bool HadError
         {
-            had_error = true;
+            get;
+            private set;
+        }
+
+        public override void SyntaxError(
+            TextWriter output,
+            IRecognizer recognizer,
+            S offendingSymbol,
+            int line,
+            int col,
+            string msg,
+            RecognitionException e
+            )
+        {
+            HadError = true;
             base.SyntaxError(output, recognizer, offendingSymbol, line, col, msg, e);
         }
     }

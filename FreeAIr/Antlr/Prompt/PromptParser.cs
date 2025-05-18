@@ -2,30 +2,31 @@
 using Antlr4.Runtime.Tree;
 using FreeAIr.UI.Embedillo;
 using FreeAIr.UI.Embedillo.Answer.Parser;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
-using System.Security.Cryptography;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace FreeAIr.Antlr
+namespace FreeAIr.Antlr.Prompt
 {
-    public sealed class AnswerParser
+    public sealed class PromptParser : IAnswerParser
     {
-        private readonly List<MentionVisualLineGenerator> _generators;
+        private readonly List<MentionVisualLineGenerator> _generators = new();
 
-        public AnswerParser(
-            List<MentionVisualLineGenerator> generators
+        public IReadOnlyList<MentionVisualLineGenerator> Generators => _generators;
+
+        public PromptParser(
+            params IMentionVisualLineGeneratorFactory[] generatorFactories
             )
         {
-            if (generators is null)
+            if (generatorFactories is null)
             {
-                throw new ArgumentNullException(nameof(generators));
+                throw new ArgumentNullException(nameof(generatorFactories));
             }
 
-            _generators = generators;
+            foreach (var generatorFactory in generatorFactories)
+            {
+                var generator = generatorFactory.Create();
+                _generators.Add(generator);
+            }
         }
 
         public ParsedAnswer? Parse(string answer)
@@ -35,11 +36,7 @@ namespace FreeAIr.Antlr
                 throw new ArgumentNullException(nameof(answer));
             }
 
-            var ais = new AntlrInputStream(answer);
-
-            var lexer = new MDLexer(ais);
-            var tokens = new CommonTokenStream(lexer);
-            var parser = new MDParser(tokens);
+            var (lexer, parser) = CreateComponents(answer);
 
             var lexerListener = new ErrorListener<int>();
             lexer.RemoveErrorListeners();
@@ -51,7 +48,7 @@ namespace FreeAIr.Antlr
 
             var tree = parser.markdownFile();
 
-            if (lexerListener.had_error || parserListener.had_error)
+            if (lexerListener.HadError || parserListener.HadError)
             {
                 return null;
             }
@@ -65,6 +62,15 @@ namespace FreeAIr.Antlr
             var parsedAnswer = listener.GetParsedAnswer();
 
             return parsedAnswer;
+        }
+
+        private (PromptMarkdownLexer, PromptMarkdownParser) CreateComponents(string answer)
+        {
+            var ais = new AntlrInputStream(answer);
+            var lexer = new PromptMarkdownLexer(ais);
+            var tokens = new CommonTokenStream(lexer);
+            var parser = new PromptMarkdownParser(tokens);
+            return (lexer, parser);
         }
     }
 }

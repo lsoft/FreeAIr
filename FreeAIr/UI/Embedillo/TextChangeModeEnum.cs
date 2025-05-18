@@ -2,7 +2,9 @@
 {
     public enum TextChangeModeEnum
     {
+        CtrlBackspace,
         Backspace,
+        CtrlDelete,
         Delete,
         SelectionReplace
     }

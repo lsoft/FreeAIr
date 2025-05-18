@@ -29,7 +29,7 @@ namespace FreeAIr.UI.Embedillo.Answer.Parser
 
         public Task<string> AsPromptStringAsync()
         {
-            return Task.FromResult(SelectedIdentifier.FilePath + SelectedIdentifier?.ToString());
+            return Task.FromResult(SelectedIdentifier.ToString());
         }
 
         public bool IsFileExists()

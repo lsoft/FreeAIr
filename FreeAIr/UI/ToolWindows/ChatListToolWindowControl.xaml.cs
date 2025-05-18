@@ -1,4 +1,7 @@
-﻿using FreeAIr.Helper;
+﻿using FreeAIr.Antlr.Context;
+using FreeAIr.Antlr.Prompt;
+using FreeAIr.Helper;
+using FreeAIr.UI.Embedillo;
 using FreeAIr.UI.Embedillo.VisualLine.Command;
 using FreeAIr.UI.Embedillo.VisualLine.SolutionItem;
 using FreeAIr.UI.ViewModels;
@@ -23,13 +26,17 @@ namespace FreeAIr.UI.ToolWindows
 
             InitializeComponent();
 
-            PromptControl.AddVisualLineGeneratorFactory(
-                new SolutionItemVisualLineGeneratorFactory(),
-                new CommandVisualLineGeneratorFactory()
+            PromptControl.Setup(
+                new PromptParser(
+                    new SolutionItemVisualLineGeneratorFactory(),
+                    new CommandVisualLineGeneratorFactory()
+                    )
                 );
 
-            AddToContextControl.AddVisualLineGeneratorFactory(
-                new SolutionItemVisualLineGeneratorFactory()
+            AddToContextControl.Setup(
+                new ContextParser(
+                    new SolutionItemVisualLineGeneratorFactory()
+                    )
                 );
 
             viewModel.MarkdownReReadEvent += ViewModel_MarkdownReReadEvent;

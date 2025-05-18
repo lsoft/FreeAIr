@@ -11,10 +11,15 @@ namespace FreeAIr.UI.Embedillo.VisualLine.Command
 {
     public sealed class CommandVisualLineGeneratorFactory : IMentionVisualLineGeneratorFactory
     {
-        public MentionVisualLineGenerator Create(ControlPositionManager positionManager)
+        public CommandVisualLineGeneratorFactory(
+            )
+        {
+        }
+
+        public MentionVisualLineGenerator Create(
+            )
         {
             return new CommandVisualLineGenerator(
-                positionManager
                 );
         }
     }
@@ -24,8 +29,7 @@ namespace FreeAIr.UI.Embedillo.VisualLine.Command
         public const char Anchor = '/';
 
         public CommandVisualLineGenerator(
-            ControlPositionManager controlPositionManager
-            ) : base(Anchor, controlPositionManager)
+            ) : base(Anchor)
         {
         }
 

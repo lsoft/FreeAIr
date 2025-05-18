@@ -1,4 +1,4 @@
-﻿grammar MD;
+﻿grammar PromptMarkdown;
 
 markdownFile
    : paragraph+ EOF
@@ -33,8 +33,12 @@ heading
    ;
 
 sentence
-  : (xml_block | code_line | url | freeair_command | freeair_solution_item | word)+
+  : (xml_block | code_line | url | freeair_command | freeair_solution_item | word | whitespace)+
   ;
+
+whitespace
+   : WHITESPACE
+   ;
 
 xml_block
    : XML_BLOCK
@@ -100,7 +104,7 @@ XML_TAIL
    ;
 
 CODE_LINE
-   : '`' (~[\r\n`])+ '`' WHITESPACE?
+   : '`' (~[\r\n`])+ '`'
    ;
 
 URL
@@ -120,7 +124,7 @@ FREEAIR_SOLUTION_ITEM
    ;
 
 WORD
-  : NOT_A_WHITESPACE+ WHITESPACE?
+  : NOT_A_WHITESPACE+
   ;
 
 NOT_A_WHITESPACE

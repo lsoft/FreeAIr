@@ -1073,8 +1073,8 @@ namespace FreeAIr.UI.ViewModels
 
         public string Tooltip =>
             ContextItem.IsAutoFound
-                ? "This item is came from automatic scanner"
-                : "This item is came from user"
+                ? "This item came from automatic scanner"
+                : "This item came from user"
                 ;
 
         public ChatContextItemViewModel(
