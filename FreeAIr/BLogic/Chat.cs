@@ -1,6 +1,8 @@
 ﻿using FreeAIr.BLogic.Context;
 using FreeAIr.Helper;
+using FreeAIr.Shared.Helper;
 using ICSharpCode.AvalonEdit.Utils;
+using ModelContextProtocol.Protocol;
 using OpenAI;
 using OpenAI.Chat;
 using System.ClientModel;
@@ -83,7 +85,7 @@ namespace FreeAIr.BLogic
                 Guid.NewGuid().ToString() + ".md"
                 );
 
-            _chatClient = new(
+            _chatClient = new ChatClient(
                 model: ApiPage.Instance.ChosenModel,
                 new ApiKeyCredential(
                     ApiPage.Instance.Token
@@ -204,15 +206,34 @@ namespace FreeAIr.BLogic
                 chatMessages.Add(
                     new SystemChatMessage(userPrompt.BuildRulesSection())
                     );
-                chatMessages.AddRange(
-                    _prompts.ConvertAll(p => new UserChatMessage(p.PromptBody))
-                    );
-                foreach (var contextItem in _chatContext.Items)
+
+                foreach (var prompt in _prompts.Take(_prompts.Count - 1))
                 {
                     chatMessages.Add(
-                        new UserChatMessage(await contextItem.AsContextPromptTextAsync())
+                        new UserChatMessage(
+                            ChatMessageContentPart.CreateTextPart(prompt.PromptBody)
+                            )
                         );
                 }
+
+                var lastPromptParts = new List<ChatMessageContentPart>(_chatContext.Items.Count + 1);
+                foreach (var contextItem in _chatContext.Items)
+                {
+                    lastPromptParts.Add(
+                        ChatMessageContentPart.CreateTextPart(
+                            await contextItem.AsContextPromptTextAsync()
+                            )
+                        );
+                }
+
+                var lastUserPrompt = _prompts.Last();
+                var lastUserPromptPart = ChatMessageContentPart.CreateTextPart(lastUserPrompt.PromptBody);
+                lastPromptParts.Insert(0, lastUserPromptPart);
+                chatMessages.Add(
+                    new UserChatMessage(
+                        lastPromptParts
+                        )
+                    );
 
                 //new ChatCompletionOptions
                 //{
@@ -223,7 +244,6 @@ namespace FreeAIr.BLogic
 
                 var completionUpdates = _chatClient.CompleteChatStreaming(
                     messages: chatMessages,
-                    
                     cancellationToken: cancellationToken
                     );
                 foreach (StreamingChatCompletionUpdate completionUpdate in completionUpdates)
