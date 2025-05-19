@@ -73,6 +73,14 @@
           <ButtonText>Open chat list window...</ButtonText>
         </Strings>
       </Button>
+      <Button guid="FreeAIr" id="InstallGithubMCPServerCommandId" priority="0x0102" type="Button">
+        <Parent guid="FreeAIr" id="SubExtensionMenuGroup" />
+        <Icon guid="ImageCatalogGuid" id="Git" />
+        <CommandFlag>IconIsMoniker</CommandFlag>
+        <Strings>
+          <ButtonText>Install Github MCP server...</ButtonText>
+        </Strings>
+      </Button>
 
       <Button guid="FreeAIr" id="ExplainCommandId" priority="0x0100" type="Button">
         <Parent guid="FreeAIr" id="SourceCodeContextGroup" />
@@ -210,10 +218,12 @@
       <IDSymbol name="AddXmlCommentsCommandId" value="0x1022" />
       <IDSymbol name="OptimizeCommandId" value="0x1023" />
       <IDSymbol name="CompleteCodeByCommentsCommandId" value="0x1025" />
-      <IDSymbol name="ChooseModelCommandId" value="0x1027" />
-      <IDSymbol name="OpenChatListToolWindowCommandId" value="0x1028" />
-      <IDSymbol name="StartDiscussionCommandId" value="0x1029" />
-      <IDSymbol name="GenerateWholeLineSuggestionCommand" value="0x1030" />
+      <IDSymbol name="StartDiscussionCommandId" value="0x1026" />
+      <IDSymbol name="GenerateWholeLineSuggestionCommand" value="0x1027" />
+
+      <IDSymbol name="ChooseModelCommandId" value="0x1028" />
+      <IDSymbol name="OpenChatListToolWindowCommandId" value="0x1029" />
+      <IDSymbol name="InstallGithubMCPServerCommandId" value="0x1030" />
 
       <IDSymbol name="SolutionContextMenu" value="0x1031" />
       <IDSymbol name="SolutionContextGroup" value="0x1032" />

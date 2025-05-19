@@ -37,10 +37,11 @@ namespace FreeAIr
         public const int AddXmlCommentsCommandId = 0x1022;
         public const int OptimizeCommandId = 0x1023;
         public const int CompleteCodeByCommentsCommandId = 0x1025;
-        public const int ChooseModelCommandId = 0x1027;
-        public const int OpenChatListToolWindowCommandId = 0x1028;
-        public const int StartDiscussionCommandId = 0x1029;
-        public const int GenerateWholeLineSuggestionCommand = 0x1030;
+        public const int StartDiscussionCommandId = 0x1026;
+        public const int GenerateWholeLineSuggestionCommand = 0x1027;
+        public const int ChooseModelCommandId = 0x1028;
+        public const int OpenChatListToolWindowCommandId = 0x1029;
+        public const int InstallGithubMCPServerCommandId = 0x1030;
         public const int SolutionContextMenu = 0x1031;
         public const int SolutionContextGroup = 0x1032;
         public const int ExplainFileCommandId = 0x1033;

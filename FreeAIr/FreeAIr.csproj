@@ -70,6 +70,7 @@
     <Compile Include="BLogic\Context\Item\SolutionItemChatContextItem.cs" />
     <Compile Include="Commands\BuildError\BuildErrorWindowFixErrorCommand.cs" />
     <Compile Include="Commands\BuildError\ErrorInformation.cs" />
+    <Compile Include="Commands\Other\InstallGithubMCPServerCommand.cs" />
     <Compile Include="Helper\ProcessHelper.cs" />
     <Compile Include="BLogic\TextDescriptor.cs" />
     <Compile Include="CodeLens\CodeLensConnectionHandler.cs" />
@@ -105,6 +106,8 @@
     <Compile Include="Helper\RoslynDocumentHelper.cs" />
     <Compile Include="Helper\SuggestionHijackHelper.cs" />
     <Compile Include="ImageMonikers.cs" />
+    <Compile Include="MCP\Github\Api.cs" />
+    <Compile Include="MCP\Github\Installer.cs" />
     <Compile Include="Options\ApiPage.cs" />
     <Compile Include="Options\OptionsProvider.cs" />
     <Compile Include="Options\ResponsePage.cs" />
