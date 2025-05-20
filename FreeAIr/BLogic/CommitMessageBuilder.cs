@@ -5,9 +5,11 @@ using FreeAIr.UI.ToolWindows;
 using FreeAIr.UI.Windows;
 using Microsoft.VisualStudio.ComponentModelHost;
 using Microsoft.VisualStudio.Imaging;
+using Microsoft.VisualStudio.TeamFoundation.Git.Extensibility;
 using RunProcessAsTask;
 using System.ComponentModel.Composition;
 using System.Diagnostics;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -137,10 +139,14 @@ namespace FreeAIr.BLogic
         {
             try
             {
-                var w = new WaitGitWindow();
+                var backgroundTask = new GitCollectBackgroundTask(
+                        );
+                var w = new WaitForTaskWindow(
+                    backgroundTask
+                    );
                 await w.ShowDialogAsync();
 
-                var commitMessage = w.GitDiffBody;
+                var commitMessage = backgroundTask.Result;
                 if (string.IsNullOrEmpty(commitMessage))
                 {
                     await ShowErrorAsync("Cannot collect git patch. Please enter commit message manually.");
@@ -202,6 +208,84 @@ namespace FreeAIr.BLogic
                 error
                 );
         }
+
+        private sealed class GitCollectBackgroundTask : BackgroundTask
+        {
+            public override string TaskDescription => "Please wait for git patch building...";
+
+            public string? Result
+            {
+                get;
+                private set;
+            }
+
+            protected override async Task RunWorkingTaskAsync(
+                )
+            {
+                Result = null;
+
+                await Task.Delay(10000);
+
+                var cancellationToken = _cancellationTokenSource.Token;
+
+                var gitExt = (IGitExt)await FreeAIrPackage.Instance.GetServiceAsync(typeof(IGitExt));
+                if (gitExt is null)
+                {
+                    //todo log
+                    return;
+                }
+                if (gitExt.ActiveRepositories.Count != 1)
+                {
+                    //todo log
+                    return;
+                }
+
+                var activeRepository = gitExt.ActiveRepositories[0] as IGitRepositoryInfo2;
+                if (activeRepository.Remotes.Count != 1)
+                {
+                    //todo log
+                    return;
+                }
+
+                var repositoryFolder = activeRepository.RepositoryPath;
+
+                var summaryDiff = new StringBuilder();
+
+                var diffIndex = await GitDiffProcess.RunAndParseGitDiffSilentlyAsync(
+                    repositoryFolder,
+                    string.Empty,
+                    cancellationToken
+                    );
+                if (string.IsNullOrEmpty(diffIndex))
+                {
+                    //todo log
+                    return;
+                }
+                summaryDiff.AppendLine(diffIndex);
+
+                var lsFiles = await ProcessHelper.RunSilentlyAsync(
+                    repositoryFolder,
+                    "git.exe",
+                    @"ls-files --others --exclude-standard",
+                    cancellationToken
+                    );
+
+                foreach (var lsFile in lsFiles.StandardOutput)
+                {
+                    var diffNoIndex = await GitDiffProcess.RunAndParseGitDiffSilentlyAsync(
+                        repositoryFolder,
+                        lsFile,
+                        cancellationToken
+                        );
+
+                    summaryDiff.AppendLine(diffNoIndex);
+                }
+
+                Result = summaryDiff.ToString();
+            }
+        }
+
+
     }
 
     public static class GitDiffProcess

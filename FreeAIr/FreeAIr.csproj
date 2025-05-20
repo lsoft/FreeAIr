@@ -163,8 +163,8 @@
     <Compile Include="UI\Informer\UIInformer.cs" />
     <Compile Include="UI\ViewModels\ChooseModelViewModel.cs" />
     <Compile Include="UI\ViewModels\ChatListViewModel.cs" />
-    <Compile Include="UI\Windows\WaitGitWindow.xaml.cs">
-      <DependentUpon>WaitGitWindow.xaml</DependentUpon>
+    <Compile Include="UI\Windows\WaitForTaskWindow.xaml.cs">
+      <DependentUpon>WaitForTaskWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="ViewElementFactory.cs" />
     <Compile Include="VSCommandTable.cs">
@@ -332,7 +332,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="UI\Windows\WaitGitWindow.xaml">
+    <Page Include="UI\Windows\WaitForTaskWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

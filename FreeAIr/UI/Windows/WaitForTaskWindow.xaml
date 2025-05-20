@@ -1,5 +1,5 @@
 ﻿<Window
-    x:Class="FreeAIr.UI.Windows.WaitGitWindow"
+    x:Class="FreeAIr.UI.Windows.WaitForTaskWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -28,7 +28,7 @@
             VerticalAlignment="Center"
             FontSize="20"
             Margin="2"
-            Content="Please wait for git patch building..."
+            Name="TaskDescriptionLabel"
             />
 
         <Button

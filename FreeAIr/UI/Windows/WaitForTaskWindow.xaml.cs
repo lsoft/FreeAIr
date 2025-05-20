@@ -1,0 +1,116 @@
+﻿using FreeAIr.BLogic;
+using FreeAIr.Helper;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Input;
+
+namespace FreeAIr.UI.Windows
+{
+    public partial class WaitForTaskWindow : Window
+    {
+        private readonly BackgroundTask _backgroundTask;
+
+        public WaitForTaskWindow(
+            BackgroundTask backgroundTask
+            )
+        {
+            if (backgroundTask is null)
+            {
+                throw new ArgumentNullException(nameof(backgroundTask));
+            }
+
+            InitializeComponent();
+
+            _backgroundTask = backgroundTask;
+
+            TaskDescriptionLabel.Content = backgroundTask.TaskDescription;
+        }
+
+        private void CancelButton_Click(object sender, RoutedEventArgs e)
+        {
+            this.Close();
+        }
+
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            //todo log
+
+            CloseWindowAsync()
+                .FileAndForget(nameof(CloseWindowAsync));
+        }
+
+        private async Task CloseWindowAsync()
+        {
+            await _backgroundTask.StopAsync();
+        }
+
+        private async void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+            await _backgroundTask.WaitForCompleteAsync();
+
+            this.Close();
+        }
+
+        private void Window_KeyUp(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Escape)
+            {
+                this.Close();
+            }
+        }
+    }
+
+    public abstract class BackgroundTask
+    {
+        protected CancellationTokenSource? _cancellationTokenSource;
+        
+        private readonly Task _workingTask;
+
+        public abstract string TaskDescription
+        {
+            get;
+        }
+
+        public BackgroundTask(
+            )
+        {
+            _cancellationTokenSource = new();
+
+            _workingTask = RunWorkingTaskAsync();
+        }
+
+        protected abstract Task RunWorkingTaskAsync();
+
+        public async Task WaitForCompleteAsync()
+        {
+            if (_workingTask is not null && !_workingTask.IsCompleted)
+            {
+                try
+                {
+                    await _workingTask;
+                }
+                catch (OperationCanceledException)
+                {
+                    //nothing to do, this is ok
+                }
+                catch (Exception excp)
+                {
+                    //todo log
+                }
+            }
+        }
+
+        public async Task StopAsync()
+        {
+            _cancellationTokenSource.Cancel();
+
+            await WaitForCompleteAsync();
+
+            _cancellationTokenSource.Dispose();
+        }
+
+    }
+
+}

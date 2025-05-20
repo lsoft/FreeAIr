@@ -8,7 +8,14 @@ namespace FreeAIr.Commands.Other
         protected override async Task ExecuteAsync(OleMenuCmdEventArgs e)
         {
             var installResult = await MCP.Github.Installer.InstallAsync();
-            if (!installResult)
+            if (installResult)
+            {
+                await VS.MessageBox.ShowAsync(
+                    string.Empty,
+                    $"GitHub MCP server installed SUCCESSFULLY."
+                    );
+            }
+            else
             {
                 await VS.MessageBox.ShowErrorAsync(
                     Resources.Resources.Error,
