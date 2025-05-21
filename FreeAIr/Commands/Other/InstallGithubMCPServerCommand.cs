@@ -1,4 +1,7 @@
-﻿using FreeAIr.UI.ToolWindows;
+﻿using FreeAIr.MCP.Agent.Github;
+using FreeAIr.UI.ToolWindows;
+using FreeAIr.UI.Windows;
+using System.Windows;
 
 namespace FreeAIr.Commands.Other
 {
@@ -7,7 +10,14 @@ namespace FreeAIr.Commands.Other
     {
         protected override async Task ExecuteAsync(OleMenuCmdEventArgs e)
         {
-            var installResult = await MCP.Github.Installer.InstallAsync();
+            var backgroundTask = new GithubMCPInstallBackgroundTask(
+                );
+            var w = new WaitForTaskWindow(
+                backgroundTask
+                );
+            await w.ShowDialogAsync();
+
+            var installResult = backgroundTask.SuccessfullyInstalled;
             if (installResult)
             {
                 await VS.MessageBox.ShowAsync(
@@ -22,11 +32,6 @@ namespace FreeAIr.Commands.Other
                     $"Installation GitHub MCP server fails. Please install it manually."
                     );
             }
-        }
-
-        protected override void BeforeQueryStatus(EventArgs e)
-        {
-            this.Command.Enabled = !MCP.Github.Installer.IsInstalled();
         }
     }
 }

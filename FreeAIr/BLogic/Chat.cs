@@ -1,8 +1,5 @@
 ﻿using FreeAIr.BLogic.Context;
 using FreeAIr.Helper;
-using FreeAIr.Shared.Helper;
-using ICSharpCode.AvalonEdit.Utils;
-using ModelContextProtocol.Protocol;
 using OpenAI;
 using OpenAI.Chat;
 using System.ClientModel;

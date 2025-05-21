@@ -13,5 +13,10 @@ namespace FreeAIr
         public class ResponsePageOptions : BaseOptionPage<ResponsePage>
         {
         }
+
+        [ComVisible(true)]
+        public class MCPPageOptions : BaseOptionPage<MCPPage>
+        {
+        }
     }
 }

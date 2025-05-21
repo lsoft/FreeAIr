@@ -26,6 +26,7 @@
     <StartAction>Program</StartAction>
     <StartProgram Condition="'$(DevEnvDir)' != ''">$(DevEnvDir)devenv.exe</StartProgram>
     <StartArguments>/rootsuffix Exp</StartArguments>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -106,9 +107,13 @@
     <Compile Include="Helper\RoslynDocumentHelper.cs" />
     <Compile Include="Helper\SuggestionHijackHelper.cs" />
     <Compile Include="ImageMonikers.cs" />
-    <Compile Include="MCP\Github\Api.cs" />
-    <Compile Include="MCP\Github\Installer.cs" />
+    <Compile Include="MCP\Agent\Github\BLO\Tools.cs" />
+    <Compile Include="MCP\Agent\Github\GithubAgent.cs" />
+    <Compile Include="MCP\Agent\Github\GithubMCPInstallBackgroundTask.cs" />
+    <Compile Include="MCP\Agent\ProcessMonitor.cs" />
+    <Compile Include="MCP\AvailableToolController.cs" />
     <Compile Include="Options\ApiPage.cs" />
+    <Compile Include="Options\MCPPage.cs" />
     <Compile Include="Options\OptionsProvider.cs" />
     <Compile Include="Options\ResponsePage.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -244,8 +249,11 @@
     <PackageReference Include="MessagePack">
       <Version>2.5.187</Version>
     </PackageReference>
-    <PackageReference Include="Microsoft.Bcl.AsyncInterfaces">
-      <Version>9.0.4</Version>
+    <PackageReference Include="Microsoft.AspNetCore.WebUtilities">
+      <Version>2.3.0</Version>
+    </PackageReference>
+    <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" PrivateAssets="all">
+      <Version>9.0.5</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp">
       <Version>4.13.0</Version>
@@ -255,6 +263,12 @@
     </PackageReference>
     <PackageReference Include="Microsoft.CodeAnalysis.EditorFeatures.Wpf">
       <Version>2.8.2</Version>
+    </PackageReference>
+    <PackageReference Include="Microsoft.Extensions.AI.Abstractions">
+      <Version>9.5.0</Version>
+    </PackageReference>
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions">
+      <Version>9.0.5</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.CoreUtility">
       <Version>17.13.226</Version>
@@ -281,9 +295,6 @@
     <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf">
       <Version>1.1.135</Version>
     </PackageReference>
-    <PackageReference Include="ModelContextProtocol">
-      <Version>0.2.0-preview.1</Version>
-    </PackageReference>
     <PackageReference Include="OpenAI">
       <Version>2.1.0</Version>
     </PackageReference>
@@ -291,16 +302,23 @@
       <Version>1.2.4</Version>
     </PackageReference>
     <PackageReference Include="System.Net.Http.Json">
-      <Version>9.0.4</Version>
+      <Version>9.0.5</Version>
+    </PackageReference>
+    <PackageReference Include="System.Net.ServerSentEvents">
+      <Version>9.0.5</Version>
     </PackageReference>
     <PackageReference Include="System.Text.Json">
-      <Version>9.0.4</Version>
+      <Version>9.0.5</Version>
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\CodeLens\FreeAIr.CodeLens.csproj">
       <Project>{12fb1b96-34e8-7f37-782d-4e07363c95d9}</Project>
       <Name>FreeAIr.CodeLens</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\MCP\Github\Dto\Dto.csproj">
+      <Project>{2F2E14EA-0DB3-1CC8-B8A2-D6C94D74026B}</Project>
+      <Name>Dto</Name>
     </ProjectReference>
     <ProjectReference Include="..\Shared\FreeAIr.Shared.csproj">
       <Project>{e2646cf6-c92f-94ee-f875-5a7c18451b93}</Project>
@@ -349,6 +367,8 @@
   <Import Project="$(VSToolsPath)\VSSDK\Microsoft.VsSDK.targets" Condition="'$(VSToolsPath)' != ''" />
   <Target Name="IncludeNuGetPackageReferences" AfterTargets="GetVsixSourceItems">
     <ItemGroup>
+      <VSIXSourceItem Include="$(SolutionDir).art\Github.Agent.zip" TargetPath="MCP\Github\Agent\Archive\Github.Agent.zip" />
+      <VSIXSourceItem Include="@(ReferenceCopyLocalPaths)" Condition="'%(ReferenceCopyLocalPaths.NuGetPackageId)' == 'System.IO.Pipelines'" />
       <VSIXSourceItem Include="@(ReferenceCopyLocalPaths)" Condition="'%(ReferenceCopyLocalPaths.NuGetPackageId)' == 'System.Text.Json'" />
       <VSIXSourceItem Include="@(ReferenceCopyLocalPaths)" Condition="'%(ReferenceCopyLocalPaths.NuGetPackageId)' == 'Microsoft.Bcl.AsyncInterfaces'" />
     </ItemGroup>

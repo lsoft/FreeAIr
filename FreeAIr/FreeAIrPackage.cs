@@ -48,26 +48,37 @@ namespace FreeAIr
             IProgress<ServiceProgressData> progress
             )
         {
-            //load dlls manually, for unknown reason these dlls does not loaded automatically
-            Assembly a1 = Assembly.LoadFrom(System.IO.Path.Combine(WorkingFolder, "MdXaml.dll"));
-            AppDomain.CurrentDomain.Load(a1.FullName);
+            try
+            {
+                //load dlls manually, for unknown reason these dlls does not loaded automatically
+                Assembly a1 = Assembly.LoadFrom(System.IO.Path.Combine(WorkingFolder, "MdXaml.dll"));
+                AppDomain.CurrentDomain.Load(a1.FullName);
 
-            ResponsePage.LoadOrUpdateMarkdownStyles();
+                //Assembly a2 = Assembly.LoadFrom(System.IO.Path.Combine(WorkingFolder, "ModelContextProtocol.dll"));
+                //AppDomain.CurrentDomain.Load(a2.FullName);
 
-            await this.JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
+                ResponsePage.LoadOrUpdateMarkdownStyles();
 
-            await this.RegisterCommandsAsync();
+                await this.JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
 
-            this.RegisterToolWindows();
+                await this.RegisterCommandsAsync();
 
-            //refresh codelenses
-            //we do not wait it for its completion.
-            CodeLensConnectionHandler.AcceptCodeLensConnectionsAsync()
-                .FileAndForget(nameof(CodeLensConnectionHandler.AcceptCodeLensConnectionsAsync))
-                ;
+                this.RegisterToolWindows();
 
-            var componentModel = (IComponentModel)await this.GetServiceAsync(typeof(SComponentModel));
-            StartServices(componentModel);
+                //refresh codelenses
+                //we do not wait it for its completion.
+                CodeLensConnectionHandler.AcceptCodeLensConnectionsAsync()
+                    .FileAndForget(nameof(CodeLensConnectionHandler.AcceptCodeLensConnectionsAsync))
+                    ;
+
+                var componentModel = (IComponentModel)await this.GetServiceAsync(typeof(SComponentModel));
+                StartServices(componentModel);
+            }
+            catch (Exception excp)
+            {
+                //todo log
+                throw;
+            }
         }
 
 
