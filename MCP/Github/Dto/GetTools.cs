@@ -12,12 +12,6 @@ namespace Dto
 
     public sealed class GetToolsReply : Reply
     {
-        public string AgentName
-        {
-            get;
-            set;
-        }
-
         public GetToolReply[] Tools
         {
             get;
@@ -29,21 +23,14 @@ namespace Dto
         }
 
         public GetToolsReply(
-            string agentName,
             GetToolReply[] tools
             )
         {
-            if (string.IsNullOrEmpty(agentName))
-            {
-                throw new ArgumentException($"'{nameof(agentName)}' cannot be null or empty.", nameof(agentName));
-            }
-
             if (tools is null)
             {
                 throw new ArgumentNullException(nameof(tools));
             }
 
-            AgentName = agentName;
             Tools = tools;
         }
 

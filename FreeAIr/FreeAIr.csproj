@@ -107,9 +107,11 @@
     <Compile Include="Helper\RoslynDocumentHelper.cs" />
     <Compile Include="Helper\SuggestionHijackHelper.cs" />
     <Compile Include="ImageMonikers.cs" />
+    <Compile Include="MCP\Agent\AgentCollection.cs" />
     <Compile Include="MCP\Agent\Github\BLO\Tools.cs" />
     <Compile Include="MCP\Agent\Github\GithubAgent.cs" />
     <Compile Include="MCP\Agent\Github\GithubMCPInstallBackgroundTask.cs" />
+    <Compile Include="MCP\Agent\IAgent.cs" />
     <Compile Include="MCP\Agent\ProcessMonitor.cs" />
     <Compile Include="MCP\AvailableToolController.cs" />
     <Compile Include="Options\ApiPage.cs" />
@@ -166,8 +168,16 @@
       <DependentUpon>StatusPopup.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\Informer\UIInformer.cs" />
+    <Compile Include="UI\NestedCheckBox\NestedCheckBoxList.xaml.cs">
+      <DependentUpon>NestedCheckBoxList.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\NestedCheckBox\CheckableItem.cs" />
+    <Compile Include="UI\Windows\NestedCheckBoxWindow.xaml.cs">
+      <DependentUpon>NestedCheckBoxWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI\ViewModels\ChooseModelViewModel.cs" />
     <Compile Include="UI\ViewModels\ChatListViewModel.cs" />
+    <Compile Include="UI\ViewModels\AvailableToolsViewModel.cs" />
     <Compile Include="UI\Windows\WaitForTaskWindow.xaml.cs">
       <DependentUpon>WaitForTaskWindow.xaml</DependentUpon>
     </Compile>
@@ -349,6 +359,14 @@
     <Page Include="UI\Informer\StatusPopup.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\NestedCheckBox\NestedCheckBoxList.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\Windows\NestedCheckBoxWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="UI\Windows\WaitForTaskWindow.xaml">
       <Generator>MSBuild:Compile</Generator>

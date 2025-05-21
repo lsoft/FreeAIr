@@ -1,0 +1,78 @@
+﻿<Window x:Class="FreeAIr.UI.Windows.NestedCheckBoxWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:nestedcheckbox="clr-namespace:FreeAIr.UI.NestedCheckBox"
+        xmlns:ui="clr-namespace:FreeAIr.UI"
+        mc:Ignorable="d"
+        ui:VsTheme.UseVsTheme="True"
+        WindowStyle="None"
+        KeyUp="Window_KeyUp"
+        Height="450" Width="500"
+        Loaded="Window_Loaded"
+        >
+    <Grid
+        Margin="2"
+        >
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
+            <RowDefinition />
+        </Grid.RowDefinitions>
+
+        <Border
+            Grid.Row="0"
+            x:Name="TitleBar"
+            Background="{Binding ElementName=InfoLabel, Path=Background}"
+            HorizontalAlignment="Stretch"
+            VerticalAlignment="Top"
+            >
+            <Label
+                Content="Available MCP tools"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                Margin="0"
+                />
+        </Border>
+
+        <Grid
+            Grid.Row="1"
+            >
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition />
+                <ColumnDefinition Width="auto"/>
+                <ColumnDefinition Width="auto"/>
+            </Grid.ColumnDefinitions>
+
+            <Label
+                Grid.Column="0"
+                Margin="2"
+                Name="InfoLabel"
+                VerticalAlignment="Bottom"
+                Content="Choose the MCP tools you want to provide to LLM:"
+                />
+
+            <Button
+                Grid.Column="1"
+                Margin="2"
+                HorizontalAlignment="Right"
+                Content="Save"
+                Command="{Binding SaveToolsCommand}"
+                />
+            <Button
+                Grid.Column="2"
+                Margin="2"
+                HorizontalAlignment="Right"
+                Content="Cancel"
+                Click="CancelButton_Click"
+                />
+
+        </Grid>
+        
+        <nestedcheckbox:NestedCheckBoxList
+            Grid.Row="2"
+            DataContext="{Binding}"
+            />
+    </Grid>
+</Window>

@@ -4,10 +4,11 @@ global using System;
 global using Task = System.Threading.Tasks.Task;
 using FreeAIr.BLogic;
 using FreeAIr.Extension.CodeLens;
+using FreeAIr.MCP.Agent;
+using FreeAIr.UI.Informer;
 using FreeAIr.UI.ToolWindows;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.ComponentModelHost;
-using FreeAIr.UI.Informer;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Threading;
@@ -69,6 +70,10 @@ namespace FreeAIr
                 //we do not wait it for its completion.
                 CodeLensConnectionHandler.AcceptCodeLensConnectionsAsync()
                     .FileAndForget(nameof(CodeLensConnectionHandler.AcceptCodeLensConnectionsAsync))
+                    ;
+
+                AgentCollection.InitAsync()
+                    .FileAndForget(nameof(AgentCollection))
                     ;
 
                 var componentModel = (IComponentModel)await this.GetServiceAsync(typeof(SComponentModel));

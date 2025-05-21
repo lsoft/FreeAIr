@@ -5,6 +5,8 @@ using FreeAIr.BLogic.Context.Item;
 using FreeAIr.Helper;
 using FreeAIr.Shared.Helper;
 using FreeAIr.UI.Embedillo.Answer.Parser;
+using FreeAIr.UI.ToolWindows;
+using FreeAIr.UI.Windows;
 using ICSharpCode.AvalonEdit.Editing;
 using Microsoft.VisualStudio.Imaging;
 using Microsoft.VisualStudio.Imaging.Interop;
@@ -41,6 +43,7 @@ namespace FreeAIr.UI.ViewModels
         private ICommand _removeAllAutomaticItemsFromContextCommand;
         private ICommand _addRelatedItemsToContextCommand;
         private ICommand _addCustomFileToContextCommand;
+        private ICommand _editAvailableToolsCommand;
 
         public event MarkdownReReadDelegate MarkdownReReadEvent;
 
@@ -684,6 +687,64 @@ namespace FreeAIr.UI.ViewModels
                 }
 
                 return _removeAllAutomaticItemsFromContextCommand;
+            }
+        }
+
+        public ICommand EditAvailableToolsCommand
+        {
+            get
+            {
+                if (_editAvailableToolsCommand == null)
+                {
+                    _editAvailableToolsCommand = new AsyncRelayCommand(
+                        async a =>
+                        {
+                            if (_selectedChat is null)
+                            {
+                                return;
+                            }
+                            if (_selectedChat.Chat is null)
+                            {
+                                return;
+                            }
+
+                            var chat = _selectedChat.Chat;
+
+                            if (chat.Status.NotIn(ChatStatusEnum.NotStarted, ChatStatusEnum.Ready))
+                            {
+                                return;
+                            }
+
+                            var w = new NestedCheckBoxWindow();
+                            w.DataContext = new AvailableToolsViewModel();
+                            await w.ShowDialogAsync();
+
+                            OnPropertyChanged();
+                        },
+                        a =>
+                        {
+                            if (_selectedChat is null)
+                            {
+                                return false;
+                            }
+                            if (_selectedChat.Chat is null)
+                            {
+                                return false;
+                            }
+
+                            var chat = _selectedChat.Chat;
+
+                            if (chat.Status.NotIn(ChatStatusEnum.NotStarted, ChatStatusEnum.Ready))
+                            {
+                                return false;
+                            }
+
+                            return true;
+                        }
+                        );
+                }
+
+                return _editAvailableToolsCommand;
             }
         }
 

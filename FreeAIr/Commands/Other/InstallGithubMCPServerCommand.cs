@@ -1,4 +1,5 @@
-﻿using FreeAIr.MCP.Agent.Github;
+﻿using FreeAIr.MCP.Agent;
+using FreeAIr.MCP.Agent.Github;
 using FreeAIr.UI.ToolWindows;
 using FreeAIr.UI.Windows;
 using System.Windows;
@@ -20,6 +21,8 @@ namespace FreeAIr.Commands.Other
             var installResult = backgroundTask.SuccessfullyInstalled;
             if (installResult)
             {
+                await AgentCollection.ProcessAgentAsync(GithubAgent.Instance);
+
                 await VS.MessageBox.ShowAsync(
                     string.Empty,
                     $"GitHub MCP server installed SUCCESSFULLY."

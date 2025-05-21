@@ -8,32 +8,20 @@ namespace FreeAIr.MCP.Agent.Github.BLO
 {
     public sealed class AgentTools
     {
-        public string AgentName
-        {
-            get;
-        }
-
         public IReadOnlyList<AgentTool> Tools
         {
             get;
         }
 
         public AgentTools(
-            string agentName,
             IReadOnlyList<AgentTool> tools
             )
         {
-            if (string.IsNullOrEmpty(agentName))
-            {
-                throw new ArgumentException($"'{nameof(agentName)}' cannot be null or empty.", nameof(agentName));
-            }
-
             if (tools is null)
             {
                 throw new ArgumentNullException(nameof(tools));
             }
 
-            AgentName = agentName;
             Tools = tools;
         }
     }

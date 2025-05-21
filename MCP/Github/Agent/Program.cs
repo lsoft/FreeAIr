@@ -147,7 +147,6 @@ namespace Agent
             var mcpTools = await mcpClient.ListToolsAsync();
 
             var reply = new GetToolsReply(
-                mcpClient.ServerInfo.Name,
                 mcpTools.Select(t => new GetToolReply(t.Name, t.Description, t.JsonSchema.GetRawText())).ToArray()
                 );
 

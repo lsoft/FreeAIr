@@ -180,7 +180,23 @@
                             HorizontalAlignment="Right"
                             VerticalAlignment="Bottom"
                             >
-                        
+
+                            <Label
+                                Margin="5,0,5,0"
+                                Content="Edit tools..."
+                                Foreground="#569CD6"
+                                Cursor="Hand"
+                                FontFamily="Cascadia Code"
+                                ToolTip="Edit available model context protocol tools"
+                                >
+                                <Label.InputBindings>
+                                    <MouseBinding
+                                        Command="{Binding ElementName=ChatListToolWindow, Path=DataContext.EditAvailableToolsCommand}"
+                                        MouseAction="LeftClick"
+                                        />
+                                </Label.InputBindings>
+                            </Label>
+
                             <Label
                                 Margin="5,0,5,0"
                                 Content="Add custom file..."

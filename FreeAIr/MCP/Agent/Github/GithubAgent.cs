@@ -19,47 +19,63 @@ using System.Threading.Tasks;
 
 namespace FreeAIr.MCP.Agent.Github
 {
-    public sealed class GithubAgent
+
+    public sealed class GithubAgent : IAgent
     {
         public const string MCPServerFolderName = @"MCP\Github\Server";
 
-        private readonly ProcessMonitor _processMonitor;
 
+        public static readonly GithubAgent Instance = new();
+
+        private readonly string _agentUnpackedFolderPath;
+        private readonly string _agentZipFolderPath;
         private readonly HttpClient _client;
-        private Task? _processTask;
+        private readonly ProcessMonitor _processMonitor;
+        private readonly Task _processTask;
+        private readonly bool _started;
 
-        public static readonly string AgentUnpackedFolderPath = Path.Combine(FreeAIrPackage.WorkingFolder, @"MCP\Github\Agent\Unpacked");
-
-        public static readonly string AgentZipFolderPath = Path.Combine(FreeAIrPackage.WorkingFolder, @"MCP\Github\Agent\Archive");
         public const string AgentZipFileName = "Github.Agent.zip";
         public const string AgentExeFileName = "Agent.exe";
 
-        public static readonly GithubAgent Instance = new();
+        public string Name => "github.com";
 
         private GithubAgent(
             )
         {
-            UnpackAgent();
+            try
+            {
+                _agentUnpackedFolderPath = Path.Combine(FreeAIrPackage.WorkingFolder, @"MCP\Github\Agent\Unpacked");
+                _agentZipFolderPath = Path.Combine(FreeAIrPackage.WorkingFolder, @"MCP\Github\Agent\Archive");
 
-            var agentProcessId = 30000 + (System.Diagnostics.Process.GetCurrentProcess().Id % 10000);
+                UnpackAgent();
 
-            _client = new();
-            _client.BaseAddress = new Uri($"https://localhost:{agentProcessId}");
+                var agentProcessId = 30000 + (System.Diagnostics.Process.GetCurrentProcess().Id % 10000);
 
-            _processMonitor = new ProcessMonitor(
-                AgentUnpackedFolderPath,
-                AgentExeFileName,
-                agentProcessId.ToString()
-                );
+                _client = new();
+                _client.BaseAddress = new Uri($"https://localhost:{agentProcessId}");
 
-            _processTask = _processMonitor.StartMonitoringAsync();
+                _processMonitor = new ProcessMonitor(
+                    _agentUnpackedFolderPath,
+                    AgentExeFileName,
+                    agentProcessId.ToString()
+                    );
+
+                _processTask = _processMonitor.StartMonitoringAsync();
+
+                _started = true;
+            }
+            catch (Exception excp)
+            {
+                //todo log
+                _started = false;
+            }
         }
 
         public async Task<bool> IsInstalledAsync()
         {
-            if (_processTask is null)
+            if (!_started)
             {
-                throw new InvalidOperationException("Github MCP server not started.");
+                return false;
             }
 
             var queryParams = new Dictionary<string, string>()
@@ -80,9 +96,9 @@ namespace FreeAIr.MCP.Agent.Github
 
         public async Task InstallAsync()
         {
-            if (_processTask is null)
+            if (!_started)
             {
-                throw new InvalidOperationException("Github MCP server not started.");
+                throw new InvalidOperationException("Agent is not started");
             }
 
             var response = await _client.PostAsJsonAsync<InstallRequest>(
@@ -100,9 +116,9 @@ namespace FreeAIr.MCP.Agent.Github
 
         public async Task<AgentTools> GetToolsAsync()
         {
-            if (_processTask is null)
+            if (!_started)
             {
-                throw new InvalidOperationException("Github MCP server not started.");
+                throw new InvalidOperationException("Agent is not started");
             }
 
             var queryParams = new Dictionary<string, string>()
@@ -125,7 +141,6 @@ namespace FreeAIr.MCP.Agent.Github
             }
 
             return new AgentTools(
-                reply.AgentName,
                 reply.Tools.Select(t => new AgentTool(t.Name, t.Description, t.Parameters)).ToList()
                 );
         }
@@ -135,9 +150,9 @@ namespace FreeAIr.MCP.Agent.Github
             IReadOnlyDictionary<string, object?>? arguments = null
             )
         {
-            if (_processTask is null)
+            if (!_started)
             {
-                throw new InvalidOperationException("Github MCP server not started.");
+                throw new InvalidOperationException("Agent is not started");
             }
 
             var response = await _client.PostAsJsonAsync<CallToolRequest>(
@@ -194,25 +209,17 @@ namespace FreeAIr.MCP.Agent.Github
 
         private void UnpackAgent()
         {
-            try
+            if (!Directory.Exists(_agentUnpackedFolderPath))
             {
-                if (!Directory.Exists(AgentUnpackedFolderPath))
-                {
-                    Directory.CreateDirectory(AgentUnpackedFolderPath);
+                Directory.CreateDirectory(_agentUnpackedFolderPath);
 
-                    var zipFilePath = Path.Combine(
-                        FreeAIrPackage.WorkingFolder,
-                        AgentZipFolderPath,
-                        AgentZipFileName
-                        );
-                    using var zip = ZipFile.OpenRead(zipFilePath);
-                    zip.ExtractToDirectory(AgentUnpackedFolderPath);
-                }
-            }
-            catch (Exception excp)
-            {
-                //todo log
-                int g = 0;
+                var zipFilePath = Path.Combine(
+                    FreeAIrPackage.WorkingFolder,
+                    _agentZipFolderPath,
+                    AgentZipFileName
+                    );
+                using var zip = ZipFile.OpenRead(zipFilePath);
+                zip.ExtractToDirectory(_agentUnpackedFolderPath);
             }
         }
 
