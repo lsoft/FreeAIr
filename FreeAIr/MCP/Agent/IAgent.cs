@@ -1,5 +1,6 @@
 ﻿using FreeAIr.MCP.Agent.Github.BLO;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace FreeAIr.MCP.Agent
@@ -19,7 +20,8 @@ namespace FreeAIr.MCP.Agent
         
         Task<AgentToolCallResult> CallToolAsync(
             string toolName,
-            IReadOnlyDictionary<string, object?>? arguments = null
+            IReadOnlyDictionary<string, object?>? arguments = null,
+            CancellationToken cancellationToken = default
             );
     }
 }

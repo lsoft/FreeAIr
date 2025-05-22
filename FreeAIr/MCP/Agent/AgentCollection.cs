@@ -1,11 +1,14 @@
 ﻿using FreeAIr.MCP.Agent.Github;
 using FreeAIr.MCP.Agent.Github.BLO;
 using FreeAIr.Shared.Helper;
+using Microsoft.Extensions.AI;
+using OpenAI.Chat;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Media;
 
@@ -48,7 +51,7 @@ namespace FreeAIr.MCP.Agent
             //остальные просто включатся
             AvailableToolController.AddToolsIfNotExists(
                 agentWrapper.Agent.Name,
-                agentWrapper.Tools.Tools.ConvertAll(t => t.Name)
+                agentWrapper.Tools.Tools.ConvertAll(t => t.ToolName)
                 );
         }
 
@@ -68,7 +71,7 @@ namespace FreeAIr.MCP.Agent
                     agent.AddTool(
                         new AgentToolStatus(
                             tool,
-                            AvailableToolController.GetToolStatus(agentName, tool.Name)
+                            AvailableToolController.GetToolStatus(agentName, tool.ToolName)
                             )
                         );
                 }
@@ -79,6 +82,30 @@ namespace FreeAIr.MCP.Agent
             return result;
         }
 
+        public static async Task<string[]?> CallToolAsync(
+            string toolName,
+            Dictionary<string, object?> arguments,
+            CancellationToken cancellationToken
+            )
+        {
+            foreach (var agent in _agentWrappers)
+            {
+                foreach (var tool in agent.Tools.Tools)
+                {
+                    if (StringComparer.InvariantCultureIgnoreCase.Compare(tool.FullName, toolName) == 0)
+                    {
+                        var toolResult = await agent.Agent.CallToolAsync(
+                            tool.ToolName,
+                            arguments,
+                            cancellationToken
+                            );
+                        return toolResult.Content;
+                    }
+                }
+            }
+
+            return null;
+        }
 
         public sealed class AgentWrapper
         {
@@ -93,7 +120,7 @@ namespace FreeAIr.MCP.Agent
             }
 
 
-            public AgentWrapper(
+            private AgentWrapper(
                 IAgent agent,
                 AgentTools tools
                 )
@@ -143,6 +170,24 @@ namespace FreeAIr.MCP.Agent
             }
 
             _agents.Add(agent);
+        }
+
+        public IReadOnlyList<AgentToolStatus> GetActiveToolList()
+        {
+            var result = new List<AgentToolStatus>();
+
+            foreach (var agent in this.Agents)
+            {
+                foreach (var tool in agent.Tools)
+                {
+                    if (tool.Enabled)
+                    {
+                        result.Add(tool);
+                    }
+                }
+            }
+
+            return result;
         }
     }
 
@@ -205,6 +250,11 @@ namespace FreeAIr.MCP.Agent
 
             Tool = tool;
             Enabled = enabled;
+        }
+
+        public ChatTool CreateChatTools()
+        {
+            return Tool.CreateChatTools();
         }
     }
 

@@ -60,12 +60,12 @@ namespace FreeAIr.UI.ViewModels
                                         tool.Name,
                                         tool.IsChecked
                                         );
-
-                                    if (CloseWindow is not null)
-                                    {
-                                        CloseWindow();
-                                    }
                                 }
+                            }
+
+                            if (CloseWindow is not null)
+                            {
+                                CloseWindow();
                             }
                         });
                 }
@@ -87,7 +87,7 @@ namespace FreeAIr.UI.ViewModels
                     agent.AgentName,
                     string.Empty,
                     null,
-                    agent.Tools.Select(t => new CheckableItem(t.Tool.Name, t.Tool.Description, t.Enabled, t)).ToList()
+                    agent.Tools.Select(t => new CheckableItem(t.Tool.ToolName, t.Tool.Description, t.Enabled, t)).ToList()
                     );
             }
             Groups.AddRange(groups.Values);

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using OpenAI.Chat;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -28,10 +29,17 @@ namespace FreeAIr.MCP.Agent.Github.BLO
 
     public sealed class AgentTool
     {
-        public string Name
+        public string AgentName
         {
             get;
         }
+
+        public string ToolName
+        {
+            get;
+        }
+
+        public string FullName => AgentName + " " + ToolName;
 
         public string Description
         {
@@ -43,11 +51,21 @@ namespace FreeAIr.MCP.Agent.Github.BLO
             get;
         }
 
-        public AgentTool(string name, string description, string parameters)
+        public AgentTool(
+            string agentName,
+            string toolName,
+            string description,
+            string parameters
+            )
         {
-            if (string.IsNullOrEmpty(name))
+            if (string.IsNullOrEmpty(agentName))
             {
-                throw new ArgumentException($"'{nameof(name)}' cannot be null or empty.", nameof(name));
+                throw new ArgumentException($"'{nameof(agentName)}' cannot be null or empty.", nameof(agentName));
+            }
+
+            if (string.IsNullOrEmpty(toolName))
+            {
+                throw new ArgumentException($"'{nameof(toolName)}' cannot be null or empty.", nameof(toolName));
             }
 
             if (string.IsNullOrEmpty(description))
@@ -60,9 +78,22 @@ namespace FreeAIr.MCP.Agent.Github.BLO
                 throw new ArgumentException($"'{nameof(parameters)}' cannot be null or empty.", nameof(parameters));
             }
 
-            Name = name;
+            AgentName = agentName;
+            ToolName = toolName;
             Description = description;
             Parameters = parameters;
+        }
+
+        public ChatTool CreateChatTools()
+        {
+            return ChatTool.CreateFunctionTool(
+                functionName: FullName,
+                functionDescription: Description,
+                functionParameters: BinaryData.FromString(
+                    Parameters
+                    ),
+                functionSchemaIsStrict: true
+                );
         }
     }
 

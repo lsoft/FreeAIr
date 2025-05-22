@@ -25,7 +25,8 @@ namespace FreeAIr.Commands.Other
 
                 await VS.MessageBox.ShowAsync(
                     string.Empty,
-                    $"GitHub MCP server installed SUCCESSFULLY."
+                    $"GitHub MCP server installed SUCCESSFULLY.",
+                    buttons: Microsoft.VisualStudio.Shell.Interop.OLEMSGBUTTON.OLEMSGBUTTON_OK
                     );
             }
             else

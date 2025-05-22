@@ -73,6 +73,12 @@ namespace FreeAIr.UI.NestedCheckBox
 
         public void SetChecked(bool isChecked)
         {
+            if (_isChecked == isChecked)
+            {
+                return;
+            }
+
+            HasChanged = true;
             _isChecked = isChecked;
             OnPropertyChanged();
         }

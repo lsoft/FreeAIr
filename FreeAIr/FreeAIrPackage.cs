@@ -23,6 +23,7 @@ namespace FreeAIr
     [ProvideAutoLoad(VSConstants.UICONTEXT.SolutionExistsAndFullyLoaded_string, PackageAutoLoadFlags.BackgroundLoad)]
     [ProvideOptionPage(typeof(OptionsProvider.ApiPageOptions), "FreeAIr", "Api", 0, 0, true, SupportsProfiles = true)]
     [ProvideOptionPage(typeof(OptionsProvider.ResponsePageOptions), "FreeAIr", "Response", 0, 0, true, SupportsProfiles = true)]
+    [ProvideOptionPage(typeof(OptionsProvider.MCPPageOptions), "FreeAIr", "MCP", 0, 0, true, SupportsProfiles = true)]
     [ProvideToolWindow(typeof(ChatListToolWindow.Pane), Style = VsDockStyle.Tabbed, Window = WindowGuids.DocumentWell)]
     [ProvideToolWindow(typeof(ChooseModelToolWindow.Pane), Style = VsDockStyle.Tabbed, Window = WindowGuids.DocumentWell)]
     public sealed class FreeAIrPackage : ToolkitPackage

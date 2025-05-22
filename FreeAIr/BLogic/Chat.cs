@@ -1,11 +1,13 @@
 ﻿using FreeAIr.BLogic.Context;
 using FreeAIr.Helper;
+using FreeAIr.MCP.Agent;
 using OpenAI;
 using OpenAI.Chat;
 using System.ClientModel;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -89,6 +91,7 @@ namespace FreeAIr.BLogic
                     ),
                 new OpenAIClientOptions
                 {
+                    NetworkTimeout = TimeSpan.FromHours(1),
                     Endpoint = ApiPage.Instance.TryBuildEndpointUri(),
                 }
                 );
@@ -127,9 +130,11 @@ namespace FreeAIr.BLogic
 
         public async Task StopAsync()
         {
-            _cancellationTokenSource.Cancel();
+            _cancellationTokenSource?.Cancel();
 
             await WaitForTaskAsync();
+            
+            _cancellationTokenSource?.Dispose();
 
             _cancellationTokenSource = new CancellationTokenSource();
         }
@@ -232,44 +237,106 @@ namespace FreeAIr.BLogic
                         )
                     );
 
-                //new ChatCompletionOptions
-                //{
-                //    ResponseFormat = ChatResponseFormat.CreateTextFormat(),
-                //    //Metadata = { [""] => "" }
-                //    Temperature = ...
-                //};
+                var toolCollection = AgentCollection.GetTools();
+                var activeTools = toolCollection.GetActiveToolList();
 
-                var completionUpdates = _chatClient.CompleteChatStreaming(
-                    messages: chatMessages,
-                    cancellationToken: cancellationToken
-                    );
-                foreach (StreamingChatCompletionUpdate completionUpdate in completionUpdates)
+                var cco = new ChatCompletionOptions
                 {
-                    if (completionUpdate.CompletionId is null)
+                    //ResponseFormat = ChatResponseFormat.CreateTextFormat(),
+                    MaxOutputTokenCount = 4096,
+                };
+                foreach (var tool in activeTools)
+                {
+                    cco.Tools.Add(
+                        tool.CreateChatTools()
+                        );
+                }
+
+                var continueTalk = false;
+                do
+                {
+                    continueTalk = false;
+
+                    var completionUpdates = _chatClient.CompleteChatStreaming(
+                        messages: chatMessages,
+                        options: cco,
+                        cancellationToken: cancellationToken
+                        );
+
+                    ChatFinishReason? chatFinishReason = null;
+                    var toolCalls = new List<StreamingChatToolCallUpdate>();
+
+                    foreach (StreamingChatCompletionUpdate completionUpdate in completionUpdates)
                     {
-                        answer.Append("Error reading answer (out of limit for free account?).");
-                        Status = ChatStatusEnum.Failed;
-                        return answer;
-                    }
-
-                    foreach (ChatMessageContentPart contentPart in completionUpdate.ContentUpdate)
-                    {
-                        if (string.IsNullOrEmpty(contentPart.Text))
+                        if (completionUpdate.CompletionId is null)
                         {
-                            continue;
-                        }
-
-                        answer.Append(contentPart.Text);
-
-                        Status = ChatStatusEnum.ReadingAnswer;
-
-                        if (cancellationToken.IsCancellationRequested)
-                        {
-                            Status = ChatStatusEnum.Ready;
+                            answer.Append("Error reading answer (out of limit for free account?).");
+                            Status = ChatStatusEnum.Failed;
                             return answer;
                         }
+
+                        chatFinishReason ??= completionUpdate.FinishReason;
+                        toolCalls.AddRange(completionUpdate.ToolCallUpdates);
+
+                        foreach (ChatMessageContentPart contentPart in completionUpdate.ContentUpdate)
+                        {
+                            if (string.IsNullOrEmpty(contentPart.Text))
+                            {
+                                continue;
+                            }
+
+                            answer.Append(contentPart.Text);
+
+                            Status = ChatStatusEnum.ReadingAnswer;
+
+                            if (cancellationToken.IsCancellationRequested)
+                            {
+                                Status = ChatStatusEnum.Ready;
+                                return answer;
+                            }
+                        }
+                    }
+
+                    if (chatFinishReason == ChatFinishReason.ToolCalls && toolCalls.Count > 0)
+                    {
+                        foreach (var toolCall in toolCalls)
+                        {
+                            File.AppendAllText(
+                                ResultFilePath,
+                                Environment.NewLine
+                                + "<ToolCall>"
+                                + Environment.NewLine
+                                + toolCall.FunctionName
+                                + Environment.NewLine
+                                + "</ToolCall>"
+                                + Environment.NewLine
+                                );
+
+                            var toolArguments = ParseToolInvocationArguments(toolCall);
+
+                            var toolResult = await AgentCollection.CallToolAsync(
+                                toolCall.FunctionName,
+                                toolArguments,
+                                cancellationToken: CancellationToken.None
+                                );
+                            if (toolResult is not null)
+                            {
+                                chatMessages.Add(
+                                    new ToolChatMessage(
+                                        toolCall.ToolCallId,
+                                        string.Join(
+                                            Environment.NewLine,
+                                            toolResult
+                                            )
+                                        )
+                                    );
+                            }
+                        }
+
+                        continueTalk = true;
                     }
                 }
+                while (continueTalk);
 
                 Status = ChatStatusEnum.Ready;
             }
@@ -320,6 +387,27 @@ namespace FreeAIr.BLogic
                 e(this, new ChatEventArgs(this));
             }
         }
+
+        private static Dictionary<string, object?> ParseToolInvocationArguments(
+            StreamingChatToolCallUpdate toolCall
+            )
+        {
+            var toolArguments = new Dictionary<string, object?>();
+            if (toolCall.FunctionArgumentsUpdate.ToMemory().Length > 0)
+            {
+                using JsonDocument toolArgumentJson = JsonDocument.Parse(
+                    toolCall.FunctionArgumentsUpdate
+                    );
+
+                foreach (var pair in toolArgumentJson.RootElement.EnumerateObject())
+                {
+                    toolArguments.Add(pair.Name, pair.Value.GetRawText());
+                }
+            }
+
+            return toolArguments;
+        }
+
     }
 
     public delegate void ChatStatusChangedDelegate(object sender, ChatEventArgs e);

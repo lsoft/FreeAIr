@@ -1,4 +1,6 @@
 ﻿using Dto;
+using EnvDTE;
+using EnvDTE80;
 using FreeAIr.Agent;
 using FreeAIr.MCP.Agent.Github.BLO;
 using FreeAIr.UI.ViewModels;
@@ -19,13 +21,16 @@ using System.Threading.Tasks;
 
 namespace FreeAIr.MCP.Agent.Github
 {
-
     public sealed class GithubAgent : IAgent
     {
         public const string MCPServerFolderName = @"MCP\Github\Server";
 
+        public const string AgentZipFileName = "Github.Agent.zip";
+        public const string AgentExeFileName = "Agent.exe";
 
         public static readonly GithubAgent Instance = new();
+
+        private readonly CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
 
         private readonly string _agentUnpackedFolderPath;
         private readonly string _agentZipFolderPath;
@@ -34,14 +39,15 @@ namespace FreeAIr.MCP.Agent.Github
         private readonly Task _processTask;
         private readonly bool _started;
 
-        public const string AgentZipFileName = "Github.Agent.zip";
-        public const string AgentExeFileName = "Agent.exe";
+        private readonly DTEEvents _dteEvents;
 
         public string Name => "github.com";
 
         private GithubAgent(
             )
         {
+            ThreadHelper.ThrowIfNotOnUIThread();
+
             try
             {
                 _agentUnpackedFolderPath = Path.Combine(FreeAIrPackage.WorkingFolder, @"MCP\Github\Agent\Unpacked");
@@ -60,7 +66,13 @@ namespace FreeAIr.MCP.Agent.Github
                     agentProcessId.ToString()
                     );
 
-                _processTask = _processMonitor.StartMonitoringAsync();
+                _processTask = _processMonitor.StartMonitoringAsync(
+                    _cancellationTokenSource.Token
+                    );
+
+                var dte = AsyncPackage.GetGlobalService(typeof(EnvDTE.DTE)) as DTE2;
+                _dteEvents = ((Events2)dte.Events).DTEEvents;
+                _dteEvents.OnBeginShutdown += DTEEvents_OnBeginShutdown;
 
                 _started = true;
             }
@@ -141,13 +153,14 @@ namespace FreeAIr.MCP.Agent.Github
             }
 
             return new AgentTools(
-                reply.Tools.Select(t => new AgentTool(t.Name, t.Description, t.Parameters)).ToList()
+                reply.Tools.Select(t => new AgentTool(Name, t.Name, t.Description, t.Parameters)).ToList()
                 );
         }
 
         public async Task<AgentToolCallResult> CallToolAsync(
             string toolName,
-            IReadOnlyDictionary<string, object?>? arguments = null
+            IReadOnlyDictionary<string, object?>? arguments = null,
+            CancellationToken cancellationToken = default
             )
         {
             if (!_started)
@@ -162,11 +175,14 @@ namespace FreeAIr.MCP.Agent.Github
                     MCPPage.Instance.GitHubToken,
                     toolName,
                     arguments?.ToDictionary(d => d.Key, d => d.Value as string)
-                    )
+                    ),
+                cancellationToken
                 );
             response.EnsureSuccessStatusCode();
 
-            var reply = await response.Content.ReadFromJsonAsync<CallToolReply>();
+            var reply = await response.Content.ReadFromJsonAsync<CallToolReply>(
+                cancellationToken
+                );
             if (!string.IsNullOrEmpty(reply.ErrorMessage))
             {
                 throw new InvalidOperationException(reply.ErrorMessage);
@@ -206,6 +222,16 @@ namespace FreeAIr.MCP.Agent.Github
                     );
             }
         }
+
+        private void DTEEvents_OnBeginShutdown()
+        {
+            _cancellationTokenSource.Cancel();
+
+            ////а зачем вызывать WaitForStopAsync и НЕ ждать его?
+            //WaitForStopAsync()
+            //    .FileAndForget(nameof(WaitForStopAsync));
+        }
+
 
         private void UnpackAgent()
         {
