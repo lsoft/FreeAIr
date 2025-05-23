@@ -18,7 +18,7 @@ namespace FreeAIr.MCP.Agent
         
         Task<AgentTools> GetToolsAsync();
         
-        Task<AgentToolCallResult> CallToolAsync(
+        Task<AgentToolCallResult?> CallToolAsync(
             string toolName,
             IReadOnlyDictionary<string, object?>? arguments = null,
             CancellationToken cancellationToken = default

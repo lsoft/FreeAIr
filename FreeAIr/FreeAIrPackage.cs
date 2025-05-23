@@ -56,8 +56,8 @@ namespace FreeAIr
                 Assembly a1 = Assembly.LoadFrom(System.IO.Path.Combine(WorkingFolder, "MdXaml.dll"));
                 AppDomain.CurrentDomain.Load(a1.FullName);
 
-                //Assembly a2 = Assembly.LoadFrom(System.IO.Path.Combine(WorkingFolder, "ModelContextProtocol.dll"));
-                //AppDomain.CurrentDomain.Load(a2.FullName);
+                Assembly a2 = Assembly.LoadFrom(System.IO.Path.Combine(WorkingFolder, "System.ClientModel.dll"));
+                AppDomain.CurrentDomain.Load(a2.FullName);
 
                 ResponsePage.LoadOrUpdateMarkdownStyles();
 

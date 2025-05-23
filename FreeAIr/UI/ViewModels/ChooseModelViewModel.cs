@@ -144,7 +144,9 @@ namespace FreeAIr.UI.ViewModels
                 var chosenModel = ApiPage.Instance.ChosenModel;
                 
                 ModelList.AddRange(
-                    models.ConvertAll(m => new ModelWrapper(m.id, m.name, m.id == chosenModel))
+                    models
+                        .OrderBy(m => m.name)
+                        .Select(m => new ModelWrapper(m.id, m.name, m.id == chosenModel))
                     );
 
                 Message = string.Empty;

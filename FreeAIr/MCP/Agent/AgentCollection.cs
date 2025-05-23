@@ -1,5 +1,6 @@
 ﻿using FreeAIr.MCP.Agent.Github;
 using FreeAIr.MCP.Agent.Github.BLO;
+using FreeAIr.MCP.Agent.VS;
 using FreeAIr.Shared.Helper;
 using Microsoft.Extensions.AI;
 using OpenAI.Chat;
@@ -23,6 +24,7 @@ namespace FreeAIr.MCP.Agent
 
         public static async Task InitAsync()
         {
+            await ProcessAgentAsync(VisualStudioAgent.Instance);
             await ProcessAgentAsync(GithubAgent.Instance);
         }
 
@@ -99,6 +101,11 @@ namespace FreeAIr.MCP.Agent
                             arguments,
                             cancellationToken
                             );
+                        if (toolResult is null)
+                        {
+                            return [];
+                        }
+
                         return toolResult.Content;
                     }
                 }
@@ -252,9 +259,9 @@ namespace FreeAIr.MCP.Agent
             Enabled = enabled;
         }
 
-        public ChatTool CreateChatTools()
+        public ChatTool CreateChatTool()
         {
-            return Tool.CreateChatTools();
+            return Tool.CreateChatTool();
         }
     }
 

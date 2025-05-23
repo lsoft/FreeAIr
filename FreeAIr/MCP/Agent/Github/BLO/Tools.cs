@@ -27,7 +27,7 @@ namespace FreeAIr.MCP.Agent.Github.BLO
         }
     }
 
-    public sealed class AgentTool
+    public /*sealed*/ class AgentTool
     {
         public string AgentName
         {
@@ -39,7 +39,7 @@ namespace FreeAIr.MCP.Agent.Github.BLO
             get;
         }
 
-        public string FullName => AgentName + " " + ToolName;
+        public string FullName => AgentName + "." + ToolName;
 
         public string Description
         {
@@ -73,18 +73,23 @@ namespace FreeAIr.MCP.Agent.Github.BLO
                 throw new ArgumentException($"'{nameof(description)}' cannot be null or empty.", nameof(description));
             }
 
-            if (string.IsNullOrEmpty(parameters))
+            if (parameters is null)
             {
-                throw new ArgumentException($"'{nameof(parameters)}' cannot be null or empty.", nameof(parameters));
+                throw new ArgumentNullException(nameof(parameters));
             }
 
             AgentName = agentName;
             ToolName = toolName;
             Description = description;
             Parameters = parameters;
+
+            if (FullName.Contains(' '))
+            {
+                throw new InvalidOperationException($"Function '{FullName}' contain spaces which is not allowed to some LLM providers.");
+            }
         }
 
-        public ChatTool CreateChatTools()
+        public ChatTool CreateChatTool()
         {
             return ChatTool.CreateFunctionTool(
                 functionName: FullName,
@@ -102,6 +107,13 @@ namespace FreeAIr.MCP.Agent.Github.BLO
         public string[] Content
         {
             get;
+        }
+
+        public AgentToolCallResult(
+            string content
+            )
+        {
+            Content = [content];
         }
 
         public AgentToolCallResult(string[] content)

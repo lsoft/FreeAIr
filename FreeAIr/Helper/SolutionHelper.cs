@@ -12,19 +12,36 @@ namespace FreeAIr.Helper
         public static async Task<List<FoundSolutionItem>> ProcessDownRecursivelyForAsync(
             this SolutionItem item,
             SolutionItemType[] types,
-            string? fullPath
+            string? fullPath,
+            bool includeSelection
             )
         {
             var foundItems = new FoundSolutionItems();
-            await ProcessDownRecursivelyForAsync(foundItems, item, types, fullPath);
+            await ProcessDownRecursivelyForAsync(
+                foundItems,
+                item,
+                item => item.Type.In(types) && (string.IsNullOrEmpty(fullPath) || fullPath == item.FullPath),
+                includeSelection
+                );
+            return foundItems.Result;
+        }
+
+        public static async Task<List<FoundSolutionItem>> ProcessDownRecursivelyForAsync(
+            this SolutionItem item,
+            Predicate<SolutionItem> predicate,
+            bool includeSelection
+            )
+        {
+            var foundItems = new FoundSolutionItems();
+            await ProcessDownRecursivelyForAsync(foundItems, item, predicate, includeSelection);
             return foundItems.Result;
         }
 
         private static async Task ProcessDownRecursivelyForAsync(
             FoundSolutionItems foundItems,
             SolutionItem item,
-            SolutionItemType[] types,
-            string? fullPath
+            Predicate<SolutionItem> predicate,
+            bool includeSelection
             )
         {
             //https://github.com/VsixCommunity/Community.VisualStudio.Toolkit/issues/401
@@ -38,7 +55,7 @@ namespace FreeAIr.Helper
                 }
             }
 
-            if (item.Type.In(types) && (string.IsNullOrEmpty(fullPath) || fullPath == item.FullPath))
+            if (predicate(item))
             {
                 //check for selection for this file
                 var documentView = await VS.Documents.GetDocumentViewAsync(item.FullPath);
@@ -58,24 +75,27 @@ namespace FreeAIr.Helper
                         );
                 }
 
-                var selection = documentView?.TextView?.Selection;
-                if (selection is not null
-                    && selection.SelectedSpans.Count == 1
-                    )
+                if (includeSelection)
                 {
-                    var sspan = selection.SelectedSpans[0];
-                    if (!sspan.IsEmpty)
+                    var selection = documentView?.TextView?.Selection;
+                    if (selection is not null
+                        && selection.SelectedSpans.Count == 1
+                        )
                     {
-                        foundItems.Insert(
-                            0,
-                            new(
-                                item,
-                                new UI.Embedillo.Answer.Parser.SelectedSpan(
-                                    sspan.Span.Start,
-                                    sspan.Span.Length
+                        var sspan = selection.SelectedSpans[0];
+                        if (!sspan.IsEmpty)
+                        {
+                            foundItems.Insert(
+                                0,
+                                new(
+                                    item,
+                                    new UI.Embedillo.Answer.Parser.SelectedSpan(
+                                        sspan.Span.Start,
+                                        sspan.Span.Length
+                                        )
                                     )
-                                )
-                            );
+                                );
+                        }
                     }
                 }
             }
@@ -87,7 +107,7 @@ namespace FreeAIr.Helper
                     continue;
                 }
 
-                await ProcessDownRecursivelyForAsync(foundItems, child, types, fullPath);
+                await ProcessDownRecursivelyForAsync(foundItems, child, predicate, includeSelection);
             }
         }
 

@@ -51,9 +51,9 @@ namespace FreeAIr.UI.Embedillo.VisualLine.SolutionItem
 
             var solutionItems = await solution.ProcessDownRecursivelyForAsync(
                 [SolutionItemType.Solution, SolutionItemType.Project, SolutionItemType.PhysicalFile],
-                null
+                null,
+                true
                 );
-
 
             var suggestions = solutionItems.ConvertAll(si =>
             {

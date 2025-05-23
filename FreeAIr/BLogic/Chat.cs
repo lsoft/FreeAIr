@@ -185,20 +185,16 @@ namespace FreeAIr.BLogic
 
             try
             {
-                File.AppendAllText(
-                    ResultFilePath,
+                answer.Append(
                     Environment.NewLine + Environment.NewLine
                     );
-                File.AppendAllText(
-                    ResultFilePath,
+                answer.Append(
                     $"> {"UI_Prompt".GetLocalizedResourceByName()}:" + Environment.NewLine
                     );
-                File.AppendAllText(
-                    ResultFilePath,
+                answer.Append(
                     _prompts.Last().PromptBody + Environment.NewLine + Environment.NewLine
                     );
-                File.AppendAllText(
-                    ResultFilePath,
+                answer.Append(
                     $"> {"UI_Answer".GetLocalizedResourceByName()}:" + Environment.NewLine
                     );
 
@@ -242,13 +238,14 @@ namespace FreeAIr.BLogic
 
                 var cco = new ChatCompletionOptions
                 {
+                    //ToolChoice = ChatToolChoice.CreateRequiredChoice(),
                     //ResponseFormat = ChatResponseFormat.CreateTextFormat(),
-                    MaxOutputTokenCount = 4096,
+                    MaxOutputTokenCount = 8192,
                 };
                 foreach (var tool in activeTools)
                 {
                     cco.Tools.Add(
-                        tool.CreateChatTools()
+                        tool.CreateChatTool()
                         );
                 }
 
@@ -256,6 +253,84 @@ namespace FreeAIr.BLogic
                 do
                 {
                     continueTalk = false;
+
+                    //var cr = _chatClient.CompleteChat(
+                    //    messages: chatMessages,
+                    //    options: cco,
+                    //    cancellationToken: cancellationToken
+                    //    );
+                    //var crv = cr.Value;
+
+
+                    //if (crv.FinishReason == ChatFinishReason.ToolCalls)
+                    //{
+                    //    chatMessages.Add(
+                    //        new AssistantChatMessage(
+                    //            crv.ToolCalls
+                    //            )
+                    //        );
+
+                    //    foreach (var toolCall in crv.ToolCalls)
+                    //    {
+                    //        answer.Append(
+                    //            Environment.NewLine
+                    //            + "<ToolCall>"
+                    //            + Environment.NewLine
+                    //            + toolCall.FunctionName
+                    //            + Environment.NewLine
+                    //            + (toolCall.FunctionArguments.ToMemory().Length > 0
+                    //                ? toolCall.FunctionArguments.ToString()
+                    //                : string.Empty)
+                    //            + Environment.NewLine
+                    //            + "</ToolCall>"
+                    //            + Environment.NewLine
+                    //            );
+
+                    //        var toolArguments = ParseToolInvocationArguments(toolCall);
+
+                    //        var toolResult = await AgentCollection.CallToolAsync(
+                    //            toolCall.FunctionName,
+                    //            toolArguments,
+                    //            cancellationToken: CancellationToken.None
+                    //            );
+                    //        if (toolResult is null)
+                    //        {
+                    //            throw new InvalidOperationException($"Tool named {toolCall.FunctionName} does not exists.");
+                    //        }
+
+                    //        chatMessages.Add(
+                    //            new ToolChatMessage(
+                    //                toolCall.Id,
+                    //                string.Join(
+                    //                    Environment.NewLine,
+                    //                    toolResult
+                    //                    )
+                    //                )
+                    //            );
+                    //    }
+
+                    //    continueTalk = true;
+                    //}
+                    //else
+                    //{
+                    //    foreach (var content in crv.Content)
+                    //    {
+                    //        if (content.Kind == ChatMessageContentPartKind.Text)
+                    //        {
+                    //            answer.Append(
+                    //                content.Text
+                    //                );
+                    //        }
+                    //    }
+
+                    //    chatMessages.Add(
+                    //        new AssistantChatMessage(
+                    //            crv.Content
+                    //            )
+                    //        );
+                    //}
+
+
 
                     var completionUpdates = _chatClient.CompleteChatStreaming(
                         messages: chatMessages,
@@ -270,13 +345,30 @@ namespace FreeAIr.BLogic
                     {
                         if (completionUpdate.CompletionId is null)
                         {
-                            answer.Append("Error reading answer (out of limit for free account?).");
+                            answer.Append("Server returns error.");
                             Status = ChatStatusEnum.Failed;
                             return answer;
                         }
 
                         chatFinishReason ??= completionUpdate.FinishReason;
                         toolCalls.AddRange(completionUpdate.ToolCallUpdates);
+
+                        if (completionUpdate.FinishReason == ChatFinishReason.ToolCalls)
+                        {
+                            chatMessages.Add(
+                                new AssistantChatMessage(
+                                    completionUpdate.ToolCallUpdates.ConvertToChatTools()
+                                    )
+                                );
+                        }
+                        else
+                        {
+                            chatMessages.Add(
+                                new AssistantChatMessage(
+                                    completionUpdate.ContentUpdate
+                                    )
+                                );
+                        }
 
                         foreach (ChatMessageContentPart contentPart in completionUpdate.ContentUpdate)
                         {
@@ -301,12 +393,15 @@ namespace FreeAIr.BLogic
                     {
                         foreach (var toolCall in toolCalls)
                         {
-                            File.AppendAllText(
-                                ResultFilePath,
+                            answer.Append(
                                 Environment.NewLine
                                 + "<ToolCall>"
                                 + Environment.NewLine
                                 + toolCall.FunctionName
+                                + Environment.NewLine
+                                + (toolCall.FunctionArgumentsUpdate.ToMemory().Length > 0
+                                    ? toolCall.FunctionArgumentsUpdate.ToString()
+                                    : string.Empty)
                                 + Environment.NewLine
                                 + "</ToolCall>"
                                 + Environment.NewLine
@@ -319,18 +414,20 @@ namespace FreeAIr.BLogic
                                 toolArguments,
                                 cancellationToken: CancellationToken.None
                                 );
-                            if (toolResult is not null)
+                            if (toolResult is null)
                             {
-                                chatMessages.Add(
-                                    new ToolChatMessage(
-                                        toolCall.ToolCallId,
-                                        string.Join(
-                                            Environment.NewLine,
-                                            toolResult
-                                            )
-                                        )
-                                    );
+                                throw new InvalidOperationException($"Tool named {toolCall.FunctionName} does not exists.");
                             }
+
+                            chatMessages.Add(
+                                new ToolChatMessage(
+                                    toolCall.ToolCallId,
+                                    string.Join(
+                                        Environment.NewLine,
+                                        toolResult
+                                        )
+                                    )
+                                );
                         }
 
                         continueTalk = true;
@@ -389,6 +486,26 @@ namespace FreeAIr.BLogic
         }
 
         private static Dictionary<string, object?> ParseToolInvocationArguments(
+            ChatToolCall toolCall
+            )
+        {
+            var toolArguments = new Dictionary<string, object?>();
+            if (toolCall.FunctionArguments.ToMemory().Length > 0)
+            {
+                using JsonDocument toolArgumentJson = JsonDocument.Parse(
+                    toolCall.FunctionArguments
+                    );
+
+                foreach (var pair in toolArgumentJson.RootElement.EnumerateObject())
+                {
+                    toolArguments.Add(pair.Name, pair.Value.DeserializeToObject());
+                }
+            }
+
+            return toolArguments;
+        }
+
+        private static Dictionary<string, object?> ParseToolInvocationArguments(
             StreamingChatToolCallUpdate toolCall
             )
         {
@@ -401,7 +518,7 @@ namespace FreeAIr.BLogic
 
                 foreach (var pair in toolArgumentJson.RootElement.EnumerateObject())
                 {
-                    toolArguments.Add(pair.Name, pair.Value.GetRawText());
+                    toolArguments.Add(pair.Name, pair.Value.DeserializeToObject());
                 }
             }
 
