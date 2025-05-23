@@ -163,6 +163,8 @@ Your environment:
 #6 Each item has a name, type, and content. Content, text, body are synonyms that mean the same thing. An item can also have a full path.
 #7 If a user asks about an item and specifies its name, not its full path, you can use the available functions to get a list of all items in the solution and find the full path of the item yourself.
 #8 You can query the contents of an item using the available functions.
+#9 A solution can be in several states: not compiled, compiled with errors, compiled successfully. ""Not compiled"" means that the solution's source code contained outdated changes that had not yet been compiled.
+#10 You can get a list of compilation errors and compilation warnings using the available functions.
 ";
 
             return string.Format(

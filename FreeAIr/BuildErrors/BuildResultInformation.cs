@@ -1,7 +1,11 @@
-﻿namespace FreeAIr.Commands.BuildError
+﻿namespace FreeAIr.BuildErrors
 {
-    public sealed class ErrorInformation
+    public sealed class BuildResultInformation
     {
+        public ErrorInformationTypeEnum Type
+        {
+            get;
+        }
         public string FilePath
         {
             get;
@@ -19,18 +23,27 @@
             get;
         }
 
-        public ErrorInformation(
+        public BuildResultInformation(
+            ErrorInformationTypeEnum type,
             string filePath,
             string errorDescription,
             int line,
             int column
             )
         {
+            Type = type;
             FilePath = filePath;
             ErrorDescription = errorDescription;
             Line = line;
             Column = column;
         }
 
+    }
+
+    public enum ErrorInformationTypeEnum
+    {
+        Error,
+        Warning,
+        Information
     }
 }

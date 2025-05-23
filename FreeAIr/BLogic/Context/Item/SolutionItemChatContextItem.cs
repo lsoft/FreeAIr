@@ -103,7 +103,7 @@ namespace FreeAIr.BLogic.Context.Item
             {
                 return
                     Environment.NewLine
-                    + $"Source code of the file `{SelectedIdentifier.FilePath}`:"
+                    + $"Text of the file `{SelectedIdentifier.FilePath}`:"
                     + Environment.NewLine
                     + Environment.NewLine
                     + "```"

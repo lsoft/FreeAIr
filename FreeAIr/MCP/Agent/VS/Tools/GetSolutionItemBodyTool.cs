@@ -23,7 +23,7 @@ namespace FreeAIr.MCP.Agent.VS.Tools
             ) : base(
                 VisualStudioAgent.VisualStudioAgentName,
                 VisualStudioToolName,
-                "Returns a JSON-formatted information about solution item (document, file). The result of its function includes: item name, item full path, item kind and its content (body, text) for each found item.",
+                "Returns a JSON-formatted information about solution item (document, file). The result of this function includes: item name, item full path, item kind and its content (body, text) for each found item.",
                 $$$"""
                 {
                     "type": "object",

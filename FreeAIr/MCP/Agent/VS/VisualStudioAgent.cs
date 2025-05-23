@@ -3,6 +3,7 @@ using FreeAIr.MCP.Agent.VS.Tools;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -25,8 +26,17 @@ namespace FreeAIr.MCP.Agent.VS
 
             #region add available tools
 
-            _tools[GetAllSolutionItemsTool.VisualStudioToolName] = GetAllSolutionItemsTool.Instance;
-            _tools[GetSolutionItemBodyTool.VisualStudioToolName] = GetSolutionItemBodyTool.Instance;
+            var tools =
+                from type in typeof(VisualStudioAgent).Assembly.GetTypes()
+                where type.BaseType == typeof(VisualStudioAgentTool)
+                let instanceField = type.GetField("Instance", BindingFlags.Static | BindingFlags.Public)
+                let tool = instanceField.GetValue(null) as VisualStudioAgentTool
+                select tool;
+
+            foreach (var tool in tools)
+            {
+                _tools[tool.ToolName] = tool;
+            }
 
             #endregion
         }

@@ -20,7 +20,7 @@ namespace FreeAIr.MCP.Agent.VS.Tools
             ) : base(
                 VisualStudioAgent.VisualStudioAgentName,
                 VisualStudioToolName,
-                "Returns a JSON-formatted list of items (documents, files) metadata of an open solution. The result of its function includes: item name, item full path, item kind for each found item.",
+                "Returns a JSON-formatted list of items (documents, files) metadata of an open solution. The result of this function includes: item name, item full path, item kind for each found item.",
                 "{}"
                 )
         {

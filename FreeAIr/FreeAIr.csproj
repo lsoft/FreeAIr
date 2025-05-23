@@ -69,8 +69,9 @@
     <Compile Include="BLogic\Context\IChatContextItem.cs" />
     <Compile Include="BLogic\Context\Item\CustomFileContextItem.cs" />
     <Compile Include="BLogic\Context\Item\SolutionItemChatContextItem.cs" />
+    <Compile Include="BuildErrors\BuildResultProvider.cs" />
     <Compile Include="Commands\BuildError\BuildErrorWindowFixErrorCommand.cs" />
-    <Compile Include="Commands\BuildError\ErrorInformation.cs" />
+    <Compile Include="BuildErrors\BuildResultInformation.cs" />
     <Compile Include="Commands\Other\InstallGithubMCPServerCommand.cs" />
     <Compile Include="Helper\JsonElementDeserializer.cs" />
     <Compile Include="Helper\OpenAIHelper.cs" />
@@ -115,8 +116,9 @@
     <Compile Include="MCP\Agent\Github\GithubMCPInstallBackgroundTask.cs" />
     <Compile Include="MCP\Agent\IAgent.cs" />
     <Compile Include="MCP\Agent\ProcessMonitor.cs" />
-    <Compile Include="MCP\Agent\VS\Tools\GetSolutionItemBodyTool.cs" />
     <Compile Include="MCP\Agent\VS\Tools\GetAllSolutionItemsTool.cs" />
+    <Compile Include="MCP\Agent\VS\Tools\GetSolutionItemBodyTool.cs" />
+    <Compile Include="MCP\Agent\VS\Tools\GetAllWarningErrorsTool.cs" />
     <Compile Include="MCP\Agent\VS\Tools\VisualStudioAgentTool.cs" />
     <Compile Include="MCP\Agent\VS\VisualStudioAgent.cs" />
     <Compile Include="MCP\AvailableToolController.cs" />

@@ -200,7 +200,7 @@ namespace FreeAIr.BLogic
 
                 Status = ChatStatusEnum.WaitingForAnswer;
 
-                var chatMessages = new List<ChatMessage>(_prompts.Count + 1);
+                var chatMessages = new List<ChatMessage>();
                 chatMessages.Add(
                     new SystemChatMessage(userPrompt.BuildRulesSection())
                     );
@@ -214,22 +214,37 @@ namespace FreeAIr.BLogic
                         );
                 }
 
-                var lastPromptParts = new List<ChatMessageContentPart>(_chatContext.Items.Count + 1);
+                //var lastPromptParts = new List<ChatMessageContentPart>(_chatContext.Items.Count + 1);
+                //foreach (var contextItem in _chatContext.Items)
+                //{
+                //    lastPromptParts.Add(
+                //        ChatMessageContentPart.CreateTextPart(
+                //            await contextItem.AsContextPromptTextAsync()
+                //            )
+                //        );
+                //}
                 foreach (var contextItem in _chatContext.Items)
                 {
-                    lastPromptParts.Add(
-                        ChatMessageContentPart.CreateTextPart(
-                            await contextItem.AsContextPromptTextAsync()
+                    chatMessages.Add(
+                        new UserChatMessage(
+                            ChatMessageContentPart.CreateTextPart(
+                                await contextItem.AsContextPromptTextAsync()
+                                )
                             )
                         );
                 }
 
-                var lastUserPrompt = _prompts.Last();
-                var lastUserPromptPart = ChatMessageContentPart.CreateTextPart(lastUserPrompt.PromptBody);
-                lastPromptParts.Insert(0, lastUserPromptPart);
+                //var lastUserPrompt = _prompts.Last();
+                //var lastUserPromptPart = ChatMessageContentPart.CreateTextPart(lastUserPrompt.PromptBody);
+                //lastPromptParts.Insert(0, lastUserPromptPart);
+                //chatMessages.Add(
+                //    new UserChatMessage(
+                //        lastPromptParts
+                //        )
+                //    );
                 chatMessages.Add(
                     new UserChatMessage(
-                        lastPromptParts
+                        ChatMessageContentPart.CreateTextPart(_prompts.Last().PromptBody)
                         )
                     );
 
@@ -238,7 +253,7 @@ namespace FreeAIr.BLogic
 
                 var cco = new ChatCompletionOptions
                 {
-                    //ToolChoice = ChatToolChoice.CreateRequiredChoice(),
+                    ToolChoice = ChatToolChoice.CreateRequiredChoice(),
                     //ResponseFormat = ChatResponseFormat.CreateTextFormat(),
                     MaxOutputTokenCount = 8192,
                 };
@@ -253,6 +268,10 @@ namespace FreeAIr.BLogic
                 do
                 {
                     continueTalk = false;
+
+
+
+
 
                     //var cr = _chatClient.CompleteChat(
                     //    messages: chatMessages,
@@ -332,6 +351,8 @@ namespace FreeAIr.BLogic
 
 
 
+
+
                     var completionUpdates = _chatClient.CompleteChatStreaming(
                         messages: chatMessages,
                         options: cco,
@@ -353,7 +374,9 @@ namespace FreeAIr.BLogic
                         chatFinishReason ??= completionUpdate.FinishReason;
                         toolCalls.AddRange(completionUpdate.ToolCallUpdates);
 
-                        if (completionUpdate.FinishReason == ChatFinishReason.ToolCalls)
+                        if (completionUpdate.FinishReason == ChatFinishReason.ToolCalls
+                            || completionUpdate.ToolCallUpdates.Count > 0
+                            )
                         {
                             chatMessages.Add(
                                 new AssistantChatMessage(
@@ -363,11 +386,14 @@ namespace FreeAIr.BLogic
                         }
                         else
                         {
-                            chatMessages.Add(
-                                new AssistantChatMessage(
-                                    completionUpdate.ContentUpdate
-                                    )
-                                );
+                            if (completionUpdate.ContentUpdate.Count > 0)
+                            {
+                                chatMessages.Add(
+                                    new AssistantChatMessage(
+                                        completionUpdate.ContentUpdate
+                                        )
+                                    );
+                            }
                         }
 
                         foreach (ChatMessageContentPart contentPart in completionUpdate.ContentUpdate)
@@ -393,6 +419,32 @@ namespace FreeAIr.BLogic
                     {
                         foreach (var toolCall in toolCalls)
                         {
+                            var toolArguments = ParseToolInvocationArguments(toolCall);
+
+                            var toolResult = await AgentCollection.CallToolAsync(
+                                toolCall.FunctionName,
+                                toolArguments,
+                                cancellationToken: CancellationToken.None
+                                );
+                            if (toolResult is null)
+                            {
+                                answer.Append(
+                                    Environment.NewLine
+                                    + "<ToolCall>"
+                                    + Environment.NewLine
+                                    + toolCall.FunctionName
+                                    + Environment.NewLine
+                                    + (toolCall.FunctionArgumentsUpdate.ToMemory().Length > 0
+                                        ? toolCall.FunctionArgumentsUpdate.ToString()
+                                        : string.Empty)
+                                    + Environment.NewLine
+                                    + "</ToolCall>"
+                                    + Environment.NewLine
+                                    );
+
+                                throw new InvalidOperationException($"Tool named {toolCall.FunctionName} does not exists.");
+                            }
+
                             answer.Append(
                                 Environment.NewLine
                                 + "<ToolCall>"
@@ -403,21 +455,15 @@ namespace FreeAIr.BLogic
                                     ? toolCall.FunctionArgumentsUpdate.ToString()
                                     : string.Empty)
                                 + Environment.NewLine
+                                + Environment.NewLine
+                                + string.Join(
+                                    Environment.NewLine,
+                                    toolResult
+                                    )
+                                + Environment.NewLine
                                 + "</ToolCall>"
                                 + Environment.NewLine
                                 );
-
-                            var toolArguments = ParseToolInvocationArguments(toolCall);
-
-                            var toolResult = await AgentCollection.CallToolAsync(
-                                toolCall.FunctionName,
-                                toolArguments,
-                                cancellationToken: CancellationToken.None
-                                );
-                            if (toolResult is null)
-                            {
-                                throw new InvalidOperationException($"Tool named {toolCall.FunctionName} does not exists.");
-                            }
 
                             chatMessages.Add(
                                 new ToolChatMessage(
@@ -432,6 +478,10 @@ namespace FreeAIr.BLogic
 
                         continueTalk = true;
                     }
+
+
+
+
                 }
                 while (continueTalk);
 

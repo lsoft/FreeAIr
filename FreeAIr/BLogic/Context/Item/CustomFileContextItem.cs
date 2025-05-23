@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace FreeAIr.BLogic.Context.Item
@@ -38,10 +39,9 @@ namespace FreeAIr.BLogic.Context.Item
             }
 
             var fi = new FileInfo(_filePath);
-
             return
                 Environment.NewLine
-                + $"Source code of the file `{_filePath}`:"
+                + $"Text of the file `{_filePath}`:"
                 + Environment.NewLine
                 + Environment.NewLine
                 + "```"
