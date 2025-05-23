@@ -40,10 +40,11 @@
 
     }
 
+    [Flags]
     public enum ErrorInformationTypeEnum
     {
-        Error,
-        Warning,
-        Information
+        Error = 1,
+        Warning = 2,
+        Information = 4
     }
 }

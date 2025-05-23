@@ -11,7 +11,9 @@ namespace FreeAIr.BuildErrors
 {
     public static class BuildResultProvider
     {
-        public static async Task<List<BuildResultInformation>> GetBuildResultInformationsAsync()
+        public static async Task<List<BuildResultInformation>> GetBuildResultInformationsAsync(
+            ErrorInformationTypeEnum allowedTypes = ErrorInformationTypeEnum.Error
+            )
         {
             await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
 
@@ -49,12 +51,18 @@ namespace FreeAIr.BuildErrors
                 var isError = category == (uint)TaskErrorCategory.Error;
                 var isWarning = category == (uint)TaskErrorCategory.Warning;
 
+                var type = isError
+                    ? ErrorInformationTypeEnum.Error
+                    : isWarning
+                        ? ErrorInformationTypeEnum.Warning
+                        : ErrorInformationTypeEnum.Information;
+                if ((allowedTypes & type) == 0)
+                {
+                    continue;
+                }
+
                 var errorInformation = new BuildResultInformation(
-                    isError
-                        ? ErrorInformationTypeEnum.Error
-                        : isWarning
-                            ? ErrorInformationTypeEnum.Warning
-                            : ErrorInformationTypeEnum.Information,
+                    type,
                     document,
                     text,
                     line,

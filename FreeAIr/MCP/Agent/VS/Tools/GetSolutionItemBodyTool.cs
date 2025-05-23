@@ -13,7 +13,7 @@ namespace FreeAIr.MCP.Agent.VS.Tools
 {
     public sealed class GetSolutionItemBodyTool : VisualStudioAgentTool
     {
-        private const string ParameterName = "item_name_or_full_path";
+        private const string ItemNamePathParameterName = "item_name_or_full_path";
 
         public static readonly GetSolutionItemBodyTool Instance = new();
 
@@ -28,12 +28,12 @@ namespace FreeAIr.MCP.Agent.VS.Tools
                 {
                     "type": "object",
                     "properties": {
-                        "{{{ParameterName}}}": {
+                        "{{{ItemNamePathParameterName}}}": {
                         "type": "string",
                         "description": "Full path or name of solution item"
                         }
                     },
-                    "required": ["{{{ParameterName}}}"]
+                    "required": ["{{{ItemNamePathParameterName}}}"]
                 }
                 """
                 )
@@ -46,24 +46,24 @@ namespace FreeAIr.MCP.Agent.VS.Tools
             CancellationToken cancellationToken = default
             )
         {
-            if (!arguments.TryGetValue(ParameterName, out var itemNameObj))
+            await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+
+            if (!arguments.TryGetValue(ItemNamePathParameterName, out var itemNamePathObj))
             {
-                return new AgentToolCallResult($"Parameter {ParameterName} does not found.");
+                return new AgentToolCallResult($"Parameter {ItemNamePathParameterName} does not found.");
             }
 
-            var itemName = itemNameObj as string;
-
-            await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+            var itemNamePath = itemNamePathObj as string;
              
             var solution = await Community.VisualStudio.Toolkit.VS.Solutions.GetCurrentSolutionAsync();
             var items = await solution.ProcessDownRecursivelyForAsync(
-                item => !item.IsNonVisibleItem && (StringComparer.InvariantCultureIgnoreCase.Compare(item.Text, itemName) == 0 || StringComparer.InvariantCultureIgnoreCase.Compare(item.FullPath, itemName) == 0),
+                item => !item.IsNonVisibleItem && (StringComparer.InvariantCultureIgnoreCase.Compare(item.Text, itemNamePath) == 0 || StringComparer.InvariantCultureIgnoreCase.Compare(item.FullPath, itemNamePath) == 0),
                 false
                 );
             var item = items.FirstOrDefault(i => !i.SolutionItem.IsNonVisibleItem);
             if (item is null)
             {
-                return new AgentToolCallResult($"File {itemName} does not found in current solution.");
+                return new AgentToolCallResult($"File {itemNamePath} does not found in current solution.");
             }
 
             var packed = new SolutionItemBodiesJson

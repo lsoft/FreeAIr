@@ -3,7 +3,7 @@ using System.Linq;
 
 namespace FreeAIr.BLogic.Context
 {
-    public sealed class ChatContext : IChatContext
+    public sealed class ChatContext
     {
         private readonly List<IChatContextItem> _items = new();
 

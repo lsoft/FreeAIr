@@ -169,7 +169,7 @@ namespace FreeAIr.BLogic
                         {
                             if (answer is not null)
                             {
-                                var commitMessage = answer.GetAnswer().CleanupFromQuotesAndThinks(
+                                var commitMessage = answer.GetTextualAnswer().CleanupFromQuotesAndThinks(
                                     Environment.NewLine
                                     );
                                 if (!string.IsNullOrEmpty(commitMessage))

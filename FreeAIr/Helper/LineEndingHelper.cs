@@ -128,6 +128,32 @@ namespace FreeAIr.Helper
                 return Environment.NewLine;
             }
 
+            public static string GetDocumentLineEnding(
+                string filePath
+                )
+            {
+                if (!System.IO.File.Exists(filePath))
+                {
+                    return EditorConfig.GetLineEndingFor(filePath);
+                }
+
+                var body = System.IO.File.ReadAllText(filePath);
+                if (body.Contains("\r\n"))
+                {
+                    return "\r\n";
+                }
+                if (body.Contains("\r"))
+                {
+                    return "\r";
+                }
+                if (body.Contains("\n"))
+                {
+                    return "\n";
+                }
+
+                return Environment.NewLine;
+            }
+
             private static string GetDocumentLineEnding(
                 EnvDTE.Document activeDoc
                 )
@@ -145,6 +171,7 @@ namespace FreeAIr.Helper
 
                 return Environment.NewLine;
             }
+
         }
     }
 }

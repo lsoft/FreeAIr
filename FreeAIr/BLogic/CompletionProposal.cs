@@ -116,19 +116,24 @@ namespace FreeAIr.BLogic
                 if (chat.Status == ChatStatusEnum.Ready)
                 {
                     var lastPrompt = chat.Prompts.Last();
-                    if (!string.IsNullOrEmpty(lastPrompt.Answer))
+                    if (lastPrompt.Answer is not null)
                     {
-                        var cleanAnswer = lastPrompt.Answer.CleanupFromQuotesAndThinks(
-                            lineEnding
-                            );
-                        if (!string.IsNullOrEmpty(cleanAnswer))
+                        var textAnswer = lastPrompt.Answer.GetTextualAnswer();
+
+                        if (!string.IsNullOrEmpty(textAnswer))
                         {
-                            var proposalCollection = ProposalFactory.CreateCollectionFromText(
-                                cleanAnswer,
-                                _textView,
-                                caretPosition
+                            var cleanAnswer = textAnswer.CleanupFromQuotesAndThinks(
+                                lineEnding
                                 );
-                            return proposalCollection;
+                            if (!string.IsNullOrEmpty(cleanAnswer))
+                            {
+                                var proposalCollection = ProposalFactory.CreateCollectionFromText(
+                                    cleanAnswer,
+                                    _textView,
+                                    caretPosition
+                                    );
+                                return proposalCollection;
+                            }
                         }
                     }
                 }

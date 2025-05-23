@@ -44,7 +44,7 @@ namespace FreeAIr.BLogic
         public async Task<Chat?> StartChatAsync(
             ChatDescription kind,
             UserPrompt? prompt,
-            Action<Chat, Answer> promptAnsweredCallBack = null
+            Action<Chat, LLMAnswer> promptAnsweredCallBack = null
             )
         {
             if (kind is null)
