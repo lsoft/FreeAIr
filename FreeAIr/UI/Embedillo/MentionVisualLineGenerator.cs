@@ -1,11 +1,12 @@
-﻿using ICSharpCode.AvalonEdit.Rendering;
+﻿using FreeAIr.Helper;
+using FreeAIr.UI.Embedillo.Answer.Parser;
+using ICSharpCode.AvalonEdit.Rendering;
+using Microsoft.VisualStudio.Imaging.Interop;
+using System.Collections.Generic;
+using System.Linq;
 using System.Text.RegularExpressions;
 using System.Windows;
-using System.Linq;
-using FreeAIr.Helper;
-using System.Collections.Generic;
-using FreeAIr.UI.Embedillo.Answer.Parser;
-using Microsoft.VisualStudio.Imaging.Interop;
+using System.Windows.Media.TextFormatting;
 
 namespace FreeAIr.UI.Embedillo
 {
@@ -103,7 +104,7 @@ namespace FreeAIr.UI.Embedillo
 
             var control = CreateControl(mentionText);
 
-            var element = new InlineObjectElement(
+            var element = new FixedInlineObjectElement(
                 mentionText.Length,
                 control
                 );
@@ -116,6 +117,53 @@ namespace FreeAIr.UI.Embedillo
         public abstract System.Threading.Tasks.Task<List<ISuggestion>> GetSuggestionsAsync();
         
         public abstract IAnswerPart CreatePart(string partPayload);
+
+        #region private classes
+
+        /// <summary>
+        /// Исправленная версия контрола. Теперь контрол правильно выравнивается по вертикали.
+        /// </summary>
+        public class FixedInlineObjectElement : InlineObjectElement
+        {
+            public FixedInlineObjectElement(int documentLength, UIElement element)
+                : base(documentLength, element)
+            {
+            }
+
+            /// <inheritdoc/>
+            public override TextRun CreateTextRun(int startVisualColumn, ITextRunConstructionContext context)
+            {
+                var run = base.CreateTextRun(startVisualColumn, context);
+
+                return new FixedInlineObjectRun(
+                    run.Length,
+                    run.Properties,
+                    this.Element
+                    );
+            }
+
+        }
+
+        private class FixedInlineObjectRun : InlineObjectRun
+        {
+            public FixedInlineObjectRun(int length, TextRunProperties properties, UIElement element)
+                : base(length, properties, element)
+            {
+            }
+
+            /// <inheritdoc/>
+            public override TextEmbeddedObjectMetrics Format(double remainingParagraphWidth)
+            {
+                var result = base.Format(remainingParagraphWidth);
+                return new TextEmbeddedObjectMetrics(
+                    result.Width,
+                    result.Height,
+                    result.Baseline * 0.75
+                    );
+            }
+        }
+
+        #endregion
     }
 
     public interface ISuggestion

@@ -360,12 +360,13 @@
                             HorizontalContentAlignment="Stretch"
                             Foreground="{Binding ElementName=ForegroundButton, Path=Foreground}"
                             Background="Transparent"
-                            FontSize="14"
+                            FontSize="12"
                             FontFamily="Cascadia Code"
                             x:Name="AddToContextControl"
+                            HintText="Press # to enter context items here. Press Ctrl + Enter to add items to context."
                             EnterCommand="{Binding AddItemToContextCommand}"
                             >
-                        </embedillo:EmbedilloControl>
+                            </embedillo:EmbedilloControl>
 
                     </Grid>
 
@@ -697,22 +698,17 @@
 
             <embedillo:EmbedilloControl
                 Grid.Row="3"
-                Margin="2,2,2,20"
+                Margin="2,2,2,2"
                 VerticalAlignment="Stretch"
+                VerticalContentAlignment="Stretch"
                 Foreground="{Binding ElementName=ForegroundButton, Path=Foreground}"
                 Background="Transparent"
-                FontSize="18"
+                FontSize="14"
                 x:Name="PromptControl"
                 EnterCommand="{Binding CreatePromptCommand}"
+                HintText="Enter your prompt here. Press / to open commands. Press # to choose solution item. Press Ctrl + Enter to send your prompt."
                 >
             </embedillo:EmbedilloControl>
-
-            <Label
-                Grid.Row="3"
-                VerticalAlignment="Bottom"
-                HorizontalAlignment="Right"
-                Content="Press / to open commands. Press # to choose solution item. Press Ctrl + Enter to send your prompt."
-                />
 
         </Grid>
 

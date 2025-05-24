@@ -842,10 +842,11 @@ Your environment:
 
 Your behavior against available functions:
 #0 You are allowed to use any function you need to complete user's task.
-#1 If a user asks about an item and specifies its name, not its full path, you can use the available functions to get a list of all items in the solution and find the full path of the item yourself.
-#2 You can query the contents of an item using the available functions.
-#3 If a user ask you to fix the buf, you should get a list of compilation errors and compilation warnings using the available functions.
-#4 If a user asks you to change (fix) their code, do it and then build solution yourself using the available functions. If the build returns errors, offer to fix them, but do not fix them automatically.
+#1 You MUST call any available function without asking a user permission.
+#2 If a user asks about an item and specifies its name, not its full path, you can use the available functions to get a list of all items in the solution and find the full path of the item yourself.
+#3 You can query the contents of an item using the available functions.
+#4 If a user ask you to fix the buf, you should get a list of compilation errors using the available functions.
+#5 If a user asks you to change (fix) their code, do it and then build solution yourself using the available functions. If the build returns errors, offer to fix them, but do not fix them automatically.
 ";
 
             return string.Format(

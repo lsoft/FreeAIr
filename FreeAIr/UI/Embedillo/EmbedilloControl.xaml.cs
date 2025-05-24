@@ -23,6 +23,24 @@ namespace FreeAIr.UI.Embedillo
                 typeof(ICommand),
                 typeof(EmbedilloControl));
         
+
+        public Visibility HintVisibility
+        {
+            get
+            {
+                return string.IsNullOrEmpty(AvalonTextEditor.Text)
+                    ? Visibility.Visible
+                    : Visibility.Hidden
+                    ;
+            }
+        }
+
+        public string HintText
+        {
+            get;
+            set;
+        }
+
         public ICommand EnterCommand
         {
             get => (ICommand)GetValue(EnterCommandProperty);
@@ -42,6 +60,11 @@ namespace FreeAIr.UI.Embedillo
                         .FileAndForget(nameof(ShowCompletionWindowAsync))
                         ;
                 }
+            };
+
+            AvalonTextEditor.KeyUp += (object sender, KeyEventArgs e) =>
+            {
+                UpdateHintStatus();
             };
 
             AvalonTextEditor.PreviewKeyDown += (object sender, KeyEventArgs e) =>
@@ -118,6 +141,12 @@ namespace FreeAIr.UI.Embedillo
                     e.Handled = true; //блокируем стандартную обработку
                 }
             };
+        }
+
+        private void UpdateHintStatus()
+        {
+            HintLabel.GetBindingExpression(System.Windows.Controls.Label.VisibilityProperty).UpdateTarget();
+            HintLabel.GetBindingExpression(System.Windows.Controls.Label.ContentProperty).UpdateTarget();
         }
 
         public void Setup(
@@ -431,6 +460,11 @@ namespace FreeAIr.UI.Embedillo
                 AvalonTextEditor.Text
                 );
             return parsedAnswer;
+        }
+
+        private void EmbedilloInternalName_Loaded(object sender, RoutedEventArgs e)
+        {
+            UpdateHintStatus();
         }
     }
 }

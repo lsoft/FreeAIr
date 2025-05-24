@@ -11,16 +11,10 @@
     d:DesignHeight="450" d:DesignWidth="800"
     x:Name="EmbedilloInternalName"
     Focusable="True"
+    Loaded="EmbedilloInternalName_Loaded"
     >
-    <Border
-        CornerRadius="0"
-        BorderThickness="0,0,0,1"
-        BorderBrush="{Binding ElementName=EmbedilloInternalName, Path=Foreground}"
-        Margin="0"
-        x:Name="BorderName"
-        VerticalAlignment="{Binding ElementName=EmbedilloInternalName, Path=VerticalAlignment}"
-        HorizontalAlignment="{Binding ElementName=EmbedilloInternalName, Path=HorizontalAlignment}"
-        Focusable="True"
+    <Grid
+        VerticalAlignment="Stretch"
         >
         <avalonEdit:TextEditor
             x:Name="AvalonTextEditor"
@@ -28,8 +22,7 @@
             Background="{Binding ElementName=EmbedilloInternalName, Path=Background}"
             FontFamily="{Binding ElementName=EmbedilloInternalName, Path=FontFamily}"
             FontSize="{Binding ElementName=EmbedilloInternalName, Path=FontSize}"
-            Height="{Binding ElementName=BorderName, Path=Height}"
-            Margin="0,0,0,2"
+            Margin="0"
             HorizontalScrollBarVisibility="Auto"
             VerticalScrollBarVisibility="Auto"
             HorizontalAlignment="Stretch"
@@ -47,5 +40,21 @@
             </Behaviors:Interaction.Behaviors>
 
         </avalonEdit:TextEditor>
-    </Border>
+        <Label
+            x:Name="HintLabel"
+            HorizontalAlignment="Center"
+            VerticalAlignment="Center"
+            FontFamily="{Binding ElementName=EmbedilloInternalName, Path=FontFamily}"
+            FontSize="{Binding ElementName=EmbedilloInternalName, Path=FontSize}"
+            Foreground="Gray"
+            Background="Transparent"
+            Content="{Binding ElementName=EmbedilloInternalName, Path=HintText}"
+            Margin="0"
+            Padding="0"
+            Focusable="False"
+            IsHitTestVisible="False"
+            Visibility="{Binding ElementName=EmbedilloInternalName, Path=HintVisibility}"
+            />
+    </Grid>
+
 </UserControl>

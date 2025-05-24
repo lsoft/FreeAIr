@@ -1,5 +1,6 @@
 ﻿using FreeAIr.Helper;
 using FreeAIr.UI.Embedillo.Answer.Parser;
+using ICSharpCode.AvalonEdit.Rendering;
 using Microsoft.VisualStudio.Imaging;
 using Microsoft.VisualStudio.Imaging.Interop;
 using System.Collections.Generic;
@@ -108,60 +109,69 @@ namespace FreeAIr.UI.Embedillo.VisualLine.SolutionItem
             UIElement child;
             if (fileExists)
             {
-                var sp = new StackPanel
+                var sp = new Grid
                 {
-                    Orientation = Orientation.Horizontal,
+                    Margin = new Thickness(5, 0, 0, 0),
                     ToolTip = filePath
                 };
-                sp.Children.Add(
-                    new TextBlock
-                    {
-                        Padding = new Thickness(2),
-                        Text = fileName,
-                        FontWeight = FontWeights.Bold,
-                        ToolTip = filePath
-                    }
-                    );
-                sp.Children.Add(
-                    new TextBlock
-                    {
-                        Padding = new Thickness(2),
-                        Text = " ✓ ",
-                        Foreground = Brushes.Green,
-                        Background = Brushes.LightGreen,
-                        FontWeight = FontWeights.Bold,
-                        ToolTip = filePath
-                    }
-                    );
+                sp.ColumnDefinitions.Add(new ColumnDefinition());
+                sp.ColumnDefinitions.Add(new ColumnDefinition());
+
+                var tb1 = new TextBlock
+                {
+                    Padding = new Thickness(0),
+                    Text = fileName,
+                    VerticalAlignment = VerticalAlignment.Bottom,
+                    FontFamily = new FontFamily("Cascadia Code"),
+                    ToolTip = filePath
+                };
+                sp.Children.Add(tb1);
+                Grid.SetColumn(tb1, 0);
+                
+                var tb2 = new TextBlock
+                {
+                    Padding = new Thickness(0),
+                    Text = " ✓ ",
+                    Foreground = Brushes.Green,
+                    VerticalAlignment = VerticalAlignment.Bottom,
+                    ToolTip = filePath
+                };
+                sp.Children.Add(tb2);
+                Grid.SetColumn(tb2, 1);
+
                 child = sp;
             }
             else
             {
-                var sp = new StackPanel
+                var sp = new Grid
                 {
-                    Orientation = Orientation.Horizontal,
+                    Margin = new Thickness(5, 0, 0, 0),
+                };
+                sp.ColumnDefinitions.Add(new ColumnDefinition());
+                sp.ColumnDefinitions.Add(new ColumnDefinition());
+
+                var tb1 = new TextBlock
+                {
+                    Padding = new Thickness(0),
+                    Text = fileName,
+                    VerticalAlignment = VerticalAlignment.Bottom,
+                    FontFamily = new FontFamily("Cascadia Code"),
                     ToolTip = filePath
                 };
-                sp.Children.Add(
-                    new TextBlock
-                    {
-                        Padding = new Thickness(2),
-                        Text = fileName,
-                        FontWeight = FontWeights.Bold,
-                        ToolTip = filePath
-                    }
-                    );
-                sp.Children.Add(
-                    new TextBlock
-                    {
-                        Padding = new Thickness(2),
-                        Text = "<!>",
-                        Foreground = Brushes.Red,
-                        Background = Brushes.LightPink,
-                        FontWeight = FontWeights.Bold,
-                        ToolTip = filePath
-                    }
-                    );
+                sp.Children.Add(tb1);
+                Grid.SetColumn(tb1, 0);
+
+                var tb2 = new TextBlock
+                {
+                    Padding = new Thickness(0),
+                    Text = "<!>",
+                    Foreground = Brushes.Red,
+                    VerticalAlignment = VerticalAlignment.Bottom,
+                    ToolTip = filePath
+                };
+                sp.Children.Add(tb2);
+                Grid.SetColumn(tb2, 1);
+
                 child = sp;
             }
 
@@ -170,9 +180,10 @@ namespace FreeAIr.UI.Embedillo.VisualLine.SolutionItem
                 Background = Brushes.Transparent,
                 BorderBrush = fileExists ? Brushes.Green : Brushes.Red,
                 BorderThickness = new Thickness(1),
+                CornerRadius = new CornerRadius(0),
                 Padding = new Thickness(0),
-                Margin = new Thickness(0, 0, 0, -4),
-                VerticalAlignment = VerticalAlignment.Center,
+                Margin = new Thickness(0),
+                VerticalAlignment = VerticalAlignment.Stretch,
                 Child = child,
                 ToolTip = filePath
             };

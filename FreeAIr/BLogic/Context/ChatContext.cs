@@ -32,7 +32,8 @@ namespace FreeAIr.BLogic.Context
             {
                 context._items.Add(
                     new CustomFileContextItem(
-                        fullPath
+                        fullPath,
+                        true
                         )
                     );
             }
@@ -52,7 +53,9 @@ namespace FreeAIr.BLogic.Context
                     {
                         var repositoryFolder = activeRepository.RepositoryPath;
 
-                        var repoFullPath = Path.Combine(repositoryFolder, CopilotInstructionFilePath);
+                        var repoFullPath = Path.GetFullPath(
+                            Path.Combine(repositoryFolder, CopilotInstructionFilePath)
+                            );
                         if (File.Exists(repoFullPath))
                         {
                             return repoFullPath;
@@ -63,7 +66,9 @@ namespace FreeAIr.BLogic.Context
 
             var solution = await VS.Solutions.GetCurrentSolutionAsync();
             var solutionFolder = new FileInfo(solution.FullPath).Directory.FullName;
-            var solutionFullPath = Path.Combine(solutionFolder, CopilotInstructionFilePath);
+            var solutionFullPath = Path.GetFullPath(
+                Path.Combine(solutionFolder, CopilotInstructionFilePath)
+                );
             if (File.Exists(solutionFullPath))
             {
                 return solutionFullPath;

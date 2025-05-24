@@ -17,10 +17,14 @@ namespace FreeAIr.BLogic.Context.Item
 
         public string ContextUIDescription => _filePath;
 
-        public bool IsAutoFound => false;
+        public bool IsAutoFound
+        {
+            get;
+        }
 
         public CustomFileContextItem(
-            string filePath
+            string filePath,
+            bool isAutoFound
             )
         {
             if (filePath is null)
@@ -29,6 +33,7 @@ namespace FreeAIr.BLogic.Context.Item
             }
 
             _filePath = filePath.Trim();
+            IsAutoFound = isAutoFound;
         }
 
         public async Task<string> AsContextPromptTextAsync()

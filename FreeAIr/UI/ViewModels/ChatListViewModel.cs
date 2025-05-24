@@ -913,7 +913,8 @@ namespace FreeAIr.UI.ViewModels
                             }
 
                             var contextItem = new CustomFileContextItem(
-                                ofd.FileName
+                                ofd.FileName,
+                                false
                                 );
 
                             chat.ChatContext.AddItem(

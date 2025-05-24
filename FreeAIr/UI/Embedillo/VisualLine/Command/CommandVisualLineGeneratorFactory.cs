@@ -1,6 +1,7 @@
 ﻿using FreeAIr.BLogic;
 using FreeAIr.UI.Embedillo.Answer.Parser;
 using Microsoft.VisualStudio.Imaging;
+using SharpCompress.Common;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
@@ -56,59 +57,66 @@ namespace FreeAIr.UI.Embedillo.VisualLine.Command
             UIElement child;
             if (suggestion is not null)
             {
-                var sp = new StackPanel
+                var sp = new Grid
                 {
-                    Orientation = Orientation.Horizontal,
+                    Margin = new Thickness(5, 0, 5, 0),
+                    ToolTip = suggestion.FullData,
+                };
+                sp.ColumnDefinitions.Add(new ColumnDefinition());
+                sp.ColumnDefinitions.Add(new ColumnDefinition());
+
+                var img0 = new CrispImage
+                {
+                    Moniker = new Microsoft.VisualStudio.Imaging.Interop.ImageMoniker
+                    {
+                        Guid = new Guid("ae27a6b0-e345-4288-96df-5eaf394ee369"),
+                        Id = 2646
+                    }
+                };
+                sp.Children.Add(img0);
+                Grid.SetColumn(img0, 0);
+
+                var tb1 = new TextBlock
+                {
+                    Padding = new Thickness(0),
+                    Text = suggestion.PublicData,
+                    VerticalAlignment = VerticalAlignment.Bottom,
                     ToolTip = suggestion.FullData
                 };
+                sp.Children.Add(tb1);
+                Grid.SetColumn(tb1, 1);
 
-                sp.Children.Add(
-                    new CrispImage
-                    {
-                        Moniker = new Microsoft.VisualStudio.Imaging.Interop.ImageMoniker
-                        {
-                            Guid = new Guid("ae27a6b0-e345-4288-96df-5eaf394ee369"),
-                            Id = 2646
-                        }
-                    }
-                    );
-                sp.Children.Add(
-                    new TextBlock
-                    {
-                        Padding = new Thickness(2),
-                        Text = suggestion.PublicData,
-                        FontWeight = FontWeights.Bold,
-                        ToolTip = suggestion.FullData
-                    }
-                    );
                 child = sp;
             }
             else
             {
-                var sp = new StackPanel
+                var sp = new Grid
                 {
-                    Orientation = Orientation.Horizontal,
-                    ToolTip = "Invalid command"
+                    Margin = new Thickness(5, 0, 5, 0),
                 };
-                sp.Children.Add(
-                    new CrispImage
+                sp.ColumnDefinitions.Add(new ColumnDefinition());
+                sp.ColumnDefinitions.Add(new ColumnDefinition());
+
+                var img0 = new CrispImage
+                {
+                    Moniker = new Microsoft.VisualStudio.Imaging.Interop.ImageMoniker
                     {
-                        Moniker = new Microsoft.VisualStudio.Imaging.Interop.ImageMoniker
-                        {
-                            Guid = new Guid("ae27a6b0-e345-4288-96df-5eaf394ee369"),
-                            Id = 2926
-                        }
+                        Guid = new Guid("ae27a6b0-e345-4288-96df-5eaf394ee369"),
+                        Id = 2926
                     }
-                    );
-                sp.Children.Add(
-                    new TextBlock
-                    {
-                        Padding = new Thickness(2),
-                        Text = command,
-                        FontWeight = FontWeights.Bold,
-                        ToolTip = "Invalid command"
-                    }
-                    );
+                };
+                sp.Children.Add(img0);
+                Grid.SetColumn(img0, 0);
+
+                var tb1 = new TextBlock
+                {
+                    Padding = new Thickness(0),
+                    Text = command,
+                    VerticalAlignment = VerticalAlignment.Bottom,
+                };
+                sp.Children.Add(tb1);
+                Grid.SetColumn(tb1, 1);
+
                 child = sp;
             }
 
@@ -117,11 +125,11 @@ namespace FreeAIr.UI.Embedillo.VisualLine.Command
                 Background = Brushes.Transparent,
                 BorderBrush = suggestion is not null ? Brushes.Green : Brushes.Red,
                 BorderThickness = new Thickness(1),
+                CornerRadius = new CornerRadius(0),
                 Padding = new Thickness(0),
-                Margin = new Thickness(0, 0, 0, -4),
-                VerticalAlignment = VerticalAlignment.Center,
+                Margin = new Thickness(0),
+                VerticalAlignment = VerticalAlignment.Stretch,
                 Child = child,
-                //ToolTip = filePath
             };
 
             return border;
