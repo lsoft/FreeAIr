@@ -48,6 +48,14 @@ Main functions:
 - Generate unit tests
 - Fix build errors
 
+Searching with natural language:
+
+![Natural0](https://raw.githubusercontent.com/lsoft/FreeAIr/main/natural0.png)
+
+![Natural1](https://raw.githubusercontent.com/lsoft/FreeAIr/main/natural1.png)
+
+At the time, only `find in whole solution` mode is supported.
+
 Context menu:
 
 ![Context Menu](https://raw.githubusercontent.com/lsoft/FreeAIr/main/contextmenu.png)
