@@ -1,4 +1,4 @@
-﻿using DataObject.BLogic;
+using DataObject.BLogic;
 using DataObject.Repo;
 
 namespace TestSubject
@@ -20,8 +20,8 @@ namespace TestSubject
                 DateTime.Now.AddDays(1).Date
                 );
 
-            object o = null;
-            var p = o.ToString();
+            //object o = null;
+            //var p = o.ToString();
 
             Console.WriteLine($"Found {secondVoyages.Count} second voyages.");
         }

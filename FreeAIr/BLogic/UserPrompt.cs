@@ -85,6 +85,37 @@ namespace FreeAIr.BLogic
         }
 
         /// <summary>
+        /// Создает промпт на основе итема из контекста чата
+        /// </summary>
+        /// <param name="kind">Тип диалога</param>
+        /// <param name="chatContextItemNames">Имена итемов из контекста чата</param>
+        /// <returns>Новый объект UserPrompt</returns>
+        public static UserPrompt CreateContextItemBasedPrompt(
+            ChatKindEnum kind,
+            IReadOnlyList<string> chatContextItemNames
+            )
+        {
+            var sb = new StringBuilder();
+
+            foreach (var chatContextItemName in chatContextItemNames)
+            {
+                sb.Append(kind.AsPromptString());
+                sb.Append(" ");
+                sb.Append(
+                    string.Join(
+                        ", ",
+                        $"`{chatContextItemName}`"
+                        )
+                    );
+                sb.AppendLine();
+            }
+
+            return new UserPrompt(
+                sb.ToString()
+                );
+        }
+
+        /// <summary>
         /// Создает текстовый промпт для общего обсуждения
         /// </summary>
         /// <param name="userPrompt">Пользовательский текст</param>

@@ -38,46 +38,17 @@ namespace FreeAIr.Commands.File
 
             var sew = await VS.Windows.GetSolutionExplorerWindowAsync();
             var selections = (await sew.GetSelectionAsync()).ToList();
-            if (selections.Count != 1)
+            if (selections.Count == 0)
             {
-                await VS.MessageBox.ShowErrorAsync(
-                    Resources.Resources.Error,
-                    "Please select only one item."
-                    );
                 return;
             }
-
-            var selectedFile = selections[0];
-            if (selectedFile.Type != SolutionItemType.PhysicalFile)
-            {
-                await VS.MessageBox.ShowErrorAsync(
-                    Resources.Resources.Error,
-                    "Selected item is not a physical file."
-                    );
-                return;
-            }
-
-            var fileName = new FileInfo(selectedFile.FullPath).Name;
 
             var kind = GetChatKind();
-
-            var lineEnding = LineEndingHelper.Actual.OpenDocumentAndGetLineEnding(
-                selectedFile.FullPath
-                );
-
-            var wfd = new WholeFileTextDescriptor(
-                selectedFile.FullPath,
-                lineEnding
-                );
-
-            var contextItems = (await ContextComposer.ComposeFromFilePathAsync(
-                selectedFile.FullPath
-                )).ConvertToChatContextItem();
 
             var chat = await chatContainer.StartChatAsync(
                 new ChatDescription(
                     kind,
-                    wfd
+                    null
                     ),
                 null
                 );
@@ -86,22 +57,37 @@ namespace FreeAIr.Commands.File
                 return;
             }
 
-            chat.ChatContext.AddItem(
-                new SolutionItemChatContextItem(
-                    new UI.Embedillo.Answer.Parser.SelectedIdentifier(
-                        selectedFile.FullPath,
-                        null
-                        ),
-                    false
-                    )
-                );
+            foreach (var selection in selections)
+            {
+                if (selection.Type != SolutionItemType.PhysicalFile)
+                {
+                    continue;
+                }
 
-            chat.ChatContext.AddItems(
-                contextItems
-                );
+                var contextItems = (await ContextComposer.ComposeFromFilePathAsync(
+                    selection.FullPath
+                    )).ConvertToChatContextItem();
+
+                chat.ChatContext.AddItem(
+                    new SolutionItemChatContextItem(
+                        new UI.Embedillo.Answer.Parser.SelectedIdentifier(
+                            selection.FullPath,
+                            null
+                            ),
+                        false
+                        )
+                    );
+
+                chat.ChatContext.AddItems(
+                    contextItems
+                    );
+            }
 
             chat.AddPrompt(
-                UserPrompt.CreateCodeBasedPrompt(kind, fileName, selectedFile.FullPath)
+                UserPrompt.CreateContextItemBasedPrompt(
+                    kind,
+                    selections.ConvertAll(s => s.FullPath)
+                    )
                 );
 
             await ChatListToolWindow.ShowIfEnabledAsync();

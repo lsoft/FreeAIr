@@ -253,7 +253,7 @@ namespace FreeAIr.UI.ViewModels
                             }
 
                             await std.ReplaceOriginalTextWithNewAsync(
-                                codeText.WithLineEnding(std.LineEnding)
+                                codeText
                                 );
                         },
                         a =>

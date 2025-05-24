@@ -1,4 +1,5 @@
-﻿using FreeAIr.UI.Embedillo.Answer.Parser;
+﻿using FreeAIr.Helper;
+using FreeAIr.UI.Embedillo.Answer.Parser;
 using Microsoft.VisualStudio.Text;
 using SharpCompress.Common;
 using System.IO;
@@ -28,16 +29,6 @@ namespace FreeAIr.BLogic
             get;
         }
 
-        string OriginalText
-        {
-            get;
-        }
-
-        string LineEnding
-        {
-            get;
-        }
-
         SelectedIdentifier CreateSelectedIdentifier();
 
         Task ReplaceOriginalTextWithNewAsync(string newText);
@@ -45,6 +36,8 @@ namespace FreeAIr.BLogic
 
     public sealed class WholeFileTextDescriptor : IOriginalTextDescriptor
     {
+        private readonly string _lineEnding;
+
         public string FilePath
         {
             get;
@@ -58,15 +51,6 @@ namespace FreeAIr.BLogic
         public FreeAIr.UI.Embedillo.Answer.Parser.SelectedSpan? SelectedSpan => null;
 
         public bool IsAbleToManipulate => File.Exists(FilePath);
-
-        public string OriginalText
-        {
-            get;
-        }
-        public string LineEnding
-        {
-            get;
-        }
 
         public WholeFileTextDescriptor(
             string filePath,
@@ -84,9 +68,8 @@ namespace FreeAIr.BLogic
             }
 
             FilePath = filePath;
-            LineEnding = lineEnding;
+            _lineEnding = lineEnding;
             FileName = new FileInfo(filePath).Name;
-            OriginalText = File.ReadAllText(FilePath);
         }
 
 
@@ -102,7 +85,10 @@ namespace FreeAIr.BLogic
                 throw new ArgumentNullException(nameof(newText));
             }
 
-            File.WriteAllText(FilePath, newText);
+            File.WriteAllText(
+                FilePath,
+                newText.WithLineEnding(_lineEnding)
+                );
 
             return Task.CompletedTask;
         }
@@ -115,6 +101,8 @@ namespace FreeAIr.BLogic
 
     public sealed class SelectedTextDescriptor : IOriginalTextDescriptor
     {
+        private readonly string _lineEnding;
+
         private int _disposed = 0;
 
         private DocumentView? _documentView;
@@ -134,17 +122,7 @@ namespace FreeAIr.BLogic
             get;
         }
 
-        public string OriginalText
-        {
-            get;
-        }
-
         public bool IsAbleToManipulate => _documentView is not null;
-
-        public string LineEnding
-        {
-            get;
-        }
 
         public SelectedTextDescriptor(
             DocumentView documentView,
@@ -163,23 +141,14 @@ namespace FreeAIr.BLogic
 
             var filePath = documentView.FilePath;
 
-            var selection = documentView?.TextView.Selection;
-            var selectedSpan = selection.StreamSelectionSpan.SnapshotSpan;
-            SelectedSpan = new UI.Embedillo.Answer.Parser.SelectedSpan(
-                selectedSpan.Span.Start,
-                selectedSpan.Span.Length
-                );
-            var selectedText = selectedSpan.GetText();
-
             var fileName = new FileInfo(filePath).Name;
 
             documentView.TextView.Closed += TextView_Closed;
 
             FilePath = filePath;
             FileName = fileName;
-            OriginalText = selectedText;
             _documentView = documentView;
-            LineEnding = lineEnding;
+            _lineEnding = lineEnding;
         }
 
         public void Dispose()
@@ -228,7 +197,7 @@ namespace FreeAIr.BLogic
                     SelectedSpan.StartPosition,
                     SelectedSpan.Length
                     ),
-                newText
+                newText.WithLineEnding(_lineEnding)
                 ))
             {
                 documentEdit.Apply();
