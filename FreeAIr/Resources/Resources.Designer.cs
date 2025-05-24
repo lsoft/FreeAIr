@@ -115,6 +115,15 @@ namespace FreeAIr.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Using the search query given to you, carefully examine all the attached files and find all the places that match the query. Your response should be a list in the following JSON format: `{ &quot;matches&quot;: [ {&quot;fullpath&quot;: &quot;full path to the file&quot;, &quot;found_text&quot;:&quot;a matched text from document&quot;, &quot;line&quot;:line_number_of_found_text, &quot;column&quot;:column_number_of_found_text, &quot;offset&quot;:a_found_text_offset_from_file_start, &quot;reason&quot;:&quot;a reason why you include this item to your result&quot;} ] }`. `line_number` is the line number where `fo [rest of string was truncated]&quot;;.
+        /// </summary>
+        public static string ChatKindEnum_NaturalLanguageSearch {
+            get {
+                return ResourceManager.GetString("ChatKindEnum_NaturalLanguageSearch", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Optimize the following code:.
         /// </summary>
         public static string ChatKindEnum_OptimizeCode {

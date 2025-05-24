@@ -180,4 +180,8 @@
   <data name="ChatKindEnum_FixBuildError" xml:space="preserve">
     <value>The compiler reported an error in the source code. Help fix the code. Error: </value>
   </data>
+  <data name="ChatKindEnum_NaturalLanguageSearch" xml:space="preserve">
+    <value>Using the search query given to you, carefully examine all the attached files and find all the places that match the query. Your response should be a list in the following JSON format: `{ "matches": [ {"fullpath": "full path to the file", "found_text":"a matched text from document", "line":line_number_of_found_text, "column":column_number_of_found_text, "offset":a_found_text_offset_from_file_start, "reason":"a reason why you include this item to your result"} ] }`. `line_number` is the line number where `found_text` was found, `column_number` is the column number from the start of the line, `offset` is the number of characters from the start of the file where `found_text` was found.
+Search query:</value>
+  </data>
 </root>

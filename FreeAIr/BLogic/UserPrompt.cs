@@ -188,6 +188,18 @@ namespace FreeAIr.BLogic
                 + "```"
                 );
         }
+
+        public static UserPrompt CreateNaturalLanguageSearchPrompt(
+            string searchText
+            )
+        {
+            return new UserPrompt(
+                ChatKindEnum.NaturalLanguageSearch.AsPromptString()
+                + Environment.NewLine
+                + ""
+                + searchText
+                );
+        }
     }
 
     public sealed class LLMAnswer

@@ -10,6 +10,7 @@
         GenerateCommitMessage,
         SuggestWholeLine,
         GenerateUnitTests,
-        FixBuildError
+        FixBuildError,
+        NaturalLanguageSearch
     }
 }

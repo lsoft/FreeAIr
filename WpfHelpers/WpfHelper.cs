@@ -103,20 +103,46 @@ namespace WpfHelpers
             }
         }
 
-        public static FrameworkElement GetRecursiveByName(
+
+        public static void GetRecursiveByType<T>(
             this DependencyObject root,
-            string childTypeName,
-            string name
+            ref List<T> result
             )
+            where T : FrameworkElement
         {
             if (root == null)
             {
                 throw new ArgumentNullException(nameof(root));
             }
 
-            if (name == null)
+            var childrenCount = VisualTreeHelper.GetChildrenCount(root);
+
+            for (var cc = 0; cc < childrenCount; cc++)
             {
-                throw new ArgumentNullException(nameof(name));
+                var control = VisualTreeHelper.GetChild(
+                    root,
+                    cc
+                    );
+
+                if (control is T typedControl)
+                {
+                    result.Add(typedControl);
+                    continue;
+                }
+
+                control.GetRecursiveByType(ref result);
+            }
+        }
+
+        public static FrameworkElement? GetRecursiveByTypeOrName(
+            this DependencyObject root,
+            string childTypeName,
+            string? name = null
+            )
+        {
+            if (root == null)
+            {
+                throw new ArgumentNullException(nameof(root));
             }
 
             var childrenCount = VisualTreeHelper.GetChildrenCount(root);
@@ -131,13 +157,13 @@ namespace WpfHelpers
                 if (control.GetType().Name == childTypeName)
                 {
                     var fe = control as FrameworkElement;
-                    if (fe.Name == name)
+                    if (string.IsNullOrEmpty(name) || fe.Name == name)
                     {
                         return fe;
                     }
                 }
 
-                var result = control.GetRecursiveByName(childTypeName, name);
+                var result = control.GetRecursiveByTypeOrName(childTypeName, name);
                 if (result != null)
                 {
                     return result;

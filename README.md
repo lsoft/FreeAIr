@@ -33,6 +33,7 @@ A: No problem! You can use local LLM, for example via KoboldCpp. Local LLM sends
 
 Main functions:
 
+- Searching with natural language
 - Explain the code
   - selected piece of the code
   - whole file

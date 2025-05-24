@@ -71,6 +71,7 @@
     <Compile Include="Commands\BuildError\BuildErrorWindowFixErrorCommand.cs" />
     <Compile Include="BuildErrors\BuildResultInformation.cs" />
     <Compile Include="Commands\Other\InstallGithubMCPServerCommand.cs" />
+    <Compile Include="Find\FindWindowModifier.cs" />
     <Compile Include="Helper\DialogContextHelper.cs" />
     <Compile Include="Helper\DTEHelper.cs" />
     <Compile Include="Helper\JsonElementDeserializer.cs" />
@@ -183,6 +184,11 @@
       <DependentUpon>NestedCheckBoxList.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\NestedCheckBox\CheckableItem.cs" />
+    <Compile Include="UI\ToolWindows\NaturalLanguageResultsToolWindow.cs" />
+    <Compile Include="UI\ToolWindows\NaturalLanguageResultsToolWindowControl.xaml.cs">
+      <DependentUpon>NaturalLanguageResultsToolWindowControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\ViewModels\NaturalLanguageResultsViewModel.cs" />
     <Compile Include="UI\Windows\NestedCheckBoxWindow.xaml.cs">
       <DependentUpon>NestedCheckBoxWindow.xaml</DependentUpon>
     </Compile>
@@ -379,6 +385,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UI\NestedCheckBox\NestedCheckBoxList.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\ToolWindows\NaturalLanguageResultsToolWindowControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

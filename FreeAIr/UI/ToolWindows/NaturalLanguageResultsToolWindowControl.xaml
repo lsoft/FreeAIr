@@ -1,0 +1,243 @@
+﻿<UserControl
+    x:Class="FreeAIr.UI.ToolWindows.NaturalLanguageResultsToolWindowControl"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:imaging="clr-namespace:Microsoft.VisualStudio.Imaging;assembly=Microsoft.VisualStudio.Imaging"
+    xmlns:theming="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Imaging"
+    xmlns:util="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Utilities"
+    xmlns:catalog="clr-namespace:Microsoft.VisualStudio.Imaging;assembly=Microsoft.VisualStudio.ImageCatalog"
+    xmlns:toolkit="clr-namespace:Community.VisualStudio.Toolkit;assembly=Community.VisualStudio.Toolkit" xmlns:b="http://schemas.microsoft.com/xaml/behaviors" xmlns:toolwindows="clr-namespace:FreeAIr.UI.ToolWindows"
+    mc:Ignorable="d"
+    d:DesignHeight="300"
+    d:DesignWidth="300"
+    Name="NaturaLanguageResultsName"
+    >
+    <!-- toolkit:Themes.UseVsTheme="True" -->
+    <UserControl.Resources>
+        <DoubleCollection x:Key="Proportions">3,14,1,1,1</DoubleCollection>
+    </UserControl.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto" />
+            <RowDefinition />
+        </Grid.RowDefinitions>
+
+        <Grid
+            Grid.Row="0"
+            >
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="auto" />
+                <ColumnDefinition />
+            </Grid.ColumnDefinitions>
+
+            <Label
+                Grid.Column="0"
+                HorizontalAlignment="Left"
+                Foreground="{Binding ElementName=CancelButtonName, Path=Foreground}"
+                Content="{Binding Status}"
+                />
+
+            <Button
+                Grid.Column="1"
+                x:Name="CancelButtonName"
+                HorizontalAlignment="Right"
+                Content="Cancel chat"
+                toolkit:Themes.UseVsTheme="True"
+                Command="{Binding CancelChatCommand}"
+                />
+
+        </Grid>
+        
+        <ScrollViewer
+            Grid.Row="1"
+            VerticalScrollBarVisibility="Auto"
+            >
+            <ListView
+                Margin="2"
+                HorizontalAlignment="Stretch"
+                ItemsSource="{Binding FoundItems}"
+                Foreground="White"
+                Background="Transparent"
+                >
+                <b:Interaction.Behaviors>
+                    <toolwindows:ListViewGridViewBehavior
+                        ColumnProportions="{StaticResource Proportions}"
+                        />
+                </b:Interaction.Behaviors>
+                <ListView.ItemContainerStyle>
+                    <Style TargetType="{x:Type ListViewItem}">
+                        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                        <Setter Property="Background" Value="Transparent" />
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="{x:Type ListViewItem}">
+                                    <GridViewRowPresenter  />
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
+                </ListView.ItemContainerStyle>
+                <ListView.View>
+                    <GridView>
+                        <GridView.ColumnHeaderContainerStyle>
+                            <Style TargetType="GridViewColumnHeader">
+                                <Setter Property="Foreground" Value="White" />
+                                <Setter Property="Background" Value="Transparent" />
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate
+                                            TargetType="{x:Type GridViewColumnHeader}"
+                                            >
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*" />
+                                                    <ColumnDefinition Width="1" />
+                                                </Grid.ColumnDefinitions>
+                                                <Border
+                                                    Grid.Column="0"
+                                                    BorderBrush="{TemplateBinding BorderBrush}"
+                                                    BorderThickness="{TemplateBinding BorderThickness}"
+                                                    Background="{TemplateBinding Background}"
+                                                    >
+                                                    <ContentPresenter
+                                                        Margin="{TemplateBinding Padding}"
+                                                        HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                                        VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                                        />
+                                                </Border>
+                                                
+                                                <Thumb
+                                                    Grid.Column="1"
+                                                    x:Name="PART_HeaderGripper"
+                                                    HorizontalAlignment="Right"
+                                                    Margin="-8,0,0,0"
+                                                    Style="{DynamicResource GridView.ColumnHeader.Gripper.Style}"
+                                                    />
+                                            </Grid>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                            </Style>
+                        </GridView.ColumnHeaderContainerStyle>
+
+                        <GridViewColumn Header="File Name" Width="120">
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <Label
+                                        Margin="0,5,0,5"
+                                        HorizontalAlignment="Center"
+                                        Content="{Binding FileName}"
+                                        Background="Transparent"
+                                        Foreground="#569CD6"
+                                        Cursor="Hand"
+                                        >
+                                        <Label.InputBindings>
+                                            <MouseBinding
+                                                Command="{Binding ElementName=NaturaLanguageResultsName, Path=DataContext.GotoCommand}"
+                                                CommandParameter="{Binding}"
+                                                MouseAction="LeftClick"
+                                                />
+                                        </Label.InputBindings>
+                                    </Label>
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
+
+                        <GridViewColumn Header="Found text" Width="120">
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <Grid
+                                        HorizontalAlignment="Left"
+                                        x:Name="FoundItemGrid"
+                                        >
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition/>
+                                            <RowDefinition/>
+                                        </Grid.RowDefinitions>
+                                        <TextBlock
+                                            Grid.Row="0"
+                                            Text="{Binding FoundText}"
+                                            TextWrapping="NoWrap"
+                                            HorizontalAlignment="Left"
+                                            Foreground="#569CD6"
+                                            Background="Transparent"
+                                            Cursor="Hand"
+                                            >
+                                            <TextBlock.InputBindings>
+                                                <MouseBinding
+                                                    Command="{Binding ElementName=NaturaLanguageResultsName, Path=DataContext.GotoCommand}"
+                                                    CommandParameter="{Binding ElementName=FoundItemGrid, Path=DataContext}"
+                                                    MouseAction="LeftClick"
+                                                    />
+                                            </TextBlock.InputBindings>
+                                        </TextBlock>
+                                        <TextBlock
+                                            Grid.Row="1"
+                                            Text="{Binding Reason}"
+                                            TextWrapping="NoWrap"
+                                            HorizontalAlignment="Left"
+                                            Foreground="Gray"
+                                            Background="Transparent"
+                                            Cursor="Hand"
+                                            >
+                                            <TextBlock.InputBindings>
+                                                <MouseBinding
+                                                    Command="{Binding ElementName=NaturaLanguageResultsName, Path=DataContext.GotoCommand}"
+                                                    CommandParameter="{Binding ElementName=FoundItemGrid, Path=DataContext}"
+                                                    MouseAction="LeftClick"
+                                                    />
+                                            </TextBlock.InputBindings>
+                                        </TextBlock>
+                                    </Grid>
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
+
+                        <GridViewColumn Header="Line" Width="60">
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <Label
+                                        HorizontalAlignment="Center"
+                                        Content="{Binding LineIndex}"
+                                        Background="Transparent"
+                                        Foreground="White"
+                                        />
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
+
+                        <GridViewColumn Header="Column" Width="60">
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <Label
+                                        HorizontalAlignment="Center"
+                                        Content="{Binding ColumnIndex}"
+                                        Background="Transparent"
+                                        Foreground="White"
+                                        />
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
+
+                        <GridViewColumn Header="Offset" Width="60">
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <Label
+                                        HorizontalAlignment="Center"
+                                        Content="{Binding OffsetIndex}"
+                                        Background="Transparent"
+                                        Foreground="White"
+                                        />
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
+
+                    </GridView>
+                </ListView.View>
+            </ListView>
+        </ScrollViewer>
+    </Grid>
+</UserControl>

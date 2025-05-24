@@ -2,8 +2,11 @@
 global using Microsoft.VisualStudio.Shell;
 global using System;
 global using Task = System.Threading.Tasks.Task;
+using EnvDTE;
+using EnvDTE80;
 using FreeAIr.BLogic;
 using FreeAIr.Extension.CodeLens;
+using FreeAIr.Find;
 using FreeAIr.MCP.Agent;
 using FreeAIr.UI.Informer;
 using FreeAIr.UI.ToolWindows;
@@ -26,6 +29,7 @@ namespace FreeAIr
     [ProvideOptionPage(typeof(OptionsProvider.MCPPageOptions), "FreeAIr", "MCP", 0, 0, true, SupportsProfiles = true)]
     [ProvideToolWindow(typeof(ChatListToolWindow.Pane), Style = VsDockStyle.Tabbed, Window = WindowGuids.DocumentWell)]
     [ProvideToolWindow(typeof(ChooseModelToolWindow.Pane), Style = VsDockStyle.Tabbed, Window = WindowGuids.DocumentWell)]
+    [ProvideToolWindow(typeof(NaturalLanguageResultsToolWindow.Pane), Style = VsDockStyle.Tabbed, Window = WindowGuids.DocumentWell)]
     public sealed class FreeAIrPackage : ToolkitPackage
     {
         public static FreeAIrPackage Instance = null;
@@ -75,6 +79,10 @@ namespace FreeAIr
 
                 AgentCollection.InitAsync()
                     .FileAndForget(nameof(AgentCollection))
+                    ;
+
+                FindWindowModifier.StartScanAsync(cancellationToken)
+                    .FileAndForget(nameof(FindWindowModifier))
                     ;
 
                 var componentModel = (IComponentModel)await this.GetServiceAsync(typeof(SComponentModel));

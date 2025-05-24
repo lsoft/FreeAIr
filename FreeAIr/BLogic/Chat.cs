@@ -230,7 +230,7 @@ namespace FreeAIr.BLogic
 
                 var cco = new ChatCompletionOptions
                 {
-                    ToolChoice = ChatToolChoice.CreateRequiredChoice(),
+                    //ToolChoice = ChatToolChoice.CreateRequiredChoice(),
                     //ResponseFormat = ChatResponseFormat.CreateTextFormat(),
                     MaxOutputTokenCount = ResponsePage.Instance.MaxOutputTokenCount,
                 };

@@ -16,6 +16,7 @@ namespace FreeAIr.Helper
                 case ChatKindEnum.CompleteCodeAccordingComments:
                 case ChatKindEnum.GenerateCommitMessage:
                 case ChatKindEnum.FixBuildError:
+                case ChatKindEnum.NaturalLanguageSearch:
                     return FreeAIr.Resources.Resources.ResourceManager.GetString(
                         nameof(ChatKindEnum) + "_" + kind.ToString(),
                         ResponsePage.GetAnswerCulture()
@@ -48,7 +49,7 @@ namespace FreeAIr.Helper
                 case ChatKindEnum.ExplainCode:
                     return "Explain code";
                 case ChatKindEnum.AddXmlComments:
-                    return "Add comments";
+                    return "Add XML comments";
                 case ChatKindEnum.OptimizeCode:
                     return "Optimize code";
                 case ChatKindEnum.CompleteCodeAccordingComments:
@@ -61,6 +62,8 @@ namespace FreeAIr.Helper
                     return "Suggest whole line";
                 case ChatKindEnum.FixBuildError:
                     return "Fix build error";
+                case ChatKindEnum.NaturalLanguageSearch:
+                    return "Find using natural language";
                 default:
                     return taskKind.ToString();
             }
