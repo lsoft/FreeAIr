@@ -55,7 +55,8 @@ namespace FreeAIr.MCP.Agent.Github
 
                 UnpackAgent();
 
-                var agentProcessId = 30000 + (System.Diagnostics.Process.GetCurrentProcess().Id % 10000);
+                var visualStudioProcessId = System.Diagnostics.Process.GetCurrentProcess().Id;
+                var agentProcessId = 30000 + (visualStudioProcessId % 10000);
 
                 _client = new();
                 _client.BaseAddress = new Uri($"https://localhost:{agentProcessId}");
@@ -63,7 +64,7 @@ namespace FreeAIr.MCP.Agent.Github
                 _processMonitor = new ProcessMonitor(
                     _agentUnpackedFolderPath,
                     AgentExeFileName,
-                    agentProcessId.ToString()
+                    $"{agentProcessId} {visualStudioProcessId}"
                     );
 
                 _processTask = _processMonitor.StartMonitoringAsync(
@@ -159,7 +160,7 @@ namespace FreeAIr.MCP.Agent.Github
 
         public async Task<AgentToolCallResult> CallToolAsync(
             string toolName,
-            IReadOnlyDictionary<string, object?>? arguments = null,
+            Dictionary<string, object?>? arguments = null,
             CancellationToken cancellationToken = default
             )
         {
@@ -168,33 +169,42 @@ namespace FreeAIr.MCP.Agent.Github
                 throw new InvalidOperationException("Agent is not started");
             }
 
-            var response = await _client.PostAsJsonAsync<CallToolRequest>(
-                "/tool",
-                new CallToolRequest(
-                    MCPServerFolderPath,
-                    MCPPage.Instance.GitHubToken,
-                    toolName,
-                    arguments?.ToDictionary(d => d.Key, d => d.Value as string)
-                    ),
-                cancellationToken
-                );
-            response.EnsureSuccessStatusCode();
-
-            var reply = await response.Content.ReadFromJsonAsync<CallToolReply>(
-                cancellationToken
-                );
-            if (!string.IsNullOrEmpty(reply.ErrorMessage))
+            try
             {
-                throw new InvalidOperationException(reply.ErrorMessage);
+                var response = await _client.PostAsJsonAsync<CallToolRequest>(
+                    "/tool",
+                    new CallToolRequest(
+                        MCPServerFolderPath,
+                        MCPPage.Instance.GitHubToken,
+                        toolName,
+                        arguments
+                        ),
+                    cancellationToken
+                    );
+                response.EnsureSuccessStatusCode();
+
+                var reply = await response.Content.ReadFromJsonAsync<CallToolReply>(
+                    cancellationToken
+                    );
+                if (!string.IsNullOrEmpty(reply.ErrorMessage))
+                {
+                    throw new InvalidOperationException(reply.ErrorMessage);
+                }
+                if (reply.IsError)
+                {
+                    throw new InvalidOperationException("Error during tool call");
+                }
+
+                return new AgentToolCallResult(
+                    reply.Content
+                    );
             }
-            if (reply.IsError)
+            catch (Exception excp)
             {
-                throw new InvalidOperationException("Error during tool call");
+                //todo log
+                return new AgentToolCallResult([excp.Message + Environment.NewLine + excp.StackTrace]);
             }
 
-            return new AgentToolCallResult(
-                reply.Content
-                );
         }
 
 

@@ -1,4 +1,5 @@
 ﻿using ModelContextProtocol.Client;
+using ModelContextProtocol.Protocol;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -46,6 +47,5 @@ namespace Agent.BLogic
 
             return _mcpClient;
         }
-
     }
 }

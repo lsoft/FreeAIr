@@ -20,7 +20,7 @@ namespace FreeAIr.MCP.Agent
         
         Task<AgentToolCallResult?> CallToolAsync(
             string toolName,
-            IReadOnlyDictionary<string, object?>? arguments = null,
+            Dictionary<string, object?>? arguments = null,
             CancellationToken cancellationToken = default
             );
     }

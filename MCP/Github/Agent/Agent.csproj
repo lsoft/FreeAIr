@@ -13,7 +13,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="JsonPath.Net" Version="2.1.1" />
     <PackageReference Include="ModelContextProtocol" Version="0.2.0-preview.1" />
+    <PackageReference Include="Serilog" Version="4.3.0" />
+    <PackageReference Include="Serilog.Sinks.Console" Version="6.0.0" />
+    <PackageReference Include="Serilog.Sinks.File" Version="7.0.0" />
     <PackageReference Include="System.Management" Version="10.0.0-preview.4.25258.110" />
     <PackageReference Include="System.Net.Http.Json" Version="9.0.4" />
   </ItemGroup>

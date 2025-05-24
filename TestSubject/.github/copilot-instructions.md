@@ -1,0 +1,1 @@
+This project uses .NET 8 and C# language.

@@ -14,8 +14,6 @@ using System.Text;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using static FreeAIr.BLogic.Chat;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.Window;
 
 namespace FreeAIr.BLogic
 {
@@ -23,9 +21,9 @@ namespace FreeAIr.BLogic
     {
         private readonly ChatClient _chatClient;
         private readonly List<UserPrompt> _prompts = new();
-        private readonly ChatContext _chatContext = new();
+        private readonly ChatContext _chatContext;
 
-        private readonly Action<Chat, LLMAnswer> _promptAnsweredCallBack;
+        private readonly Action<Chat, LLMAnswer>? _promptAnsweredCallBack;
 
         private CancellationTokenSource _cancellationTokenSource = new();
         private Task? _task;
@@ -55,7 +53,7 @@ namespace FreeAIr.BLogic
         }
 
         /// <summary>
-        /// Status of last prompt in the chat = whole chat status.
+        /// Status of the chat.
         /// </summary>
         public ChatStatusEnum Status
         {
@@ -68,16 +66,23 @@ namespace FreeAIr.BLogic
             }
         }
 
-        public Chat(
+        private Chat(
+            ChatContext chatContext,
             ChatDescription description,
-            Action<Chat, LLMAnswer> promptAnsweredCallBack = null
+            Action<Chat, LLMAnswer>? promptAnsweredCallBack = null
             )
         {
+            if (chatContext is null)
+            {
+                throw new ArgumentNullException(nameof(chatContext));
+            }
+
             if (description is null)
             {
                 throw new ArgumentNullException(nameof(description));
             }
 
+            _chatContext = chatContext;
             Description = description;
             _promptAnsweredCallBack = promptAnsweredCallBack;
 
@@ -103,6 +108,22 @@ namespace FreeAIr.BLogic
                 );
 
             _chatContext.ChatContextChangedEvent += ChatContextChangedRaised;
+        }
+
+        public static async System.Threading.Tasks.Task<Chat> CreateChatAsync(
+            ChatDescription description,
+            Action<Chat, LLMAnswer> promptAnsweredCallBack = null
+            )
+        {
+            var chatContext = await ChatContext.CreateChatContextAsync();
+
+            var result = new Chat(
+                chatContext,
+                description,
+                promptAnsweredCallBack
+                );
+
+            return result;
         }
 
         public void AddPrompt(
@@ -211,7 +232,7 @@ namespace FreeAIr.BLogic
                 {
                     ToolChoice = ChatToolChoice.CreateRequiredChoice(),
                     //ResponseFormat = ChatResponseFormat.CreateTextFormat(),
-                    MaxOutputTokenCount = 8192,
+                    MaxOutputTokenCount = ResponsePage.Instance.MaxOutputTokenCount,
                 };
 
                 var toolCollection = AgentCollection.GetTools();
@@ -466,25 +487,25 @@ namespace FreeAIr.BLogic
             }
         }
 
-        private static Dictionary<string, object?> ParseToolInvocationArguments(
-            ChatToolCall toolCall
-            )
-        {
-            var toolArguments = new Dictionary<string, object?>();
-            if (toolCall.FunctionArguments.ToMemory().Length > 0)
-            {
-                using JsonDocument toolArgumentJson = JsonDocument.Parse(
-                    toolCall.FunctionArguments
-                    );
+        //private static Dictionary<string, object?> ParseToolInvocationArguments(
+        //    ChatToolCall toolCall
+        //    )
+        //{
+        //    var toolArguments = new Dictionary<string, object?>();
+        //    if (toolCall.FunctionArguments.ToMemory().Length > 0)
+        //    {
+        //        using JsonDocument toolArgumentJson = JsonDocument.Parse(
+        //            toolCall.FunctionArguments
+        //            );
 
-                foreach (var pair in toolArgumentJson.RootElement.EnumerateObject())
-                {
-                    toolArguments.Add(pair.Name, pair.Value.DeserializeToObject());
-                }
-            }
+        //        foreach (var pair in toolArgumentJson.RootElement.EnumerateObject())
+        //        {
+        //            toolArguments.Add(pair.Name, pair.Value.DeserializeToObject());
+        //        }
+        //    }
 
-            return toolArguments;
-        }
+        //    return toolArguments;
+        //}
 
         private static Dictionary<string, object?> ParseToolInvocationArguments(
             StreamingChatToolCallUpdate toolCall
@@ -846,6 +867,7 @@ Your behavior against available functions:
         {
             get;
         }
+
         public LLMAnswer Answer
         {
             get;

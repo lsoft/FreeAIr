@@ -25,7 +25,7 @@ namespace Dto
             set;
         }
 
-        public Dictionary<string, string?>? Arguments
+        public Dictionary<string, object?>? Arguments
         {
             get;
             set;
@@ -39,7 +39,7 @@ namespace Dto
             string mCPServerFolderPath,
             string githubToken,
             string toolName,
-            Dictionary<string, string?>? arguments
+            Dictionary<string, object?>? arguments
             )
         {
             if (string.IsNullOrEmpty(mCPServerFolderPath))

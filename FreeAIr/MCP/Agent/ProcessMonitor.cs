@@ -49,6 +49,7 @@ namespace FreeAIr.Agent
                         process.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
                         process.StartInfo.CreateNoWindow = true;
 
+                        //todo replace Console.WriteLine with logging in the whole class
                         Console.WriteLine($"Запускаем процесс: {_fileName} {_arguments}");
                         process.Start();
 

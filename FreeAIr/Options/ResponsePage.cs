@@ -27,6 +27,12 @@ namespace FreeAIr
         public LLMResultEnum ResponseFormat  { get; set; } = LLMResultEnum.MD;
 
         [Category("Response")]
+        [DisplayName("Max output token count")]
+        [Description("Maximum count of tokens LLM answer can contain.")]
+        [DefaultValue(8192)]
+        public int MaxOutputTokenCount { get; set; } = 8192;
+
+        [Category("Response")]
         [DisplayName("Switch to chat window")]
         [Description("Should FreeAIr switch to its window after dev asked a prompt.")]
         [DefaultValue(true)]

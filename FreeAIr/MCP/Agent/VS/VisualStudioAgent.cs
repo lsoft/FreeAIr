@@ -54,7 +54,7 @@ namespace FreeAIr.MCP.Agent.VS
 
         public async Task<AgentToolCallResult?> CallToolAsync(
             string toolName,
-            IReadOnlyDictionary<string, object?>? arguments = null,
+            Dictionary<string, object?>? arguments = null,
             CancellationToken cancellationToken = default
             )
         {

@@ -21,7 +21,6 @@
                         <!-- Первый уровень -->
                         <CheckBox
                             IsChecked="{Binding IsChecked, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                            VerticalAlignment="Center"
                             Focusable="False"
                             >
                             <ContentControl>
@@ -46,22 +45,29 @@
                                 <DataTemplate>
                                     <CheckBox
                                         IsChecked="{Binding IsChecked, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                        VerticalAlignment="Center"
+                                        VerticalAlignment="Top"
                                         Focusable="False"
                                         >
                                         <ContentControl>
-                                            <StackPanel
-                                                Orientation="Horizontal"
+                                            <Grid
                                                 >
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="auto" />
+                                                    <ColumnDefinition />
+                                                </Grid.ColumnDefinitions>
                                                 <TextBlock
+                                                    Grid.Column="0"
+                                                    VerticalAlignment="Center"
                                                     FontWeight="Bold"
                                                     Text="{Binding Name}"
                                                     />
                                                 <TextBlock
+                                                    Grid.Column="1"
+                                                    VerticalAlignment="Center"
                                                     Margin="20,0,0,0"
                                                     Text="{Binding Description}"
                                                     />
-                                            </StackPanel>
+                                            </Grid>
                                         </ContentControl>
                                     </CheckBox>
                                 </DataTemplate>

@@ -57,7 +57,7 @@ namespace FreeAIr.BLogic
                 return null;
             }
 
-            var chat = new Chat(
+            var chat = await Chat.CreateChatAsync(
                 kind,
                 promptAnsweredCallBack
                 );
