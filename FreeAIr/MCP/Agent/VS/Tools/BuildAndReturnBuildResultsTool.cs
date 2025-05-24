@@ -15,7 +15,7 @@ namespace FreeAIr.MCP.Agent.VS.Tools
     {
         public static readonly BuildAndReturnBuildResultsTool Instance = new();
 
-        public const string VisualStudioToolName = "BuildAndReturnBuildResultsTool";
+        public const string VisualStudioToolName = "BuildAndReturnBuildResults";
 
         public BuildAndReturnBuildResultsTool(
             ) : base(

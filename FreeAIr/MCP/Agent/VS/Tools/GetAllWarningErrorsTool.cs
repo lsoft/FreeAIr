@@ -15,7 +15,7 @@ namespace FreeAIr.MCP.Agent.VS.Tools
     {
         public static readonly GetAllWarningErrorsTool Instance = new();
 
-        public const string VisualStudioToolName = "GetAllWarningErrorsTool";
+        public const string VisualStudioToolName = "GetAllWarningErrors";
 
         public GetAllWarningErrorsTool(
             ) : base(
