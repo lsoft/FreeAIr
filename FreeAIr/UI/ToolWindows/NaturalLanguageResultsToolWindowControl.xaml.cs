@@ -56,7 +56,7 @@ namespace FreeAIr.UI.ToolWindows
 
         private void OnLoaded(object sender, RoutedEventArgs e)
         {
-            Dispatcher.BeginInvoke(new Action(UpdateColumns), DispatcherPriority.Loaded);
+            _ = Dispatcher.BeginInvoke(new Action(UpdateColumns), DispatcherPriority.Loaded);
         }
 
         private void OnSizeChanged(object sender, SizeChangedEventArgs e)

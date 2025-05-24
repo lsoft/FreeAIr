@@ -5,8 +5,10 @@ using FreeAIr.UI.Embedillo;
 using FreeAIr.UI.Embedillo.VisualLine.Command;
 using FreeAIr.UI.Embedillo.VisualLine.SolutionItem;
 using FreeAIr.UI.ViewModels;
+using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
 using System.Windows.Input;
 
 namespace FreeAIr.UI.ToolWindows
@@ -97,6 +99,25 @@ namespace FreeAIr.UI.ToolWindows
             {
                 SetValue(DataProperty, value);
             }
+        }
+    }
+
+    public class RelativeMaxHeightConverter : IValueConverter
+    {
+        public double Ratio { get; set; } = 0.2; // 20% от высоты контейнера по умолчанию
+
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value is double height)
+            {
+                return height * Ratio; // Возвращаем относительную высоту
+            }
+            return double.NaN;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
         }
     }
 }

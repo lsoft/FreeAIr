@@ -14,7 +14,9 @@
     xmlns:plugins="clr-namespace:MdXaml.Plugins;assembly=MdXaml.Plugins"
     xmlns:embedillo="clr-namespace:FreeAIr.UI.Embedillo"
     xmlns:viewmodels="clr-namespace:FreeAIr.UI.ViewModels"
-    xmlns:toolwindows="clr-namespace:FreeAIr.UI.ToolWindows" xmlns:b="http://schemas.microsoft.com/xaml/behaviors" xmlns:ui="clr-namespace:FreeAIr.UI"
+    xmlns:toolwindows="clr-namespace:FreeAIr.UI.ToolWindows"
+    xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
+    xmlns:ui="clr-namespace:FreeAIr.UI"
     toolkit:Themes.UseVsTheme="True"
     mc:Ignorable="d"
     d:DesignHeight="300"
@@ -26,7 +28,10 @@
         <!-- Прокси для передачи контекста в ContextMenu -->
         <toolwindows:BindingProxy x:Key="DataContextProxy" Data="{Binding}" />
         <toolwindows:BindingProxy x:Key="ForegroundButtonProxy" Data="{Binding ElementName=ForegroundButton}" />
+
         <ui:CombinedParameterConverter x:Key="CombinedParameterConverter" />
+        
+        <toolwindows:RelativeMaxHeightConverter x:Key="RelativeMaxHeightConverter" Ratio="0.2" />
     </UserControl.Resources>
     
     <Grid
@@ -157,7 +162,7 @@
                     >
                     <Grid.RowDefinitions>
                         <RowDefinition Height="auto"/>
-                        <RowDefinition />
+                        <RowDefinition Height="auto" MinHeight="50" />
                         <RowDefinition Height="auto"/>
                         <RowDefinition Height="auto"/>
                     </Grid.RowDefinitions>
@@ -233,82 +238,90 @@
                         </StackPanel>
                     </Grid>
 
-                    <!-- chat context item list -->
-                    <ItemsControl
+                    <ScrollViewer
                         Grid.Row="1"
                         Margin="2"
-                        ItemsSource="{Binding ChatContextItems}"
+                        MaxHeight="{Binding Path=ActualHeight, ElementName=ChatListToolWindow, Converter={StaticResource RelativeMaxHeightConverter}}"
+                        VerticalScrollBarVisibility="Auto"
                         >
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate>
-                                <Grid
-                                    Margin="0"
-                                    >
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="auto" />
-                                        <ColumnDefinition Width="auto" />
-                                        <ColumnDefinition Width="auto" />
-                                        <ColumnDefinition />
-                                    </Grid.ColumnDefinitions>
 
-                                    <imaging:CrispImage
-                                        Grid.Column="0"
-                                        Moniker="{x:Static catalog:KnownMonikers.Cancel}"
-                                        ToolTip="Delete from context"
-                                        Cursor="Hand"
+                        <!-- chat context item list -->
+                        <ItemsControl
+                            ItemsSource="{Binding ChatContextItems}"
+                            >
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid
+                                        Margin="0"
                                         >
-                                        <imaging:CrispImage.InputBindings>
-                                            <MouseBinding
-                                                Command="{Binding ElementName=ChatListToolWindow, Path=DataContext.DeleteItemFromContextCommand}"
-                                                CommandParameter="{Binding .}"
-                                                MouseAction="LeftClick"
-                                                />
-                                        </imaging:CrispImage.InputBindings>
-                                    </imaging:CrispImage>
-                                    <imaging:CrispImage
-                                        Grid.Column="1"
-                                        Margin="5,0,0,0"
-                                        Moniker="{x:Static catalog:KnownMonikers.ZoomIn}"
-                                        ToolTip="Search and add related context items"
-                                        Cursor="Hand"
-                                        >
-                                        <imaging:CrispImage.InputBindings>
-                                            <MouseBinding
-                                                Command="{Binding ElementName=ChatListToolWindow, Path=DataContext.AddRelatedItemsToContextCommand}"
-                                                CommandParameter="{Binding .}"
-                                                MouseAction="LeftClick"
-                                                />
-                                        </imaging:CrispImage.InputBindings>
-                                    </imaging:CrispImage>
-                                    <imaging:CrispImage
-                                        Grid.Column="2"
-                                        Margin="20,0,0,0"
-                                        Moniker="{Binding Moniker}"
-                                        ToolTip="{Binding Tooltip}"
-                                        />
-                                    <Label
-                                        Grid.Column="3"
-                                        Margin="0,0,0,0"
-                                        Content="{Binding ChatContextDescription}"
-                                        HorizontalAlignment="Left"
-                                        HorizontalContentAlignment="Left"
-                                        Foreground="#569CD6"
-                                        Cursor="Hand"
-                                        FontFamily="Cascadia Code"
-                                        ToolTip="Open item in new window"
-                                        >
-                                        <Label.InputBindings>
-                                            <MouseBinding
-                                                Command="{Binding ElementName=ChatListToolWindow, Path=DataContext.OpenContextItemCommand}"
-                                                CommandParameter="{Binding .}"
-                                                MouseAction="LeftClick"
-                                                />
-                                        </Label.InputBindings>
-                                    </Label>
-                                </Grid>
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                    </ItemsControl>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="auto" />
+                                            <ColumnDefinition Width="auto" />
+                                            <ColumnDefinition Width="auto" />
+                                            <ColumnDefinition />
+                                        </Grid.ColumnDefinitions>
+
+                                        <imaging:CrispImage
+                                            Grid.Column="0"
+                                            Moniker="{x:Static catalog:KnownMonikers.Cancel}"
+                                            ToolTip="Delete from context"
+                                            Cursor="Hand"
+                                            >
+                                            <imaging:CrispImage.InputBindings>
+                                                <MouseBinding
+                                                    Command="{Binding ElementName=ChatListToolWindow, Path=DataContext.DeleteItemFromContextCommand}"
+                                                    CommandParameter="{Binding .}"
+                                                    MouseAction="LeftClick"
+                                                    />
+                                            </imaging:CrispImage.InputBindings>
+                                        </imaging:CrispImage>
+                                        <imaging:CrispImage
+                                            Grid.Column="1"
+                                            Margin="5,0,0,0"
+                                            Moniker="{x:Static catalog:KnownMonikers.ZoomIn}"
+                                            ToolTip="Search and add related context items"
+                                            Cursor="Hand"
+                                            >
+                                            <imaging:CrispImage.InputBindings>
+                                                <MouseBinding
+                                                    Command="{Binding ElementName=ChatListToolWindow, Path=DataContext.AddRelatedItemsToContextCommand}"
+                                                    CommandParameter="{Binding .}"
+                                                    MouseAction="LeftClick"
+                                                    />
+                                            </imaging:CrispImage.InputBindings>
+                                        </imaging:CrispImage>
+                                        <imaging:CrispImage
+                                            Grid.Column="2"
+                                            Margin="20,0,0,0"
+                                            Moniker="{Binding Moniker}"
+                                            ToolTip="{Binding Tooltip}"
+                                            />
+                                        <Label
+                                            Grid.Column="3"
+                                            Margin="0,0,0,0"
+                                            Content="{Binding ChatContextDescription}"
+                                            HorizontalAlignment="Left"
+                                            HorizontalContentAlignment="Left"
+                                            Foreground="#569CD6"
+                                            Cursor="Hand"
+                                            FontFamily="Cascadia Code"
+                                            ToolTip="Open item in new window"
+                                            >
+                                            <Label.InputBindings>
+                                                <MouseBinding
+                                                    Command="{Binding ElementName=ChatListToolWindow, Path=DataContext.OpenContextItemCommand}"
+                                                    CommandParameter="{Binding .}"
+                                                    MouseAction="LeftClick"
+                                                    />
+                                            </Label.InputBindings>
+                                        </Label>
+                                    </Grid>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+
+                    </ScrollViewer>
+
 
                     <Border
                         Grid.Row="2"
@@ -375,8 +388,7 @@
                 </Grid>
 
             </Border>
-            
-            
+
             <mdxaml:MarkdownScrollViewer 
                 Grid.Row="1"
                 Margin="2"

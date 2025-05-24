@@ -2,6 +2,7 @@
 using FreeAIr.Helper;
 using FreeAIr.Shared.Helper;
 using MessagePack.Formatters;
+using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.TextManager.Interop;
 using SharpCompress.Common;
@@ -86,7 +87,10 @@ namespace FreeAIr.UI.ViewModels
 
                             var docViewType = default(Guid);
 
-                            _ = textView.ToIVsTextView().GetBuffer(out var buffer);
+                            if (textView.ToIVsTextView().GetBuffer(out var buffer) != VSConstants.S_OK)
+                            {
+                                return;
+                            }
 
                             var _textManager = Package.GetGlobalService(typeof(VsTextManagerClass)) as IVsTextManager;
                             _textManager.NavigateToLineAndColumn(
