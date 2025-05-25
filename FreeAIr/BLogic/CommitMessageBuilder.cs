@@ -146,8 +146,8 @@ namespace FreeAIr.BLogic
                     );
                 await w.ShowDialogAsync();
 
-                var commitMessage = backgroundTask.Result;
-                if (string.IsNullOrEmpty(commitMessage))
+                var gitDiff = backgroundTask.Result;
+                if (string.IsNullOrEmpty(gitDiff))
                 {
                     await ShowErrorAsync("Cannot collect git patch. Please enter commit message manually.");
                     return;
@@ -156,40 +156,28 @@ namespace FreeAIr.BLogic
                 var componentModel = (IComponentModel)await FreeAIrPackage.Instance.GetServiceAsync(typeof(SComponentModel));
                 var chatContainer = componentModel.GetService<ChatContainer>();
 
-                _ = await chatContainer.StartChatAsync(
+                var chat = await chatContainer.StartChatAsync(
                     new ChatDescription(
                         ChatKindEnum.GenerateCommitMessage,
                         null
                         ),
-                    UserPrompt.CreateCommitMessagePrompt(commitMessage),
-                    (chat, answer) =>
-                    {
-                        //prompt has answered
-                        if (chat is not null && chat.Status == ChatStatusEnum.Ready)
-                        {
-                            if (answer is not null)
-                            {
-                                var commitMessage = answer.GetTextualAnswer().CleanupFromQuotesAndThinks(
-                                    Environment.NewLine
-                                    );
-                                if (!string.IsNullOrEmpty(commitMessage))
-                                {
-                                    ThreadHelper.JoinableTaskFactory.RunAsync(
-                                        async () =>
-                                        {
-                                            await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
-
-                                            CommitMessageTextBox.Text = commitMessage;
-                                        }).FileAndForget("CommitMessageTextBox.Text");
-                                    return;
-                                }
-                            }
-                        }
-
-                        ShowErrorAsync("Cannot receive AI answer. Please enter commit message manually.")
-                            .FileAndForget(nameof(ShowErrorAsync));
-                    }
+                    UserPrompt.CreateCommitMessagePrompt(gitDiff)
                     );
+
+                if (chat is not null)
+                {
+                    var commitMessage = await chat.WaitForPromptCleanAnswerAsync(
+                        Environment.NewLine
+                        );
+                    if (!string.IsNullOrEmpty(commitMessage))
+                    {
+                        CommitMessageTextBox.Text = commitMessage;
+                        return;
+                    }
+                }
+
+                ShowErrorAsync("Cannot receive AI answer. Please enter commit message manually.")
+                    .FileAndForget(nameof(ShowErrorAsync));
 
                 await ChatListToolWindow.ShowIfEnabledAsync();
             }

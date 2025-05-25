@@ -111,31 +111,18 @@ namespace FreeAIr.BLogic
                     return null;
                 }
 
-                await chat.WaitForPromptResultAsync();
-
-                if (chat.Status == ChatStatusEnum.Ready)
+                var cleanAnswer = await chat.WaitForPromptCleanAnswerAsync(
+                    lineEnding
+                    );
+                if (!string.IsNullOrEmpty(cleanAnswer))
                 {
-                    var lastPrompt = chat.Prompts.Last();
-                    if (lastPrompt.Answer is not null)
-                    {
-                        var textAnswer = lastPrompt.Answer.GetTextualAnswer();
+                    var proposalCollection = ProposalFactory.CreateCollectionFromText(
+                        cleanAnswer,
+                        _textView,
+                        caretPosition
+                        );
 
-                        if (!string.IsNullOrEmpty(textAnswer))
-                        {
-                            var cleanAnswer = textAnswer.CleanupFromQuotesAndThinks(
-                                lineEnding
-                                );
-                            if (!string.IsNullOrEmpty(cleanAnswer))
-                            {
-                                var proposalCollection = ProposalFactory.CreateCollectionFromText(
-                                    cleanAnswer,
-                                    _textView,
-                                    caretPosition
-                                    );
-                                return proposalCollection;
-                            }
-                        }
-                    }
+                    return proposalCollection;
                 }
             }
             catch (Exception excp)

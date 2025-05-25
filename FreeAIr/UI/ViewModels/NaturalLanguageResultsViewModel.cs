@@ -91,8 +91,8 @@ namespace FreeAIr.UI.ViewModels
                                 return;
                             }
 
-                            var _textManager = Package.GetGlobalService(typeof(VsTextManagerClass)) as IVsTextManager;
-                            _textManager.NavigateToLineAndColumn(
+                            var textManager = Package.GetGlobalService(typeof(VsTextManagerClass)) as IVsTextManager;
+                            textManager.NavigateToLineAndColumn(
                                 buffer,
                                 ref docViewType,
                                 foundItem.LineIndex,
@@ -182,36 +182,23 @@ namespace FreeAIr.UI.ViewModels
 
                 Status = "Waiting for answers...";
 
-                await chat.WaitForPromptResultAsync();
-
-                if (chat.Status == ChatStatusEnum.Ready)
+                var cleanAnswer = await chat.WaitForPromptCleanAnswerAsync(
+                    Environment.NewLine
+                    );
+                if (!string.IsNullOrEmpty(cleanAnswer))
                 {
-                    var lastPrompt = chat.Prompts.Last();
-                    if (lastPrompt.Answer is not null)
+                    var results = JsonSerializer.Deserialize<NaturalSearchResults>(cleanAnswer);
+                    foreach (var match in results.matches.OrderByDescending(m => m.confidence_level))
                     {
-                        var textAnswer = lastPrompt.Answer.GetTextualAnswer();
-                        if (!string.IsNullOrEmpty(textAnswer))
-                        {
-                            var cleanAnswer = textAnswer.CleanupFromQuotesAndThinks(
-                                Environment.NewLine
-                                );
-                            if (!string.IsNullOrEmpty(cleanAnswer))
-                            {
-                                var results = JsonSerializer.Deserialize<NaturalSearchResults>(cleanAnswer);
-                                foreach (var match in results.matches.OrderByDescending(m => m.confidence_level))
-                                {
-                                    FoundItems.Add(
-                                        new FoundItem(
-                                            filePath: match.fullpath,
-                                            foundText: match.found_text,
-                                            reason: match.reason,
-                                            confidenceLevel: match.confidence_level,
-                                            lineIndex: match.line
-                                            )
-                                        );
-                                }
-                            }
-                        }
+                        FoundItems.Add(
+                            new FoundItem(
+                                filePath: match.fullpath,
+                                foundText: match.found_text,
+                                reason: match.reason,
+                                confidenceLevel: match.confidence_level,
+                                lineIndex: match.line
+                                )
+                            );
                     }
                 }
 

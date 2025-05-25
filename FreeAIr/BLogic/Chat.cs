@@ -23,8 +23,6 @@ namespace FreeAIr.BLogic
         private readonly List<UserPrompt> _prompts = new();
         private readonly ChatContext _chatContext;
 
-        private readonly Action<Chat, LLMAnswer>? _promptAnsweredCallBack;
-
         private CancellationTokenSource _cancellationTokenSource = new();
         private Task? _task;
 
@@ -68,8 +66,7 @@ namespace FreeAIr.BLogic
 
         private Chat(
             ChatContext chatContext,
-            ChatDescription description,
-            Action<Chat, LLMAnswer>? promptAnsweredCallBack = null
+            ChatDescription description
             )
         {
             if (chatContext is null)
@@ -84,7 +81,6 @@ namespace FreeAIr.BLogic
 
             _chatContext = chatContext;
             Description = description;
-            _promptAnsweredCallBack = promptAnsweredCallBack;
 
             _status = ChatStatusEnum.NotStarted;
 
@@ -111,16 +107,14 @@ namespace FreeAIr.BLogic
         }
 
         public static async System.Threading.Tasks.Task<Chat> CreateChatAsync(
-            ChatDescription description,
-            Action<Chat, LLMAnswer> promptAnsweredCallBack = null
+            ChatDescription description
             )
         {
             var chatContext = await ChatContext.CreateChatContextAsync();
 
             var result = new Chat(
                 chatContext,
-                description,
-                promptAnsweredCallBack
+                description
                 );
 
             return result;
@@ -192,18 +186,6 @@ namespace FreeAIr.BLogic
         }
 
         private async Task AskPromptAndReceiveAnswerAsync()
-        {
-            await AskAndWaitForAnswerInternalAsync();
-
-            var e = _promptAnsweredCallBack;
-            if (e is not null)
-            {
-                e(this, _prompts.Last().Answer);
-            }
-        }
-
-        private async Task AskAndWaitForAnswerInternalAsync(
-            )
         {
             var dialog = await ProduceAnswerAsync();
 
