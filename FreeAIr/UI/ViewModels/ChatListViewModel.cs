@@ -63,6 +63,18 @@ namespace FreeAIr.UI.ViewModels
             }
         }
 
+        public Visibility ChatPanelVisibility
+        {
+            get
+            {
+                return SelectedChat is not null
+                    ? Visibility.Visible
+                    : Visibility.Collapsed
+                    ;
+            }
+        }
+
+
         public string SelectedChatResponse
         {
             get

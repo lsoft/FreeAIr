@@ -222,6 +222,7 @@
         <Grid
             Grid.Row="1"
             Grid.Column="2"
+            Visibility="{Binding ChatPanelVisibility}"
             >
             <Grid.RowDefinitions>
                 <RowDefinition Height="auto" />
