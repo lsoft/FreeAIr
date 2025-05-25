@@ -43,7 +43,8 @@ namespace FreeAIr.BLogic
 
         public async Task<Chat?> StartChatAsync(
             ChatDescription kind,
-            UserPrompt? prompt
+            UserPrompt? prompt,
+            FreeAIr.BLogic.ChatOptions? options
             )
         {
             if (kind is null)
@@ -57,7 +58,8 @@ namespace FreeAIr.BLogic
             }
 
             var chat = await Chat.CreateChatAsync(
-                kind
+                kind,
+                options
                 );
             chat.ChatStatusChangedEvent += ChatStatusChanged;
 

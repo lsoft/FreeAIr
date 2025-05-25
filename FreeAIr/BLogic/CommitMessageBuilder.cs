@@ -161,7 +161,8 @@ namespace FreeAIr.BLogic
                         ChatKindEnum.GenerateCommitMessage,
                         null
                         ),
-                    UserPrompt.CreateCommitMessagePrompt(gitDiff)
+                    UserPrompt.CreateCommitMessagePrompt(gitDiff),
+                    ChatOptions.NoToolAutoProcessed
                     );
 
                 if (chat is not null)

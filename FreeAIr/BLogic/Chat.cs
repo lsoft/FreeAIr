@@ -10,6 +10,7 @@ using System.ClientModel;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Management.Instrumentation;
 using System.Text;
 using System.Text.Json;
 using System.Threading;
@@ -21,12 +22,19 @@ namespace FreeAIr.BLogic
     {
         private readonly ChatClient _chatClient;
         private readonly List<UserPrompt> _prompts = new();
-        private readonly ChatContext _chatContext;
 
         private CancellationTokenSource _cancellationTokenSource = new();
         private Task? _task;
 
-        public ChatContext ChatContext => _chatContext;
+        public ChatContext ChatContext
+        {
+            get;
+        }
+
+        public ChatOptions Options
+        {
+            get;
+        }
 
         private ChatStatusEnum _status;
 
@@ -66,7 +74,8 @@ namespace FreeAIr.BLogic
 
         private Chat(
             ChatContext chatContext,
-            ChatDescription description
+            ChatDescription description,
+            FreeAIr.BLogic.ChatOptions options
             )
         {
             if (chatContext is null)
@@ -79,9 +88,14 @@ namespace FreeAIr.BLogic
                 throw new ArgumentNullException(nameof(description));
             }
 
-            _chatContext = chatContext;
-            Description = description;
+            if (options is null)
+            {
+                throw new ArgumentNullException(nameof(options));
+            }
 
+            ChatContext = chatContext;
+            Description = description;
+            Options = options;
             _status = ChatStatusEnum.NotStarted;
 
             Started = DateTime.Now;
@@ -103,18 +117,20 @@ namespace FreeAIr.BLogic
                 }
                 );
 
-            _chatContext.ChatContextChangedEvent += ChatContextChangedRaised;
+            ChatContext.ChatContextChangedEvent += ChatContextChangedRaised;
         }
 
         public static async System.Threading.Tasks.Task<Chat> CreateChatAsync(
-            ChatDescription description
+            ChatDescription description,
+            FreeAIr.BLogic.ChatOptions? options = null
             )
         {
             var chatContext = await ChatContext.CreateChatContextAsync();
 
             var result = new Chat(
                 chatContext,
-                description
+                description,
+                options ?? FreeAIr.BLogic.ChatOptions.Default
                 );
 
             return result;
@@ -212,7 +228,7 @@ namespace FreeAIr.BLogic
 
                 var cco = new ChatCompletionOptions
                 {
-                    //ToolChoice = ChatToolChoice.CreateRequiredChoice(),
+                    ToolChoice = Options.ToolChoice,
                     //ResponseFormat = ChatResponseFormat.CreateTextFormat(),
                     MaxOutputTokenCount = ResponsePage.Instance.MaxOutputTokenCount,
                 };
@@ -909,6 +925,44 @@ Your behavior against available functions:
         public ChatEventArgs(Chat chat)
         {
             Chat = chat;
+        }
+    }
+
+
+    public sealed class ChatOptions
+    {
+        public static readonly ChatOptions Default = new ChatOptions(
+            ChatToolChoice.CreateAutoChoice(),
+            false
+            );
+
+        public static readonly ChatOptions NoToolAutoProcessed = new ChatOptions(
+            ChatToolChoice.CreateNoneChoice(),
+            true
+            );
+
+        public ChatToolChoice ToolChoice
+        {
+            get;
+        }
+
+        public bool AutomaticallyProcessed
+        {
+            get;
+        }
+
+        public ChatOptions(
+            ChatToolChoice toolChoice,
+            bool automaticallyProcessed
+            )
+        {
+            if (toolChoice is null)
+            {
+                throw new ArgumentNullException(nameof(toolChoice));
+            }
+
+            ToolChoice = toolChoice;
+            AutomaticallyProcessed = automaticallyProcessed;
         }
     }
 }

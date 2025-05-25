@@ -120,7 +120,8 @@ namespace FreeAIr.Find
                     ChatKindEnum.NaturalLanguageSearch,
                     null
                     ),
-                null
+                null,
+                ChatOptions.NoToolAutoProcessed
                 );
             if (chat is null)
             {

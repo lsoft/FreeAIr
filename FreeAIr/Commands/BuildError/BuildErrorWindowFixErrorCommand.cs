@@ -54,6 +54,7 @@ namespace FreeAIr.Commands.BuildError
                     ChatKindEnum.FixBuildError,
                     wfd
                     ),
+                null,
                 null
                 );
             if (chat is null)

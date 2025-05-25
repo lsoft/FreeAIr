@@ -74,6 +74,10 @@ namespace FreeAIr.UI.ViewModels
                 {
                     return false;
                 }
+                if (_selectedChat.Chat.Options.AutomaticallyProcessed)
+                {
+                    return false;
+                }
 
                 return _selectedChat.IsReadyToAcceptNewPrompt;
             }
@@ -195,6 +199,7 @@ namespace FreeAIr.UI.ViewModels
 
                             _ = await _chatContainer.StartChatAsync(
                                 new ChatDescription(ChatKindEnum.Discussion, null),
+                                null,
                                 null
                                 );
 

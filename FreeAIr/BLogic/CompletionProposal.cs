@@ -104,7 +104,8 @@ namespace FreeAIr.BLogic
                         ChatKindEnum.SuggestWholeLine,
                         null
                         ),
-                    userPrompt
+                    userPrompt,
+                    ChatOptions.NoToolAutoProcessed
                     );
                 if (chat is null)
                 {

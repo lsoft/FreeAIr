@@ -50,6 +50,7 @@ namespace FreeAIr.Commands.File
                     kind,
                     null
                     ),
+                null,
                 null
                 );
             if (chat is null)
