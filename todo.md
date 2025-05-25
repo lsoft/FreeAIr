@@ -4,6 +4,9 @@ OK - start discussion with presetted selected code in promt TextBox (with chat c
 OK - for prompts: c# additional context by roslyn references
 OK - fix all warning/error in build log
 OK - ошибка: `что такое C#?` решетка превращается в знак вопроса
+- natural language search
+  - add a probability of confidence and sort the list appropriate
+  - different scopes (whole solution, current project, current document)
 - MCP protocol and its tools
   - auto search for mcp.json (as copilot does)
 - feature: `implement with freeair` in context menu of editor if user clicked on throw notimplementedexception or in its codelens

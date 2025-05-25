@@ -699,47 +699,11 @@ namespace FreeAIr.UI.ViewModels
                     _editAvailableToolsCommand = new AsyncRelayCommand(
                         async a =>
                         {
-                            if (_selectedChat is null)
-                            {
-                                return;
-                            }
-                            if (_selectedChat.Chat is null)
-                            {
-                                return;
-                            }
-
-                            var chat = _selectedChat.Chat;
-
-                            if (chat.Status.NotIn(ChatStatusEnum.NotStarted, ChatStatusEnum.Ready))
-                            {
-                                return;
-                            }
-
                             var w = new NestedCheckBoxWindow();
                             w.DataContext = new AvailableToolsViewModel();
                             await w.ShowDialogAsync();
 
                             OnPropertyChanged();
-                        },
-                        a =>
-                        {
-                            if (_selectedChat is null)
-                            {
-                                return false;
-                            }
-                            if (_selectedChat.Chat is null)
-                            {
-                                return false;
-                            }
-
-                            var chat = _selectedChat.Chat;
-
-                            if (chat.Status.NotIn(ChatStatusEnum.NotStarted, ChatStatusEnum.Ready))
-                            {
-                                return false;
-                            }
-
-                            return true;
                         }
                         );
                 }

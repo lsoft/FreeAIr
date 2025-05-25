@@ -149,6 +149,7 @@ namespace FreeAIr.Find
                             i.SolutionItem.FullPath,
                             null
                             ),
+                        true,
                         true
                         )
                     )

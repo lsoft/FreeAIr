@@ -181,7 +181,7 @@
     <value>Компилятор сообщил об ошибке в исходном коде. Помоги исправить код. Ошибка: </value>
   </data>
   <data name="ChatKindEnum_NaturalLanguageSearch" xml:space="preserve">
-    <value>Используя данный тебе поисковый запрос, внимательно изучи все приложенные файлы и найди все места, которые соответствуют запросу. Твой ответ должен быть в виде списка в следующем JSON формате: `{ "matches": [ {"fullpath": "full path to the file", "found_text":"a matched text from document", "line":line_number_of_found_text, "column":column_number_of_found_text, "offset":a_found_text_offset_from_file_start, "reason":"a reason why you include this item to your result"} ] }`. `line_number` - это номер строки, где найден `found_text`, `column_number` - это номер столбца от начала строки, `offset` - это количество символов от начала файла, где найден `found_text`.
+    <value>Используя данный тебе поисковый запрос, внимательно изучи все приложенные файлы и найди все места, которые соответствуют запросу. Твой ответ должен быть в виде списка в следующем JSON формате: `{ "matches": [ {"fullpath": "full path to the file", "found_text":"a matched word sequence from document",  "confidence_level":a_level_of_your_confidence, "line":line_number_of_found_text, "reason":"a reason why you include this item to your result"} ] }`. `found_text` - 5-10 слов из документа, которые по твоему мнению соответствуют поисковому запросу, `confidence_level` - это целое число, уровень твоей уверенности, что `found_text` соответствует поисковому запросу, где 0 - минимальная уверенность, 100 - максимальная уверенность, `line_number` - это номер строки, где найден `found_text`.
 Поисковый запрос:</value>
   </data>
 </root>

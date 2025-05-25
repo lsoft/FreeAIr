@@ -4,12 +4,16 @@ using FreeAIr.UI.Embedillo.Answer.Parser;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Packaging;
+using System.Text;
 using System.Threading.Tasks;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.Tab;
 
 namespace FreeAIr.BLogic.Context.Item
 {
     public sealed class SolutionItemChatContextItem : IChatContextItem
     {
+        private readonly bool _addLineNumberInTheBody;
+
         public SelectedIdentifier SelectedIdentifier
         {
             get;
@@ -24,7 +28,8 @@ namespace FreeAIr.BLogic.Context.Item
 
         public SolutionItemChatContextItem(
             SelectedIdentifier selectedIdentifier,
-            bool isAutoFound
+            bool isAutoFound,
+            bool addLineNumberInTheBody = false
             )
         {
             if (selectedIdentifier is null)
@@ -34,6 +39,7 @@ namespace FreeAIr.BLogic.Context.Item
 
             SelectedIdentifier = selectedIdentifier;
             IsAutoFound = isAutoFound;
+            _addLineNumberInTheBody = addLineNumberInTheBody;
         }
 
         public bool IsSame(IChatContextItem other)
@@ -88,12 +94,18 @@ namespace FreeAIr.BLogic.Context.Item
                     SelectedIdentifier.Selection.GetVisualStudioSpan()
                     );
 
+                var lineEnding = LineEndingHelper.Actual.GetOpenedDocumentLineEnding(SelectedIdentifier.FilePath);
+                var modifiedBody = ProcessLineNumbers(
+                    body,
+                    lineEnding
+                    );
+
                 return
                     Environment.NewLine
                     + "```"
                     + LanguageHelper.GetMarkdownLanguageCodeBlockNameBasedOnFileExtension(fi.Extension)
                     + Environment.NewLine
-                    + body
+                    + modifiedBody
                     + Environment.NewLine
                     + "```"
                     + Environment.NewLine
@@ -101,6 +113,12 @@ namespace FreeAIr.BLogic.Context.Item
             }
             else
             {
+                var lineEnding = LineEndingHelper.Actual.GetDocumentLineEnding(SelectedIdentifier.FilePath);
+                var modifiedBody = ProcessLineNumbers(
+                    System.IO.File.ReadAllText(SelectedIdentifier.FilePath),
+                    lineEnding
+                    );
+
                 return
                     Environment.NewLine
                     + $"Text of the file `{SelectedIdentifier.FilePath}`:"
@@ -109,12 +127,40 @@ namespace FreeAIr.BLogic.Context.Item
                     + "```"
                     + LanguageHelper.GetMarkdownLanguageCodeBlockNameBasedOnFileExtension(fi.Extension)
                     + Environment.NewLine
-                    + System.IO.File.ReadAllText(SelectedIdentifier.FilePath)
+                    + modifiedBody
                     + Environment.NewLine
                     + "```"
                     + Environment.NewLine
                     ;
             }
+        }
+
+        private string ProcessLineNumbers(string body, string lineEnding)
+        {
+            if (!_addLineNumberInTheBody)
+            {
+                return body;
+            }
+
+            var lines = body.Split(new[] { lineEnding }, StringSplitOptions.None);
+
+            var digitCount = Math.Ceiling(Math.Log10(lines.Length));
+            var toStringMode = "D" + digitCount.ToString();
+
+            var result = new StringBuilder();
+            for (var lineIndex = 0; lineIndex < lines.Length; lineIndex++)
+            {
+                var line = lines[lineIndex];
+                if (_addLineNumberInTheBody)
+                {
+                    result.Append(lineIndex.ToString(toStringMode));
+                    result.Append(": ");
+                }
+
+                result.AppendLine(line);
+            }
+
+            return result.ToString();
         }
 
         public void ReplaceWithText(string body)

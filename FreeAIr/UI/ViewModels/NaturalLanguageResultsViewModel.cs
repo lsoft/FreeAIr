@@ -66,21 +66,20 @@ namespace FreeAIr.UI.ViewModels
                             }
 
                             var textView = documentView.TextView;
-                            var text = textView.TextSnapshot.GetText();
-                            var offset = text.IndexOf(foundItem.FoundText);
-                            if (offset < 0)
-                            {
-                                offset = foundItem.OffsetIndex;
-                            }
 
                             var snapshot = textView.TextSnapshot;
 
-                            var startOffset = offset;
-                            var startLine = snapshot.GetLineFromPosition(startOffset);
-                            var startLineIndex = startLine.LineNumber;
-                            var startColumnIndex = startOffset - startLine.Start.Position;
+                            var startLine = snapshot.GetLineFromLineNumber(foundItem.LineIndex);
+                            var lineText = startLine.GetText();
+                            
+                            var startColumnIndex = lineText.IndexOf(foundItem.FoundText);
+                            if (startColumnIndex < 0)
+                            {
+                                startColumnIndex = 0;
+                            }
 
-                            var endOffset = offset + foundItem.FoundText.Length;
+                            var startOffset = startLine.Start.Position + startColumnIndex;
+                            var endOffset = startOffset + foundItem.FoundText.Length;
                             var endLine = snapshot.GetLineFromPosition(endOffset);
                             var endLineIndex = endLine.LineNumber;
                             var endColumnIndex = endOffset - endLine.Start.Position;
@@ -96,9 +95,9 @@ namespace FreeAIr.UI.ViewModels
                             _textManager.NavigateToLineAndColumn(
                                 buffer,
                                 ref docViewType,
-                                startLineIndex,
+                                foundItem.LineIndex,
                                 startColumnIndex,
-                                endLineIndex,
+                                foundItem.LineIndex,
                                 endColumnIndex
                                 );
 
@@ -199,16 +198,15 @@ namespace FreeAIr.UI.ViewModels
                             if (!string.IsNullOrEmpty(cleanAnswer))
                             {
                                 var results = JsonSerializer.Deserialize<NaturalSearchResults>(cleanAnswer);
-                                foreach (var match in results.matches)
+                                foreach (var match in results.matches.OrderByDescending(m => m.confidence_level))
                                 {
                                     FoundItems.Add(
                                         new FoundItem(
                                             filePath: match.fullpath,
                                             foundText: match.found_text,
                                             reason: match.reason,
-                                            lineIndex: match.line,
-                                            columnIndex: match.column,
-                                            offsetIndex: match.offset
+                                            confidenceLevel: match.confidence_level,
+                                            lineIndex: match.line
                                             )
                                         );
                                 }
@@ -248,15 +246,11 @@ namespace FreeAIr.UI.ViewModels
         {
             get; set;
         }
+        public double confidence_level
+        {
+            get; set;
+        }
         public int line
-        {
-            get; set;
-        }
-        public int column
-        {
-            get; set;
-        }
-        public int offset
         {
             get; set;
         }
@@ -289,28 +283,23 @@ namespace FreeAIr.UI.ViewModels
             get;
         }
 
+        public double ConfidenceLevel
+        {
+            get;
+        }
+
         public int LineIndex
         {
             get;
         }
 
-        public int ColumnIndex
-        {
-            get;
-        }
-
-        public int OffsetIndex
-        {
-            get;
-        }
 
         public FoundItem(
             string filePath,
             string foundText,
             string reason,
-            int lineIndex,
-            int columnIndex,
-            int offsetIndex
+            double confidenceLevel,
+            int lineIndex
             )
         {
             FilePath = filePath;
@@ -318,9 +307,14 @@ namespace FreeAIr.UI.ViewModels
             FileName = new System.IO.FileInfo(filePath).Name;
             FoundText = foundText;
             Reason = reason;
+            ConfidenceLevel = 
+                confidenceLevel > 100
+                    ? 100
+                    : (confidenceLevel < 0
+                        ? 0
+                        : confidenceLevel)
+                    ;
             LineIndex = lineIndex;
-            ColumnIndex = columnIndex;
-            OffsetIndex = offsetIndex;
         }
     }
 }
