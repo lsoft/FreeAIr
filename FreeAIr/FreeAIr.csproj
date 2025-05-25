@@ -149,6 +149,7 @@
     <Compile Include="UI\CodeLens\CodeLenseUserControlViewModel.cs" />
     <Compile Include="UI\CodeLens\ViewElementFactory.cs" />
     <Compile Include="UI\CombinedParameterConverter.cs" />
+    <Compile Include="UI\Converters.cs" />
     <Compile Include="UI\Embedillo\Answer\Parser\CommandAnswerPart.cs" />
     <Compile Include="UI\Embedillo\Answer\Parser\IAnswerPart.cs" />
     <Compile Include="UI\Embedillo\Answer\Parser\ParsedAnswer.cs" />

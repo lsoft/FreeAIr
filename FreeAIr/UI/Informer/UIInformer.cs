@@ -44,6 +44,11 @@ namespace FreeAIr.UI.Informer
             {
                 await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
 
+                if (_status == status)
+                {
+                    return;
+                }
+
                 _status = status;
 
                 if (_statusControl is null)

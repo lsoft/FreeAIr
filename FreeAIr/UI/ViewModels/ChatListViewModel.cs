@@ -132,10 +132,24 @@ namespace FreeAIr.UI.ViewModels
                     _openInEditorCommand = new AsyncRelayCommand(
                         async a =>
                         {
-                            await VS.Documents.OpenAsync(_selectedChat.Chat.ResultFilePath);
+                            var wrapper = a as ChatWrapper;
+                            if (wrapper is null)
+                            {
+                                return;
+                            }
+
+                            await VS.Documents.OpenAsync(wrapper.Chat.ResultFilePath);
                         },
-                        a => _selectedChat is not null && _selectedChat.Chat.Status.In(ChatStatusEnum.Ready, ChatStatusEnum.Failed)
-                        );
+                        a =>
+                        {
+                            var wrapper = a as ChatWrapper;
+                            if (wrapper is null)
+                            {
+                                return false;
+                            }
+
+                            return wrapper.Chat.Status.In(ChatStatusEnum.Ready, ChatStatusEnum.Failed);
+                        });
                 }
 
                 return _openInEditorCommand;
@@ -171,11 +185,25 @@ namespace FreeAIr.UI.ViewModels
                     _stopCommand = new RelayCommand(
                         a =>
                         {
-                            _chatContainer.StopChatAsync(_selectedChat.Chat)
+                            var wrapper = a as ChatWrapper;
+                            if (wrapper is null)
+                            {
+                                return;
+                            }
+
+                            _chatContainer.StopChatAsync(wrapper.Chat)
                                 .FileAndForget(nameof(ChatContainer.StopChatAsync));
                         },
-                        a => _selectedChat is not null && _selectedChat.Chat.Status.In(ChatStatusEnum.WaitingForAnswer, ChatStatusEnum.ReadingAnswer)
-                        );
+                        a =>
+                        {
+                            var wrapper = a as ChatWrapper;
+                            if (wrapper is null)
+                            {
+                                return false;
+                            }
+
+                            return wrapper.Chat.Status.In(ChatStatusEnum.WaitingForAnswer, ChatStatusEnum.ReadingAnswer);
+                        });
                 }
 
                 return _stopCommand;
