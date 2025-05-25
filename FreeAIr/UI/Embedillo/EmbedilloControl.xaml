@@ -13,6 +13,7 @@
     Focusable="True"
     Loaded="EmbedilloInternalName_Loaded"
     >
+
     <Grid
         VerticalAlignment="Stretch"
         >
@@ -22,6 +23,7 @@
             Background="{Binding ElementName=EmbedilloInternalName, Path=Background}"
             FontFamily="{Binding ElementName=EmbedilloInternalName, Path=FontFamily}"
             FontSize="{Binding ElementName=EmbedilloInternalName, Path=FontSize}"
+            IsEnabled="{Binding ElementName=EmbedilloInternalName, Path=ControlEnabled}"
             Margin="0"
             HorizontalScrollBarVisibility="Auto"
             VerticalScrollBarVisibility="Auto"

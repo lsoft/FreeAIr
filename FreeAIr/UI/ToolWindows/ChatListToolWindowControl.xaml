@@ -164,7 +164,7 @@
                     >
                     <Label.InputBindings>
                         <MouseBinding
-                            Command="{Binding ElementName=ChatListToolWindow, Path=DataContext.StartDiscussionCommand}"
+                            Command="{Binding ElementName=ChatListToolWindow, Path=DataContext.StartChatCommand}"
                             MouseAction="LeftClick"
                             />
                     </Label.InputBindings>
@@ -201,9 +201,17 @@
                         <TextBlock
                             Text="{Binding Path=ThirdRow, Mode=OneWay}"
                             />
-                        <TextBlock
-                            Text="{Binding Path=FourthRow, Mode=OneWay}"
-                            />
+                        <StackPanel
+                            Orientation="Horizontal">
+                            <imaging:CrispImage
+                                Margin="0"
+                                Moniker="{Binding StatusMoniker}"
+                                />
+                            <TextBlock
+                                Margin="5,0,0,0"
+                                Text="{Binding Path=FourthRow, Mode=OneWay}"
+                                />
+                        </StackPanel>
                     </StackPanel>
                 </DataTemplate>
             </ListBox.ItemTemplate>
@@ -444,6 +452,7 @@
                             x:Name="AddToContextControl"
                             HintText="Press # to enter context items here. Press Ctrl + Enter to add items to context."
                             EnterCommand="{Binding AddItemToContextCommand}"
+                            ControlEnabled="{Binding IsReadyToAcceptNewPrompt}"
                             >
                             </embedillo:EmbedilloControl>
 
@@ -785,8 +794,29 @@
                 x:Name="PromptControl"
                 EnterCommand="{Binding CreatePromptCommand}"
                 HintText="Enter your prompt here. Press / to open commands. Press # to choose solution item. Press Ctrl + Enter to send your prompt."
+                ControlEnabled="{Binding IsReadyToAcceptNewPrompt}"
                 >
             </embedillo:EmbedilloControl>
+
+            <StackPanel
+                Grid.Row="3"
+                Margin="2,5,2,2"
+                Orientation="Horizontal"
+                HorizontalAlignment="Right"
+                VerticalAlignment="Top"
+                IsHitTestVisible="False"
+                >
+                <imaging:CrispImage
+                    Moniker="{x:Static catalog:KnownMonikers.NeuralNetwork}"
+                    IsHitTestVisible="False"
+                    />
+                <imaging:CrispImage
+                    Margin="4,0,0,0"
+                    Moniker="{Binding StatusMoniker}"
+                    IsHitTestVisible="False"
+                    />
+            </StackPanel>
+
 
         </Grid>
 

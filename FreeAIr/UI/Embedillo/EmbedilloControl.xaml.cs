@@ -9,6 +9,7 @@ using System.Reflection.Emit;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media;
 
 namespace FreeAIr.UI.Embedillo
 {
@@ -22,17 +23,25 @@ namespace FreeAIr.UI.Embedillo
                 nameof(EnterCommand),
                 typeof(ICommand),
                 typeof(EmbedilloControl));
-        
 
-        public Visibility HintVisibility
+        public static readonly DependencyProperty ControlEnabledProperty =
+            DependencyProperty.Register(
+                nameof(ControlEnabled),
+                typeof(bool),
+                typeof(EmbedilloControl),
+                new PropertyMetadata(default(bool), OnControlEnabledChanged)
+                );
+
+        public bool ControlEnabled
         {
-            get
-            {
-                return string.IsNullOrEmpty(AvalonTextEditor.Text)
-                    ? Visibility.Visible
-                    : Visibility.Hidden
-                    ;
-            }
+            get => (bool)GetValue(ControlEnabledProperty);
+            set => SetValue(ControlEnabledProperty, value);
+        }
+
+        private static void OnControlEnabledChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            var control = d as EmbedilloControl;
+            control.UpdateHintStatus();
         }
 
         public string HintText
@@ -47,9 +56,27 @@ namespace FreeAIr.UI.Embedillo
             set => SetValue(EnterCommandProperty, value);
         }
 
+        public Visibility HintVisibility
+        {
+            get
+            {
+                if (!ControlEnabled)
+                {
+                    return Visibility.Hidden;
+                }
+
+                return string.IsNullOrEmpty(AvalonTextEditor.Text)
+                    ? Visibility.Visible
+                    : Visibility.Hidden
+                    ;
+            }
+        }
+
         public EmbedilloControl()
         {
             InitializeComponent();
+
+            ControlEnabled = true;
 
             AvalonTextEditor.TextArea.TextEntered += (object sender, TextCompositionEventArgs e) =>
             {

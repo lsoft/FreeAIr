@@ -12,7 +12,6 @@ using Microsoft.VisualStudio.Imaging;
 using Microsoft.VisualStudio.Imaging.Interop;
 using Microsoft.Win32;
 using System.ComponentModel.Composition;
-using System.Diagnostics.Contracts;
 using System.IO;
 using System.Linq;
 using System.Windows;
@@ -32,7 +31,7 @@ namespace FreeAIr.UI.ViewModels
         private ICommand _removeCommand;
         private ICommand _stopCommand;
         private ICommand _createPromptCommand;
-        private ICommand _startDiscussionCommand;
+        private ICommand _startChatCommand;
         private ICommand _copyCodeBlockCommand;
         private ICommand _replaceSelectedTextCommand;
         private ICommand _createNewFileCommand;
@@ -46,10 +45,38 @@ namespace FreeAIr.UI.ViewModels
         private ICommand _editAvailableToolsCommand;
 
         public event MarkdownReReadDelegate MarkdownReReadEvent;
+        public event Action ContextControlFocus;
+        public event Action PromptControlFocus;
 
         public ObservableCollection2<ChatWrapper> ChatList
         {
             get;
+        }
+
+        public ImageMoniker StatusMoniker
+        {
+            get
+            {
+                if (_selectedChat is null)
+                {
+                    return KnownMonikers.Pause;
+                }
+
+                return _selectedChat.StatusMoniker;
+            }
+        }
+
+        public bool IsReadyToAcceptNewPrompt
+        {
+            get
+            {
+                if (_selectedChat is null)
+                {
+                    return false;
+                }
+
+                return _selectedChat.IsReadyToAcceptNewPrompt;
+            }
         }
 
         public ChatWrapper? SelectedChat
@@ -58,6 +85,8 @@ namespace FreeAIr.UI.ViewModels
             set
             {
                 _selectedChat = value;
+
+                FocusPromptControl();
 
                 OnPropertyChanged();
             }
@@ -101,7 +130,7 @@ namespace FreeAIr.UI.ViewModels
                         {
                             await VS.Documents.OpenAsync(_selectedChat.Chat.ResultFilePath);
                         },
-                        a => _selectedChat is not null && _selectedChat.Chat.Status == ChatStatusEnum.Ready
+                        a => _selectedChat is not null && _selectedChat.Chat.Status.In(ChatStatusEnum.Ready, ChatStatusEnum.Failed)
                         );
                 }
 
@@ -150,13 +179,13 @@ namespace FreeAIr.UI.ViewModels
         }
         
 
-        public ICommand StartDiscussionCommand
+        public ICommand StartChatCommand
         {
             get
             {
-                if (_startDiscussionCommand == null)
+                if (_startChatCommand == null)
                 {
-                    _startDiscussionCommand = new AsyncRelayCommand(
+                    _startChatCommand = new AsyncRelayCommand(
                         async a =>
                         {
                             if (!await ApiPage.Instance.VerifyUriAndShowErrorIfNotAsync())
@@ -168,11 +197,13 @@ namespace FreeAIr.UI.ViewModels
                                 new ChatDescription(ChatKindEnum.Discussion, null),
                                 null
                                 );
+
+                            FocusPromptControl();
                         }
                         );
                 }
 
-                return _startDiscussionCommand;
+                return _startChatCommand;
             }
         }
 
@@ -394,7 +425,7 @@ namespace FreeAIr.UI.ViewModels
 
                             var chat = _selectedChat.Chat;
 
-                            if (chat.Status.NotIn(ChatStatusEnum.NotStarted, ChatStatusEnum.Ready))
+                            if (chat.Status.NotIn(ChatStatusEnum.NotStarted, ChatStatusEnum.Ready, ChatStatusEnum.Failed))
                             {
                                 return;
                             }
@@ -436,7 +467,7 @@ namespace FreeAIr.UI.ViewModels
 
                             var chat = _selectedChat.Chat;
 
-                            if (chat.Status.NotIn(ChatStatusEnum.NotStarted, ChatStatusEnum.Ready))
+                            if (chat.Status.NotIn(ChatStatusEnum.NotStarted, ChatStatusEnum.Ready, ChatStatusEnum.Failed))
                             {
                                 return false;
                             }
@@ -455,7 +486,6 @@ namespace FreeAIr.UI.ViewModels
                 return _createPromptCommand;
             }
         }
-
 
         #region chat context
 
@@ -610,6 +640,8 @@ namespace FreeAIr.UI.ViewModels
                             }
 
                             AddContextItemsFromPrompt(chat, parsedAnswer);
+
+                            FocusContextControl();
 
                             OnPropertyChanged();
                         },
@@ -897,6 +929,8 @@ namespace FreeAIr.UI.ViewModels
                                 contextItem
                                 );
 
+                            FocusContextControl();
+
                             OnPropertyChanged();
                         },
                         (a) =>
@@ -1007,10 +1041,36 @@ namespace FreeAIr.UI.ViewModels
                 {
                     OnPropertyChanged();
                 }
+
+                if (e.Chat is not null)
+                {
+                    if (e.Chat.Status.NotIn(ChatStatusEnum.WaitingForAnswer, ChatStatusEnum.ReadingAnswer))
+                    {
+                        FocusPromptControl();
+                    }
+                }
             }
             catch (Exception excp)
             {
                 //todo
+            }
+        }
+
+        private void FocusContextControl()
+        {
+            var pcf = ContextControlFocus;
+            if (pcf is not null)
+            {
+                pcf();
+            }
+        }
+
+        private void FocusPromptControl()
+        {
+            var pcf = PromptControlFocus;
+            if (pcf is not null)
+            {
+                pcf();
             }
         }
 
@@ -1038,6 +1098,35 @@ namespace FreeAIr.UI.ViewModels
             public Chat Chat
             {
                 get;
+            }
+
+            public ImageMoniker StatusMoniker
+            {
+                get
+                {
+                    if (Chat.Status.In(ChatStatusEnum.NotStarted, ChatStatusEnum.Ready))
+                    {
+                        return KnownMonikers.Pause;
+                    }
+                    if (Chat.Status.In(ChatStatusEnum.WaitingForAnswer, ChatStatusEnum.ReadingAnswer))
+                    {
+                        return KnownMonikers.Run;
+                    }
+                    if (Chat.Status == ChatStatusEnum.Failed)
+                    {
+                        return KnownMonikers.StatusErrorOutline;
+                    }
+
+                    return KnownMonikers.QuestionMark;
+                }
+            }
+
+            public bool IsReadyToAcceptNewPrompt
+            {
+                get
+                {
+                    return Chat.Status.In(ChatStatusEnum.NotStarted, ChatStatusEnum.Ready, ChatStatusEnum.Failed);
+                }
             }
 
             public string FirstRow
@@ -1111,7 +1200,7 @@ namespace FreeAIr.UI.ViewModels
 
         public string Tooltip =>
             ContextItem.IsAutoFound
-                ? "This item came from automatic scanner"
+                ? "This item came from software logic"
                 : "This item came from user"
                 ;
 

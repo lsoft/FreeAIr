@@ -42,6 +42,18 @@ namespace FreeAIr.UI.ToolWindows
                 );
 
             viewModel.MarkdownReReadEvent += ViewModel_MarkdownReReadEvent;
+            viewModel.ContextControlFocus += ViewModel_ContextControlFocus;
+            viewModel.PromptControlFocus += ViewModel_PromptControlFocus;
+        }
+
+        private void ViewModel_ContextControlFocus()
+        {
+            FocusContextControl();
+        }
+
+        private void ViewModel_PromptControlFocus()
+        {
+            FocusPromptControl();
         }
 
         private void ViewModel_MarkdownReReadEvent(object sender, EventArgs e)
@@ -58,13 +70,7 @@ namespace FreeAIr.UI.ToolWindows
                     var visible = (bool)e.NewValue;
                     if (visible)
                     {
-                        _ = Dispatcher.BeginInvoke(() =>
-                        {
-                            PromptControl.MakeFocused();
-                        });
-
-                        //await Task.Delay(100);
-                        //PromptControl.MakeFocused();
+                        FocusPromptControl();
                     }
                 }
             }
@@ -72,6 +78,28 @@ namespace FreeAIr.UI.ToolWindows
             {
                 //todo log
             }
+        }
+
+        private void FocusContextControl()
+        {
+            _ = Dispatcher.BeginInvoke(() =>
+            {
+                AddToContextControl.MakeFocused();
+            });
+
+            //await Task.Delay(100);
+            //AddToContextControl.MakeFocused();
+        }
+
+        private void FocusPromptControl()
+        {
+            _ = Dispatcher.BeginInvoke(() =>
+            {
+                PromptControl.MakeFocused();
+            });
+
+            //await Task.Delay(100);
+            //PromptControl.MakeFocused();
         }
     }
 
