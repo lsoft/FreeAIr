@@ -1,12 +1,12 @@
 ﻿using FreeAIr.BLogic.Context.Composer;
 using FreeAIr.Helper;
 using FreeAIr.UI.Embedillo.Answer.Parser;
+using OpenAI.Chat;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Packaging;
 using System.Text;
 using System.Threading.Tasks;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.Tab;
 
 namespace FreeAIr.BLogic.Context.Item
 {
@@ -188,6 +188,16 @@ namespace FreeAIr.BLogic.Context.Item
                 )).ConvertToChatContextItem();
             return contextItems;
         }
+
+        public async Task<UserChatMessage> CreateChatMessageAsync()
+        {
+            return new UserChatMessage(
+                ChatMessageContentPart.CreateTextPart(
+                    await AsContextPromptTextAsync()
+                    )
+                );
+        }
+
     }
 
 }

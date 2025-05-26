@@ -31,7 +31,7 @@ namespace FreeAIr.BLogic
             if (chat.Status == ChatStatusEnum.Ready)
             {
                 var lastPrompt = chat.Prompts.Last();
-                if (lastPrompt.Answer is not null)
+                if (!lastPrompt.Answer.IsEmpty)
                 {
                     var textAnswer = lastPrompt.Answer.GetTextualAnswer();
                     if (!string.IsNullOrEmpty(textAnswer))

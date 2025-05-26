@@ -16,30 +16,6 @@ namespace FreeAIr.MCP.Agent
     /// </summary>
     public static class AvailableToolController
     {
-        //public static IReadOnlyDictionary<string, List<string>> GetTools()
-        //{
-        //    var result = new Dictionary<string, List<string>>();
-
-        //    var agents = Read();
-        //    foreach (var agent in agents.Agents)
-        //    {
-        //        if (!result.ContainsKey(agent.Name))
-        //        {
-        //            result[agent.Name] = new();
-        //        }
-
-        //        foreach (var tool in agent.Tools)
-        //        {
-        //            if (tool.Enabled)
-        //            {
-        //                result[agent.Name].Add(tool.Name);
-        //            }
-        //        }
-        //    }
-
-        //    return result;
-        //}
-
         public static bool GetToolStatus(
             string agentName,
             string toolName
@@ -124,7 +100,7 @@ namespace FreeAIr.MCP.Agent
 
         private static AvailableAgents Read()
         {
-            var json = MCPPage.Instance.AvailableTools;
+            var json = InternalPage.Instance.AvailableTools;
             if (string.IsNullOrEmpty(json))
             {
                 return new AvailableAgents();
@@ -150,8 +126,8 @@ namespace FreeAIr.MCP.Agent
                 throw new ArgumentNullException(nameof(agents));
             }
 
-            MCPPage.Instance.AvailableTools = JsonSerializer.Serialize(agents);
-            MCPPage.Instance.Save();
+            InternalPage.Instance.AvailableTools = JsonSerializer.Serialize(agents);
+            InternalPage.Instance.Save();
         }
 
 

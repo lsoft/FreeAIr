@@ -6,6 +6,7 @@ using FreeAIr.Shared.Helper;
 using Microsoft.Extensions.AI;
 using OpenAI;
 using OpenAI.Chat;
+using System;
 using System.ClientModel;
 using System.Collections.Generic;
 using System.IO;
@@ -176,6 +177,11 @@ namespace FreeAIr.BLogic
             _cancellationTokenSource = new CancellationTokenSource();
         }
 
+        public void ArchiveAllPrompts()
+        {
+            _prompts.ForEach(p => p.Archive());
+        }
+
         public void Dispose()
         {
             DeleteResultFile();
@@ -189,9 +195,9 @@ namespace FreeAIr.BLogic
             {
                 return;
             }
-            if (_task.IsCompleted)
+            if (_task.IsCompleted || _task.IsCanceled || _task.IsFaulted)
             {
-                return;
+                    return;
             }
             await _task;
         }
@@ -203,23 +209,13 @@ namespace FreeAIr.BLogic
 
         private async Task AskPromptAndReceiveAnswerAsync()
         {
-            var dialog = await ProduceAnswerAsync();
-
-            _prompts.Last().SetAnswer(dialog.CurrentDialog.Last().Answer);
-        }
-
-        private async Task<Dialog> ProduceAnswerAsync(
-            )
-        {
             var cancellationToken = _cancellationTokenSource.Token;
 
             var dialog = new Dialog(
                 ResultFilePath,
-                Description,
-                _prompts,
-                ChatContext
+                this
                 );
-            await dialog.InitAsync();
+            dialog.Init();
 
             try
             {
@@ -229,7 +225,7 @@ namespace FreeAIr.BLogic
                 var cco = new ChatCompletionOptions
                 {
                     ToolChoice = Options.ToolChoice,
-                    //ResponseFormat = ChatResponseFormat.CreateTextFormat(),
+                    ResponseFormat = Options.ResponseFormat, //ChatResponseFormat.CreateTextFormat(),
                     MaxOutputTokenCount = ResponsePage.Instance.MaxOutputTokenCount,
                 };
 
@@ -332,7 +328,7 @@ namespace FreeAIr.BLogic
 
 
                     var completionUpdates = _chatClient.CompleteChatStreaming(
-                        messages: dialog.GetMessageList(),
+                        messages: await dialog.GetMessageListAsync(),
                         options: cco,
                         cancellationToken: cancellationToken
                         );
@@ -347,7 +343,7 @@ namespace FreeAIr.BLogic
                         {
                             dialog.AppendHelperTextToFile("Server returns error.");
                             Status = ChatStatusEnum.Failed;
-                            return dialog;
+                            return;
                         }
 
                         chatFinishReason ??= completionUpdate.FinishReason;
@@ -388,7 +384,7 @@ namespace FreeAIr.BLogic
                             if (cancellationToken.IsCancellationRequested)
                             {
                                 Status = ChatStatusEnum.Ready;
-                                return dialog;
+                                return;
                             }
                         }
                     }
@@ -449,8 +445,6 @@ namespace FreeAIr.BLogic
 
                 //todo
             }
-
-            return dialog;
         }
 
 
@@ -529,24 +523,14 @@ namespace FreeAIr.BLogic
     public sealed class Dialog
     {
         private readonly string _resultFilePath;
-        private readonly ChatDescription _chatDescription;
-        private readonly IReadOnlyList<UserPrompt> _prompts;
-        private readonly ChatContext _chatContext;
-        private readonly List<PromptAndAnswer> _promptAndAnswers;
-        private readonly List<UserChatMessage> _dialogContext;
+        private readonly Chat _chat;
         private readonly SystemChatMessage _systemChatMessage;
 
-        private PromptAndAnswer _lastPromptAndAnswer => _promptAndAnswers[_promptAndAnswers.Count - 1];
-
-
-        public IReadOnlyList<PromptAndAnswer> CurrentDialog => _promptAndAnswers;
-
+        private UserPrompt _lastPrompt => _chat.Prompts.Last();
 
         public Dialog(
             string resultFilePath,
-            ChatDescription chatDescription,
-            IReadOnlyList<UserPrompt> prompts,
-            ChatContext chatContext
+            Chat chat
             )
         {
             if (resultFilePath is null)
@@ -554,57 +538,20 @@ namespace FreeAIr.BLogic
                 throw new ArgumentNullException(nameof(resultFilePath));
             }
 
-            if (chatDescription is null)
+            if (chat is null)
             {
-                throw new ArgumentNullException(nameof(chatDescription));
+                throw new ArgumentNullException(nameof(chat));
             }
 
-            if (prompts is null)
-            {
-                throw new ArgumentNullException(nameof(prompts));
-            }
-
-            if (chatContext is null)
-            {
-                throw new ArgumentNullException(nameof(chatContext));
-            }
-
-            _promptAndAnswers = new();
             _resultFilePath = resultFilePath;
-            _chatDescription = chatDescription;
-            _prompts = prompts;
-            _chatContext = chatContext;
-
-            _dialogContext = new();
-
+            _chat = chat;
             _systemChatMessage = new SystemChatMessage(
                 BuildRulesSection()
                 );
         }
 
-        public async Task InitAsync()
+        public void Init()
         {
-            foreach (var contextItem in _chatContext.Items)
-            {
-                _dialogContext.Add(
-                    new UserChatMessage(
-                        ChatMessageContentPart.CreateTextPart(
-                            await contextItem.AsContextPromptTextAsync()
-                            )
-                        )
-                    );
-            }
-
-            foreach (var prompt in _prompts)
-            {
-                _promptAndAnswers.Add(
-                    new PromptAndAnswer(
-                        prompt
-                        )
-                    );
-            }
-
-
             AppendHelperTextToFile(
                 Environment.NewLine + Environment.NewLine
                 );
@@ -612,7 +559,7 @@ namespace FreeAIr.BLogic
                 $"> {"UI_Prompt".GetLocalizedResourceByName()}:" + Environment.NewLine
                 );
             AppendHelperTextToFile(
-                _lastPromptAndAnswer.Prompt.PromptBody + Environment.NewLine + Environment.NewLine
+                _lastPrompt.PromptBody + Environment.NewLine + Environment.NewLine
                 );
             AppendHelperTextToFile(
                 $"> {"UI_Answer".GetLocalizedResourceByName()}:" + Environment.NewLine
@@ -646,7 +593,7 @@ namespace FreeAIr.BLogic
                 content
                 );
 
-            _lastPromptAndAnswer.AddAssistantReply(assistantReply);
+            _lastPrompt.Answer.AppendPermanentReaction(assistantReply);
         }
 
 
@@ -664,7 +611,7 @@ namespace FreeAIr.BLogic
                 return;
             }
 
-            _lastPromptAndAnswer.AddAssistantReply(
+            _lastPrompt.Answer.AppendPermanentReaction(
                 new AssistantChatMessage(
                     chatToolCalls
                     )
@@ -740,7 +687,7 @@ namespace FreeAIr.BLogic
                 + Environment.NewLine
                 );
 
-            _lastPromptAndAnswer.AddAssistantReply(
+            _lastPrompt.Answer.AppendPermanentReaction(
                 new ToolChatMessage(
                     toolCall.ToolCallId,
                     string.Join(
@@ -749,30 +696,57 @@ namespace FreeAIr.BLogic
                         )
                     )
                 );
-
         }
 
-        public IReadOnlyList<OpenAI.Chat.ChatMessage> GetMessageList()
+        public void ArchiveAllPrompts()
+        {
+            _chat.ArchiveAllPrompts();
+        }
+
+        public async Task<IReadOnlyList<OpenAI.Chat.ChatMessage>> GetMessageListAsync()
         {
             var result = new List<OpenAI.Chat.ChatMessage>();
 
             result.Add(_systemChatMessage);
 
-            foreach (var dialog in _promptAndAnswers.Take(_promptAndAnswers.Count - 1))
+            var nonArchivedPrompts = _chat.Prompts.FindAll(p => !p.IsArchived);
+
+            foreach (var prompt in nonArchivedPrompts.Take(nonArchivedPrompts.Count - 1))
             {
-                dialog.FillMessageList(result);
+                FillMessageList(prompt, result);
             }
 
-            foreach (var context in _dialogContext)
+            foreach (var contextItem in _chat.ChatContext.Items)
             {
-                DialogContextHelper.FillMessageList(context, result);
+                result.Add(await contextItem.CreateChatMessageAsync());
             }
 
-            _lastPromptAndAnswer.FillMessageList(result);
+            FillMessageList(nonArchivedPrompts.Last(), result);
 
             return result;
         }
 
+
+        private static void FillMessageList(
+            UserPrompt prompt,
+            List<OpenAI.Chat.ChatMessage> result
+            )
+        {
+            if (result is null)
+            {
+                throw new ArgumentNullException(nameof(result));
+            }
+
+            //put prompt
+            var chatMessage = prompt.CreateChatMessage();
+            result.Add(chatMessage);
+
+            //put answers (assistant + tool)
+            foreach (var reaction in prompt.Answer.Reactions)
+            {
+                result.Add(reaction);
+            }
+        }
 
         private void AppendToFile(string contentPart)
         {
@@ -787,7 +761,7 @@ namespace FreeAIr.BLogic
         private string BuildRulesSection()
         {
             // Определение формата ответа в зависимости от типа диалога
-            var respondFormat = _chatDescription.Kind.In(ChatKindEnum.GenerateCommitMessage, ChatKindEnum.SuggestWholeLine)
+            var respondFormat = _chat.Description.Kind.In(ChatKindEnum.GenerateCommitMessage, ChatKindEnum.SuggestWholeLine)
                 ? "plain text"
                 : ResponsePage.Instance.ResponseFormat switch
                 {
@@ -852,66 +826,66 @@ Your behavior against available functions:
         }
     }
 
-    public sealed class PromptAndAnswer
-    {
-        public UserPrompt Prompt
-        {
-            get;
-        }
+    //public sealed class PromptAndAnswer
+    //{
+    //    public UserPrompt Prompt
+    //    {
+    //        get;
+    //    }
 
-        public UserChatMessage UserChatMessage
-        {
-            get;
-        }
+    //    public UserChatMessage UserChatMessage
+    //    {
+    //        get;
+    //    }
 
-        public LLMAnswer Answer
-        {
-            get;
-        }
+    //    public LLMAnswer Answer
+    //    {
+    //        get;
+    //    }
 
-        public PromptAndAnswer(
-            UserPrompt prompt
-            )
-        {
-            Prompt = prompt;
-            UserChatMessage = prompt.CreateChatMessage();
-            Answer = prompt.Answer ?? new LLMAnswer();
-        }
+    //    public PromptAndAnswer(
+    //        UserPrompt prompt
+    //        )
+    //    {
+    //        Prompt = prompt;
+    //        UserChatMessage = prompt.CreateChatMessage();
+    //        Answer = prompt.Answer ?? new LLMAnswer();
+    //    }
 
-        public void AddAssistantReply(
-            ToolChatMessage assistantReply
-            )
-        {
-            Answer.AppendPermanentReaction(assistantReply);
-        }
+    //    public void AddAssistantReply(
+    //        ToolChatMessage assistantReply
+    //        )
+    //    {
+    //        Answer.AppendPermanentReaction(assistantReply);
+    //    }
 
-        public void AddAssistantReply(
-            AssistantChatMessage assistantReply
-            )
-        {
-            Answer.AppendPermanentReaction(assistantReply);
-        }
+    //    public void AddAssistantReply(
+    //        AssistantChatMessage assistantReply
+    //        )
+    //    {
+    //        Answer.AppendPermanentReaction(assistantReply);
+    //    }
 
-        public void FillMessageList(List<OpenAI.Chat.ChatMessage> result)
-        {
-            if (result is null)
-            {
-                throw new ArgumentNullException(nameof(result));
-            }
+    //    public void FillMessageList(List<OpenAI.Chat.ChatMessage> result)
+    //    {
+    //        if (result is null)
+    //        {
+    //            throw new ArgumentNullException(nameof(result));
+    //        }
 
-            //put prompt
-            result.Add(UserChatMessage);
+    //        //put prompt
+    //        result.Add(UserChatMessage);
 
-            //put answers (assistant + tool)
-            if (Answer is not null)
-            {
-                foreach (var reaction in Answer.Reactions)
-                {
-                    result.Add(reaction);
-                }
-            }
-        }
-    }
+    //        //put answers (assistant + tool)
+    //        if (Answer is not null)
+    //        {
+    //            foreach (var reaction in Answer.Reactions)
+    //            {
+    //                result.Add(reaction);
+    //            }
+    //        }
+    //    }
+    //}
 
     public delegate void ChatStatusChangedDelegate(object sender, ChatEventArgs e);
 
@@ -933,15 +907,28 @@ Your behavior against available functions:
     {
         public static readonly ChatOptions Default = new ChatOptions(
             ChatToolChoice.CreateAutoChoice(),
+            OpenAI.Chat.ChatResponseFormat.CreateTextFormat(),
             false
             );
 
-        public static readonly ChatOptions NoToolAutoProcessed = new ChatOptions(
+        public static readonly ChatOptions NoToolAutoProcessedTextResponse = new ChatOptions(
             ChatToolChoice.CreateNoneChoice(),
+            OpenAI.Chat.ChatResponseFormat.CreateTextFormat(),
+            true
+            );
+
+        public static readonly ChatOptions NoToolAutoProcessedJsonResponse = new ChatOptions(
+            ChatToolChoice.CreateNoneChoice(),
+            OpenAI.Chat.ChatResponseFormat.CreateJsonObjectFormat(),
             true
             );
 
         public ChatToolChoice ToolChoice
+        {
+            get;
+        }
+
+        public OpenAI.Chat.ChatResponseFormat ResponseFormat
         {
             get;
         }
@@ -953,6 +940,7 @@ Your behavior against available functions:
 
         public ChatOptions(
             ChatToolChoice toolChoice,
+            OpenAI.Chat.ChatResponseFormat responseFormat,
             bool automaticallyProcessed
             )
         {
@@ -961,7 +949,13 @@ Your behavior against available functions:
                 throw new ArgumentNullException(nameof(toolChoice));
             }
 
+            if (responseFormat is null)
+            {
+                throw new ArgumentNullException(nameof(responseFormat));
+            }
+
             ToolChoice = toolChoice;
+            ResponseFormat = responseFormat;
             AutomaticallyProcessed = automaticallyProcessed;
         }
     }

@@ -808,6 +808,21 @@
                 Moniker="{Binding StatusMoniker}"
                 />
 
+            <embedillo:EmbedilloControl
+                Grid.Row="3"
+                Margin="2,2,2,2"
+                VerticalAlignment="Stretch"
+                VerticalContentAlignment="Stretch"
+                Foreground="{Binding ElementName=ForegroundButton, Path=Foreground}"
+                Background="Transparent"
+                FontSize="14"
+                x:Name="PromptControl"
+                EnterCommand="{Binding CreatePromptCommand}"
+                HintText="Enter your prompt here. Press / to open commands. Press # to choose solution item. Press Ctrl + Enter to send your prompt."
+                ControlEnabled="{Binding IsReadyToAcceptNewPrompt}"
+                >
+            </embedillo:EmbedilloControl>
+
             <Label
                 Grid.Row="3"
                 Margin="5,2,5,2"
@@ -828,21 +843,6 @@
                         />
                 </Label.InputBindings>
             </Label>
-
-            <embedillo:EmbedilloControl
-                Grid.Row="3"
-                Margin="2,2,2,2"
-                VerticalAlignment="Stretch"
-                VerticalContentAlignment="Stretch"
-                Foreground="{Binding ElementName=ForegroundButton, Path=Foreground}"
-                Background="Transparent"
-                FontSize="14"
-                x:Name="PromptControl"
-                EnterCommand="{Binding CreatePromptCommand}"
-                HintText="Enter your prompt here. Press / to open commands. Press # to choose solution item. Press Ctrl + Enter to send your prompt."
-                ControlEnabled="{Binding IsReadyToAcceptNewPrompt}"
-                >
-            </embedillo:EmbedilloControl>
 
         </Grid>
 

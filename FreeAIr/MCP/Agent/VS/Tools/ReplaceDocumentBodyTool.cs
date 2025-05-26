@@ -73,7 +73,8 @@ namespace FreeAIr.MCP.Agent.VS.Tools
             var solution = await Community.VisualStudio.Toolkit.VS.Solutions.GetCurrentSolutionAsync();
             var items = await solution.ProcessDownRecursivelyForAsync(
                 item => !item.IsNonVisibleItem && (StringComparer.InvariantCultureIgnoreCase.Compare(item.Text, itemNamePath) == 0 || StringComparer.InvariantCultureIgnoreCase.Compare(item.FullPath, itemNamePath) == 0),
-                false
+                false,
+                cancellationToken
                 );
             var item = items.FirstOrDefault(i => !i.SolutionItem.IsNonVisibleItem);
             if (item is null)

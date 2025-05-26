@@ -77,6 +77,22 @@ namespace FreeAIr.BLogic.Context
             return null;
         }
 
+        public void RemoveItems(
+            IReadOnlyList<IChatContextItem> items
+            )
+        {
+            if (items is null)
+            {
+                throw new ArgumentNullException(nameof(items));
+            }
+
+            var removedCount = _items.RemoveAll(i => items.Any(ii => ii.IsSame(i)));
+            if (removedCount > 0)
+            {
+                RaiseChatContextChanged();
+            }
+        }
+
         public void RemoveItem(
             IChatContextItem item
             )

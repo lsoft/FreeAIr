@@ -181,7 +181,7 @@
                                         <TextBlock
                                             Grid.Row="0"
                                             Text="{Binding FoundText}"
-                                            TextWrapping="NoWrap"
+                                            TextWrapping="Wrap"
                                             HorizontalAlignment="Left"
                                             Foreground="#569CD6"
                                             Background="Transparent"
@@ -198,7 +198,7 @@
                                         <TextBlock
                                             Grid.Row="1"
                                             Text="{Binding Reason}"
-                                            TextWrapping="NoWrap"
+                                            TextWrapping="Wrap"
                                             HorizontalAlignment="Left"
                                             Foreground="Gray"
                                             Background="Transparent"

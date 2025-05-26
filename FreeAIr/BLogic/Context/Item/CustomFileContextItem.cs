@@ -1,5 +1,6 @@
 ﻿using FreeAIr.Helper;
 using FreeAIr.UI.Embedillo.Answer.Parser;
+using OpenAI.Chat;
 using SharpCompress.Common;
 using System;
 using System.Collections.Generic;
@@ -117,6 +118,15 @@ namespace FreeAIr.BLogic.Context.Item
         public async Task<IReadOnlyList<IChatContextItem>> SearchRelatedContextItemsAsync()
         {
             return [];
+        }
+
+        public async Task<UserChatMessage> CreateChatMessageAsync()
+        {
+            return new UserChatMessage(
+                ChatMessageContentPart.CreateTextPart(
+                    await AsContextPromptTextAsync()
+                    )
+                );
         }
     }
 }

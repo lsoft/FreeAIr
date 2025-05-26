@@ -21,7 +21,16 @@ namespace FreeAIr.BLogic
         }
 
         /// <inheritdoc />
-        public LLMAnswer? Answer
+        public LLMAnswer Answer
+        {
+            get;
+        }
+
+        /// <summary>
+        /// This prompt may be archived.
+        /// If so, this means it is not a subject to send into LLM.
+        /// </summary>
+        public bool IsArchived
         {
             get;
             private set;
@@ -37,21 +46,7 @@ namespace FreeAIr.BLogic
                 throw new ArgumentNullException(nameof(promptBody));
 
             PromptBody = promptBody;
-        }
-
-        /// <summary>
-        /// Устанавливает ответ ИИ, только если он еще не был задан
-        /// </summary>
-        /// <param name="answer">Текст ответа</param>
-        public void SetAnswer(LLMAnswer answer)
-        {
-            if (answer is null)
-                throw new ArgumentNullException(nameof(answer));
-
-            if (Answer is not null)
-                throw new ArgumentNullException(nameof(Answer));
-
-            Answer = answer;
+            Answer = new LLMAnswer();
         }
 
         public UserChatMessage CreateChatMessage()
@@ -59,6 +54,11 @@ namespace FreeAIr.BLogic
             return new UserChatMessage(
                 ChatMessageContentPart.CreateTextPart(PromptBody)
                 );
+        }
+
+        public void Archive()
+        {
+            IsArchived = true;
         }
 
         /// <summary>
@@ -205,6 +205,8 @@ namespace FreeAIr.BLogic
     public sealed class LLMAnswer
     {
         private readonly List<OpenAI.Chat.ChatMessage> _reactions = new();
+
+        public bool IsEmpty => _reactions.Count == 0;
 
         public IReadOnlyList<OpenAI.Chat.ChatMessage> Reactions => _reactions;
 

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using OpenAI.Chat;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace FreeAIr.BLogic.Context
@@ -42,7 +43,9 @@ namespace FreeAIr.BLogic.Context
         /// ```
         /// </summary>
         Task<string> AsContextPromptTextAsync();
-        
+
+        Task<UserChatMessage> CreateChatMessageAsync();
+
         Task<IReadOnlyList<IChatContextItem>> SearchRelatedContextItemsAsync();
     }
 

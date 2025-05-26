@@ -85,7 +85,9 @@ namespace FreeAIr.UI.Windows
 
         public async Task WaitForCompleteAsync()
         {
-            if (_workingTask is not null && !_workingTask.IsCompleted)
+            if (_workingTask is not null
+                && !(_workingTask.IsCompleted || _workingTask.IsCanceled || _workingTask.IsFaulted)
+                )
             {
                 try
                 {

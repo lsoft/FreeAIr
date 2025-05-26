@@ -6,6 +6,7 @@ using Microsoft.VisualStudio.Imaging.Interop;
 using System.Collections.Generic;
 using System.IO;
 using System.Runtime.Remoting.Channels;
+using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -53,7 +54,8 @@ namespace FreeAIr.UI.Embedillo.VisualLine.SolutionItem
             var solutionItems = await solution.ProcessDownRecursivelyForAsync(
                 [SolutionItemType.Solution, SolutionItemType.Project, SolutionItemType.PhysicalFile],
                 null,
-                true
+                true,
+                CancellationToken.None
                 );
 
             var suggestions = solutionItems.ConvertAll(si =>

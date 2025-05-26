@@ -162,7 +162,7 @@ namespace FreeAIr.BLogic
                         null
                         ),
                     UserPrompt.CreateCommitMessagePrompt(gitDiff),
-                    ChatOptions.NoToolAutoProcessed
+                    ChatOptions.NoToolAutoProcessedTextResponse
                     );
 
                 if (chat is not null)

@@ -3,6 +3,7 @@ using FreeAIr.UI.Embedillo.Answer.Parser;
 using Microsoft.Internal.VisualStudio.PlatformUI;
 using Microsoft.VisualStudio.Shell.Interop;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace FreeAIr.Helper
@@ -13,7 +14,8 @@ namespace FreeAIr.Helper
             this SolutionItem item,
             SolutionItemType[] types,
             string? fullPath,
-            bool includeSelection
+            bool includeSelection,
+            CancellationToken cancellationToken
             )
         {
             var foundItems = new FoundSolutionItems();
@@ -21,7 +23,8 @@ namespace FreeAIr.Helper
                 foundItems,
                 item,
                 item => item.Type.In(types) && (string.IsNullOrEmpty(fullPath) || fullPath == item.FullPath),
-                includeSelection
+                includeSelection,
+                cancellationToken
                 );
             return foundItems.Result;
         }
@@ -29,11 +32,12 @@ namespace FreeAIr.Helper
         public static async Task<List<FoundSolutionItem>> ProcessDownRecursivelyForAsync(
             this SolutionItem item,
             Predicate<SolutionItem> predicate,
-            bool includeSelection
+            bool includeSelection,
+            CancellationToken cancellationToken
             )
         {
             var foundItems = new FoundSolutionItems();
-            await ProcessDownRecursivelyForAsync(foundItems, item, predicate, includeSelection);
+            await ProcessDownRecursivelyForAsync(foundItems, item, predicate, includeSelection, cancellationToken);
             return foundItems.Result;
         }
 
@@ -41,7 +45,8 @@ namespace FreeAIr.Helper
             FoundSolutionItems foundItems,
             SolutionItem item,
             Predicate<SolutionItem> predicate,
-            bool includeSelection
+            bool includeSelection,
+            CancellationToken cancellationToken
             )
         {
             //https://github.com/VsixCommunity/Community.VisualStudio.Toolkit/issues/401
@@ -57,8 +62,12 @@ namespace FreeAIr.Helper
 
             if (predicate(item))
             {
+                cancellationToken.ThrowIfCancellationRequested();
+
                 //check for selection for this file
-                var documentView = await VS.Documents.GetDocumentViewAsync(item.FullPath);
+                var documentView = await VS.Documents.GetDocumentViewAsync(
+                    item.FullPath
+                    );
 
                 //if the document is selected, put it in the head of the list
                 if (documentView is not null)
@@ -107,7 +116,13 @@ namespace FreeAIr.Helper
                     continue;
                 }
 
-                await ProcessDownRecursivelyForAsync(foundItems, child, predicate, includeSelection);
+                await ProcessDownRecursivelyForAsync(
+                    foundItems,
+                    child,
+                    predicate,
+                    includeSelection,
+                    cancellationToken
+                    );
             }
         }
 

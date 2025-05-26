@@ -37,7 +37,8 @@ namespace FreeAIr.MCP.Agent.VS.Tools
             var solution = await Community.VisualStudio.Toolkit.VS.Solutions.GetCurrentSolutionAsync();
             var items = await solution.ProcessDownRecursivelyForAsync(
                 item => !item.IsNonVisibleItem,
-                false
+                false,
+                cancellationToken
                 );
 
             var converted = items

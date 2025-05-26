@@ -51,6 +51,8 @@ namespace FreeAIr
         public const int CodeLens_GenerateUnitTestsCommandId = 0x1037;
         public const int BuildErrorWindowGroup = 0x1039;
         public const int BuildErrorWindowFixErrorCommandId = 0x1040;
+        public const int OpenNaturalSearchToolWindowCommandId = 0x1041;
+        public const int ShowReleaseNotesCommandId = 0x1042;
         public const int Icon16 = 0x0001;
         public const int Icon32 = 0x0001;
     }

@@ -73,12 +73,28 @@
           <ButtonText>Open chat list window...</ButtonText>
         </Strings>
       </Button>
+      <Button guid="FreeAIr" id="OpenNaturalSearchToolWindowCommandId" priority="0x0101" type="Button">
+        <Parent guid="FreeAIr" id="SubExtensionMenuGroup" />
+        <Icon guid="ImageCatalogGuid" id="FindInFile" />
+        <CommandFlag>IconIsMoniker</CommandFlag>
+        <Strings>
+          <ButtonText>Open natural search result window...</ButtonText>
+        </Strings>
+      </Button>
       <Button guid="FreeAIr" id="InstallGithubMCPServerCommandId" priority="0x0102" type="Button">
         <Parent guid="FreeAIr" id="SubExtensionMenuGroup" />
         <Icon guid="ImageCatalogGuid" id="Git" />
         <CommandFlag>IconIsMoniker</CommandFlag>
         <Strings>
           <ButtonText>Install Github MCP server...</ButtonText>
+        </Strings>
+      </Button>
+      <Button guid="FreeAIr" id="ShowReleaseNotesCommandId" priority="0x0102" type="Button">
+        <Parent guid="FreeAIr" id="SubExtensionMenuGroup" />
+         <Icon guid="ImageCatalogGuid" id="MarkdownFile" />
+        <CommandFlag>IconIsMoniker</CommandFlag>
+        <Strings>
+          <ButtonText>Show release notes...</ButtonText>
         </Strings>
       </Button>
 
@@ -237,6 +253,10 @@
 
       <IDSymbol name="BuildErrorWindowGroup" value="0x1039" />
       <IDSymbol name="BuildErrorWindowFixErrorCommandId" value="0x1040" />
+      
+      <IDSymbol name="OpenNaturalSearchToolWindowCommandId" value="0x1041" />
+
+      <IDSymbol name="ShowReleaseNotesCommandId" value="0x1042" />
 
     </GuidSymbol>
 

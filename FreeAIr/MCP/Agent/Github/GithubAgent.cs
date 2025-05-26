@@ -214,7 +214,7 @@ namespace FreeAIr.MCP.Agent.Github
             {
                 return;
             }
-            if (_processTask.IsCompleted)
+            if (_processTask.IsCompleted || _processTask.IsCanceled || _processTask.IsFaulted)
             {
                 return;
             }

@@ -7,13 +7,18 @@ using EnvDTE80;
 using FreeAIr.BLogic;
 using FreeAIr.Extension.CodeLens;
 using FreeAIr.Find;
+using FreeAIr.Helper;
+using FreeAIr.InfoBar;
 using FreeAIr.MCP.Agent;
 using FreeAIr.UI.Informer;
 using FreeAIr.UI.ToolWindows;
+using Json.Path;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.ComponentModelHost;
+using Microsoft.VisualStudio.Shell.Interop;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Text.Json.Nodes;
 using System.Threading;
 
 namespace FreeAIr
@@ -27,6 +32,7 @@ namespace FreeAIr
     [ProvideOptionPage(typeof(OptionsProvider.ApiPageOptions), "FreeAIr", "Api", 0, 0, true, SupportsProfiles = true)]
     [ProvideOptionPage(typeof(OptionsProvider.ResponsePageOptions), "FreeAIr", "Response", 0, 0, true, SupportsProfiles = true)]
     [ProvideOptionPage(typeof(OptionsProvider.MCPPageOptions), "FreeAIr", "MCP", 0, 0, true, SupportsProfiles = true)]
+    [ProvideOptionPage(typeof(OptionsProvider.InternalPageOptions), "FreeAIr", "Internal", 0, 0, true, SupportsProfiles = true)]
     [ProvideToolWindow(typeof(ChatListToolWindow.Pane), Style = VsDockStyle.Tabbed, Window = WindowGuids.DocumentWell)]
     [ProvideToolWindow(typeof(ChooseModelToolWindow.Pane), Style = VsDockStyle.Tabbed, Window = WindowGuids.DocumentWell)]
     [ProvideToolWindow(typeof(NaturalLanguageResultsToolWindow.Pane), Style = VsDockStyle.Tabbed, Window = WindowGuids.DocumentWell)]
@@ -63,6 +69,9 @@ namespace FreeAIr
                 Assembly a2 = Assembly.LoadFrom(System.IO.Path.Combine(WorkingFolder, "System.ClientModel.dll"));
                 AppDomain.CurrentDomain.Load(a2.FullName);
 
+                Assembly a3 = Assembly.LoadFrom(System.IO.Path.Combine(WorkingFolder, "JsonPath.Net.dll"));
+                AppDomain.CurrentDomain.Load(a3.FullName);
+
                 ResponsePage.LoadOrUpdateMarkdownStyles();
 
                 await this.JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
@@ -87,6 +96,8 @@ namespace FreeAIr
 
                 var componentModel = (IComponentModel)await this.GetServiceAsync(typeof(SComponentModel));
                 StartServices(componentModel);
+
+                ShowReleaseNotesInfoBarIfNeeded();
             }
             catch (Exception excp)
             {
@@ -95,6 +106,16 @@ namespace FreeAIr
             }
         }
 
+        private static void ShowReleaseNotesInfoBarIfNeeded()
+        {
+            if (Vsix.Version != InternalPage.Instance.FreeAIrLastVersion)
+            {
+                var dte = AsyncPackage.GetGlobalService(typeof(EnvDTE.DTE)) as DTE2;
+                var sp = new ServiceProvider((Microsoft.VisualStudio.OLE.Interop.IServiceProvider)dte);
+                ReleaseNotesInfoBarService.Initialize(sp);
+                ReleaseNotesInfoBarService.Instance.ShowInfoBar();
+            }
+        }
 
         private static void StartServices(
             IComponentModel componentModel

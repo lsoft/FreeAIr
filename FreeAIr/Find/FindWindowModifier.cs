@@ -60,12 +60,19 @@ namespace FreeAIr.Find
 
                         var naturalSearchButton = new Button
                         {
-                            Content = "Find using natural language",
+                            Content = new TextBlock
+                            {
+                                HorizontalAlignment = HorizontalAlignment.Center,
+                                TextAlignment = TextAlignment.Center,
+                                TextWrapping = TextWrapping.Wrap,
+                                Text = "Find using natural language (whole solution)"
+                            },
                             Margin = findAllButton.Margin,
                             VerticalAlignment = findAllButton.VerticalAlignment,
                             VerticalContentAlignment = findAllButton.VerticalContentAlignment,
                             Height = findAllButton.ActualHeight,
                             Style = findAllButton.Style,
+                            ToolTip = "Find using natural language in every file of current solution (filters do not applied)"
                         };
                         naturalSearchButton.Click += (sender, e) =>
                         {
@@ -112,65 +119,13 @@ namespace FreeAIr.Find
             string searchText
             )
         {
-            var componentModel = (IComponentModel)await FreeAIrPackage.Instance.GetServiceAsync(typeof(SComponentModel));
-            var chatContainer = componentModel.GetService<ChatContainer>();
-
-            var chat = await chatContainer.StartChatAsync(
-                new ChatDescription(
-                    ChatKindEnum.NaturalLanguageSearch,
-                    null
-                    ),
-                null,
-                ChatOptions.NoToolAutoProcessed
-                );
-            if (chat is null)
-            {
-                //todo messagebox
-                return;
-            }
-
-            var solution = await VS.Solutions.GetCurrentSolutionAsync();
-            var foundItems = await solution.ProcessDownRecursivelyForAsync(
-                item =>
-                {
-                    if (item.Type != SolutionItemType.PhysicalFile)
-                    {
-                        return false;
-                    }
-
-                    return true;
-                },
-                false
-                );
-
-            chat.ChatContext.AddItems(
-                foundItems.ConvertAll(i =>
-                    new SolutionItemChatContextItem(
-                        new UI.Embedillo.Answer.Parser.SelectedIdentifier(
-                            i.SolutionItem.FullPath,
-                            null
-                            ),
-                        true,
-                        true
-                        )
-                    )
-                );
-
-            chat.AddPrompt(
-                UserPrompt.CreateNaturalLanguageSearchPrompt(
-                    searchText
-                    )
-                );
-
             //закрываем окно поиска
             CloseFindWindow();
-
-            await ChatListToolWindow.ShowIfEnabledAsync();
 
             var pane = await NaturalLanguageResultsToolWindow.ShowAsync();
             var toolWindow = pane.Content as NaturalLanguageResultsToolWindowControl;
             var viewModel = toolWindow.DataContext as NaturalLanguageResultsViewModel;
-            await viewModel.SetNewChatAsync(chat);
+            await viewModel.SetNewChatAsync(searchText);
         }
 
         private static void CloseFindWindow()
