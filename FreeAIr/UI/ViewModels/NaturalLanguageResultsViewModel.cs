@@ -258,6 +258,7 @@ namespace FreeAIr.UI.ViewModels
         }
 
         public async Task SetNewChatAsync(
+            NaturalSearchScopeEnum scope,
             string searchText
             )
         {
@@ -298,11 +299,13 @@ namespace FreeAIr.UI.ViewModels
                 });
 
             _processingTask = ProcessSolutionDocumentsAsync(
+                scope,
                 searchText
                 );
         }
 
         public async Task ProcessSolutionDocumentsAsync(
+            NaturalSearchScopeEnum scope,
             string searchText
             )
         {
@@ -313,8 +316,8 @@ namespace FreeAIr.UI.ViewModels
 
             var cancellationToken = _cancellationTokenSource.Token;
 
-            var solution = await VS.Solutions.GetCurrentSolutionAsync();
-            var foundSolutionItems = await solution.ProcessDownRecursivelyForAsync(
+            var root = await DetermineRootAsync(scope);
+            var foundRootItems = await root.ProcessDownRecursivelyForAsync(
                 item =>
                 {
                     if (item.Type != SolutionItemType.PhysicalFile)
@@ -336,7 +339,7 @@ namespace FreeAIr.UI.ViewModels
             {
                 Status = $"In progress...";
 
-                foreach (var portion in foundSolutionItems.SplitByItemsSize(ApiPage.Instance.ContextSize))
+                foreach (var portion in foundRootItems.SplitByItemsSize(ApiPage.Instance.ContextSize))
                 {
                     cancellationToken.ThrowIfCancellationRequested();
 
@@ -400,6 +403,20 @@ namespace FreeAIr.UI.ViewModels
             }
 
             OnPropertyChanged();
+        }
+
+        private static async Task<SolutionItem> DetermineRootAsync(
+            NaturalSearchScopeEnum scope
+            )
+        {
+            switch (scope)
+            {
+                case NaturalSearchScopeEnum.WholeSolution:
+                default:
+                    return await VS.Solutions.GetCurrentSolutionAsync();
+                case NaturalSearchScopeEnum.CurrentProject:
+                    return await VS.Solutions.GetActiveProjectAsync();
+            }
         }
 
         private static void FillFoundItemsByLLMJson(
@@ -546,5 +563,11 @@ $"""
                     ;
             LineIndex = lineIndex;
         }
+    }
+
+    public enum NaturalSearchScopeEnum
+    {
+        WholeSolution,
+        CurrentProject
     }
 }

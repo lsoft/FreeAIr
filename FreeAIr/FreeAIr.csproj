@@ -154,6 +154,9 @@
     <Compile Include="UI\CodeLens\CodeLenseUserControlViewModel.cs" />
     <Compile Include="UI\CodeLens\ViewElementFactory.cs" />
     <Compile Include="UI\CombinedParameterConverter.cs" />
+    <Compile Include="UI\ContextMenuButton\MenuButton.xaml.cs">
+      <DependentUpon>MenuButton.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI\Converters.cs" />
     <Compile Include="UI\Embedillo\Answer\Parser\CommandAnswerPart.cs" />
     <Compile Include="UI\Embedillo\Answer\Parser\IAnswerPart.cs" />
@@ -386,6 +389,10 @@
     <Page Include="UI\CodeLens\CodeLenseUserControl.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI\ContextMenuButton\MenuButton.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UI\Embedillo\EmbedilloControl.xaml">
       <Generator>MSBuild:Compile</Generator>

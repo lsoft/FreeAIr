@@ -3,9 +3,11 @@ using EnvDTE80;
 using FreeAIr.BLogic;
 using FreeAIr.BLogic.Context.Item;
 using FreeAIr.Helper;
+using FreeAIr.UI.ContextMenuButton;
 using FreeAIr.UI.ToolWindows;
 using FreeAIr.UI.ViewModels;
 using Microsoft.VisualStudio.ComponentModelHost;
+using Microsoft.VisualStudio.Shell.Interop;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -58,27 +60,57 @@ namespace FreeAIr.Find
                             select textBox
                             ).FirstOrDefault();
 
-                        var naturalSearchButton = new Button
+                        var naturalSearchButton = new MenuButton
                         {
-                            Content = new TextBlock
-                            {
-                                HorizontalAlignment = HorizontalAlignment.Center,
-                                TextAlignment = TextAlignment.Center,
-                                TextWrapping = TextWrapping.Wrap,
-                                Text = "Find using natural language (whole solution)"
-                            },
                             Margin = findAllButton.Margin,
                             VerticalAlignment = findAllButton.VerticalAlignment,
                             VerticalContentAlignment = findAllButton.VerticalContentAlignment,
                             Height = findAllButton.ActualHeight,
-                            Style = findAllButton.Style,
-                            ToolTip = "Find using natural language in every file of current solution (filters do not applied)"
+                            ToolTip = "Find using natural language in every file of current solution (filters do not applied)",
+                            ContextClickItemCommand = new AsyncRelayCommand(
+                                async a =>
+                                {
+                                    if (a is not ContextMenuItem cmi)
+                                    {
+                                        return;
+                                    }
+
+                                    var scope = (NaturalSearchScopeEnum)cmi.Tag;
+
+                                    //закрываем окно поиска
+                                    CloseFindWindow();
+
+                                    var pane = await NaturalLanguageResultsToolWindow.ShowAsync();
+                                    var toolWindow = pane.Content as NaturalLanguageResultsToolWindowControl;
+                                    var viewModel = toolWindow.DataContext as NaturalLanguageResultsViewModel;
+                                    viewModel.SetNewChatAsync(scope, subjectToSearchTextBox.Text)
+                                        .FileAndForget(nameof(NaturalLanguageResultsViewModel.SetNewChatAsync));
+                                })
                         };
-                        naturalSearchButton.Click += (sender, e) =>
-                        {
-                            StartSearchByNaturalLanguageAsync(subjectToSearchTextBox.Text)
-                                .FileAndForget(nameof(StartSearchByNaturalLanguageAsync));
-                        };
+                        naturalSearchButton.SetContent(
+                            new TextBlock
+                            {
+                                HorizontalAlignment = HorizontalAlignment.Center,
+                                TextAlignment = TextAlignment.Center,
+                                TextWrapping = TextWrapping.Wrap,
+                                Text = "Find using natural language"
+                            }
+                            );
+                        naturalSearchButton.SetButtonStyle(findAllButton.Style);
+                        naturalSearchButton.ContextItems.Add(
+                            new ContextMenuItem
+                            {
+                                Header = "Whole solution",
+                                Tag = NaturalSearchScopeEnum.WholeSolution
+                            }
+                            );
+                        naturalSearchButton.ContextItems.Add(
+                            new ContextMenuItem
+                            {
+                                Header = "Current project",
+                                Tag = NaturalSearchScopeEnum.CurrentProject
+                            }
+                            );
 
                         subjectToSearchTextBox.TextChanged += (sender, e) =>
                         {
@@ -113,19 +145,6 @@ namespace FreeAIr.Find
             {
                 //todo logging
             }
-        }
-
-        private static async Task StartSearchByNaturalLanguageAsync(
-            string searchText
-            )
-        {
-            //закрываем окно поиска
-            CloseFindWindow();
-
-            var pane = await NaturalLanguageResultsToolWindow.ShowAsync();
-            var toolWindow = pane.Content as NaturalLanguageResultsToolWindowControl;
-            var viewModel = toolWindow.DataContext as NaturalLanguageResultsViewModel;
-            await viewModel.SetNewChatAsync(searchText);
         }
 
         private static void CloseFindWindow()
