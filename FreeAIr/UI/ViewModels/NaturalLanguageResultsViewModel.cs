@@ -325,6 +325,11 @@ namespace FreeAIr.UI.ViewModels
                         return false;
                     }
 
+                    if (FileTypeHelper.GetFileType(item.FullPath) != FileTypeEnum.Text)
+                    {
+                        return false;
+                    }
+
                     return true;
                 },
                 false,

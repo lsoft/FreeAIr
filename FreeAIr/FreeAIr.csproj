@@ -81,6 +81,7 @@
     <Compile Include="Git\GitRunner.cs" />
     <Compile Include="Helper\DTEHelper.cs" />
     <Compile Include="Helper\ExtensionPath.cs" />
+    <Compile Include="Helper\FileTypeHelper.cs" />
     <Compile Include="Helper\JsonElementDeserializer.cs" />
     <Compile Include="Helper\OpenAIHelper.cs" />
     <Compile Include="Helper\ProcessHelper.cs" />
