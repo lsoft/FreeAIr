@@ -1,4 +1,5 @@
 ﻿using FreeAIr.BLogic.Context.Item;
+using FreeAIr.Git;
 using Microsoft.VisualStudio.TeamFoundation.Git.Extensibility;
 using System.Collections.Generic;
 using System.IO;
@@ -43,24 +44,15 @@ namespace FreeAIr.BLogic.Context
 
         private static async System.Threading.Tasks.Task<string?> GetFullPathToCopilotInstructionAsync()
         {
-            var gitExt = (IGitExt)await FreeAIrPackage.Instance.GetServiceAsync(typeof(IGitExt));
-            if (gitExt is not null)
+            var repositoryFolder = await GitRepositoryProvider.GetRepositoryFolderAsync();
+            if (!string.IsNullOrEmpty(repositoryFolder))
             {
-                if (gitExt.ActiveRepositories.Count == 1)
+                var repoFullPath = Path.GetFullPath(
+                    Path.Combine(repositoryFolder, CopilotInstructionFilePath)
+                    );
+                if (File.Exists(repoFullPath))
                 {
-                    var activeRepository = gitExt.ActiveRepositories[0] as IGitRepositoryInfo2;
-                    if (activeRepository.Remotes.Count == 1)
-                    {
-                        var repositoryFolder = activeRepository.RepositoryPath;
-
-                        var repoFullPath = Path.GetFullPath(
-                            Path.Combine(repositoryFolder, CopilotInstructionFilePath)
-                            );
-                        if (File.Exists(repoFullPath))
-                        {
-                            return repoFullPath;
-                        }
-                    }
+                    return repoFullPath;
                 }
             }
 

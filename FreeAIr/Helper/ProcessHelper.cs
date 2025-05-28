@@ -14,7 +14,7 @@ namespace FreeAIr.Helper
             CancellationToken cancellationToken
             )
         {
-            return RunWithTimeoutAsync(
+            return Run(
                     new ProcessStartInfo
                     {
                         WorkingDirectory = workingDirectory,
@@ -27,7 +27,7 @@ namespace FreeAIr.Helper
                     );
         }
 
-        public static Task<ProcessResults> RunWithTimeoutAsync(
+        public static Task<ProcessResults> Run(
             ProcessStartInfo psi,
             CancellationToken cancellationToken
             )

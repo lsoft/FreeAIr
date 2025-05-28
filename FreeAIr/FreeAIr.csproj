@@ -76,6 +76,9 @@
     <Compile Include="Commands\Other\ShowReleaseNotesCommand.cs" />
     <Compile Include="Commands\Other\OpenNaturalSearchToolWindowCommand.cs" />
     <Compile Include="Find\FindWindowModifier.cs" />
+    <Compile Include="Git\GitDiffCombiner.cs" />
+    <Compile Include="Git\GitRepositoryProvider.cs" />
+    <Compile Include="Git\GitRunner.cs" />
     <Compile Include="Helper\DTEHelper.cs" />
     <Compile Include="Helper\ExtensionPath.cs" />
     <Compile Include="Helper\JsonElementDeserializer.cs" />
@@ -123,6 +126,8 @@
     <Compile Include="MCP\Agent\Github\GithubMCPInstallBackgroundTask.cs" />
     <Compile Include="MCP\Agent\IAgent.cs" />
     <Compile Include="MCP\Agent\ProcessMonitor.cs" />
+    <Compile Include="MCP\Agent\VS\Tools\GitCollectChangesTool.cs" />
+    <Compile Include="MCP\Agent\VS\Tools\GitCommitTool.cs" />
     <Compile Include="MCP\Agent\VS\Tools\InstallNugetPackageTool.cs" />
     <Compile Include="MCP\Agent\VS\Tools\ReplaceDocumentBodyTool.cs" />
     <Compile Include="MCP\Agent\VS\Tools\GetAllSolutionItemsTool.cs" />

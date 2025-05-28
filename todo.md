@@ -15,16 +15,13 @@ OK   - different scopes (whole solution, current project)
 - custom prompt text (add to new option page)
 
 MCP servers:
-- github
-- VS
-  - list of files (solution items)
-  - analyze file body
-  - change file body or its part
-  - build
-  - access to warning\error list
-- git (https://github.com/geropl/git-mcp-go)
-  - analyze history of git commits
-  - access to branches information
+OK - github
+ - VS
+OK   - list of files (solution items)
+OK   - change file body
+OK   - build
+OK   - access to warning\error list
+OK - git
 - websearch (https://github.com/claw256/mcp-web-search OR https://github.com/williamvd4/web-search and A LOT OF OTHERS)
 - pandoc (https://github.com/vivekVells/mcp-pandoc OR https://github.com/Klavis-AI/klavis/tree/main/mcp_servers/pandoc)
 - sql server (https://github.com/aekanun2020/mcp-server/ and A LOT OF OTHERS)

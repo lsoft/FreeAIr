@@ -125,5 +125,15 @@ namespace FreeAIr.MCP.Agent.Github.BLO
 
             Content = content;
         }
+
+        public AgentToolCallResult(IEnumerable<string> content)
+        {
+            if (content is null)
+            {
+                throw new ArgumentNullException(nameof(content));
+            }
+
+            Content = content.ToArray();
+        }
     }
 }

@@ -1,5 +1,6 @@
 using EnvDTE;
 using EnvDTE80;
+using FreeAIr.Git;
 using FreeAIr.Helper;
 using FreeAIr.UI.ToolWindows;
 using FreeAIr.UI.Windows;
@@ -211,143 +212,13 @@ namespace FreeAIr.BLogic
             protected override async Task RunWorkingTaskAsync(
                 )
             {
+                //in case of exception set it null first
                 Result = null;
 
-                await Task.Delay(10000);
-
-                var cancellationToken = _cancellationTokenSource.Token;
-
-                var gitExt = (IGitExt)await FreeAIrPackage.Instance.GetServiceAsync(typeof(IGitExt));
-                if (gitExt is null)
-                {
-                    //todo log
-                    return;
-                }
-                if (gitExt.ActiveRepositories.Count != 1)
-                {
-                    //todo log
-                    return;
-                }
-
-                var activeRepository = gitExt.ActiveRepositories[0] as IGitRepositoryInfo2;
-                if (activeRepository.Remotes.Count != 1)
-                {
-                    //todo log
-                    return;
-                }
-
-                var repositoryFolder = activeRepository.RepositoryPath;
-
-                var summaryDiff = new StringBuilder();
-
-                var diffIndex = await GitDiffProcess.RunAndParseGitDiffSilentlyAsync(
-                    repositoryFolder,
-                    string.Empty,
-                    cancellationToken
-                    );
-                if (string.IsNullOrEmpty(diffIndex))
-                {
-                    //todo log
-                    return;
-                }
-                summaryDiff.AppendLine(diffIndex);
-
-                var lsFiles = await ProcessHelper.RunSilentlyAsync(
-                    repositoryFolder,
-                    "git.exe",
-                    @"ls-files --others --exclude-standard",
-                    cancellationToken
-                    );
-
-                foreach (var lsFile in lsFiles.StandardOutput)
-                {
-                    var diffNoIndex = await GitDiffProcess.RunAndParseGitDiffSilentlyAsync(
-                        repositoryFolder,
-                        lsFile,
-                        cancellationToken
-                        );
-
-                    summaryDiff.AppendLine(diffNoIndex);
-                }
-
-                Result = summaryDiff.ToString();
+                Result = await GitDiffCombiner.CombineDiffAsync(_cancellationTokenSource.Token);
             }
         }
 
 
-    }
-
-    public static class GitDiffProcess
-    {
-        public static async Task<string?> RunAndParseGitDiffSilentlyAsync(
-            string workingDirectory,
-            string? nonVersionedFile,
-            CancellationToken cancellationToken
-            )
-        {
-            ProcessResults diff;
-            //int skipLineCount;
-            if (string.IsNullOrEmpty(nonVersionedFile))
-            {
-                diff = await ProcessHelper.RunWithTimeoutAsync(
-                    new ProcessStartInfo
-                    {
-                        WorkingDirectory = workingDirectory,
-                        FileName = "git.exe",
-                        Arguments = $"diff",
-                        CreateNoWindow = true,
-                        WindowStyle = ProcessWindowStyle.Hidden
-                    },
-                    cancellationToken
-                    );
-
-                //skipLineCount = 3;
-            }
-            else
-            {
-                diff = await ProcessHelper.RunWithTimeoutAsync(
-                    new ProcessStartInfo
-                    {
-                        WorkingDirectory = workingDirectory,
-                        FileName = "git.exe",
-                        Arguments = $"diff --no-index /dev/null {nonVersionedFile}",
-                        CreateNoWindow = true,
-                        WindowStyle = ProcessWindowStyle.Hidden
-                    },
-                    cancellationToken
-                    );
-
-                //skipLineCount = 4;
-            }
-
-            if (diff.ExitCode != 0 && diff.ExitCode != 1)
-            {
-                return null;
-            }
-            if (diff.StandardError.Length > 0)
-            {
-                return null;
-            }
-            if (diff.StandardOutput.Length < 5)
-            {
-                return null;
-            }
-
-            //var patch = diff.StandardOutput.Skip(skipLineCount).ToList();
-            //if (patch.Count > 0)
-            //{
-            //    var lastLine = patch[patch.Count - 1];
-            //    if (lastLine.Contains(@"\ No newline at end of file"))
-            //    {
-            //        patch.RemoveAt(patch.Count - 1);
-            //    }
-            //}
-            //patch[0] = patch[0].Replace("+++ b/", "+++ ");
-
-            return string.Join(
-                Environment.NewLine,
-                diff.StandardOutput
-                );
-        }
     }
 }
