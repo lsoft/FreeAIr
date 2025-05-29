@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Data;
+using System.Windows.Media;
 
 namespace FreeAIr.UI
 {
@@ -13,6 +14,19 @@ namespace FreeAIr.UI
     {
         public InvertBooleanToVisibilityConverter() :
             base(Visibility.Collapsed, Visibility.Visible)
+        {
+        }
+    }
+
+    public sealed class BooleanToBrushConverter : BooleanConverter<Brush>
+    {
+        public BooleanToBrushConverter(
+            Brush? enabledBrush = null,
+            Brush? disabledBrush = null
+            ) : base(
+                enabledBrush ?? new SolidColorBrush(Color.FromRgb(0x56, 0x9C, 0xD6)),
+                disabledBrush ?? new SolidColorBrush(Color.FromRgb(0x88, 0x88, 0x88))
+                )
         {
         }
     }

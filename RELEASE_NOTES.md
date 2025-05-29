@@ -4,7 +4,7 @@ If you like this project, please [gift a ★★★★★ rating](https://marketp
 
 Please report any bugs to the [github repo](https://github.com/lsoft/FreeAIr).
 
-If you are enjoying FreeAIr to the enough level to donate, there are a a [lot of small cancer patients](https://advitausa.org/au/index.php/donate/) that need your help.
+If you are enjoying FreeAIr to the enough level to donate, there are a [lot of small cancer patients](https://advitausa.org/au/index.php/donate/) that need your help.
 
 ## 0.2.3
 

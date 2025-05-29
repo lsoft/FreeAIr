@@ -1,11 +1,9 @@
 ﻿using FreeAIr.BLogic;
 using FreeAIr.BLogic.Context;
-using FreeAIr.BLogic.Context.Composer;
 using FreeAIr.BLogic.Context.Item;
 using FreeAIr.Helper;
 using FreeAIr.Shared.Helper;
 using FreeAIr.UI.Embedillo.Answer.Parser;
-using FreeAIr.UI.ToolWindows;
 using FreeAIr.UI.Windows;
 using ICSharpCode.AvalonEdit.Editing;
 using Microsoft.VisualStudio.Imaging;
@@ -232,6 +230,8 @@ namespace FreeAIr.UI.ViewModels
                                 );
 
                             FocusPromptControl();
+
+                            OnPropertyChanged();
                         }
                         );
                 }
@@ -1042,7 +1042,6 @@ namespace FreeAIr.UI.ViewModels
 
             ChatList = new ObservableCollection2<ChatWrapper>();
             UpdateControl();
-
         }
 
         private async void ChatCollectionChanged(object sender, EventArgs e)

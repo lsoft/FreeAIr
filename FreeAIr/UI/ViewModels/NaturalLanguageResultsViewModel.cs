@@ -342,10 +342,11 @@ namespace FreeAIr.UI.ViewModels
 
             try
             {
-                Status = $"In progress...";
-
+                var processedItemCount = 0;
                 foreach (var portion in foundRootItems.SplitByItemsSize(ApiPage.Instance.ContextSize))
                 {
+                    Status = $"In progress ({processedItemCount}/{foundRootItems.Count})...";
+
                     cancellationToken.ThrowIfCancellationRequested();
 
                     var contextItems = new List<IChatContextItem>();
@@ -392,14 +393,16 @@ namespace FreeAIr.UI.ViewModels
 
                     _chat.ArchiveAllPrompts();
                     _chat.ChatContext.RemoveItems(contextItems);
+
+                    processedItemCount += portion.Count;
                 }
 
                 Status = $"Found {FoundItems.Count} items:";
             }
             catch (OperationCanceledException)
             {
-                //nothing to do
                 //this is ok
+                Status = $"Cancelled";
             }
             catch (Exception excp)
             {

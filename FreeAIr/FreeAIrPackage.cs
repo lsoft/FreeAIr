@@ -2,7 +2,6 @@
 global using Microsoft.VisualStudio.Shell;
 global using System;
 global using Task = System.Threading.Tasks.Task;
-using EnvDTE;
 using EnvDTE80;
 using FreeAIr.BLogic;
 using FreeAIr.Extension.CodeLens;
@@ -10,16 +9,12 @@ using FreeAIr.Find;
 using FreeAIr.Helper;
 using FreeAIr.InfoBar;
 using FreeAIr.MCP.Agent;
-using FreeAIr.Seaarch;
 using FreeAIr.UI.Informer;
 using FreeAIr.UI.ToolWindows;
-using Json.Path;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.ComponentModelHost;
-using Microsoft.VisualStudio.Shell.Interop;
 using System.Reflection;
 using System.Runtime.InteropServices;
-using System.Text.Json.Nodes;
 using System.Threading;
 
 namespace FreeAIr
@@ -99,6 +94,8 @@ namespace FreeAIr
                 StartServices(componentModel);
 
                 ShowReleaseNotesInfoBarIfNeeded();
+
+                EmbeddedResourceHelper.LoadXamlEmbeddedResource("FreeAIr.UI.ClickableText.ClickableTextResource.xaml");
             }
             catch (Exception excp)
             {

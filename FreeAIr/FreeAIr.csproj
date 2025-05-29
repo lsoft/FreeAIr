@@ -80,6 +80,7 @@
     <Compile Include="Git\GitRepositoryProvider.cs" />
     <Compile Include="Git\GitRunner.cs" />
     <Compile Include="Helper\DTEHelper.cs" />
+    <Compile Include="Helper\EmbeddedResourceHelper.cs" />
     <Compile Include="Helper\ExtensionPath.cs" />
     <Compile Include="Helper\FileTypeHelper.cs" />
     <Compile Include="Helper\JsonElementDeserializer.cs" />
@@ -402,6 +403,10 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="UI\ClickableText\ClickableTextResource.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
     <Page Include="UI\CodeLens\CodeLenseUserControl.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
