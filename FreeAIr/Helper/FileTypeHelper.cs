@@ -54,7 +54,7 @@ namespace FreeAIr.Helper
 
                 // 5. Если BOM не найден, читаем больше данных и пытаемся декодировать как UTF-8
                 fs.Seek(0, SeekOrigin.Begin);
-                byte[] buffer = new byte[1024];
+                var buffer = new byte[1024];
                 bytesRead = fs.Read(buffer, 0, buffer.Length);
 
                 try
@@ -76,7 +76,7 @@ namespace FreeAIr.Helper
 
         private static bool IsTextExtension(string filePath)
         {
-            string ext = Path.GetExtension(filePath);
+            var ext = Path.GetExtension(filePath);
             return !string.IsNullOrEmpty(ext) && _textFileExtensions.Contains(ext);
         }
 
@@ -85,15 +85,20 @@ namespace FreeAIr.Helper
             for (int i = 0; i < length; i++)
             {
                 if (buffer[i] == 0)
+                {
                     return true;
+                }
             }
+
             return false;
         }
 
-        private static Encoding DetectEncodingFromBom(byte[] data)
+        private static Encoding? DetectEncodingFromBom(byte[] data)
         {
             if (data.Length >= 3 && data[0] == 0xEF && data[1] == 0xBB && data[2] == 0xBF)
+            {
                 return Encoding.UTF8;
+            }
 
             if (data.Length >= 2)
             {
@@ -101,18 +106,26 @@ namespace FreeAIr.Helper
                 {
                     // UTF-16 LE или UTF-32 LE
                     if (data.Length >= 4 && data[2] == 0x00 && data[3] == 0x00)
+                    {
                         return Encoding.UTF32;
+                    }
                     else
+                    {
                         return Encoding.Unicode;
+                    }
                 }
 
                 if (data[0] == 0xFE && data[1] == 0xFF)
                 {
                     // UTF-16 BE или UTF-32 BE
                     if (data.Length >= 4 && data[2] == 0x00 && data[3] == 0x00)
+                    {
                         return Encoding.UTF32;
+                    }
                     else
+                    {
                         return Encoding.BigEndianUnicode;
+                    }
                 }
             }
 

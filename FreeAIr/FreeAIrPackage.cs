@@ -10,6 +10,7 @@ using FreeAIr.Find;
 using FreeAIr.Helper;
 using FreeAIr.InfoBar;
 using FreeAIr.MCP.Agent;
+using FreeAIr.Seaarch;
 using FreeAIr.UI.Informer;
 using FreeAIr.UI.ToolWindows;
 using Json.Path;
