@@ -105,7 +105,7 @@ OpenRouter.ai choose model window:
 
 This is possible. If you are banned only from Copilot:
 
-0. Install this VSIX into your Visual Studio. You will need to have Visual Studio 2022 v.17.10 at least.
+0. Install this VSIX into your Visual Studio. You will need to have Visual Studio 2022 v.17.14 at least.
 1. Register on [openrouter.ai](openrouter.ai). This is easily can be done via github.com account. Also, you can obtain access to any LLM with OpenAI compatible API. FreeAIr itself does not include any LLM.
 2. Choose any `free` model at [openrouter.ai](openrouter.ai) and create an access token.
 3. Put your token into options page (see screenshot above).

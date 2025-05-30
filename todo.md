@@ -22,8 +22,9 @@ OK   - change file body
 OK   - build
 OK   - access to warning\error list
 OK - git
-- websearch (https://github.com/claw256/mcp-web-search OR https://github.com/williamvd4/web-search and A LOT OF OTHERS)
+OK - websearch
 - pandoc (https://github.com/vivekVells/mcp-pandoc OR https://github.com/Klavis-AI/klavis/tree/main/mcp_servers/pandoc)
+- excel mcp server (but no docker installation: https://github.com/negokaz/excel-mcp-server)
 - sql server (https://github.com/aekanun2020/mcp-server/ and A LOT OF OTHERS)
   - access to schema
   - access to data
@@ -31,7 +32,7 @@ OK - git
   - access to schema
   - access to data
 - gitlab
-- nuget
+OK - nuget
 - clickhouse (https://github.com/ClickHouse/mcp-clickhouse?tab=readme-ov-file)
 
 (отдельное расширение) - автоперевод комментов, текстов (через adornments) на язык, выбранный как язык ответов LLM

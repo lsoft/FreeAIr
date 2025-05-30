@@ -10,7 +10,7 @@
         <Tags>AI, Autocomplete, C#, Code Generation, Code Prediction, Code Snippets, Coding Accelerator, Coding Assistant, Developer Tools, IntelliCode, IntelliSense, LLM, Machine Learning, ML, Productivity, Suggestions</Tags>
     </Metadata>
     <Installation>
-        <InstallationTarget Id="Microsoft.VisualStudio.Community" Version="[17.10, 18.0)">
+        <InstallationTarget Id="Microsoft.VisualStudio.Community" Version="[17.14, 18.0)">
             <ProductArchitecture>amd64</ProductArchitecture>
         </InstallationTarget>
     </Installation>
