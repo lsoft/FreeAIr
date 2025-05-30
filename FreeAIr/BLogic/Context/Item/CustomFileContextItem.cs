@@ -1,13 +1,7 @@
 ﻿using FreeAIr.Helper;
-using FreeAIr.UI.Embedillo.Answer.Parser;
 using OpenAI.Chat;
-using SharpCompress.Common;
-using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace FreeAIr.BLogic.Context.Item

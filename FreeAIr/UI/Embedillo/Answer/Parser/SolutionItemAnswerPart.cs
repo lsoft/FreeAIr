@@ -1,9 +1,6 @@
 ﻿using FreeAIr.BLogic.Context;
 using FreeAIr.BLogic.Context.Item;
-using FreeAIr.Helper;
 using System.IO;
-using System.Linq;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace FreeAIr.UI.Embedillo.Answer.Parser

@@ -1,11 +1,5 @@
-﻿using FreeAIr.BLogic;
-using FreeAIr.Helper;
-using RunProcessAsTask;
-using System;
+﻿using RunProcessAsTask;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Globalization;
-using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;

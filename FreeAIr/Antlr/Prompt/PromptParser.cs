@@ -3,7 +3,6 @@ using Antlr4.Runtime.Tree;
 using FreeAIr.UI.Embedillo;
 using FreeAIr.UI.Embedillo.Answer.Parser;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace FreeAIr.Antlr.Prompt
 {

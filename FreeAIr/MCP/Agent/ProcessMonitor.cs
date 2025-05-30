@@ -1,12 +1,6 @@
-﻿using FreeAIr.Helper;
-using Microsoft.VisualStudio.Threading;
-using System;
-using System.Collections.Generic;
+﻿using Microsoft.VisualStudio.Threading;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace FreeAIr.Agent
 {
@@ -54,6 +48,8 @@ namespace FreeAIr.Agent
                         process.Start();
 
                         _ = await process.WaitForExitAsync(cancellationToken);
+
+                        cancellationToken.ThrowIfCancellationRequested();
 
                         Console.WriteLine("Процесс завершён нештатно. Перезапуск...");
 

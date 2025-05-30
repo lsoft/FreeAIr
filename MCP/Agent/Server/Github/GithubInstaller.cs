@@ -1,4 +1,5 @@
-﻿using ModelContextProtocol.Client;
+﻿using Agent.BLogic;
+using ModelContextProtocol.Client;
 using System;
 using System.Collections.Generic;
 using System.IO.Compression;
@@ -7,9 +8,9 @@ using System.Net.Http.Json;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Agent.BLogic
+namespace Agent.Server.Github
 {
-    public static class Installer
+    public static class GithubInstaller
     {
         public const string AssetsUrl = "https://api.github.com/repos/github/github-mcp-server/releases/latest";
         public const string WinX64AssetFileName = "github-mcp-server_Windows_x86_64.zip";

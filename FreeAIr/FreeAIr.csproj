@@ -125,9 +125,13 @@
     <Compile Include="InfoBar\InfoBarService.cs" />
     <Compile Include="InfoBar\ReleaseNotesInfoBarService.cs" />
     <Compile Include="MCP\Agent\AgentCollection.cs" />
-    <Compile Include="MCP\Agent\Github\BLO\Tools.cs" />
+    <Compile Include="MCP\Agent\AgentApplication.cs" />
+    <Compile Include="MCP\Agent\External\ExternalAgentJsonParser.cs" />
+    <Compile Include="MCP\Agent\External\ExternalAgent.cs" />
+    <Compile Include="MCP\Tools.cs" />
     <Compile Include="MCP\Agent\Github\GithubAgent.cs" />
     <Compile Include="MCP\Agent\Github\GithubMCPInstallBackgroundTask.cs" />
+    <Compile Include="MCP\Agent\Github\GithubRequestFactory.cs" />
     <Compile Include="MCP\Agent\IAgent.cs" />
     <Compile Include="MCP\Agent\ProcessMonitor.cs" />
     <Compile Include="MCP\Agent\VS\Tools\GitCollectChangesTool.cs" />
@@ -143,6 +147,7 @@
     <Compile Include="MCP\Agent\VS\VisualStudioAgent.cs" />
     <Compile Include="MCP\AvailableToolController.cs" />
     <Compile Include="Options\ApiPage.cs" />
+    <Compile Include="Options\InternalPage.cs" />
     <Compile Include="Options\MCPPage.cs" />
     <Compile Include="Options\OptionsProvider.cs" />
     <Compile Include="Options\ResponsePage.cs" />
@@ -390,7 +395,7 @@
       <Project>{12fb1b96-34e8-7f37-782d-4e07363c95d9}</Project>
       <Name>FreeAIr.CodeLens</Name>
     </ProjectReference>
-    <ProjectReference Include="..\MCP\Github\Dto\Dto.csproj">
+    <ProjectReference Include="..\MCP\Dto\Dto.csproj">
       <Project>{2F2E14EA-0DB3-1CC8-B8A2-D6C94D74026B}</Project>
       <Name>Dto</Name>
     </ProjectReference>
@@ -461,7 +466,7 @@
   <Import Project="$(VSToolsPath)\VSSDK\Microsoft.VsSDK.targets" Condition="'$(VSToolsPath)' != ''" />
   <Target Name="IncludeNuGetPackageReferences" AfterTargets="GetVsixSourceItems">
     <ItemGroup>
-      <VSIXSourceItem Include="$(SolutionDir).art\Github.Agent.zip" TargetPath="MCP\Github\Agent\Archive\Github.Agent.zip" />
+      <VSIXSourceItem Include="$(SolutionDir).art\Agent.zip" TargetPath="MCP\Agent\Archive\Agent.zip" />
       <VSIXSourceItem Include="@(ReferenceCopyLocalPaths)" Condition="'%(ReferenceCopyLocalPaths.NuGetPackageId)' == 'System.IO.Pipelines'" />
       <VSIXSourceItem Include="@(ReferenceCopyLocalPaths)" Condition="'%(ReferenceCopyLocalPaths.NuGetPackageId)' == 'System.Text.Json'" />
       <VSIXSourceItem Include="@(ReferenceCopyLocalPaths)" Condition="'%(ReferenceCopyLocalPaths.NuGetPackageId)' == 'Microsoft.Bcl.AsyncInterfaces'" />

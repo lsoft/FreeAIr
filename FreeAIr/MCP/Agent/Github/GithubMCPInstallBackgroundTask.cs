@@ -1,11 +1,4 @@
 ﻿using FreeAIr.UI.Windows;
-using System;
-using System.Collections.Generic;
-using System.IO.Compression;
-using System.Linq;
-using System.Net.Http;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace FreeAIr.MCP.Agent.Github
 {

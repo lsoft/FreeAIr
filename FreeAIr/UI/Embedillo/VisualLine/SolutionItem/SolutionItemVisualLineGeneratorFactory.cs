@@ -1,11 +1,9 @@
 ﻿using FreeAIr.Helper;
 using FreeAIr.UI.Embedillo.Answer.Parser;
-using ICSharpCode.AvalonEdit.Rendering;
 using Microsoft.VisualStudio.Imaging;
 using Microsoft.VisualStudio.Imaging.Interop;
 using System.Collections.Generic;
 using System.IO;
-using System.Runtime.Remoting.Channels;
 using System.Threading;
 using System.Windows;
 using System.Windows.Controls;

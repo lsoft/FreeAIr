@@ -1,22 +1,11 @@
 ﻿using EnvDTE;
 using FreeAIr.BLogic;
-using FreeAIr.BLogic.Context;
 using FreeAIr.BLogic.Context.Composer;
 using FreeAIr.BLogic.Context.Item;
 using FreeAIr.Helper;
-using FreeAIr.Shared.Helper;
 using FreeAIr.UI.ToolWindows;
-using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.ComponentModelHost;
-using Microsoft.VisualStudio.Shell;
-using Microsoft.VisualStudio.Shell.Interop;
-using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
 
 namespace FreeAIr.Commands.BuildError
 {

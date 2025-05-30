@@ -1,27 +1,8 @@
-﻿using Community.VisualStudio.Toolkit;
-using EnvDTE;
-using EnvDTE80;
-using FreeAIr.BLogic;
-using FreeAIr.BLogic.Context;
+﻿using FreeAIr.BLogic;
 using FreeAIr.BLogic.Context.Composer;
 using FreeAIr.Helper;
-using FreeAIr.Shared.Helper;
-using FreeAIr.UI.Embedillo.Answer.Parser;
 using FreeAIr.UI.ToolWindows;
-using Microsoft.Build.Framework;
-using Microsoft.Build.Utilities;
-using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.VisualStudio.ComponentModelHost;
-using Microsoft.VisualStudio.LanguageServices;
-using Microsoft.VisualStudio.Shell.Interop;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.Remoting.Contexts;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace FreeAIr.Commands
 {

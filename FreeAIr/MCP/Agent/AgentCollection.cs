@@ -1,17 +1,11 @@
-﻿using FreeAIr.MCP.Agent.Github;
-using FreeAIr.MCP.Agent.Github.BLO;
+﻿using FreeAIr.MCP.Agent.External;
+using FreeAIr.MCP.Agent.Github;
 using FreeAIr.MCP.Agent.VS;
 using FreeAIr.Shared.Helper;
-using Microsoft.Extensions.AI;
 using OpenAI.Chat;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.InteropServices;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Windows.Media;
 
 namespace FreeAIr.MCP.Agent
 {
@@ -26,6 +20,19 @@ namespace FreeAIr.MCP.Agent
         {
             await ProcessAgentAsync(VisualStudioAgent.Instance);
             await ProcessAgentAsync(GithubAgent.Instance);
+
+            if (ExternalAgentJsonParser.TryParse(out var mcpServers))
+            {
+                foreach (var mcpServer in mcpServers.Servers)
+                {
+                    var server = new ExternalAgent(
+                        mcpServer.Key,
+                        mcpServer.Value
+                        );
+
+                    await ProcessAgentAsync(server);
+                }
+            }
         }
 
         public static async Task ProcessAgentAsync(

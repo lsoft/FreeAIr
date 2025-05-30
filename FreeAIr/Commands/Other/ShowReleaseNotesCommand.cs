@@ -1,5 +1,4 @@
 ﻿using FreeAIr.Helper;
-using FreeAIr.UI.ToolWindows;
 
 namespace FreeAIr.Commands.Other
 {

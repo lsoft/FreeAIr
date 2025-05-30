@@ -4,7 +4,6 @@ using FreeAIr.UI.Embedillo.Answer.Parser;
 using OpenAI.Chat;
 using System.Collections.Generic;
 using System.IO;
-using System.IO.Packaging;
 using System.Text;
 using System.Threading.Tasks;
 

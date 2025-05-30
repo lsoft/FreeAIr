@@ -1,6 +1,4 @@
-﻿using Microsoft.VisualStudio.Shell;
-using Microsoft.VisualStudio.Shell.Interop;
-using System;
+﻿using Microsoft.VisualStudio.Shell.Interop;
 
 namespace FreeAIr.InfoBar
 {

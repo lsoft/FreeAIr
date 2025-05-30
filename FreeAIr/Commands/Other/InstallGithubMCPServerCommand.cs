@@ -1,6 +1,5 @@
 ﻿using FreeAIr.MCP.Agent;
 using FreeAIr.MCP.Agent.Github;
-using FreeAIr.UI.ToolWindows;
 using FreeAIr.UI.Windows;
 using System.Windows;
 

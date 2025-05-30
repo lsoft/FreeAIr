@@ -1,6 +1,6 @@
 ﻿namespace Dto
 {
-    public abstract class Reply
+    public abstract class BaseReply
     {
         public string? ErrorMessage
         {
@@ -9,7 +9,7 @@
         }
 
         public static T FromError<T>(string error)
-            where T : Reply, new()
+            where T : BaseReply, new()
         {
             return new T
             {

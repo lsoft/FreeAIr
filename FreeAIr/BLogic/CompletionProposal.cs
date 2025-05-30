@@ -9,7 +9,6 @@ using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Utilities;
 using System.ComponentModel.Composition;
-using System.Linq;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;

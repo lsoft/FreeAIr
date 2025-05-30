@@ -1,8 +1,5 @@
-﻿using FreeAIr.Commands.Other;
-using Microsoft.VisualStudio.Imaging;
-using Microsoft.VisualStudio.Shell;
+﻿using Microsoft.VisualStudio.Imaging;
 using Microsoft.VisualStudio.Shell.Interop;
-using System;
 
 namespace FreeAIr.InfoBar
 {

@@ -1,4 +1,5 @@
 ﻿using Agent.BLogic;
+using Agent.Server;
 using Dto;
 using Json.Path;
 using Microsoft.AspNetCore.Builder;
@@ -17,50 +18,10 @@ namespace Agent
     {
         private static readonly ILogger _log = SerilogLogger.Logger.ForContext<Program>();
 
+        public static Servers Servers = new();
+
         static async Task Main(string[] args)
         {
-
-            //var mcpClient = await McpClient.CreateClientAsync(
-            //    @"C:\Temp\_github_mcp",
-            //    "token here"
-            //    );
-            //if (mcpClient is null)
-            //{
-            //    return;
-            //}
-
-            //var tool = (await mcpClient.ListToolsAsync()).First(t => t.Name == "get_issue");
-            //var json = tool.JsonSchema;
-
-            //var jsonPath = JsonPath.Parse("$.properties.*");
-
-            //var instance = JsonNode.Parse(
-            //    json.GetRawText()
-            //    );
-            //var evaluateds = jsonPath.Evaluate(instance);
-            //foreach (var match in evaluateds.Matches)
-            //{
-            //    var fp = new FunctionParameter(match.Value);
-
-            //}
-
-
-            //var converted = new Dictionary<string, object?>();
-            //foreach (var parameter in tool.AdditionalProperties)
-            //{
-            //    int g = 0;
-            //}
-
-            //var result = await mcpClient.CallToolAsync(
-            //    "get_issue",
-            //    new Dictionary<string, object?>
-            //    {
-            //        ["owner"] = "lsoft",
-            //        ["repo"] = "FreeAIr",
-            //        ["issue_number"] = 1
-            //    }
-            //    );
-
             var port = int.Parse(args[0]);
             var visualStudioProcessId = int.Parse(args[1]);
 
@@ -69,21 +30,27 @@ namespace Agent
             SerilogLogger.Init(
                 workingFolder,
                 "Log",
-                $"github_agent_vspid={visualStudioProcessId}.log"
+                $"agent_vspid={visualStudioProcessId}.log"
                 );
 
             _log.Information("Starting...");
 
-
             ParentProcessWatcher.StartAsync();
 
             var builder = WebApplication.CreateBuilder(args);
-            builder.WebHost.UseUrls($"https://localhost:{port}");
+            builder.WebHost.UseUrls($"http://localhost:{port}");
 
             var app = builder.Build();
 
-            app.MapGet(
-                "/install",
+            app.MapPost(
+                "/add_external_servers",
+                async (context) =>
+                {
+                    _ = await AddExternalServersAsync(context);
+                }
+            );
+            app.MapPost(
+                "/is_installed",
                 async (context) =>
                 {
                     _ = await IsInstalledAsync(context);
@@ -96,15 +63,15 @@ namespace Agent
                     _ = await InstallAsync(context);
                 }
             );
-            app.MapGet(
-                "/tools",
+            app.MapPost(
+                "/get_tools",
                 async (context) =>
                 {
                     _ = await GetToolsAsync(context);
                 }
             );
             app.MapPost(
-                "/tool",
+                "/call_tool",
                 async (context) =>
                 {
                     _ = await CallToolAsync(context);
@@ -116,20 +83,67 @@ namespace Agent
             app.Run();
         }
 
+        private static async Task<bool> AddExternalServersAsync(
+            HttpContext context
+            )
+        {
+            try
+            {
+                var req = await context.Request.ReadFromJsonAsync<AddExternalServersRequest>();
+                if (req is null)
+                {
+                    _log.Error("Cannot parse request");
+                    await context.Response.WriteAsJsonAsync(
+                        BaseReply.FromError<AddExternalServersReply>("Cannot parse request")
+                        );
+                    return false;
+                }
+
+                Servers.RemoveAllExternalServers();
+                Servers.AddExternalServers(req.McpServers);
+
+                await context.Response.WriteAsJsonAsync(
+                    new AddExternalServersReply()
+                    );
+                return true;
+            }
+            catch (Exception excp)
+            {
+                _log.Error(excp, "Error during adding external servers");
+
+                await context.Response.WriteAsJsonAsync(
+                    BaseReply.FromError<AddExternalServersReply>("Error during adding external servers: " + excp.Message + Environment.NewLine + excp.StackTrace)
+                    );
+            }
+
+            return false;
+        }
+
         private static async Task<bool> IsInstalledAsync(
             HttpContext context
             )
         {
             try
             {
-                var mcpServerFolderPath = context.Request.Query["mcpServerFolderPath"];
+                var req = await context.Request.ReadFromJsonAsync<IsInstalledRequest>();
+                if (req is null)
+                {
+                    _log.Error("Cannot parse request");
+                    await context.Response.WriteAsJsonAsync(
+                        BaseReply.FromError<IsInstalledReply>("Cannot parse request")
+                        );
+                    return false;
+                }
 
-                var result = Installer.IsInstalled(
-                    mcpServerFolderPath
+                var serverName = req.MCPServerName;
+                var server = Servers.GetServer(serverName);
+
+                var result = await server.IsInstalledAsync(
+                    req
                     );
 
                 await context.Response.WriteAsJsonAsync(
-                    new IsInstalledReply(result)
+                    result
                     );
                 return true;
             }
@@ -156,25 +170,20 @@ namespace Agent
                 {
                     _log.Error("Cannot parse request");
                     await context.Response.WriteAsJsonAsync(
-                        Reply.FromError<InstallReply>("Cannot parse request")
+                        BaseReply.FromError<InstallReply>("Cannot parse request")
                         );
                     return false;
                 }
 
-                var result = await Installer.InstallAsync(
-                    req.MCPServerFolderPath
+                var serverName = req.MCPServerName;
+                var server = Servers.GetServer(serverName);
+
+                var result = await server.InstallAsync(
+                    req
                     );
-                if (!result)
-                {
-                    _log.Error("Cannot during installation");
-                    await context.Response.WriteAsJsonAsync(
-                        Reply.FromError<InstallReply>("Error during installation")
-                        );
-                    return false;
-                }
 
                 await context.Response.WriteAsJsonAsync(
-                    new InstallReply()
+                    result
                     );
                 return true;
             }
@@ -183,7 +192,7 @@ namespace Agent
                 _log.Error(excp, "Error during installation");
 
                 await context.Response.WriteAsJsonAsync(
-                    Reply.FromError<InstallReply>("Error during installation: " + excp.Message + Environment.NewLine + excp.StackTrace)
+                    BaseReply.FromError<InstallReply>("Error during installation: " + excp.Message + Environment.NewLine + excp.StackTrace)
                     );
             }
 
@@ -196,30 +205,25 @@ namespace Agent
         {
             try
             {
-                var mcpServerFolderPath = context.Request.Query["mcpServerFolderPath"];
-                var githubToken = context.Request.Query["githubToken"];
-
-                var mcpClient = await McpClient.CreateClientAsync(
-                    mcpServerFolderPath,
-                    githubToken
-                    );
-                if (mcpClient is null)
+                var req = await context.Request.ReadFromJsonAsync<GetToolsRequest>();
+                if (req is null)
                 {
-                    _log.Error("Cannot create McpClient");
+                    _log.Error("Cannot parse request");
                     await context.Response.WriteAsJsonAsync(
-                        Reply.FromError<GetToolsReply>("Cannot create McpClient")
+                        BaseReply.FromError<GetToolsReply>("Cannot parse request")
                         );
                     return false;
                 }
 
-                var mcpTools = await mcpClient.ListToolsAsync();
+                var serverName = req.MCPServerName;
+                var server = Servers.GetServer(serverName);
 
-                var reply = new GetToolsReply(
-                    mcpTools.Select(t => new GetToolReply(t.Name, t.Description, t.JsonSchema.GetRawText())).ToArray()
+                var result = await server.GetToolsAsync(
+                    req
                     );
 
                 await context.Response.WriteAsJsonAsync(
-                    reply
+                    result
                     );
 
                 return true;
@@ -229,7 +233,7 @@ namespace Agent
                 _log.Error(excp, "Error during getting tools");
 
                 await context.Response.WriteAsJsonAsync(
-                    Reply.FromError<GetToolsReply>("Error during getting tools: " + excp.Message + Environment.NewLine + excp.StackTrace)
+                    BaseReply.FromError<GetToolsReply>("Error during getting tools: " + excp.Message + Environment.NewLine + excp.StackTrace)
                     );
             }
 
@@ -247,50 +251,22 @@ namespace Agent
                 {
                     _log.Error("Cannot parse request");
                     await context.Response.WriteAsJsonAsync(
-                        Reply.FromError<CallToolReply>("Cannot parse request")
+                        BaseReply.FromError<CallToolReply>("Cannot parse request")
                         );
                     return false;
                 }
 
-                var mcpClient = await McpClient.CreateClientAsync(
-                    req.MCPServerFolderPath,
-                    req.GithubToken
-                    );
-                if (mcpClient is null)
-                {
-                    _log.Error("Cannot create McpClient");
-                    await context.Response.WriteAsJsonAsync(
-                        Reply.FromError<CallToolReply>("Cannot create McpClient")
-                        );
-                    return false;
-                }
+                var serverName = req.MCPServerName;
+                var server = Servers.GetServer(serverName);
 
-                var result = await mcpClient.CallToolAsync(
+                var result = await server.CallToolAsync(
+                    req,
                     req.ToolName,
                     req.Arguments?.ToDictionary(d => d.Key, d => (object?)d.Value)
                     );
 
-                var texts = result.Content
-                    .Where(t => t.Type == "text")
-                    .Select(t => t.Text)
-                    .ToArray()
-                    ;
-
-                if (result.IsError)
-                {
-                    var msg = "Error call tool: " + string.Join(string.Empty, texts);
-                    _log.Error(msg);
-                    await context.Response.WriteAsJsonAsync(
-                        Reply.FromError<CallToolReply>(msg)
-                        );
-                    return false;
-                }
-
                 await context.Response.WriteAsJsonAsync(
-                    new CallToolReply(
-                        false,
-                        texts
-                        )
+                    result
                     );
 
                 return true;
@@ -300,7 +276,7 @@ namespace Agent
                 _log.Error(excp, "Error during calling tools");
 
                 await context.Response.WriteAsJsonAsync(
-                    Reply.FromError<CallToolReply>("Error during calling tools: " + excp.Message + Environment.NewLine + excp.StackTrace)
+                    BaseReply.FromError<CallToolReply>("Error during calling tools: " + excp.Message + Environment.NewLine + excp.StackTrace)
                     );
             }
 

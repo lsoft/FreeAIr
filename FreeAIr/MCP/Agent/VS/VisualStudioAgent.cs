@@ -1,10 +1,7 @@
-﻿using FreeAIr.MCP.Agent.Github.BLO;
-using FreeAIr.MCP.Agent.VS.Tools;
-using System;
+﻿using FreeAIr.MCP.Agent.VS.Tools;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 

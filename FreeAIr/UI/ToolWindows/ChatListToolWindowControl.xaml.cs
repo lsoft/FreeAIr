@@ -1,7 +1,6 @@
 ﻿using FreeAIr.Antlr.Context;
 using FreeAIr.Antlr.Prompt;
 using FreeAIr.Helper;
-using FreeAIr.UI.Embedillo;
 using FreeAIr.UI.Embedillo.VisualLine.Command;
 using FreeAIr.UI.Embedillo.VisualLine.SolutionItem;
 using FreeAIr.UI.ViewModels;
@@ -9,7 +8,6 @@ using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
-using System.Windows.Input;
 
 namespace FreeAIr.UI.ToolWindows
 {

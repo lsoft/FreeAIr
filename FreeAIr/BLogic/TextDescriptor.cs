@@ -1,7 +1,6 @@
 ﻿using FreeAIr.Helper;
 using FreeAIr.UI.Embedillo.Answer.Parser;
 using Microsoft.VisualStudio.Text;
-using SharpCompress.Common;
 using System.IO;
 using System.Threading;
 

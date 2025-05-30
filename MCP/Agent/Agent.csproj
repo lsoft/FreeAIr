@@ -27,7 +27,7 @@
   </ItemGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="if exist $(SolutionDir).art\Github.Agent.zip del /F /Q $(SolutionDir).art\Github.Agent.zip&#xD;&#xA;PowerShell.exe -Command &quot;Add-Type -A 'System.IO.Compression.FileSystem'; [IO.Compression.ZipFile]::CreateFromDirectory('$(SolutionDir)MCP\Github\Agent\$(OutDir)', '$(SolutionDir).art\Github.Agent.zip')&quot;" />
+    <Exec Command="if exist $(SolutionDir).art\Agent.zip del /F /Q $(SolutionDir).art\Agent.zip&#xD;&#xA;PowerShell.exe -Command &quot;Add-Type -A 'System.IO.Compression.FileSystem'; [IO.Compression.ZipFile]::CreateFromDirectory('$(SolutionDir)MCP\Agent\$(OutDir)', '$(SolutionDir).art\Agent.zip')&quot;" />
   </Target>
 
 </Project>

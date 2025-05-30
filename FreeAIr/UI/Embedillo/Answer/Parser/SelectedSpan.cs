@@ -1,7 +1,6 @@
 ﻿
 using FreeAIr.Helper;
 using Microsoft.VisualStudio.Text;
-using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
 namespace FreeAIr.UI.Embedillo.Answer.Parser

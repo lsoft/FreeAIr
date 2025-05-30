@@ -1,13 +1,9 @@
 ﻿using FreeAIr.Helper;
 using HtmlAgilityPack;
 using PuppeteerSharp;
-using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Net;
-using System.Text;
-using System.Text.Encodings.Web;
 using System.Threading.Tasks;
 
 namespace FreeAIr.Seaarch

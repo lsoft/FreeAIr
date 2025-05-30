@@ -5,19 +5,8 @@ using System.Text;
 
 namespace Dto
 {
-    public sealed class CallToolRequest
+    public sealed class CallToolRequest : BaseRequest
     {
-        public string MCPServerFolderPath
-        {
-            get;
-            set;
-        }
-
-        public string GithubToken
-        {
-            get;
-            set;
-        }
 
         public string ToolName
         {
@@ -36,35 +25,23 @@ namespace Dto
         }
 
         public CallToolRequest(
-            string mCPServerFolderPath,
-            string githubToken,
+            string mcpServerName,
             string toolName,
-            Dictionary<string, object?>? arguments
-            )
+            Dictionary<string, object?>? arguments,
+            IReadOnlyDictionary<string, string>? parameters = null
+            ) : base(mcpServerName, parameters)
         {
-            if (string.IsNullOrEmpty(mCPServerFolderPath))
-            {
-                throw new ArgumentException($"'{nameof(mCPServerFolderPath)}' cannot be null or empty.", nameof(mCPServerFolderPath));
-            }
-
-            if (string.IsNullOrEmpty(githubToken))
-            {
-                throw new ArgumentException($"'{nameof(githubToken)}' cannot be null or empty.", nameof(githubToken));
-            }
-
             if (string.IsNullOrEmpty(toolName))
             {
                 throw new ArgumentException($"'{nameof(toolName)}' cannot be null or empty.", nameof(toolName));
             }
 
-            MCPServerFolderPath = mCPServerFolderPath;
-            GithubToken = githubToken;
             ToolName = toolName;
             Arguments = arguments;
         }
     }
 
-    public sealed class CallToolReply : Reply
+    public sealed class CallToolReply : BaseReply
     {
         public bool IsError
         {

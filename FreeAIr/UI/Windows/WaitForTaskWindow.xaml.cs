@@ -1,8 +1,4 @@
-﻿using FreeAIr.BLogic;
-using FreeAIr.Helper;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
+﻿using System.Threading;
 using System.Windows;
 using System.Windows.Input;
 

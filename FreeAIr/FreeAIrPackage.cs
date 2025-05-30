@@ -9,6 +9,7 @@ using FreeAIr.Find;
 using FreeAIr.Helper;
 using FreeAIr.InfoBar;
 using FreeAIr.MCP.Agent;
+using FreeAIr.MCP.Agent.External;
 using FreeAIr.UI.Informer;
 using FreeAIr.UI.ToolWindows;
 using Microsoft.VisualStudio;
@@ -96,6 +97,8 @@ namespace FreeAIr
                 ShowReleaseNotesInfoBarIfNeeded();
 
                 EmbeddedResourceHelper.LoadXamlEmbeddedResource("FreeAIr.UI.ClickableText.ClickableTextResource.xaml");
+
+                await AgentApplication.AddExternalServersAsync();
             }
             catch (Exception excp)
             {

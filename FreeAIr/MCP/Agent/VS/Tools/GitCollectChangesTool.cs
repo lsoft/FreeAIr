@@ -1,14 +1,5 @@
-﻿using EnvDTE80;
-using FreeAIr.Git;
-using FreeAIr.Helper;
-using FreeAIr.MCP.Agent.Github.BLO;
-using Microsoft.VisualStudio.Shell.Interop;
-using Microsoft.VisualStudio.TeamFoundation.Git.Extensibility;
-using System;
+﻿using FreeAIr.Git;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 

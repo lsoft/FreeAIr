@@ -1,10 +1,8 @@
 ﻿using FreeAIr.BLogic.Context.Item;
 using FreeAIr.Git;
-using Microsoft.VisualStudio.TeamFoundation.Git.Extensibility;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Runtime.Remoting.Contexts;
 
 namespace FreeAIr.BLogic.Context
 {

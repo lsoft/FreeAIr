@@ -1,10 +1,7 @@
-﻿using EnvDTE;
-using FreeAIr.Helper;
-using FreeAIr.Shared.Helper;
+﻿using FreeAIr.Helper;
 using OpenAI.Chat;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Text;
 
 namespace FreeAIr.BLogic

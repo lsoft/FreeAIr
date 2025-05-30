@@ -1,7 +1,6 @@
 ﻿using FreeAIr.BLogic;
 using FreeAIr.UI.Embedillo.Answer.Parser;
 using Microsoft.VisualStudio.Imaging;
-using SharpCompress.Common;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows;

@@ -5,12 +5,22 @@ using System.Text;
 
 namespace Dto
 {
-    public sealed class GetToolsRequest
+    public sealed class GetToolsRequest : BaseRequest
     {
-        public static readonly GetToolsRequest Instance = new();
+        public GetToolsRequest()
+        {
+        }
+
+        public GetToolsRequest(
+            string mcpServerName,
+            IReadOnlyDictionary<string, string>? parameters = null
+            ) : base(mcpServerName, parameters)
+        {
+            
+        }
     }
 
-    public sealed class GetToolsReply : Reply
+    public sealed class GetToolsReply : BaseReply
     {
         public GetToolReply[] Tools
         {

@@ -5,11 +5,9 @@ using ICSharpCode.AvalonEdit.CodeCompletion;
 using ICSharpCode.AvalonEdit.Rendering;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection.Emit;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using System.Windows.Media;
 
 namespace FreeAIr.UI.Embedillo
 {
