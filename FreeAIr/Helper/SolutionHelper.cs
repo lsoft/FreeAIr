@@ -3,6 +3,7 @@ using FreeAIr.UI.Embedillo.Answer.Parser;
 using Microsoft.Internal.VisualStudio.PlatformUI;
 using Microsoft.VisualStudio.Shell.Interop;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -168,6 +169,7 @@ namespace FreeAIr.Helper
         }
 
 
+        [DebuggerDisplay("{SolutionItem}")]
         public sealed class FoundSolutionItem
         {
             public SolutionItem SolutionItem

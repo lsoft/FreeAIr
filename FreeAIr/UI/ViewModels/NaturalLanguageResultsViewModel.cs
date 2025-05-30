@@ -1,6 +1,7 @@
 ﻿using FreeAIr.BLogic;
 using FreeAIr.BLogic.Context;
 using FreeAIr.BLogic.Context.Item;
+using FreeAIr.Find;
 using FreeAIr.Helper;
 using FreeAIr.Shared.Helper;
 using FuzzySharp;
@@ -259,12 +260,18 @@ namespace FreeAIr.UI.ViewModels
 
         public async Task SetNewChatAsync(
             NaturalSearchScopeEnum scope,
-            string searchText
+            string searchText,
+            FileTypesFilter filesTypeFilters
             )
         {
             if (searchText is null)
             {
                 throw new ArgumentNullException(nameof(searchText));
+            }
+
+            if (filesTypeFilters is null)
+            {
+                throw new ArgumentNullException(nameof(filesTypeFilters));
             }
 
             var oldChat = Interlocked.Exchange(ref _chat, null);
@@ -300,18 +307,25 @@ namespace FreeAIr.UI.ViewModels
 
             _processingTask = ProcessSolutionDocumentsAsync(
                 scope,
-                searchText
+                searchText,
+                filesTypeFilters
                 );
         }
 
         public async Task ProcessSolutionDocumentsAsync(
             NaturalSearchScopeEnum scope,
-            string searchText
+            string searchText,
+            FileTypesFilter filesTypeFilters
             )
         {
             if (searchText is null)
             {
                 throw new ArgumentNullException(nameof(searchText));
+            }
+
+            if (filesTypeFilters is null)
+            {
+                throw new ArgumentNullException(nameof(filesTypeFilters));
             }
 
             var cancellationToken = _cancellationTokenSource.Token;
@@ -326,6 +340,11 @@ namespace FreeAIr.UI.ViewModels
                     }
 
                     if (FileTypeHelper.GetFileType(item.FullPath) != FileTypeEnum.Text)
+                    {
+                        return false;
+                    }
+
+                    if (!filesTypeFilters.Match(item.FullPath))
                     {
                         return false;
                     }
@@ -477,7 +496,6 @@ $"""
             catch (Exception excp)
             {
                 //todo log
-                int g = 0;
             }
         }
     }

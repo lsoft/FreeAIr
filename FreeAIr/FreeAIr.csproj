@@ -108,6 +108,7 @@
     <Compile Include="Helper\CollectionHelper.cs" />
     <Compile Include="Helper\KeyboardHelper.cs" />
     <Compile Include="Helper\PathHelper.cs" />
+    <Compile Include="Helper\RegExHelper.cs" />
     <Compile Include="Helper\ResourceHelper.cs" />
     <Compile Include="Helper\RoslynHelper.cs" />
     <Compile Include="Helper\SolutionHelper.cs" />

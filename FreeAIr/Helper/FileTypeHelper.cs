@@ -16,7 +16,7 @@ namespace FreeAIr.Helper
             ".md", ".html", ".css", ".js", ".ts", ".py", ".java", ".cs", ".sh", ".sql",
             ".cfg", ".conf", ".env", ".properties", ".gitignore", ".editorconfig",
             ".rst", ".adoc", ".tex", ".bib", ".nfo", ".todo", ".notes", ".mail", ".url",
-            ".props", ".cpp"
+            ".props", ".cpp", ".h", ".bat"
         };
 
         public static FileTypeEnum GetFileType(
