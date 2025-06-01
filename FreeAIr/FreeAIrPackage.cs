@@ -83,10 +83,6 @@ namespace FreeAIr
                     .FileAndForget(nameof(CodeLensConnectionHandler.AcceptCodeLensConnectionsAsync))
                     ;
 
-                AgentCollection.InitAsync()
-                    .FileAndForget(nameof(AgentCollection))
-                    ;
-
                 FindWindowModifier.StartScanAsync(cancellationToken)
                     .FileAndForget(nameof(FindWindowModifier))
                     ;
@@ -98,7 +94,9 @@ namespace FreeAIr
 
                 EmbeddedResourceHelper.LoadXamlEmbeddedResource("FreeAIr.UI.ClickableText.ClickableTextResource.xaml");
 
-                await AgentApplication.AddExternalServersAsync();
+                AgentApplication.UpdateExternalServersAsync()
+                    .FileAndForget(nameof(AgentApplication.UpdateExternalServersAsync))
+                    ;
             }
             catch (Exception excp)
             {

@@ -25,20 +25,23 @@ namespace FreeAIr.UI.Windows
         {
             if (e.Key == Key.Escape)
             {
-                this.Close();
+                DialogResult = false;
             }
         }
 
         private void CancelButton_Click(object sender, RoutedEventArgs e)
         {
-            this.Close();
+            DialogResult = false;
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             if (DataContext is AvailableToolsViewModel vm)
             {
-                vm.CloseWindow = this.Close;
+                vm.CloseWindow = result =>
+                {
+                    DialogResult = result;
+                };
             }
         }
     }

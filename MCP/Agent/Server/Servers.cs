@@ -32,18 +32,27 @@ namespace Agent.Server
             throw new InvalidOperationException($"Server with name {serverName} does not found.");
         }
 
-        public void AddExternalServers(
+        public async Task<McpServers> UpdateExternalServersAsync(
             McpServers servers
             )
         {
+            var result = new McpServers();
+
             foreach (var server in servers.Servers)
             {
                 var extServer = new ExternalServer(
                     server.Key,
                     server.Value
                     );
+                await extServer.PingAsync(
+                    FakeParameterProvider.Instance
+                    );
+
                 _servers[extServer.Name] = extServer;
+                result.Servers[server.Key] = server.Value;
             }
+
+            return result;
         }
 
         public void RemoveAllExternalServers()

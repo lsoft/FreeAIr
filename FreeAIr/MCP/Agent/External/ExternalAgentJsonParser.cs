@@ -13,12 +13,13 @@ namespace FreeAIr.MCP.Agent.External
     public static class ExternalAgentJsonParser
     {
         public static bool TryParse(
+            string externalMCPServersJson,
             out McpServers? servers
             )
         {
             try
             {
-                servers = JsonSerializer.Deserialize<McpServers>(MCPPage.Instance.ExternalMCPServers);
+                servers = JsonSerializer.Deserialize<McpServers>(externalMCPServersJson);
                 return true;
             }
             catch

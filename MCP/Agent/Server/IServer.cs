@@ -4,6 +4,10 @@ namespace Agent.Server
 {
     public interface IServer
     {
+        Task PingAsync(
+            IParameterProvider parameterProvider
+            );
+
         Task<IsInstalledReply> IsInstalledAsync(
             IParameterProvider parameterProvider
             );

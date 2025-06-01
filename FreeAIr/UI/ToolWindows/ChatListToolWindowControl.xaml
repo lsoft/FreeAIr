@@ -108,11 +108,11 @@
 
                 <Button
                     Margin="5,2,0,2"
-                    Content="Edit tools..."
+                    Content="Edit global MCP tools..."
                     HorizontalAlignment="Right"
                     VerticalAlignment="Center"
                     FontFamily="Cascadia Code"
-                    ToolTip="Edit available model context protocol tools"
+                    ToolTip="Edit globally available model context protocol tools. These changes do not affects opened chats."
                     Command="{Binding ElementName=ChatListToolWindow, Path=DataContext.EditAvailableToolsCommand}"
                     Style="{DynamicResource TextBlockLikeButtonStyle}"
                     />
@@ -257,6 +257,16 @@
 
                             <Button
                                 Margin="5,0,5,0"
+                                Content="Edit chat tools..."
+                                FontFamily="Cascadia Code"
+                                VerticalAlignment="Center"
+                                ToolTip="Edit the MCP tools for the selected chat. These changes are not shared across other chats."
+                                Command="{Binding ElementName=ChatListToolWindow, Path=DataContext.EditChatToolsCommand}"
+                                Style="{DynamicResource TextBlockLikeButtonStyle}"
+                                />
+
+                            <Button
+                                Margin="5,0,5,0"
                                 Content="Add custom file..."
                                 FontFamily="Cascadia Code"
                                 VerticalAlignment="Center"
@@ -319,7 +329,7 @@
                                             Grid.Column="1"
                                             Margin="5,0,0,0"
                                             Moniker="{x:Static catalog:KnownMonikers.ZoomIn}"
-                                            ToolTip="Search and add related context items"
+                                            ToolTip="Search and add related context items (.NET only)"
                                             Cursor="Hand"
                                             >
                                             <imaging:CrispImage.InputBindings>

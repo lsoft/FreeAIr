@@ -14,6 +14,7 @@ namespace FreeAIr
         [DisplayName("External MCP server")]
         [Description("A Claude compatible json for external MCP servers.")]
         [DefaultValue("place your github.com token here")]
+        [Browsable(false)]
         public string ExternalMCPServers
         {
             get; set;
@@ -32,9 +33,26 @@ $$$"""
         "-e", "EnableExecuteStoredProcedure=true",
         "aadversteeg/mssqlclient-mcp-server:latest"
         ]
+    },
+    "sequentialthinking": {
+      "command": "docker",
+      "args": [
+        "run",
+        "--rm",
+        "-i",
+        "mcp/sequentialthinking"
+      ]
     }
   }
 }
 """;
+
+        [Category("Tools")]
+        [DisplayName("AvailableTools")]
+        [Description("An json with list of available tools and its status.")]
+        [Browsable(false)]
+        [DefaultValue("")]
+        public string AvailableTools { get; set; } = string.Empty;
+
     }
 }

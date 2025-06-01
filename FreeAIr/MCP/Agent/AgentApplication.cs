@@ -3,11 +3,13 @@ using EnvDTE;
 using EnvDTE80;
 using FreeAIr.Agent;
 using FreeAIr.MCP.Agent.External;
+using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Net.Http;
 using System.Net.Http.Json;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace FreeAIr.MCP.Agent
 {
@@ -64,20 +66,44 @@ namespace FreeAIr.MCP.Agent
             Started = true;
         }
 
-        public static async Task AddExternalServersAsync()
+        public static async Task<AgentSetupConfigurationResult?> UpdateExternalServersAsync(
+            McpServers? mcpServers = null
+            )
         {
-            if (!ExternalAgentJsonParser.TryParse(out var mcpServers))
+            if (mcpServers is null)
             {
-                return;
+                if (!ExternalAgentJsonParser.TryParse(
+                    MCPPage.Instance.ExternalMCPServers,
+                    out mcpServers))
+                {
+                    return null;
+                }
             }
 
-            var response = await AgentApplication.HttpClient.PostAsJsonAsync<AddExternalServersRequest>(
-                "/add_external_servers",
-                new AddExternalServersRequest(
+            var response = await AgentApplication.HttpClient.PostAsJsonAsync<UpdateExternalServersRequest>(
+                "/update_external_servers",
+                new UpdateExternalServersRequest(
                     mcpServers
                     )
                 );
             response.EnsureSuccessStatusCode();
+
+            var reply = await response.Content.ReadFromJsonAsync<UpdateExternalServersReply>();
+            if (!string.IsNullOrEmpty(reply.ErrorMessage))
+            {
+                throw new InvalidOperationException(reply.ErrorMessage);
+            }
+
+            var approvedExternalMcpServers = reply.McpServers;
+
+            var toolContainer = AvailableToolContainer.ReadSystem();
+
+            var setupResult = await AgentCollection.SetupConfigurationAsync(
+                toolContainer,
+                approvedExternalMcpServers
+                );
+
+            return setupResult;
         }
 
         private static void DTEEvents_OnBeginShutdown()

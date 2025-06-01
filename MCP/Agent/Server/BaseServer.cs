@@ -79,6 +79,24 @@ namespace Agent.Server
     {
         protected readonly ILogger _log = SerilogLogger.Logger.ForContext<T>();
 
+        public async Task PingAsync(
+            IParameterProvider parameterProvider
+            )
+        {
+            ArgumentNullException.ThrowIfNull(parameterProvider);
+
+            await using var mcpClient = await CreateMcpClientAsync(
+                parameterProvider
+                );
+            if (mcpClient is null)
+            {
+                _log.Error("Cannot create McpClient");
+                throw new InvalidOperationException("Cannot create McpClient");
+            }
+
+            await mcpClient.PingAsync();
+        }
+
         public async Task<CallToolReply> CallToolAsync(
             IParameterProvider parameterProvider,
             string toolName,

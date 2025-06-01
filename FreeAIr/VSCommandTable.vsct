@@ -81,20 +81,20 @@
           <ButtonText>Open natural search result window...</ButtonText>
         </Strings>
       </Button>
-      <Button guid="FreeAIr" id="InstallGithubMCPServerCommandId" priority="0x0102" type="Button">
-        <Parent guid="FreeAIr" id="SubExtensionMenuGroup" />
-        <Icon guid="ImageCatalogGuid" id="Git" />
-        <CommandFlag>IconIsMoniker</CommandFlag>
-        <Strings>
-          <ButtonText>Install Github MCP server...</ButtonText>
-        </Strings>
-      </Button>
       <Button guid="FreeAIr" id="ShowReleaseNotesCommandId" priority="0x0102" type="Button">
         <Parent guid="FreeAIr" id="SubExtensionMenuGroup" />
          <Icon guid="ImageCatalogGuid" id="MarkdownFile" />
         <CommandFlag>IconIsMoniker</CommandFlag>
         <Strings>
           <ButtonText>Show release notes...</ButtonText>
+        </Strings>
+      </Button>
+        <Button guid="FreeAIr" id="OpenControlCenterCommandId" priority="0x0102" type="Button">
+        <Parent guid="FreeAIr" id="SubExtensionMenuGroup" />
+        <Icon guid="ImageCatalogGuid" id="Settings" />
+        <CommandFlag>IconIsMoniker</CommandFlag>
+        <Strings>
+          <ButtonText>Open Control Center...</ButtonText>
         </Strings>
       </Button>
 
@@ -239,7 +239,6 @@
 
       <IDSymbol name="ChooseModelCommandId" value="0x1028" />
       <IDSymbol name="OpenChatListToolWindowCommandId" value="0x1029" />
-      <IDSymbol name="InstallGithubMCPServerCommandId" value="0x1030" />
 
       <IDSymbol name="SolutionContextMenu" value="0x1031" />
       <IDSymbol name="SolutionContextGroup" value="0x1032" />
@@ -255,8 +254,8 @@
       <IDSymbol name="BuildErrorWindowFixErrorCommandId" value="0x1040" />
       
       <IDSymbol name="OpenNaturalSearchToolWindowCommandId" value="0x1041" />
-
       <IDSymbol name="ShowReleaseNotesCommandId" value="0x1042" />
+      <IDSymbol name="OpenControlCenterCommandId" value="0x1043" />
 
     </GuidSymbol>
 

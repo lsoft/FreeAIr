@@ -1,14 +1,17 @@
-﻿using FreeAIr.MCP.Agent.External;
+﻿using Dto;
+using FreeAIr.MCP.Agent.External;
 using FreeAIr.MCP.Agent.Github;
 using FreeAIr.MCP.Agent.VS;
 using FreeAIr.Shared.Helper;
 using OpenAI.Chat;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace FreeAIr.MCP.Agent
 {
+
     /// <summary>
     /// Коллекция текущих инициализированных агентов.
     /// </summary>
@@ -16,29 +19,136 @@ namespace FreeAIr.MCP.Agent
     {
         private static readonly List<AgentWrapper> _agentWrappers = new();
 
-        public static async Task InitAsync()
+        public static async Task<AgentSetupConfigurationResult> SetupConfigurationAsync(
+            AvailableToolContainer toolContainer,
+            McpServers mcpServers
+            )
         {
-            await ProcessAgentAsync(VisualStudioAgent.Instance);
-            await ProcessAgentAsync(GithubAgent.Instance);
-
-            if (ExternalAgentJsonParser.TryParse(out var mcpServers))
+            if (toolContainer is null)
             {
-                foreach (var mcpServer in mcpServers.Servers)
+                throw new ArgumentNullException(nameof(toolContainer));
+            }
+
+            if (mcpServers is null)
+            {
+                throw new ArgumentNullException(nameof(mcpServers));
+            }
+
+            var agentToProcess = new List<string>
+            {
+                VisualStudioAgent.Instance.Name,
+                GithubAgent.Instance.Name
+            };
+            mcpServers.Servers.ForEach(s => agentToProcess.Add(s.Key));
+
+            var successStartedAgents = await ProcessAgentsAsync(
+                toolContainer,
+                agentToProcess,
+                mcpServers
+                );
+            
+            return new AgentSetupConfigurationResult(toolContainer, successStartedAgents);
+        }
+
+        private static async Task<List<IAgent>> ProcessAgentsAsync(
+            AvailableToolContainer toolContainer,
+            List<string> agentToProcess,
+            McpServers mcpServers
+            )
+        {
+            var knownAgents = _agentWrappers.ConvertAll(a => a.Agent.Name);
+            var deletedAgents = knownAgents.Except(agentToProcess).ToList();
+            //var addedAgents = agentToProcess.Except(knownAgents).ToList();
+            var addedOrUpdatedAgents = agentToProcess.Except(deletedAgents).ToList();
+
+            DeleteAgents(toolContainer, deletedAgents);
+            var successStartedAgents = await AddOrUpdateAgentsAsync(
+                toolContainer,
+                addedOrUpdatedAgents,
+                mcpServers
+                );
+
+            return successStartedAgents;
+        }
+
+        private static async Task<List<IAgent>> AddOrUpdateAgentsAsync(
+            AvailableToolContainer toolContainer,
+            List<string> addedOrUpdatedAgents,
+            McpServers mcpServers
+            )
+        {
+            if (toolContainer is null)
+            {
+                throw new ArgumentNullException(nameof(toolContainer));
+            }
+
+            if (addedOrUpdatedAgents is null)
+            {
+                throw new ArgumentNullException(nameof(addedOrUpdatedAgents));
+            }
+
+            if (mcpServers is null)
+            {
+                throw new ArgumentNullException(nameof(mcpServers));
+            }
+
+            var successStartedAgents = new List<IAgent>();
+
+            foreach (var addedOrUpdatedAgent in addedOrUpdatedAgents)
+            {
+                if (addedOrUpdatedAgent == VisualStudioAgent.Instance.Name)
                 {
-                    var server = new ExternalAgent(
+                    if (await ProcessAgentAsync(toolContainer, VisualStudioAgent.Instance))
+                    {
+                        successStartedAgents.Add(VisualStudioAgent.Instance);
+                    }
+                }
+                else if (addedOrUpdatedAgent == GithubAgent.Instance.Name)
+                {
+                    if (await ProcessAgentAsync(toolContainer, GithubAgent.Instance))
+                    {
+                        successStartedAgents.Add(GithubAgent.Instance);
+                    }
+                }
+                else
+                {
+                    //this is an external agent
+
+                    var mcpServer = mcpServers.Servers.First(s => s.Key == addedOrUpdatedAgent);
+
+                    var agent = new ExternalAgent(
                         mcpServer.Key,
                         mcpServer.Value
                         );
-
-                    await ProcessAgentAsync(server);
+                    if (await ProcessAgentAsync(toolContainer, agent))
+                    {
+                        successStartedAgents.Add(agent);
+                    }
                 }
             }
+
+            return successStartedAgents;
         }
 
-        public static async Task ProcessAgentAsync(
+        private static void DeleteAgents(
+            AvailableToolContainer toolContainer,
+            List<string> deletedAgents
+            )
+        {
+            _agentWrappers.RemoveAll(a => a.Agent.Name.In(deletedAgents));
+            toolContainer.DeleteAllToolsForAgents(deletedAgents);
+        }
+
+        public static async Task<bool> ProcessAgentAsync(
+            AvailableToolContainer toolContainer,
             IAgent agent
             )
         {
+            if (toolContainer is null)
+            {
+                throw new ArgumentNullException(nameof(toolContainer));
+            }
+
             if (agent is null)
             {
                 throw new ArgumentNullException(nameof(agent));
@@ -48,24 +158,33 @@ namespace FreeAIr.MCP.Agent
             if (agentWrapper is null)
             {
                 //агент не запущен, выключаем его тулзы
-                AvailableToolController.DeleteAllToolsForAgent(
-                    agent.Name
+                toolContainer.DeleteAllToolsForAgents(
+                    [agent.Name]
                     );
-                return;
+                return false;
             }
 
             _agentWrappers.Add(agentWrapper);
 
             //фиксируем тулзы в настройках (некоторые могли удалиться, некоторые - добавиться)
             //остальные просто включатся
-            AvailableToolController.AddToolsIfNotExists(
+            toolContainer.AddToolsIfNotExists(
                 agentWrapper.Agent.Name,
                 agentWrapper.Tools.Tools.ConvertAll(t => t.ToolName)
                 );
+
+            return true;
         }
 
-        public static AgentsToolsStatusCollection GetTools()
+        public static AgentsToolsStatusCollection GetTools(
+            AvailableToolContainer toolContainer
+            )
         {
+            if (toolContainer is null)
+            {
+                throw new ArgumentNullException(nameof(toolContainer));
+            }
+
             var result = new AgentsToolsStatusCollection();
 
             foreach (var agentWrapper in _agentWrappers)
@@ -80,7 +199,7 @@ namespace FreeAIr.MCP.Agent
                     agent.AddTool(
                         new AgentToolStatus(
                             tool,
-                            AvailableToolController.GetToolStatus(agentName, tool.ToolName)
+                            toolContainer.GetToolStatus(agentName, tool.ToolName)
                             )
                         );
                 }
@@ -272,4 +391,35 @@ namespace FreeAIr.MCP.Agent
         }
     }
 
+    public sealed class AgentSetupConfigurationResult
+    {
+        public AvailableToolContainer ToolContainer
+        {
+            get;
+        }
+        public List<IAgent> SuccessStartedAgents
+        {
+            get;
+        }
+
+        public AgentSetupConfigurationResult(
+            AvailableToolContainer toolContainer,
+            List<IAgent> successStartedAgents
+            )
+        {
+            if (toolContainer is null)
+            {
+                throw new ArgumentNullException(nameof(toolContainer));
+            }
+
+            if (successStartedAgents is null)
+            {
+                throw new ArgumentNullException(nameof(successStartedAgents));
+            }
+
+            ToolContainer = toolContainer;
+            SuccessStartedAgents = successStartedAgents;
+        }
+
+    }
 }

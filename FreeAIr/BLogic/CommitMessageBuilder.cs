@@ -203,6 +203,11 @@ namespace FreeAIr.BLogic
                 private set;
             }
 
+            public GitCollectBackgroundTask()
+            {
+                StartAsyncTask();
+            }
+
             protected override async Task RunWorkingTaskAsync(
                 )
             {

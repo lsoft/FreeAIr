@@ -17,6 +17,11 @@ namespace Dto
         {
             get; set;
         }
+
+        public McpServers()
+        {
+            Servers = new();
+        }
     }
 
     public class McpServer
@@ -41,7 +46,7 @@ namespace Dto
 
         public string GetArgStringRepresentation()
         {
-            return JsonSerializer.Serialize(Args ?? new string[0]);
+            return JsonSerializer.Serialize(Args ?? []);
         }
 
         public string GetEnvStringRepresentation()

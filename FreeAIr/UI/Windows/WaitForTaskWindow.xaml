@@ -8,7 +8,7 @@
     xmlns:ui="clr-namespace:FreeAIr.UI"
     mc:Ignorable="d" 
     d:DesignHeight="150" d:DesignWidth="400"
-    Height="150" Width="400"
+    Height="200" Width="400"
     ui:VsTheme.UseVsTheme="True"
     ShowInTaskbar="False"
     ResizeMode="NoResize"
@@ -22,13 +22,15 @@
             <RowDefinition Height="auto"/>
         </Grid.RowDefinitions>
 
-        <Label
+        <TextBlock
             Grid.Row="0"
             HorizontalAlignment="Center"
             VerticalAlignment="Center"
             FontSize="20"
             Margin="2"
-            Name="TaskDescriptionLabel"
+            Name="TaskDescriptionTextBlock"
+            Foreground="{Binding ElementName=CancelButton, Path=Foreground}"
+            TextWrapping="Wrap"
             />
 
         <Button

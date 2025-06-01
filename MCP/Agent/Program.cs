@@ -43,10 +43,10 @@ namespace Agent
             var app = builder.Build();
 
             app.MapPost(
-                "/add_external_servers",
+                "/update_external_servers",
                 async (context) =>
                 {
-                    _ = await AddExternalServersAsync(context);
+                    _ = await UpdateExternalServersAsync(context);
                 }
             );
             app.MapPost(
@@ -83,36 +83,38 @@ namespace Agent
             app.Run();
         }
 
-        private static async Task<bool> AddExternalServersAsync(
+        private static async Task<bool> UpdateExternalServersAsync(
             HttpContext context
             )
         {
             try
             {
-                var req = await context.Request.ReadFromJsonAsync<AddExternalServersRequest>();
+                var req = await context.Request.ReadFromJsonAsync<UpdateExternalServersRequest>();
                 if (req is null)
                 {
                     _log.Error("Cannot parse request");
                     await context.Response.WriteAsJsonAsync(
-                        BaseReply.FromError<AddExternalServersReply>("Cannot parse request")
+                        BaseReply.FromError<UpdateExternalServersReply>("Cannot parse request")
                         );
                     return false;
                 }
 
                 Servers.RemoveAllExternalServers();
-                Servers.AddExternalServers(req.McpServers);
+                var approvedMcpServers = await Servers.UpdateExternalServersAsync(req.McpServers);
 
                 await context.Response.WriteAsJsonAsync(
-                    new AddExternalServersReply()
+                    new UpdateExternalServersReply(
+                        approvedMcpServers
+                        )
                     );
                 return true;
             }
             catch (Exception excp)
             {
-                _log.Error(excp, "Error during adding external servers");
+                _log.Error(excp, "Error during updating external servers");
 
                 await context.Response.WriteAsJsonAsync(
-                    BaseReply.FromError<AddExternalServersReply>("Error during adding external servers: " + excp.Message + Environment.NewLine + excp.StackTrace)
+                    BaseReply.FromError<UpdateExternalServersReply>("Error during updating external servers: " + excp.Message + Environment.NewLine + excp.StackTrace)
                     );
             }
 

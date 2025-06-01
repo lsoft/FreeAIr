@@ -21,7 +21,7 @@ namespace FreeAIr.UI.Windows
 
             _backgroundTask = backgroundTask;
 
-            TaskDescriptionLabel.Content = backgroundTask.TaskDescription;
+            TaskDescriptionTextBlock.Text = backgroundTask.TaskDescription;
         }
 
         private void CancelButton_Click(object sender, RoutedEventArgs e)
@@ -62,7 +62,7 @@ namespace FreeAIr.UI.Windows
     {
         protected CancellationTokenSource? _cancellationTokenSource;
         
-        private readonly Task _workingTask;
+        private Task? _workingTask;
 
         public abstract string TaskDescription
         {
@@ -73,7 +73,10 @@ namespace FreeAIr.UI.Windows
             )
         {
             _cancellationTokenSource = new();
+        }
 
+        protected void StartAsyncTask()
+        {
             _workingTask = RunWorkingTaskAsync();
         }
 

@@ -41,7 +41,6 @@ namespace FreeAIr
         public const int GenerateWholeLineSuggestionCommand = 0x1027;
         public const int ChooseModelCommandId = 0x1028;
         public const int OpenChatListToolWindowCommandId = 0x1029;
-        public const int InstallGithubMCPServerCommandId = 0x1030;
         public const int SolutionContextMenu = 0x1031;
         public const int SolutionContextGroup = 0x1032;
         public const int ExplainFileCommandId = 0x1033;
@@ -53,6 +52,7 @@ namespace FreeAIr
         public const int BuildErrorWindowFixErrorCommandId = 0x1040;
         public const int OpenNaturalSearchToolWindowCommandId = 0x1041;
         public const int ShowReleaseNotesCommandId = 0x1042;
+        public const int OpenControlCenterCommandId = 0x1043;
         public const int Icon16 = 0x0001;
         public const int Icon32 = 0x0001;
     }

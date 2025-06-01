@@ -72,7 +72,7 @@
     <Compile Include="BuildErrors\BuildResultProvider.cs" />
     <Compile Include="Commands\BuildError\BuildErrorWindowFixErrorCommand.cs" />
     <Compile Include="BuildErrors\BuildResultInformation.cs" />
-    <Compile Include="Commands\Other\InstallGithubMCPServerCommand.cs" />
+    <Compile Include="Commands\Other\OpenControlCenterCommand.cs" />
     <Compile Include="Commands\Other\ShowReleaseNotesCommand.cs" />
     <Compile Include="Commands\Other\OpenNaturalSearchToolWindowCommand.cs" />
     <Compile Include="Find\FindWindowModifier.cs" />
@@ -145,7 +145,7 @@
     <Compile Include="MCP\Agent\VS\Tools\GetAllWarningErrorsTool.cs" />
     <Compile Include="MCP\Agent\VS\Tools\VisualStudioAgentTool.cs" />
     <Compile Include="MCP\Agent\VS\VisualStudioAgent.cs" />
-    <Compile Include="MCP\AvailableToolController.cs" />
+    <Compile Include="MCP\AvailableToolContainer.cs" />
     <Compile Include="Options\ApiPage.cs" />
     <Compile Include="Options\InternalPage.cs" />
     <Compile Include="Options\MCPPage.cs" />
@@ -215,6 +215,7 @@
     <Compile Include="UI\ToolWindows\NaturalLanguageResultsToolWindowControl.xaml.cs">
       <DependentUpon>NaturalLanguageResultsToolWindowControl.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UI\ViewModels\ControlCenterViewModel.cs" />
     <Compile Include="UI\ViewModels\NaturalLanguageResultsViewModel.cs" />
     <Compile Include="UI\Windows\NestedCheckBoxWindow.xaml.cs">
       <DependentUpon>NestedCheckBoxWindow.xaml</DependentUpon>
@@ -222,6 +223,9 @@
     <Compile Include="UI\ViewModels\ChooseModelViewModel.cs" />
     <Compile Include="UI\ViewModels\ChatListViewModel.cs" />
     <Compile Include="UI\ViewModels\AvailableToolsViewModel.cs" />
+    <Compile Include="UI\Windows\ControlCenterWindow.xaml.cs">
+      <DependentUpon>ControlCenterWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI\Windows\WaitForTaskWindow.xaml.cs">
       <DependentUpon>WaitForTaskWindow.xaml</DependentUpon>
     </Compile>
@@ -446,6 +450,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UI\Windows\NestedCheckBoxWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI\Windows\ControlCenterWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

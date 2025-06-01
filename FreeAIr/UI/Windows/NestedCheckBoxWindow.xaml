@@ -9,7 +9,7 @@
         ui:VsTheme.UseVsTheme="True"
         WindowStyle="None"
         KeyUp="Window_KeyUp"
-        Height="450" Width="500"
+        Height="450" Width="800"
         Loaded="Window_Loaded"
         >
     <Grid
@@ -50,7 +50,7 @@
                 Margin="2"
                 Name="InfoLabel"
                 VerticalAlignment="Bottom"
-                Content="Choose the MCP tools you want to provide to LLM:"
+                Content="{Binding Header}"
                 />
 
             <Button
@@ -58,7 +58,7 @@
                 Margin="2"
                 HorizontalAlignment="Right"
                 Content="Save"
-                Command="{Binding SaveToolsCommand}"
+                Command="{Binding SaveCommand}"
                 />
             <Button
                 Grid.Column="2"

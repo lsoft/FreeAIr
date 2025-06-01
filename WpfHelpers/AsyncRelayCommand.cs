@@ -14,11 +14,11 @@ namespace WpfHelpers
 
         public AsyncRelayCommand(
             Func<object, Task> execute,
-            Predicate<object> canExecute = null
+            Predicate<object>? canExecute = null
             )
         {
-            this._execute = execute;
-            this._canExecute = canExecute ?? (o => true);
+            _execute = execute;
+            _canExecute = canExecute ?? (o => true);
         }
 
         public event EventHandler CanExecuteChanged
@@ -69,12 +69,11 @@ namespace WpfHelpers
 
         public AsyncRelayCommand(
             Func<TParameter, Task> execute,
-            Func<TParameter, bool> canExecute = null
+            Func<TParameter, bool>? canExecute = null
         )
         {
-
-            this._execute = execute;
-            this._canExecute = canExecute ?? (o => true);
+            _execute = execute;
+            _canExecute = canExecute ?? (o => true);
         }
 
         public event EventHandler CanExecuteChanged

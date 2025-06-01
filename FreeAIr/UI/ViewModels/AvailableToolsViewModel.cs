@@ -9,7 +9,11 @@ namespace FreeAIr.UI.ViewModels
 {
     public sealed class AvailableToolsViewModel : BaseViewModel
     {
-        private ICommand _saveToolsCommand;
+        private readonly AvailableToolContainer _toolContainer;
+
+        private ICommand _saveCommand;
+
+        public string Header => "Choose the MCP tools you want to provide to LLM:";
 
         public ObservableCollection2<CheckableGroup> Groups
         {
@@ -17,24 +21,31 @@ namespace FreeAIr.UI.ViewModels
             set;
         }
 
-        public Action? CloseWindow
+        public Action<bool>? CloseWindow
         {
             get;
             set;
         }
 
-        public ICommand SaveToolsCommand
+        public ICommand SaveCommand
         {
             get
             {
-                if (_saveToolsCommand == null)
+                if (_saveCommand == null)
                 {
-                    _saveToolsCommand = new RelayCommand(
+                    _saveCommand = new RelayCommand(
                         a =>
                         {
                             foreach (var group in Groups)
                             {
                                 var toolGroupName = group.Name;
+
+                                _toolContainer.DeleteAgent(
+                                    toolGroupName
+                                    );
+                                _toolContainer.AddAgent(
+                                    toolGroupName
+                                    );
 
                                 foreach (var tool in group.Children)
                                 {
@@ -42,12 +53,8 @@ namespace FreeAIr.UI.ViewModels
                                     {
                                         continue;
                                     }
-                                    if (!tool.HasChanged)
-                                    {
-                                        continue;
-                                    }
 
-                                    AvailableToolController.UpdateTool(
+                                    _toolContainer.AddTool(
                                         toolGroupName,
                                         tool.Name,
                                         tool.IsChecked
@@ -57,20 +64,29 @@ namespace FreeAIr.UI.ViewModels
 
                             if (CloseWindow is not null)
                             {
-                                CloseWindow();
+                                CloseWindow(true);
                             }
                         });
                 }
 
-                return _saveToolsCommand;
+                return _saveCommand;
             }
         }
 
-        public AvailableToolsViewModel()
+        public AvailableToolsViewModel(
+            AvailableToolContainer toolContainer
+            )
         {
+            if (toolContainer is null)
+            {
+                throw new ArgumentNullException(nameof(toolContainer));
+            }
+
             Groups = new ObservableCollection2<CheckableGroup>();
 
-            var tools = AgentCollection.GetTools();
+            _toolContainer = toolContainer;
+
+            var tools = AgentCollection.GetTools(_toolContainer);
 
             var groups = new Dictionary<string, CheckableGroup>();
             foreach (var agent in tools.Agents)

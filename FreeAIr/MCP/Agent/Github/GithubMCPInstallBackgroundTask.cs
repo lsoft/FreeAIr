@@ -15,6 +15,7 @@ namespace FreeAIr.MCP.Agent.Github
         public GithubMCPInstallBackgroundTask(
             )
         {
+            StartAsyncTask();
         }
 
         protected override async Task RunWorkingTaskAsync()

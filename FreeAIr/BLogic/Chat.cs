@@ -2,6 +2,7 @@
 using FreeAIr.Helper;
 using FreeAIr.MCP.Agent;
 using FreeAIr.Shared.Helper;
+using Microsoft.VisualStudio.Shell.Interop;
 using OpenAI;
 using OpenAI.Chat;
 using System.ClientModel;
@@ -21,6 +22,12 @@ namespace FreeAIr.BLogic
 
         private CancellationTokenSource _cancellationTokenSource = new();
         private Task? _task;
+
+
+        public AvailableToolContainer ChatTools
+        {
+            get;
+        }
 
         public ChatContext ChatContext
         {
@@ -93,6 +100,8 @@ namespace FreeAIr.BLogic
             Description = description;
             Options = options;
             _status = ChatStatusEnum.NotStarted;
+
+            ChatTools = AvailableToolContainer.ReadSystem();
 
             Started = DateTime.Now;
 
@@ -214,17 +223,16 @@ namespace FreeAIr.BLogic
 
             try
             {
-
                 Status = ChatStatusEnum.WaitingForAnswer;
 
                 var cco = new ChatCompletionOptions
                 {
                     ToolChoice = Options.ToolChoice,
-                    ResponseFormat = Options.ResponseFormat, //ChatResponseFormat.CreateTextFormat(),
+                    ResponseFormat = Options.ResponseFormat,
                     MaxOutputTokenCount = ResponsePage.Instance.MaxOutputTokenCount,
                 };
 
-                var toolCollection = AgentCollection.GetTools();
+                var toolCollection = AgentCollection.GetTools(ChatTools);
                 var activeTools = toolCollection.GetActiveToolList();
                 foreach (var tool in activeTools)
                 {
@@ -804,12 +812,13 @@ Your environment:
 #6 Each item has a name, type, and content. Content, text, body are synonyms that mean the same thing. An item can also have a full path.
 
 Your behavior against available functions:
-#0 You are allowed to use any tool or function you need to complete user's task.
+#0 You are allowed to use any tool or function you need to complete user's task. You are allowed to call functions sequentially to obtain all needed information.
 #1 You MUST call any available tool or function without asking a user permission.
 #2 You can query the contents of an item using the available tools or functions.
 #3 If a user ask you to fix the buf, you should get a list of compilation errors using the available tools or functions.
 #4 If a user asks you to change (fix) their code, do it and then build solution yourself using the available tools or functions. If the build returns errors, offer to fix them, but do not fix them automatically.
 #5 If you need to search the Web to accomplish user prompt, you are allowed to use the available tools or functions.
+#6 If user asks to analyze the database or its data, you should compose appropriate SQL query and then use available functions to execute the SQL query. If you need information about table (database) structure, gather it first via functions.
 ";
 
             return string.Format(

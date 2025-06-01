@@ -1,14 +1,19 @@
 ﻿using FreeAIr.BLogic;
 using FreeAIr.BLogic.Context;
 using FreeAIr.BLogic.Context.Item;
+using FreeAIr.Git;
 using FreeAIr.Helper;
+using FreeAIr.MCP.Agent;
 using FreeAIr.Shared.Helper;
 using FreeAIr.UI.Embedillo.Answer.Parser;
 using FreeAIr.UI.Windows;
 using ICSharpCode.AvalonEdit.Editing;
 using Microsoft.VisualStudio.Imaging;
 using Microsoft.VisualStudio.Imaging.Interop;
+using Microsoft.VisualStudio.Shell.Interop;
+using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.Win32;
+using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.IO;
 using System.Linq;
@@ -41,6 +46,7 @@ namespace FreeAIr.UI.ViewModels
         private ICommand _addRelatedItemsToContextCommand;
         private ICommand _addCustomFileToContextCommand;
         private ICommand _editAvailableToolsCommand;
+        private ICommand _editChatToolsCommand;
 
         public event MarkdownReReadDelegate MarkdownReReadEvent;
         public event Action ContextControlFocus;
@@ -776,9 +782,16 @@ namespace FreeAIr.UI.ViewModels
                     _editAvailableToolsCommand = new AsyncRelayCommand(
                         async a =>
                         {
+                            var toolContainer = AvailableToolContainer.ReadSystem();
+
                             var w = new NestedCheckBoxWindow();
-                            w.DataContext = new AvailableToolsViewModel();
-                            await w.ShowDialogAsync();
+                            w.DataContext = new AvailableToolsViewModel(
+                                toolContainer
+                                );
+                            if ((await w.ShowDialogAsync()).GetValueOrDefault())
+                            {
+                                toolContainer.SaveToSystem();
+                            }
 
                             OnPropertyChanged();
                         }
@@ -786,6 +799,29 @@ namespace FreeAIr.UI.ViewModels
                 }
 
                 return _editAvailableToolsCommand;
+            }
+        }
+        public ICommand EditChatToolsCommand
+        {
+            get
+            {
+                if (_editChatToolsCommand == null)
+                {
+                    _editChatToolsCommand = new AsyncRelayCommand(
+                        async a =>
+                        {
+                            var w = new NestedCheckBoxWindow();
+                            w.DataContext = new AvailableToolsViewModel(
+                                _selectedChat.Chat.ChatTools
+                                );
+                            _ = await w.ShowDialogAsync();
+
+                            OnPropertyChanged();
+                        }
+                        );
+                }
+
+                return _editChatToolsCommand;
             }
         }
 
@@ -877,11 +913,49 @@ namespace FreeAIr.UI.ViewModels
                                 return;
                             }
 
-                            var contextItems = await itemViewModel.ContextItem.SearchRelatedContextItemsAsync();
+                            try
+                            {
+                                var backgroundTask = new AddRelatedItemsToContextBackgroundTask(
+                                    itemViewModel
+                                    );
+                                var w = new WaitForTaskWindow(
+                                    backgroundTask
+                                    );
+                                await w.ShowDialogAsync();
 
-                            chat.ChatContext.AddItems(
-                                contextItems
-                                );
+                                if (backgroundTask.Result is not null)
+                                {
+                                    if (backgroundTask.Result.Count > 0)
+                                    {
+                                        chat.ChatContext.AddItems(
+                                            backgroundTask.Result
+                                            );
+                                    }
+                                    else
+                                    {
+                                        await VS.MessageBox.ShowAsync(
+                                            "No dependencies found. This may occurs because Intellisense is not loaded (yet), or the context item is not a .Net source code.",
+                                            buttons: OLEMSGBUTTON.OLEMSGBUTTON_OK
+                                            );
+                                    }
+                                }
+                                else
+                                {
+                                    await VS.MessageBox.ShowAsync(
+                                        "Unknown error occurred during scanning for dependencies",
+                                        buttons: OLEMSGBUTTON.OLEMSGBUTTON_OK
+                                        );
+                                }
+                            }
+                            catch (Exception excp)
+                            {
+                                //todo log
+
+                                await VS.MessageBox.ShowErrorAsync(
+                                    Resources.Resources.Error,
+                                    $"Error occurred: {excp.Message}{Environment.NewLine}{excp.StackTrace}"
+                                    );
+                            }
 
                             OnPropertyChanged();
                         },
@@ -1213,6 +1287,43 @@ namespace FreeAIr.UI.ViewModels
                 OnPropertyChanged();
             }
         }
+
+        private sealed class AddRelatedItemsToContextBackgroundTask : BackgroundTask
+        {
+            private readonly ChatContextItemViewModel _viewModel;
+
+            public override string TaskDescription => "Please wait for the code dependencies scanning...";
+
+            public IReadOnlyList<IChatContextItem>? Result
+            {
+                get;
+                private set;
+            }
+
+            public AddRelatedItemsToContextBackgroundTask(
+                ChatContextItemViewModel viewModel
+                )
+            {
+                if (viewModel is null)
+                {
+                    throw new ArgumentNullException(nameof(viewModel));
+                }
+
+                _viewModel = viewModel;
+
+                StartAsyncTask();
+            }
+
+            protected override async Task RunWorkingTaskAsync(
+                )
+            {
+                //in case of exception set it null first
+                Result = null;
+
+                Result = await _viewModel.ContextItem.SearchRelatedContextItemsAsync();
+            }
+        }
+
     }
 
     public sealed class ChatContextItemViewModel : BaseViewModel
@@ -1247,9 +1358,8 @@ namespace FreeAIr.UI.ViewModels
 
             ContextItem = contextItem;
         }
-
     }
 
-
     public delegate void MarkdownReReadDelegate(object sender, EventArgs e);
+
 }
