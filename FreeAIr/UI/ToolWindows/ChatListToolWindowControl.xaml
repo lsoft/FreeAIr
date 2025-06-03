@@ -11,12 +11,11 @@
     xmlns:toolkit="clr-namespace:Community.VisualStudio.Toolkit;assembly=Community.VisualStudio.Toolkit"
     xmlns:resources="clr-namespace:FreeAIr.Resources"
     xmlns:mdxaml="https://github.com/whistyun/MdXaml"
-    xmlns:plugins="clr-namespace:MdXaml.Plugins;assembly=MdXaml.Plugins"
     xmlns:embedillo="clr-namespace:FreeAIr.UI.Embedillo"
     xmlns:viewmodels="clr-namespace:FreeAIr.UI.ViewModels"
     xmlns:toolwindows="clr-namespace:FreeAIr.UI.ToolWindows"
     xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
-    xmlns:ui="clr-namespace:FreeAIr.UI"
+    xmlns:ui="clr-namespace:FreeAIr.UI" xmlns:dialog="clr-namespace:FreeAIr.UI.Dialog"
     toolkit:Themes.UseVsTheme="True"
     mc:Ignorable="d"
     d:DesignHeight="300"
@@ -28,8 +27,8 @@
         <ui:InvertBooleanToVisibilityConverter  x:Key="StopCommandVisibilityConverter" />
 
         <!-- Прокси для передачи контекста в ContextMenu -->
-        <toolwindows:BindingProxy x:Key="DataContextProxy" Data="{Binding}" />
-        <toolwindows:BindingProxy x:Key="ForegroundButtonProxy" Data="{Binding ElementName=ForegroundButton}" />
+        <ui:BindingProxy x:Key="DataContextProxy" Data="{Binding}" />
+        <ui:BindingProxy x:Key="ForegroundButtonProxy" Data="{Binding ElementName=ForegroundButton}" />
 
         <ui:CombinedParameterConverter x:Key="CombinedParameterConverter" />
         
@@ -434,310 +433,14 @@
 
             </Border>
 
-            <mdxaml:MarkdownScrollViewer 
+            <dialog:DialogControl
                 Grid.Row="1"
                 Margin="2"
                 HorizontalAlignment="Stretch"
                 VerticalAlignment="Stretch"
-                HorizontalScrollBarVisibility="Auto"
-                VerticalScrollBarVisibility="Auto"
-                Markdown="{Binding Path=SelectedChatResponse, Mode=OneWay}"
-                Name="AnswerControl"
-                >
-                <mdxaml:MarkdownScrollViewer.MarkdownStyle>
-                    <Style TargetType="FlowDocument">
-                        <Setter Property="FontFamily"	 Value="Calibri" />
-                        <Setter Property="TextAlignment" Value="Left" />
-                        <Setter Property="PagePadding"   Value="0"/>
-
-                        <Style.Resources>
-                            <Style TargetType="Section">
-                                <Style.Triggers>
-                                    <Trigger Property="Tag" Value="Blockquote">
-                                        <Setter Property="Margin"          Value="0, 10, 0, 0"/>
-                                        <Setter Property="Padding"         Value="10, 1, 0, 1"/>
-                                        <Setter Property="BorderBrush"     Value="#FF000055"/>
-                                        <Setter Property="BorderThickness" Value="15,1,1,1"/>
-                                        <Setter Property="FontFamily"      Value="Cascadia Code"/>
-                                        <Setter Property="FontSize"        Value="20"/>
-                                    </Trigger>
-                                </Style.Triggers>
-                            </Style>
-
-                            <!-- here is a style for ```block``` -->
-                            <Style TargetType="avalonEdit:TextEditor" xmlns:avalonEdit="http://icsharpcode.net/sharpdevelop/avalonedit">
-                                <Setter Property="Foreground"      Value="{Binding ElementName=ForegroundButton, Path=Foreground}"/>
-                                <Setter Property="Background"      Value="Transparent"/>
-                                <Setter Property="FontFamily"      Value="Cascadia Code"/>
-                                <Setter Property="FontSize"        Value="14"/>
-
-                                <Setter Property="HorizontalScrollBarVisibility" Value="Auto"/>
-                                <Setter Property="VerticalScrollBarVisibility"   Value="Auto"/>
-                                <Setter Property="Padding"                       Value="5,5,5,5"/>
-
-                                <Setter Property="Template">
-                                    <Setter.Value>
-                                        <ControlTemplate TargetType="{x:Type avalonEdit:TextEditor}">
-
-                                            <Grid
-                                                Margin="0,5,0,0"
-                                                >
-                                                <Grid.RowDefinitions>
-                                                    <RowDefinition />
-                                                    <RowDefinition Height="auto" />
-                                                </Grid.RowDefinitions>
-
-                                                <ScrollViewer
-                                                    Grid.Row="0"
-                                                    Focusable="False"
-                                                    Name="PART_ScrollViewer"
-                                                    CanContentScroll="True"
-                                                    VerticalScrollBarVisibility="{TemplateBinding VerticalScrollBarVisibility}"
-                                                    HorizontalScrollBarVisibility="{TemplateBinding HorizontalScrollBarVisibility}"
-                                                    Content="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=TextArea}"
-                                                    VerticalContentAlignment="Top"
-                                                    HorizontalContentAlignment="Left"
-                                                    Padding="{TemplateBinding Padding}"
-                                                    />
-
-                                                <StackPanel
-                                                    Grid.Row="1"
-                                                    Orientation="Horizontal"
-                                                    HorizontalAlignment="Right"
-                                                    >
-                                                    <Button
-                                                        HorizontalAlignment="Right"
-                                                        Margin="2,0,2,0"
-                                                        Content="↑ Copy"
-                                                        Style="{Binding ElementName=ForegroundButton, Path=Style}"
-                                                        Command="{Binding ElementName=ChatListToolWindow, Path=DataContext.CopyCodeBlockCommand}"
-                                                        CommandParameter="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=TextArea}"
-                                                        FontSize="12"
-                                                        ToolTip="Copy this code part to clipboard"
-                                                        />
-                                                    <Button
-                                                        HorizontalAlignment="Right"
-                                                        Margin="2,0,2,0"
-                                                        Content="↑ Replace original text"
-                                                        Style="{Binding ElementName=ForegroundButton, Path=Style}"
-                                                        Command="{Binding ElementName=ChatListToolWindow, Path=DataContext.ReplaceSelectedTextCommand}"
-                                                        CommandParameter="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=TextArea}"
-                                                        FontSize="12"
-                                                        ToolTip="Replace the selected block of the code in the VS document with this code part"
-                                                        />
-                                                    <Button
-                                                        HorizontalAlignment="Right"
-                                                        Margin="2,0,2,0"
-                                                        Content="↑ Create new file..."
-                                                        Style="{Binding ElementName=ForegroundButton, Path=Style}"
-                                                        Command="{Binding ElementName=ChatListToolWindow, Path=DataContext.CreateNewFileCommand}"
-                                                        CommandParameter="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=TextArea}"
-                                                        FontSize="12"
-                                                        ToolTip="Create new file with this code part"
-                                                        />
-                                                    <Button
-                                                        HorizontalAlignment="Right"
-                                                        Margin="2,0,2,0"
-                                                        Style="{Binding ElementName=ForegroundButton, Path=Style}"
-                                                        Content="↑ Replace context item..."
-                                                        FontSize="12"
-                                                        ToolTip="Choose context item to replace its content with this code part"
-                                                        >
-                                                        <Button.ContextMenu>
-                                                            <ContextMenu 
-                                                                ItemsSource="{Binding Source={StaticResource DataContextProxy}, Path=Data.ChatContextItems}"
-                                                                Background="{Binding Source={StaticResource ForegroundButtonProxy}, Path=Data.Background}"
-                                                                >
-                                                                <ContextMenu.Template>
-                                                                    <ControlTemplate TargetType="ContextMenu">
-                                                                        <Border
-                                                                            BorderBrush="{Binding Source={StaticResource ForegroundButtonProxy}, Path=Data.Foreground}"
-                                                                            BorderThickness="1"
-                                                                            Margin="2"
-                                                                            Background="{Binding Source={StaticResource ForegroundButtonProxy}, Path=Data.Background}"
-                                                                            >
-                                                                            <ItemsPresenter
-                                                                                />
-                                                                        </Border>
-                                                                    </ControlTemplate>
-                                                                </ContextMenu.Template>
-                                                                <ContextMenu.ItemTemplate>
-                                                                    <DataTemplate>
-                                                                        <Button
-                                                                            x:Name="ChatContextItem"
-                                                                            Content="{Binding Path=ChatContextDescription}"
-                                                                            HorizontalAlignment="Stretch"
-                                                                            HorizontalContentAlignment="Stretch"
-                                                                            VerticalAlignment="Stretch"
-                                                                            Command="{Binding Source={StaticResource DataContextProxy}, Path=Data.UpdateContextItemCommand}"
-                                                                            Style="{DynamicResource TextBlockLikeButtonStyle}"
-                                                                            >
-                                                                            <Button.CommandParameter>
-                                                                                <MultiBinding Converter="{StaticResource CombinedParameterConverter}">
-                                                                                    <!-- 1. Текущий элемент (ChatContextItem) -->
-                                                                                    <Binding />
-
-                                                                                    <!-- 2. TextArea из TextEditor -->
-                                                                                    <Binding 
-                                                                                        RelativeSource="{RelativeSource AncestorType={x:Type avalonEdit:TextEditor}}" 
-                                                                                        Path="TextArea" />
-                                                                                </MultiBinding>
-                                                                            </Button.CommandParameter>
-                                                                        </Button>
-                                                                    </DataTemplate>
-                                                                </ContextMenu.ItemTemplate>
-                                                            </ContextMenu>
-                                                        </Button.ContextMenu>
-                                                        <b:Interaction.Behaviors>
-                                                            <ui:OpenContextMenuOnLeftClickBehavior />
-                                                        </b:Interaction.Behaviors>
-                                                    </Button>
-                                                </StackPanel>
-
-                                            </Grid>
-                                        </ControlTemplate>
-                                    </Setter.Value>
-                                </Setter>
-                            </Style>
-
-                            <Style TargetType="Paragraph">
-                                <Style.Triggers>
-                                    <Trigger Property="Tag" Value="Heading1">
-                                        <Setter Property="FontSize"    Value="42" />
-                                        <Setter Property="Foreground"  Value="{Binding ElementName=ForegroundButton, Path=Foreground}" />
-                                        <Setter Property="FontWeight"  Value="Light" />
-                                    </Trigger>
-
-                                    <Trigger Property="Tag" Value="Heading2">
-                                        <Setter Property="FontSize"    Value="36" />
-                                        <Setter Property="Foreground"  Value="{Binding ElementName=ForegroundButton, Path=Foreground}" />
-                                        <Setter Property="FontWeight"  Value="Light" />
-                                    </Trigger>
-
-                                    <Trigger Property="Tag" Value="Heading3">
-                                        <Setter Property="FontSize"    Value="30" />
-                                        <Setter Property="Foreground"  Value="{Binding ElementName=ForegroundButton, Path=Foreground}" />
-                                        <Setter Property="FontWeight"  Value="Light" />
-                                    </Trigger>
-
-                                    <Trigger Property="Tag" Value="Heading4">
-                                        <Setter Property="FontSize"    Value="24" />
-                                        <Setter Property="Foreground"  Value="{Binding ElementName=ForegroundButton, Path=Foreground}" />
-                                        <Setter Property="FontWeight"  Value="Light" />
-                                    </Trigger>
-
-                                    <Trigger Property="Tag" Value="CodeBlock">
-                                        <Setter Property="FontFamily"      Value="Cascadia Code"/>
-                                        <Setter Property="FontSize"        Value="14"/>
-                                        <Setter Property="Foreground"      Value="{Binding ElementName=ForegroundButton, Path=Foreground}" />
-                                        <Setter Property="Background"      Value="Transparent"/>
-                                        <Setter Property="BorderBrush"     Value="#DEDEDE"/>
-                                        <Setter Property="BorderThickness" Value="0,5,0,5"/>
-                                        <Setter Property="Margin"          Value="5,0,5,0"/>
-                                    </Trigger>
-
-                                    <!-- here is a style for xml node name -->
-                                    <Trigger Property="Tag" Value="Note">
-                                        <Setter Property="Margin"          Value="20,0,20,0"/>
-                                        <Setter Property="Padding"         Value="10, 5"/>
-                                        <Setter Property="BorderBrush"     Value="DarkRed"/>
-                                        <Setter Property="BorderThickness" Value="0,0,0,1"/>
-                                        <Setter Property="Foreground"      Value="DarkRed"/>
-                                        <Setter Property="Background"      Value="Transparent"/>
-                                    </Trigger>
-
-                                </Style.Triggers>
-                            </Style>
-
-                            <!-- here is a style for `block` -->
-                            <Style TargetType="Run">
-                                <Style.Triggers>
-                                    <Trigger Property="Tag" Value="CodeSpan">
-                                        <Setter Property="FontFamily" Value="Cascadia Code"/>
-                                        <Setter Property="FontSize"   Value="14"/>
-                                        <Setter Property="Foreground" Value="#569CD6"/>
-                                        <Setter Property="Background" Value="Transparent"/>
-                                    </Trigger>
-                                </Style.Triggers>
-                            </Style>
-                            <Style TargetType="Span">
-                                <Style.Triggers>
-                                    <Trigger Property="Tag" Value="CodeSpan">
-                                        <Setter Property="FontFamily" Value="Cascadia Code"/>
-                                        <Setter Property="FontSize"   Value="14"/>
-                                        <Setter Property="Foreground" Value="#569CD6"/>
-                                        <Setter Property="Background" Value="Transparent"/>
-                                    </Trigger>
-                                </Style.Triggers>
-                            </Style>
-
-                            <Style TargetType="Hyperlink">
-                                <Setter Property="TextDecorations" Value="None" />
-                            </Style>
-
-                            <Style TargetType="Image">
-                                <Setter Property="RenderOptions.BitmapScalingMode" Value="NearestNeighbor" />
-                                <Style.Triggers>
-                                    <Trigger Property="Tag" Value="imageright">
-                                        <Setter Property="Margin"  Value="20,0,0,0" />
-                                    </Trigger>
-                                </Style.Triggers>
-                            </Style>
-
-                            <!--
-                        The Table's style don't seem to support border-collapse.
-                        By making the ruled line width 0.5 and applying it to cell and table,
-                        it looks like the ruled lines are not doubled.
-                        -->
-                            <Style TargetType="Table">
-                                <Setter Property="CellSpacing" Value="0"/>
-                                <Setter Property="BorderThickness" Value="0.5"/>
-                                <Setter Property="BorderBrush" Value="Gray"/>
-                            </Style>
-
-                            <Style TargetType="TableRowGroup">
-                                <Style.Triggers>
-                                    <Trigger Property="Tag" Value="TableHeader">
-                                        <Setter Property="FontWeight" Value="DemiBold"/>
-                                        <Setter Property="Background" Value="Transparent"/>
-                                    </Trigger>
-                                </Style.Triggers>
-                            </Style>
-
-                            <Style TargetType="TableCell">
-                                <Setter Property="BorderThickness" Value="0.5"/>
-                                <Setter Property="BorderBrush" Value="Gray"/>
-                                <Setter Property="Padding" Value="2"/>
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type TableRow}}, Path=Tag}" Value="EvenTableRow">
-                                        <Setter Property="Background" Value="Transparent"/>
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-
-                            <Style TargetType="BlockUIContainer">
-                                <Style.Triggers>
-                                    <Trigger Property="Tag"  Value="RuleSingle">
-                                        <Setter Property="Margin" Value="0,3"/>
-                                    </Trigger>
-
-                                    <Trigger Property="Tag"  Value="RuleDouble">
-                                        <Setter Property="Margin" Value="0,3"/>
-                                    </Trigger>
-
-                                    <Trigger Property="Tag"  Value="RuleBold">
-                                        <Setter Property="Margin" Value="0,3"/>
-                                    </Trigger>
-
-                                    <Trigger Property="Tag"  Value="RuleBoldWithSingle">
-                                        <Setter Property="Margin" Value="0,3"/>
-                                    </Trigger>
-                                </Style.Triggers>
-                            </Style>
-                        </Style.Resources>
-                    </Style>
-                </mdxaml:MarkdownScrollViewer.MarkdownStyle>
-            </mdxaml:MarkdownScrollViewer>
+                x:Name="DialogControlName"
+                Dialog="{Binding Dialog}"
+                />
 
             <GridSplitter
                 Grid.Row="2"

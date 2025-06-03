@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace FreeAIr.UI.Embedillo.Answer.Parser
 {
-    public sealed class SolutionItemAnswerPart : IAnswerPart
+    public sealed class SolutionItemAnswerPart : IParsedPart
     {
         public SelectedIdentifier SelectedIdentifier
         {

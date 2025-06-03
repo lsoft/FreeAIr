@@ -2,6 +2,7 @@
 using OpenAI.Chat;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 
 namespace FreeAIr.BLogic
@@ -207,17 +208,42 @@ namespace FreeAIr.BLogic
 
         public IReadOnlyList<OpenAI.Chat.ChatMessage> Reactions => _reactions;
 
-        public void AppendPermanentReaction(
+        public void AddPermanentReaction(
             ToolChatMessage toolChatMessage
             )
         {
             _reactions.Add(toolChatMessage);
         }
 
-        public void AppendPermanentReaction(
+        public void UpdateAssistantPermanentReaction(
+            string suffix
+            )
+        {
+            var ar = _reactions.FirstOrDefault(r => r is AssistantChatMessage);
+            if (ar is not null)
+            {
+                _reactions.RemoveAll(r => r is AssistantChatMessage);
+                _reactions.Add(
+                    new AssistantChatMessage(
+                        string.Join("", ar.Content.Where(c => c.Kind == ChatMessageContentPartKind.Text).Select(c => c.Text)) + suffix
+                        )
+                    );
+            }
+            else
+            {
+                _reactions.Add(
+                    new AssistantChatMessage(
+                        suffix
+                        )
+                    );
+            }
+        }
+
+        public void AddPermanentReaction(
             AssistantChatMessage assistantChatMessage
             )
         {
+            _reactions.RemoveAll(r => r is AssistantChatMessage);
             _reactions.Add(assistantChatMessage);
         }
 
@@ -227,20 +253,30 @@ namespace FreeAIr.BLogic
 
             foreach (var reaction in _reactions)
             {
-                if (!(reaction is AssistantChatMessage areaction))
+                if (reaction is AssistantChatMessage areaction)
                 {
-                    continue;
-                }
-
-                foreach (var part in areaction.Content)
-                {
-                    if (part.Kind != ChatMessageContentPartKind.Text)
+                    foreach (var part in areaction.Content)
                     {
-                        continue;
-                    }
+                        if (part.Kind != ChatMessageContentPartKind.Text)
+                        {
+                            continue;
+                        }
 
-                    sb.Append(part.Text);
+                        sb.Append(part.Text);
+                    }
                 }
+                //else if (reaction is ToolChatMessage treaction)
+                //{
+                //    foreach (var part in treaction.Content)
+                //    {
+                //        if (part.Kind != ChatMessageContentPartKind.Text)
+                //        {
+                //            continue;
+                //        }
+
+                //        sb.Append(part.Text);
+                //    }
+                //}
             }
 
             return sb.ToString();

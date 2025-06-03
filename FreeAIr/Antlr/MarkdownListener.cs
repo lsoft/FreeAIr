@@ -10,7 +10,7 @@ namespace FreeAIr.Antlr
     public class MarkdownListener : PromptMarkdownBaseListener
     {
         private readonly List<MentionVisualLineGenerator> _generators;
-        private readonly ParsedAnswer _parsedAnswer;
+        private readonly Parsed _parsed;
 
         public MarkdownListener(
             List<MentionVisualLineGenerator> generators
@@ -22,7 +22,7 @@ namespace FreeAIr.Antlr
             }
 
             _generators = generators;
-            _parsedAnswer = new ParsedAnswer();
+            _parsed = new Parsed();
         }
 
         public override void EnterEveryRule([NotNull] ParserRuleContext context)
@@ -33,13 +33,13 @@ namespace FreeAIr.Antlr
             }
 
             var word = context.GetText();
-            ProcessWord(_parsedAnswer, word);
+            ProcessWord(_parsed, word);
         }
 
-        public ParsedAnswer GetParsedAnswer() => _parsedAnswer;
+        public Parsed GetParsed() => _parsed;
 
         private void ProcessWord(
-            ParsedAnswer parsedAnswer,
+            Parsed parsed,
             string word
             )
         {
@@ -49,13 +49,13 @@ namespace FreeAIr.Antlr
             if (generator is null)
             {
                 var part = new StringAnswerPart(word);
-                parsedAnswer.AppendPart(part);
+                parsed.AppendPart(part);
             }
             else
             {
                 var partPayload = word.Substring(1);
                 var part = generator.CreatePart(partPayload);
-                parsedAnswer.AppendPart(part);
+                parsed.AppendPart(part);
             }
         }
 

@@ -6,7 +6,7 @@ using System.Collections.Generic;
 
 namespace FreeAIr.Antlr.Context
 {
-    public sealed class ContextParser : IAnswerParser
+    public sealed class ContextParser : IParser
     {
         private readonly List<MentionVisualLineGenerator> _generators = new();
 
@@ -28,7 +28,7 @@ namespace FreeAIr.Antlr.Context
             }
         }
 
-        public ParsedAnswer? Parse(string answer)
+        public Parsed? Parse(string answer)
         {
             if (answer is null)
             {
@@ -58,9 +58,9 @@ namespace FreeAIr.Antlr.Context
                 );
             walker.Walk(listener, tree);
 
-            var parsedAnswer = listener.GetParsedAnswer();
+            var parsed = listener.GetParsed();
 
-            return parsedAnswer;
+            return parsed;
         }
 
         private (ContextMarkdownLexer, ContextMarkdownParser) CreateComponents(string answer)

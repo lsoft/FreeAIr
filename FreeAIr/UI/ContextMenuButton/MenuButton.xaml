@@ -13,8 +13,8 @@
     x:Name="OurControl"
     >
     <UserControl.Resources>
-        <toolwindows:BindingProxy x:Key="DataContextProxy" Data="{Binding RelativeSource={RelativeSource AncestorType=UserControl}, Path=.}" />
-        <toolwindows:BindingProxy x:Key="ForegroundButtonProxy" Data="{Binding ElementName=ForegroundButton}" />
+        <ui:BindingProxy x:Key="DataContextProxy" Data="{Binding RelativeSource={RelativeSource AncestorType=UserControl}, Path=.}" />
+        <ui:BindingProxy x:Key="ForegroundButtonProxy" Data="{Binding ElementName=ForegroundButton}" />
     </UserControl.Resources>
 
     <Grid>

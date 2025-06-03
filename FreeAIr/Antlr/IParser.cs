@@ -4,13 +4,13 @@ using System.Collections.Generic;
 
 namespace FreeAIr.Antlr
 {
-    public interface IAnswerParser
+    public interface IParser
     {
         IReadOnlyList<MentionVisualLineGenerator> Generators
         {
             get;
         }
 
-        ParsedAnswer Parse(string answer);
+        Parsed Parse(string answer);
     }
 }

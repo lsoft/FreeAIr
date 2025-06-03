@@ -116,7 +116,7 @@ namespace FreeAIr.UI.Embedillo
 
         public abstract System.Threading.Tasks.Task<List<ISuggestion>> GetSuggestionsAsync();
         
-        public abstract IAnswerPart CreatePart(string partPayload);
+        public abstract IParsedPart CreatePart(string partPayload);
 
         #region private classes
 

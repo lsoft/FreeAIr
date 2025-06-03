@@ -144,62 +144,6 @@ namespace FreeAIr.UI.ViewModels
             }
         }
 
-        private static bool FindSelectionFromDocumentBody(
-            Microsoft.VisualStudio.Text.ITextSnapshot snapshot,
-            FoundItem foundItem,
-            ref int startLineIndex,
-            ref int startColumnIndex,
-            ref int endLineIndex,
-            ref int endColumnIndex
-            )
-        {
-            var documentText = snapshot.GetText();
-
-            var startOffset = documentText.IndexOf(foundItem.FoundText);
-            var endOffset = startOffset + foundItem.FoundText.Length;
-            if (startOffset < 0)
-            {
-                return false;
-            }
-
-            var startLine = snapshot.GetLineFromPosition(startOffset);
-            startLineIndex = startLine.LineNumber;
-            startColumnIndex = startOffset - startLine.Start.Position;
-
-            var endLine = snapshot.GetLineFromPosition(endOffset);
-            endLineIndex = endLine.LineNumber;
-            endColumnIndex = endOffset - endLine.Start.Position;
-            
-            return true;
-        }
-
-        private static void FindSelectionFromLLMData(
-            Microsoft.VisualStudio.Text.ITextSnapshot snapshot, 
-            FoundItem foundItem,
-            out int startLineIndex,
-            out int startColumnIndex,
-            out int startOffset,
-            out int endOffset,
-            out int endLineIndex,
-            out int endColumnIndex
-            )
-        {
-            var snapshotLine = snapshot.GetLineFromLineNumber(foundItem.LineIndex);
-            var lineText = snapshotLine.GetText();
-
-            startLineIndex = foundItem.LineIndex;
-            startColumnIndex = lineText.IndexOf(foundItem.FoundText);
-            if (startColumnIndex < 0)
-            {
-                startColumnIndex = 0;
-            }
-            startOffset = snapshotLine.Start.Position + startColumnIndex;
-            endOffset = startOffset + foundItem.FoundText.Length;
-            var endLine = snapshot.GetLineFromPosition(endOffset);
-            endLineIndex = endLine.LineNumber;
-            endColumnIndex = endOffset - endLine.Start.Position;
-        }
-
         public ICommand CancelChatCommand
         {
             get
@@ -492,6 +436,63 @@ $"""
                 //todo log
             }
         }
+
+        private static bool FindSelectionFromDocumentBody(
+            Microsoft.VisualStudio.Text.ITextSnapshot snapshot,
+            FoundItem foundItem,
+            ref int startLineIndex,
+            ref int startColumnIndex,
+            ref int endLineIndex,
+            ref int endColumnIndex
+            )
+        {
+            var documentText = snapshot.GetText();
+
+            var startOffset = documentText.IndexOf(foundItem.FoundText);
+            var endOffset = startOffset + foundItem.FoundText.Length;
+            if (startOffset < 0)
+            {
+                return false;
+            }
+
+            var startLine = snapshot.GetLineFromPosition(startOffset);
+            startLineIndex = startLine.LineNumber;
+            startColumnIndex = startOffset - startLine.Start.Position;
+
+            var endLine = snapshot.GetLineFromPosition(endOffset);
+            endLineIndex = endLine.LineNumber;
+            endColumnIndex = endOffset - endLine.Start.Position;
+
+            return true;
+        }
+
+        private static void FindSelectionFromLLMData(
+            Microsoft.VisualStudio.Text.ITextSnapshot snapshot,
+            FoundItem foundItem,
+            out int startLineIndex,
+            out int startColumnIndex,
+            out int startOffset,
+            out int endOffset,
+            out int endLineIndex,
+            out int endColumnIndex
+            )
+        {
+            var snapshotLine = snapshot.GetLineFromLineNumber(foundItem.LineIndex);
+            var lineText = snapshotLine.GetText();
+
+            startLineIndex = foundItem.LineIndex;
+            startColumnIndex = lineText.IndexOf(foundItem.FoundText);
+            if (startColumnIndex < 0)
+            {
+                startColumnIndex = 0;
+            }
+            startOffset = snapshotLine.Start.Position + startColumnIndex;
+            endOffset = startOffset + foundItem.FoundText.Length;
+            var endLine = snapshot.GetLineFromPosition(endOffset);
+            endLineIndex = endLine.LineNumber;
+            endColumnIndex = endOffset - endLine.Start.Position;
+        }
+
     }
 
 

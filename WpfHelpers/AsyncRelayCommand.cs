@@ -1,11 +1,78 @@
-﻿using System;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Windows.Input;
+﻿using System.Windows.Input;
 
 namespace WpfHelpers
 {
-    public class AsyncRelayCommand : ICommand
+    public abstract class AsyncBaseRelayCommand : ICommand
+    {
+        private long _isExecuting;
+
+        public AsyncBaseRelayCommand(
+            )
+        {
+        }
+
+        public event EventHandler CanExecuteChanged
+        {
+            add
+            {
+                CommandManager.RequerySuggested += value;
+            }
+            remove
+            {
+                CommandManager.RequerySuggested -= value;
+            }
+        }
+
+        public void RaiseCanExecuteChanged()
+        {
+            CommandManager.InvalidateRequerySuggested();
+        }
+
+        public bool CanExecute(object parameter)
+        {
+            if (Interlocked.Read(ref _isExecuting) != 0)
+            {
+                return false;
+            }
+
+            try
+            {
+                return CanExecuteInternal(parameter);
+            }
+            catch (Exception excp)
+            {
+                //togo log
+            }
+
+            return false;
+        }
+
+        public async void Execute(object parameter)
+        {
+            Interlocked.Exchange(ref _isExecuting, 1);
+            RaiseCanExecuteChanged();
+
+            try
+            {
+                await ExecuteInternalAsync(parameter);
+            }
+            catch (Exception excp)
+            {
+                //togo log
+            }
+            finally
+            {
+                Interlocked.Exchange(ref _isExecuting, 0);
+                RaiseCanExecuteChanged();
+            }
+        }
+
+        protected abstract Task ExecuteInternalAsync(object parameter);
+        protected virtual bool CanExecuteInternal(object parameter) => true;
+
+    }
+
+    public sealed class AsyncRelayCommand : ICommand
     {
         private readonly Func<object, Task> _execute;
         private readonly Predicate<object> _canExecute;
@@ -59,7 +126,7 @@ namespace WpfHelpers
         }
     }
 
-    public class AsyncRelayCommand<TParameter> : ICommand
+    public sealed class AsyncRelayCommand<TParameter> : ICommand
         where TParameter : class
     {
         private readonly Func<TParameter, Task> _execute;

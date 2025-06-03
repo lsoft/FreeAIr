@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 
 namespace FreeAIr.UI.Embedillo.Answer.Parser
 {
-    public interface IAnswerPart
+    public interface IParsedPart
     {
         /// <summary>
         /// Как должен выглядеть этот парт непосредственно

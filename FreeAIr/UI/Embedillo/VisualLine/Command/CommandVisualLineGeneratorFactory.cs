@@ -33,7 +33,7 @@ namespace FreeAIr.UI.Embedillo.VisualLine.Command
         {
         }
 
-        public override IAnswerPart CreatePart(string partPayload)
+        public override IParsedPart CreatePart(string partPayload)
         {
             var kind = (ChatKindEnum)Enum.Parse(typeof(ChatKindEnum), partPayload);
             return new CommandAnswerPart(kind);

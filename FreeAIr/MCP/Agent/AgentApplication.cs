@@ -3,7 +3,6 @@ using EnvDTE;
 using EnvDTE80;
 using FreeAIr.Agent;
 using FreeAIr.MCP.Agent.External;
-using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Net.Http;

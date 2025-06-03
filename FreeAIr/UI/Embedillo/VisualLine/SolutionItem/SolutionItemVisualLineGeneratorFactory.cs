@@ -34,7 +34,7 @@ namespace FreeAIr.UI.Embedillo.VisualLine.SolutionItem
         {
         }
 
-        public override IAnswerPart CreatePart(string partPayload)
+        public override IParsedPart CreatePart(string partPayload)
         {
             return new SolutionItemAnswerPart(partPayload);
         }

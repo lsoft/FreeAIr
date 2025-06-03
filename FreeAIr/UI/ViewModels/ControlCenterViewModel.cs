@@ -1,16 +1,11 @@
-﻿using Dto;
-using FreeAIr.MCP.Agent;
+﻿using FreeAIr.MCP.Agent;
 using FreeAIr.MCP.Agent.External;
 using FreeAIr.MCP.Agent.Github;
 using FreeAIr.UI.Windows;
 using Microsoft.VisualStudio.Shell.Interop;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Input;
 using System.Windows.Media;
 using WpfHelpers;
 
@@ -39,7 +34,7 @@ namespace FreeAIr.UI.ViewModels
             }
         }
 
-        public ICommand InstallGithubMCPServerCommand
+        public InstallGithubMCPServerCmd InstallGithubMCPServerCommand
         {
             get;
         }
@@ -67,12 +62,12 @@ namespace FreeAIr.UI.ViewModels
             }
         }
 
-        public ICommand ApplyExternalMcpServerChangesCommand
+        public ApplyExternalMcpServerChangesCmd ApplyExternalMcpServerChangesCommand
         {
             get;
         }
 
-        public ICommand EditGlobalToolsCommand
+        public EditGlobalToolsCmd EditGlobalToolsCommand
         {
             get;
         }
@@ -82,77 +77,116 @@ namespace FreeAIr.UI.ViewModels
             _githubMcpServerStatus = null;
             ExternalMcpServerJson = MCPPage.Instance.ExternalMCPServers;
 
-            Task.Run(
-                async () =>
+            InstallGithubMCPServerCommand = new(this);
+            ApplyExternalMcpServerChangesCommand = new(this);
+            EditGlobalToolsCommand = new(this);
+
+            UpdateGithubMcpStatusAsync()
+                .FileAndForget(nameof(UpdateGithubMcpStatusAsync));
+        }
+
+        private async Task UpdateGithubMcpStatusAsync()
+        {
+            var isInstalled = await GithubAgent.Instance.IsInstalledAsync();
+            if (isInstalled)
+            {
+                _githubMcpServerStatus = true;
+            }
+            else
+            {
+                _githubMcpServerStatus = false;
+            }
+
+            await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+
+            OnPropertyChanged();
+        }
+
+        public sealed class InstallGithubMCPServerCmd : AsyncBaseRelayCommand
+        {
+            private readonly ControlCenterViewModel _viewModel;
+
+            public InstallGithubMCPServerCmd(
+                ControlCenterViewModel viewModel
+                )
+            {
+                if (viewModel is null)
                 {
-                    var isInstalled = await GithubAgent.Instance.IsInstalledAsync();
-                    if (isInstalled)
-                    {
-                        _githubMcpServerStatus = true;
-                    }
-                    else
-                    {
-                        _githubMcpServerStatus = false;
-                    }
+                    throw new ArgumentNullException(nameof(viewModel));
+                }
 
-                    await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+                _viewModel = viewModel;
+            }
 
-                    OnPropertyChanged();
+            protected override async Task ExecuteInternalAsync(object parameter)
+            {
+                var backgroundTask = new GithubMCPInstallBackgroundTask(
+                    );
+                var w = new WaitForTaskWindow(
+                    backgroundTask
+                    );
+                await w.ShowDialogAsync();
 
-                }).FileAndForget(nameof(GithubMcpServerStatusMessage));
-
-            InstallGithubMCPServerCommand = new AsyncRelayCommand(
-                async a =>
+                var installResult = backgroundTask.SuccessfullyInstalled;
+                if (installResult)
                 {
-                    var backgroundTask = new GithubMCPInstallBackgroundTask(
-                        );
-                    var w = new WaitForTaskWindow(
-                        backgroundTask
-                        );
-                    await w.ShowDialogAsync();
+                    var toolContainer = AvailableToolContainer.ReadSystem();
 
-                    var installResult = backgroundTask.SuccessfullyInstalled;
-                    if (installResult)
+                    if (await AgentCollection.ProcessAgentAsync(toolContainer, GithubAgent.Instance))
                     {
-                        var toolContainer = AvailableToolContainer.ReadSystem();
+                        toolContainer.SaveToSystem();
+                        _viewModel._githubMcpServerStatus = true;
 
-                        if (await AgentCollection.ProcessAgentAsync(toolContainer, GithubAgent.Instance))
-                        {
-                            toolContainer.SaveToSystem();
-                            _githubMcpServerStatus = true;
-
-                            await VS.MessageBox.ShowAsync(
-                                string.Empty,
-                                $"GitHub MCP server installed SUCCESSFULLY.",
-                                buttons: OLEMSGBUTTON.OLEMSGBUTTON_OK
-                                );
-                        }
-                    }
-                    else
-                    {
-                        _githubMcpServerStatus = false;
-
-                        await VS.MessageBox.ShowErrorAsync(
-                            Resources.Resources.Error,
-                            $"Installation GitHub MCP server fails. Please install it manually."
+                        await VS.MessageBox.ShowAsync(
+                            string.Empty,
+                            $"GitHub MCP server installed SUCCESSFULLY.",
+                            buttons: OLEMSGBUTTON.OLEMSGBUTTON_OK
                             );
                     }
-
-                    OnPropertyChanged();
-                });
-
-            ApplyExternalMcpServerChangesCommand = new AsyncRelayCommand(
-                async a =>
+                }
+                else
                 {
-                    if (!ExternalAgentJsonParser.TryParse(_externalMcpServerJson, out var mcpServers))
-                    {
-                        await VS.MessageBox.ShowErrorAsync(
-                            Resources.Resources.Error,
-                            $"Invalid json (1). Fix json and try again."
-                            );
-                        return;
-                    }
+                    _viewModel._githubMcpServerStatus = false;
 
+                    await VS.MessageBox.ShowErrorAsync(
+                        Resources.Resources.Error,
+                        $"Installation GitHub MCP server fails. Please install it manually."
+                        );
+                }
+
+                _viewModel.OnPropertyChanged();
+            }
+        }
+
+        public sealed class ApplyExternalMcpServerChangesCmd : AsyncBaseRelayCommand
+        {
+            private readonly ControlCenterViewModel _viewModel;
+
+            public ApplyExternalMcpServerChangesCmd(
+                ControlCenterViewModel viewModel
+                )
+            {
+                if (viewModel is null)
+                {
+                    throw new ArgumentNullException(nameof(viewModel));
+                }
+
+                _viewModel = viewModel;
+            }
+
+            protected override async Task ExecuteInternalAsync(object parameter)
+            {
+                if (!ExternalAgentJsonParser.TryParse(_viewModel._externalMcpServerJson, out var mcpServers))
+                {
+                    await VS.MessageBox.ShowErrorAsync(
+                        Resources.Resources.Error,
+                        $"Invalid json (1). Fix json and try again."
+                        );
+                    return;
+                }
+
+                try
+                {
                     var setupResult = await AgentApplication.UpdateExternalServersAsync(
                         mcpServers
                         );
@@ -183,7 +217,7 @@ namespace FreeAIr.UI.ViewModels
                     }
                     else
                     {
-                        MCPPage.Instance.ExternalMCPServers = _externalMcpServerJson;
+                        MCPPage.Instance.ExternalMCPServers = _viewModel._externalMcpServerJson;
                         await MCPPage.Instance.SaveAsync();
 
                         setupResult.ToolContainer.SaveToSystem();
@@ -193,39 +227,63 @@ namespace FreeAIr.UI.ViewModels
                             buttons: OLEMSGBUTTON.OLEMSGBUTTON_OK
                             );
                     }
-                },
-                b =>
-                {
-                    if (string.IsNullOrEmpty(_externalMcpServerJson))
-                    {
-                        return false;
-                    }
-                    if (!ExternalAgentJsonParser.TryParse(_externalMcpServerJson, out _))
-                    {
-                        return false;
-                    }
-
-                    return true;
                 }
-                );
-
-            EditGlobalToolsCommand = new AsyncRelayCommand(
-                async a =>
+                catch (Exception excp)
                 {
-                    var toolContainer = AvailableToolContainer.ReadSystem();
-
-                    var w = new NestedCheckBoxWindow();
-                    w.DataContext = new AvailableToolsViewModel(
-                        toolContainer
+                    //todo log
+                    await VS.MessageBox.ShowErrorAsync(
+                        Resources.Resources.Error,
+                        excp.Message + Environment.NewLine + excp.StackTrace
                         );
-                    if ((await w.ShowDialogAsync()).GetValueOrDefault())
-                    {
-                        toolContainer.SaveToSystem();
-                    }
-
-                    OnPropertyChanged();
                 }
-                );
+            }
+
+            protected override bool CanExecuteInternal(object parameter)
+            {
+                if (string.IsNullOrEmpty(_viewModel._externalMcpServerJson))
+                {
+                    return false;
+                }
+                if (!ExternalAgentJsonParser.TryParse(_viewModel._externalMcpServerJson, out _))
+                {
+                    return false;
+                }
+
+                return true;
+            }
+        }
+
+        public sealed class EditGlobalToolsCmd : AsyncBaseRelayCommand
+        {
+            private readonly ControlCenterViewModel _viewModel;
+
+            public EditGlobalToolsCmd(
+                ControlCenterViewModel viewModel
+                )
+            {
+                if (viewModel is null)
+                {
+                    throw new ArgumentNullException(nameof(viewModel));
+                }
+
+                _viewModel = viewModel;
+            }
+
+            protected override async Task ExecuteInternalAsync(object parameter)
+            {
+                var toolContainer = AvailableToolContainer.ReadSystem();
+
+                var w = new NestedCheckBoxWindow();
+                w.DataContext = new AvailableToolsViewModel(
+                    toolContainer
+                    );
+                if ((await w.ShowDialogAsync()).GetValueOrDefault())
+                {
+                    toolContainer.SaveToSystem();
+                }
+
+                _viewModel.OnPropertyChanged();
+            }
         }
     }
 }

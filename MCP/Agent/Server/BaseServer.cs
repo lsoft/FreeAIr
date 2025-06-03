@@ -1,5 +1,4 @@
-﻿using Agent.Server.Github;
-using Dto;
+﻿using Dto;
 using ModelContextProtocol.Client;
 using Serilog;
 

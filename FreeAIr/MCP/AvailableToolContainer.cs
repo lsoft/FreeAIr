@@ -1,6 +1,4 @@
-﻿using FreeAIr.MCP.Agent.External;
-using FreeAIr.Shared.Helper;
-using Microsoft.VisualStudio.Shell.Design;
+﻿using FreeAIr.Shared.Helper;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;

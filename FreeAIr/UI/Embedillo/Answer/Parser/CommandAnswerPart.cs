@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace FreeAIr.UI.Embedillo.Answer.Parser
 {
-    public sealed class CommandAnswerPart : IAnswerPart
+    public sealed class CommandAnswerPart : IParsedPart
     {
         public ChatKindEnum Kind
         {

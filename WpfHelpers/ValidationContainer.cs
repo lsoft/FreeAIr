@@ -1,7 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-
-namespace WpfHelpers
+﻿namespace WpfHelpers
 {
     /// <summary>
     /// Класс, инкапсулирующий в себе информацию об ошибках валидации вводимых данных

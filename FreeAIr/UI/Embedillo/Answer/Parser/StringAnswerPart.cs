@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 
 namespace FreeAIr.UI.Embedillo.Answer.Parser
 {
-    public sealed class StringAnswerPart : IAnswerPart
+    public sealed class StringAnswerPart : IParsedPart
     {
         public string Text
         {

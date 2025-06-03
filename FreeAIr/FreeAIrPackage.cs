@@ -9,7 +9,6 @@ using FreeAIr.Find;
 using FreeAIr.Helper;
 using FreeAIr.InfoBar;
 using FreeAIr.MCP.Agent;
-using FreeAIr.MCP.Agent.External;
 using FreeAIr.UI.Informer;
 using FreeAIr.UI.ToolWindows;
 using Microsoft.VisualStudio;
@@ -60,16 +59,14 @@ namespace FreeAIr
             try
             {
                 //load dlls manually, for unknown reason these dlls does not loaded automatically
-                Assembly a1 = Assembly.LoadFrom(System.IO.Path.Combine(WorkingFolder, "MdXaml.dll"));
-                AppDomain.CurrentDomain.Load(a1.FullName);
+                //Assembly a1 = Assembly.LoadFrom(System.IO.Path.Combine(WorkingFolder, "MdXaml.dll"));
+                //AppDomain.CurrentDomain.Load(a1.FullName);
 
                 Assembly a2 = Assembly.LoadFrom(System.IO.Path.Combine(WorkingFolder, "System.ClientModel.dll"));
                 AppDomain.CurrentDomain.Load(a2.FullName);
 
                 Assembly a3 = Assembly.LoadFrom(System.IO.Path.Combine(WorkingFolder, "JsonPath.Net.dll"));
                 AppDomain.CurrentDomain.Load(a3.FullName);
-
-                ResponsePage.LoadOrUpdateMarkdownStyles();
 
                 await this.JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
 

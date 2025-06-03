@@ -51,14 +51,14 @@ namespace FreeAIr.UI.Embedillo
             {
                 if (ParentControl is EmbedilloControl parentControl)
                 {
-                    var parsedAnswer = parentControl.ParseAnswer();
-                    if (parsedAnswer is not null)
+                    var parsed = parentControl.Parse();
+                    if (parsed is not null)
                     {
                         if (
-                            Command?.CanExecute(parsedAnswer) == true
+                            Command?.CanExecute(parsed) == true
                             )
                         {
-                            Command.Execute(parsedAnswer);
+                            Command.Execute(parsed);
 
                             textEditor.Clear();
                         }

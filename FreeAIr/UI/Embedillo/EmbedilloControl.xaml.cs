@@ -14,7 +14,7 @@ namespace FreeAIr.UI.Embedillo
     public partial class EmbedilloControl : UserControl
     {
         private readonly List<MentionVisualLineGenerator> _generators = new();
-        private IAnswerParser? _answerParser;
+        private IParser? _parser;
 
         public static readonly DependencyProperty EnterCommandProperty =
             DependencyProperty.Register(
@@ -175,17 +175,17 @@ namespace FreeAIr.UI.Embedillo
         }
 
         public void Setup(
-            IAnswerParser answerParser
+            IParser parser
             )
         {
-            if (answerParser is null)
+            if (parser is null)
             {
-                throw new ArgumentNullException(nameof(answerParser));
+                throw new ArgumentNullException(nameof(parser));
             }
 
-            _answerParser = answerParser;
+            _parser = parser;
 
-            foreach (var generator in answerParser.Generators)
+            foreach (var generator in parser.Generators)
             {
                 _generators.Add(generator);
                 AvalonTextEditor.TextArea.TextView.ElementGenerators.Add(generator);
@@ -475,16 +475,16 @@ namespace FreeAIr.UI.Embedillo
             }
         }
 
-        public ParsedAnswer ParseAnswer()
+        public Parsed Parse()
         {
-            if (_answerParser is null)
+            if (_parser is null)
             {
                 throw new InvalidOperationException("Setup this control before.");
             }
-            var parsedAnswer = _answerParser.Parse(
+            var parsed = _parser.Parse(
                 AvalonTextEditor.Text
                 );
-            return parsedAnswer;
+            return parsed;
         }
 
         private void EmbedilloInternalName_Loaded(object sender, RoutedEventArgs e)

@@ -4,13 +4,13 @@ using System.Threading.Tasks;
 
 namespace FreeAIr.UI.Embedillo.Answer.Parser
 {
-    public sealed class ParsedAnswer
+    public sealed class Parsed
     {
-        private readonly List<IAnswerPart> _parts = new();
+        private readonly List<IParsedPart> _parts = new();
 
-        public IReadOnlyList<IAnswerPart> Parts => _parts;
+        public IReadOnlyList<IParsedPart> Parts => _parts;
 
-        public void AppendPart(IAnswerPart part)
+        public void AppendPart(IParsedPart part)
         {
             if (part is null)
             {

@@ -1,7 +1,8 @@
-﻿using FreeAIr.BLogic;
+﻿using FreeAIr.Antlr.Answer;
+using FreeAIr.Antlr.Answer.Parts;
+using FreeAIr.BLogic;
 using FreeAIr.BLogic.Context;
 using FreeAIr.BLogic.Context.Item;
-using FreeAIr.Git;
 using FreeAIr.Helper;
 using FreeAIr.MCP.Agent;
 using FreeAIr.Shared.Helper;
@@ -11,7 +12,6 @@ using ICSharpCode.AvalonEdit.Editing;
 using Microsoft.VisualStudio.Imaging;
 using Microsoft.VisualStudio.Imaging.Interop;
 using Microsoft.VisualStudio.Shell.Interop;
-using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.Win32;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
@@ -19,7 +19,10 @@ using System.IO;
 using System.Linq;
 using System.Windows;
 using System.Windows.Input;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
 using WpfHelpers;
+using static FreeAIr.UI.Dialog.DialogControl;
 
 namespace FreeAIr.UI.ViewModels
 {
@@ -48,7 +51,6 @@ namespace FreeAIr.UI.ViewModels
         private ICommand _editAvailableToolsCommand;
         private ICommand _editChatToolsCommand;
 
-        public event MarkdownReReadDelegate MarkdownReReadEvent;
         public event Action ContextControlFocus;
         public event Action PromptControlFocus;
 
@@ -94,11 +96,88 @@ namespace FreeAIr.UI.ViewModels
             {
                 _selectedChat = value;
 
+                UpdateDialogFromChat();
+
                 FocusPromptControl();
 
                 OnPropertyChanged();
             }
         }
+
+        #region Dialog
+
+        private void UpdateDialogFromChat()
+        {
+            Dialog.Clear();
+
+            if (_selectedChat is null)
+            {
+                return;
+            }
+            if (_selectedChat.Chat is null)
+            {
+                return;
+            }
+
+            foreach (var prompt in _selectedChat.Chat.Prompts)
+            {
+                AddReplic(
+                    prompt.PromptBody,
+                    true,
+                    false
+                    );
+                AddReplic(
+                    prompt.Answer.GetTextualAnswer(),
+                    false,
+                    false
+                    );
+            }
+        }
+
+        private void AddReplic(
+            string text,
+            bool isUser,
+            bool inProgress
+            )
+        {
+            var replic = new Replic(
+                AnswerParser.Parse(text),
+                isUser,
+                AdditionalCommandContainer,
+                inProgress
+                );
+            Dialog.Add(replic);
+        }
+
+        private void UpdateLastReplic(
+            string text,
+            bool inProgress
+            )
+        {
+            if (Dialog.Count == 0)
+            {
+                return;
+            }
+
+            var lastReplic = Dialog.Last();
+            lastReplic.Update(
+                AnswerParser.Parse(text),
+                inProgress
+                );
+        }
+
+        #endregion
+
+        public AdditionalCommandContainer AdditionalCommandContainer
+        {
+            get;
+        } = new();
+
+        public ObservableCollection2<Replic> Dialog
+        {
+            get;
+        } = new();
+
 
         public Visibility ChatPanelVisibility
         {
@@ -111,21 +190,6 @@ namespace FreeAIr.UI.ViewModels
             }
         }
 
-
-        public string SelectedChatResponse
-        {
-            get
-            {
-                RaiseMarkdownReReadEvent();
-
-                if (_selectedChat is null)
-                {
-                    return string.Empty;
-                }
-
-                return _selectedChat.Chat.ReadResponse();
-            }
-        }
 
         public ICommand OpenInEditorCommand
         {
@@ -245,7 +309,6 @@ namespace FreeAIr.UI.ViewModels
                 return _startChatCommand;
             }
         }
-
 
         public ICommand CopyCodeBlockCommand
         {
@@ -469,17 +532,17 @@ namespace FreeAIr.UI.ViewModels
                                 return;
                             }
 
-                            var parsedAnswer = a as ParsedAnswer;
-                            if (parsedAnswer is null)
+                            var parsed = a as Parsed;
+                            if (parsed is null)
                             {
                                 return;
                             }
 
                             //добавляем в корзину итемы, которые пользователь перечислил
                             //в промпте, но которых нет в контексте
-                            AddContextItemsFromPrompt(chat, parsedAnswer);
+                            AddContextItemsFromPrompt(chat, parsed);
 
-                            var parsedRepresentation = await parsedAnswer.ComposeStringRepresentationAsync();
+                            var parsedRepresentation = await parsed.ComposeStringRepresentationAsync();
                             if (string.IsNullOrEmpty(parsedRepresentation))
                             {
                                 return;
@@ -489,6 +552,17 @@ namespace FreeAIr.UI.ViewModels
                                 UserPrompt.CreateTextBasedPrompt(
                                     parsedRepresentation
                                     )
+                                );
+
+                            AddReplic(
+                                parsedRepresentation,
+                                true,
+                                false
+                                );
+                            AddReplic(
+                                string.Empty,
+                                false,
+                                true
                                 );
 
                             OnPropertyChanged();
@@ -511,8 +585,8 @@ namespace FreeAIr.UI.ViewModels
                                 return false;
                             }
 
-                            var parsedAnswer = a as ParsedAnswer;
-                            if (parsedAnswer is null)
+                            var parsed = a as Parsed;
+                            if (parsed is null)
                             {
                                 return false;
                             }
@@ -666,19 +740,19 @@ namespace FreeAIr.UI.ViewModels
                                 return;
                             }
 
-                            var parsedAnswer = a as ParsedAnswer;
-                            if (parsedAnswer is null)
+                            var parsed = a as Parsed;
+                            if (parsed is null)
                             {
                                 return;
                             }
 
-                            var parsedRepresentation = await parsedAnswer.ComposeStringRepresentationAsync();
+                            var parsedRepresentation = await parsed.ComposeStringRepresentationAsync();
                             if (string.IsNullOrEmpty(parsedRepresentation))
                             {
                                 return;
                             }
 
-                            AddContextItemsFromPrompt(chat, parsedAnswer);
+                            AddContextItemsFromPrompt(chat, parsed);
 
                             FocusContextControl();
 
@@ -702,8 +776,8 @@ namespace FreeAIr.UI.ViewModels
                                 return false;
                             }
 
-                            var parsedAnswer = a as ParsedAnswer;
-                            if (parsedAnswer is null)
+                            var parsed = a as Parsed;
+                            if (parsed is null)
                             {
                                 return false;
                             }
@@ -817,6 +891,26 @@ namespace FreeAIr.UI.ViewModels
                             _ = await w.ShowDialogAsync();
 
                             OnPropertyChanged();
+                        },
+                        (a) =>
+                        {
+                            if (_selectedChat is null)
+                            {
+                                return false;
+                            }
+                            if (_selectedChat.Chat is null)
+                            {
+                                return false;
+                            }
+
+                            var chat = _selectedChat.Chat;
+
+                            if (chat.Status.NotIn(ChatStatusEnum.NotStarted, ChatStatusEnum.Ready))
+                            {
+                                return false;
+                            }
+
+                            return true;
                         }
                         );
                 }
@@ -1069,7 +1163,7 @@ namespace FreeAIr.UI.ViewModels
 
         private void AddContextItemsFromPrompt(
             Chat chat,
-            ParsedAnswer parsedAnswer
+            Parsed parsed
             )
         {
             if (chat is null)
@@ -1077,12 +1171,12 @@ namespace FreeAIr.UI.ViewModels
                 throw new ArgumentNullException(nameof(chat));
             }
 
-            if (parsedAnswer is null)
+            if (parsed is null)
             {
-                throw new ArgumentNullException(nameof(parsedAnswer));
+                throw new ArgumentNullException(nameof(parsed));
             }
 
-            foreach (var part in parsedAnswer.Parts)
+            foreach (var part in parsed.Parts)
             {
                 var contextItem = part.TryCreateChatContextItem();
                 if (contextItem is null)
@@ -1115,6 +1209,48 @@ namespace FreeAIr.UI.ViewModels
             chatContainer.ChatStatusChangedEvent += ChatStatusChanged;
 
             ChatList = new ObservableCollection2<ChatWrapper>();
+
+            #region AdditionalCommandContainer
+
+            var defaultAdditionalBrush = new SolidColorBrush(Color.FromRgb(0x56, 0x9C, 0xD6));
+
+            AdditionalCommandContainer.AddAdditionalCommand(
+                new AdditionalCommand(
+                    PartTypeEnum.CodeLine | PartTypeEnum.CodeBlock | PartTypeEnum.Xml | PartTypeEnum.Url,
+                    "↑",
+                    "Click to copy to clipboard",
+                    new RelayCommand(
+                        a =>
+                        {
+                            var code = a as string;
+                            if (!string.IsNullOrEmpty(code))
+                            {
+                                Clipboard.SetText(code);
+                            }
+                        }),
+                    defaultAdditionalBrush
+                    )
+                );
+            AdditionalCommandContainer.AddAdditionalCommand(
+                new AdditionalCommand(
+                    PartTypeEnum.Image,
+                    "↑",
+                    "Click to copy to clipboard",
+                    new RelayCommand(
+                        a =>
+                        {
+                            var bitmap = a as BitmapImage;
+                            if (bitmap is not null)
+                            {
+                                Clipboard.SetImage(bitmap);
+                            }
+                        }),
+                    defaultAdditionalBrush
+                    )
+                );
+
+            #endregion
+
             UpdateControl();
         }
 
@@ -1143,10 +1279,20 @@ namespace FreeAIr.UI.ViewModels
                     chat.Update();
                 }
 
+                if (SelectedChat is not null && ReferenceEquals(SelectedChat.Chat, e.Chat))
+                {
+                    UpdateLastReplic(
+                        e.Chat.Prompts.Last().Answer.GetTextualAnswer(),
+                        true
+                        );
+                }
+
                 if (SelectedChat is null || ReferenceEquals(SelectedChat.Chat, e.Chat))
                 {
                     OnPropertyChanged();
                 }
+
+
 
                 if (e.Chat is not null)
                 {
@@ -1188,15 +1334,6 @@ namespace FreeAIr.UI.ViewModels
                 );
 
             SelectedChat = ChatList.FirstOrDefault();
-        }
-
-        private void RaiseMarkdownReReadEvent()
-        {
-            var e = MarkdownReReadEvent;
-            if (e is not null)
-            {
-                e(this, new EventArgs());
-            }
         }
 
         public sealed class ChatWrapper : BaseViewModel

@@ -2,7 +2,6 @@
 using FreeAIr.Helper;
 using FreeAIr.MCP.Agent;
 using FreeAIr.Shared.Helper;
-using Microsoft.VisualStudio.Shell.Interop;
 using OpenAI;
 using OpenAI.Chat;
 using System.ClientModel;
@@ -344,7 +343,7 @@ namespace FreeAIr.BLogic
                     {
                         if (completionUpdate.CompletionId is null)
                         {
-                            dialog.AppendHelperTextToFile("Server returns error.");
+                            dialog.AppendText("Server returns error.");
                             Status = ChatStatusEnum.Failed;
                             return;
                         }
@@ -352,7 +351,7 @@ namespace FreeAIr.BLogic
                         chatFinishReason ??= completionUpdate.FinishReason;
                         toolCalls.AddRange(completionUpdate.ToolCallUpdates);
 
-                        if (completionUpdate.FinishReason == OpenAI.Chat.ChatFinishReason.ToolCalls
+                        if (completionUpdate.FinishReason == ChatFinishReason.ToolCalls
                             && completionUpdate.ToolCallUpdates.Count > 0
                             )
                         {
@@ -380,7 +379,7 @@ namespace FreeAIr.BLogic
                             }
 
                             //for updating UI in real time
-                            dialog.AppendHelperTextToFile(contentPart.Text);
+                            dialog.AppendText(contentPart.Text);
 
                             Status = ChatStatusEnum.ReadingAnswer;
 
@@ -392,7 +391,9 @@ namespace FreeAIr.BLogic
                         }
                     }
 
-                    if (chatFinishReason == OpenAI.Chat.ChatFinishReason.ToolCalls && toolCalls.Count > 0)
+                    //dialog.ClearTemporarilyTextualRepresentation();
+
+                    if (chatFinishReason == ChatFinishReason.ToolCalls && toolCalls.Count > 0)
                     {
                         foreach (var toolCall in toolCalls)
                         {
@@ -555,16 +556,16 @@ namespace FreeAIr.BLogic
 
         public void Init()
         {
-            AppendHelperTextToFile(
+            AppendTextToFile(
                 Environment.NewLine + Environment.NewLine
                 );
-            AppendHelperTextToFile(
+            AppendTextToFile(
                 $"> {"UI_Prompt".GetLocalizedResourceByName()}:" + Environment.NewLine
                 );
-            AppendHelperTextToFile(
+            AppendTextToFile(
                 _lastPrompt.PromptBody + Environment.NewLine + Environment.NewLine
                 );
-            AppendHelperTextToFile(
+            AppendTextToFile(
                 $"> {"UI_Answer".GetLocalizedResourceByName()}:" + Environment.NewLine
                 );
 
@@ -596,7 +597,7 @@ namespace FreeAIr.BLogic
                 content
                 );
 
-            _lastPrompt.Answer.AppendPermanentReaction(assistantReply);
+            _lastPrompt.Answer.AddPermanentReaction(assistantReply);
         }
 
 
@@ -614,14 +615,14 @@ namespace FreeAIr.BLogic
                 return;
             }
 
-            _lastPrompt.Answer.AppendPermanentReaction(
+            _lastPrompt.Answer.AddPermanentReaction(
                 new AssistantChatMessage(
                     chatToolCalls
                     )
                 );
         }
 
-        public void AppendHelperTextToFile(string helperText)
+        public void AppendTextToFile(string helperText)
         {
             if (string.IsNullOrEmpty(helperText))
             {
@@ -629,6 +630,20 @@ namespace FreeAIr.BLogic
             }
 
             AppendToFile(
+                helperText
+                );
+        }
+
+        public void AppendText(string helperText)
+        {
+            if (string.IsNullOrEmpty(helperText))
+            {
+                return;
+            }
+
+            AppendTextToFile(helperText);
+
+            _lastPrompt.Answer.UpdateAssistantPermanentReaction(
                 helperText
                 );
         }
@@ -645,6 +660,7 @@ namespace FreeAIr.BLogic
                 + "```"
                 );
         }
+
 
         public void AppendUnsuccessfulToolCall(
             StreamingChatToolCallUpdate toolCall
@@ -690,7 +706,7 @@ namespace FreeAIr.BLogic
                 + Environment.NewLine
                 );
 
-            _lastPrompt.Answer.AppendPermanentReaction(
+            _lastPrompt.Answer.AddPermanentReaction(
                 new ToolChatMessage(
                     toolCall.ToolCallId,
                     string.Join(
@@ -827,6 +843,7 @@ Your behavior against available functions:
                 respondFormat
             );
         }
+
     }
 
     public delegate void ChatStatusChangedDelegate(object sender, ChatEventArgs e);

@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Runtime;
-using System.Text;
-
-namespace Dto
+﻿namespace Dto
 {
     public sealed class CallToolRequest : BaseRequest
     {

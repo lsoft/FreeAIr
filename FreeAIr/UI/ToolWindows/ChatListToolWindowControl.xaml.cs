@@ -1,6 +1,5 @@
 ﻿using FreeAIr.Antlr.Context;
 using FreeAIr.Antlr.Prompt;
-using FreeAIr.Helper;
 using FreeAIr.UI.Embedillo.VisualLine.Command;
 using FreeAIr.UI.Embedillo.VisualLine.SolutionItem;
 using FreeAIr.UI.ViewModels;
@@ -26,20 +25,10 @@ namespace FreeAIr.UI.ToolWindows
 
             InitializeComponent();
 
-            PromptControl.Setup(
-                new PromptParser(
-                    new SolutionItemVisualLineGeneratorFactory(),
-                    new CommandVisualLineGeneratorFactory()
-                    )
-                );
+            SetupPromptControl();
 
-            AddToContextControl.Setup(
-                new ContextParser(
-                    new SolutionItemVisualLineGeneratorFactory()
-                    )
-                );
+            SetupAddToContextControl();
 
-            viewModel.MarkdownReReadEvent += ViewModel_MarkdownReReadEvent;
             viewModel.ContextControlFocus += ViewModel_ContextControlFocus;
             viewModel.PromptControlFocus += ViewModel_PromptControlFocus;
         }
@@ -52,11 +41,6 @@ namespace FreeAIr.UI.ToolWindows
         private void ViewModel_PromptControlFocus()
         {
             FocusPromptControl();
-        }
-
-        private void ViewModel_MarkdownReReadEvent(object sender, EventArgs e)
-        {
-            AnswerControl.ScrollToEnd();
         }
 
         private void ChatListToolWindow_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
@@ -99,33 +83,26 @@ namespace FreeAIr.UI.ToolWindows
             //await Task.Delay(100);
             //PromptControl.MakeFocused();
         }
-    }
 
-    public class BindingProxy : Freezable
-    {
-        protected override Freezable CreateInstanceCore()
+        private void SetupAddToContextControl()
         {
-            return new BindingProxy();
+            AddToContextControl.Setup(
+                new ContextParser(
+                    new SolutionItemVisualLineGeneratorFactory()
+                    )
+                );
         }
 
-        public static readonly DependencyProperty DataProperty = DependencyProperty.Register(
-            "Data",
-            typeof(object),
-            typeof(BindingProxy),
-            new UIPropertyMetadata(null)
-            );
-
-        public object Data
+        private void SetupPromptControl()
         {
-            get
-            {
-                return GetValue(DataProperty);
-            }
-            set
-            {
-                SetValue(DataProperty, value);
-            }
+            PromptControl.Setup(
+                new PromptParser(
+                    new SolutionItemVisualLineGeneratorFactory(),
+                    new CommandVisualLineGeneratorFactory()
+                    )
+                );
         }
+
     }
 
     public class RelativeMaxHeightConverter : IValueConverter

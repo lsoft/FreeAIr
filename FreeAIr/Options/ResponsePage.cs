@@ -39,19 +39,6 @@ namespace FreeAIr
         public bool SwitchToTaskWindow { get; set; } = true;
 
         [Category("Response")]
-        [DisplayName("Code colorization schemas")]
-        [Description("Edit this list to provide custom colorization schemas for your programming languages. Xshd file path can be local relative of FreeAIr.dll, or absolute. RESTART OF VISUAL STUDIO IS REQUIRED TO APPLY THIS OPTION.")]
-        [DefaultValue(true)]
-        public XshdProvider[] XshdProviders
-        {
-            get => _xshdProviders;
-            set
-            {
-                _xshdProviders = value;
-            }
-        }
-
-        [Category("Response")]
         [DisplayName("Custom culture of AI responses")]
         [Description("If your preferred AI answers culture is differ of your VS UI culture, then use this option to override AI answer culture. For example set ru-RU to get answers in Russian.")]
         [DefaultValue("")]
@@ -93,35 +80,5 @@ namespace FreeAIr
                     : ResponsePage.Instance.OverriddenCulture
                     ;
         }
-
-        public static void LoadOrUpdateMarkdownStyles()
-        {
-            System.Windows.Application.Current.Resources.Remove("MdXamlPlugins");
-
-            var plugins = new MdXaml.Plugins.MdXamlPlugins();
-            foreach (var xshdProvider in ResponsePage.Instance.XshdProviders)
-            {
-                var fullPath = System.IO.Path.IsPathRooted(xshdProvider.XshdFilePath)
-                    ? xshdProvider.XshdFilePath
-                    : System.IO.Path.GetFullPath(
-                        System.IO.Path.Combine(
-                            FreeAIrPackage.WorkingFolder,
-                            xshdProvider.XshdFilePath
-                            )
-                        )
-                    ;
-
-                plugins.Highlights.Add(
-                    new MdXaml.Plugins.Definition
-                    {
-                        Alias = xshdProvider.LanguageAlias,
-                        Resource = new Uri("file:///" + fullPath)
-                    }
-                );
-            }
-
-            System.Windows.Application.Current.Resources.Add("MdXamlPlugins", plugins);
-        }
-
     }
 }
