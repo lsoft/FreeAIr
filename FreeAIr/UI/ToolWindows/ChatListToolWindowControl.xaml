@@ -244,7 +244,7 @@
                             Margin="2"
                             Content="Chat context:"
                             HorizontalAlignment="Left"
-                            FontSize="14"
+                            FontSize="12"
                             FontFamily="Cascadia Code"
                             />
 
@@ -404,7 +404,7 @@
                             VerticalAlignment="Center"
                             HorizontalAlignment="Left"
                             HorizontalContentAlignment="Left"
-                            FontSize="14"
+                            FontSize="12"
                             FontFamily="Cascadia Code"
                             ToolTip="Add new items to context"
                             />
@@ -466,7 +466,7 @@
                 VerticalContentAlignment="Stretch"
                 Foreground="{Binding ElementName=ForegroundButton, Path=Foreground}"
                 Background="Transparent"
-                FontSize="14"
+                FontSize="12"
                 x:Name="PromptControl"
                 EnterCommand="{Binding CreatePromptCommand}"
                 HintText="Enter your prompt here. Press / to open commands. Press # to choose solution item. Press Ctrl + Enter to send your prompt."

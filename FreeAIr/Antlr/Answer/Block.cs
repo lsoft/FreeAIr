@@ -10,6 +10,8 @@ namespace FreeAIr.Antlr.Answer
 {
     public sealed class Block
     {
+        private static readonly System.Windows.Media.Brush _semiTransparentGray = new SolidColorBrush(Color.FromArgb(0x40, 0x80, 0x80, 0x80));
+
         private readonly List<IPart> _parts = new();
 
         private BlockUIContainer? _blockContainer;
@@ -77,7 +79,7 @@ namespace FreeAIr.Antlr.Answer
                 case BlockTypeEnum.Paragraph:
                     return;
                 case BlockTypeEnum.Blockquote:
-                    paragraph.Background = Brushes.LightGray;
+                    paragraph.Background = _semiTransparentGray;
                     paragraph.BorderBrush = Brushes.Green;
                     paragraph.BorderThickness = new Thickness(5, 0, 0, 0);
                     paragraph.Padding = new Thickness(5, 5, 5, 5);
@@ -119,9 +121,9 @@ namespace FreeAIr.Antlr.Answer
             _parts.Add(new HeaderPart(headerLevel, text));
         }
 
-        public void AddCodeBlock(string text)
+        public void AddCodeBlock(string text, string code)
         {
-            _parts.Add(new CodeBlockPart(text));
+            _parts.Add(new CodeBlockPart(text, code));
         }
 
         public void AddCodeLine(string text)

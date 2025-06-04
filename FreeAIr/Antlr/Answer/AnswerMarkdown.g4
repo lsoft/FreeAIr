@@ -17,7 +17,7 @@ paragraph
   ;
 
 blockquote
-  : BLOCKQUOTE_START (sentence | newline)*
+  : BLOCKQUOTE_START sentence_without_newline* NEWLINE
   ;
   
 horizontal_rule
@@ -66,7 +66,11 @@ h6
   ;
 
 sentence
-  : (xml_block | code_line | quick_link | url | image | word | whitespace)+ NEWLINE?
+  : sentence_without_newline NEWLINE?
+  ;
+
+sentence_without_newline
+  : (xml_block | code_line | quick_link | url | image | word | whitespace)+
   ;
 
 image

@@ -51,9 +51,9 @@ namespace FreeAIr.Antlr.Answer
             _lastBlock.AddHeader(headerLevel, text);
         }
 
-        public void AddCodeBlock(string text)
+        public void AddCodeBlock(string text, string code)
         {
-            _lastBlock.AddCodeBlock(text);
+            _lastBlock.AddCodeBlock(text, code);
         }
 
         public void AddCodeLine(string text)

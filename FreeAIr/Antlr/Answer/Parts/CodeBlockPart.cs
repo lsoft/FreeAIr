@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Windows.Documents;
 using System.Windows.Media;
 
@@ -21,16 +22,22 @@ namespace FreeAIr.Antlr.Answer.Parts
         }
 
         public CodeBlockPart(
+            string text,
             string code
             )
         {
+            if (text is null)
+            {
+                throw new ArgumentNullException(nameof(text));
+            }
+
             if (code is null)
             {
                 throw new ArgumentNullException(nameof(code));
             }
 
-            Text = code;
-            Code = code.Trim('`');
+            Text = text;
+            Code = code;
         }
 
         public object GetContextForAdditionalCommand()

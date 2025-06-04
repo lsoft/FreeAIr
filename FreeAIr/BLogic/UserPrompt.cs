@@ -203,6 +203,7 @@ namespace FreeAIr.BLogic
     public sealed class LLMAnswer
     {
         private readonly List<OpenAI.Chat.ChatMessage> _reactions = new();
+        private readonly StringBuilder _userVisibleAnswer = new();
 
         public bool IsEmpty => _reactions.Count == 0;
 
@@ -215,71 +216,23 @@ namespace FreeAIr.BLogic
             _reactions.Add(toolChatMessage);
         }
 
-        public void UpdateAssistantPermanentReaction(
+        public void UpdateUserVisibleAnswer(
             string suffix
             )
         {
-            var ar = _reactions.FirstOrDefault(r => r is AssistantChatMessage);
-            if (ar is not null)
-            {
-                _reactions.RemoveAll(r => r is AssistantChatMessage);
-                _reactions.Add(
-                    new AssistantChatMessage(
-                        string.Join("", ar.Content.Where(c => c.Kind == ChatMessageContentPartKind.Text).Select(c => c.Text)) + suffix
-                        )
-                    );
-            }
-            else
-            {
-                _reactions.Add(
-                    new AssistantChatMessage(
-                        suffix
-                        )
-                    );
-            }
+            _userVisibleAnswer.Append(suffix);
         }
 
         public void AddPermanentReaction(
             AssistantChatMessage assistantChatMessage
             )
-        {
-            _reactions.RemoveAll(r => r is AssistantChatMessage);
+         {
             _reactions.Add(assistantChatMessage);
         }
 
-        public string GetTextualAnswer()
+        public string GetUserVisibleAnswer()
         {
-            var sb = new StringBuilder();
-
-            foreach (var reaction in _reactions)
-            {
-                if (reaction is AssistantChatMessage areaction)
-                {
-                    foreach (var part in areaction.Content)
-                    {
-                        if (part.Kind != ChatMessageContentPartKind.Text)
-                        {
-                            continue;
-                        }
-
-                        sb.Append(part.Text);
-                    }
-                }
-                //else if (reaction is ToolChatMessage treaction)
-                //{
-                //    foreach (var part in treaction.Content)
-                //    {
-                //        if (part.Kind != ChatMessageContentPartKind.Text)
-                //        {
-                //            continue;
-                //        }
-
-                //        sb.Append(part.Text);
-                //    }
-                //}
-            }
-
-            return sb.ToString();
+            return _userVisibleAnswer.ToString();
         }
     }
 

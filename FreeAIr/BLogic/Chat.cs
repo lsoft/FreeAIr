@@ -343,7 +343,7 @@ namespace FreeAIr.BLogic
                     {
                         if (completionUpdate.CompletionId is null)
                         {
-                            dialog.AppendText("Server returns error.");
+                            dialog.UpdateUserVisibleAnswer("Server returns error.");
                             Status = ChatStatusEnum.Failed;
                             return;
                         }
@@ -379,7 +379,7 @@ namespace FreeAIr.BLogic
                             }
 
                             //for updating UI in real time
-                            dialog.AppendText(contentPart.Text);
+                            dialog.UpdateUserVisibleAnswer(contentPart.Text);
 
                             Status = ChatStatusEnum.ReadingAnswer;
 
@@ -634,7 +634,7 @@ namespace FreeAIr.BLogic
                 );
         }
 
-        public void AppendText(string helperText)
+        public void UpdateUserVisibleAnswer(string helperText)
         {
             if (string.IsNullOrEmpty(helperText))
             {
@@ -643,7 +643,7 @@ namespace FreeAIr.BLogic
 
             AppendTextToFile(helperText);
 
-            _lastPrompt.Answer.UpdateAssistantPermanentReaction(
+            _lastPrompt.Answer.UpdateUserVisibleAnswer(
                 helperText
                 );
         }
@@ -679,6 +679,18 @@ namespace FreeAIr.BLogic
                 + "</ToolCall>"
                 + Environment.NewLine
                 );
+
+            _lastPrompt.Answer.UpdateUserVisibleAnswer(
+                 Environment.NewLine + $"> Tool {toolCall.FunctionName} has been called and the tool is FAILED." + Environment.NewLine + Environment.NewLine
+                );
+
+            _lastPrompt.Answer.AddPermanentReaction(
+                new ToolChatMessage(
+                    toolCall.ToolCallId,
+                    $"Tool {toolCall.FunctionName} FAILED to produce results."
+                    )
+                );
+
         }
 
         public void AppendToolCallResult(
@@ -704,6 +716,10 @@ namespace FreeAIr.BLogic
                 + Environment.NewLine
                 + "</ToolCall>"
                 + Environment.NewLine
+                );
+
+            _lastPrompt.Answer.UpdateUserVisibleAnswer(
+                 Environment.NewLine + $"> Tool {toolCall.FunctionName} has been called SUCESSFULLY." + Environment.NewLine + Environment.NewLine
                 );
 
             _lastPrompt.Answer.AddPermanentReaction(

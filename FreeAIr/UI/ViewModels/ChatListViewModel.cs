@@ -127,7 +127,7 @@ namespace FreeAIr.UI.ViewModels
                     false
                     );
                 AddReplic(
-                    prompt.Answer.GetTextualAnswer(),
+                    prompt.Answer.GetUserVisibleAnswer(),
                     false,
                     false
                     );
@@ -1282,7 +1282,7 @@ namespace FreeAIr.UI.ViewModels
                 if (SelectedChat is not null && ReferenceEquals(SelectedChat.Chat, e.Chat))
                 {
                     UpdateLastReplic(
-                        e.Chat.Prompts.Last().Answer.GetTextualAnswer(),
+                        e.Chat.Prompts.Last().Answer.GetUserVisibleAnswer(),
                         true
                         );
                 }

@@ -1,10 +1,12 @@
 ﻿using Antlr4.Runtime.Misc;
 using System;
 using System.Drawing;
+using System.Linq;
 using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace FreeAIr.Antlr.Answer
 {
@@ -42,46 +44,8 @@ namespace FreeAIr.Antlr.Answer
             _answer.CreateBlock();
         }
 
-        //public override void EnterParagraph([NotNull] AnswerMarkdownParser.ParagraphContext context)
-        //{
-        //    _answer.CreateParagraph();
-
-        //    base.EnterParagraph(context);
-        //}
-
         public override void EnterBlockquote([NotNull] AnswerMarkdownParser.BlockquoteContext context)
         {
-            //var text = context.GetText();
-            //var bodies = text
-            //    .Split([Environment.NewLine, "\r", "\n"], StringSplitOptions.RemoveEmptyEntries)
-            //    ;
-            //for (var i = 0; i < bodies.Length; i++)
-            //{
-            //    bodies[i] = bodies[i].TrimStart('>', ' ');
-            //}
-
-            //var textBlock = new TextBlock
-            //{
-            //    Text = string.Join(Environment.NewLine, bodies),
-            //    Margin = new Thickness(5, 5, 5, 5),
-            //    HorizontalAlignment = HorizontalAlignment.Stretch,
-            //    VerticalAlignment = VerticalAlignment.Center,
-            //};
-
-            //var border = new Border
-            //{
-            //    Margin = new Thickness(10, 0, 0, 0),
-            //    BorderThickness = new Thickness(4, 0, 0, 0),
-            //    HorizontalAlignment = HorizontalAlignment.Stretch,
-            //    VerticalAlignment = VerticalAlignment.Center,
-            //    BorderBrush = System.Windows.Media.Brushes.Green,
-            //    Background = System.Windows.Media.Brushes.LightGray,
-            //    Child = textBlock
-            //};
-
-            //var bc = new BlockUIContainer(border);
-            ////bc.BaselineAlignment = BaselineAlignment.Center;
-
             _answer.SetBlockType(
                 BlockTypeEnum.Blockquote,
                 null
@@ -267,8 +231,18 @@ namespace FreeAIr.Antlr.Answer
 
         public override void EnterCode_block([NotNull] AnswerMarkdownParser.Code_blockContext context)
         {
+            var text = context.GetText();
+            var lines = text.Split([Environment.NewLine, "\r", "\n"], StringSplitOptions.None);
+            var code = string.Join(Environment.NewLine, lines.Skip(1).Take(lines.Length - 2));
+
+            if (string.IsNullOrEmpty(code))
+            {
+                return;
+            }
+
             _answer.AddCodeBlock(
-                context.GetText()
+                text,
+                code
                 );
         }
 

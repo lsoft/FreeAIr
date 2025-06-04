@@ -28,7 +28,7 @@ namespace FreeAIr.BLogic
                 var lastPrompt = chat.Prompts.Last();
                 if (!lastPrompt.Answer.IsEmpty)
                 {
-                    var textAnswer = lastPrompt.Answer.GetTextualAnswer();
+                    var textAnswer = lastPrompt.Answer.GetUserVisibleAnswer();
                     if (!string.IsNullOrEmpty(textAnswer))
                     {
                         var cleanAnswer = textAnswer.CleanupFromQuotesAndThinks(

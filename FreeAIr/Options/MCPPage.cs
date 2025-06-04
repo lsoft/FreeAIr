@@ -22,27 +22,7 @@ namespace FreeAIr
 $$$"""
 {
   "mcpServers": {
-    "mssqlserver": {
-      "command": "docker",
-      "args": [
-        "run",
-        "--rm",
-        "-i",
-        "-e", "MSSQL_CONNECTIONSTRING=Server=192.168.1.121;User Id=clickhouse;Password=clickhouse;TrustServerCertificate=True;",
-        "-e", "EnableExecuteQuery=true",
-        "-e", "EnableExecuteStoredProcedure=true",
-        "aadversteeg/mssqlclient-mcp-server:latest"
-        ]
-    },
-    "sequentialthinking": {
-      "command": "docker",
-      "args": [
-        "run",
-        "--rm",
-        "-i",
-        "mcp/sequentialthinking"
-      ]
-    }
+
   }
 }
 """;
