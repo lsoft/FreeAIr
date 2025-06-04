@@ -1,4 +1,5 @@
 ﻿using FreeAIr.Antlr.Answer;
+using FreeAIr.BLogic;
 using FreeAIr.Helper;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
@@ -195,6 +196,14 @@ namespace FreeAIr.UI.Dialog
                 get;
                 private set;
             }
+            public UserPrompt Prompt
+            {
+                get;
+            }
+            public bool IsPrompt
+            {
+                get;
+            }
 
             public HorizontalAlignment HorizontalAlignment
             {
@@ -219,15 +228,18 @@ namespace FreeAIr.UI.Dialog
 
             public Replic(
                 ParsedAnswer parsedAnswer,
-                bool isUser,
+                UserPrompt prompt,
+                bool isPrompt,
                 AdditionalCommandContainer? acc,
                 bool inProgress
                 )
             {
                 _acc = acc;
                 ParsedAnswer = parsedAnswer;
-                HorizontalAlignment = isUser ? HorizontalAlignment.Right : HorizontalAlignment.Left;
-                BorderThickness = isUser ? new Thickness(1, 1, 10, 1) : new Thickness(10, 1, 1, 1);
+                Prompt = prompt;
+                IsPrompt = isPrompt;
+                HorizontalAlignment = isPrompt ? HorizontalAlignment.Right : HorizontalAlignment.Left;
+                BorderThickness = isPrompt ? new Thickness(1, 1, 10, 1) : new Thickness(10, 1, 1, 1);
                 Document = parsedAnswer.ConvertToFlowDocument(_acc, inProgress);
             }
 

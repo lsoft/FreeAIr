@@ -22,6 +22,7 @@ namespace FreeAIr.BLogic
         private CancellationTokenSource _cancellationTokenSource = new();
         private Task? _task;
 
+        private ChatStatusEnum _status;
 
         public AvailableToolContainer ChatTools
         {
@@ -38,11 +39,10 @@ namespace FreeAIr.BLogic
             get;
         }
 
-        private ChatStatusEnum _status;
-
         public IReadOnlyList<UserPrompt> Prompts => _prompts;
 
         public event ChatStatusChangedDelegate ChatStatusChangedEvent;
+        public event PromptStateChangedDelegate PromptStateChangedEvent;
 
         public ChatDescription Description
         {
@@ -152,6 +152,8 @@ namespace FreeAIr.BLogic
             _prompts.Add(userPrompt);
 
             _task = Task.Run(async () => await AskPromptAndReceiveAnswerAsync());
+
+            PromptStateChanged(userPrompt, PromptChangeKindEnum.PromptAdded);
         }
 
         public Task WaitForPromptResultAsync()
@@ -182,7 +184,12 @@ namespace FreeAIr.BLogic
 
         public void ArchiveAllPrompts()
         {
-            _prompts.ForEach(p => p.Archive());
+            _prompts.ForEach(p =>
+            {
+                p.Archive();
+
+                PromptStateChanged(p, PromptChangeKindEnum.PromptArchived);
+            });
         }
 
         public void Dispose()
@@ -339,6 +346,8 @@ namespace FreeAIr.BLogic
                     var toolCalls = new List<StreamingChatToolCallUpdate>();
                     var contentParts = new List<ChatMessageContentPart>();
 
+                    Status = ChatStatusEnum.ReadingAnswer;
+
                     foreach (StreamingChatCompletionUpdate completionUpdate in completionUpdates)
                     {
                         if (completionUpdate.CompletionId is null)
@@ -381,8 +390,6 @@ namespace FreeAIr.BLogic
                             //for updating UI in real time
                             dialog.UpdateUserVisibleAnswer(contentPart.Text);
 
-                            Status = ChatStatusEnum.ReadingAnswer;
-
                             if (cancellationToken.IsCancellationRequested)
                             {
                                 Status = ChatStatusEnum.Ready;
@@ -390,8 +397,6 @@ namespace FreeAIr.BLogic
                             }
                         }
                     }
-
-                    //dialog.ClearTemporarilyTextualRepresentation();
 
                     if (chatFinishReason == ChatFinishReason.ToolCalls && toolCalls.Count > 0)
                     {
@@ -474,6 +479,18 @@ namespace FreeAIr.BLogic
             }
         }
 
+        private void PromptStateChanged(
+            UserPrompt prompt,
+            PromptChangeKindEnum kind
+            )
+        {
+            var e = PromptStateChangedEvent;
+            if (e is not null)
+            {
+                e(this, new PromptEventArgs(this, prompt, kind));
+            }
+        }
+
         private void StatusChanged()
         {
             var e = ChatStatusChangedEvent;
@@ -522,291 +539,299 @@ namespace FreeAIr.BLogic
 
             return toolArguments;
         }
-    }
 
-    public sealed class Dialog
-    {
-        private readonly string _resultFilePath;
-        private readonly Chat _chat;
-        private readonly SystemChatMessage _systemChatMessage;
-
-        private UserPrompt _lastPrompt => _chat.Prompts.Last();
-
-        public Dialog(
-            string resultFilePath,
-            Chat chat
-            )
+        public sealed class Dialog
         {
-            if (resultFilePath is null)
+            private readonly string _resultFilePath;
+            private readonly Chat _chat;
+            private readonly SystemChatMessage _systemChatMessage;
+
+            private UserPrompt _lastPrompt => _chat.Prompts.Last();
+
+            public Dialog(
+                string resultFilePath,
+                Chat chat
+                )
             {
-                throw new ArgumentNullException(nameof(resultFilePath));
+                if (resultFilePath is null)
+                {
+                    throw new ArgumentNullException(nameof(resultFilePath));
+                }
+
+                if (chat is null)
+                {
+                    throw new ArgumentNullException(nameof(chat));
+                }
+
+                _resultFilePath = resultFilePath;
+                _chat = chat;
+                _systemChatMessage = new SystemChatMessage(
+                    BuildRulesSection()
+                    );
             }
 
-            if (chat is null)
+            public void Init()
             {
-                throw new ArgumentNullException(nameof(chat));
+                AppendTextToFile(
+                    Environment.NewLine + Environment.NewLine
+                    );
+                AppendTextToFile(
+                    $"> {"UI_Prompt".GetLocalizedResourceByName()}:" + Environment.NewLine
+                    );
+                AppendTextToFile(
+                    _lastPrompt.PromptBody + Environment.NewLine + Environment.NewLine
+                    );
+                AppendTextToFile(
+                    $"> {"UI_Answer".GetLocalizedResourceByName()}:" + Environment.NewLine
+                    );
+
             }
 
-            _resultFilePath = resultFilePath;
-            _chat = chat;
-            _systemChatMessage = new SystemChatMessage(
-                BuildRulesSection()
-                );
-        }
-
-        public void Init()
-        {
-            AppendTextToFile(
-                Environment.NewLine + Environment.NewLine
-                );
-            AppendTextToFile(
-                $"> {"UI_Prompt".GetLocalizedResourceByName()}:" + Environment.NewLine
-                );
-            AppendTextToFile(
-                _lastPrompt.PromptBody + Environment.NewLine + Environment.NewLine
-                );
-            AppendTextToFile(
-                $"> {"UI_Answer".GetLocalizedResourceByName()}:" + Environment.NewLine
-                );
-
-        }
-
-        public void AppendAssistantReply(
-            IReadOnlyList<ChatMessageContentPart> contents
-            )
-        {
-            if (contents is null)
+            public void AppendAssistantReply(
+                IReadOnlyList<ChatMessageContentPart> contents
+                )
             {
-                throw new ArgumentNullException(nameof(contents));
-            }
+                if (contents is null)
+                {
+                    throw new ArgumentNullException(nameof(contents));
+                }
 
-            if (contents.Count == 0)
-            {
-                return;
+                if (contents.Count == 0)
+                {
+                    return;
+                }
+
+
+                var content = string.Join(
+                    "",
+                    contents
+                        .Where(c => c.Kind == ChatMessageContentPartKind.Text)
+                        .Select(c => c.Text)
+                    );
+
+                var assistantReply = new AssistantChatMessage(
+                    content
+                    );
+
+                _lastPrompt.Answer.AddPermanentReaction(assistantReply);
+
+                _chat.PromptStateChanged(_lastPrompt, PromptChangeKindEnum.AnswerUpdated);
             }
 
 
-            var content = string.Join(
-                "",
-                contents
-                    .Where(c => c.Kind == ChatMessageContentPartKind.Text)
-                    .Select(c => c.Text)
-                );
-
-            var assistantReply = new AssistantChatMessage(
-                content
-                );
-
-            _lastPrompt.Answer.AddPermanentReaction(assistantReply);
-        }
-
-
-        public void AppendAssistantReply(
-            IReadOnlyList<ChatToolCall> chatToolCalls
-            )
-        {
-            if (chatToolCalls is null)
+            public void AppendAssistantReply(
+                IReadOnlyList<ChatToolCall> chatToolCalls
+                )
             {
-                throw new ArgumentNullException(nameof(chatToolCalls));
+                if (chatToolCalls is null)
+                {
+                    throw new ArgumentNullException(nameof(chatToolCalls));
+                }
+
+                if (chatToolCalls.Count == 0)
+                {
+                    return;
+                }
+
+                _lastPrompt.Answer.AddPermanentReaction(
+                    new AssistantChatMessage(
+                        chatToolCalls
+                        )
+                    );
+
+                _chat.PromptStateChanged(_lastPrompt, PromptChangeKindEnum.AnswerUpdated);
             }
 
-            if (chatToolCalls.Count == 0)
+            public void AppendTextToFile(string helperText)
             {
-                return;
+                if (string.IsNullOrEmpty(helperText))
+                {
+                    return;
+                }
+
+                AppendToFile(
+                    helperText
+                    );
             }
 
-            _lastPrompt.Answer.AddPermanentReaction(
-                new AssistantChatMessage(
-                    chatToolCalls
-                    )
-                );
-        }
-
-        public void AppendTextToFile(string helperText)
-        {
-            if (string.IsNullOrEmpty(helperText))
+            public void UpdateUserVisibleAnswer(string helperText)
             {
-                return;
+                if (string.IsNullOrEmpty(helperText))
+                {
+                    return;
+                }
+
+                AppendTextToFile(helperText);
+
+                _lastPrompt.Answer.UpdateUserVisibleAnswer(
+                    helperText
+                    );
+
+                _chat.PromptStateChanged(_lastPrompt, PromptChangeKindEnum.AnswerUpdated);
             }
 
-            AppendToFile(
-                helperText
-                );
-        }
-
-        public void UpdateUserVisibleAnswer(string helperText)
-        {
-            if (string.IsNullOrEmpty(helperText))
+            public void AppendException(Exception excp)
             {
-                return;
+                AppendToFile(
+                    excp.Message
+                    + Environment.NewLine
+                    + "```"
+                    + Environment.NewLine
+                    + excp.StackTrace
+                    + Environment.NewLine
+                    + "```"
+                    );
             }
 
-            AppendTextToFile(helperText);
 
-            _lastPrompt.Answer.UpdateUserVisibleAnswer(
-                helperText
-                );
-        }
+            public void AppendUnsuccessfulToolCall(
+                StreamingChatToolCallUpdate toolCall
+                )
+            {
+                AppendToFile(
+                    Environment.NewLine
+                    + "<ToolCall>"
+                    + Environment.NewLine
+                    + toolCall.FunctionName
+                    + Environment.NewLine
+                    + (toolCall.FunctionArgumentsUpdate.ToMemory().Length > 0
+                        ? toolCall.FunctionArgumentsUpdate.ToString()
+                        : string.Empty)
+                    + Environment.NewLine
+                    + "</ToolCall>"
+                    + Environment.NewLine
+                    );
 
-        public void AppendException(Exception excp)
-        {
-            AppendToFile(
-                excp.Message
-                + Environment.NewLine
-                + "```"
-                + Environment.NewLine
-                + excp.StackTrace
-                + Environment.NewLine
-                + "```"
-                );
-        }
+                _lastPrompt.Answer.UpdateUserVisibleAnswer(
+                     Environment.NewLine + $"> Tool {toolCall.FunctionName} has been called and the tool is FAILED." + Environment.NewLine + Environment.NewLine
+                    );
 
+                _lastPrompt.Answer.AddPermanentReaction(
+                    new ToolChatMessage(
+                        toolCall.ToolCallId,
+                        $"Tool {toolCall.FunctionName} FAILED to produce results."
+                        )
+                    );
 
-        public void AppendUnsuccessfulToolCall(
-            StreamingChatToolCallUpdate toolCall
-            )
-        {
-            AppendToFile(
-                Environment.NewLine
-                + "<ToolCall>"
-                + Environment.NewLine
-                + toolCall.FunctionName
-                + Environment.NewLine
-                + (toolCall.FunctionArgumentsUpdate.ToMemory().Length > 0
-                    ? toolCall.FunctionArgumentsUpdate.ToString()
-                    : string.Empty)
-                + Environment.NewLine
-                + "</ToolCall>"
-                + Environment.NewLine
-                );
+                _chat.PromptStateChanged(_lastPrompt, PromptChangeKindEnum.AnswerUpdated);
+            }
 
-            _lastPrompt.Answer.UpdateUserVisibleAnswer(
-                 Environment.NewLine + $"> Tool {toolCall.FunctionName} has been called and the tool is FAILED." + Environment.NewLine + Environment.NewLine
-                );
-
-            _lastPrompt.Answer.AddPermanentReaction(
-                new ToolChatMessage(
-                    toolCall.ToolCallId,
-                    $"Tool {toolCall.FunctionName} FAILED to produce results."
-                    )
-                );
-
-        }
-
-        public void AppendToolCallResult(
-            StreamingChatToolCallUpdate toolCall,
-            string[] toolResult
-            )
-        {
-            AppendToFile(
-                Environment.NewLine
-                + "<ToolCall>"
-                + Environment.NewLine
-                + toolCall.FunctionName
-                + Environment.NewLine
-                + (toolCall.FunctionArgumentsUpdate.ToMemory().Length > 0
-                    ? toolCall.FunctionArgumentsUpdate.ToString()
-                    : string.Empty)
-                + Environment.NewLine
-                + Environment.NewLine
-                + string.Join(
-                    Environment.NewLine,
-                    toolResult
-                    )
-                + Environment.NewLine
-                + "</ToolCall>"
-                + Environment.NewLine
-                );
-
-            _lastPrompt.Answer.UpdateUserVisibleAnswer(
-                 Environment.NewLine + $"> Tool {toolCall.FunctionName} has been called SUCESSFULLY." + Environment.NewLine + Environment.NewLine
-                );
-
-            _lastPrompt.Answer.AddPermanentReaction(
-                new ToolChatMessage(
-                    toolCall.ToolCallId,
-                    string.Join(
+            public void AppendToolCallResult(
+                StreamingChatToolCallUpdate toolCall,
+                string[] toolResult
+                )
+            {
+                AppendToFile(
+                    Environment.NewLine
+                    + "<ToolCall>"
+                    + Environment.NewLine
+                    + toolCall.FunctionName
+                    + Environment.NewLine
+                    + (toolCall.FunctionArgumentsUpdate.ToMemory().Length > 0
+                        ? toolCall.FunctionArgumentsUpdate.ToString()
+                        : string.Empty)
+                    + Environment.NewLine
+                    + Environment.NewLine
+                    + string.Join(
                         Environment.NewLine,
                         toolResult
                         )
-                    )
-                );
-        }
+                    + Environment.NewLine
+                    + "</ToolCall>"
+                    + Environment.NewLine
+                    );
 
-        public void ArchiveAllPrompts()
-        {
-            _chat.ArchiveAllPrompts();
-        }
+                _lastPrompt.Answer.UpdateUserVisibleAnswer(
+                     Environment.NewLine + $"> Tool {toolCall.FunctionName} has been called SUCESSFULLY." + Environment.NewLine + Environment.NewLine
+                    );
 
-        public async Task<IReadOnlyList<OpenAI.Chat.ChatMessage>> GetMessageListAsync()
-        {
-            var result = new List<OpenAI.Chat.ChatMessage>();
+                _lastPrompt.Answer.AddPermanentReaction(
+                    new ToolChatMessage(
+                        toolCall.ToolCallId,
+                        string.Join(
+                            Environment.NewLine,
+                            toolResult
+                            )
+                        )
+                    );
 
-            result.Add(_systemChatMessage);
-
-            var nonArchivedPrompts = _chat.Prompts.FindAll(p => !p.IsArchived);
-
-            foreach (var prompt in nonArchivedPrompts.Take(nonArchivedPrompts.Count - 1))
-            {
-                FillMessageList(prompt, result);
+                _chat.PromptStateChanged(_lastPrompt, PromptChangeKindEnum.AnswerUpdated);
             }
 
-            foreach (var contextItem in _chat.ChatContext.Items)
+            public void ArchiveAllPrompts()
             {
-                result.Add(await contextItem.CreateChatMessageAsync());
+                _chat.ArchiveAllPrompts();
             }
 
-            FillMessageList(nonArchivedPrompts.Last(), result);
-
-            return result;
-        }
-
-
-        private static void FillMessageList(
-            UserPrompt prompt,
-            List<OpenAI.Chat.ChatMessage> result
-            )
-        {
-            if (result is null)
+            public async Task<IReadOnlyList<OpenAI.Chat.ChatMessage>> GetMessageListAsync()
             {
-                throw new ArgumentNullException(nameof(result));
-            }
+                var result = new List<OpenAI.Chat.ChatMessage>();
 
-            //put prompt
-            var chatMessage = prompt.CreateChatMessage();
-            result.Add(chatMessage);
+                result.Add(_systemChatMessage);
 
-            //put answers (assistant + tool)
-            foreach (var reaction in prompt.Answer.Reactions)
-            {
-                result.Add(reaction);
-            }
-        }
+                var nonArchivedPrompts = _chat.Prompts.FindAll(p => !p.IsArchived);
 
-        private void AppendToFile(string contentPart)
-        {
-            File.AppendAllText(_resultFilePath, contentPart);
-        }
-
-
-        /// <summary>
-        /// Генерирует раздел правил для ИИ-модели с учетом текущих настроек
-        /// </summary>
-        /// <returns>Текст правил с подставленными параметрами</returns>
-        private string BuildRulesSection()
-        {
-            // Определение формата ответа в зависимости от типа диалога
-            var respondFormat = _chat.Description.Kind.In(ChatKindEnum.GenerateCommitMessage, ChatKindEnum.SuggestWholeLine)
-                ? "plain text"
-                : ResponsePage.Instance.ResponseFormat switch
+                foreach (var prompt in nonArchivedPrompts.Take(nonArchivedPrompts.Count - 1))
                 {
-                    LLMResultEnum.PlainText => "plain text",
-                    LLMResultEnum.MD => "markdown",
-                    _ => "markdown"
-                };
+                    FillMessageList(prompt, result);
+                }
 
-            // Полный список правил ИИ-ассистента
-            const string systemPrompt = @"
+                foreach (var contextItem in _chat.ChatContext.Items)
+                {
+                    result.Add(await contextItem.CreateChatMessageAsync());
+                }
+
+                FillMessageList(nonArchivedPrompts.Last(), result);
+
+                return result;
+            }
+
+
+            private static void FillMessageList(
+                UserPrompt prompt,
+                List<OpenAI.Chat.ChatMessage> result
+                )
+            {
+                if (result is null)
+                {
+                    throw new ArgumentNullException(nameof(result));
+                }
+
+                //put prompt
+                var chatMessage = prompt.CreateChatMessage();
+                result.Add(chatMessage);
+
+                //put answers (assistant + tool)
+                foreach (var reaction in prompt.Answer.Reactions)
+                {
+                    result.Add(reaction);
+                }
+            }
+
+            private void AppendToFile(string contentPart)
+            {
+                File.AppendAllText(_resultFilePath, contentPart);
+            }
+
+
+            /// <summary>
+            /// Генерирует раздел правил для ИИ-модели с учетом текущих настроек
+            /// </summary>
+            /// <returns>Текст правил с подставленными параметрами</returns>
+            private string BuildRulesSection()
+            {
+                // Определение формата ответа в зависимости от типа диалога
+                var respondFormat = _chat.Description.Kind.In(ChatKindEnum.GenerateCommitMessage, ChatKindEnum.SuggestWholeLine)
+                    ? "plain text"
+                    : ResponsePage.Instance.ResponseFormat switch
+                    {
+                        LLMResultEnum.PlainText => "plain text",
+                        LLMResultEnum.MD => "markdown",
+                        _ => "markdown"
+                    };
+
+                // Полный список правил ИИ-ассистента
+                const string systemPrompt = @"
 Your general rules:
 #01 You are an AI programming assistant working inside Visual Studio.
 #02 Follow the user's requirements carefully & to the letter.
@@ -853,16 +878,51 @@ Your behavior against available functions:
 #6 If user asks to analyze the database or its data, you should compose appropriate SQL query and then use available functions to execute the SQL query. If you need information about table (database) structure, gather it first via functions.
 ";
 
-            return string.Format(
-                systemPrompt,
-                ResponsePage.GetAnswerCultureName(),
-                respondFormat
-            );
+                return string.Format(
+                    systemPrompt,
+                    ResponsePage.GetAnswerCultureName(),
+                    respondFormat
+                );
+            }
+
         }
 
     }
 
+
     public delegate void ChatStatusChangedDelegate(object sender, ChatEventArgs e);
+    public delegate void PromptStateChangedDelegate(object sender, PromptEventArgs e);
+
+    public sealed class PromptEventArgs : EventArgs
+    {
+        public Chat Chat
+        {
+            get;
+        }
+
+        public UserPrompt Prompt
+        {
+            get;
+        }
+        public PromptChangeKindEnum Kind
+        {
+            get;
+        }
+
+        public PromptEventArgs(Chat chat, UserPrompt prompt, PromptChangeKindEnum kind)
+        {
+            Chat = chat;
+            Prompt = prompt;
+            Kind = kind;
+        }
+    }
+
+    public enum PromptChangeKindEnum
+    {
+        PromptAdded,
+        AnswerUpdated,
+        PromptArchived
+    }
 
     public sealed class ChatEventArgs : EventArgs
     {

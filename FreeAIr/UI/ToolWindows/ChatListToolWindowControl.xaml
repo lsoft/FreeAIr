@@ -439,7 +439,7 @@
                 HorizontalAlignment="Stretch"
                 VerticalAlignment="Stretch"
                 x:Name="DialogControlName"
-                Dialog="{Binding Dialog}"
+                Dialog="{Binding DialogViewModel.Dialog}"
                 />
 
             <GridSplitter

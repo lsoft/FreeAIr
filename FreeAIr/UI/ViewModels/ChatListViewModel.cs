@@ -9,6 +9,7 @@ using FreeAIr.Shared.Helper;
 using FreeAIr.UI.Embedillo.Answer.Parser;
 using FreeAIr.UI.Windows;
 using ICSharpCode.AvalonEdit.Editing;
+using Microsoft.Extensions.AI;
 using Microsoft.VisualStudio.Imaging;
 using Microsoft.VisualStudio.Imaging.Interop;
 using Microsoft.VisualStudio.Shell.Interop;
@@ -23,6 +24,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using WpfHelpers;
 using static FreeAIr.UI.Dialog.DialogControl;
+using static FreeAIr.UI.ViewModels.ChatListViewModel;
 
 namespace FreeAIr.UI.ViewModels
 {
@@ -96,7 +98,7 @@ namespace FreeAIr.UI.ViewModels
             {
                 _selectedChat = value;
 
-                UpdateDialogFromChat();
+                DialogViewModel.UpdateDialog(value);
 
                 FocusPromptControl();
 
@@ -104,79 +106,10 @@ namespace FreeAIr.UI.ViewModels
             }
         }
 
-        #region Dialog
-
-        private void UpdateDialogFromChat()
-        {
-            Dialog.Clear();
-
-            if (_selectedChat is null)
-            {
-                return;
-            }
-            if (_selectedChat.Chat is null)
-            {
-                return;
-            }
-
-            foreach (var prompt in _selectedChat.Chat.Prompts)
-            {
-                AddReplic(
-                    prompt.PromptBody,
-                    true,
-                    false
-                    );
-                AddReplic(
-                    prompt.Answer.GetUserVisibleAnswer(),
-                    false,
-                    false
-                    );
-            }
-        }
-
-        private void AddReplic(
-            string text,
-            bool isUser,
-            bool inProgress
-            )
-        {
-            var replic = new Replic(
-                AnswerParser.Parse(text),
-                isUser,
-                AdditionalCommandContainer,
-                inProgress
-                );
-            Dialog.Add(replic);
-        }
-
-        private void UpdateLastReplic(
-            string text,
-            bool inProgress
-            )
-        {
-            if (Dialog.Count == 0)
-            {
-                return;
-            }
-
-            var lastReplic = Dialog.Last();
-            lastReplic.Update(
-                AnswerParser.Parse(text),
-                inProgress
-                );
-        }
-
-        #endregion
-
-        public AdditionalCommandContainer AdditionalCommandContainer
+        public DialogViewModel DialogViewModel
         {
             get;
-        } = new();
-
-        public ObservableCollection2<Replic> Dialog
-        {
-            get;
-        } = new();
+        }
 
 
         public Visibility ChatPanelVisibility
@@ -552,17 +485,6 @@ namespace FreeAIr.UI.ViewModels
                                 UserPrompt.CreateTextBasedPrompt(
                                     parsedRepresentation
                                     )
-                                );
-
-                            AddReplic(
-                                parsedRepresentation,
-                                true,
-                                false
-                                );
-                            AddReplic(
-                                string.Empty,
-                                false,
-                                true
                                 );
 
                             OnPropertyChanged();
@@ -1210,46 +1132,7 @@ namespace FreeAIr.UI.ViewModels
 
             ChatList = new ObservableCollection2<ChatWrapper>();
 
-            #region AdditionalCommandContainer
-
-            var defaultAdditionalBrush = new SolidColorBrush(Color.FromRgb(0x56, 0x9C, 0xD6));
-
-            AdditionalCommandContainer.AddAdditionalCommand(
-                new AdditionalCommand(
-                    PartTypeEnum.CodeLine | PartTypeEnum.CodeBlock | PartTypeEnum.Xml | PartTypeEnum.Url,
-                    "↑",
-                    "Click to copy to clipboard",
-                    new RelayCommand(
-                        a =>
-                        {
-                            var code = a as string;
-                            if (!string.IsNullOrEmpty(code))
-                            {
-                                Clipboard.SetText(code);
-                            }
-                        }),
-                    defaultAdditionalBrush
-                    )
-                );
-            AdditionalCommandContainer.AddAdditionalCommand(
-                new AdditionalCommand(
-                    PartTypeEnum.Image,
-                    "↑",
-                    "Click to copy to clipboard",
-                    new RelayCommand(
-                        a =>
-                        {
-                            var bitmap = a as BitmapImage;
-                            if (bitmap is not null)
-                            {
-                                Clipboard.SetImage(bitmap);
-                            }
-                        }),
-                    defaultAdditionalBrush
-                    )
-                );
-
-            #endregion
+            DialogViewModel = new DialogViewModel(chatContainer);
 
             UpdateControl();
         }
@@ -1277,14 +1160,6 @@ namespace FreeAIr.UI.ViewModels
                 foreach (var chat in ChatList)
                 {
                     chat.Update();
-                }
-
-                if (SelectedChat is not null && ReferenceEquals(SelectedChat.Chat, e.Chat))
-                {
-                    UpdateLastReplic(
-                        e.Chat.Prompts.Last().Answer.GetUserVisibleAnswer(),
-                        true
-                        );
                 }
 
                 if (SelectedChat is null || ReferenceEquals(SelectedChat.Chat, e.Chat))
@@ -1498,5 +1373,166 @@ namespace FreeAIr.UI.ViewModels
     }
 
     public delegate void MarkdownReReadDelegate(object sender, EventArgs e);
+
+    public class DialogViewModel : BaseViewModel
+    {
+        private ChatWrapper? _selectedChat;
+
+        public ObservableCollection2<Replic> Dialog
+        {
+            get;
+        } = new();
+
+        public AdditionalCommandContainer AdditionalCommandContainer
+        {
+            get;
+        } = new();
+
+        public DialogViewModel(ChatContainer chatContainer)
+        {
+            if (chatContainer is null)
+            {
+                throw new ArgumentNullException(nameof(chatContainer));
+            }
+
+            #region AdditionalCommandContainer
+
+            var defaultAdditionalBrush = new SolidColorBrush(Color.FromRgb(0x56, 0x9C, 0xD6));
+
+            AdditionalCommandContainer.AddAdditionalCommand(
+                new AdditionalCommand(
+                    PartTypeEnum.CodeLine | PartTypeEnum.CodeBlock | PartTypeEnum.Xml | PartTypeEnum.Url,
+                    "↑",
+                    "Click to copy to clipboard",
+                    new RelayCommand(
+                        a =>
+                        {
+                            var code = a as string;
+                            if (!string.IsNullOrEmpty(code))
+                            {
+                                Clipboard.SetText(code);
+                            }
+                        }),
+                    defaultAdditionalBrush
+                    )
+                );
+            AdditionalCommandContainer.AddAdditionalCommand(
+                new AdditionalCommand(
+                    PartTypeEnum.Image,
+                    "↑",
+                    "Click to copy to clipboard",
+                    new RelayCommand(
+                        a =>
+                        {
+                            var bitmap = a as BitmapImage;
+                            if (bitmap is not null)
+                            {
+                                Clipboard.SetImage(bitmap);
+                            }
+                        }),
+                    defaultAdditionalBrush
+                    )
+                );
+
+            #endregion
+
+            chatContainer.PromptStateChangedEvent += PromptStateChanged;
+        }
+
+        public void UpdateDialog(
+            ChatWrapper? selectedChat
+            )
+        {
+            Dialog.Clear();
+
+            _selectedChat = selectedChat;
+
+            if (selectedChat is not null)
+            {
+                var chat = selectedChat.Chat;
+                if (chat is not null)
+                {
+                    foreach (var prompt in chat.Prompts)
+                    {
+                        UpdateDialogPrompt(
+                            prompt,
+                            PromptChangeKindEnum.PromptAdded
+                            );
+                    }
+                }
+            }
+        }
+
+        private void UpdateDialogPrompt(
+            UserPrompt prompt,
+            PromptChangeKindEnum kind
+            )
+        {
+            switch (kind)
+            {
+                case PromptChangeKindEnum.PromptAdded:
+                    {
+                        var promptReplic = new Replic(
+                            AnswerParser.Parse(prompt.PromptBody),
+                            prompt,
+                            true,
+                            AdditionalCommandContainer,
+                            false
+                            );
+                        Dialog.Add(promptReplic);
+
+                        var answerReplic = new Replic(
+                            AnswerParser.Parse(prompt.Answer.GetUserVisibleAnswer()),
+                            prompt,
+                            false,
+                            AdditionalCommandContainer,
+                            false
+                            );
+                        Dialog.Add(answerReplic);
+                    }
+                    break;
+                case PromptChangeKindEnum.AnswerUpdated:
+                    {
+                        var replic = Dialog.FirstOrDefault(d => ReferenceEquals(d.Prompt, prompt) && !d.IsPrompt);
+                        if (replic is not null)
+                        {
+                            replic.Update(
+                                AnswerParser.Parse(
+                                    prompt.Answer.GetUserVisibleAnswer()
+                                    ),
+                                true
+                                );
+                        }
+                    }
+                    break;
+                case PromptChangeKindEnum.PromptArchived:
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        private async void PromptStateChanged(object sender, PromptEventArgs e)
+        {
+            try
+            {
+                await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+
+                if (_selectedChat is not null && ReferenceEquals(_selectedChat.Chat, e.Chat))
+                {
+                    UpdateDialogPrompt(
+                        e.Prompt,
+                        e.Kind
+                        );
+                }
+
+            }
+            catch (Exception excp)
+            {
+                //todo
+            }
+        }
+
+    }
 
 }
