@@ -125,6 +125,7 @@ namespace FreeAIr.BLogic
 
         public SelectedTextDescriptor(
             DocumentView documentView,
+            SelectedSpan? selectedSpan,
             string lineEnding
             )
         {
@@ -147,6 +148,7 @@ namespace FreeAIr.BLogic
             FilePath = filePath;
             FileName = fileName;
             _documentView = documentView;
+            SelectedSpan = selectedSpan;
             _lineEnding = lineEnding;
         }
 

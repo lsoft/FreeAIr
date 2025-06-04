@@ -14,10 +14,21 @@ namespace FreeAIr.Helper
                 return null;
             }
 
+            FreeAIr.UI.Embedillo.Answer.Parser.SelectedSpan? selected = null;
+            var selection = docView.TextView.Selection;
+            if (!selection.IsEmpty)
+            {
+                selected = new UI.Embedillo.Answer.Parser.SelectedSpan(
+                    selection.Start.Position.Position,
+                    selection.End.Position.Position - selection.Start.Position.Position
+                    );
+            }
+
             var lineEnding = LineEndingHelper.Actual.GetActiveDocumentLineEnding();
 
             return new SelectedTextDescriptor(
                 docView,
+                selected,
                 lineEnding
                 );
         }
