@@ -53,6 +53,7 @@ namespace FreeAIr
         public const int OpenNaturalSearchToolWindowCommandId = 0x1041;
         public const int ShowReleaseNotesCommandId = 0x1042;
         public const int OpenControlCenterCommandId = 0x1043;
+        public const int ShowOptionsCommandId = 0x1044;
         public const int Icon16 = 0x0001;
         public const int Icon32 = 0x0001;
     }

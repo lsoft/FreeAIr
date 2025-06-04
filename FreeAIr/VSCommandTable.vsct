@@ -89,12 +89,20 @@
           <ButtonText>Show release notes...</ButtonText>
         </Strings>
       </Button>
-        <Button guid="FreeAIr" id="OpenControlCenterCommandId" priority="0x0102" type="Button">
+      <Button guid="FreeAIr" id="OpenControlCenterCommandId" priority="0x0102" type="Button">
         <Parent guid="FreeAIr" id="SubExtensionMenuGroup" />
         <Icon guid="ImageCatalogGuid" id="Settings" />
         <CommandFlag>IconIsMoniker</CommandFlag>
         <Strings>
           <ButtonText>Open Control Center...</ButtonText>
+        </Strings>
+      </Button>
+      <Button guid="FreeAIr" id="ShowOptionsCommandId" priority="0x0102" type="Button">
+        <Parent guid="FreeAIr" id="SubExtensionMenuGroup" />
+         <Icon guid="ImageCatalogGuid" id="PropertyInternal" />
+        <CommandFlag>IconIsMoniker</CommandFlag>
+        <Strings>
+          <ButtonText>Show options...</ButtonText>
         </Strings>
       </Button>
 
@@ -256,6 +264,7 @@
       <IDSymbol name="OpenNaturalSearchToolWindowCommandId" value="0x1041" />
       <IDSymbol name="ShowReleaseNotesCommandId" value="0x1042" />
       <IDSymbol name="OpenControlCenterCommandId" value="0x1043" />
+      <IDSymbol name="ShowOptionsCommandId" value="0x1044" />
 
     </GuidSymbol>
 
