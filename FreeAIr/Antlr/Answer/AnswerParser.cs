@@ -1,5 +1,6 @@
 ﻿using Antlr4.Runtime;
 using Antlr4.Runtime.Tree;
+using System;
 
 namespace FreeAIr.Antlr.Answer
 {
@@ -37,7 +38,7 @@ namespace FreeAIr.Antlr.Answer
                 throw new ArgumentNullException(nameof(text));
             }
 
-            answer.CreateParagraph();
+            answer.CreateBlock();
             answer.AddText(text);
         }
 
@@ -92,11 +93,6 @@ namespace FreeAIr.Antlr.Answer
             var tokens = new CommonTokenStream(lexer);
             var parser = new AnswerMarkdownParser(tokens);
             return (lexer, parser);
-        }
-
-        internal static ParsedAnswer Parse(object value)
-        {
-            throw new NotImplementedException();
         }
     }
 }

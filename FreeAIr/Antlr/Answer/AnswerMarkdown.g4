@@ -1,16 +1,25 @@
 ﻿grammar AnswerMarkdown;
 
 markdownFile
-  : paragraph+ EOF
+  : block+ EOF
+  ;
+
+block
+  : paragraph
+  | horizontal_rule
+  | blockquote
   ;
 
 paragraph
   : code_block
   | not_a_code_block
   | newline
-  | horizontal_rule
   ;
 
+blockquote
+  : BLOCKQUOTE_START (sentence | newline)*
+  ;
+  
 horizontal_rule
   : HORIZONTAL_RULE
   ;
@@ -122,6 +131,10 @@ CODE_BLOCK
 
 URL
   : '[' ~[\]\r\n]+ ']'      '('      ~[)\r\n ]+        ([\t \u000C]+ '"' ~["]+ '"')?     ')'
+  ;
+
+BLOCKQUOTE_START
+  : '> '      // обязателен пробел после '>'
   ;
 
 WORD

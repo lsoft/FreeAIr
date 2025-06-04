@@ -1,4 +1,6 @@
-﻿namespace FreeAIr.Antlr.Answer.Parts
+﻿using System;
+
+namespace FreeAIr.Antlr.Answer.Parts
 {
     [Flags]
     public enum PartTypeEnum
@@ -10,6 +12,5 @@
         CodeBlock = 16,
         CodeLine = 32,
         Image = 64,
-        HorizontalRule = 128
     }
 }

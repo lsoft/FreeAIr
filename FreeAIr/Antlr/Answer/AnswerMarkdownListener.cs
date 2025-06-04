@@ -1,5 +1,10 @@
 ﻿using Antlr4.Runtime.Misc;
+using System;
+using System.Drawing;
 using System.Text.RegularExpressions;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Documents;
 
 namespace FreeAIr.Antlr.Answer
 {
@@ -32,19 +37,76 @@ namespace FreeAIr.Antlr.Answer
             _answer = answer;
         }
 
-        public override void EnterParagraph([NotNull] AnswerMarkdownParser.ParagraphContext context)
+        public override void EnterBlock([NotNull] AnswerMarkdownParser.BlockContext context)
         {
-            _answer.CreateParagraph();
+            _answer.CreateBlock();
+        }
 
-            base.EnterParagraph(context);
+        //public override void EnterParagraph([NotNull] AnswerMarkdownParser.ParagraphContext context)
+        //{
+        //    _answer.CreateParagraph();
+
+        //    base.EnterParagraph(context);
+        //}
+
+        public override void EnterBlockquote([NotNull] AnswerMarkdownParser.BlockquoteContext context)
+        {
+            //var text = context.GetText();
+            //var bodies = text
+            //    .Split([Environment.NewLine, "\r", "\n"], StringSplitOptions.RemoveEmptyEntries)
+            //    ;
+            //for (var i = 0; i < bodies.Length; i++)
+            //{
+            //    bodies[i] = bodies[i].TrimStart('>', ' ');
+            //}
+
+            //var textBlock = new TextBlock
+            //{
+            //    Text = string.Join(Environment.NewLine, bodies),
+            //    Margin = new Thickness(5, 5, 5, 5),
+            //    HorizontalAlignment = HorizontalAlignment.Stretch,
+            //    VerticalAlignment = VerticalAlignment.Center,
+            //};
+
+            //var border = new Border
+            //{
+            //    Margin = new Thickness(10, 0, 0, 0),
+            //    BorderThickness = new Thickness(4, 0, 0, 0),
+            //    HorizontalAlignment = HorizontalAlignment.Stretch,
+            //    VerticalAlignment = VerticalAlignment.Center,
+            //    BorderBrush = System.Windows.Media.Brushes.Green,
+            //    Background = System.Windows.Media.Brushes.LightGray,
+            //    Child = textBlock
+            //};
+
+            //var bc = new BlockUIContainer(border);
+            ////bc.BaselineAlignment = BaselineAlignment.Center;
+
+            _answer.SetBlockType(
+                BlockTypeEnum.Blockquote,
+                null
+                );
+
+            base.EnterBlockquote(context);
         }
 
         public override void EnterHorizontal_rule([NotNull] AnswerMarkdownParser.Horizontal_ruleContext context)
         {
-            var text = context.GetText();
+            var border = new Border
+            {
+                Margin = new Thickness(5, 5, 5, 5),
+                BorderThickness = new Thickness(2),
+                HorizontalAlignment = HorizontalAlignment.Stretch,
+                VerticalAlignment = VerticalAlignment.Center,
+                BorderBrush = System.Windows.Media.Brushes.Green,
+            };
 
-            _answer.AddHorizontalRule(
-                text
+            var bc = new BlockUIContainer(border);
+            //bc.BaselineAlignment = BaselineAlignment.Center;
+
+            _answer.SetBlockType(
+                BlockTypeEnum.HorizontalRule,
+                bc
                 );
         }
 

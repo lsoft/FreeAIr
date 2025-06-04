@@ -49,11 +49,12 @@
     <Compile Include="Antlr\Answer\AdditionalCommand.cs" />
     <Compile Include="Antlr\Answer\AnswerMarkdownListener.cs" />
     <Compile Include="Antlr\Answer\AnswerParser.cs" />
+    <Compile Include="Antlr\Answer\Block.cs" />
+    <Compile Include="Antlr\Answer\BlockTypeEnum.cs" />
     <Compile Include="Antlr\Answer\ParsedAnswer.cs" />
     <Compile Include="Antlr\Answer\Parts\CodeBlockPart.cs" />
     <Compile Include="Antlr\Answer\Parts\CodeLinePart.cs" />
     <Compile Include="Antlr\Answer\Parts\HeaderPart.cs" />
-    <Compile Include="Antlr\Answer\Parts\HorizontalRulePart.cs" />
     <Compile Include="Antlr\Answer\Parts\ImagePart.cs" />
     <Compile Include="Antlr\Answer\Parts\IPart.cs" />
     <Compile Include="Antlr\Answer\Parts\PartTypeEnum.cs" />
