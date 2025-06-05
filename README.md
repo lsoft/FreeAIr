@@ -47,14 +47,14 @@ Main functions:
 - Whole line completion
 - Generate unit tests
 - Fix build errors
+- Support for MCP servers and its tools.
+- A Visual Studio MCP server is built into FreeAIr.
 
 Searching with natural language:
 
 ![Natural0](https://raw.githubusercontent.com/lsoft/FreeAIr/main/natural0.png)
 
 ![Natural1](https://raw.githubusercontent.com/lsoft/FreeAIr/main/natural1.png)
-
-At the time, only `find in whole solution` mode is supported.
 
 Context menu:
 
@@ -99,6 +99,10 @@ Options:
 OpenRouter.ai choose model window:
 
 ![OpenRouter Model](https://raw.githubusercontent.com/lsoft/FreeAIr/main/openroutermodelpng.png)
+
+MCP servers:
+
+![MCP servers](https://raw.githubusercontent.com/lsoft/FreeAIr/main/controlpanel.png)
 
 
 # How I can access to AI if my country is banned from Copilot and from any other LLM provider?
