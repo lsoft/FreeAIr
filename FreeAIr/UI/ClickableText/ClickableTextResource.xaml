@@ -16,10 +16,7 @@
 
         <Setter Property="Foreground" Value="#569CD6" />
         <Setter Property="Background" Value="Transparent"/>
-        <!--<Setter Property="BorderBrush" Value="Transparent"/>-->
         <Setter Property="Padding" Value="0"/>
-        <!--<Setter Property="HorizontalContentAlignment" Value="Left"/>
-            <Setter Property="VerticalContentAlignment" Value="Center"/>-->
         <Setter Property="Cursor" Value="Hand"/>
 
         <Style.Triggers>

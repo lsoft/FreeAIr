@@ -236,6 +236,7 @@
       <DependentUpon>NaturalLanguageResultsToolWindowControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\ViewModels\ControlCenterViewModel.cs" />
+    <Compile Include="UI\ViewModels\DialogViewModel.cs" />
     <Compile Include="UI\ViewModels\NaturalLanguageResultsViewModel.cs" />
     <Compile Include="UI\Windows\NestedCheckBoxWindow.xaml.cs">
       <DependentUpon>NestedCheckBoxWindow.xaml</DependentUpon>

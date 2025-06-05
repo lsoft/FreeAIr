@@ -52,31 +52,18 @@ namespace FreeAIr.Antlr.Answer
                 Orientation = Orientation.Horizontal,
                 VerticalAlignment = VerticalAlignment.Center,
             };
-
+            
             foreach (var ourCommand in ourCommands)
             {
-                var tb = new TextBlock
-                {
-                    Margin = new Thickness(2, 0, 2, 0),
-                    FontSize = 12,
-                    FontFamily = new FontFamily("Cascadia Code"),
-                    ToolTip = ourCommand.ToolTip,
-                    FontWeight = FontWeights.Bold,
-                    Foreground = ourCommand.Foreground,
-                    VerticalAlignment = VerticalAlignment.Center,
-                    Cursor = Cursors.Hand,
-                    Text = ourCommand.Title
-                };
-                tb.InputBindings.Add(
-                    new MouseBinding(
-                        ourCommand.ActionCommand,
-                        new MouseGesture(MouseAction.LeftClick)
-                        )
-                    {
-                        CommandParameter = part.GetContextForAdditionalCommand()
-                    }
+                var control = ourCommand.CreateControl(
+                    part
                     );
-                sp.Children.Add(tb);
+                if (control is null)
+                {
+                    continue;
+                }
+
+                sp.Children.Add(control);
             }
 
             var border = new Border
@@ -95,7 +82,7 @@ namespace FreeAIr.Antlr.Answer
 
     }
 
-    public sealed class AdditionalCommand
+    public /*sealed*/ class AdditionalCommand
     {
         public PartTypeEnum PartType
         {
@@ -110,12 +97,12 @@ namespace FreeAIr.Antlr.Answer
         {
             get;
         }
-        public ICommand ActionCommand
+        public ICommand? ActionCommand
         {
             get;
         }
 
-        public System.Windows.Media.Brush Foreground
+        public System.Windows.Media.Brush? Foreground
         {
             get;
         }
@@ -124,8 +111,8 @@ namespace FreeAIr.Antlr.Answer
             PartTypeEnum partType,
             string title,
             string toolTip,
-            ICommand actionCommand,
-            System.Windows.Media.Brush foreground
+            ICommand? actionCommand,
+            System.Windows.Media.Brush? foreground
             )
         {
             if (title is null)
@@ -138,21 +125,36 @@ namespace FreeAIr.Antlr.Answer
                 throw new ArgumentNullException(nameof(toolTip));
             }
 
-            if (actionCommand is null)
-            {
-                throw new ArgumentNullException(nameof(actionCommand));
-            }
-
-            if (foreground is null)
-            {
-                throw new ArgumentNullException(nameof(foreground));
-            }
-
             PartType = partType;
             Title = title;
             ToolTip = toolTip;
             ActionCommand = actionCommand;
             Foreground = foreground;
+        }
+
+        public virtual UIElement? CreateControl(
+            IPart part
+            )
+        {
+            var control = new Button
+            {
+                Margin = new Thickness(2, 0, 2, 0),
+                FontSize = 12,
+                FontFamily = new FontFamily("Cascadia Code"),
+                ToolTip = ToolTip,
+                FontWeight = FontWeights.Bold,
+                VerticalAlignment = VerticalAlignment.Center,
+                Cursor = Cursors.Hand,
+                Content = Title,
+                Command = ActionCommand,
+                CommandParameter = part.GetContextForAdditionalCommand()
+            };
+            if (Foreground is not null)
+            {
+                control.Foreground = Foreground;
+            }
+            control.SetResourceReference(Button.StyleProperty, "TextBlockLikeButtonStyle");
+            return control;
         }
     }
 }

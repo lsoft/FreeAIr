@@ -681,6 +681,12 @@ namespace FreeAIr.BLogic
                     + Environment.NewLine
                     + "```"
                     );
+
+                _lastPrompt.Answer.UpdateUserVisibleAnswer(
+                    $"Error: {excp.Message}"
+                    );
+
+                _chat.PromptStateChanged(_lastPrompt, PromptChangeKindEnum.AnswerUpdated);
             }
 
 

@@ -14,17 +14,17 @@ using Microsoft.VisualStudio.Imaging;
 using Microsoft.VisualStudio.Imaging.Interop;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.Win32;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.IO;
 using System.Linq;
 using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
 using WpfHelpers;
-using static FreeAIr.UI.Dialog.DialogControl;
-using static FreeAIr.UI.ViewModels.ChatListViewModel;
 
 namespace FreeAIr.UI.ViewModels
 {
@@ -40,13 +40,9 @@ namespace FreeAIr.UI.ViewModels
         private ICommand _stopCommand;
         private ICommand _createPromptCommand;
         private ICommand _startChatCommand;
-        private ICommand _copyCodeBlockCommand;
-        private ICommand _replaceSelectedTextCommand;
-        private ICommand _createNewFileCommand;
         private ICommand _deleteItemFromContextCommand;
         private ICommand _openContextItemCommand;
         private ICommand _addItemToContextCommand;
-        private ICommand _updateContextItemCommand;
         private ICommand _removeAllAutomaticItemsFromContextCommand;
         private ICommand _addRelatedItemsToContextCommand;
         private ICommand _addCustomFileToContextCommand;
@@ -240,203 +236,6 @@ namespace FreeAIr.UI.ViewModels
                 }
 
                 return _startChatCommand;
-            }
-        }
-
-        public ICommand CopyCodeBlockCommand
-        {
-            get
-            {
-                if (_copyCodeBlockCommand == null)
-                {
-                    _copyCodeBlockCommand = new AsyncRelayCommand(
-                        async a =>
-                        {
-                            var textArea = a as ICSharpCode.AvalonEdit.Editing.TextArea;
-                            if (textArea is null)
-                            {
-                                await VS.MessageBox.ShowErrorAsync(
-                                    FreeAIr.Resources.Resources.Error,
-                                    "Cannot copy code block. Please copy manually."
-                                    );
-                                return;
-                            }
-
-                            var codeText = textArea?.Document?.Text ?? string.Empty;
-                            Clipboard.SetText(codeText);
-                        }
-                        );
-                }
-
-                return _copyCodeBlockCommand;
-            }
-        }
-
-        public ICommand ReplaceSelectedTextCommand
-        {
-            get
-            {
-                if (_replaceSelectedTextCommand == null)
-                {
-                    _replaceSelectedTextCommand = new AsyncRelayCommand(
-                        async a =>
-                        {
-                            var textArea = a as ICSharpCode.AvalonEdit.Editing.TextArea;
-                            if (textArea is null)
-                            {
-                                await VS.MessageBox.ShowErrorAsync(
-                                    FreeAIr.Resources.Resources.Error,
-                                    "Cannot replace selected text. Please replace the selected text manually."
-                                    );
-                                return;
-                            }
-
-                            var codeText = textArea?.Document?.Text;
-                            if (codeText is null)
-                            {
-                                await VS.MessageBox.ShowErrorAsync(
-                                    FreeAIr.Resources.Resources.Error,
-                                    "Cannot replace selected text. Please replace the selected text manually."
-                                    );
-                                return;
-                            }
-
-                            var chat = SelectedChat?.Chat;
-                            if (chat is null)
-                            {
-                                await VS.MessageBox.ShowErrorAsync(
-                                    FreeAIr.Resources.Resources.Error,
-                                    "Cannot replace selected text. Please replace the selected text manually."
-                                    );
-                                return;
-                            }
-
-                            var std = chat.Description.SelectedTextDescriptor;
-                            if (std is null)
-                            {
-                                await VS.MessageBox.ShowErrorAsync(
-                                    FreeAIr.Resources.Resources.Error,
-                                    "Cannot replace selected text. Please replace the selected text manually."
-                                    );
-                                return;
-                            }
-
-                            if (!std.IsAbleToManipulate)
-                            {
-                                await VS.MessageBox.ShowErrorAsync(
-                                    FreeAIr.Resources.Resources.Error,
-                                    "Cannot replace selected text. Please replace the selected text manually."
-                                    );
-                                return;
-                            }
-
-                            await std.ReplaceOriginalTextWithNewAsync(
-                                codeText
-                                );
-                        },
-                        a =>
-                        {
-                            var textArea = a as ICSharpCode.AvalonEdit.Editing.TextArea;
-                            if (textArea is null)
-                            {
-                                return false;
-                            }
-
-                            var codeText = textArea?.Document?.Text;
-                            if (string.IsNullOrEmpty(codeText))
-                            {
-                                return false;
-                            }
-
-                            var chat = SelectedChat?.Chat;
-                            if (chat is null)
-                            {
-                                return false;
-                            }
-
-                            var std = chat.Description.SelectedTextDescriptor;
-                            if (std is null)
-                            {
-                                return false;
-                            }
-
-                            if (!std.IsAbleToManipulate)
-                            {
-                                return false;
-                            }
-
-                            return true;
-                        }
-                        );
-                }
-
-                return _replaceSelectedTextCommand;
-            }
-        }
-
-        public ICommand CreateNewFileCommand
-        {
-            get
-            {
-                if (_createNewFileCommand == null)
-                {
-                    _createNewFileCommand = new AsyncRelayCommand(
-                        async a =>
-                        {
-                            var textArea = a as ICSharpCode.AvalonEdit.Editing.TextArea;
-                            if (textArea is null)
-                            {
-                                await VS.MessageBox.ShowErrorAsync(
-                                    FreeAIr.Resources.Resources.Error,
-                                    "Cannot create a new file. Please create the file manually."
-                                    );
-                                return;
-                            }
-
-                            var codeText = textArea?.Document?.Text;
-                            if (codeText is null)
-                            {
-                                await VS.MessageBox.ShowErrorAsync(
-                                    FreeAIr.Resources.Resources.Error,
-                                    "Cannot create a new file. Please create the file manually."
-                                    );
-                                return;
-                            }
-
-                            var solution = await VS.Solutions.GetCurrentSolutionAsync();
-                            if (solution is null)
-                            {
-                                await VS.MessageBox.ShowErrorAsync(
-                                    FreeAIr.Resources.Resources.Error,
-                                    "Cannot create a new file. Please create the file manually."
-                                    );
-                                return;
-                            }
-
-                            var sfi = new FileInfo(solution.FullPath);
-
-                            var sfd = new SaveFileDialog();
-                            sfd.InitialDirectory = sfi.Directory.FullName;
-                            sfd.FileName = "_.cs";
-                            var r = sfd.ShowDialog();
-                            if (!r.HasValue || !r.Value)
-                            {
-                                return;
-                            }
-
-                            var targetFilePath = sfd.FileName;
-
-                            var lineEndings = LineEndingHelper.EditorConfig.GetLineEndingFor(targetFilePath);
-
-                            File.WriteAllText(
-                                targetFilePath,
-                                codeText.WithLineEnding(lineEndings)
-                                );
-                        }
-                        );
-                }
-
-                return _createNewFileCommand;
             }
         }
 
@@ -841,64 +640,6 @@ namespace FreeAIr.UI.ViewModels
             }
         }
 
-        public ICommand UpdateContextItemCommand
-        {
-            get
-            {
-                if (_updateContextItemCommand == null)
-                {
-                    _updateContextItemCommand = new AsyncRelayCommand(
-                        async a =>
-                        {
-                            if (a is not Tuple<object, object> tuple)
-                            {
-                                return;
-                            }
-
-                            var vm = tuple.Item1 as ChatContextItemViewModel;
-                            if (vm is null)
-                            {
-                                await VS.MessageBox.ShowErrorAsync(
-                                    FreeAIr.Resources.Resources.Error,
-                                    "Cannot replace context document body. Please replace manually."
-                                    );
-                                return;
-                            }
-
-                            var textArea = tuple.Item2 as TextArea;
-                            if (textArea is null)
-                            {
-                                await VS.MessageBox.ShowErrorAsync(
-                                    FreeAIr.Resources.Resources.Error,
-                                    "Cannot replace context document body. Please replace manually."
-                                    );
-                                return;
-                            }
-
-                            var codeText = textArea?.Document?.Text;
-                            if (codeText is null)
-                            {
-                                await VS.MessageBox.ShowErrorAsync(
-                                    FreeAIr.Resources.Resources.Error,
-                                    "Cannot replace context document body. Please replace manually."
-                                    );
-                                return;
-                            }
-
-                            vm.ContextItem.ReplaceWithText(
-                                codeText
-                                );
-
-                            OnPropertyChanged();
-                        }
-                        );
-                }
-
-                return _updateContextItemCommand;
-            }
-        }
-
-        
         public ICommand AddRelatedItemsToContextCommand
         {
             get
@@ -1132,7 +873,9 @@ namespace FreeAIr.UI.ViewModels
 
             ChatList = new ObservableCollection2<ChatWrapper>();
 
-            DialogViewModel = new DialogViewModel(chatContainer);
+            DialogViewModel = new DialogViewModel(
+                chatContainer
+                );
 
             UpdateControl();
         }
@@ -1373,166 +1116,5 @@ namespace FreeAIr.UI.ViewModels
     }
 
     public delegate void MarkdownReReadDelegate(object sender, EventArgs e);
-
-    public class DialogViewModel : BaseViewModel
-    {
-        private ChatWrapper? _selectedChat;
-
-        public ObservableCollection2<Replic> Dialog
-        {
-            get;
-        } = new();
-
-        public AdditionalCommandContainer AdditionalCommandContainer
-        {
-            get;
-        } = new();
-
-        public DialogViewModel(ChatContainer chatContainer)
-        {
-            if (chatContainer is null)
-            {
-                throw new ArgumentNullException(nameof(chatContainer));
-            }
-
-            #region AdditionalCommandContainer
-
-            var defaultAdditionalBrush = new SolidColorBrush(Color.FromRgb(0x56, 0x9C, 0xD6));
-
-            AdditionalCommandContainer.AddAdditionalCommand(
-                new AdditionalCommand(
-                    PartTypeEnum.CodeLine | PartTypeEnum.CodeBlock | PartTypeEnum.Xml | PartTypeEnum.Url,
-                    "↑",
-                    "Click to copy to clipboard",
-                    new RelayCommand(
-                        a =>
-                        {
-                            var code = a as string;
-                            if (!string.IsNullOrEmpty(code))
-                            {
-                                Clipboard.SetText(code);
-                            }
-                        }),
-                    defaultAdditionalBrush
-                    )
-                );
-            AdditionalCommandContainer.AddAdditionalCommand(
-                new AdditionalCommand(
-                    PartTypeEnum.Image,
-                    "↑",
-                    "Click to copy to clipboard",
-                    new RelayCommand(
-                        a =>
-                        {
-                            var bitmap = a as BitmapImage;
-                            if (bitmap is not null)
-                            {
-                                Clipboard.SetImage(bitmap);
-                            }
-                        }),
-                    defaultAdditionalBrush
-                    )
-                );
-
-            #endregion
-
-            chatContainer.PromptStateChangedEvent += PromptStateChanged;
-        }
-
-        public void UpdateDialog(
-            ChatWrapper? selectedChat
-            )
-        {
-            Dialog.Clear();
-
-            _selectedChat = selectedChat;
-
-            if (selectedChat is not null)
-            {
-                var chat = selectedChat.Chat;
-                if (chat is not null)
-                {
-                    foreach (var prompt in chat.Prompts)
-                    {
-                        UpdateDialogPrompt(
-                            prompt,
-                            PromptChangeKindEnum.PromptAdded
-                            );
-                    }
-                }
-            }
-        }
-
-        private void UpdateDialogPrompt(
-            UserPrompt prompt,
-            PromptChangeKindEnum kind
-            )
-        {
-            switch (kind)
-            {
-                case PromptChangeKindEnum.PromptAdded:
-                    {
-                        var promptReplic = new Replic(
-                            AnswerParser.Parse(prompt.PromptBody),
-                            prompt,
-                            true,
-                            AdditionalCommandContainer,
-                            false
-                            );
-                        Dialog.Add(promptReplic);
-
-                        var answerReplic = new Replic(
-                            AnswerParser.Parse(prompt.Answer.GetUserVisibleAnswer()),
-                            prompt,
-                            false,
-                            AdditionalCommandContainer,
-                            false
-                            );
-                        Dialog.Add(answerReplic);
-                    }
-                    break;
-                case PromptChangeKindEnum.AnswerUpdated:
-                    {
-                        var replic = Dialog.FirstOrDefault(d => ReferenceEquals(d.Prompt, prompt) && !d.IsPrompt);
-                        if (replic is not null)
-                        {
-                            replic.Update(
-                                AnswerParser.Parse(
-                                    prompt.Answer.GetUserVisibleAnswer()
-                                    ),
-                                true
-                                );
-                        }
-                    }
-                    break;
-                case PromptChangeKindEnum.PromptArchived:
-                    break;
-                default:
-                    break;
-            }
-        }
-
-        private async void PromptStateChanged(object sender, PromptEventArgs e)
-        {
-            try
-            {
-                await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
-
-                if (_selectedChat is not null && ReferenceEquals(_selectedChat.Chat, e.Chat))
-                {
-                    UpdateDialogPrompt(
-                        e.Prompt,
-                        e.Kind
-                        );
-                }
-
-            }
-            catch (Exception excp)
-            {
-                //todo
-            }
-        }
-
-    }
 
 }

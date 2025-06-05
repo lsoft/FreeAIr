@@ -50,7 +50,7 @@ namespace FreeAIr.Commands
             var chat = await chatContainer.StartChatAsync(
                 new ChatDescription(
                     kind,
-                    null
+                    std
                     ),
                 null,
                 null

@@ -14,10 +14,10 @@ namespace FreeAIr.UI
 
         private static void UseVsThemePropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            SetUseVsTheme((UIElement)d, (bool)e.NewValue);
+            SetUseVsTheme((FrameworkElement)d, (bool)e.NewValue);
         }
 
-        public static void SetUseVsTheme(UIElement element, bool value)
+        public static void SetUseVsTheme(FrameworkElement element, bool value)
         {
             if (value)
             {
@@ -26,11 +26,11 @@ namespace FreeAIr.UI
                     _originalBackgrounds[element] = c.Background;
                 }
 
-                ((ContentControl)element).ShouldBeThemed();
+                element.ShouldBeThemed();
             }
             else
             {
-                ((ContentControl)element).ShouldNotBeThemed();
+                element.ShouldNotBeThemed();
             }
 
             _isUsingVsTheme[element] = value;
