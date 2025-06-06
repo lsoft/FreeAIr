@@ -2,9 +2,11 @@
 using FreeAIr.MCP.Agent.External;
 using FreeAIr.MCP.Agent.Github;
 using FreeAIr.UI.Windows;
+using Microsoft.VisualStudio.PlatformUI;
 using Microsoft.VisualStudio.Shell.Interop;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices.WindowsRuntime;
 using System.Windows;
 using System.Windows.Media;
 using WpfHelpers;
@@ -15,6 +17,7 @@ namespace FreeAIr.UI.ViewModels
     {
         private bool? _githubMcpServerStatus;
         private string _externalMcpServerJson;
+        private RelayCommand _restoreDefaultSystemPromptCommand;
 
         public string GithubMcpServerStatusMessage
         {
@@ -81,6 +84,23 @@ namespace FreeAIr.UI.ViewModels
                 InternalPage.Instance.Save();
             }
         }
+
+        public RelayCommand RestoreDefaultSystemPromptCommand
+        {
+            get
+            {
+                if (_restoreDefaultSystemPromptCommand is null)
+                {
+                    _restoreDefaultSystemPromptCommand = new RelayCommand(
+                        a =>
+                        {
+                            InternalPage.Instance.RestoreDefaultSystemPrompt();
+                            OnPropertyChanged();
+                        });
+                }
+                return _restoreDefaultSystemPromptCommand;
+            }
+        } 
 
         public ControlCenterViewModel()
         {

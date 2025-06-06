@@ -18,6 +18,7 @@
         HorizontalContentAlignment="Stretch"
         HorizontalScrollBarVisibility="Disabled"
         VerticalScrollBarVisibility="Auto"
+        Margin="5,5,5,30"
         >
         <Grid>
             <Grid.RowDefinitions>
@@ -31,6 +32,7 @@
                 <!-- system prompt -->
                 <RowDefinition Height="auto"/> <!-- 6 -->
                 <RowDefinition Height="auto"/> <!-- 7 -->
+                <RowDefinition Height="auto"/> <!-- 8 -->
             </Grid.RowDefinitions>
 
             <Label
@@ -155,7 +157,7 @@
             <ScrollViewer
                 Grid.Row="7"
                 MaxHeight="350"
-                HorizontalScrollBarVisibility="Auto"
+                HorizontalScrollBarVisibility="Disabled"
                 VerticalScrollBarVisibility="Auto"
                 >
                 <TextBox
@@ -168,9 +170,21 @@
                     BorderThickness="1"
                     MinHeight="150"
                     AcceptsReturn="True"
+                    TextWrapping="Wrap"
                     />
             </ScrollViewer>
 
+            <Button
+                Grid.Row="8"
+                HorizontalAlignment="Right"
+                VerticalAlignment="Center"
+                Margin="0,0,8,0"
+                FontSize="12"
+                FontFamily="Cascadia Code"
+                Content="Restore default system prompt..."
+                Command="{Binding RestoreDefaultSystemPromptCommand}"
+                Style="{DynamicResource TextBlockLikeButtonStyle}"
+                />
 
 
         </Grid>
