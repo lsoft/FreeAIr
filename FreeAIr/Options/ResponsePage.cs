@@ -5,27 +5,6 @@ namespace FreeAIr
 {
     public class ResponsePage : BaseOptionModel<ResponsePage>
     {
-        private XshdProvider[] _xshdProviders =
-            [
-                new XshdProvider
-                {
-                    LanguageAlias = "cs,csharp",
-                    XshdFilePath = @"Resources/xshd/csharp.xshd"
-                },
-                new XshdProvider
-                {
-                    LanguageAlias = "patch,diff",
-                    XshdFilePath = @"Resources/xshd/patch.xshd"
-                },
-            ];
-
-        [Category("Response")]
-        [DisplayName("Type")]
-        [Description("A type of response of LLM API provider.")]
-        [TypeConverter(typeof(EnumConverter))]
-        [DefaultValue(LLMResultEnum.MD)]
-        public LLMResultEnum ResponseFormat  { get; set; } = LLMResultEnum.MD;
-
         [Category("Response")]
         [DisplayName("Max output token count")]
         [Description("Maximum count of tokens LLM answer can contain.")]

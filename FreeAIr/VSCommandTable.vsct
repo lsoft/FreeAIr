@@ -31,6 +31,18 @@
         </Strings>
       </Menu>
 
+      <Menu guid="FreeAIr" id="SolutionItemsContextMenu" type="Context">
+        <Strings>
+          <ButtonText>Solution Items Context Menu</ButtonText>
+        </Strings>
+      </Menu>
+
+      <Menu guid="FreeAIr" id="FindScopeContextMenu" type="Context">
+        <Strings>
+          <ButtonText>Find Scope Context Menu</ButtonText>
+        </Strings>
+      </Menu>
+
     </Menus>
 
     <Groups>
@@ -54,6 +66,15 @@
       <Group guid="FreeAIr" id="BuildErrorWindowGroup" priority="0x0600">
         <Parent guid="guidSHLMainMenu" id="IDM_VS_CTXT_ERRORLIST" />
       </Group>
+
+      <Group guid="FreeAIr" id="SolutionItemsContextMenuGroup" priority="0x0000">
+        <Parent guid="FreeAIr" id="SolutionItemsContextMenu"/>
+      </Group>
+
+      <Group guid="FreeAIr" id="FindScopeContextMenuGroup" priority="0x0000">
+        <Parent guid="FreeAIr" id="FindScopeContextMenu"/>
+      </Group>
+
     </Groups>
 
     <Buttons>
@@ -211,6 +232,22 @@
         </Strings>
       </Button>
 
+      <Button guid="FreeAIr" id="SolutionItemsContextMenuDynamicCommandId" type="Button" priority="0">
+        <Parent guid="FreeAIr" id="SolutionItemsContextMenuGroup"/>
+        <CommandFlag>DynamicItemStart</CommandFlag>
+        <Strings>
+          <ButtonText>Solution items...</ButtonText>
+        </Strings>
+      </Button>
+
+      <Button guid="FreeAIr" id="FindScopeContextMenuDynamicCommandId" type="Button" priority="0">
+        <Parent guid="FreeAIr" id="FindScopeContextMenuGroup"/>
+        <CommandFlag>DynamicItemStart</CommandFlag>
+        <Strings>
+          <ButtonText>Find Scope...</ButtonText>
+        </Strings>
+      </Button>
+
     </Buttons>
 
     <Bitmaps>
@@ -265,6 +302,16 @@
       <IDSymbol name="ShowReleaseNotesCommandId" value="0x1042" />
       <IDSymbol name="OpenControlCenterCommandId" value="0x1043" />
       <IDSymbol name="ShowOptionsCommandId" value="0x1044" />
+
+      <!-- solution items context menu -->
+      <IDSymbol name="SolutionItemsContextMenu" value="0x1045"/>
+      <IDSymbol name="SolutionItemsContextMenuGroup" value="0x1046"/>
+      <IDSymbol name="SolutionItemsContextMenuDynamicCommandId" value="0x1047"/>
+
+      <!-- find scope context menu -->
+      <IDSymbol name="FindScopeContextMenu" value="0x1048"/>
+      <IDSymbol name="FindScopeContextMenuGroup" value="0x1049"/>
+      <IDSymbol name="FindScopeContextMenuDynamicCommandId" value="0x1050"/>
 
     </GuidSymbol>
 

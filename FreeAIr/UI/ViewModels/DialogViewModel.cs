@@ -3,6 +3,10 @@ using FreeAIr.Antlr.Answer.Parts;
 using FreeAIr.BLogic;
 using FreeAIr.BLogic.Context;
 using FreeAIr.Helper;
+using FreeAIr.UI.Bridge;
+using Microsoft.Xaml.Behaviors.Core;
+using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Windows;
@@ -13,6 +17,7 @@ using System.Windows.Media.Imaging;
 using WpfHelpers;
 using static FreeAIr.UI.Dialog.DialogControl;
 using static FreeAIr.UI.ViewModels.ChatListViewModel;
+using static FreeAIr.UI.ViewModels.SolutionItemsContextMenuCommandBridge;
 
 namespace FreeAIr.UI.ViewModels
 {
@@ -375,37 +380,93 @@ namespace FreeAIr.UI.ViewModels
                 throw new InvalidOperationException("Expected a Button");
             }
 
-            var contextMenu = new ContextMenu();
-
             button.Click += (sender, e) =>
             {
-                contextMenu.Items.Clear();
-
                 var chat = _chatFunc();
                 if (chat is null)
                 {
                     return;
                 }
 
+                var menuItems = new List<SolutionItemContextMenuItem>();
                 foreach (var chatContextItem in chat.ChatContext.Items)
                 {
-                    contextMenu.Items.Add(
-                        new MenuItem
-                        {
-                            Header = chatContextItem.ContextUIDescription,
-                            Command = _actionCommand,
-                            CommandParameter = new Tuple<IChatContextItem, object>(
+                    menuItems.Add(
+                        new SolutionItemContextMenuItem(
+                            chatContextItem.ContextUIDescription,
+                            _actionCommand,
+                            new Tuple<IChatContextItem, object>(
                                 chatContextItem,
                                 part.GetContextForAdditionalCommand()
                                 )
-                        });
+                            )
+                        );
                 }
 
-                button.ContextMenu.IsOpen = true;
+                MenuCommandBridge<SolutionItemContextMenuItem>.ShowContextMenu<SolutionItemsContextMenuCommandBridge>(
+                    button,
+                    menuItems
+                    );
             };
-            button.ContextMenu = contextMenu;
 
             return button;
+        }
+    }
+
+    public sealed class SolutionItemsContextMenuCommandBridge : MenuCommandBridge<SolutionItemContextMenuItem>
+    {
+        protected override int GetMenuID() => PackageIds.SolutionItemsContextMenu;
+
+        public sealed class SolutionItemContextMenuItem
+        {
+            public string Title
+            {
+                get;
+            }
+
+            public ICommand Command
+            {
+                get;
+            }
+
+            public Tuple<IChatContextItem, object> CommandParameter
+            {
+                get;
+            }
+
+            public SolutionItemContextMenuItem(
+                string title,
+                ICommand command,
+                Tuple<IChatContextItem, object> commandParameter
+                )
+            {
+                if (string.IsNullOrEmpty(title))
+                {
+                    throw new ArgumentException($"'{nameof(title)}' cannot be null or empty.", nameof(title));
+                }
+
+                if (command is null)
+                {
+                    throw new ArgumentNullException(nameof(command));
+                }
+
+                if (commandParameter is null)
+                {
+                    throw new ArgumentNullException(nameof(commandParameter));
+                }
+
+                Title = title;
+                Command = command;
+                CommandParameter = commandParameter;
+            }
+
+            public void InvokeCommand()
+            {
+                if (Command.CanExecute(CommandParameter))
+                {
+                    Command.Execute(CommandParameter);
+                }
+            }
         }
     }
 }

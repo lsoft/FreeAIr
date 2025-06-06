@@ -21,12 +21,16 @@
         >
         <Grid>
             <Grid.RowDefinitions>
-                <RowDefinition Height="auto"/>
-                <RowDefinition Height="auto"/>
-                <RowDefinition Height="auto"/>
-                <RowDefinition Height="auto"/>
-                <RowDefinition Height="auto"/>
-                <RowDefinition Height="auto"/>
+                <RowDefinition Height="auto"/> <!-- 0 -->
+                <RowDefinition Height="auto"/> <!-- 1 -->
+                <RowDefinition Height="auto"/> <!-- 2 -->
+                <RowDefinition Height="auto"/> <!-- 3 -->
+                <RowDefinition Height="auto"/> <!-- 4 -->
+                <RowDefinition Height="auto"/> <!-- 5 -->
+
+                <!-- system prompt -->
+                <RowDefinition Height="auto"/> <!-- 6 -->
+                <RowDefinition Height="auto"/> <!-- 7 -->
             </Grid.RowDefinitions>
 
             <Label
@@ -96,6 +100,7 @@
 
             <ScrollViewer
                 Grid.Row="3"
+                MaxHeight="350"
                 HorizontalScrollBarVisibility="Auto"
                 VerticalScrollBarVisibility="Auto"
                 >
@@ -108,7 +113,7 @@
                     Text="{Binding ExternalMcpServerJson, UpdateSourceTrigger=PropertyChanged}"
                     BorderBrush="{Binding ExternalMcpServerJsonBorder}"
                     BorderThickness="1"
-                    MinHeight="350"
+                    MinHeight="150"
                     AcceptsReturn="True"
                     />
             </ScrollViewer>
@@ -136,6 +141,38 @@
                 Command="{Binding EditGlobalToolsCommand}"
                 Style="{DynamicResource TextBlockLikeButtonStyle}"
                 />
+
+            <Label
+                Grid.Row="6"
+                HorizontalAlignment="Left"
+                VerticalAlignment="Center"
+                FontWeight="Bold"
+                FontSize="18"
+                Margin="2"
+                Content="System prompt:"
+                />
+
+            <ScrollViewer
+                Grid.Row="7"
+                MaxHeight="350"
+                HorizontalScrollBarVisibility="Auto"
+                VerticalScrollBarVisibility="Auto"
+                >
+                <TextBox
+                    HorizontalAlignment="Stretch"
+                    VerticalAlignment="Stretch"
+                    FontSize="12"
+                    FontFamily="Cascadia Code"
+                    Margin="6"
+                    Text="{Binding CurrentSystemPrompt, UpdateSourceTrigger=PropertyChanged}"
+                    BorderThickness="1"
+                    MinHeight="150"
+                    AcceptsReturn="True"
+                    />
+            </ScrollViewer>
+
+
+
         </Grid>
     </ScrollViewer>
 </Window>

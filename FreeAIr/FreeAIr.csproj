@@ -91,6 +91,11 @@
     <Compile Include="Commands\Other\OpenControlCenterCommand.cs" />
     <Compile Include="Commands\Other\ShowReleaseNotesCommand.cs" />
     <Compile Include="Commands\Other\OpenNaturalSearchToolWindowCommand.cs" />
+    <Compile Include="Commands\Other\FindScopeContextMenuCommand.cs" />
+    <Compile Include="Commands\Other\SolutionItemsContextMenuCommand.cs" />
+    <Compile Include="Find\FileTypeFilter.cs" />
+    <Compile Include="Find\FileTypesFilter.cs" />
+    <Compile Include="Find\FindScopeContextMenuCommandBridge.cs" />
     <Compile Include="Find\FindWindowModifier.cs" />
     <Compile Include="Git\GitDiffCombiner.cs" />
     <Compile Include="Git\GitRepositoryProvider.cs" />
@@ -182,6 +187,7 @@
       <DependentUpon>source.extension.vsixmanifest</DependentUpon>
     </Compile>
     <Compile Include="UI\BindingProxy.cs" />
+    <Compile Include="UI\Bridge\MenuCommandBridge.cs" />
     <Compile Include="UI\CodeLens\CodeLenseUserControl.xaml.cs">
       <DependentUpon>CodeLenseUserControl.xaml</DependentUpon>
     </Compile>
@@ -315,6 +321,7 @@
     <Reference Include="System" />
     <Reference Include="System.Design" />
     <Reference Include="System.ComponentModel.Composition" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Xaml" />
     <Reference Include="System.Xml" />
     <Reference Include="WindowsBase" />

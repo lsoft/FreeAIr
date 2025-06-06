@@ -11,6 +11,7 @@ using FreeAIr.InfoBar;
 using FreeAIr.MCP.Agent;
 using FreeAIr.UI.Informer;
 using FreeAIr.UI.ToolWindows;
+using FreeAIr.UI.ViewModels;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.ComponentModelHost;
 using System.Reflection;
@@ -32,6 +33,8 @@ namespace FreeAIr
     [ProvideToolWindow(typeof(ChatListToolWindow.Pane), Style = VsDockStyle.Tabbed, Window = WindowGuids.DocumentWell)]
     [ProvideToolWindow(typeof(ChooseModelToolWindow.Pane), Style = VsDockStyle.Tabbed, Window = WindowGuids.DocumentWell)]
     [ProvideToolWindow(typeof(NaturalLanguageResultsToolWindow.Pane), Style = VsDockStyle.Tabbed, Window = WindowGuids.DocumentWell)]
+    [ProvideService(typeof(SolutionItemsContextMenuCommandBridge), IsAsyncQueryable = true)]
+    [ProvideService(typeof(FindScopeContextMenuCommandBridge), IsAsyncQueryable = true)]
     public sealed class FreeAIrPackage : ToolkitPackage
     {
         public static FreeAIrPackage Instance = null;
@@ -67,6 +70,17 @@ namespace FreeAIr
 
                 Assembly a3 = Assembly.LoadFrom(System.IO.Path.Combine(WorkingFolder, "JsonPath.Net.dll"));
                 AppDomain.CurrentDomain.Load(a3.FullName);
+
+                AddService(
+                    typeof(SolutionItemsContextMenuCommandBridge),
+                    (_, _, _) => Task.FromResult<object>(new SolutionItemsContextMenuCommandBridge()),
+                    true
+                    );
+                AddService(
+                    typeof(FindScopeContextMenuCommandBridge),
+                    (_, _, _) => Task.FromResult<object>(new FindScopeContextMenuCommandBridge()),
+                    true
+                    );
 
                 await this.JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
 

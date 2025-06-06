@@ -54,6 +54,12 @@ namespace FreeAIr
         public const int ShowReleaseNotesCommandId = 0x1042;
         public const int OpenControlCenterCommandId = 0x1043;
         public const int ShowOptionsCommandId = 0x1044;
+        public const int SolutionItemsContextMenu = 0x1045;
+        public const int SolutionItemsContextMenuGroup = 0x1046;
+        public const int SolutionItemsContextMenuDynamicCommandId = 0x1047;
+        public const int FindScopeContextMenu = 0x1048;
+        public const int FindScopeContextMenuGroup = 0x1049;
+        public const int FindScopeContextMenuDynamicCommandId = 0x1050;
         public const int Icon16 = 0x0001;
         public const int Icon32 = 0x0001;
     }

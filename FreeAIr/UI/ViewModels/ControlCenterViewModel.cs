@@ -72,6 +72,16 @@ namespace FreeAIr.UI.ViewModels
             get;
         }
 
+        public string CurrentSystemPrompt
+        {
+            get => InternalPage.Instance.CurrentSystemPrompt;
+            set
+            {
+                InternalPage.Instance.CurrentSystemPrompt = value;
+                InternalPage.Instance.Save();
+            }
+        }
+
         public ControlCenterViewModel()
         {
             _githubMcpServerStatus = null;

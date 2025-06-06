@@ -42,7 +42,6 @@ Main functions:
   - whole file
 - Optimize the code
 - Continue writing code according to the comments
-- Chat
 - Composing commit message
 - Whole line completion
 - Generate unit tests
