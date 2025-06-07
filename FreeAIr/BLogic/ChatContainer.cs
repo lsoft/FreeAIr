@@ -45,7 +45,7 @@ namespace FreeAIr.BLogic
         public async Task<Chat?> StartChatAsync(
             ChatDescription kind,
             UserPrompt? prompt,
-            FreeAIr.BLogic.ChatOptions? options
+            FreeAIr.BLogic.ChatOptions options
             )
         {
             if (kind is null)
@@ -53,7 +53,12 @@ namespace FreeAIr.BLogic
                 throw new ArgumentNullException(nameof(kind));
             }
 
-            if (!await ApiPage.Instance.VerifyUriAndShowErrorIfNotAsync())
+            if (options is null)
+            {
+                throw new ArgumentNullException(nameof(options));
+            }
+
+            if (!await options.ChatAgents.VerifyAgentAndShowErrorIfNotAsync())
             {
                 return null;
             }

@@ -1,6 +1,7 @@
 ﻿using FreeAIr.UI.ViewModels;
 using System.Windows;
 using System.Windows.Input;
+using WpfHelpers;
 
 namespace FreeAIr.UI.Windows
 {
@@ -36,7 +37,7 @@ namespace FreeAIr.UI.Windows
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            if (DataContext is AvailableToolsViewModel vm)
+            if (DataContext is NestedCheckBoxViewModel vm)
             {
                 vm.CloseWindow = result =>
                 {
@@ -44,5 +45,15 @@ namespace FreeAIr.UI.Windows
                 };
             }
         }
+    }
+
+    public abstract class NestedCheckBoxViewModel : BaseViewModel
+    {
+        public Action<bool>? CloseWindow
+        {
+            get;
+            set;
+        }
+
     }
 }

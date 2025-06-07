@@ -167,7 +167,6 @@
     <Compile Include="MCP\ServerProxy\VS\Tools\VisualStudioMcpServerTool.cs" />
     <Compile Include="MCP\ServerProxy\VS\VisualStudioMcpServerProxy.cs" />
     <Compile Include="MCP\AvailableToolContainer.cs" />
-    <Compile Include="Options\ApiPage.cs" />
     <Compile Include="Options\InternalPage.cs" />
     <Compile Include="Options\MCPPage.cs" />
     <Compile Include="Options\OptionsProvider.cs" />
@@ -241,6 +240,7 @@
     <Compile Include="UI\ToolWindows\NaturalLanguageResultsToolWindowControl.xaml.cs">
       <DependentUpon>NaturalLanguageResultsToolWindowControl.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UI\ViewModels\ChooseChatAgentViewModel.cs" />
     <Compile Include="UI\ViewModels\ControlCenterViewModel.cs" />
     <Compile Include="UI\ViewModels\DialogViewModel.cs" />
     <Compile Include="UI\ViewModels\NaturalLanguageResultsViewModel.cs" />

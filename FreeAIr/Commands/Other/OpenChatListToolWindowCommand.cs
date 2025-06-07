@@ -9,7 +9,7 @@ namespace FreeAIr.Commands.Other
         {
             await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
 
-            if (string.IsNullOrEmpty(ApiPage.Instance.Token))
+            if (!InternalPage.Instance.IsActiveAgentHasToken())
             {
                 await VS.MessageBox.ShowErrorAsync(
                     Resources.Resources.Error,

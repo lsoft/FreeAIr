@@ -6,6 +6,12 @@ Please report any bugs to the [github repo](https://github.com/lsoft/FreeAIr).
 
 If you are enjoying FreeAIr to the enough level to donate, there are a [lot of small cancer patients](https://advitausa.org/au/index.php/donate/) that need your help. Please provide your help them!
 
+## 3.0.0
+
+- Major revision has changed because of breaking changes in FreeAIr properties. Now you can control FreeAIr via its Control Center.
+- Added multiagent support.
+- Added chat chosen agent.
+
 ## 2.5.0
 
 - Switched to different rendering of LLM answers.

@@ -50,6 +50,7 @@ namespace FreeAIr.UI.ViewModels
         private ICommand _editGlobalToolsCommand;
         private ICommand _editChatToolsCommand;
         private ICommand _editGlobalAgentsCommand;
+        private ICommand _chooseChatAgentCommand;
 
         public event Action ContextControlFocus;
         public event Action PromptControlFocus;
@@ -219,7 +220,7 @@ namespace FreeAIr.UI.ViewModels
                     _startChatCommand = new AsyncRelayCommand(
                         async a =>
                         {
-                            if (!await ApiPage.Instance.VerifyUriAndShowErrorIfNotAsync())
+                            if (!await InternalPage.Instance.VerifyAgentAndShowErrorIfNotAsync())
                             {
                                 return;
                             }
@@ -227,7 +228,7 @@ namespace FreeAIr.UI.ViewModels
                             _ = await _chatContainer.StartChatAsync(
                                 new ChatDescription(ChatKindEnum.Discussion, null),
                                 null,
-                                null
+                                FreeAIr.BLogic.ChatOptions.Default
                                 );
 
                             FocusPromptControl();
@@ -617,6 +618,68 @@ namespace FreeAIr.UI.ViewModels
                 }
 
                 return _editGlobalToolsCommand;
+            }
+        }
+
+        public string ChosenChatAgentText
+        {
+            get
+            {
+                if (_selectedChat is not null)
+                {
+                    var agents = _selectedChat.Chat.Options.ChatAgents;
+                    var agent = agents.TryGetActiveAgent();
+                    if (!string.IsNullOrEmpty(agent.Name))
+                    {
+                        return $"Change chat agent ({agent.Name})...";
+                    }
+                }
+
+                return "Choose chat agent...";
+            }
+        }
+
+        public ICommand ChooseChatAgentCommand
+        {
+            get
+            {
+                if (_chooseChatAgentCommand == null)
+                {
+                    _chooseChatAgentCommand = new AsyncRelayCommand(
+                        async a =>
+                        {
+                            var w = new NestedCheckBoxWindow();
+                            w.DataContext = new ChooseChatAgentViewModel(
+                                _selectedChat.Chat.Options.ChatAgents
+                                );
+                            _ = await w.ShowDialogAsync();
+
+                            OnPropertyChanged();
+                        },
+                        (a) =>
+                        {
+                            if (_selectedChat is null)
+                            {
+                                return false;
+                            }
+                            if (_selectedChat.Chat is null)
+                            {
+                                return false;
+                            }
+
+                            var chat = _selectedChat.Chat;
+
+                            if (chat.Status.NotIn(ChatStatusEnum.NotStarted, ChatStatusEnum.Ready))
+                            {
+                                return false;
+                            }
+
+                            return true;
+                        }
+                        );
+                }
+
+                return _chooseChatAgentCommand;
             }
         }
 

@@ -250,8 +250,13 @@
                         Grid.Row="0"
                         HorizontalAlignment="Stretch"
                         >
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="auto"/>
+                            <ColumnDefinition />
+                        </Grid.ColumnDefinitions>
 
                         <Label
+                            Grid.Column="0"
                             Margin="2"
                             Content="Chat context:"
                             HorizontalAlignment="Left"
@@ -259,15 +264,17 @@
                             FontFamily="Cascadia Code"
                             />
 
-                        <StackPanel
+                        <WrapPanel
+                            Grid.Column="1"
                             Orientation="Horizontal"
                             HorizontalAlignment="Right"
                             VerticalAlignment="Stretch"
+                            Margin="0,5,0,5"
                             >
 
                             <Button
                                 Margin="5,0,5,0"
-                                Content="Choose chat agent..."
+                                Content="{Binding ChosenChatAgentText}"
                                 FontFamily="Cascadia Code"
                                 VerticalAlignment="Center"
                                 ToolTip="Choose this chat agent. These changes are not shared across other chats."
@@ -305,7 +312,7 @@
                                 Style="{DynamicResource TextBlockLikeButtonStyle}"
                                 />
 
-                        </StackPanel>
+                        </WrapPanel>
                     </Grid>
 
                     <ScrollViewer

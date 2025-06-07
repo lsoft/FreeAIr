@@ -80,8 +80,16 @@ namespace FreeAIr.UI.ViewModels
 
                             ModelList.ForEach(m => m.IsSelected = false);
                             _selectedModel.IsSelected = true;
-                            ApiPage.Instance.ChosenModel = _selectedModel.ModelId;
-                            await ApiPage.Instance.SaveAsync();
+
+                            var agents = InternalPage.Instance.GetAgents();
+                            var activeAgent = agents.GetActiveAgent();
+                            if (!activeAgent.IsOpenRouterAgent())
+                            {
+                                return;
+                            }
+
+                            activeAgent.ChosenModel = _selectedModel.ModelId;
+                            await InternalPage.Instance.SaveAgentsAsync(agents);
                         },
                         a => _selectedModel is not null && !_selectedModel.IsSelected
                         );
@@ -141,8 +149,9 @@ namespace FreeAIr.UI.ViewModels
                     .ToList()
                     ;
 
-                var chosenModel = ApiPage.Instance.ChosenModel;
-                
+                var activeAgent = InternalPage.Instance.GetActiveAgent();
+                var chosenModel = activeAgent.ChosenModel;
+
                 ModelList.AddRange(
                     models
                         .OrderBy(m => m.name)

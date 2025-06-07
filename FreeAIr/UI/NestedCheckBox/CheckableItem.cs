@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using FreeAIr.Shared.Helper;
+using System.Collections.Generic;
 using System.Linq;
 using WpfHelpers;
 
@@ -42,6 +43,11 @@ namespace FreeAIr.UI.NestedCheckBox
             }
         }
 
+        public bool IsEnabled
+        {
+            get;
+        }
+
         public bool HasChanged
         {
             get;
@@ -52,7 +58,8 @@ namespace FreeAIr.UI.NestedCheckBox
             string name,
             string description,
             bool isChecked,
-            object? tag
+            object? tag,
+            bool isEnabled
             )
         {
             if (name is null)
@@ -69,9 +76,10 @@ namespace FreeAIr.UI.NestedCheckBox
             Description = description;
             _isChecked = isChecked;
             Tag = tag;
+            IsEnabled = isEnabled;
         }
 
-        public void SetChecked(bool isChecked)
+        public virtual void SetChecked(bool isChecked)
         {
             if (_isChecked == isChecked)
             {
@@ -81,6 +89,27 @@ namespace FreeAIr.UI.NestedCheckBox
             HasChanged = true;
             _isChecked = isChecked;
             OnPropertyChanged();
+        }
+    }
+
+
+    public sealed class SingleSelectedChildGroup : CheckableGroup
+    {
+        public SingleSelectedChildGroup(
+            string name,
+            string description,
+            object? tag,
+            IReadOnlyList<CheckableItem> children,
+            bool isGroupEnabled
+            ) : base(name, description, tag, children, isGroupEnabled)
+        {
+        }
+
+        protected override void Child_OnCheckedChanged(object sender, EventArgs e)
+        {
+            Children.ForEach(c => c.SetChecked(false));
+            var child = sender as CheckableItem;
+            child.SetChecked(true);
         }
     }
 
@@ -95,36 +124,42 @@ namespace FreeAIr.UI.NestedCheckBox
             string name,
             string description,
             object? tag,
-            IReadOnlyList<CheckableItem> children
-            ) : base(name, description, children.All(c => c.IsChecked), tag)
+            IReadOnlyList<CheckableItem> children,
+            bool isGroupEnabled
+            ) : base(name, description, children.All(c => c.IsChecked), tag, isGroupEnabled)
         {
             Children.AddRange(children);
 
-            //когда изменяется состояние группы — обновляем всех детей
-            this.OnCheckedChanged += (sender, args) =>
+            if (isGroupEnabled)
             {
-                if (sender is not CheckableGroup group)
+                //когда изменяется состояние группы — обновляем всех детей
+                this.OnCheckedChanged += (sender, args) =>
                 {
-                    return;
-                }
+                    if (sender is not CheckableGroup group)
+                    {
+                        return;
+                    }
 
-                foreach (var child in Children)
-                {
-                    child.SetChecked(
-                        group.IsChecked
-                        );
-                }
-            };
+                    foreach (var child in Children)
+                    {
+                        child.SetChecked(
+                            group.IsChecked
+                            );
+                    }
+                };
+            }
 
             //подписываемся на изменения каждого дочернего пункта
             foreach (var child in Children)
             {
-                child.OnCheckedChanged += (sender, args) =>
-                {
-                    _isChecked = Children.All(c => c.IsChecked);
-                    OnPropertyChanged();
-                };
+                child.OnCheckedChanged += Child_OnCheckedChanged;
             }
+        }
+
+        protected virtual void Child_OnCheckedChanged(object sender, EventArgs e)
+        {
+            _isChecked = Children.All(c => c.IsChecked);
+            OnPropertyChanged();
         }
     }
 

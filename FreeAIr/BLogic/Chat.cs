@@ -16,7 +16,6 @@ namespace FreeAIr.BLogic
 {
     public sealed class Chat : IDisposable
     {
-        private readonly ChatClient _chatClient;
         private readonly List<UserPrompt> _prompts = new();
 
         private CancellationTokenSource _cancellationTokenSource = new();
@@ -109,24 +108,12 @@ namespace FreeAIr.BLogic
                 Guid.NewGuid().ToString() + ".md"
                 );
 
-            _chatClient = new ChatClient(
-                model: ApiPage.Instance.ChosenModel,
-                new ApiKeyCredential(
-                    ApiPage.Instance.Token
-                    ),
-                new OpenAIClientOptions
-                {
-                    NetworkTimeout = TimeSpan.FromHours(1),
-                    Endpoint = ApiPage.Instance.TryBuildEndpointUri(),
-                }
-                );
-
             ChatContext.ChatContextChangedEvent += ChatContextChangedRaised;
         }
 
         public static async System.Threading.Tasks.Task<Chat> CreateChatAsync(
             ChatDescription description,
-            FreeAIr.BLogic.ChatOptions? options = null
+            FreeAIr.BLogic.ChatOptions options
             )
         {
             var chatContext = await ChatContext.CreateChatContextAsync();
@@ -134,7 +121,7 @@ namespace FreeAIr.BLogic
             var result = new Chat(
                 chatContext,
                 description,
-                options ?? FreeAIr.BLogic.ChatOptions.Default
+                options
                 );
 
             return result;
@@ -231,6 +218,19 @@ namespace FreeAIr.BLogic
             {
                 Status = ChatStatusEnum.WaitingForAnswer;
 
+                var activeAgent = this.Options.ChatAgents.GetActiveAgent();
+                var chatClient = new ChatClient(
+                    model: activeAgent.ChosenModel,
+                    new ApiKeyCredential(
+                        activeAgent.Token
+                        ),
+                    new OpenAIClientOptions
+                    {
+                        NetworkTimeout = TimeSpan.FromHours(1),
+                        Endpoint = activeAgent.TryBuildEndpointUri(),
+                    }
+                    );
+
                 var cco = new ChatCompletionOptions
                 {
                     ToolChoice = Options.ToolChoice,
@@ -252,7 +252,7 @@ namespace FreeAIr.BLogic
                 {
                     continueTalk = false;
 
-                    var completionUpdates = _chatClient.CompleteChatStreaming(
+                    var completionUpdates = chatClient.CompleteChatStreaming(
                         messages: await dialog.GetMessageListAsync(),
                         options: cco,
                         cancellationToken: cancellationToken
@@ -789,25 +789,33 @@ namespace FreeAIr.BLogic
 
     public sealed class ChatOptions
     {
-        public static readonly ChatOptions Default = new ChatOptions(
+        public static ChatOptions Default => new ChatOptions(
             ChatToolChoice.CreateAutoChoice(),
+            InternalPage.Instance.GetAgents(),
             OpenAI.Chat.ChatResponseFormat.CreateTextFormat(),
             false
             );
 
-        public static readonly ChatOptions NoToolAutoProcessedTextResponse = new ChatOptions(
+        public static ChatOptions NoToolAutoProcessedTextResponse => new ChatOptions(
             ChatToolChoice.CreateNoneChoice(),
+            InternalPage.Instance.GetAgents(),
             OpenAI.Chat.ChatResponseFormat.CreateTextFormat(),
             true
             );
 
-        public static readonly ChatOptions NoToolAutoProcessedJsonResponse = new ChatOptions(
+        public static ChatOptions NoToolAutoProcessedJsonResponse => new ChatOptions(
             ChatToolChoice.CreateNoneChoice(),
+            InternalPage.Instance.GetAgents(),
             OpenAI.Chat.ChatResponseFormat.CreateJsonObjectFormat(),
             true
             );
 
         public ChatToolChoice ToolChoice
+        {
+            get;
+        }
+
+        public OptionAgents ChatAgents
         {
             get;
         }
@@ -822,8 +830,9 @@ namespace FreeAIr.BLogic
             get;
         }
 
-        public ChatOptions(
+        private ChatOptions(
             ChatToolChoice toolChoice,
+            OptionAgents chatAgents,
             OpenAI.Chat.ChatResponseFormat responseFormat,
             bool automaticallyProcessed
             )
@@ -833,12 +842,18 @@ namespace FreeAIr.BLogic
                 throw new ArgumentNullException(nameof(toolChoice));
             }
 
+            if (chatAgents is null)
+            {
+                throw new ArgumentNullException(nameof(chatAgents));
+            }
+
             if (responseFormat is null)
             {
                 throw new ArgumentNullException(nameof(responseFormat));
             }
 
             ToolChoice = toolChoice;
+            ChatAgents = chatAgents;
             ResponseFormat = responseFormat;
             AutomaticallyProcessed = automaticallyProcessed;
         }

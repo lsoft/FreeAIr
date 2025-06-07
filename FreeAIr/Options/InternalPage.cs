@@ -1,8 +1,14 @@
 ﻿using Dto;
+using Microsoft.VisualStudio.OLE.Interop;
 using Microsoft.VisualStudio.Shell.Interop;
+using PuppeteerSharp;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
+using System.Net;
 using System.Text.Json;
+using System.Threading.Tasks;
 
 namespace FreeAIr
 {
@@ -129,25 +135,74 @@ Your behavior against available functions:
             return new();
         }
 
+        public OptionAgent GetActiveAgent()
+        {
+            var optionAgents = GetAgents();
+            var agent = optionAgents.GetActiveAgent();
+            return agent;
+        }
+
+        public bool IsActiveAgentHasToken()
+        {
+            try
+            {
+                var optionAgents = GetAgents();
+                var agent = optionAgents.TryGetActiveAgent();
+                if (agent is null)
+                {
+                    return false;
+                }
+
+                return !string.IsNullOrEmpty(agent.Token);
+            }
+            catch
+            {
+                //todo log
+            }
+
+            return new();
+        }
+
+        public async Task<bool> VerifyAgentAndShowErrorIfNotAsync()
+        {
+            var optionAgents = GetAgents();
+            return await optionAgents.VerifyAgentAndShowErrorIfNotAsync();
+        }
+
+        public async Task SaveAgentsAsync(
+            OptionAgents agents
+            )
+        {
+            var agentsJson = System.Text.Json.JsonSerializer.Serialize(
+                agents,
+                new JsonSerializerOptions { WriteIndented = true }
+                );
+            Agents = agentsJson;
+            await SaveAsync();
+        }
+
         private const string _agentsJson =
 """
 {
-    "koboldcpp_local":
-    {
-        "Endpoint": "http://localhost:5001/v1",
-        "Token": "",
-        "ChosenModel": "do_not_applied",
-        "ContextSize": 16384,
-        "IsDefault": true
-    },
-    "openrouter":
-    {
-        "Endpoint": "https://openrouter.ai/api/v1",
-        "Token": "",
-        "ChosenModel": "qwen/qwen3-32b:free",
-        "ContextSize": 16384,
-        "IsDefault": false
-    }
+    "Agents":
+        [
+            {
+                "Name": "koboldcpp_local",
+                "Endpoint":"http://localhost:5001/v1",
+                "Token":"",
+                "ChosenModel":"do_not_applied",
+                "ContextSize":16384,
+                "IsDefault":true
+            },
+            {
+                "Name": "openrouter",
+                "Endpoint":"https://openrouter.ai/api/v1",
+                "Token":"",
+                "ChosenModel":"qwen/qwen3-32b:free",
+                "ContextSize":16384,
+                "IsDefault":false
+            }
+        ]
 }
 """;
 
@@ -156,11 +211,11 @@ Your behavior against available functions:
 
     public sealed class OptionAgents
     {
-        public Dictionary<string, OptionAgent> Agents
+        public List<OptionAgent> Agents
         {
             get;
             set;
-        }
+        } = new();
 
         public static bool TryParse(
             string optionAgentsJson,
@@ -182,10 +237,51 @@ Your behavior against available functions:
             return false;
         }
 
+        public OptionAgent GetActiveAgent()
+        {
+            return TryGetActiveAgent() ?? new OptionAgent();
+        }
+
+        public OptionAgent? TryGetActiveAgent()
+        {
+            return Agents.FirstOrDefault(a => a.IsDefault);
+        }
+
+
+        public async Task<bool> VerifyAgentAndShowErrorIfNotAsync()
+        {
+            var optionAgent = TryGetActiveAgent();
+            if (optionAgent is null)
+            {
+                return false;
+            }
+
+            return await optionAgent.VerifyAgentAndShowErrorIfNotAsync();
+        }
+
+        public Uri? TryBuildEndpointUri()
+        {
+            var optionAgent = TryGetActiveAgent();
+            if (optionAgent is null)
+            {
+                return null;
+            }
+
+            return optionAgent.TryBuildEndpointUri();
+        }
     }
 
     public sealed class OptionAgent
     {
+        /// <summary>
+        /// Agent name.
+        /// </summary>
+        public string Name
+        {
+            get;
+            set;
+        }
+
         /// <summary>
         /// An endpoint of LLM API provider.
         /// </summary>
@@ -231,6 +327,38 @@ Your behavior against available functions:
             set;
         }
 
+        public OptionAgent()
+        {
+            Name = string.Empty;
+            Endpoint = "http://localhost:5001/v1";
+            Token = string.Empty;
+            ContextSize = 8192;
+            IsDefault = false;
+        }
+
+        public async Task<bool> VerifyAgentAndShowErrorIfNotAsync()
+        {
+            var endpointUri = TryBuildEndpointUri();
+            if (endpointUri is null)
+            {
+                await VS.MessageBox.ShowErrorAsync(
+                    Resources.Resources.Error,
+                    "Invalid endpoint Uri. Please make sure it is correct uri. For example, the uri must contain a protocol prefix, like http, https."
+                    );
+                return false;
+            }
+            if (string.IsNullOrEmpty(Token))
+            {
+                await VS.MessageBox.ShowErrorAsync(
+                    Resources.Resources.Error,
+                    "Empty access token for chosen agent. Set the actual token via FreeAIr contronl center and repeat."
+                    );
+                return false;
+            }
+
+            return true;
+        }
+
         public Uri? TryBuildEndpointUri()
         {
             try
@@ -245,5 +373,22 @@ Your behavior against available functions:
             return null;
         }
 
+        public bool IsOpenRouterAgent()
+        {
+            var uri = TryBuildEndpointUri();
+            if (uri is null)
+            {
+                return false;
+            }
+
+            if (string.Compare(uri.Host, "openrouter.ai", true) == 0)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
     }
 }

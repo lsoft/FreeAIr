@@ -44,7 +44,7 @@ namespace FreeAIr.Commands.BuildError
                     wfd
                     ),
                 null,
-                null
+                FreeAIr.BLogic.ChatOptions.Default
                 );
             if (chat is null)
             {

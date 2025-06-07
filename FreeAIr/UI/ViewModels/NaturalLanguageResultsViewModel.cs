@@ -300,7 +300,9 @@ namespace FreeAIr.UI.ViewModels
             try
             {
                 var processedItemCount = 0;
-                foreach (var portion in foundRootItems.SplitByItemsSize(ApiPage.Instance.ContextSize))
+
+                var agent = InternalPage.Instance.GetActiveAgent();
+                foreach (var portion in foundRootItems.SplitByItemsSize(agent.ContextSize))
                 {
                     Status = $"In progress ({processedItemCount}/{foundRootItems.Count})...";
 

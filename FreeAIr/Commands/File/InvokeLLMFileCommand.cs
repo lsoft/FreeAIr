@@ -21,7 +21,7 @@ namespace FreeAIr.Commands.File
         {
             await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
 
-            if (string.IsNullOrEmpty(ApiPage.Instance.Token))
+            if (!InternalPage.Instance.IsActiveAgentHasToken())
             {
                 await VS.MessageBox.ShowErrorAsync(
                     Resources.Resources.Error,
@@ -48,7 +48,7 @@ namespace FreeAIr.Commands.File
                     null
                     ),
                 null,
-                null
+                FreeAIr.BLogic.ChatOptions.Default
                 );
             if (chat is null)
             {

@@ -1,5 +1,6 @@
 ﻿using FreeAIr.MCP.McpServerProxy;
 using FreeAIr.UI.NestedCheckBox;
+using FreeAIr.UI.Windows;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Input;
@@ -7,7 +8,7 @@ using WpfHelpers;
 
 namespace FreeAIr.UI.ViewModels
 {
-    public sealed class AvailableToolsViewModel : BaseViewModel
+    public sealed class AvailableToolsViewModel : NestedCheckBoxViewModel
     {
         private readonly AvailableToolContainer _toolContainer;
 
@@ -16,12 +17,6 @@ namespace FreeAIr.UI.ViewModels
         public string Header => "Choose the MCP tools you want to provide to LLM:";
 
         public ObservableCollection2<CheckableGroup> Groups
-        {
-            get;
-            set;
-        }
-
-        public Action<bool>? CloseWindow
         {
             get;
             set;
@@ -95,7 +90,8 @@ namespace FreeAIr.UI.ViewModels
                     toolsStatus.McpServerProxyName,
                     string.Empty,
                     null,
-                    toolsStatus.Tools.Select(t => new CheckableItem(t.Tool.ToolName, t.Tool.Description, t.Enabled, t)).ToList()
+                    toolsStatus.Tools.Select(t => new CheckableItem(t.Tool.ToolName, t.Tool.Description, t.Enabled, t, true)).ToList(),
+                    true
                     );
             }
             Groups.AddRange(groups.Values);

@@ -11,7 +11,7 @@ namespace FreeAIr.Commands.Other
         {
             await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
 
-            FreeAIrPackage.Instance.ShowOptionPage(typeof(OptionsProvider.ApiPageOptions));
+            FreeAIrPackage.Instance.ShowOptionPage(typeof(OptionsProvider.MCPPageOptions));
         }
 
     }
