@@ -1,8 +1,0 @@
-{
-  "profiles": {
-    "Agent": {
-      "commandName": "Project",
-      "commandLineArgs": "34315 34315"
-    }
-  }
-}

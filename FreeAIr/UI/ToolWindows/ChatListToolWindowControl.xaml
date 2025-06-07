@@ -107,12 +107,23 @@
 
                 <Button
                     Margin="5,2,0,2"
+                    Content="Edit global agents..."
+                    HorizontalAlignment="Right"
+                    VerticalAlignment="Center"
+                    FontFamily="Cascadia Code"
+                    ToolTip="Edit globally available agents metadata, include their endpoint, token etc. These changes do not affects opened chats."
+                    Command="{Binding ElementName=ChatListToolWindow, Path=DataContext.EditGlobalAgentsCommand}"
+                    Style="{DynamicResource TextBlockLikeButtonStyle}"
+                    />
+
+                <Button
+                    Margin="5,2,0,2"
                     Content="Edit global MCP tools..."
                     HorizontalAlignment="Right"
                     VerticalAlignment="Center"
                     FontFamily="Cascadia Code"
                     ToolTip="Edit globally available model context protocol tools. These changes do not affects opened chats."
-                    Command="{Binding ElementName=ChatListToolWindow, Path=DataContext.EditAvailableToolsCommand}"
+                    Command="{Binding ElementName=ChatListToolWindow, Path=DataContext.EditGlobalToolsCommand}"
                     Style="{DynamicResource TextBlockLikeButtonStyle}"
                     />
 
@@ -253,6 +264,16 @@
                             HorizontalAlignment="Right"
                             VerticalAlignment="Stretch"
                             >
+
+                            <Button
+                                Margin="5,0,5,0"
+                                Content="Choose chat agent..."
+                                FontFamily="Cascadia Code"
+                                VerticalAlignment="Center"
+                                ToolTip="Choose this chat agent. These changes are not shared across other chats."
+                                Command="{Binding ElementName=ChatListToolWindow, Path=DataContext.ChooseChatAgentCommand}"
+                                Style="{DynamicResource TextBlockLikeButtonStyle}"
+                                />
 
                             <Button
                                 Margin="5,0,5,0"

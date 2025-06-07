@@ -2,17 +2,17 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace FreeAIr.MCP.Agent
+namespace FreeAIr.MCP.McpServerProxy
 {
-    public sealed class AgentTools
+    public sealed class McpServerTools
     {
-        public IReadOnlyList<AgentTool> Tools
+        public IReadOnlyList<McpServerTool> Tools
         {
             get;
         }
 
-        public AgentTools(
-            IReadOnlyList<AgentTool> tools
+        public McpServerTools(
+            IReadOnlyList<McpServerTool> tools
             )
         {
             if (tools is null)
@@ -24,9 +24,9 @@ namespace FreeAIr.MCP.Agent
         }
     }
 
-    public /*sealed*/ class AgentTool
+    public /*sealed*/ class McpServerTool
     {
-        public string AgentName
+        public string McpServerProxyName
         {
             get;
         }
@@ -36,7 +36,7 @@ namespace FreeAIr.MCP.Agent
             get;
         }
 
-        public string FullName => AgentName + "." + ToolName;
+        public string FullName => McpServerProxyName + "." + ToolName;
 
         public string Description
         {
@@ -48,16 +48,16 @@ namespace FreeAIr.MCP.Agent
             get;
         }
 
-        public AgentTool(
-            string agentName,
+        public McpServerTool(
+            string mcpServerProxyName,
             string toolName,
             string description,
             string parameters
             )
         {
-            if (string.IsNullOrEmpty(agentName))
+            if (string.IsNullOrEmpty(mcpServerProxyName))
             {
-                throw new ArgumentException($"'{nameof(agentName)}' cannot be null or empty.", nameof(agentName));
+                throw new ArgumentException($"'{nameof(mcpServerProxyName)}' cannot be null or empty.", nameof(mcpServerProxyName));
             }
 
             if (string.IsNullOrEmpty(toolName))
@@ -75,7 +75,7 @@ namespace FreeAIr.MCP.Agent
                 throw new ArgumentNullException(nameof(parameters));
             }
 
-            AgentName = agentName;
+            McpServerProxyName = mcpServerProxyName;
             ToolName = toolName;
             Description = description;
             Parameters = parameters;
@@ -99,21 +99,21 @@ namespace FreeAIr.MCP.Agent
         }
     }
 
-    public sealed class AgentToolCallResult
+    public sealed class McpServerProxyToolCallResult
     {
         public string[] Content
         {
             get;
         }
 
-        public AgentToolCallResult(
+        public McpServerProxyToolCallResult(
             string content
             )
         {
             Content = [content];
         }
 
-        public AgentToolCallResult(string[] content)
+        public McpServerProxyToolCallResult(string[] content)
         {
             if (content is null)
             {
@@ -123,7 +123,7 @@ namespace FreeAIr.MCP.Agent
             Content = content;
         }
 
-        public AgentToolCallResult(IEnumerable<string> content)
+        public McpServerProxyToolCallResult(IEnumerable<string> content)
         {
             if (content is null)
             {

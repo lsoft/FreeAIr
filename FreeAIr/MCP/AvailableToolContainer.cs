@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
 
-namespace FreeAIr.MCP.Agent
+namespace FreeAIr.MCP.McpServerProxy
 {
     /// <summary>
     /// Тулзы, доступные согласно настройкам.
@@ -11,27 +11,27 @@ namespace FreeAIr.MCP.Agent
     /// </summary>
     public sealed class AvailableToolContainer
     {
-        private readonly AvailableAgents _agents;
+        private readonly AvailableMcpServers _servers;
 
         public static AvailableToolContainer ReadSystem() => new AvailableToolContainer();
 
         private AvailableToolContainer()
         {
-            _agents = Read();
+            _servers = Read();
         }
 
         public bool GetToolStatus(
-            string agentName,
+            string serverName,
             string toolName
             )
         {
-            var agent = _agents.Agents.FirstOrDefault(s => s.Name == agentName);
-            if (agent is null)
+            var server = _servers.Servers.FirstOrDefault(s => s.Name == serverName);
+            if (server is null)
             {
                 return false;
             }
 
-            var tool = agent.Tools.FirstOrDefault(t => t.Name == toolName);
+            var tool = server.Tools.FirstOrDefault(t => t.Name == toolName);
             if (tool is null)
             {
                 return false;
@@ -41,49 +41,49 @@ namespace FreeAIr.MCP.Agent
         }
 
 
-        public void AddAgent(string agentName)
+        public void AddServer(string serverName)
         {
-            _agents.Agents.Add(new AvailableAgent(agentName, []));
+            _servers.Servers.Add(new AvailableMcpServer(serverName, []));
         }
 
-        public void DeleteAgent(string agentName)
+        public void DeleteServer(string serverName)
         {
-            _agents.Agents.RemoveAll(a => a.Name == agentName);
+            _servers.Servers.RemoveAll(a => a.Name == serverName);
         }
 
 
         public void AddToolsIfNotExists(
-            string agentName,
+            string serverName,
             IReadOnlyList<string> toolNames
             )
         {
-            var agent = _agents.Agents.FirstOrDefault(s => s.Name == agentName);
-            if (agent is null)
+            var server = _servers.Servers.FirstOrDefault(s => s.Name == serverName);
+            if (server is null)
             {
-                agent = new AvailableAgent(
-                    agentName,
+                server = new AvailableMcpServer(
+                    serverName,
                     toolNames
                     );
-                _agents.Add(agent);
+                _servers.Add(server);
                 return;
             }
 
-            agent.AddToolsIfNotExists(toolNames);
+            server.AddToolsIfNotExists(toolNames);
         }
 
-        public bool DeleteAllToolsForAgents(
-            IEnumerable<string> agentNames
+        public bool DeleteAllToolsForMcpServerProxies(
+            IEnumerable<string> serverNames
             )
         {
-            if (agentNames is null)
+            if (serverNames is null)
             {
-                throw new ArgumentNullException(nameof(agentNames));
+                throw new ArgumentNullException(nameof(serverNames));
             }
 
             var deleted = false;
-            foreach (var agentNAme in agentNames)
+            foreach (var serverName in serverNames)
             {
-                if (_agents.DeleteAllToolsForAgent(agentNAme))
+                if (_servers.DeleteAllToolsForServer(serverName))
                 {
                     deleted = true;
                 }
@@ -93,21 +93,21 @@ namespace FreeAIr.MCP.Agent
         }
 
         public void AddTool(
-            string agentName,
+            string serverName,
             string toolName,
             bool enabled
             )
         {
-            var agent = _agents.Agents.FirstOrDefault(s => s.Name == agentName);
-            if (agent is null)
+            var server = _servers.Servers.FirstOrDefault(s => s.Name == serverName);
+            if (server is null)
             {
                 return;
             }
 
-            var tool = agent.Tools.FirstOrDefault(t => t.Name == toolName);
+            var tool = server.Tools.FirstOrDefault(t => t.Name == toolName);
             if (tool is null)
             {
-                agent.Tools.Add(new AvailableAgentTool(toolName, enabled));
+                server.Tools.Add(new AvailableMcpServerTool(toolName, enabled));
                 return;
             }
 
@@ -116,21 +116,21 @@ namespace FreeAIr.MCP.Agent
 
         public void SaveToSystem()
         {
-            MCPPage.Instance.AvailableTools = JsonSerializer.Serialize(_agents);
+            MCPPage.Instance.AvailableTools = JsonSerializer.Serialize(_servers);
             MCPPage.Instance.Save();
         }
 
-        private static AvailableAgents Read()
+        private static AvailableMcpServers Read()
         {
             var json = MCPPage.Instance.AvailableTools;
             if (string.IsNullOrEmpty(json))
             {
-                return new AvailableAgents();
+                return new AvailableMcpServers();
             }
 
             try
             {
-                var result = JsonSerializer.Deserialize<AvailableAgents>(json);
+                var result = JsonSerializer.Deserialize<AvailableMcpServers>(json);
                 return result;
             }
             catch (Exception excp)
@@ -138,41 +138,41 @@ namespace FreeAIr.MCP.Agent
                 //todo log
             }
 
-            return new AvailableAgents();
+            return new AvailableMcpServers();
         }
 
-        public sealed class AvailableAgents
+        public sealed class AvailableMcpServers
         {
-            public List<AvailableAgent> Agents
+            public List<AvailableMcpServer> Servers
             {
                 get;
                 set;
             }
 
-            public AvailableAgents()
+            public AvailableMcpServers()
             {
-                Agents = [];
+                Servers = [];
             }
 
-            public void Add(AvailableAgent agent)
+            public void Add(AvailableMcpServer server)
             {
-                if (agent is null)
+                if (server is null)
                 {
-                    throw new ArgumentNullException(nameof(agent));
+                    throw new ArgumentNullException(nameof(server));
                 }
 
-                Agents.Add(agent);
+                Servers.Add(server);
             }
 
-            public bool DeleteAllToolsForAgent(string agentName)
+            public bool DeleteAllToolsForServer(string serverName)
             {
-                var lengthBeforeDelete = Agents.Count;
-                Agents.RemoveAll(a => a.Name == agentName);
-                return Agents.Count != lengthBeforeDelete;
+                var lengthBeforeDelete = Servers.Count;
+                Servers.RemoveAll(a => a.Name == serverName);
+                return Servers.Count != lengthBeforeDelete;
             }
         }
 
-        public sealed class AvailableAgent
+        public sealed class AvailableMcpServer
         {
             public string Name
             {
@@ -180,19 +180,19 @@ namespace FreeAIr.MCP.Agent
                 set;
             }
 
-            public List<AvailableAgentTool> Tools
+            public List<AvailableMcpServerTool> Tools
             {
                 get;
                 set;
             }
 
-            public AvailableAgent()
+            public AvailableMcpServer()
             {
                 Name = string.Empty;
                 Tools = [];
             }
 
-            public AvailableAgent(
+            public AvailableMcpServer(
                 string name,
                 IReadOnlyList<string> toolNames
                 )
@@ -203,7 +203,7 @@ namespace FreeAIr.MCP.Agent
                 }
 
                 Name = name;
-                Tools = toolNames.ConvertAll(t => new AvailableAgentTool(t));
+                Tools = toolNames.ConvertAll(t => new AvailableMcpServerTool(t));
             }
 
             public void AddToolsIfNotExists(
@@ -224,20 +224,20 @@ namespace FreeAIr.MCP.Agent
                     }
                     else
                     {
-                        tools.Add(new AvailableAgentTool(toolName));
+                        tools.Add(new AvailableMcpServerTool(toolName));
                     }
                 }
 
                 Tools = tools;
             }
 
-            public void UpdateAllToolsForAgent(bool enabled)
+            public void UpdateAllTools(bool enabled)
             {
                 Tools.ForEach(t => t.Enabled = enabled);
             }
         }
 
-        public sealed class AvailableAgentTool
+        public sealed class AvailableMcpServerTool
         {
             public bool Enabled
             {
@@ -251,13 +251,13 @@ namespace FreeAIr.MCP.Agent
                 set;
             }
 
-            public AvailableAgentTool()
+            public AvailableMcpServerTool()
             {
                 Enabled = false;
                 Name = string.Empty;
             }
 
-            public AvailableAgentTool(string name)
+            public AvailableMcpServerTool(string name)
             {
                 if (name is null)
                 {
@@ -268,7 +268,7 @@ namespace FreeAIr.MCP.Agent
                 Name = name;
             }
 
-            public AvailableAgentTool(string name, bool enabled)
+            public AvailableMcpServerTool(string name, bool enabled)
             {
                 if (name is null)
                 {

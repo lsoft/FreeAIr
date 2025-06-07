@@ -3,8 +3,9 @@ using FreeAIr.Antlr.Answer.Parts;
 using FreeAIr.BLogic;
 using FreeAIr.BLogic.Context;
 using FreeAIr.BLogic.Context.Item;
+using FreeAIr.Commands.Other;
 using FreeAIr.Helper;
-using FreeAIr.MCP.Agent;
+using FreeAIr.MCP.McpServerProxy;
 using FreeAIr.Shared.Helper;
 using FreeAIr.UI.Embedillo.Answer.Parser;
 using FreeAIr.UI.Windows;
@@ -46,8 +47,9 @@ namespace FreeAIr.UI.ViewModels
         private ICommand _removeAllAutomaticItemsFromContextCommand;
         private ICommand _addRelatedItemsToContextCommand;
         private ICommand _addCustomFileToContextCommand;
-        private ICommand _editAvailableToolsCommand;
+        private ICommand _editGlobalToolsCommand;
         private ICommand _editChatToolsCommand;
+        private ICommand _editGlobalAgentsCommand;
 
         public event Action ContextControlFocus;
         public event Action PromptControlFocus;
@@ -568,13 +570,34 @@ namespace FreeAIr.UI.ViewModels
             }
         }
 
-        public ICommand EditAvailableToolsCommand
+        public ICommand EditGlobalAgentsCommand
         {
             get
             {
-                if (_editAvailableToolsCommand == null)
+                if (_editGlobalAgentsCommand == null)
                 {
-                    _editAvailableToolsCommand = new AsyncRelayCommand(
+                    _editGlobalAgentsCommand = new AsyncRelayCommand(
+                        async a =>
+                        {
+                            await OpenControlCenterCommand.ShowAsync(
+                                ControlCenterSectionEnum.Agents
+                                );
+                            OnPropertyChanged();
+                        }
+                        );
+                }
+
+                return _editGlobalAgentsCommand;
+            }
+        }
+
+        public ICommand EditGlobalToolsCommand
+        {
+            get
+            {
+                if (_editGlobalToolsCommand == null)
+                {
+                    _editGlobalToolsCommand = new AsyncRelayCommand(
                         async a =>
                         {
                             var toolContainer = AvailableToolContainer.ReadSystem();
@@ -593,9 +616,10 @@ namespace FreeAIr.UI.ViewModels
                         );
                 }
 
-                return _editAvailableToolsCommand;
+                return _editGlobalToolsCommand;
             }
         }
+
         public ICommand EditChatToolsCommand
         {
             get

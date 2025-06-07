@@ -1,6 +1,6 @@
-﻿using FreeAIr.MCP.Agent;
-using FreeAIr.MCP.Agent.External;
-using FreeAIr.MCP.Agent.Github;
+﻿using FreeAIr.MCP.McpServerProxy;
+using FreeAIr.MCP.McpServerProxy.External;
+using FreeAIr.MCP.McpServerProxy.Github;
 using FreeAIr.UI.Windows;
 using Microsoft.VisualStudio.PlatformUI;
 using Microsoft.VisualStudio.Shell.Interop;
@@ -18,6 +18,9 @@ namespace FreeAIr.UI.ViewModels
         private bool? _githubMcpServerStatus;
         private string _externalMcpServerJson;
         private RelayCommand _restoreDefaultSystemPromptCommand;
+        private string _agentsJson;
+
+        #region Model Context Protocol
 
         public string GithubMcpServerStatusMessage
         {
@@ -56,7 +59,7 @@ namespace FreeAIr.UI.ViewModels
         {
             get
             {
-                if (!ExternalAgentJsonParser.TryParse(_externalMcpServerJson, out _))
+                if (!ExternalMcpServersJsonParser.TryParse(_externalMcpServerJson, out _))
                 {
                     return Brushes.Red;
                 }
@@ -74,6 +77,10 @@ namespace FreeAIr.UI.ViewModels
         {
             get;
         }
+
+        #endregion
+
+        #region System Prompt
 
         public string CurrentSystemPrompt
         {
@@ -100,16 +107,52 @@ namespace FreeAIr.UI.ViewModels
                 }
                 return _restoreDefaultSystemPromptCommand;
             }
-        } 
+        }
+
+        #endregion
+
+        #region Agents
+
+        public string AgentsJson
+        {
+            get => _agentsJson;
+            set
+            {
+                _agentsJson = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public Brush AgentsJsonBorder
+        {
+            get
+            {
+                if (!OptionAgents.TryParse(_agentsJson, out _))
+                {
+                    return Brushes.Red;
+                }
+
+                return Brushes.Green;
+            }
+        }
+
+        public ApplyAgentsJsonCmd ApplyAgentsJsonCommand
+        {
+            get;
+        }
+
+        #endregion
 
         public ControlCenterViewModel()
         {
             _githubMcpServerStatus = null;
             ExternalMcpServerJson = MCPPage.Instance.ExternalMCPServers;
+            AgentsJson = InternalPage.Instance.Agents;
 
             InstallGithubMCPServerCommand = new(this);
             ApplyExternalMcpServerChangesCommand = new(this);
             EditGlobalToolsCommand = new(this);
+            ApplyAgentsJsonCommand = new(this);
 
             UpdateGithubMcpStatusAsync()
                 .FileAndForget(nameof(UpdateGithubMcpStatusAsync));
@@ -117,7 +160,7 @@ namespace FreeAIr.UI.ViewModels
 
         private async Task UpdateGithubMcpStatusAsync()
         {
-            var isInstalled = await GithubAgent.Instance.IsInstalledAsync();
+            var isInstalled = await GithubMcpServerProxy.Instance.IsInstalledAsync();
             if (isInstalled)
             {
                 _githubMcpServerStatus = true;
@@ -162,7 +205,7 @@ namespace FreeAIr.UI.ViewModels
                 {
                     var toolContainer = AvailableToolContainer.ReadSystem();
 
-                    if (await AgentCollection.ProcessAgentAsync(toolContainer, GithubAgent.Instance))
+                    if (await McpServerProxyCollection.ProcessMcpServerProxyAsync(toolContainer, GithubMcpServerProxy.Instance))
                     {
                         toolContainer.SaveToSystem();
                         _viewModel._githubMcpServerStatus = true;
@@ -188,6 +231,63 @@ namespace FreeAIr.UI.ViewModels
             }
         }
 
+        public sealed class ApplyAgentsJsonCmd : AsyncBaseRelayCommand
+        {
+            private readonly ControlCenterViewModel _viewModel;
+
+            public ApplyAgentsJsonCmd(
+                ControlCenterViewModel viewModel
+                )
+            {
+                if (viewModel is null)
+                {
+                    throw new ArgumentNullException(nameof(viewModel));
+                }
+
+                _viewModel = viewModel;
+            }
+
+            protected override async Task ExecuteInternalAsync(object parameter)
+            {
+                if (!OptionAgents.TryParse(_viewModel._agentsJson, out var optionAgents))
+                {
+                    await VS.MessageBox.ShowErrorAsync(
+                        Resources.Resources.Error,
+                        $"Invalid json (1). Fix json and try again."
+                        );
+                    return;
+                }
+
+                try
+                {
+                    InternalPage.Instance.Agents = _viewModel._agentsJson;
+                    await InternalPage.Instance.SaveAsync();
+                }
+                catch (Exception excp)
+                {
+                    //todo log
+                    await VS.MessageBox.ShowErrorAsync(
+                        Resources.Resources.Error,
+                        excp.Message + Environment.NewLine + excp.StackTrace
+                        );
+                }
+            }
+
+            protected override bool CanExecuteInternal(object parameter)
+            {
+                if (string.IsNullOrEmpty(_viewModel._agentsJson))
+                {
+                    return false;
+                }
+                if (!OptionAgents.TryParse(_viewModel._agentsJson, out _))
+                {
+                    return false;
+                }
+
+                return true;
+            }
+        }
+
         public sealed class ApplyExternalMcpServerChangesCmd : AsyncBaseRelayCommand
         {
             private readonly ControlCenterViewModel _viewModel;
@@ -206,7 +306,7 @@ namespace FreeAIr.UI.ViewModels
 
             protected override async Task ExecuteInternalAsync(object parameter)
             {
-                if (!ExternalAgentJsonParser.TryParse(_viewModel._externalMcpServerJson, out var mcpServers))
+                if (!ExternalMcpServersJsonParser.TryParse(_viewModel._externalMcpServerJson, out var mcpServers))
                 {
                     await VS.MessageBox.ShowErrorAsync(
                         Resources.Resources.Error,
@@ -217,14 +317,14 @@ namespace FreeAIr.UI.ViewModels
 
                 try
                 {
-                    var setupResult = await AgentApplication.UpdateExternalServersAsync(
+                    var setupResult = await McpServerProxyApplication.UpdateExternalServersAsync(
                         mcpServers
                         );
 
                     var failedServerNames = new List<string>();
                     foreach (var mcpServer in mcpServers.Servers)
                     {
-                        if (setupResult.SuccessStartedAgents.All(a => a.Name != mcpServer.Key))
+                        if (setupResult.SuccessStartedMcpServers.All(a => a.Name != mcpServer.Key))
                         {
                             //этот сервер не был инициализирован по какой-то причине
                             failedServerNames.Add(mcpServer.Key);
@@ -274,7 +374,7 @@ namespace FreeAIr.UI.ViewModels
                 {
                     return false;
                 }
-                if (!ExternalAgentJsonParser.TryParse(_viewModel._externalMcpServerJson, out _))
+                if (!ExternalMcpServersJsonParser.TryParse(_viewModel._externalMcpServerJson, out _))
                 {
                     return false;
                 }

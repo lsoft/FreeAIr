@@ -1,4 +1,4 @@
-﻿using FreeAIr.MCP.Agent;
+﻿using FreeAIr.MCP.McpServerProxy;
 using FreeAIr.UI.NestedCheckBox;
 using System.Collections.Generic;
 using System.Linq;
@@ -40,16 +40,16 @@ namespace FreeAIr.UI.ViewModels
                             {
                                 var toolGroupName = group.Name;
 
-                                _toolContainer.DeleteAgent(
+                                _toolContainer.DeleteServer(
                                     toolGroupName
                                     );
-                                _toolContainer.AddAgent(
+                                _toolContainer.AddServer(
                                     toolGroupName
                                     );
 
                                 foreach (var tool in group.Children)
                                 {
-                                    if (!(tool.Tag is AgentToolStatus agentTool))
+                                    if (!(tool.Tag is McpServerToolStatus serverTool))
                                     {
                                         continue;
                                     }
@@ -86,16 +86,16 @@ namespace FreeAIr.UI.ViewModels
 
             _toolContainer = toolContainer;
 
-            var tools = AgentCollection.GetTools(_toolContainer);
+            var tools = McpServerProxyCollection.GetTools(_toolContainer);
 
             var groups = new Dictionary<string, CheckableGroup>();
-            foreach (var agent in tools.Agents)
+            foreach (var toolsStatus in tools.ToolsStatuses)
             {
-                groups[agent.AgentName] = new CheckableGroup(
-                    agent.AgentName,
+                groups[toolsStatus.McpServerProxyName] = new CheckableGroup(
+                    toolsStatus.McpServerProxyName,
                     string.Empty,
                     null,
-                    agent.Tools.Select(t => new CheckableItem(t.Tool.ToolName, t.Tool.Description, t.Enabled, t)).ToList()
+                    toolsStatus.Tools.Select(t => new CheckableItem(t.Tool.ToolName, t.Tool.Description, t.Enabled, t)).ToList()
                     );
             }
             Groups.AddRange(groups.Values);

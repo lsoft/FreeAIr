@@ -11,12 +11,22 @@ namespace FreeAIr.Commands.Other
         {
             await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
 
-            var w = new ControlCenterWindow();
+            await ShowAsync(
+                ControlCenterSectionEnum.None
+                );
+        }
+
+        public static async Task ShowAsync(
+            ControlCenterSectionEnum section
+            )
+        {
+            var w = new ControlCenterWindow(
+                section
+                );
             var vm = new ControlCenterViewModel();
             w.DataContext = vm;
             _ = await w.ShowDialogAsync();
         }
-
     }
 
 }

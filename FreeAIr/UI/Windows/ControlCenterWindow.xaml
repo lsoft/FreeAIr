@@ -12,6 +12,7 @@
     ui:VsTheme.UseVsTheme="True"
     ShowInTaskbar="False"
     Title="FreeAIr Control Center"
+    Loaded="Window_Loaded"
     >
     <ScrollViewer
         HorizontalAlignment="Stretch"
@@ -19,9 +20,12 @@
         HorizontalScrollBarVisibility="Disabled"
         VerticalScrollBarVisibility="Auto"
         Margin="5,5,5,30"
+        Name="MainScrollViewerName"
         >
         <Grid>
             <Grid.RowDefinitions>
+
+                <!-- Model Context Protocol -->
                 <RowDefinition Height="auto"/> <!-- 0 -->
                 <RowDefinition Height="auto"/> <!-- 1 -->
                 <RowDefinition Height="auto"/> <!-- 2 -->
@@ -33,8 +37,15 @@
                 <RowDefinition Height="auto"/> <!-- 6 -->
                 <RowDefinition Height="auto"/> <!-- 7 -->
                 <RowDefinition Height="auto"/> <!-- 8 -->
+
+                <!-- agents -->
+                <RowDefinition Height="auto"/> <!-- 9 -->
+                <RowDefinition Height="auto"/> <!-- 10 -->
+                <RowDefinition Height="auto"/> <!-- 11 -->
+
             </Grid.RowDefinitions>
 
+            <!-- Model Context Protocol -->
             <Label
                 Grid.Row="0"
                 HorizontalAlignment="Left"
@@ -43,6 +54,7 @@
                 FontSize="18"
                 Margin="2"
                 Content="Model Context Protocol"
+                Name="ModelContextProtocolLabel"
                 />
 
             <Grid
@@ -105,6 +117,7 @@
                 MaxHeight="350"
                 HorizontalScrollBarVisibility="Auto"
                 VerticalScrollBarVisibility="Auto"
+                PreviewMouseWheel="ScrollViewer_PreviewMouseWheel"
                 >
                 <TextBox
                     HorizontalAlignment="Stretch"
@@ -142,8 +155,10 @@
                 Content="Edit global MCP tools..."
                 Command="{Binding EditGlobalToolsCommand}"
                 Style="{DynamicResource TextBlockLikeButtonStyle}"
+                Name="MCPAppyButton"
                 />
 
+            <!-- system prompt -->
             <Label
                 Grid.Row="6"
                 HorizontalAlignment="Left"
@@ -152,6 +167,7 @@
                 FontSize="18"
                 Margin="2"
                 Content="System prompt:"
+                Name="SystemPromptLabel"
                 />
 
             <ScrollViewer
@@ -159,6 +175,7 @@
                 MaxHeight="350"
                 HorizontalScrollBarVisibility="Disabled"
                 VerticalScrollBarVisibility="Auto"
+                PreviewMouseWheel="ScrollViewer_PreviewMouseWheel"
                 >
                 <TextBox
                     HorizontalAlignment="Stretch"
@@ -186,7 +203,51 @@
                 Style="{DynamicResource TextBlockLikeButtonStyle}"
                 />
 
+            <!-- Agents -->
+            <Label
+                Grid.Row="9"
+                HorizontalAlignment="Left"
+                VerticalAlignment="Center"
+                FontWeight="Bold"
+                FontSize="18"
+                Margin="2"
+                Content="Agents"
+                Name="AgentslLabel"
+                />
 
+            <ScrollViewer
+                Grid.Row="10"
+                MaxHeight="350"
+                HorizontalScrollBarVisibility="Auto"
+                VerticalScrollBarVisibility="Auto"
+                PreviewMouseWheel="ScrollViewer_PreviewMouseWheel"
+                >
+                <TextBox
+                    HorizontalAlignment="Stretch"
+                    VerticalAlignment="Stretch"
+                    FontSize="12"
+                    FontFamily="Cascadia Code"
+                    Margin="6"
+                    Text="{Binding AgentsJson, UpdateSourceTrigger=PropertyChanged}"
+                    BorderBrush="{Binding AgentsJsonBorder}"
+                    BorderThickness="1"
+                    MinHeight="150"
+                    AcceptsReturn="True"
+                    />
+            </ScrollViewer>
+
+            <Button
+                Grid.Row="11"
+                HorizontalAlignment="Right"
+                VerticalAlignment="Center"
+                Margin="0,0,8,0"
+                FontSize="12"
+                FontFamily="Cascadia Code"
+                Content="Apply changes..."
+                Command="{Binding ApplyAgentsJsonCommand}"
+                Style="{DynamicResource TextBlockLikeButtonStyle}"
+                Name="AgentsAppyButton"
+                />
         </Grid>
     </ScrollViewer>
 </Window>

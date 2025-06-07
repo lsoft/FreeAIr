@@ -145,27 +145,27 @@
     <Compile Include="ImageMonikers.cs" />
     <Compile Include="InfoBar\InfoBarService.cs" />
     <Compile Include="InfoBar\ReleaseNotesInfoBarService.cs" />
-    <Compile Include="MCP\Agent\AgentCollection.cs" />
-    <Compile Include="MCP\Agent\AgentApplication.cs" />
-    <Compile Include="MCP\Agent\External\ExternalAgentJsonParser.cs" />
-    <Compile Include="MCP\Agent\External\ExternalAgent.cs" />
+    <Compile Include="MCP\ServerProxy\McpServerProxyCollection.cs" />
+    <Compile Include="MCP\ServerProxy\McpServerProxyApplication.cs" />
+    <Compile Include="MCP\ServerProxy\External\ExternalMcpServersJsonParser.cs" />
+    <Compile Include="MCP\ServerProxy\External\ExternalMcpServerProxy.cs" />
     <Compile Include="MCP\Tools.cs" />
-    <Compile Include="MCP\Agent\Github\GithubAgent.cs" />
-    <Compile Include="MCP\Agent\Github\GithubMCPInstallBackgroundTask.cs" />
-    <Compile Include="MCP\Agent\Github\GithubRequestFactory.cs" />
-    <Compile Include="MCP\Agent\IAgent.cs" />
-    <Compile Include="MCP\Agent\ProcessMonitor.cs" />
-    <Compile Include="MCP\Agent\VS\Tools\GitCollectChangesTool.cs" />
-    <Compile Include="MCP\Agent\VS\Tools\WebSearchTool.cs" />
-    <Compile Include="MCP\Agent\VS\Tools\GitCommitTool.cs" />
-    <Compile Include="MCP\Agent\VS\Tools\InstallNugetPackageTool.cs" />
-    <Compile Include="MCP\Agent\VS\Tools\ReplaceDocumentBodyTool.cs" />
-    <Compile Include="MCP\Agent\VS\Tools\GetAllSolutionItemsTool.cs" />
-    <Compile Include="MCP\Agent\VS\Tools\BuildAndReturnBuildResultsTool.cs" />
-    <Compile Include="MCP\Agent\VS\Tools\GetSolutionItemBodyTool.cs" />
-    <Compile Include="MCP\Agent\VS\Tools\GetAllWarningErrorsTool.cs" />
-    <Compile Include="MCP\Agent\VS\Tools\VisualStudioAgentTool.cs" />
-    <Compile Include="MCP\Agent\VS\VisualStudioAgent.cs" />
+    <Compile Include="MCP\ServerProxy\Github\GithubMcpServerProxy.cs" />
+    <Compile Include="MCP\ServerProxy\Github\GithubMCPInstallBackgroundTask.cs" />
+    <Compile Include="MCP\ServerProxy\Github\GithubRequestFactory.cs" />
+    <Compile Include="MCP\ServerProxy\IMcpServerProxy.cs" />
+    <Compile Include="MCP\ServerProxy\ProcessMonitor.cs" />
+    <Compile Include="MCP\ServerProxy\VS\Tools\GitCollectChangesTool.cs" />
+    <Compile Include="MCP\ServerProxy\VS\Tools\WebSearchTool.cs" />
+    <Compile Include="MCP\ServerProxy\VS\Tools\GitCommitTool.cs" />
+    <Compile Include="MCP\ServerProxy\VS\Tools\InstallNugetPackageTool.cs" />
+    <Compile Include="MCP\ServerProxy\VS\Tools\ReplaceDocumentBodyTool.cs" />
+    <Compile Include="MCP\ServerProxy\VS\Tools\GetAllSolutionItemsTool.cs" />
+    <Compile Include="MCP\ServerProxy\VS\Tools\BuildAndReturnBuildResultsTool.cs" />
+    <Compile Include="MCP\ServerProxy\VS\Tools\GetSolutionItemBodyTool.cs" />
+    <Compile Include="MCP\ServerProxy\VS\Tools\GetAllWarningErrorsTool.cs" />
+    <Compile Include="MCP\ServerProxy\VS\Tools\VisualStudioMcpServerTool.cs" />
+    <Compile Include="MCP\ServerProxy\VS\VisualStudioMcpServerProxy.cs" />
     <Compile Include="MCP\AvailableToolContainer.cs" />
     <Compile Include="Options\ApiPage.cs" />
     <Compile Include="Options\InternalPage.cs" />
@@ -510,7 +510,7 @@
   <Import Project="$(VSToolsPath)\VSSDK\Microsoft.VsSDK.targets" Condition="'$(VSToolsPath)' != ''" />
   <Target Name="IncludeNuGetPackageReferences" AfterTargets="GetVsixSourceItems">
     <ItemGroup>
-      <VSIXSourceItem Include="$(SolutionDir).art\Agent.zip" TargetPath="MCP\Agent\Archive\Agent.zip" />
+      <VSIXSourceItem Include="$(SolutionDir).art\Proxy.zip" TargetPath="MCP\Proxy\Archive\Proxy.zip" />
       <VSIXSourceItem Include="@(ReferenceCopyLocalPaths)" Condition="'%(ReferenceCopyLocalPaths.NuGetPackageId)' == 'System.IO.Pipelines'" />
       <VSIXSourceItem Include="@(ReferenceCopyLocalPaths)" Condition="'%(ReferenceCopyLocalPaths.NuGetPackageId)' == 'System.Text.Json'" />
       <VSIXSourceItem Include="@(ReferenceCopyLocalPaths)" Condition="'%(ReferenceCopyLocalPaths.NuGetPackageId)' == 'Microsoft.Bcl.AsyncInterfaces'" />

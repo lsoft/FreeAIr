@@ -49,7 +49,7 @@ namespace FreeAIr
 
         [Category("OpenAI compatible API requisites")]
         [DisplayName("Chosen model")]
-        [Description("A token of LLM API provider.")]
+        [Description("Chosen model, if API provider suggests many.")]
         [DefaultValue("qwen/qwen3-32b:free")]
         public string ChosenModel { get; set; } = "qwen/qwen3-32b:free";
 
@@ -60,26 +60,5 @@ namespace FreeAIr
         [DefaultValue(16384)]
         public int ContextSize { get; set; } = 16384;
 
-    }
-
-    public sealed class XshdProvider
-    {
-        public string LanguageAlias
-        {
-            get;
-            set;
-        }
-
-        public string XshdFilePath
-        {
-            get;
-            set;
-        }
-    }
-
-    public enum LLMResultEnum
-    {
-        MD,
-        PlainText
     }
 }

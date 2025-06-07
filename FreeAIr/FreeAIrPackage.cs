@@ -8,7 +8,7 @@ using FreeAIr.Extension.CodeLens;
 using FreeAIr.Find;
 using FreeAIr.Helper;
 using FreeAIr.InfoBar;
-using FreeAIr.MCP.Agent;
+using FreeAIr.MCP.McpServerProxy;
 using FreeAIr.UI.Informer;
 using FreeAIr.UI.ToolWindows;
 using FreeAIr.UI.ViewModels;
@@ -105,8 +105,8 @@ namespace FreeAIr
 
                 EmbeddedResourceHelper.LoadXamlEmbeddedResource("FreeAIr.UI.ClickableText.ClickableTextResource.xaml");
 
-                AgentApplication.UpdateExternalServersAsync()
-                    .FileAndForget(nameof(AgentApplication.UpdateExternalServersAsync))
+                McpServerProxyApplication.UpdateExternalServersAsync()
+                    .FileAndForget(nameof(McpServerProxyApplication.UpdateExternalServersAsync))
                     ;
             }
             catch (Exception excp)

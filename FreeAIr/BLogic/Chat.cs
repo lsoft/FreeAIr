@@ -1,6 +1,6 @@
 ﻿using FreeAIr.BLogic.Context;
 using FreeAIr.Helper;
-using FreeAIr.MCP.Agent;
+using FreeAIr.MCP.McpServerProxy;
 using FreeAIr.Shared.Helper;
 using OpenAI;
 using OpenAI.Chat;
@@ -238,7 +238,7 @@ namespace FreeAIr.BLogic
                     MaxOutputTokenCount = ResponsePage.Instance.MaxOutputTokenCount,
                 };
 
-                var toolCollection = AgentCollection.GetTools(ChatTools);
+                var toolCollection = McpServerProxyCollection.GetTools(ChatTools);
                 var activeTools = toolCollection.GetActiveToolList();
                 foreach (var tool in activeTools)
                 {
@@ -251,90 +251,6 @@ namespace FreeAIr.BLogic
                 do
                 {
                     continueTalk = false;
-
-
-
-
-
-                    //var cr = _chatClient.CompleteChat(
-                    //    messages: chatMessages,
-                    //    options: cco,
-                    //    cancellationToken: cancellationToken
-                    //    );
-                    //var crv = cr.Value;
-
-
-                    //if (crv.FinishReason == ChatFinishReason.ToolCalls)
-                    //{
-                    //    chatMessages.Add(
-                    //        new AssistantChatMessage(
-                    //            crv.ToolCalls
-                    //            )
-                    //        );
-
-                    //    foreach (var toolCall in crv.ToolCalls)
-                    //    {
-                    //        answer.Append(
-                    //            Environment.NewLine
-                    //            + "<ToolCall>"
-                    //            + Environment.NewLine
-                    //            + toolCall.FunctionName
-                    //            + Environment.NewLine
-                    //            + (toolCall.FunctionArguments.ToMemory().Length > 0
-                    //                ? toolCall.FunctionArguments.ToString()
-                    //                : string.Empty)
-                    //            + Environment.NewLine
-                    //            + "</ToolCall>"
-                    //            + Environment.NewLine
-                    //            );
-
-                    //        var toolArguments = ParseToolInvocationArguments(toolCall);
-
-                    //        var toolResult = await AgentCollection.CallToolAsync(
-                    //            toolCall.FunctionName,
-                    //            toolArguments,
-                    //            cancellationToken: CancellationToken.None
-                    //            );
-                    //        if (toolResult is null)
-                    //        {
-                    //            throw new InvalidOperationException($"Tool named {toolCall.FunctionName} does not exists.");
-                    //        }
-
-                    //        chatMessages.Add(
-                    //            new ToolChatMessage(
-                    //                toolCall.Id,
-                    //                string.Join(
-                    //                    Environment.NewLine,
-                    //                    toolResult
-                    //                    )
-                    //                )
-                    //            );
-                    //    }
-
-                    //    continueTalk = true;
-                    //}
-                    //else
-                    //{
-                    //    foreach (var content in crv.Content)
-                    //    {
-                    //        if (content.Kind == ChatMessageContentPartKind.Text)
-                    //        {
-                    //            answer.Append(
-                    //                content.Text
-                    //                );
-                    //        }
-                    //    }
-
-                    //    chatMessages.Add(
-                    //        new AssistantChatMessage(
-                    //            crv.Content
-                    //            )
-                    //        );
-                    //}
-
-
-
-
 
                     var completionUpdates = _chatClient.CompleteChatStreaming(
                         messages: await dialog.GetMessageListAsync(),
@@ -404,7 +320,7 @@ namespace FreeAIr.BLogic
                         {
                             var toolArguments = ParseToolInvocationArguments(toolCall);
 
-                            var toolResult = await AgentCollection.CallToolAsync(
+                            var toolResult = await McpServerProxyCollection.CallToolAsync(
                                 toolCall.FunctionName,
                                 toolArguments,
                                 cancellationToken: CancellationToken.None
