@@ -50,6 +50,11 @@ namespace FreeAIr.Agents
             Technical = new();
             SystemPrompt = InternalPage.DefaultSystemPrompt;
         }
+
+        public string GetFormattedSystemPrompt()
+        {
+            return SystemPrompt.Replace("{CULTURE}", ResponsePage.GetAnswerCultureName());
+        }
     }
 
     public sealed class AgentTechnical

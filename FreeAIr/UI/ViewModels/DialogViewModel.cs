@@ -467,6 +467,11 @@ namespace FreeAIr.UI.ViewModels
                     Command.Execute(CommandParameter);
                 }
             }
+
+            public override string ToString()
+            {
+                return Title;
+            }
         }
     }
 }

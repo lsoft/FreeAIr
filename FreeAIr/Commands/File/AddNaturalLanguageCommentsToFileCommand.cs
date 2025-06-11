@@ -20,17 +20,17 @@ namespace FreeAIr.Commands.File
             await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
 
             AgentsContextMenuCommandBridge.Show(
-                SelectedSolutionItemsBuilder.Instance,
+                SelectedSolutionItemsCommandProcessor.Instance,
                 InternalPage.Instance.GetAgentCollection()
                 );
         }
     }
 
-    public sealed class SelectedSolutionItemsBuilder : IContextItemsBuilder
+    public sealed class SelectedSolutionItemsCommandProcessor : CommandProcessor
     {
-        public static readonly SelectedSolutionItemsBuilder Instance = new();
+        public static readonly SelectedSolutionItemsCommandProcessor Instance = new();
 
-        public async System.Threading.Tasks.Task<List<SolutionItemChatContextItem>> CreateContextItemsAsync(
+        protected override async System.Threading.Tasks.Task<List<SolutionItemChatContextItem>> CreateContextItemsAsync(
             )
         {
             var contextItems = new List<SolutionItemChatContextItem>();

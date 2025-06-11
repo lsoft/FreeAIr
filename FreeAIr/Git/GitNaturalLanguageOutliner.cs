@@ -15,18 +15,18 @@ namespace FreeAIr.Git
             )
         {
             AgentsContextMenuCommandBridge.Show(
-                GitDiffItemsBuilder.Instance,
+                GitDiffItemsCommandProcessor.Instance,
                 InternalPage.Instance.GetAgentCollection()
                 );
         }
     }
 
 
-    public sealed class GitDiffItemsBuilder : IContextItemsBuilder
+    public /*sealed*/ class GitDiffItemsCommandProcessor : CommandProcessor
     {
-        public static readonly GitDiffItemsBuilder Instance = new();
+        public static readonly GitDiffItemsCommandProcessor Instance = new();
 
-        public async System.Threading.Tasks.Task<List<SolutionItemChatContextItem>> CreateContextItemsAsync(
+        protected override async System.Threading.Tasks.Task<List<SolutionItemChatContextItem>> CreateContextItemsAsync(
             )
         {
             var contextItems = new List<SolutionItemChatContextItem>();

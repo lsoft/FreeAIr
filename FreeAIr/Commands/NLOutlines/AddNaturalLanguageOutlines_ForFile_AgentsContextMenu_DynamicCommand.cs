@@ -28,28 +28,9 @@ namespace FreeAIr.Commands.NLOutlines
             var componentModel = (IComponentModel)await FreeAIrPackage.Instance.GetServiceAsync(typeof(SComponentModel));
             var chatContainer = componentModel.GetService<ChatContainer>();
 
-            var contextItems = await _bridge.ContextItemsBuilder.CreateContextItemsAsync();
-            if (contextItems is null || contextItems.Count == 0)
-            {
-                return;
-            }
-
-            await ShowAsync(menuItem.Agent, contextItems);
-        }
-
-        private static async Task ShowAsync(
-            Agent agent,
-            List<SolutionItemChatContextItem> contextItems
-            )
-        {
-            var pane = await NaturalLanguageOutlinesToolWindow.ShowAsync();
-            var toolWindow = pane.Content as NaturalLanguageOutlinesToolWindowControl;
-            var viewModel = toolWindow.DataContext as NaturalLanguageOutlinesViewModel;
-            viewModel.SetNewChatAsync(
-                agent,
-                contextItems
-                )
-                .FileAndForget(nameof(NaturalLanguageOutlinesViewModel.SetNewChatAsync));
+            await _bridge.CommandProcessor.ProcessAsync(
+                menuItem.Agent
+                );
         }
     }
 }

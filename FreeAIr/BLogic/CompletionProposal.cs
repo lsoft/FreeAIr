@@ -104,7 +104,7 @@ namespace FreeAIr.BLogic
                         null
                         ),
                     userPrompt,
-                    ChatOptions.NoToolAutoProcessedTextResponse
+                    ChatOptions.NoToolAutoProcessedTextResponse()
                     );
                 if (chat is null)
                 {

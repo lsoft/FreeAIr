@@ -483,7 +483,7 @@ namespace FreeAIr.BLogic
                 _resultFilePath = resultFilePath;
                 _chat = chat;
                 _systemChatMessage = new SystemChatMessage(
-                    chat.Options.GetActiveAgent().SystemPrompt
+                    chat.Options.GetActiveAgent().GetFormattedSystemPrompt()
                     );
             }
 
@@ -797,19 +797,29 @@ namespace FreeAIr.BLogic
             false
             );
 
-        public static ChatOptions NoToolAutoProcessedTextResponse => new ChatOptions(
-            ChatToolChoice.CreateNoneChoice(),
-            InternalPage.Instance.GetAgentCollection(),
-            OpenAI.Chat.ChatResponseFormat.CreateTextFormat(),
-            true
-            );
+        public static ChatOptions NoToolAutoProcessedTextResponse(
+            Agent? defaultAgent = null
+            )
+        {
+            var agentCollection = InternalPage.Instance.GetAgentCollection();
+            if (defaultAgent is not null)
+            {
+                agentCollection.SetDefaultAgent(defaultAgent);
+            }
+
+            return new ChatOptions(
+                ChatToolChoice.CreateNoneChoice(),
+                agentCollection,
+                OpenAI.Chat.ChatResponseFormat.CreateTextFormat(),
+                true
+                );
+        }
 
         public static ChatOptions NoToolAutoProcessedJsonResponse(
             Agent? defaultAgent = null
             )
         {
             var agentCollection = InternalPage.Instance.GetAgentCollection();
-
             if (defaultAgent is not null)
             {
                 agentCollection.SetDefaultAgent(defaultAgent);

@@ -1,6 +1,7 @@
 ﻿using FreeAIr.BLogic.Context.Item;
 using FreeAIr.Find;
 using FreeAIr.UI.Bridge;
+using FreeAIr.UI.ToolWindows;
 using FreeAIr.UI.ViewModels;
 using System;
 using System.Collections.Generic;
@@ -12,7 +13,7 @@ namespace FreeAIr.Agents
 {
     public sealed class AgentsContextMenuCommandBridge : MenuCommandBridge<AgentContextMenuItem>
     {
-        public IContextItemsBuilder ContextItemsBuilder
+        public CommandProcessor CommandProcessor
         {
             get;
             private set;
@@ -22,25 +23,25 @@ namespace FreeAIr.Agents
 
 
         public async Task ShowMenuAsync(
-            IContextItemsBuilder contextItemsBuilder,
+            CommandProcessor commandProcessor,
             List<AgentContextMenuItem> menuItems,
             int x,
             int y
             )
         {
-            ContextItemsBuilder = contextItemsBuilder;
+            CommandProcessor = commandProcessor;
             try
             {
                 await base.ShowAsync(menuItems, x, y);
             }
             finally
             {
-                ContextItemsBuilder = null;
+                CommandProcessor = null;
             }
         }
 
         public static void Show(
-            IContextItemsBuilder contextItemsBuilder,
+            CommandProcessor commandProcessor,
             AgentCollection agentCollection
             )
         {
@@ -61,7 +62,7 @@ namespace FreeAIr.Agents
                             System.Windows.Forms.Cursor.Position.Y
                             );
                         await bridge.ShowMenuAsync(
-                            contextItemsBuilder,
+                            commandProcessor,
                             menuItems,
                             (int)point.X,
                             (int)point.Y
@@ -102,9 +103,38 @@ namespace FreeAIr.Agents
         }
     }
 
-    public interface IContextItemsBuilder
+    public abstract class CommandProcessor
     {
-        System.Threading.Tasks.Task<List<SolutionItemChatContextItem>> CreateContextItemsAsync(
+        public virtual async System.Threading.Tasks.Task ProcessAsync(
+            Agent agent
+            )
+        {
+            var contextItems = await CreateContextItemsAsync();
+            if (contextItems is null || contextItems.Count == 0)
+            {
+                return;
+            }
+
+            await ShowAsync(agent, contextItems);
+        }
+
+        protected abstract System.Threading.Tasks.Task<List<SolutionItemChatContextItem>> CreateContextItemsAsync(
             );
+
+
+        private static async Task ShowAsync(
+            Agent agent,
+            List<SolutionItemChatContextItem> contextItems
+            )
+        {
+            var pane = await NaturalLanguageOutlinesToolWindow.ShowAsync();
+            var toolWindow = pane.Content as NaturalLanguageOutlinesToolWindowControl;
+            var viewModel = toolWindow.DataContext as NaturalLanguageOutlinesViewModel;
+            viewModel.SetNewChatAsync(
+                agent,
+                contextItems
+                )
+                .FileAndForget(nameof(NaturalLanguageOutlinesViewModel.SetNewChatAsync));
+        }
     }
 }

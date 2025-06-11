@@ -1,21 +1,20 @@
+using FreeAIr.Agents;
+using FreeAIr.Git;
 using FreeAIr.UI.ToolWindows;
 using FreeAIr.UI.Windows;
 using Microsoft.VisualStudio.ComponentModelHost;
 using System.Windows;
-using System.Windows.Controls;
 
 namespace FreeAIr.BLogic
 {
     public static class CommitMessageBuilder
     {
         public static async Task BuildCommitMessageAsync(
-            TextBox commitMessageTextBox
+            Agent agent
             )
         {
-            if (commitMessageTextBox is null)
-            {
-                throw new ArgumentNullException(nameof(commitMessageTextBox));
-            }
+            var componentModel = (IComponentModel)await FreeAIrPackage.Instance.GetServiceAsync(typeof(SComponentModel));
+            var gitWindowModifier = componentModel.GetService<GitWindowModifier>();
 
             var backgroundTask = new GitCollectBackgroundTask(
                     );
@@ -31,7 +30,6 @@ namespace FreeAIr.BLogic
                 return;
             }
 
-            var componentModel = (IComponentModel)await FreeAIrPackage.Instance.GetServiceAsync(typeof(SComponentModel));
             var chatContainer = componentModel.GetService<ChatContainer>();
 
             var chat = await chatContainer.StartChatAsync(
@@ -40,7 +38,7 @@ namespace FreeAIr.BLogic
                     null
                     ),
                 UserPrompt.CreateCommitMessagePrompt(gitDiff),
-                ChatOptions.NoToolAutoProcessedTextResponse
+                ChatOptions.NoToolAutoProcessedTextResponse(agent)
                 );
 
             if (chat is not null)
@@ -50,7 +48,7 @@ namespace FreeAIr.BLogic
                     );
                 if (!string.IsNullOrEmpty(commitMessage))
                 {
-                    commitMessageTextBox.Text = commitMessage;
+                    gitWindowModifier.CommitMessageTextBox.Text = commitMessage;
                     return;
                 }
             }
@@ -71,4 +69,23 @@ namespace FreeAIr.BLogic
                 );
         }
     }
+
+    public sealed class CommitMessageBuilderCommandProcessor : GitDiffItemsCommandProcessor
+    {
+        public static new readonly CommitMessageBuilderCommandProcessor Instance = new();
+
+        public override async Task ProcessAsync(Agent agent)
+        {
+            var contextItems = await CreateContextItemsAsync();
+            if (contextItems is null || contextItems.Count == 0)
+            {
+                return;
+            }
+
+            await CommitMessageBuilder.BuildCommitMessageAsync(
+                agent
+                );
+        }
+    }
+
 }

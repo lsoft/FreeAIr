@@ -1,5 +1,6 @@
 using EnvDTE;
 using EnvDTE80;
+using FreeAIr.Agents;
 using FreeAIr.Git;
 using Microsoft.VisualStudio.Imaging;
 using System.ComponentModel.Composition;
@@ -149,7 +150,7 @@ namespace FreeAIr.BLogic
             }
         }
 
-        private async void AddNaturalLanguageOutlinesButton_Click(object sender, RoutedEventArgs e)
+        private void AddNaturalLanguageOutlinesButton_Click(object sender, RoutedEventArgs e)
         {
             try
             {
@@ -162,12 +163,13 @@ namespace FreeAIr.BLogic
             }
         }
 
-        private async void BuildCommitMessageButton_Click(object sender, RoutedEventArgs e)
+        private void BuildCommitMessageButton_Click(object sender, RoutedEventArgs e)
         {
             try
             {
-                await CommitMessageBuilder.BuildCommitMessageAsync(
-                    CommitMessageTextBox
+                AgentsContextMenuCommandBridge.Show(
+                    CommitMessageBuilderCommandProcessor.Instance,
+                    InternalPage.Instance.GetAgentCollection()
                     );
             }
             catch (Exception excp)

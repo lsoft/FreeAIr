@@ -98,6 +98,11 @@ namespace FreeAIr.Find
                 Header = header;
                 Scope = scope;
             }
+
+            public override string ToString()
+            {
+                return Header;
+            }
         }
     }
 
