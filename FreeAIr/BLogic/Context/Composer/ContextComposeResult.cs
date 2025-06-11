@@ -73,7 +73,8 @@ namespace FreeAIr.BLogic.Context.Composer
             return FoundIdentifiers
                 .Select(i => new SolutionItemChatContextItem(
                     i.SelectedIdentifier,
-                    i.IsAutoFound
+                    i.IsAutoFound,
+                    AddLineNumbersMode.NotRequired
                     )
                 )
                 .ToList();

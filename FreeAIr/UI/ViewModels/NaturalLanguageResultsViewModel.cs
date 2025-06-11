@@ -320,7 +320,7 @@ namespace FreeAIr.UI.ViewModels
                                 null
                                 ),
                             false,
-                            true
+                            AddLineNumbersMode.RequiredAllInScope
                             );
                         contextItems.Add(contextItem);
                     }

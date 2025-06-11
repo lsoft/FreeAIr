@@ -198,9 +198,9 @@
           <ButtonText>Add comments to the code of the file</ButtonText>
         </Strings>
       </Button>
-      <Button guid="FreeAIr" id="AddNaturalLanguageCommentsCommandId" priority="0x0100" type="Button">
+      <Button guid="FreeAIr" id="AddNaturalLanguageOutlinesCommandId" priority="0x0100" type="Button">
         <Parent guid="FreeAIr" id="SolutionContextGroup" />
-        <Icon guid="ImageCatalogGuid" id="AddComment" />
+        <Icon guid="ImageCatalogGuid" id="CommentCode" />
         <CommandFlag>IconIsMoniker</CommandFlag>
         <Strings>
           <ButtonText>Add natural language comments to the code of the file</ButtonText>
@@ -316,23 +316,23 @@
 
       <IDSymbol name="ShowAgentConfigureCommandId" value="0x1044"/>
 
-      <!-- natural language comments -->
-      <IDSymbol name="AddNaturalLanguageCommentsCommandId" value="0x1052"/>
+      <!-- natural language outlines -->
+      <IDSymbol name="AddNaturalLanguageOutlinesCommandId" value="0x1052"/>
 
       <!-- solution items context menu -->
-      <IDSymbol name="SolutionItemsContextMenu" value="0x8045"/>
-      <IDSymbol name="SolutionItemsContextMenuGroup" value="0x8046"/>
-      <IDSymbol name="SolutionItemsContextMenuDynamicCommandId" value="0x8047"/>
+      <IDSymbol name="SolutionItemsContextMenu" value="0x8000"/>
+      <IDSymbol name="SolutionItemsContextMenuGroup" value="0x8001"/>
+      <IDSymbol name="SolutionItemsContextMenuDynamicCommandId" value="0x8002"/>
 
       <!-- find scope context menu -->
-      <IDSymbol name="FindScopeContextMenu" value="0x9048"/>
-      <IDSymbol name="FindScopeContextMenuGroup" value="0x9049"/>
-      <IDSymbol name="FindScopeContextMenuDynamicCommandId" value="0x9050"/>
+      <IDSymbol name="FindScopeContextMenu" value="0x8100"/>
+      <IDSymbol name="FindScopeContextMenuGroup" value="0x8101"/>
+      <IDSymbol name="FindScopeContextMenuDynamicCommandId" value="0x8102"/>
 
       <!-- agents context menu -->
-      <IDSymbol name="AgentsContextMenu" value="0xA053"/>
-      <IDSymbol name="AgentsContextMenuGroup" value="0xA054"/>
-      <IDSymbol name="AgentsContextMenuDynamicCommandId" value="0xA055"/>
+      <IDSymbol name="AgentsContextMenu" value="0x8200"/>
+      <IDSymbol name="AgentsContextMenuGroup" value="0x8201"/>
+      <IDSymbol name="AgentsContextMenuDynamicCommandId" value="0x8202"/>
 
     </GuidSymbol>
 

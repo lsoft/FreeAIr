@@ -36,11 +36,13 @@ namespace FreeAIr.Commands.ContextMenu
             }
             catch (Exception excp)
             {
-                int g = 0;
+                //todo log
             }
         }
 
-        protected abstract Task ExecuteAsync(TItem agent);
+        protected abstract Task ExecuteAsync(
+            TItem agent
+            );
     }
 
 }

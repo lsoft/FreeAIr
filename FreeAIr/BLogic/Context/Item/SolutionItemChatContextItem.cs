@@ -3,7 +3,10 @@ using FreeAIr.Helper;
 using FreeAIr.UI.Embedillo.Answer.Parser;
 using OpenAI.Chat;
 using System.Collections.Generic;
+using System.Drawing;
 using System.IO;
+using System.Linq;
+using System.Security.RightsManagement;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -11,7 +14,7 @@ namespace FreeAIr.BLogic.Context.Item
 {
     public sealed class SolutionItemChatContextItem : IChatContextItem
     {
-        private readonly bool _addLineNumberInTheBody;
+        private readonly AddLineNumbersMode _addLineNumberMode;
 
         public SelectedIdentifier SelectedIdentifier
         {
@@ -28,7 +31,7 @@ namespace FreeAIr.BLogic.Context.Item
         public SolutionItemChatContextItem(
             SelectedIdentifier selectedIdentifier,
             bool isAutoFound,
-            bool addLineNumberInTheBody = false
+            AddLineNumbersMode addLineNumberBody
             )
         {
             if (selectedIdentifier is null)
@@ -36,9 +39,14 @@ namespace FreeAIr.BLogic.Context.Item
                 throw new ArgumentNullException(nameof(selectedIdentifier));
             }
 
+            if (addLineNumberBody is null)
+            {
+                throw new ArgumentNullException(nameof(addLineNumberBody));
+            }
+
             SelectedIdentifier = selectedIdentifier;
             IsAutoFound = isAutoFound;
-            _addLineNumberInTheBody = addLineNumberInTheBody;
+            _addLineNumberMode = addLineNumberBody;
         }
 
         public bool IsSame(IChatContextItem other)
@@ -136,30 +144,7 @@ namespace FreeAIr.BLogic.Context.Item
 
         private string ProcessLineNumbers(string body, string lineEnding)
         {
-            if (!_addLineNumberInTheBody)
-            {
-                return body;
-            }
-
-            var lines = body.Split(new[] { lineEnding }, StringSplitOptions.None);
-
-            var digitCount = Math.Ceiling(Math.Log10(lines.Length));
-            var toStringMode = "D" + digitCount.ToString();
-
-            var result = new StringBuilder();
-            for (var lineIndex = 0; lineIndex < lines.Length; lineIndex++)
-            {
-                var line = lines[lineIndex];
-                if (_addLineNumberInTheBody)
-                {
-                    result.Append(lineIndex.ToString(toStringMode));
-                    result.Append(": ");
-                }
-
-                result.AppendLine(line);
-            }
-
-            return result.ToString();
+            return _addLineNumberMode.ProcessLineNumbers(body, lineEnding);
         }
 
         public void ReplaceWithText(string body)
@@ -197,6 +182,93 @@ namespace FreeAIr.BLogic.Context.Item
                 );
         }
 
+    }
+
+    public sealed class AddLineNumbersMode
+    {
+        private readonly AddLineNumbersModeEnum _mode;
+        private List<(int StartLine, int LineCount)> _scopes;
+
+        public static readonly AddLineNumbersMode NotRequired = new AddLineNumbersMode(AddLineNumbersModeEnum.Disabled);
+
+        public static readonly AddLineNumbersMode RequiredAllInScope = new AddLineNumbersMode(AddLineNumbersModeEnum.AllInScope);
+
+        public bool Enabled => _mode != AddLineNumbersModeEnum.Disabled;
+
+        private AddLineNumbersMode(
+            AddLineNumbersModeEnum mode
+            )
+        {
+            _mode = mode;
+            _scopes = new();
+        }
+
+        private AddLineNumbersMode(
+            List<(int StartLine, int LineCount)> scopes
+            )
+        {
+            _mode = AddLineNumbersModeEnum.SpecificScopes;
+            _scopes = scopes;
+        }
+
+        public static AddLineNumbersMode RequiredForScopes(
+            List<(int StartLine, int LineCount)> scopes
+            )
+        {
+            return new AddLineNumbersMode(scopes);
+        }
+
+        public enum AddLineNumbersModeEnum
+        {
+            Disabled,
+            AllInScope,
+            SpecificScopes
+        }
+
+        public string ProcessLineNumbers(
+            string body,
+            string lineEnding
+            )
+        {
+            if (!Enabled)
+            {
+                return body;
+            }
+
+            var lines = body.Split(new[] { lineEnding }, StringSplitOptions.None);
+
+            var digitCount = Math.Ceiling(Math.Log10(lines.Length));
+            var stringFormat = "D" + digitCount.ToString();
+
+            var result = new StringBuilder();
+            for (var lineIndex = 0; lineIndex < lines.Length; lineIndex++)
+            {
+                var line = lines[lineIndex];
+
+                switch (_mode)
+                {
+                    case AddLineNumbersModeEnum.AllInScope:
+                        {
+                            result.Append(lineIndex.ToString(stringFormat));
+                            result.Append(": ");
+                        }
+                        break;
+                    case AddLineNumbersModeEnum.SpecificScopes:
+                        {
+                            if (_scopes.Any(s => s.StartLine <= lineIndex && (s.StartLine + s.LineCount) > lineIndex))
+                            {
+                                result.Append(lineIndex.ToString(stringFormat));
+                                result.Append(": ");
+                            }
+                        }
+                        break;
+                }
+
+                result.AppendLine(line);
+            }
+
+            return result.ToString();
+        }
     }
 
 }

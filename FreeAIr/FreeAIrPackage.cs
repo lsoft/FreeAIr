@@ -149,9 +149,9 @@ namespace FreeAIr
             IComponentModel componentModel
             )
         {
-            var cmb = componentModel.GetService<CommitMessageBuilder>();
-            cmb.RunAsync()
-                .FileAndForget(nameof(CommitMessageBuilder));
+            var gwm = componentModel.GetService<GitWindowModifier>();
+            gwm.RunAsync()
+                .FileAndForget(nameof(GitWindowModifier));
 
             var uii = componentModel.GetService<UIInformer>();
             uii.InitAsync()

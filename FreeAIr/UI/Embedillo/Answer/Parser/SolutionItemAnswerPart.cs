@@ -44,7 +44,8 @@ namespace FreeAIr.UI.Embedillo.Answer.Parser
             return
                 new SolutionItemChatContextItem(
                     SelectedIdentifier,
-                    false
+                    false,
+                    AddLineNumbersMode.NotRequired
                     );
         }
 

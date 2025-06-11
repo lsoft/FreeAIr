@@ -1,21 +1,16 @@
 ﻿using EnvDTE;
 using FreeAIr.Agents;
-using FreeAIr.BLogic;
 using FreeAIr.BLogic.Context.Item;
-using FreeAIr.Commands.ContextMenu;
-using FreeAIr.UI.ToolWindows;
-using FreeAIr.UI.ViewModels;
-using Microsoft.VisualStudio.ComponentModelHost;
+using System.Collections.Generic;
 using System.Linq;
-using static FreeAIr.Agents.AgentsContextMenuCommandBridge;
-using static FreeAIr.Helper.SolutionHelper;
+using System.Threading;
 
 namespace FreeAIr.Commands.File
 {
-    [Command(PackageIds.AddNaturalLanguageCommentsCommandId)]
-    public sealed class AddNaturalLanguageCommentsCommand : BaseCommand<AddNaturalLanguageCommentsCommand>
+    [Command(PackageIds.AddNaturalLanguageOutlinesCommandId)]
+    public sealed class AddNaturalLanguageOutlinesCommand : BaseCommand<AddNaturalLanguageOutlinesCommand>
     {
-        public AddNaturalLanguageCommentsCommand(
+        public AddNaturalLanguageOutlinesCommand(
             )
         {
         }
@@ -25,46 +20,43 @@ namespace FreeAIr.Commands.File
             await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
 
             AgentsContextMenuCommandBridge.Show(
+                SelectedSolutionItemsBuilder.Instance,
                 InternalPage.Instance.GetAgentCollection()
                 );
         }
     }
 
-
-    [Command(PackageIds.AgentsContextMenuDynamicCommandId)]
-    public sealed class AddNaturalLanguageComments_AgentsContextMenu_DynamicCommand
-        : Base_ContextMenu_DynamicCommand<AddNaturalLanguageComments_AgentsContextMenu_DynamicCommand, AgentContextMenuItem, AgentsContextMenuCommandBridge>
+    public sealed class SelectedSolutionItemsBuilder : IContextItemsBuilder
     {
-        protected override async Task ExecuteAsync(AgentContextMenuItem menuItem)
-        {
-            if (!InternalPage.Instance.IsActiveAgentHasToken())
-            {
-                await VS.MessageBox.ShowErrorAsync(
-                    Resources.Resources.Error,
-                    Resources.Resources.Code_NoToken
-                    );
-                return;
-            }
+        public static readonly SelectedSolutionItemsBuilder Instance = new();
 
-            var componentModel = (IComponentModel)await FreeAIrPackage.Instance.GetServiceAsync(typeof(SComponentModel));
-            var chatContainer = componentModel.GetService<ChatContainer>();
+        public async System.Threading.Tasks.Task<List<SolutionItemChatContextItem>> CreateContextItemsAsync(
+            )
+        {
+            var contextItems = new List<SolutionItemChatContextItem>();
 
             var sew = await VS.Windows.GetSolutionExplorerWindowAsync();
             var selections = (await sew.GetSelectionAsync()).ToList();
             if (selections.Count == 0)
             {
-                return;
+                return contextItems;
             }
 
+            foreach (var selection in selections)
+            {
+                var contextItem = new SolutionItemChatContextItem(
+                    new UI.Embedillo.Answer.Parser.SelectedIdentifier(
+                        selection.FullPath,
+                        null
+                        ),
+                    false,
+                    AddLineNumbersMode.RequiredAllInScope
+                    );
+                contextItems.Add(contextItem);
+            }
 
-            var pane = await NaturalLanguageOutlinesToolWindow.ShowAsync();
-            var toolWindow = pane.Content as NaturalLanguageOutlinesToolWindowControl;
-            var viewModel = toolWindow.DataContext as NaturalLanguageOutlinesViewModel;
-            viewModel.SetNewChatAsync(
-                menuItem.Agent,
-                selections.ConvertAll(s => new FoundSolutionItem(s, null))
-                )
-                .FileAndForget(nameof(NaturalLanguageOutlinesViewModel.SetNewChatAsync));
+            return contextItems;
         }
+
     }
 }

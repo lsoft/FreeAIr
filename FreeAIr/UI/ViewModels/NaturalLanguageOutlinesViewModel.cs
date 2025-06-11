@@ -211,7 +211,7 @@ namespace FreeAIr.UI.ViewModels
 
         public async Task SetNewChatAsync(
             Agent defaultAgent,
-            List<FoundSolutionItem> selectedItems
+            List<SolutionItemChatContextItem> contextItems
             )
         {
             if (defaultAgent is null)
@@ -219,9 +219,9 @@ namespace FreeAIr.UI.ViewModels
                 throw new ArgumentNullException(nameof(defaultAgent));
             }
 
-            if (selectedItems is null)
+            if (contextItems is null)
             {
-                throw new ArgumentNullException(nameof(selectedItems));
+                throw new ArgumentNullException(nameof(contextItems));
             }
 
             var oldChat = Interlocked.Exchange(ref _chat, null);
@@ -258,18 +258,18 @@ namespace FreeAIr.UI.ViewModels
 
             _processingTask = ProcessSolutionDocumentsAsync(
                 defaultAgent,
-                selectedItems
+                contextItems
                 );
         }
 
         public async Task ProcessSolutionDocumentsAsync(
             Agent defaultAgent,
-            List<FoundSolutionItem> selectedItems
+            List<SolutionItemChatContextItem> contextItems
             )
         {
-            if (selectedItems is null)
+            if (contextItems is null)
             {
-                throw new ArgumentNullException(nameof(selectedItems));
+                throw new ArgumentNullException(nameof(contextItems));
             }
 
             var cancellationToken = _cancellationTokenSource.Token;
@@ -282,35 +282,19 @@ namespace FreeAIr.UI.ViewModels
             {
                 var processedItemCount = 0;
 
-                foreach (var portion in selectedItems.SplitByItemsSize(defaultAgent.Technical.ContextSize))
+                foreach (var portionContextItems in contextItems.SplitByItemsSize(defaultAgent.Technical.ContextSize))
                 {
-                    Status = $"In progress ({processedItemCount}/{selectedItems.Count})...";
-
                     cancellationToken.ThrowIfCancellationRequested();
 
-                    var contextItems = new List<IChatContextItem>();
+                    Status = $"In progress ({processedItemCount}/{contextItems.Count})...";
 
-                    foreach (var solutionItem in portion)
-                    {
-                        cancellationToken.ThrowIfCancellationRequested();
-
-                        var contextItem = new SolutionItemChatContextItem(
-                            new UI.Embedillo.Answer.Parser.SelectedIdentifier(
-                                solutionItem.SolutionItem.FullPath,
-                                null
-                                ),
-                            false,
-                            true
-                            );
-                        contextItems.Add(contextItem);
-                    }
-                    _chat.ChatContext.AddItems(contextItems);
+                    _chat.ChatContext.AddItems(portionContextItems);
 
                     _chat.AddPrompt(
                         UserPrompt.CreateTextBasedPrompt(
 $$$"""
 Identify the logical sections of the code inside following files and summarize these sections by generating comments:
-{{{string.Join(", ", portion.ConvertAll(s => s.SolutionItem.FullPath))}}}
+{{{string.Join(", ", portionContextItems.ConvertAll(s => s.SelectedIdentifier.FilePath))}}}
 """
                             )
                         );
@@ -382,9 +366,9 @@ Identify the logical sections of the code inside following files and summarize t
                     }
 
                     _chat.ArchiveAllPrompts();
-                    _chat.ChatContext.RemoveItems(contextItems);
+                    _chat.ChatContext.RemoveItems(portionContextItems);
 
-                    processedItemCount += portion.Count;
+                    processedItemCount += portionContextItems.Count;
                 }
 
                 Status = $"Generated {GeneratedComments.Count} comments:";

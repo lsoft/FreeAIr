@@ -57,7 +57,8 @@ namespace FreeAIr.Commands.BuildError
                         errorInformation.FilePath,
                         null
                         ),
-                    false
+                    false,
+                    AddLineNumbersMode.NotRequired
                     )
                 );
 

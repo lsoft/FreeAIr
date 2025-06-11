@@ -50,7 +50,8 @@ namespace FreeAIr.Commands
             chat.ChatContext.AddItem(
                 new SolutionItemChatContextItem(
                     std.CreateSelectedIdentifier(),
-                    false
+                    false,
+                    AddLineNumbersMode.NotRequired
                     )
                 );
 

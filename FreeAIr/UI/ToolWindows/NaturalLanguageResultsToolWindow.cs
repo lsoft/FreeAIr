@@ -33,7 +33,7 @@ namespace FreeAIr.UI.ToolWindows
         {
             public Pane()
             {
-                BitmapImageMoniker = KnownMonikers.ShowResultsPane;
+                BitmapImageMoniker = KnownMonikers.CommentCode;
             }
         }
     }

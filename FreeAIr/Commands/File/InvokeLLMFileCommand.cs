@@ -72,7 +72,8 @@ namespace FreeAIr.Commands.File
                             selection.FullPath,
                             null
                             ),
-                        false
+                        false,
+                        AddLineNumbersMode.NotRequired
                         )
                     );
 
