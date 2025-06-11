@@ -33,15 +33,10 @@
                 <RowDefinition Height="auto"/> <!-- 4 -->
                 <RowDefinition Height="auto"/> <!-- 5 -->
 
-                <!-- system prompt -->
+                <!-- agents -->
                 <RowDefinition Height="auto"/> <!-- 6 -->
                 <RowDefinition Height="auto"/> <!-- 7 -->
                 <RowDefinition Height="auto"/> <!-- 8 -->
-
-                <!-- agents -->
-                <RowDefinition Height="auto"/> <!-- 9 -->
-                <RowDefinition Height="auto"/> <!-- 10 -->
-                <RowDefinition Height="auto"/> <!-- 11 -->
 
             </Grid.RowDefinitions>
 
@@ -61,6 +56,10 @@
                 Grid.Row="1"
                 HorizontalAlignment="Stretch"
                 >
+                <Grid.RowDefinitions>
+                    <RowDefinition />
+                    <RowDefinition />
+                </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="auto"/>
                     <ColumnDefinition Width="auto"/>
@@ -68,6 +67,7 @@
                 </Grid.ColumnDefinitions>
 
                 <Label
+                    Grid.Row="0"
                     Grid.Column="0"
                     HorizontalAlignment="Left"
                     VerticalAlignment="Center"
@@ -78,6 +78,7 @@
                     />
 
                 <Label
+                    Grid.Row="0"
                     Grid.Column="1"
                     Margin="0,0,0,0"
                     Padding="0"
@@ -89,6 +90,7 @@
                     />
 
                 <Button
+                    Grid.Row="0"
                     Grid.Column="2"
                     HorizontalAlignment="Right"
                     VerticalAlignment="Center"
@@ -98,6 +100,29 @@
                     Content="Install Github MCP server..."
                     Command="{Binding InstallGithubMCPServerCommand}"
                     Style="{DynamicResource TextBlockLikeButtonStyle}"
+                    />
+
+                <Label
+                    Grid.Row="1"
+                    Grid.Column="0"
+                    Grid.ColumnSpan="2"
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Center"
+                    FontSize="12"
+                    FontFamily="Cascadia Code"
+                    Margin="2"
+                    Content="Github token:"
+                    />
+
+                <TextBox
+                    Grid.Row="1"
+                    Grid.Column="2"
+                    HorizontalAlignment="Stretch"
+                    VerticalAlignment="Center"
+                    Margin="2"
+                    FontSize="12"
+                    FontFamily="Cascadia Code"
+                    Text="{Binding GitHubToken, UpdateSourceTrigger=PropertyChanged}"
                     />
 
             </Grid>
@@ -158,54 +183,9 @@
                 Name="MCPAppyButton"
                 />
 
-            <!-- system prompt -->
-            <Label
-                Grid.Row="6"
-                HorizontalAlignment="Left"
-                VerticalAlignment="Center"
-                FontWeight="Bold"
-                FontSize="18"
-                Margin="2"
-                Content="System prompt:"
-                Name="SystemPromptLabel"
-                />
-
-            <ScrollViewer
-                Grid.Row="7"
-                MaxHeight="350"
-                HorizontalScrollBarVisibility="Disabled"
-                VerticalScrollBarVisibility="Auto"
-                PreviewMouseWheel="ScrollViewer_PreviewMouseWheel"
-                >
-                <TextBox
-                    HorizontalAlignment="Stretch"
-                    VerticalAlignment="Stretch"
-                    FontSize="12"
-                    FontFamily="Cascadia Code"
-                    Margin="6"
-                    Text="{Binding CurrentSystemPrompt, UpdateSourceTrigger=PropertyChanged}"
-                    BorderThickness="1"
-                    MinHeight="150"
-                    AcceptsReturn="True"
-                    TextWrapping="Wrap"
-                    />
-            </ScrollViewer>
-
-            <Button
-                Grid.Row="8"
-                HorizontalAlignment="Right"
-                VerticalAlignment="Center"
-                Margin="0,0,8,0"
-                FontSize="12"
-                FontFamily="Cascadia Code"
-                Content="Restore default system prompt..."
-                Command="{Binding RestoreDefaultSystemPromptCommand}"
-                Style="{DynamicResource TextBlockLikeButtonStyle}"
-                />
-
             <!-- Agents -->
             <Label
-                Grid.Row="9"
+                Grid.Row="6"
                 HorizontalAlignment="Left"
                 VerticalAlignment="Center"
                 FontWeight="Bold"
@@ -216,7 +196,7 @@
                 />
 
             <ScrollViewer
-                Grid.Row="10"
+                Grid.Row="7"
                 MaxHeight="350"
                 HorizontalScrollBarVisibility="Auto"
                 VerticalScrollBarVisibility="Auto"
@@ -236,18 +216,34 @@
                     />
             </ScrollViewer>
 
-            <Button
-                Grid.Row="11"
+            <StackPanel
+                Grid.Row="8"
                 HorizontalAlignment="Right"
                 VerticalAlignment="Center"
-                Margin="0,0,8,0"
-                FontSize="12"
-                FontFamily="Cascadia Code"
-                Content="Apply changes..."
-                Command="{Binding ApplyAgentsJsonCommand}"
-                Style="{DynamicResource TextBlockLikeButtonStyle}"
-                Name="AgentsAppyButton"
-                />
+                Orientation="Horizontal"
+                >
+
+                <Button
+                    Margin="0,0,8,0"
+                    FontSize="12"
+                    FontFamily="Cascadia Code"
+                    Content="Edit agents in UI..."
+                    Command="{Binding EditAgentCommand}"
+                    Style="{DynamicResource TextBlockLikeButtonStyle}"
+                    />
+
+                <Button
+                    Margin="0,0,8,0"
+                    FontSize="12"
+                    FontFamily="Cascadia Code"
+                    Content="Apply changes..."
+                    Command="{Binding ApplyAgentsJsonCommand}"
+                    Style="{DynamicResource TextBlockLikeButtonStyle}"
+                    Name="AgentsAppyButton"
+                    />
+                
+            </StackPanel>
+
         </Grid>
     </ScrollViewer>
 </Window>

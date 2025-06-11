@@ -46,6 +46,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Agents\Agent.cs" />
+    <Compile Include="Agents\AgentCollection.cs" />
+    <Compile Include="Agents\AgentsContextMenuCommandBridge.cs" />
     <Compile Include="Antlr\Answer\AdditionalCommand.cs" />
     <Compile Include="Antlr\Answer\AnswerMarkdownListener.cs" />
     <Compile Include="Antlr\Answer\AnswerParser.cs" />
@@ -87,7 +90,9 @@
     <Compile Include="BuildErrors\BuildResultProvider.cs" />
     <Compile Include="Commands\BuildError\BuildErrorWindowFixErrorCommand.cs" />
     <Compile Include="BuildErrors\BuildResultInformation.cs" />
-    <Compile Include="Commands\Other\ShowOptionsCommand.cs" />
+    <Compile Include="Commands\File\AddNaturalLanguageCommentsToFileCommand.cs" />
+    <Compile Include="Commands\ContextMenu\Base_ContextMenu_DynamicCommand.cs" />
+    <Compile Include="Commands\Other\ShowAgentConfigureCommand.cs" />
     <Compile Include="Commands\Other\OpenControlCenterCommand.cs" />
     <Compile Include="Commands\Other\ShowReleaseNotesCommand.cs" />
     <Compile Include="Commands\Other\OpenNaturalSearchToolWindowCommand.cs" />
@@ -100,6 +105,7 @@
     <Compile Include="Git\GitDiffCombiner.cs" />
     <Compile Include="Git\GitRepositoryProvider.cs" />
     <Compile Include="Git\GitRunner.cs" />
+    <Compile Include="Helper\CommentHelper.cs" />
     <Compile Include="Helper\DTEHelper.cs" />
     <Compile Include="Helper\EmbeddedResourceHelper.cs" />
     <Compile Include="Helper\ExtensionPath.cs" />
@@ -167,8 +173,9 @@
     <Compile Include="MCP\ServerProxy\VS\Tools\VisualStudioMcpServerTool.cs" />
     <Compile Include="MCP\ServerProxy\VS\VisualStudioMcpServerProxy.cs" />
     <Compile Include="MCP\AvailableToolContainer.cs" />
+    <Compile Include="NLOutline\NaturalLanguageOutline.cs" />
+    <Compile Include="NLOutline\NaturalLanguageOutlineCollection.cs" />
     <Compile Include="Options\InternalPage.cs" />
-    <Compile Include="Options\MCPPage.cs" />
     <Compile Include="Options\OptionsProvider.cs" />
     <Compile Include="Options\ResponsePage.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -236,14 +243,23 @@
       <DependentUpon>NestedCheckBoxList.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\NestedCheckBox\CheckableItem.cs" />
+    <Compile Include="UI\ToolWindows\NaturalLanguageOutlinesToolWindow.cs" />
+    <Compile Include="UI\ToolWindows\NaturalLanguageOutlinesToolWindowControl.xaml.cs">
+      <DependentUpon>NaturalLanguageOutlinesToolWindowControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI\ToolWindows\NaturalLanguageResultsToolWindow.cs" />
     <Compile Include="UI\ToolWindows\NaturalLanguageResultsToolWindowControl.xaml.cs">
       <DependentUpon>NaturalLanguageResultsToolWindowControl.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UI\ViewModels\AgentConfigureViewModel.cs" />
     <Compile Include="UI\ViewModels\ChooseChatAgentViewModel.cs" />
     <Compile Include="UI\ViewModels\ControlCenterViewModel.cs" />
     <Compile Include="UI\ViewModels\DialogViewModel.cs" />
+    <Compile Include="UI\ViewModels\NaturalLanguageOutlinesViewModel.cs" />
     <Compile Include="UI\ViewModels\NaturalLanguageResultsViewModel.cs" />
+    <Compile Include="UI\Windows\AgentConfigureWindow.xaml.cs">
+      <DependentUpon>AgentConfigureWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI\Windows\NestedCheckBoxWindow.xaml.cs">
       <DependentUpon>NestedCheckBoxWindow.xaml</DependentUpon>
     </Compile>
@@ -266,14 +282,6 @@
   <ItemGroup>
     <Resource Include="Resources\Icon16.png" />
     <Resource Include="Resources\Icon32.png" />
-    <Content Include="Resources\xshd\csharp.xshd">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <IncludeInVSIX>true</IncludeInVSIX>
-    </Content>
-    <Content Include="Resources\xshd\patch.xshd">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <IncludeInVSIX>true</IncludeInVSIX>
-    </Content>
     <Content Include="Monikers.imagemanifest">
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
@@ -342,6 +350,9 @@
     </PackageReference>
     <PackageReference Include="editorconfig">
       <Version>0.15.0</Version>
+    </PackageReference>
+    <PackageReference Include="Extended.Wpf.Toolkit">
+      <Version>4.7.25104.5739</Version>
     </PackageReference>
     <PackageReference Include="FuzzySharp">
       <Version>2.0.2</Version>
@@ -480,9 +491,17 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="UI\ToolWindows\NaturalLanguageOutlinesToolWindowControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="UI\ToolWindows\NaturalLanguageResultsToolWindowControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\Windows\AgentConfigureWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="UI\Windows\NestedCheckBoxWindow.xaml">
       <Generator>MSBuild:Compile</Generator>

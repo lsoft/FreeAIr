@@ -1,4 +1,5 @@
 ﻿using EnvDTE80;
+using FreeAIr.Agents;
 using FreeAIr.Helper;
 using System.Collections.Generic;
 using System.Linq;

@@ -72,7 +72,7 @@ namespace FreeAIr.MCP.McpServerProxy
             if (mcpServers is null)
             {
                 if (!ExternalMcpServersJsonParser.TryParse(
-                    MCPPage.Instance.ExternalMCPServers,
+                    InternalPage.Instance.ExternalMCPServers,
                     out mcpServers))
                 {
                     return null;

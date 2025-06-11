@@ -1,4 +1,6 @@
 ﻿using Dto;
+using FreeAIr.Agents;
+using FreeAIr.MCP.McpServerProxy;
 using Microsoft.VisualStudio.OLE.Interop;
 using Microsoft.VisualStudio.Shell.Interop;
 using PuppeteerSharp;
@@ -32,47 +34,76 @@ namespace FreeAIr
         }
 
         [Category("Logic")]
-        [DisplayName("System Prompt")]
-        [DefaultValue(_systemPrompt)]
-        [Browsable(false)]
-        public string CurrentSystemPrompt
-        {
-            get;
-            set;
-        } = _systemPrompt;
-
-        [Category("Logic")]
         [DisplayName("Agents")]
-        [DefaultValue(_agentsJson)]
+        [DefaultValue("")]
         [Browsable(false)]
         public string Agents
         {
             get;
             set;
-        } = _agentsJson;
+        } = JsonSerializer.Serialize(
+            DefaultAgentCollection,
+            new JsonSerializerOptions { WriteIndented = true }
+            );
 
 
-        #region default system prompt
+        [Category("Servers")]
+        [DisplayName("github.com server token")]
+        [Description("A github.com MCP server token.")]
+        [DefaultValue("place your github.com token here")]
+        [Browsable(false)]
+        public string GitHubToken { get; set; } = "place your github.com token here";
 
-        /// <summary>
-        /// Генерирует раздел правил для ИИ-модели с учетом текущих настроек
-        /// </summary>
-        /// <returns>Текст правил с подставленными параметрами</returns>
-        public string BuildSystemPrompt()
+        [Category("Servers")]
+        [DisplayName("External MCP server")]
+        [Description("A Claude compatible json for external MCP servers.")]
+        [DefaultValue("place your github.com token here")]
+        [Browsable(false)]
+        public string ExternalMCPServers
         {
-            return CurrentSystemPrompt.Replace(
-                "{CULTURE}",
-                ResponsePage.GetAnswerCultureName()
-                );
-        }
+            get; set;
+        } =
+$$$"""
+{
+  "mcpServers": {
 
-        public void RestoreDefaultSystemPrompt()
+  }
+}
+""";
+
+        [Category("Tools")]
+        [DisplayName("AvailableTools")]
+        [Description("An json with list of available tools and its status.")]
+        [Browsable(false)]
+        [DefaultValue("")]
+        public string AvailableTools { get; set; } = string.Empty;
+
+        #region MCP servers
+
+        public void SaveExternalMCPServers(
+            string externalMcpServerJson
+            )
         {
-            CurrentSystemPrompt = _systemPrompt;
+            ExternalMCPServers = externalMcpServerJson;
             Save();
         }
 
-        private const string _systemPrompt = @"
+        public void SaveExternalMCPTools(
+            AvailableToolContainer.AvailableMcpServers servers
+            )
+        {
+            AvailableTools = JsonSerializer.Serialize(
+                servers,
+                new JsonSerializerOptions { WriteIndented = true }
+                );
+            Save();
+        }
+
+        #endregion
+
+        #region system prompt
+
+        public const string DefaultSystemPrompt = @"
 Your general rules:
 #01 You are an AI programming assistant working inside Visual Studio.
 #02 Follow the user's requirements carefully & to the letter.
@@ -120,11 +151,11 @@ Your behavior against available functions:
 
         #region Agents
 
-        public OptionAgents GetAgents()
+        public AgentCollection GetAgentCollection()
         {
             try
             {
-                var result = System.Text.Json.JsonSerializer.Deserialize<OptionAgents>(Agents);
+                var result = System.Text.Json.JsonSerializer.Deserialize<AgentCollection>(Agents);
                 return result;
             }
             catch
@@ -135,9 +166,9 @@ Your behavior against available functions:
             return new();
         }
 
-        public OptionAgent GetActiveAgent()
+        public Agent GetActiveAgent()
         {
-            var optionAgents = GetAgents();
+            var optionAgents = GetAgentCollection();
             var agent = optionAgents.GetActiveAgent();
             return agent;
         }
@@ -146,14 +177,14 @@ Your behavior against available functions:
         {
             try
             {
-                var optionAgents = GetAgents();
+                var optionAgents = GetAgentCollection();
                 var agent = optionAgents.TryGetActiveAgent();
                 if (agent is null)
                 {
                     return false;
                 }
 
-                return !string.IsNullOrEmpty(agent.Token);
+                return !string.IsNullOrEmpty(agent.Technical.Token);
             }
             catch
             {
@@ -165,12 +196,12 @@ Your behavior against available functions:
 
         public async Task<bool> VerifyAgentAndShowErrorIfNotAsync()
         {
-            var optionAgents = GetAgents();
+            var optionAgents = GetAgentCollection();
             return await optionAgents.VerifyAgentAndShowErrorIfNotAsync();
         }
 
         public async Task SaveAgentsAsync(
-            OptionAgents agents
+            AgentCollection agents
             )
         {
             var agentsJson = System.Text.Json.JsonSerializer.Serialize(
@@ -181,214 +212,93 @@ Your behavior against available functions:
             await SaveAsync();
         }
 
-        private const string _agentsJson =
+
+        private static readonly AgentCollection DefaultAgentCollection = new AgentCollection
+        {
+            Agents =
+            [
+                new Agent
+                {
+                    Name = "koboldcpp general (local)",
+                    IsDefault = true,
+                    SystemPrompt = DefaultSystemPrompt,
+                    Technical = new AgentTechnical
+                    {
+                        Endpoint = "http://localhost:5001/v1",
+                        Token = "",
+                        ChosenModel = "do_not_applied",
+                        ContextSize = 16384
+                    }
+                },
+                new Agent
+                {
+                    Name = "koboldcpp outlines (local)",
+                    IsDefault = false,
+                    SystemPrompt = OutlinesSystemPrompt,
+                    Technical = new AgentTechnical
+                    {
+                        Endpoint = "http://localhost:5001/v1",
+                        Token = "",
+                        ChosenModel = "do_not_applied",
+                        ContextSize = 16384
+                    }
+                },
+                new Agent
+                {
+                    Name = "openrouter (network)",
+                    IsDefault = false,
+                    SystemPrompt = DefaultSystemPrompt,
+                    Technical = new AgentTechnical
+                    {
+                        Endpoint = "https://openrouter.ai/api/v1",
+                        Token = "",
+                        ChosenModel = "qwen/qwen3-32b:free",
+                        ContextSize = 16384
+                    }
+                },
+            ]
+        };
+
+        private const string OutlinesSystemPrompt =
 """
+SYSTEM INSTRUCTIONS:
+#1 You are an expert programmer.
+#2 You are especially good at understanding and explaining the main ideas in a code function.
+#3 Your task is to write comments that summarize the main ideas in the code.
+
+Follow these rules:
+
+#1 Use the comments to organize the code into logical sections.
+#2 Each comment should be one sentence or phrase.
+#3 When applicable, the comment should explain why the code is written that way, but only if the reasoning is unclear.
+#4 The comment should not be too detailed, so it is quick to read.
+#5 Aim for at most 3 comments for short functions, or at most 5 comments for long functions.
+#6 Do not comment every line.
+#7 You can only add comments or edit any existing single-line comment that has leading ' *'.
+#8 If existing comment has not leading `*` you must not add any comments inside of existing comments or nearby of it.
+#9 You must respond in the following Json format:
+```
 {
-    "Agents":
-        [
-            {
-                "Name": "koboldcpp_local",
-                "Endpoint":"http://localhost:5001/v1",
-                "Token":"",
-                "ChosenModel":"do_not_applied",
-                "ContextSize":16384,
-                "IsDefault":true
-            },
-            {
-                "Name": "openrouter",
-                "Endpoint":"https://openrouter.ai/api/v1",
-                "Token":"",
-                "ChosenModel":"qwen/qwen3-32b:free",
-                "ContextSize":16384,
-                "IsDefault":false
-            }
-        ]
+    "comments":
+    [
+        {
+            "filepath": "...",
+            "line": ...,
+            "text": "...",
+        },
+        {
+            "filepath": "...",
+            "line": ...,
+            "text": "...",
+        },
+    ]
 }
+```
+
+where  `filepath` is full path to the source code file, `line` is the line number before you want to add new comment OR a line where you want to replace comment, `text` is a text of comment.
 """;
 
         #endregion
     }
 
-    public sealed class OptionAgents
-    {
-        public List<OptionAgent> Agents
-        {
-            get;
-            set;
-        } = new();
-
-        public static bool TryParse(
-            string optionAgentsJson,
-            out OptionAgents? agents
-            )
-        {
-            try
-            {
-                agents = JsonSerializer.Deserialize<OptionAgents>(optionAgentsJson);
-                return true;
-            }
-            catch
-            {
-                //error in json
-                //todo log
-            }
-
-            agents = null;
-            return false;
-        }
-
-        public OptionAgent GetActiveAgent()
-        {
-            return TryGetActiveAgent() ?? new OptionAgent();
-        }
-
-        public OptionAgent? TryGetActiveAgent()
-        {
-            return Agents.FirstOrDefault(a => a.IsDefault);
-        }
-
-
-        public async Task<bool> VerifyAgentAndShowErrorIfNotAsync()
-        {
-            var optionAgent = TryGetActiveAgent();
-            if (optionAgent is null)
-            {
-                return false;
-            }
-
-            return await optionAgent.VerifyAgentAndShowErrorIfNotAsync();
-        }
-
-        public Uri? TryBuildEndpointUri()
-        {
-            var optionAgent = TryGetActiveAgent();
-            if (optionAgent is null)
-            {
-                return null;
-            }
-
-            return optionAgent.TryBuildEndpointUri();
-        }
-    }
-
-    public sealed class OptionAgent
-    {
-        /// <summary>
-        /// Agent name.
-        /// </summary>
-        public string Name
-        {
-            get;
-            set;
-        }
-
-        /// <summary>
-        /// An endpoint of LLM API provider.
-        /// </summary>
-        public string Endpoint
-        {
-            get;
-            set;
-        }
-
-        /// <summary>
-        /// A token of LLM API provider.
-        /// </summary>
-        public string Token
-        {
-            get;
-            set;
-        }
-
-        /// <summary>
-        /// Chosen model, if API provider suggests many
-        /// </summary>
-        public string ChosenModel
-        {
-            get;
-            set;
-        }
-
-        /// <summary>
-        /// A LLM context size. It depends on model.
-        /// </summary>
-        public int ContextSize
-        {
-            get;
-            set;
-        }
-
-        /// <summary>
-        /// This agent is the default choice for any new chat.
-        /// </summary>
-        public bool IsDefault
-        {
-            get;
-            set;
-        }
-
-        public OptionAgent()
-        {
-            Name = string.Empty;
-            Endpoint = "http://localhost:5001/v1";
-            Token = string.Empty;
-            ContextSize = 8192;
-            IsDefault = false;
-        }
-
-        public async Task<bool> VerifyAgentAndShowErrorIfNotAsync()
-        {
-            var endpointUri = TryBuildEndpointUri();
-            if (endpointUri is null)
-            {
-                await VS.MessageBox.ShowErrorAsync(
-                    Resources.Resources.Error,
-                    "Invalid endpoint Uri. Please make sure it is correct uri. For example, the uri must contain a protocol prefix, like http, https."
-                    );
-                return false;
-            }
-            if (string.IsNullOrEmpty(Token))
-            {
-                await VS.MessageBox.ShowErrorAsync(
-                    Resources.Resources.Error,
-                    "Empty access token for chosen agent. Set the actual token via FreeAIr contronl center and repeat."
-                    );
-                return false;
-            }
-
-            return true;
-        }
-
-        public Uri? TryBuildEndpointUri()
-        {
-            try
-            {
-                return new Uri(Endpoint);
-            }
-            catch (Exception excp)
-            {
-                //todo log
-            }
-
-            return null;
-        }
-
-        public bool IsOpenRouterAgent()
-        {
-            var uri = TryBuildEndpointUri();
-            if (uri is null)
-            {
-                return false;
-            }
-
-            if (string.Compare(uri.Host, "openrouter.ai", true) == 0)
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-        }
-    }
 }

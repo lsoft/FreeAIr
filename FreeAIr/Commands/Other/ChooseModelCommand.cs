@@ -13,8 +13,8 @@ namespace FreeAIr.Commands.Other
         protected override void BeforeQueryStatus(EventArgs e)
         {
             var agent = InternalPage.Instance.GetActiveAgent();
-            var uri = agent.TryBuildEndpointUri();
-            if (agent.IsOpenRouterAgent())
+            var uri = agent.Technical.TryBuildEndpointUri();
+            if (agent.Technical.IsOpenRouterAgent())
             {
                 this.Command.Enabled = true;
             }

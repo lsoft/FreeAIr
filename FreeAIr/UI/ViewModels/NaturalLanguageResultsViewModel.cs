@@ -46,7 +46,7 @@ namespace FreeAIr.UI.ViewModels
             }
         }
 
-        public ObservableCollection2<FoundItem> FoundItems
+        public ObservableCollection2<FoundResultItem> FoundItems
         {
             get;
         }
@@ -62,7 +62,7 @@ namespace FreeAIr.UI.ViewModels
                         {
                             try
                             {
-                                var foundItem = a as FoundItem;
+                                var foundItem = a as FoundResultItem;
                                 if (foundItem is null)
                                 {
                                     return;
@@ -228,7 +228,7 @@ namespace FreeAIr.UI.ViewModels
                     null
                     ),
                 null,
-                ChatOptions.NoToolAutoProcessedJsonResponse
+                ChatOptions.NoToolAutoProcessedJsonResponse()
                 );
             if (_chat is null)
             {
@@ -295,14 +295,14 @@ namespace FreeAIr.UI.ViewModels
 
             FoundItems.Clear();
 
-            List<FoundItem> foundItems = new();
+            List<FoundResultItem> foundItems = new();
 
             try
             {
                 var processedItemCount = 0;
 
                 var agent = InternalPage.Instance.GetActiveAgent();
-                foreach (var portion in foundRootItems.SplitByItemsSize(agent.ContextSize))
+                foreach (var portion in foundRootItems.SplitByItemsSize(agent.Technical.ContextSize))
                 {
                     Status = $"In progress ({processedItemCount}/{foundRootItems.Count})...";
 
@@ -319,7 +319,7 @@ namespace FreeAIr.UI.ViewModels
                                 solutionItem.SolutionItem.FullPath,
                                 null
                                 ),
-                            true,
+                            false,
                             true
                             );
                         contextItems.Add(contextItem);
@@ -388,7 +388,7 @@ namespace FreeAIr.UI.ViewModels
 
         private static void FillFoundItemsByLLMJson(
             string jsonBody,
-            ref List<FoundItem> foundItems
+            ref List<FoundResultItem> foundItems
             )
         {
             try
@@ -422,7 +422,7 @@ $"""
                     {
                         var match = JsonSerializer.Deserialize<Match>(jsonMatch);
                         foundItems.Add(
-                            new FoundItem(
+                            new FoundResultItem(
                                 filePath: match.fullpath,
                                 foundText: match.found_text,
                                 reason: match.reason,
@@ -441,7 +441,7 @@ $"""
 
         private static bool FindSelectionFromDocumentBody(
             Microsoft.VisualStudio.Text.ITextSnapshot snapshot,
-            FoundItem foundItem,
+            FoundResultItem foundItem,
             ref int startLineIndex,
             ref int startColumnIndex,
             ref int endLineIndex,
@@ -470,7 +470,7 @@ $"""
 
         private static void FindSelectionFromLLMData(
             Microsoft.VisualStudio.Text.ITextSnapshot snapshot,
-            FoundItem foundItem,
+            FoundResultItem foundItem,
             out int startLineIndex,
             out int startColumnIndex,
             out int startOffset,
@@ -531,7 +531,7 @@ $"""
     }
 
 
-    public sealed class FoundItem
+    public sealed class FoundResultItem
     {
         public string FilePath
         {
@@ -564,7 +564,7 @@ $"""
         }
 
 
-        public FoundItem(
+        public FoundResultItem(
             string filePath,
             string foundText,
             string reason,

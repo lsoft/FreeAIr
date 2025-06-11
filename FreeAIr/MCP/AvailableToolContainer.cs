@@ -116,13 +116,14 @@ namespace FreeAIr.MCP.McpServerProxy
 
         public void SaveToSystem()
         {
-            MCPPage.Instance.AvailableTools = JsonSerializer.Serialize(_servers);
-            MCPPage.Instance.Save();
+            InternalPage.Instance.SaveExternalMCPTools(
+                _servers
+                );
         }
 
         private static AvailableMcpServers Read()
         {
-            var json = MCPPage.Instance.AvailableTools;
+            var json = InternalPage.Instance.AvailableTools;
             if (string.IsNullOrEmpty(json))
             {
                 return new AvailableMcpServers();

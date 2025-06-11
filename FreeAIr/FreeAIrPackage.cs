@@ -3,6 +3,7 @@ global using Microsoft.VisualStudio.Shell;
 global using System;
 global using Task = System.Threading.Tasks.Task;
 using EnvDTE80;
+using FreeAIr.Agents;
 using FreeAIr.BLogic;
 using FreeAIr.Extension.CodeLens;
 using FreeAIr.Find;
@@ -14,6 +15,7 @@ using FreeAIr.UI.ToolWindows;
 using FreeAIr.UI.ViewModels;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.ComponentModelHost;
+using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Threading;
@@ -27,13 +29,14 @@ namespace FreeAIr
     [ProvideAutoLoad(VSConstants.UICONTEXT.NoSolution_string, PackageAutoLoadFlags.BackgroundLoad)]
     [ProvideAutoLoad(VSConstants.UICONTEXT.SolutionExistsAndFullyLoaded_string, PackageAutoLoadFlags.BackgroundLoad)]
     [ProvideOptionPage(typeof(OptionsProvider.ResponsePageOptions), "FreeAIr", "Response", 0, 0, true, SupportsProfiles = true)]
-    [ProvideOptionPage(typeof(OptionsProvider.MCPPageOptions), "FreeAIr", "MCP", 0, 0, true, SupportsProfiles = true)]
     [ProvideOptionPage(typeof(OptionsProvider.InternalPageOptions), "FreeAIr", "Internal", 0, 0, true, SupportsProfiles = true)]
     [ProvideToolWindow(typeof(ChatListToolWindow.Pane), Style = VsDockStyle.Tabbed, Window = WindowGuids.DocumentWell)]
     [ProvideToolWindow(typeof(ChooseModelToolWindow.Pane), Style = VsDockStyle.Tabbed, Window = WindowGuids.DocumentWell)]
     [ProvideToolWindow(typeof(NaturalLanguageResultsToolWindow.Pane), Style = VsDockStyle.Tabbed, Window = WindowGuids.DocumentWell)]
+    [ProvideToolWindow(typeof(NaturalLanguageOutlinesToolWindow.Pane), Style = VsDockStyle.Tabbed, Window = WindowGuids.DocumentWell)]
     [ProvideService(typeof(SolutionItemsContextMenuCommandBridge), IsAsyncQueryable = true)]
     [ProvideService(typeof(FindScopeContextMenuCommandBridge), IsAsyncQueryable = true)]
+    [ProvideService(typeof(AgentsContextMenuCommandBridge), IsAsyncQueryable = true)]
     public sealed class FreeAIrPackage : ToolkitPackage
     {
         public static FreeAIrPackage Instance = null;
@@ -61,14 +64,12 @@ namespace FreeAIr
             try
             {
                 //load dlls manually, for unknown reason these dlls does not loaded automatically
-                //Assembly a1 = Assembly.LoadFrom(System.IO.Path.Combine(WorkingFolder, "MdXaml.dll"));
-                //AppDomain.CurrentDomain.Load(a1.FullName);
-
-                Assembly a2 = Assembly.LoadFrom(System.IO.Path.Combine(WorkingFolder, "System.ClientModel.dll"));
-                AppDomain.CurrentDomain.Load(a2.FullName);
-
-                Assembly a3 = Assembly.LoadFrom(System.IO.Path.Combine(WorkingFolder, "JsonPath.Net.dll"));
-                AppDomain.CurrentDomain.Load(a3.FullName);
+                LoadDlls(
+                    [
+                        "Xceed.Wpf.Toolkit.dll",
+                        "System.ClientModel.dll",
+                        "JsonPath.Net.dll"
+                    ]);
 
                 AddService(
                     typeof(SolutionItemsContextMenuCommandBridge),
@@ -78,6 +79,11 @@ namespace FreeAIr
                 AddService(
                     typeof(FindScopeContextMenuCommandBridge),
                     (_, _, _) => Task.FromResult<object>(new FindScopeContextMenuCommandBridge()),
+                    true
+                    );
+                AddService(
+                    typeof(AgentsContextMenuCommandBridge),
+                    (_, _, _) => Task.FromResult<object>(new AgentsContextMenuCommandBridge()),
                     true
                     );
 
@@ -102,7 +108,9 @@ namespace FreeAIr
 
                 ShowReleaseNotesInfoBarIfNeeded();
 
-                EmbeddedResourceHelper.LoadXamlEmbeddedResource("FreeAIr.UI.ClickableText.ClickableTextResource.xaml");
+                EmbeddedResourceHelper.LoadXamlEmbeddedResource(
+                    "FreeAIr.UI.ClickableText.ClickableTextResource.xaml"
+                    );
 
                 McpServerProxyApplication.UpdateExternalServersAsync()
                     .FileAndForget(nameof(McpServerProxyApplication.UpdateExternalServersAsync))
@@ -112,6 +120,17 @@ namespace FreeAIr
             {
                 //todo log
                 throw;
+            }
+        }
+
+        private static void LoadDlls(
+            string[] dllNames
+            )
+        {
+            foreach (var dllName in dllNames)
+            {
+                Assembly a = Assembly.LoadFrom(System.IO.Path.Combine(WorkingFolder, dllName));
+                AppDomain.CurrentDomain.Load(a.FullName);
             }
         }
 

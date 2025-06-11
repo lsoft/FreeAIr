@@ -1,4 +1,6 @@
-﻿using FreeAIr.MCP.McpServerProxy;
+﻿using FreeAIr.Agents;
+using FreeAIr.Commands.Other;
+using FreeAIr.MCP.McpServerProxy;
 using FreeAIr.MCP.McpServerProxy.External;
 using FreeAIr.MCP.McpServerProxy.Github;
 using FreeAIr.UI.Windows;
@@ -6,6 +8,7 @@ using Microsoft.VisualStudio.PlatformUI;
 using Microsoft.VisualStudio.Shell.Interop;
 using System.Collections.Generic;
 using System.Linq;
+using System.Management.Instrumentation;
 using System.Runtime.InteropServices.WindowsRuntime;
 using System.Windows;
 using System.Windows.Media;
@@ -17,7 +20,6 @@ namespace FreeAIr.UI.ViewModels
     {
         private bool? _githubMcpServerStatus;
         private string _externalMcpServerJson;
-        private RelayCommand _restoreDefaultSystemPromptCommand;
         private string _agentsJson;
 
         #region Model Context Protocol
@@ -43,6 +45,21 @@ namespace FreeAIr.UI.ViewModels
         public InstallGithubMCPServerCmd InstallGithubMCPServerCommand
         {
             get;
+        }
+
+
+        public string GitHubToken
+        {
+            get
+            {
+                return InternalPage.Instance.GitHubToken;
+            }
+
+            set
+            {
+                InternalPage.Instance.GitHubToken = value;
+                InternalPage.Instance.Save();
+            }
         }
 
         public string ExternalMcpServerJson
@@ -80,37 +97,6 @@ namespace FreeAIr.UI.ViewModels
 
         #endregion
 
-        #region System Prompt
-
-        public string CurrentSystemPrompt
-        {
-            get => InternalPage.Instance.CurrentSystemPrompt;
-            set
-            {
-                InternalPage.Instance.CurrentSystemPrompt = value;
-                InternalPage.Instance.Save();
-            }
-        }
-
-        public RelayCommand RestoreDefaultSystemPromptCommand
-        {
-            get
-            {
-                if (_restoreDefaultSystemPromptCommand is null)
-                {
-                    _restoreDefaultSystemPromptCommand = new RelayCommand(
-                        a =>
-                        {
-                            InternalPage.Instance.RestoreDefaultSystemPrompt();
-                            OnPropertyChanged();
-                        });
-                }
-                return _restoreDefaultSystemPromptCommand;
-            }
-        }
-
-        #endregion
-
         #region Agents
 
         public string AgentsJson
@@ -127,7 +113,7 @@ namespace FreeAIr.UI.ViewModels
         {
             get
             {
-                if (!OptionAgents.TryParse(_agentsJson, out _))
+                if (!AgentCollection.TryParse(_agentsJson, out _))
                 {
                     return Brushes.Red;
                 }
@@ -141,18 +127,24 @@ namespace FreeAIr.UI.ViewModels
             get;
         }
 
+        public EditAgentCmd EditAgentCommand
+        {
+            get;
+        }
+
         #endregion
 
         public ControlCenterViewModel()
         {
             _githubMcpServerStatus = null;
-            ExternalMcpServerJson = MCPPage.Instance.ExternalMCPServers;
+            ExternalMcpServerJson = InternalPage.Instance.ExternalMCPServers;
             AgentsJson = InternalPage.Instance.Agents;
 
             InstallGithubMCPServerCommand = new(this);
             ApplyExternalMcpServerChangesCommand = new(this);
             EditGlobalToolsCommand = new(this);
             ApplyAgentsJsonCommand = new(this);
+            EditAgentCommand = new(this);
 
             UpdateGithubMcpStatusAsync()
                 .FileAndForget(nameof(UpdateGithubMcpStatusAsync));
@@ -249,7 +241,7 @@ namespace FreeAIr.UI.ViewModels
 
             protected override async Task ExecuteInternalAsync(object parameter)
             {
-                if (!OptionAgents.TryParse(_viewModel._agentsJson, out var optionAgents))
+                if (!AgentCollection.TryParse(_viewModel._agentsJson, out var optionAgents))
                 {
                     await VS.MessageBox.ShowErrorAsync(
                         Resources.Resources.Error,
@@ -279,7 +271,7 @@ namespace FreeAIr.UI.ViewModels
                 {
                     return false;
                 }
-                if (!OptionAgents.TryParse(_viewModel._agentsJson, out _))
+                if (!AgentCollection.TryParse(_viewModel._agentsJson, out _))
                 {
                     return false;
                 }
@@ -347,8 +339,7 @@ namespace FreeAIr.UI.ViewModels
                     }
                     else
                     {
-                        MCPPage.Instance.ExternalMCPServers = _viewModel._externalMcpServerJson;
-                        await MCPPage.Instance.SaveAsync();
+                        InternalPage.Instance.SaveExternalMCPServers(_viewModel._externalMcpServerJson);
 
                         setupResult.ToolContainer.SaveToSystem();
 
@@ -413,6 +404,49 @@ namespace FreeAIr.UI.ViewModels
                 }
 
                 _viewModel.OnPropertyChanged();
+            }
+        }
+
+        public sealed class EditAgentCmd : AsyncBaseRelayCommand
+        {
+            private readonly ControlCenterViewModel _viewModel;
+
+            public EditAgentCmd(
+                ControlCenterViewModel viewModel
+                )
+            {
+                if (viewModel is null)
+                {
+                    throw new ArgumentNullException(nameof(viewModel));
+                }
+
+                _viewModel = viewModel;
+            }
+
+            protected override async Task ExecuteInternalAsync(object parameter)
+            {
+                if (!AgentCollection.TryParse(_viewModel._agentsJson, out var agentCollection))
+                {
+                    return;
+                }
+
+                await ShowAgentConfigureCommand.ShowAsync(
+                    agentCollection
+                    );
+
+                _viewModel.AgentsJson = InternalPage.Instance.Agents;
+
+                _viewModel.OnPropertyChanged();
+            }
+
+            protected override bool CanExecuteInternal(object parameter)
+            {
+                if (!AgentCollection.TryParse(_viewModel._agentsJson, out _))
+                {
+                    return false;
+                }
+
+                return true;
             }
         }
     }

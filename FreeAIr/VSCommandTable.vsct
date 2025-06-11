@@ -36,10 +36,14 @@
           <ButtonText>Solution Items Context Menu</ButtonText>
         </Strings>
       </Menu>
-
       <Menu guid="FreeAIr" id="FindScopeContextMenu" type="Context">
         <Strings>
           <ButtonText>Find Scope Context Menu</ButtonText>
+        </Strings>
+      </Menu>
+      <Menu guid="FreeAIr" id="AgentsContextMenu" type="Context">
+        <Strings>
+          <ButtonText>Agents Context Menu</ButtonText>
         </Strings>
       </Menu>
 
@@ -70,9 +74,11 @@
       <Group guid="FreeAIr" id="SolutionItemsContextMenuGroup" priority="0x0000">
         <Parent guid="FreeAIr" id="SolutionItemsContextMenu"/>
       </Group>
-
       <Group guid="FreeAIr" id="FindScopeContextMenuGroup" priority="0x0000">
         <Parent guid="FreeAIr" id="FindScopeContextMenu"/>
+      </Group>
+      <Group guid="FreeAIr" id="AgentsContextMenuGroup" priority="0x0000">
+        <Parent guid="FreeAIr" id="AgentsContextMenu"/>
       </Group>
 
     </Groups>
@@ -116,14 +122,6 @@
         <CommandFlag>IconIsMoniker</CommandFlag>
         <Strings>
           <ButtonText>Open Control Center...</ButtonText>
-        </Strings>
-      </Button>
-      <Button guid="FreeAIr" id="ShowOptionsCommandId" priority="0x0102" type="Button">
-        <Parent guid="FreeAIr" id="SubExtensionMenuGroup" />
-         <Icon guid="ImageCatalogGuid" id="PropertyInternal" />
-        <CommandFlag>IconIsMoniker</CommandFlag>
-        <Strings>
-          <ButtonText>Show options...</ButtonText>
         </Strings>
       </Button>
 
@@ -184,13 +182,6 @@
         </Strings>
       </Button>
 
-      <!--<Button guid="FreeAIr" id="MyCommand" priority="0x0100" type="Button">
-        <Parent guid="FreeAIr" id="SolutionContextGroup" />
-        <Icon guid="ImageCatalogGuid" id="UserTask" />
-        <Strings>
-          <ButtonText>pss...</ButtonText>
-        </Strings>
-      </Button>-->
       <Button guid="FreeAIr" id="ExplainFileCommandId" priority="0x0100" type="Button">
         <Parent guid="FreeAIr" id="SolutionContextGroup" />
         <Icon guid="ImageCatalogGuid" id="SQLServerObjectExplorer" />
@@ -207,9 +198,15 @@
           <ButtonText>Add comments to the code of the file</ButtonText>
         </Strings>
       </Button>
+      <Button guid="FreeAIr" id="AddNaturalLanguageCommentsCommandId" priority="0x0100" type="Button">
+        <Parent guid="FreeAIr" id="SolutionContextGroup" />
+        <Icon guid="ImageCatalogGuid" id="AddComment" />
+        <CommandFlag>IconIsMoniker</CommandFlag>
+        <Strings>
+          <ButtonText>Add natural language comments to the code of the file</ButtonText>
+        </Strings>
+      </Button>
 
-
-      
       <Button guid="FreeAIr" id="CodeLens_AddXmlCommentCommandId" priority="0x0000" type="Button">
         <Strings>
           <LocCanonicalName>FreeAIr.AddXmlComment</LocCanonicalName>
@@ -239,12 +236,27 @@
           <ButtonText>Solution items...</ButtonText>
         </Strings>
       </Button>
-
       <Button guid="FreeAIr" id="FindScopeContextMenuDynamicCommandId" type="Button" priority="0">
         <Parent guid="FreeAIr" id="FindScopeContextMenuGroup"/>
         <CommandFlag>DynamicItemStart</CommandFlag>
         <Strings>
           <ButtonText>Find Scope...</ButtonText>
+        </Strings>
+      </Button>
+      <Button guid="FreeAIr" id="AgentsContextMenuDynamicCommandId" type="Button" priority="0">
+        <Parent guid="FreeAIr" id="AgentsContextMenuGroup"/>
+        <CommandFlag>DynamicItemStart</CommandFlag>
+        <Strings>
+          <ButtonText>Agents...</ButtonText>
+        </Strings>
+      </Button>
+
+      <Button guid="FreeAIr" id="ShowAgentConfigureCommandId" priority="0x0100" type="Button">
+        <Parent guid="FreeAIr" id="SubExtensionMenuGroup" />
+        <Icon guid="ImageCatalogGuid" id="ConfigurationEditor" />
+        <CommandFlag>IconIsMoniker</CommandFlag>
+        <Strings>
+          <ButtonText>Configure agents...</ButtonText>
         </Strings>
       </Button>
 
@@ -301,17 +313,26 @@
       <IDSymbol name="OpenNaturalSearchToolWindowCommandId" value="0x1041" />
       <IDSymbol name="ShowReleaseNotesCommandId" value="0x1042" />
       <IDSymbol name="OpenControlCenterCommandId" value="0x1043" />
-      <IDSymbol name="ShowOptionsCommandId" value="0x1044" />
+
+      <IDSymbol name="ShowAgentConfigureCommandId" value="0x1044"/>
+
+      <!-- natural language comments -->
+      <IDSymbol name="AddNaturalLanguageCommentsCommandId" value="0x1052"/>
 
       <!-- solution items context menu -->
-      <IDSymbol name="SolutionItemsContextMenu" value="0x1045"/>
-      <IDSymbol name="SolutionItemsContextMenuGroup" value="0x1046"/>
-      <IDSymbol name="SolutionItemsContextMenuDynamicCommandId" value="0x1047"/>
+      <IDSymbol name="SolutionItemsContextMenu" value="0x8045"/>
+      <IDSymbol name="SolutionItemsContextMenuGroup" value="0x8046"/>
+      <IDSymbol name="SolutionItemsContextMenuDynamicCommandId" value="0x8047"/>
 
       <!-- find scope context menu -->
-      <IDSymbol name="FindScopeContextMenu" value="0x1048"/>
-      <IDSymbol name="FindScopeContextMenuGroup" value="0x1049"/>
-      <IDSymbol name="FindScopeContextMenuDynamicCommandId" value="0x1050"/>
+      <IDSymbol name="FindScopeContextMenu" value="0x9048"/>
+      <IDSymbol name="FindScopeContextMenuGroup" value="0x9049"/>
+      <IDSymbol name="FindScopeContextMenuDynamicCommandId" value="0x9050"/>
+
+      <!-- agents context menu -->
+      <IDSymbol name="AgentsContextMenu" value="0xA053"/>
+      <IDSymbol name="AgentsContextMenuGroup" value="0xA054"/>
+      <IDSymbol name="AgentsContextMenuDynamicCommandId" value="0xA055"/>
 
     </GuidSymbol>
 

@@ -145,7 +145,7 @@
     <value>Cannot obtain selected block of code.</value>
   </data>
   <data name="Code_NoToken" xml:space="preserve">
-    <value>Please setup API endpoint and access token in Tools -&gt; Options -&gt; FreeAIr page. If you are using local LLM enter any string into token option.</value>
+    <value>Please setup API endpoint and access token in FreeAIr control panel. If you are using local LLM enter any string into token option.</value>
   </data>
   <data name="Error" xml:space="preserve">
     <value>Error</value>

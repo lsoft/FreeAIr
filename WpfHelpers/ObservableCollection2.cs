@@ -12,8 +12,14 @@ namespace WpfHelpers
 
         public ObservableCollection2()
         {
-            var itemsField = typeof (Collection<T>).GetField("items", BindingFlags.Instance | BindingFlags.NonPublic);
+            var itemsField = typeof(Collection<T>).GetField("items", BindingFlags.Instance | BindingFlags.NonPublic);
             _items = (IList<T>)(itemsField.GetValue(this));
+        }
+
+        public ObservableCollection2(IEnumerable<T> items)
+            : this()
+        {
+            AddRange(items);
         }
 
         public void ReverseInsertAt0(

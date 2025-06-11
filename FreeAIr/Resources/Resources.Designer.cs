@@ -160,7 +160,7 @@ namespace FreeAIr.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Please setup API endpoint and access token in Tools -&gt; Options -&gt; FreeAIr page. If you are using local LLM enter any string into token option..
+        ///   Looks up a localized string similar to Please setup API endpoint and access token in FreeAIr control panel. If you are using local LLM enter any string into token option..
         /// </summary>
         public static string Code_NoToken {
             get {

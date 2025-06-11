@@ -1,4 +1,7 @@
-﻿using FreeAIr.Find;
+﻿using FreeAIr.Agents;
+using FreeAIr.Commands.ContextMenu;
+using FreeAIr.Commands.File;
+using FreeAIr.Find;
 using FreeAIr.Shared.Helper;
 using FreeAIr.UI.ToolWindows;
 using FreeAIr.UI.ViewModels;
@@ -9,54 +12,31 @@ using static FreeAIr.Find.FindScopeContextMenuCommandBridge;
 namespace FreeAIr.Commands.Other
 {
     [Command(PackageIds.FindScopeContextMenuDynamicCommandId)]
-    public sealed class FindScopeContextMenuCommand : BaseDynamicCommand<FindScopeContextMenuCommand, FindScopeContextMenuItem>
+    public sealed class FindScopeContextMenuCommand
+        : Base_ContextMenu_DynamicCommand<FindScopeContextMenuCommand, FindScopeContextMenuItem, FindScopeContextMenuCommandBridge>
     {
-        private FindScopeContextMenuCommandBridge _bridge;
 
-        protected override async Task InitializeCompletedAsync()
+        protected override async Task ExecuteAsync(FindScopeContextMenuItem item)
         {
-            _bridge = await FreeAIrPackage.Instance.GetServiceAsync<FindScopeContextMenuCommandBridge, FindScopeContextMenuCommandBridge>();
-        }
+            await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
 
-        protected override IReadOnlyList<FindScopeContextMenuItem> GetItems()
-        {
-            return _bridge.MenuItems;
-        }
+            var fileTypesFilter = _bridge.FileTypesFilterText;
+            var filesTypeFilters = new FileTypesFilter(
+                fileTypesFilter
+                    .Split(';')
+                    .ConvertAll(f => new FileTypeFilter(f))
+                );
 
-        protected override void BeforeQueryStatus(OleMenuCommand menuItem, EventArgs e, FindScopeContextMenuItem item)
-        {
-            menuItem.Text = item.Header;
-            menuItem.Checked = false;
-        }
+            var scope = item.Scope;
 
-        protected override async void Execute(OleMenuCmdEventArgs e, FindScopeContextMenuItem item)
-        {
-            try
-            {
-                await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+            //закрываем окно поиска
+            CloseFindWindow();
 
-                var fileTypesFilter = _bridge.FileTypesFilterText;
-                var filesTypeFilters = new FileTypesFilter(
-                    fileTypesFilter
-                        .Split(';')
-                        .ConvertAll(f => new FileTypeFilter(f))
-                    );
-
-                var scope = item.Scope;
-
-                //закрываем окно поиска
-                CloseFindWindow();
-
-                var pane = await NaturalLanguageResultsToolWindow.ShowAsync();
-                var toolWindow = pane.Content as NaturalLanguageResultsToolWindowControl;
-                var viewModel = toolWindow.DataContext as NaturalLanguageResultsViewModel;
-                viewModel.SetNewChatAsync(scope, _bridge.SubjectToSearchText, filesTypeFilters)
-                    .FileAndForget(nameof(NaturalLanguageResultsViewModel.SetNewChatAsync));
-            }
-            catch (Exception excp)
-            {
-                int g = 0;
-            }
+            var pane = await NaturalLanguageResultsToolWindow.ShowAsync();
+            var toolWindow = pane.Content as NaturalLanguageResultsToolWindowControl;
+            var viewModel = toolWindow.DataContext as NaturalLanguageResultsViewModel;
+            viewModel.SetNewChatAsync(scope, _bridge.SubjectToSearchText, filesTypeFilters)
+                .FileAndForget(nameof(NaturalLanguageResultsViewModel.SetNewChatAsync));
         }
 
         private static void CloseFindWindow()

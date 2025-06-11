@@ -53,13 +53,17 @@ namespace FreeAIr
         public const int OpenNaturalSearchToolWindowCommandId = 0x1041;
         public const int ShowReleaseNotesCommandId = 0x1042;
         public const int OpenControlCenterCommandId = 0x1043;
-        public const int ShowOptionsCommandId = 0x1044;
-        public const int SolutionItemsContextMenu = 0x1045;
-        public const int SolutionItemsContextMenuGroup = 0x1046;
-        public const int SolutionItemsContextMenuDynamicCommandId = 0x1047;
-        public const int FindScopeContextMenu = 0x1048;
-        public const int FindScopeContextMenuGroup = 0x1049;
-        public const int FindScopeContextMenuDynamicCommandId = 0x1050;
+        public const int ShowAgentConfigureCommandId = 0x1044;
+        public const int AddNaturalLanguageCommentsCommandId = 0x1052;
+        public const int SolutionItemsContextMenu = 0x8045;
+        public const int SolutionItemsContextMenuGroup = 0x8046;
+        public const int SolutionItemsContextMenuDynamicCommandId = 0x8047;
+        public const int FindScopeContextMenu = 0x9048;
+        public const int FindScopeContextMenuGroup = 0x9049;
+        public const int FindScopeContextMenuDynamicCommandId = 0x9050;
+        public const int AgentsContextMenu = 0xA053;
+        public const int AgentsContextMenuGroup = 0xA054;
+        public const int AgentsContextMenuDynamicCommandId = 0xA055;
         public const int Icon16 = 0x0001;
         public const int Icon32 = 0x0001;
     }

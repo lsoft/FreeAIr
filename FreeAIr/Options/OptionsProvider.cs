@@ -10,11 +10,6 @@ namespace FreeAIr
         }
 
         [ComVisible(true)]
-        public class MCPPageOptions : BaseOptionPage<MCPPage>
-        {
-        }
-
-        [ComVisible(true)]
         public class InternalPageOptions : BaseOptionPage<InternalPage>
         {
         }

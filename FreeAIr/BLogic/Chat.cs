@@ -1,4 +1,5 @@
-﻿using FreeAIr.BLogic.Context;
+﻿using FreeAIr.Agents;
+using FreeAIr.BLogic.Context;
 using FreeAIr.Helper;
 using FreeAIr.MCP.McpServerProxy;
 using FreeAIr.Shared.Helper;
@@ -220,14 +221,14 @@ namespace FreeAIr.BLogic
 
                 var activeAgent = this.Options.ChatAgents.GetActiveAgent();
                 var chatClient = new ChatClient(
-                    model: activeAgent.ChosenModel,
+                    model: activeAgent.Technical.ChosenModel,
                     new ApiKeyCredential(
-                        activeAgent.Token
+                        activeAgent.Technical.Token
                         ),
                     new OpenAIClientOptions
                     {
                         NetworkTimeout = TimeSpan.FromHours(1),
-                        Endpoint = activeAgent.TryBuildEndpointUri(),
+                        Endpoint = activeAgent.Technical.TryBuildEndpointUri(),
                     }
                     );
 
@@ -482,7 +483,7 @@ namespace FreeAIr.BLogic
                 _resultFilePath = resultFilePath;
                 _chat = chat;
                 _systemChatMessage = new SystemChatMessage(
-                    InternalPage.Instance.BuildSystemPrompt()
+                    chat.Options.GetActiveAgent().SystemPrompt
                     );
             }
 
@@ -791,31 +792,43 @@ namespace FreeAIr.BLogic
     {
         public static ChatOptions Default => new ChatOptions(
             ChatToolChoice.CreateAutoChoice(),
-            InternalPage.Instance.GetAgents(),
+            InternalPage.Instance.GetAgentCollection(),
             OpenAI.Chat.ChatResponseFormat.CreateTextFormat(),
             false
             );
 
         public static ChatOptions NoToolAutoProcessedTextResponse => new ChatOptions(
             ChatToolChoice.CreateNoneChoice(),
-            InternalPage.Instance.GetAgents(),
+            InternalPage.Instance.GetAgentCollection(),
             OpenAI.Chat.ChatResponseFormat.CreateTextFormat(),
             true
             );
 
-        public static ChatOptions NoToolAutoProcessedJsonResponse => new ChatOptions(
-            ChatToolChoice.CreateNoneChoice(),
-            InternalPage.Instance.GetAgents(),
-            OpenAI.Chat.ChatResponseFormat.CreateJsonObjectFormat(),
-            true
-            );
+        public static ChatOptions NoToolAutoProcessedJsonResponse(
+            Agent? defaultAgent = null
+            )
+        {
+            var agentCollection = InternalPage.Instance.GetAgentCollection();
+
+            if (defaultAgent is not null)
+            {
+                agentCollection.SetDefaultAgent(defaultAgent);
+            }
+
+            return new ChatOptions(
+                ChatToolChoice.CreateNoneChoice(),
+                agentCollection,
+                OpenAI.Chat.ChatResponseFormat.CreateJsonObjectFormat(),
+                true
+                );
+        }
 
         public ChatToolChoice ToolChoice
         {
             get;
         }
 
-        public OptionAgents ChatAgents
+        public AgentCollection ChatAgents
         {
             get;
         }
@@ -832,7 +845,7 @@ namespace FreeAIr.BLogic
 
         private ChatOptions(
             ChatToolChoice toolChoice,
-            OptionAgents chatAgents,
+            AgentCollection chatAgents,
             OpenAI.Chat.ChatResponseFormat responseFormat,
             bool automaticallyProcessed
             )
@@ -856,6 +869,11 @@ namespace FreeAIr.BLogic
             ChatAgents = chatAgents;
             ResponseFormat = responseFormat;
             AutomaticallyProcessed = automaticallyProcessed;
+        }
+
+        public Agent GetActiveAgent()
+        {
+            return ChatAgents.GetActiveAgent();
         }
     }
 }

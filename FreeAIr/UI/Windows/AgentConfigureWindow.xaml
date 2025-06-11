@@ -1,0 +1,265 @@
+﻿<Window
+    x:Class="FreeAIr.UI.Windows.AgentConfigureWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+    xmlns:local="clr-namespace:FreeAIr"
+    xmlns:ui="clr-namespace:FreeAIr.UI"
+    xmlns:et="clr-namespace:Xceed.Wpf.Toolkit;assembly=Xceed.Wpf.Toolkit"
+    mc:Ignorable="d" 
+    d:DesignHeight="700" d:DesignWidth="1000"
+    Height="700" Width="1000"
+    ui:VsTheme.UseVsTheme="True"
+    ShowInTaskbar="False"
+    Title="FreeAIr Agent Configuration Window"
+    >
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="2*"/>
+            <ColumnDefinition Width="6*"/>
+        </Grid.ColumnDefinitions>
+
+        <Grid
+            Grid.Row="0"
+            Grid.Column="0"
+            Grid.ColumnSpan="2"
+            HorizontalAlignment="Stretch"
+            >
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="auto" />
+                <ColumnDefinition Width="auto" />
+                <ColumnDefinition />
+            </Grid.ColumnDefinitions>
+
+            <Button
+                Grid.Column="0"
+                Content="＋"
+                Margin="5,0,5,0"
+                FontSize="20"
+                Foreground="Green"
+                FontFamily="Cascadia Code"
+                VerticalAlignment="Center"
+                ToolTip="Add new agent"
+                Command="{Binding AddNewAgentCommand}"
+                Style="{DynamicResource TextBlockLikeButtonStyle}"
+                />
+            <Button
+                Grid.Column="1"
+                Content="⛌"
+                Margin="5,0,5,0"
+                FontSize="12"
+                Foreground="Red"
+                FontFamily="Cascadia Code"
+                VerticalAlignment="Center"
+                ToolTip="Delete selected agent"
+                Command="{Binding DeleteAgentCommand}"
+                Style="{DynamicResource TextBlockLikeButtonStyle}"
+                />
+            <Button
+                Grid.Column="2"
+                Content="Save changes"
+                Margin="5,0,5,0"
+                FontSize="12"
+                FontFamily="Cascadia Code"
+                HorizontalAlignment="Right"
+                VerticalAlignment="Center"
+                ToolTip="Save changes"
+                Command="{Binding SaveAndCloseCommand}"
+                Style="{DynamicResource TextBlockLikeButtonStyle}"
+                />
+
+        </Grid>
+
+        <!-- edit agent list -->
+        <Grid
+            Grid.Row="1"
+            Grid.Column="0"
+            Margin="2"
+            >
+
+            <ListView
+                Grid.Row="1"
+                ItemsSource="{Binding AvailableAgents}"
+                DisplayMemberPath="Name"
+                SelectedItem="{Binding SelectedAgent}"
+                />
+            
+        </Grid>
+        
+
+        <!-- edit agent -->
+        <Grid
+            Grid.Row="1"
+            Grid.Column="1"
+            HorizontalAlignment="Stretch"
+            VerticalAlignment="Top"
+            Margin="2"
+            Visibility="{Binding ShowAgentPanel}"
+            >
+            <Grid.RowDefinitions>
+                <!-- name -->
+                <RowDefinition Height="auto"/>
+                
+                <!-- is default -->
+                <RowDefinition Height="auto"/>
+
+                <!-- endpoint -->
+                <RowDefinition Height="auto"/>
+                
+                <!-- token -->
+                <RowDefinition Height="auto"/>
+
+                <!-- chosen model -->
+                <RowDefinition Height="auto"/>
+
+                <!-- context size -->
+                <RowDefinition Height="auto"/>
+
+                <!-- system prompt -->
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="auto"/>
+
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="auto"/>
+                <ColumnDefinition />
+            </Grid.ColumnDefinitions>
+
+            <Label
+                Grid.Row="0"
+                Grid.Column="0"
+                HorizontalAlignment="Left"
+                VerticalAlignment="Center"
+                Content="Name:"
+                />
+
+            <TextBox
+                Grid.Row="0"
+                Grid.Column="1"
+                HorizontalAlignment="Stretch"
+                VerticalAlignment="Center"
+                Text="{Binding SelectedAgent.Name, UpdateSourceTrigger=PropertyChanged}"
+                />
+
+            <Label
+                Grid.Row="1"
+                Grid.Column="0"
+                HorizontalAlignment="Left"
+                VerticalAlignment="Center"
+                Content="Is Default Agent:"
+                />
+
+            <CheckBox
+                Grid.Row="1"
+                Grid.Column="1"
+                HorizontalAlignment="Stretch"
+                VerticalAlignment="Center"
+                IsChecked="{Binding IsDefaultAgent}"
+                />
+
+            <Label
+                Grid.Row="2"
+                Grid.Column="0"
+                HorizontalAlignment="Left"
+                VerticalAlignment="Center"
+                Content="Endpoint:"
+                />
+
+            <TextBox
+                Grid.Row="2"
+                Grid.Column="1"
+                HorizontalAlignment="Stretch"
+                VerticalAlignment="Center"
+                Text="{Binding SelectedAgent.Technical.Endpoint, UpdateSourceTrigger=PropertyChanged}"
+                />
+
+            <Label
+                Grid.Row="3"
+                Grid.Column="0"
+                HorizontalAlignment="Left"
+                VerticalAlignment="Center"
+                Content="Token:"
+                />
+
+            <TextBox
+                Grid.Row="3"
+                Grid.Column="1"
+                HorizontalAlignment="Stretch"
+                VerticalAlignment="Center"
+                Text="{Binding SelectedAgent.Technical.Token, UpdateSourceTrigger=PropertyChanged}"
+                />
+
+            <Label
+                Grid.Row="4"
+                Grid.Column="0"
+                HorizontalAlignment="Left"
+                VerticalAlignment="Center"
+                Content="Chosen model:"
+                />
+
+            <TextBox
+                Grid.Row="4"
+                Grid.Column="1"
+                HorizontalAlignment="Stretch"
+                VerticalAlignment="Center"
+                Text="{Binding SelectedAgent.Technical.ChosenModel, UpdateSourceTrigger=PropertyChanged}"
+                />
+
+            <Label
+                Grid.Row="5"
+                Grid.Column="0"
+                HorizontalAlignment="Left"
+                VerticalAlignment="Center"
+                Content="Context size:"
+                x:Name="ContextSizeLabel"
+                />
+
+            <et:IntegerUpDown
+                Grid.Row="5"
+                Grid.Column="1"
+                HorizontalAlignment="Left"
+                VerticalAlignment="Center"
+                Padding="10,0,10,0"
+                Background="Transparent"
+                Foreground="{Binding ElementName=ContextSizeLabel, Path=Foreground}"
+                Value="{Binding SelectedAgent.Technical.ContextSize, UpdateSourceTrigger=PropertyChanged}"
+                />
+
+
+            <Label
+                Grid.Row="6"
+                Grid.Column="0"
+                HorizontalAlignment="Left"
+                VerticalAlignment="Center"
+                Content="Agent system prompt:"
+                />
+
+            <ScrollViewer
+                Grid.Row="7"
+                Grid.Column="0"
+                Grid.ColumnSpan="2"
+                MaxHeight="350"
+                HorizontalAlignment="Stretch"
+                HorizontalScrollBarVisibility="Auto"
+                VerticalScrollBarVisibility="Auto"
+                >
+
+                <TextBox
+                    HorizontalAlignment="Stretch"
+                    VerticalAlignment="Center"
+                    AcceptsReturn="True"
+                    Text="{Binding SelectedAgent.SystemPrompt, UpdateSourceTrigger=PropertyChanged}"
+                    />
+
+            </ScrollViewer>
+
+        </Grid>
+
+    </Grid>
+    
+</Window>
