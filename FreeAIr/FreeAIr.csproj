@@ -81,7 +81,7 @@
     <Compile Include="BLogic\Context\ChatContext.cs" />
     <Compile Include="BLogic\Context\ChatContextEventArgs.cs" />
     <Compile Include="BLogic\Context\ChatContextItemHelper.cs" />
-    <Compile Include="BLogic\Context\Composer\ContextComposer.cs" />
+    <Compile Include="BLogic\Context\Composer\CSharpContextComposer.cs" />
     <Compile Include="BLogic\Context\Composer\ContextComposeResult.cs" />
     <Compile Include="BLogic\Context\Composer\ContextSelectedIdentifier.cs" />
     <Compile Include="BLogic\Context\Composer\TypeReferenceWalker.cs" />
@@ -91,7 +91,7 @@
     <Compile Include="BuildErrors\BuildResultProvider.cs" />
     <Compile Include="Commands\BuildError\BuildErrorWindowFixErrorCommand.cs" />
     <Compile Include="BuildErrors\BuildResultInformation.cs" />
-    <Compile Include="Commands\File\AddNaturalLanguageCommentsToFileCommand.cs" />
+    <Compile Include="Commands\File\AddNaturalLanguageOutlinesCommand.cs" />
     <Compile Include="Commands\ContextMenu\Base_ContextMenu_DynamicCommand.cs" />
     <Compile Include="Commands\Other\ShowAgentConfigureCommand.cs" />
     <Compile Include="Commands\Other\OpenControlCenterCommand.cs" />

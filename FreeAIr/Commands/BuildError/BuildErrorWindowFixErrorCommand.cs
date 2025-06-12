@@ -34,7 +34,7 @@ namespace FreeAIr.Commands.BuildError
                 lineEnding
                 );
 
-            var contextItems = (await ContextComposer.ComposeFromFilePathAsync(
+            var contextItems = (await CSharpContextComposer.ComposeFromFilePathAsync(
                 errorInformation.FilePath
                 )).ConvertToChatContextItem();
 

@@ -276,28 +276,29 @@ Follow these rules:
 #5 Aim for at most 3 comments for short functions, or at most 5 comments for long functions.
 #6 Do not comment every line.
 #7 You can only add comments or edit any existing single-line comment that has leading ' *'.
-#8 If existing comment has not leading `*` you must not add any comments inside of existing comments or nearby of it.
+#8 If existing comment has not leading `*` you must not add any comments inside of it or nearby of it.
 #9 You are allowed to comment a lines which has line number; the other lines provide context for you.
-#10 You must respond in the following Json format:
-```
+#10 Your comment should use {CULTURE} culture.
+#11 You must respond in the following Json format:
+```json
 {
     "comments":
     [
         {
-            "filepath": "...",
-            "line": ...,
-            "text": "...",
+            "file_path": "myf_ile.cs",
+            "line": 100,
+            "comment": "the body of your comment",
         },
         {
-            "filepath": "...",
-            "line": ...,
-            "text": "...",
+            "file_path": "my_other_file.cs",
+            "line": 10,
+            "comment": "the body iof your other comment",
         },
     ]
 }
 ```
-
-where  `filepath` is full path to the source code file, `line` is the line number before you want to add new comment OR a line where you want to replace comment, `text` is a text of comment.
+, where  `file_path` is full path to the source code file, `line` is the line number before you want to add new comment OR a line where you want to replace comment, `comment` is a text of your comment in {CULTURE} culture. 
+#12 Your respond must contain only this JSON, avoid add anything other.
 """;
 
         #endregion

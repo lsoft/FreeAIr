@@ -53,7 +53,8 @@ namespace FreeAIr.Agents
 
         public string GetFormattedSystemPrompt()
         {
-            return SystemPrompt.Replace("{CULTURE}", ResponsePage.GetAnswerCultureName());
+            var result = SystemPrompt.Replace("{CULTURE}", ResponsePage.GetAnswerCultureName());
+            return result;
         }
     }
 

@@ -1,9 +1,11 @@
-﻿using FreeAIr.Shared.Helper;
+﻿using FreeAIr.BLogic.Context.Item;
+using FreeAIr.Shared.Helper;
 using FreeAIr.UI.Embedillo.Answer.Parser;
 using Microsoft.Internal.VisualStudio.PlatformUI;
 using Microsoft.VisualStudio.Shell.Interop;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -11,6 +13,36 @@ namespace FreeAIr.Helper
 {
     public static class SolutionHelper
     {
+        public static async System.Threading.Tasks.Task<List<FoundSolutionItem>> ProcessDownRecursivelyForSelectedAsync(
+            Predicate<SolutionItem> predicate,
+            bool includeSelection,
+            CancellationToken cancellationToken
+            )
+        {
+            var result = new List<FoundSolutionItem>();
+
+            var sew = await VS.Windows.GetSolutionExplorerWindowAsync();
+            var selections = (await sew.GetSelectionAsync()).ToList();
+            if (selections.Count == 0)
+            {
+                return result;
+            }
+
+            foreach (var selection in selections)
+            {
+                var selectionChildren = await selection.ProcessDownRecursivelyForAsync(
+                    predicate,
+                    includeSelection,
+                    cancellationToken
+                    );
+                result.AddRange(selectionChildren);
+            }
+
+            return result;
+        }
+
+
+
         public static async Task<List<FoundSolutionItem>> ProcessDownRecursivelyForAsync(
             this SolutionItem item,
             SolutionItemType[] types,

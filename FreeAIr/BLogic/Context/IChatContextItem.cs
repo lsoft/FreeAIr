@@ -1,4 +1,5 @@
-﻿using OpenAI.Chat;
+﻿using FreeAIr.BLogic.Context.Item;
+using OpenAI.Chat;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -46,7 +47,7 @@ namespace FreeAIr.BLogic.Context
 
         Task<UserChatMessage> CreateChatMessageAsync();
 
-        Task<IReadOnlyList<IChatContextItem>> SearchRelatedContextItemsAsync();
+        Task<IReadOnlyList<SolutionItemChatContextItem>> SearchRelatedContextItemsAsync();
     }
 
 }

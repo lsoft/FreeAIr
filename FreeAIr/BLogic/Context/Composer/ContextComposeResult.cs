@@ -68,7 +68,7 @@ namespace FreeAIr.BLogic.Context.Composer
             }
         }
 
-        public IReadOnlyList<IChatContextItem> ConvertToChatContextItem()
+        public IReadOnlyList<SolutionItemChatContextItem> ConvertToChatContextItem()
         {
             return FoundIdentifiers
                 .Select(i => new SolutionItemChatContextItem(

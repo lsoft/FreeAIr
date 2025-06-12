@@ -9,7 +9,10 @@ using System.Threading.Tasks;
 
 namespace FreeAIr.BLogic.Context.Composer
 {
-    public class ContextComposer
+    /// <summary>
+    /// Ищет C# типы, связанные с данным, чтобы LLM было понятнее.
+    /// </summary>
+    public class CSharpContextComposer
     {
         public static async Task<ContextComposeResult> ComposeFromFilePathAsync(
             string filePath,

@@ -40,7 +40,7 @@ namespace FreeAIr
         [DisplayName("Timeout for automatic searching chat context items in msec.")]
         [Description("Set this timeout (in msec) to determine a time spent for automatic searching context items by code dependencies.")]
         [DefaultValue(500)]
-        public int AutomaticSearchForContextItemsTimeoutMsec { get; set; } = 500;
+        public int AutomaticSearchForContextItemsTimeoutMsec { get; set; } = 1500;
 
         public static CultureInfo GetAnswerCulture()
         {

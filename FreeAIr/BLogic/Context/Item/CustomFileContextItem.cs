@@ -41,7 +41,7 @@ namespace FreeAIr.BLogic.Context.Item
             var fi = new FileInfo(_filePath);
             return
                 Environment.NewLine
-                + $"Text of the file `{_filePath}`:"
+                + $"Comment of the file `{_filePath}`:"
                 + Environment.NewLine
                 + Environment.NewLine
                 + "```"
@@ -109,7 +109,7 @@ namespace FreeAIr.BLogic.Context.Item
                 );
         }
 
-        public async Task<IReadOnlyList<IChatContextItem>> SearchRelatedContextItemsAsync()
+        public async Task<IReadOnlyList<SolutionItemChatContextItem>> SearchRelatedContextItemsAsync()
         {
             return [];
         }

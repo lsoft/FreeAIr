@@ -1,6 +1,7 @@
 ﻿using EnvDTE;
 using FreeAIr.Agents;
 using FreeAIr.BLogic.Context.Item;
+using FreeAIr.Helper;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -33,29 +34,22 @@ namespace FreeAIr.Commands.File
         protected override async System.Threading.Tasks.Task<List<SolutionItemChatContextItem>> CreateContextItemsAsync(
             )
         {
-            var contextItems = new List<SolutionItemChatContextItem>();
-
-            var sew = await VS.Windows.GetSolutionExplorerWindowAsync();
-            var selections = (await sew.GetSelectionAsync()).ToList();
-            if (selections.Count == 0)
-            {
-                return contextItems;
-            }
-
-            foreach (var selection in selections)
-            {
-                var contextItem = new SolutionItemChatContextItem(
+            var foundItems = await SolutionHelper.ProcessDownRecursivelyForSelectedAsync(
+                item => !item.IsNonVisibleItem && item.Type == SolutionItemType.PhysicalFile && FileTypeHelper.GetFileType(item.FullPath) == FileTypeEnum.Text,
+                false,
+                CancellationToken.None
+                );
+            var result = foundItems.ConvertAll(i =>
+                new SolutionItemChatContextItem(
                     new UI.Embedillo.Answer.Parser.SelectedIdentifier(
-                        selection.FullPath,
+                        i.SolutionItem.FullPath,
                         null
                         ),
                     false,
                     AddLineNumbersMode.RequiredAllInScope
-                    );
-                contextItems.Add(contextItem);
-            }
-
-            return contextItems;
+                    )
+                );
+            return result;
         }
 
     }

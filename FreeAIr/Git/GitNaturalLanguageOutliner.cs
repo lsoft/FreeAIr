@@ -2,6 +2,7 @@
 using FreeAIr.BLogic;
 using FreeAIr.BLogic.Context.Item;
 using FreeAIr.Git.Parser;
+using FreeAIr.Helper;
 using FreeAIr.Shared.Helper;
 using FreeAIr.UI.Windows;
 using System.Collections.Generic;
@@ -59,6 +60,11 @@ namespace FreeAIr.Git
 
             foreach (var diffFile in diff.Files)
             {
+                if (FileTypeHelper.GetFileType(diffFile.NewFullPath) != FileTypeEnum.Text)
+                {
+                    continue;
+                }
+
                 var contextItem = new SolutionItemChatContextItem(
                     new UI.Embedillo.Answer.Parser.SelectedIdentifier(
                         diffFile.NewFullPath,

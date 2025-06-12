@@ -9,7 +9,7 @@ namespace FreeAIr.NLOutline
 {
     public sealed class NaturalLanguageOutline
     {
-        [JsonPropertyName("filepath")]
+        [JsonPropertyName("file_path")]
         public string FilePath
         {
             get;
@@ -23,8 +23,8 @@ namespace FreeAIr.NLOutline
             set;
         }
 
-        [JsonPropertyName("text")]
-        public string Text
+        [JsonPropertyName("comment")]
+        public string Comment
         {
             get;
             set;
@@ -34,7 +34,7 @@ namespace FreeAIr.NLOutline
         {
             FilePath = string.Empty;
             Line = 0;
-            Text = string.Empty;
+            Comment = string.Empty;
         }
     }
 }

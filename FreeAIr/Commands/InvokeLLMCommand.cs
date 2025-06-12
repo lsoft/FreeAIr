@@ -42,7 +42,7 @@ namespace FreeAIr.Commands
                 return;
             }
 
-            var contextItems = (await ContextComposer.ComposeFromActiveDocumentAsync(
+            var contextItems = (await CSharpContextComposer.ComposeFromActiveDocumentAsync(
                 )).ConvertToChatContextItem();
 
             var kind = GetChatKind();

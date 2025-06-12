@@ -62,7 +62,7 @@ namespace FreeAIr.Commands.File
                     continue;
                 }
 
-                var contextItems = (await ContextComposer.ComposeFromFilePathAsync(
+                var contextItems = (await CSharpContextComposer.ComposeFromFilePathAsync(
                     selection.FullPath
                     )).ConvertToChatContextItem();
 

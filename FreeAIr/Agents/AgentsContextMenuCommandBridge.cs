@@ -1,5 +1,6 @@
 ﻿using FreeAIr.BLogic.Context.Item;
 using FreeAIr.Find;
+using FreeAIr.Helper;
 using FreeAIr.UI.Bridge;
 using FreeAIr.UI.ToolWindows;
 using FreeAIr.UI.ViewModels;
@@ -114,6 +115,8 @@ namespace FreeAIr.Agents
             {
                 return;
             }
+
+            contextItems = contextItems.FindAll(i => FileTypeHelper.GetFileType(i.SelectedIdentifier.FilePath) == FileTypeEnum.Text);
 
             await ShowAsync(agent, contextItems);
         }

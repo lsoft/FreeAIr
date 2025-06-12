@@ -149,6 +149,19 @@ namespace FreeAIr.UI.ViewModels
                             {
                                 //todo log
                             }
+                        },
+                        a =>
+                        {
+                            if (GeneratedComments.Count == 0)
+                            {
+                                return false;
+                            }
+                            if (GeneratedComments.Count(c => c.Apply) == 0)
+                            {
+                                return false;
+                            }
+
+                            return true;
                         }
                         );
                 }
@@ -288,7 +301,21 @@ namespace FreeAIr.UI.ViewModels
 
                     Status = $"In progress ({processedItemCount}/{contextItems.Count})...";
 
-                    _chat.ChatContext.AddItems(portionContextItems);
+                    //add subject items (to use line numbers)
+                    foreach (var portionContextItem in portionContextItems)
+                    {
+                        _chat.ChatContext.AddItem(portionContextItem);
+                    }
+
+                    //then add context items
+                    foreach (var portionContextItem in portionContextItems)
+                    {
+                        var contextualItems = await portionContextItem.SearchRelatedContextItemsAsync();
+                        var textContextualItems = contextualItems
+                            .FindAll(i => FileTypeHelper.GetFileType(i.SelectedIdentifier.FilePath) == FileTypeEnum.Text);
+                        _chat.ChatContext.AddItems(textContextualItems);
+                    }
+
 
                     _chat.AddPrompt(
                         UserPrompt.CreateTextBasedPrompt(
@@ -348,8 +375,8 @@ Identify the logical sections of the code inside following files and summarize t
                                         new FoundCommentItem(
                                             fileInfo,
                                             existingLine.Trim(),
-                                            comment.Text,
-                                            prefix + string.Format(commentFormat, comment.Text),
+                                            comment.Comment,
+                                            prefix + string.Format(commentFormat, comment.Comment),
                                             comment.Line
                                             )
                                         );

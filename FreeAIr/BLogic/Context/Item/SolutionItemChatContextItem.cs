@@ -3,6 +3,7 @@ using FreeAIr.Helper;
 using FreeAIr.UI.Embedillo.Answer.Parser;
 using OpenAI.Chat;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
@@ -12,6 +13,7 @@ using System.Threading.Tasks;
 
 namespace FreeAIr.BLogic.Context.Item
 {
+    [DebuggerDisplay("{SelectedIdentifier.FilePath}")]
     public sealed class SolutionItemChatContextItem : IChatContextItem
     {
         private readonly AddLineNumbersMode _addLineNumberMode;
@@ -128,7 +130,7 @@ namespace FreeAIr.BLogic.Context.Item
 
                 return
                     Environment.NewLine
-                    + $"Text of the file `{SelectedIdentifier.FilePath}`:"
+                    + $"Comment of the file `{SelectedIdentifier.FilePath}`:"
                     + Environment.NewLine
                     + Environment.NewLine
                     + "```"
@@ -165,9 +167,9 @@ namespace FreeAIr.BLogic.Context.Item
                 );
         }
 
-        public async Task<IReadOnlyList<IChatContextItem>> SearchRelatedContextItemsAsync()
+        public async Task<IReadOnlyList<SolutionItemChatContextItem>> SearchRelatedContextItemsAsync()
         {
-            var contextItems = (await ContextComposer.ComposeFromFilePathAsync(
+            var contextItems = (await CSharpContextComposer.ComposeFromFilePathAsync(
                 SelectedIdentifier.FilePath
                 )).ConvertToChatContextItem();
             return contextItems;

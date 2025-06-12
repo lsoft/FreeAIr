@@ -30,6 +30,30 @@
           <ButtonText>FreeAIr support</ButtonText>
         </Strings>
       </Menu>
+      <Menu guid="FreeAIr" id="SolutionContextMenu" priority="0x0000" type="Menu">
+        <Parent guid="VSMainMenu" id="FolderNode.AddGroup" />
+        <Strings>
+          <ButtonText>FreeAIr support</ButtonText>
+        </Strings>
+      </Menu>
+      <Menu guid="FreeAIr" id="SolutionContextMenu" priority="0x0000" type="Menu">
+        <Parent guid="VSMainMenu" id="ProjectNode.BuildGroup" />
+        <Strings>
+          <ButtonText>FreeAIr support</ButtonText>
+        </Strings>
+      </Menu>
+      <Menu guid="FreeAIr" id="SolutionContextMenu" priority="0x0000" type="Menu">
+        <Parent guid="VSMainMenu" id="SolutionNode.BuildGroup" />
+        <Strings>
+          <ButtonText>FreeAIr support</ButtonText>
+        </Strings>
+      </Menu>
+      <Menu guid="FreeAIr" id="SolutionContextMenu" priority="0x0000" type="Menu">
+        <Parent guid="VSMainMenu" id="SolutionFolder.BuildGroup" />
+        <Strings>
+          <ButtonText>FreeAIr support</ButtonText>
+        </Strings>
+      </Menu>
 
       <Menu guid="FreeAIr" id="SolutionItemsContextMenu" type="Context">
         <Strings>
