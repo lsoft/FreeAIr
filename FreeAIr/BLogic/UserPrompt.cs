@@ -198,6 +198,19 @@ namespace FreeAIr.BLogic
                 + searchText
                 );
         }
+
+        public static UserPrompt CreateFileOutlinesPrompt(
+            string filePath
+            )
+        {
+            return new UserPrompt(
+                "Please provide summary description for the file "
+                + Environment.NewLine
+                + "`"
+                + filePath
+                + "`. Take into account existing comments. Provide only description, without adding code snippets or anything else."
+                );
+        }
     }
 
     public sealed class LLMAnswer

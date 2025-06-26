@@ -55,15 +55,10 @@ namespace FreeAIr
         public const int OpenControlCenterCommandId = 0x1043;
         public const int ShowAgentConfigureCommandId = 0x1044;
         public const int AddNaturalLanguageOutlinesCommandId = 0x1052;
-        public const int SolutionItemsContextMenu = 0x8000;
-        public const int SolutionItemsContextMenuGroup = 0x8001;
-        public const int SolutionItemsContextMenuDynamicCommandId = 0x8002;
-        public const int FindScopeContextMenu = 0x8100;
-        public const int FindScopeContextMenuGroup = 0x8101;
-        public const int FindScopeContextMenuDynamicCommandId = 0x8102;
-        public const int AgentsContextMenu = 0x8200;
-        public const int AgentsContextMenuGroup = 0x8201;
-        public const int AgentsContextMenuDynamicCommandId = 0x8202;
+        public const int BuildNaturalLanguageOutlinesTreeCommandId = 0x1053;
+        public const int VisualStudioContextMenu = 0x8000;
+        public const int VisualStudioContextMenuGroup = 0x8001;
+        public const int VisualStudioContextMenuDynamicCommandId = 0x8002;
         public const int Icon16 = 0x0001;
         public const int Icon32 = 0x0001;
     }

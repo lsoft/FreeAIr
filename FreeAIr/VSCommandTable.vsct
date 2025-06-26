@@ -55,19 +55,9 @@
         </Strings>
       </Menu>
 
-      <Menu guid="FreeAIr" id="SolutionItemsContextMenu" type="Context">
+      <Menu guid="FreeAIr" id="VisualStudioContextMenu" type="Context">
         <Strings>
-          <ButtonText>Solution Items Context Menu</ButtonText>
-        </Strings>
-      </Menu>
-      <Menu guid="FreeAIr" id="FindScopeContextMenu" type="Context">
-        <Strings>
-          <ButtonText>Find Scope Context Menu</ButtonText>
-        </Strings>
-      </Menu>
-      <Menu guid="FreeAIr" id="AgentsContextMenu" type="Context">
-        <Strings>
-          <ButtonText>Agents Context Menu</ButtonText>
+          <ButtonText>Visual Studio Context Menu</ButtonText>
         </Strings>
       </Menu>
 
@@ -95,14 +85,8 @@
         <Parent guid="guidSHLMainMenu" id="IDM_VS_CTXT_ERRORLIST" />
       </Group>
 
-      <Group guid="FreeAIr" id="SolutionItemsContextMenuGroup" priority="0x0000">
-        <Parent guid="FreeAIr" id="SolutionItemsContextMenu"/>
-      </Group>
-      <Group guid="FreeAIr" id="FindScopeContextMenuGroup" priority="0x0000">
-        <Parent guid="FreeAIr" id="FindScopeContextMenu"/>
-      </Group>
-      <Group guid="FreeAIr" id="AgentsContextMenuGroup" priority="0x0000">
-        <Parent guid="FreeAIr" id="AgentsContextMenu"/>
+      <Group guid="FreeAIr" id="VisualStudioContextMenuGroup" priority="0x0000">
+        <Parent guid="FreeAIr" id="VisualStudioContextMenu"/>
       </Group>
 
     </Groups>
@@ -211,7 +195,7 @@
         <Icon guid="ImageCatalogGuid" id="SQLServerObjectExplorer" />
         <CommandFlag>IconIsMoniker</CommandFlag>
         <Strings>
-          <ButtonText>Explain code in the file</ButtonText>
+          <ButtonText>Explain code</ButtonText>
         </Strings>
       </Button>
       <Button guid="FreeAIr" id="AddCommentsToFileCommandId" priority="0x0100" type="Button">
@@ -219,7 +203,7 @@
         <Icon guid="ImageCatalogGuid" id="CodeReviewWizard" />
         <CommandFlag>IconIsMoniker</CommandFlag>
         <Strings>
-          <ButtonText>Add comments to the code of the file</ButtonText>
+          <ButtonText>Add comments</ButtonText>
         </Strings>
       </Button>
       <Button guid="FreeAIr" id="AddNaturalLanguageOutlinesCommandId" priority="0x0100" type="Button">
@@ -227,7 +211,15 @@
         <Icon guid="ImageCatalogGuid" id="CommentCode" />
         <CommandFlag>IconIsMoniker</CommandFlag>
         <Strings>
-          <ButtonText>Add natural language comments to the code of the file</ButtonText>
+          <ButtonText>Add natural language outlines</ButtonText>
+        </Strings>
+      </Button>
+      <Button guid="FreeAIr" id="BuildNaturalLanguageOutlinesTreeCommandId" priority="0x0100" type="Button">
+        <Parent guid="FreeAIr" id="SolutionContextGroup" />
+        <Icon guid="ImageCatalogGuid" id="CommentCode" />
+        <CommandFlag>IconIsMoniker</CommandFlag>
+        <Strings>
+          <ButtonText>Build natural language outlines json file</ButtonText>
         </Strings>
       </Button>
 
@@ -253,25 +245,11 @@
         </Strings>
       </Button>
 
-      <Button guid="FreeAIr" id="SolutionItemsContextMenuDynamicCommandId" type="Button" priority="0">
-        <Parent guid="FreeAIr" id="SolutionItemsContextMenuGroup"/>
+      <Button guid="FreeAIr" id="VisualStudioContextMenuDynamicCommandId" type="Button" priority="0">
+        <Parent guid="FreeAIr" id="VisualStudioContextMenuGroup"/>
         <CommandFlag>DynamicItemStart</CommandFlag>
         <Strings>
-          <ButtonText>Solution items...</ButtonText>
-        </Strings>
-      </Button>
-      <Button guid="FreeAIr" id="FindScopeContextMenuDynamicCommandId" type="Button" priority="0">
-        <Parent guid="FreeAIr" id="FindScopeContextMenuGroup"/>
-        <CommandFlag>DynamicItemStart</CommandFlag>
-        <Strings>
-          <ButtonText>Find Scope...</ButtonText>
-        </Strings>
-      </Button>
-      <Button guid="FreeAIr" id="AgentsContextMenuDynamicCommandId" type="Button" priority="0">
-        <Parent guid="FreeAIr" id="AgentsContextMenuGroup"/>
-        <CommandFlag>DynamicItemStart</CommandFlag>
-        <Strings>
-          <ButtonText>Agents...</ButtonText>
+          <ButtonText>Visual Studio Context Menu...</ButtonText>
         </Strings>
       </Button>
 
@@ -342,21 +320,12 @@
 
       <!-- natural language outlines -->
       <IDSymbol name="AddNaturalLanguageOutlinesCommandId" value="0x1052"/>
+      <IDSymbol name="BuildNaturalLanguageOutlinesTreeCommandId" value="0x1053"/>
 
-      <!-- solution items context menu -->
-      <IDSymbol name="SolutionItemsContextMenu" value="0x8000"/>
-      <IDSymbol name="SolutionItemsContextMenuGroup" value="0x8001"/>
-      <IDSymbol name="SolutionItemsContextMenuDynamicCommandId" value="0x8002"/>
-
-      <!-- find scope context menu -->
-      <IDSymbol name="FindScopeContextMenu" value="0x8100"/>
-      <IDSymbol name="FindScopeContextMenuGroup" value="0x8101"/>
-      <IDSymbol name="FindScopeContextMenuDynamicCommandId" value="0x8102"/>
-
-      <!-- agents context menu -->
-      <IDSymbol name="AgentsContextMenu" value="0x8200"/>
-      <IDSymbol name="AgentsContextMenuGroup" value="0x8201"/>
-      <IDSymbol name="AgentsContextMenuDynamicCommandId" value="0x8202"/>
+      <!-- context menu -->
+      <IDSymbol name="VisualStudioContextMenu" value="0x8000"/>
+      <IDSymbol name="VisualStudioContextMenuGroup" value="0x8001"/>
+      <IDSymbol name="VisualStudioContextMenuDynamicCommandId" value="0x8002"/>
 
     </GuidSymbol>
 

@@ -103,6 +103,8 @@ namespace FreeAIr.Agents
             ContextSize = 8192;
         }
 
+        public bool HasToken() => !string.IsNullOrEmpty(Token);
+
         public async Task<bool> VerifyAgentAndShowErrorIfNotAsync()
         {
             var endpointUri = TryBuildEndpointUri();

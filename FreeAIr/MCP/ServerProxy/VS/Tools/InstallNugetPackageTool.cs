@@ -30,7 +30,7 @@ namespace FreeAIr.MCP.McpServerProxy.VS.Tools
                     "properties": {
                         "{{{NugetPackageNameParameterName}}}": {
                             "type": "string",
-                            "description": "Name of nuget package you want to install"
+                            "description": "Header of nuget package you want to install"
                             },
                         "{{{NugetPackageVersionParameterName}}}": {
                             "type": "string",

@@ -2,6 +2,10 @@
 using FreeAIr.Agents;
 using FreeAIr.BLogic.Context.Item;
 using FreeAIr.Helper;
+using FreeAIr.NLOutline;
+using FreeAIr.UI.ContextMenu;
+using FreeAIr.UI.ToolWindows;
+using FreeAIr.UI.ViewModels;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -9,7 +13,8 @@ using System.Threading;
 namespace FreeAIr.Commands.File
 {
     [Command(PackageIds.AddNaturalLanguageOutlinesCommandId)]
-    public sealed class AddNaturalLanguageOutlinesCommand : BaseCommand<AddNaturalLanguageOutlinesCommand>
+    public sealed class AddNaturalLanguageOutlinesCommand
+        : BaseCommand<AddNaturalLanguageOutlinesCommand>
     {
         public AddNaturalLanguageOutlinesCommand(
             )
@@ -20,18 +25,21 @@ namespace FreeAIr.Commands.File
         {
             await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
 
-            AgentsContextMenuCommandBridge.Show(
-                SelectedSolutionItemsCommandProcessor.Instance,
-                InternalPage.Instance.GetAgentCollection()
+            var chosenAgent = await VisualStudioContextMenuCommandBridge.ShowAsync<Agent>(
+                "Choose agent to add NL outlines:",
+                InternalPage.Instance.GetAgentCollection().Agents.ConvertAll(a => (a.Name, a as object))
                 );
+            if (chosenAgent is null)
+            {
+                return;
+            }
+
+            var chosenSolutionItems = await CreateChosenSolutionItemsAsync();
+
+            await NaturalLanguageOutlinesViewModel.ShowPanelAsync(chosenAgent, chosenSolutionItems);
         }
-    }
 
-    public sealed class SelectedSolutionItemsCommandProcessor : CommandProcessor
-    {
-        public static readonly SelectedSolutionItemsCommandProcessor Instance = new();
-
-        protected override async System.Threading.Tasks.Task<List<SolutionItemChatContextItem>> CreateContextItemsAsync(
+        private async System.Threading.Tasks.Task<List<SolutionItemChatContextItem>> CreateChosenSolutionItemsAsync(
             )
         {
             var foundItems = await SolutionHelper.ProcessDownRecursivelyForSelectedAsync(

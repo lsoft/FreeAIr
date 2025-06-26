@@ -17,7 +17,7 @@ namespace FreeAIr.Helper
         };
 
         public static FileTypeEnum GetFileType(
-            string filePath
+            this string filePath
             )
         {
             // 1. Проверка расширения

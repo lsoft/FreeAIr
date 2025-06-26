@@ -41,7 +41,7 @@ namespace FreeAIr.BLogic.Context.Item
             var fi = new FileInfo(_filePath);
             return
                 Environment.NewLine
-                + $"Comment of the file `{_filePath}`:"
+                + $"Content of the file `{_filePath}`:"
                 + Environment.NewLine
                 + Environment.NewLine
                 + "```"

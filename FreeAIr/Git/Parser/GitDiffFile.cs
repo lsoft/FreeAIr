@@ -9,6 +9,8 @@ namespace FreeAIr.Git.Parser
 {
     public sealed class GitDiffFile
     {
+        private const string _devNull = @"/dev/null";
+
         private readonly FileDiff _diff;
         private readonly List<GitDiffChunk> _chunks;
 
@@ -41,8 +43,16 @@ namespace FreeAIr.Git.Parser
 
             _diff = diff;
 
-            OriginalFullPath = Path.GetFullPath(Path.Combine(rootPath, diff.From));
-            NewFullPath = Path.GetFullPath(Path.Combine(rootPath, diff.To));
+            OriginalFullPath =
+                diff.From == _devNull
+                ? string.Empty
+                : Path.GetFullPath(Path.Combine(rootPath, diff.From))
+                ;
+            NewFullPath =
+                diff.To == _devNull
+                ? string.Empty
+                : Path.GetFullPath(Path.Combine(rootPath, diff.To))
+                ;
 
             _chunks = diff.Chunks
                 .Select(c => new GitDiffChunk(c))

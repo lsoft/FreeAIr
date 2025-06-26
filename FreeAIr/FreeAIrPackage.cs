@@ -10,6 +10,7 @@ using FreeAIr.Find;
 using FreeAIr.Helper;
 using FreeAIr.InfoBar;
 using FreeAIr.MCP.McpServerProxy;
+using FreeAIr.UI.ContextMenu;
 using FreeAIr.UI.Informer;
 using FreeAIr.UI.ToolWindows;
 using FreeAIr.UI.ViewModels;
@@ -19,6 +20,10 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Threading;
+
+//[assembly: ProvideCodeBase(AssemblyName = "Xceed.Wpf.Toolkit")]
+//[assembly: ProvideCodeBase(AssemblyName = "System.ClientModel")]
+//[assembly: ProvideCodeBase(AssemblyName = "JsonPath.Net")]
 
 namespace FreeAIr
 {
@@ -34,9 +39,7 @@ namespace FreeAIr
     [ProvideToolWindow(typeof(ChooseModelToolWindow.Pane), Style = VsDockStyle.Tabbed, Window = WindowGuids.DocumentWell)]
     [ProvideToolWindow(typeof(NaturalLanguageResultsToolWindow.Pane), Style = VsDockStyle.Tabbed, Window = WindowGuids.DocumentWell)]
     [ProvideToolWindow(typeof(NaturalLanguageOutlinesToolWindow.Pane), Style = VsDockStyle.Tabbed, Window = WindowGuids.DocumentWell)]
-    [ProvideService(typeof(SolutionItemsContextMenuCommandBridge), IsAsyncQueryable = true)]
-    [ProvideService(typeof(FindScopeContextMenuCommandBridge), IsAsyncQueryable = true)]
-    [ProvideService(typeof(AgentsContextMenuCommandBridge), IsAsyncQueryable = true)]
+    [ProvideService(typeof(VisualStudioContextMenuCommandBridge), IsAsyncQueryable = true)]
     public sealed class FreeAIrPackage : ToolkitPackage
     {
         public static FreeAIrPackage Instance = null;
@@ -72,18 +75,8 @@ namespace FreeAIr
                     ]);
 
                 AddService(
-                    typeof(SolutionItemsContextMenuCommandBridge),
-                    (_, _, _) => Task.FromResult<object>(new SolutionItemsContextMenuCommandBridge()),
-                    true
-                    );
-                AddService(
-                    typeof(FindScopeContextMenuCommandBridge),
-                    (_, _, _) => Task.FromResult<object>(new FindScopeContextMenuCommandBridge()),
-                    true
-                    );
-                AddService(
-                    typeof(AgentsContextMenuCommandBridge),
-                    (_, _, _) => Task.FromResult<object>(new AgentsContextMenuCommandBridge()),
+                    typeof(VisualStudioContextMenuCommandBridge),
+                    (_, _, _) => Task.FromResult<object>(new VisualStudioContextMenuCommandBridge()),
                     true
                     );
 

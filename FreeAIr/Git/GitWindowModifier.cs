@@ -154,8 +154,8 @@ namespace FreeAIr.BLogic
         {
             try
             {
-                GitNaturalLanguageOutliner.CollectOutlines(
-                    );
+                GitNaturalLanguageOutliner.CollectOutlinesAsync(
+                    ).FileAndForget(nameof(GitNaturalLanguageOutliner.CollectOutlinesAsync));
             }
             catch (Exception excp)
             {
@@ -165,17 +165,8 @@ namespace FreeAIr.BLogic
 
         private void BuildCommitMessageButton_Click(object sender, RoutedEventArgs e)
         {
-            try
-            {
-                AgentsContextMenuCommandBridge.Show(
-                    CommitMessageBuilderCommandProcessor.Instance,
-                    InternalPage.Instance.GetAgentCollection()
-                    );
-            }
-            catch (Exception excp)
-            {
-                //todo log
-            }
+            CommitMessageBuilder.ChooseAgentAsync(
+                ).FileAndForget(nameof(CommitMessageBuilder.ChooseAgentAsync));
         }
     }
 

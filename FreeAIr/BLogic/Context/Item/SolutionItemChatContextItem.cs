@@ -104,7 +104,7 @@ namespace FreeAIr.BLogic.Context.Item
                     );
 
                 var lineEnding = LineEndingHelper.Actual.GetOpenedDocumentLineEnding(SelectedIdentifier.FilePath);
-                var modifiedBody = ProcessLineNumbers(
+                var modifiedBody = AddLineNumbers(
                     body,
                     lineEnding
                     );
@@ -123,14 +123,14 @@ namespace FreeAIr.BLogic.Context.Item
             else
             {
                 var lineEnding = LineEndingHelper.Actual.GetDocumentLineEnding(SelectedIdentifier.FilePath);
-                var modifiedBody = ProcessLineNumbers(
+                var modifiedBody = AddLineNumbers(
                     System.IO.File.ReadAllText(SelectedIdentifier.FilePath),
                     lineEnding
                     );
 
                 return
                     Environment.NewLine
-                    + $"Comment of the file `{SelectedIdentifier.FilePath}`:"
+                    + $"Content of the file `{SelectedIdentifier.FilePath}`:"
                     + Environment.NewLine
                     + Environment.NewLine
                     + "```"
@@ -144,9 +144,9 @@ namespace FreeAIr.BLogic.Context.Item
             }
         }
 
-        private string ProcessLineNumbers(string body, string lineEnding)
+        private string AddLineNumbers(string body, string lineEnding)
         {
-            return _addLineNumberMode.ProcessLineNumbers(body, lineEnding);
+            return _addLineNumberMode.AddLineNumbers(body, lineEnding);
         }
 
         public void ReplaceWithText(string body)
@@ -227,7 +227,7 @@ namespace FreeAIr.BLogic.Context.Item
             SpecificScopes
         }
 
-        public string ProcessLineNumbers(
+        public string AddLineNumbers(
             string body,
             string lineEnding
             )

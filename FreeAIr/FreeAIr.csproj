@@ -48,7 +48,6 @@
   <ItemGroup>
     <Compile Include="Agents\Agent.cs" />
     <Compile Include="Agents\AgentCollection.cs" />
-    <Compile Include="Agents\AgentsContextMenuCommandBridge.cs" />
     <Compile Include="Antlr\Answer\AdditionalCommand.cs" />
     <Compile Include="Antlr\Answer\AnswerMarkdownListener.cs" />
     <Compile Include="Antlr\Answer\AnswerParser.cs" />
@@ -75,7 +74,11 @@
     <Compile Include="BLogic\ChatHelper.cs" />
     <Compile Include="BLogic\ChatKindEnum.cs" />
     <Compile Include="BLogic\ChatStatusEnum.cs" />
-    <Compile Include="Commands\NLOutlines\AddNaturalLanguageOutlines_ForFile_AgentsContextMenu_DynamicCommand.cs" />
+    <Compile Include="Commands\File\BuildNaturalLanguageOutlinesTreeCommand.cs" />
+    <Compile Include="Embedding\EmbeddingContainer.cs" />
+    <Compile Include="Embedding\EmbeddingGenerator.cs" />
+    <Compile Include="Embedding\Json\Objects.cs" />
+    <Compile Include="Find\DoSearch.cs" />
     <Compile Include="Git\CommitMessageBuilder.cs" />
     <Compile Include="BLogic\CompletionProposal.cs" />
     <Compile Include="BLogic\Context\ChatContext.cs" />
@@ -92,16 +95,12 @@
     <Compile Include="Commands\BuildError\BuildErrorWindowFixErrorCommand.cs" />
     <Compile Include="BuildErrors\BuildResultInformation.cs" />
     <Compile Include="Commands\File\AddNaturalLanguageOutlinesCommand.cs" />
-    <Compile Include="Commands\ContextMenu\Base_ContextMenu_DynamicCommand.cs" />
     <Compile Include="Commands\Other\ShowAgentConfigureCommand.cs" />
     <Compile Include="Commands\Other\OpenControlCenterCommand.cs" />
     <Compile Include="Commands\Other\ShowReleaseNotesCommand.cs" />
     <Compile Include="Commands\Other\OpenNaturalSearchToolWindowCommand.cs" />
-    <Compile Include="Commands\Other\FindScopeContextMenuCommand.cs" />
-    <Compile Include="Commands\Other\SolutionItemsContextMenuCommand.cs" />
     <Compile Include="Find\FileTypeFilter.cs" />
     <Compile Include="Find\FileTypesFilter.cs" />
-    <Compile Include="Find\FindScopeContextMenuCommandBridge.cs" />
     <Compile Include="Find\FindWindowModifier.cs" />
     <Compile Include="Git\GitCollectBackgroundTask.cs" />
     <Compile Include="Git\GitDiffCombiner.cs" />
@@ -113,6 +112,7 @@
     <Compile Include="Git\Parser\GitDiffChunk.cs" />
     <Compile Include="Git\Parser\GitDiffFile.cs" />
     <Compile Include="Helper\CommentHelper.cs" />
+    <Compile Include="Helper\JsonConverters.cs" />
     <Compile Include="Helper\DTEHelper.cs" />
     <Compile Include="Helper\EmbeddedResourceHelper.cs" />
     <Compile Include="Helper\ExtensionPath.cs" />
@@ -180,8 +180,12 @@
     <Compile Include="MCP\ServerProxy\VS\Tools\VisualStudioMcpServerTool.cs" />
     <Compile Include="MCP\ServerProxy\VS\VisualStudioMcpServerProxy.cs" />
     <Compile Include="MCP\AvailableToolContainer.cs" />
+    <Compile Include="NLOutline\Json\Objects.cs" />
     <Compile Include="NLOutline\NaturalLanguageOutline.cs" />
     <Compile Include="NLOutline\NaturalLanguageOutlineCollection.cs" />
+    <Compile Include="NLOutline\Tree\Builder\File\FileBuilder.cs" />
+    <Compile Include="NLOutline\Tree\Builder\TreeBuilder.cs" />
+    <Compile Include="NLOutline\Tree\OutlineNode.cs" />
     <Compile Include="Options\InternalPage.cs" />
     <Compile Include="Options\OptionsProvider.cs" />
     <Compile Include="Options\ResponsePage.cs" />
@@ -200,7 +204,9 @@
       <DependentUpon>source.extension.vsixmanifest</DependentUpon>
     </Compile>
     <Compile Include="UI\BindingProxy.cs" />
-    <Compile Include="UI\Bridge\MenuCommandBridge.cs" />
+    <Compile Include="UI\ContextMenu\VisualStudioContextMenuItem.cs" />
+    <Compile Include="UI\ContextMenu\VisualStudioContextMenuCommandBridge.cs" />
+    <Compile Include="UI\ContextMenu\VisualStudioContextMenu_DynamicCommand.cs" />
     <Compile Include="UI\CodeLens\CodeLenseUserControl.xaml.cs">
       <DependentUpon>CodeLenseUserControl.xaml</DependentUpon>
     </Compile>

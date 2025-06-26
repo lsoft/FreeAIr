@@ -1,15 +1,47 @@
 using FreeAIr.Agents;
+using FreeAIr.BLogic.Context.Item;
+using FreeAIr.Find;
 using FreeAIr.Git;
+using FreeAIr.UI.ContextMenu;
 using FreeAIr.UI.ToolWindows;
+using FreeAIr.UI.ViewModels;
 using FreeAIr.UI.Windows;
+using Microsoft.Build.Utilities;
 using Microsoft.VisualStudio.ComponentModelHost;
+using System.Collections.Generic;
 using System.Windows;
 
 namespace FreeAIr.BLogic
 {
     public static class CommitMessageBuilder
     {
-        public static async Task BuildCommitMessageAsync(
+        public static async Task ChooseAgentAsync(
+            )
+        {
+            try
+            {
+                await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+
+                var chosenAgent = await VisualStudioContextMenuCommandBridge.ShowAsync<Agent>(
+                    "Choose agent for commit message generation:",
+                    InternalPage.Instance.GetAgentCollection().Agents.ConvertAll(a => (a.Name, (object)a))
+                    );
+                if (chosenAgent is null)
+                {
+                    return;
+                }
+
+                await BuildCommitMessageAsync(
+                    chosenAgent
+                    );
+            }
+            catch (Exception excp)
+            {
+                //todo log
+            }
+        }
+
+        private static async Task BuildCommitMessageAsync(
             Agent agent
             )
         {
@@ -17,7 +49,7 @@ namespace FreeAIr.BLogic
             var gitWindowModifier = componentModel.GetService<GitWindowModifier>();
 
             var backgroundTask = new GitCollectBackgroundTask(
-                    );
+                );
             var w = new WaitForTaskWindow(
                 backgroundTask
                 );
@@ -69,23 +101,4 @@ namespace FreeAIr.BLogic
                 );
         }
     }
-
-    public sealed class CommitMessageBuilderCommandProcessor : GitDiffItemsCommandProcessor
-    {
-        public static new readonly CommitMessageBuilderCommandProcessor Instance = new();
-
-        public override async Task ProcessAsync(Agent agent)
-        {
-            var contextItems = await CreateContextItemsAsync();
-            if (contextItems is null || contextItems.Count == 0)
-            {
-                return;
-            }
-
-            await CommitMessageBuilder.BuildCommitMessageAsync(
-                agent
-                );
-        }
-    }
-
 }

@@ -11,7 +11,7 @@ namespace FreeAIr.MCP.McpServerProxy.VS.Tools
     {
         public static readonly ReplaceDocumentBodyTool Instance = new();
 
-        public const string VisualStudioToolName = "ReplaceDocumentBody";
+        public const string VisualStudioToolName = "ReplaceDocumentBodyAsync";
 
         private const string ItemNamePathParameterName = "item_name_or_full_path";
         private const string NewItemBodyParameterName = "new_item_body";

@@ -6,15 +6,16 @@ using FreeAIr.BLogic.Context.Item;
 using FreeAIr.Helper;
 using FreeAIr.NLOutline;
 using FreeAIr.Shared.Helper;
+using FreeAIr.UI.ToolWindows;
 using Microsoft.VisualStudio.ComponentModelHost;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading;
 using System.Windows.Input;
 using WpfHelpers;
-using static FreeAIr.Helper.SolutionHelper;
 
 namespace FreeAIr.UI.ViewModels
 {
@@ -88,7 +89,7 @@ namespace FreeAIr.UI.ViewModels
                                         + Guid.NewGuid().ToString().Substring(0, 8)
                                         + fileInfo.Extension
                                     );
-                                System.IO.File.WriteAllLines(tempFilePath, bodyLines);
+                                System.IO.File.WriteAllLines(tempFilePath, bodyLines, Encoding.UTF8);
 
                                 ShowDiff(commentItem, tempFilePath);
 
@@ -138,7 +139,7 @@ namespace FreeAIr.UI.ViewModels
 
                                     var bodyLines = ApplyCommentsForFile(fileInfo.FullName, group);
 
-                                    System.IO.File.WriteAllLines(fileInfo.FullName, bodyLines);
+                                    System.IO.File.WriteAllLines(fileInfo.FullName, bodyLines, Encoding.UTF8);
                                 }
 
                                 GeneratedComments.Clear();
@@ -224,7 +225,7 @@ namespace FreeAIr.UI.ViewModels
 
         public async Task SetNewChatAsync(
             Agent defaultAgent,
-            List<SolutionItemChatContextItem> contextItems
+            List<SolutionItemChatContextItem> chosenSolutionItems
             )
         {
             if (defaultAgent is null)
@@ -232,9 +233,9 @@ namespace FreeAIr.UI.ViewModels
                 throw new ArgumentNullException(nameof(defaultAgent));
             }
 
-            if (contextItems is null)
+            if (chosenSolutionItems is null)
             {
-                throw new ArgumentNullException(nameof(contextItems));
+                throw new ArgumentNullException(nameof(chosenSolutionItems));
             }
 
             var oldChat = Interlocked.Exchange(ref _chat, null);
@@ -271,18 +272,23 @@ namespace FreeAIr.UI.ViewModels
 
             _processingTask = ProcessSolutionDocumentsAsync(
                 defaultAgent,
-                contextItems
+                chosenSolutionItems
                 );
         }
 
         public async Task ProcessSolutionDocumentsAsync(
             Agent defaultAgent,
-            List<SolutionItemChatContextItem> contextItems
+            List<SolutionItemChatContextItem> chosenSolutionItems
             )
         {
-            if (contextItems is null)
+            if (defaultAgent is null)
             {
-                throw new ArgumentNullException(nameof(contextItems));
+                throw new ArgumentNullException(nameof(defaultAgent));
+            }
+
+            if (chosenSolutionItems is null)
+            {
+                throw new ArgumentNullException(nameof(chosenSolutionItems));
             }
 
             var cancellationToken = _cancellationTokenSource.Token;
@@ -295,33 +301,34 @@ namespace FreeAIr.UI.ViewModels
             {
                 var processedItemCount = 0;
 
-                foreach (var portionContextItems in contextItems.SplitByItemsSize(defaultAgent.Technical.ContextSize))
+                foreach (var portionSolutionItems in chosenSolutionItems.SplitByItemsSize(defaultAgent.Technical.ContextSize))
                 {
                     cancellationToken.ThrowIfCancellationRequested();
 
-                    Status = $"In progress ({processedItemCount}/{contextItems.Count})...";
+                    Status = $"In progress ({processedItemCount}/{chosenSolutionItems.Count})...";
 
                     //add subject items (to use line numbers)
-                    foreach (var portionContextItem in portionContextItems)
+                    foreach (var portionSolutionItem in portionSolutionItems)
                     {
-                        _chat.ChatContext.AddItem(portionContextItem);
+                        _chat.ChatContext.AddItem(portionSolutionItem);
                     }
 
                     //then add context items
-                    foreach (var portionContextItem in portionContextItems)
+                    IReadOnlyList<SolutionItemChatContextItem> textContextualItems = [];
+                    foreach (var portionContextItem in portionSolutionItems)
                     {
                         var contextualItems = await portionContextItem.SearchRelatedContextItemsAsync();
-                        var textContextualItems = contextualItems
+                        textContextualItems = contextualItems
                             .FindAll(i => FileTypeHelper.GetFileType(i.SelectedIdentifier.FilePath) == FileTypeEnum.Text);
-                        _chat.ChatContext.AddItems(textContextualItems);
                     }
+                    _chat.ChatContext.AddItems(textContextualItems);
 
 
                     _chat.AddPrompt(
                         UserPrompt.CreateTextBasedPrompt(
 $$$"""
 Identify the logical sections of the code inside following files and summarize these sections by generating comments:
-{{{string.Join(", ", portionContextItems.ConvertAll(s => s.SelectedIdentifier.FilePath))}}}
+{{{string.Join(", ", portionSolutionItems.ConvertAll(s => s.SelectedIdentifier.FilePath))}}}
 """
                             )
                         );
@@ -393,9 +400,10 @@ Identify the logical sections of the code inside following files and summarize t
                     }
 
                     _chat.ArchiveAllPrompts();
-                    _chat.ChatContext.RemoveItems(portionContextItems);
+                    _chat.ChatContext.RemoveItems(portionSolutionItems);
+                    _chat.ChatContext.RemoveItems(textContextualItems);
 
-                    processedItemCount += portionContextItems.Count;
+                    processedItemCount += portionSolutionItems.Count;
                 }
 
                 Status = $"Generated {GeneratedComments.Count} comments:";
@@ -419,11 +427,54 @@ Identify the logical sections of the code inside following files and summarize t
             IEnumerable<FoundCommentItem> appliedComments
             )
         {
+            if (filePath is null)
+            {
+                throw new ArgumentNullException(nameof(filePath));
+            }
+
+            if (appliedComments is null)
+            {
+                throw new ArgumentNullException(nameof(appliedComments));
+            }
+
+            var fileInfo = new FileInfo(filePath);
+            var prefix = CommentHelper.GetSingleLineCommentSymbol(fileInfo.Extension);
+
+            bool IsCommentLine(string commentedLine)
+            {
+                return commentedLine.Trim().StartsWith(prefix);
+            }
+
             var bodyLines = System.IO.File.ReadAllLines(filePath).ToList();
 
             foreach (var appliedComment in appliedComments.Where(c => c.Apply).OrderByDescending(c => c.LineIndex))
             {
-                appliedComment.ApplyComment(bodyLines);
+                var ln = appliedComment.LineIndex;
+                var nln = ln + 1;
+                var pln = ln - 1;
+
+                if (nln < bodyLines.Count)
+                {
+                    if (IsCommentLine(bodyLines[nln]))
+                    {
+                        bodyLines.RemoveAt(nln);
+                    }
+                }
+
+                if (IsCommentLine(bodyLines[ln]))
+                {
+                    bodyLines.RemoveAt(ln);
+                }
+
+                bodyLines.Insert(ln, appliedComment.CompleteComment);
+
+                if (pln >= 0)
+                {
+                    if (IsCommentLine(bodyLines[pln]))
+                    {
+                        bodyLines.RemoveAt(pln);
+                    }
+                }
             }
 
             return bodyLines;
@@ -439,6 +490,22 @@ Identify the logical sections of the code inside following files and summarize t
 
             var dte = AsyncPackage.GetGlobalService(typeof(EnvDTE.DTE)) as DTE2;
             dte.Commands.Raise(diffFilesCmd, diffFilesId, ref args, ref args);
+        }
+
+
+        public static async Task ShowPanelAsync(
+            Agent agent,
+            List<SolutionItemChatContextItem> chosenSolutionItems
+            )
+        {
+            var pane = await NaturalLanguageOutlinesToolWindow.ShowAsync();
+            var toolWindow = pane.Content as NaturalLanguageOutlinesToolWindowControl;
+            var viewModel = toolWindow.DataContext as NaturalLanguageOutlinesViewModel;
+            viewModel.SetNewChatAsync(
+                agent,
+                chosenSolutionItems
+                )
+                .FileAndForget(nameof(NaturalLanguageOutlinesViewModel.SetNewChatAsync));
         }
 
     }
@@ -487,11 +554,6 @@ Identify the logical sections of the code inside following files and summarize t
             get;
         }
 
-        public bool ReplaceMode
-        {
-            get;
-        }
-
         public FoundCommentItem(
             FileInfo fileInfo,
             string commentedLine,
@@ -508,28 +570,6 @@ Identify the logical sections of the code inside following files and summarize t
             Comment = comment;
             CompleteComment = completeComment;
             LineIndex = lineIndex;
-
-            var prefix = CommentHelper.GetSingleLineCommentSymbol(fileInfo.Extension);
-            if (commentedLine.Trim().StartsWith(prefix))
-            {
-                ReplaceMode = true;
-            }
-            else
-            {
-                ReplaceMode = false;
-            }
-        }
-
-        public void ApplyComment(List<string> bodyLines)
-        {
-            if (ReplaceMode)
-            {
-                bodyLines[LineIndex] = CompleteComment;
-            }
-            else
-            {
-                bodyLines.Insert(LineIndex, CompleteComment);
-            }
         }
     }
 }

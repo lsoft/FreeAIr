@@ -81,5 +81,15 @@ namespace FreeAIr.Agents
 
             Agents.ForEach(a => a.IsDefault = ReferenceEquals(foundAgent, a));
         }
+
+        public void RemoveWithNoTokenAvailable()
+        {
+            Agents.RemoveAll(a => !a.Technical.HasToken());
+        }
+
+        public void SortByDefaultState()
+        {
+            Agents.Sort((a, b) => b.IsDefault.CompareTo(a.IsDefault));
+        }
     }
 }

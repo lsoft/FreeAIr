@@ -1,4 +1,4 @@
-﻿using DataObject.BLogic;
+using DataObject.BLogic;
 using DataObject.Repo;
 
 namespace TestSubject

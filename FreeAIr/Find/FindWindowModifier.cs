@@ -64,10 +64,11 @@ namespace FreeAIr.Find
 
                         naturalSearchButton.Click += (sender, e) =>
                         {
-                            FindScopeContextMenuCommandBridge.Show(
+                            DoSearch.SearchAsync(
                                 fileTypesFilterTextBox.Text,
                                 subjectToSearchTextBox.Text
-                                );
+                                )
+                                .FileAndForget(nameof(DoSearch.SearchAsync));
                         };
 
                         subjectToSearchTextBox.TextChanged += (sender, e) =>
@@ -78,7 +79,7 @@ namespace FreeAIr.Find
                         //do it for first time manually:
                         naturalSearchButton.IsEnabled = !string.IsNullOrEmpty(subjectToSearchTextBox.Text);
 
-                        //but the new button
+                        //put the new button
                         var parent = VisualTreeHelper.GetParent(findAllButton) as WrapPanel;
                         parent.Children.Insert(
                             0,

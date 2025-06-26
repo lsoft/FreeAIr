@@ -1,9 +1,13 @@
 ﻿using FreeAIr.Agents;
 using FreeAIr.BLogic;
 using FreeAIr.BLogic.Context.Item;
+using FreeAIr.Commands.File;
 using FreeAIr.Git.Parser;
 using FreeAIr.Helper;
+using FreeAIr.NLOutline;
 using FreeAIr.Shared.Helper;
+using FreeAIr.UI.ContextMenu;
+using FreeAIr.UI.ViewModels;
 using FreeAIr.UI.Windows;
 using System.Collections.Generic;
 using System.Windows;
@@ -12,22 +16,33 @@ namespace FreeAIr.Git
 {
     public static class GitNaturalLanguageOutliner
     {
-        public static void CollectOutlines(
+        public static async Task CollectOutlinesAsync(
             )
         {
-            AgentsContextMenuCommandBridge.Show(
-                GitDiffItemsCommandProcessor.Instance,
-                InternalPage.Instance.GetAgentCollection()
-                );
+            try
+            {
+                await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+
+                var chosenAgent = await VisualStudioContextMenuCommandBridge.ShowAsync<Agent>(
+                    "Choose agent to add NL outlines to changed files:",
+                    InternalPage.Instance.GetAgentCollection().Agents.ConvertAll(a => (a.Name, (object)a))
+                    );
+                if (chosenAgent is null)
+                {
+                    return;
+                }
+
+                var chosenSolutionItems = await CreateChosenSolutionItemsAsync();
+
+                await NaturalLanguageOutlinesViewModel.ShowPanelAsync(chosenAgent, chosenSolutionItems);
+            }
+            catch (Exception excp)
+            {
+                //todo log
+            }
         }
-    }
 
-
-    public /*sealed*/ class GitDiffItemsCommandProcessor : CommandProcessor
-    {
-        public static readonly GitDiffItemsCommandProcessor Instance = new();
-
-        protected override async System.Threading.Tasks.Task<List<SolutionItemChatContextItem>> CreateContextItemsAsync(
+        private static async System.Threading.Tasks.Task<List<SolutionItemChatContextItem>> CreateChosenSolutionItemsAsync(
             )
         {
             var contextItems = new List<SolutionItemChatContextItem>();
@@ -60,6 +75,10 @@ namespace FreeAIr.Git
 
             foreach (var diffFile in diff.Files)
             {
+                if (string.IsNullOrEmpty(diffFile.NewFullPath))
+                {
+                    continue;
+                }
                 if (FileTypeHelper.GetFileType(diffFile.NewFullPath) != FileTypeEnum.Text)
                 {
                     continue;

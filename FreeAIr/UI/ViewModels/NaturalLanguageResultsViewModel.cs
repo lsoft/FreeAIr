@@ -3,6 +3,8 @@ using FreeAIr.BLogic.Context;
 using FreeAIr.BLogic.Context.Item;
 using FreeAIr.Find;
 using FreeAIr.Helper;
+using FreeAIr.Shared.Helper;
+using FreeAIr.UI.ToolWindows;
 using FuzzySharp;
 using FuzzySharp.PreProcess;
 using Json.Path;
@@ -199,7 +201,7 @@ namespace FreeAIr.UI.ViewModels
         public async Task SetNewChatAsync(
             NaturalSearchScopeEnum scope,
             string searchText,
-            FileTypesFilter filesTypeFilters
+            string fileTypesFilterText
             )
         {
             if (searchText is null)
@@ -207,9 +209,9 @@ namespace FreeAIr.UI.ViewModels
                 throw new ArgumentNullException(nameof(searchText));
             }
 
-            if (filesTypeFilters is null)
+            if (fileTypesFilterText is null)
             {
-                throw new ArgumentNullException(nameof(filesTypeFilters));
+                throw new ArgumentNullException(nameof(fileTypesFilterText));
             }
 
             var oldChat = Interlocked.Exchange(ref _chat, null);
@@ -218,6 +220,12 @@ namespace FreeAIr.UI.ViewModels
                 await oldChat.StopAsync();
             }
             _cancellationTokenSource?.Dispose();
+
+            var filesTypeFilters = new FileTypesFilter(
+                fileTypesFilterText
+                    .Split(';')
+                    .ConvertAll(f => new FileTypeFilter(f))
+                );
 
             var componentModel = (IComponentModel)await FreeAIrPackage.Instance.GetServiceAsync(typeof(SComponentModel));
             var chatContainer = componentModel.GetService<ChatContainer>();
@@ -250,7 +258,7 @@ namespace FreeAIr.UI.ViewModels
                 );
         }
 
-        public async Task ProcessSolutionDocumentsAsync(
+        private async Task ProcessSolutionDocumentsAsync(
             NaturalSearchScopeEnum scope,
             string searchText,
             FileTypesFilter filesTypeFilters
@@ -495,6 +503,28 @@ $"""
             endColumnIndex = endOffset - endLine.Start.Position;
         }
 
+        public static async Task ShowPanelAsync(
+            string fileTypesFilterText,
+            string subjectToSearchText,
+            NaturalSearchScopeEnum chosenScope
+            )
+        {
+            if (fileTypesFilterText is null)
+            {
+                throw new ArgumentNullException(nameof(fileTypesFilterText));
+            }
+
+            if (subjectToSearchText is null)
+            {
+                throw new ArgumentNullException(nameof(subjectToSearchText));
+            }
+
+            var pane = await NaturalLanguageResultsToolWindow.ShowAsync();
+            var toolWindow = pane.Content as NaturalLanguageResultsToolWindowControl;
+            var viewModel = toolWindow.DataContext as NaturalLanguageResultsViewModel;
+            viewModel.SetNewChatAsync(chosenScope, subjectToSearchText, fileTypesFilterText)
+                .FileAndForget(nameof(NaturalLanguageResultsViewModel.SetNewChatAsync));
+        }
     }
 
 

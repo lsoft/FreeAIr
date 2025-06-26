@@ -1,14 +1,19 @@
-﻿using FreeAIr.Antlr.Answer;
+﻿using EnvDTE;
+using FreeAIr.Agents;
+using FreeAIr.Antlr.Answer;
 using FreeAIr.Antlr.Answer.Parts;
 using FreeAIr.BLogic;
 using FreeAIr.BLogic.Context;
 using FreeAIr.Helper;
-using FreeAIr.UI.Bridge;
+using FreeAIr.Shared.Helper;
+using FreeAIr.UI.ContextMenu;
+using Microsoft.VisualStudio.Threading;
 using Microsoft.Xaml.Behaviors.Core;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -17,7 +22,6 @@ using System.Windows.Media.Imaging;
 using WpfHelpers;
 using static FreeAIr.UI.Dialog.DialogControl;
 using static FreeAIr.UI.ViewModels.ChatListViewModel;
-using static FreeAIr.UI.ViewModels.SolutionItemsContextMenuCommandBridge;
 
 namespace FreeAIr.UI.ViewModels
 {
@@ -382,96 +386,47 @@ namespace FreeAIr.UI.ViewModels
 
             button.Click += (sender, e) =>
             {
-                var chat = _chatFunc();
-                if (chat is null)
+                try
                 {
-                    return;
+                    ReplaceDocumentBodyAsync(part)
+                        .FileAndForget(nameof(ReplaceDocumentBodyAsync));
                 }
-
-                var menuItems = new List<SolutionItemContextMenuItem>();
-                foreach (var chatContextItem in chat.ChatContext.Items)
+                catch (Exception excp)
                 {
-                    menuItems.Add(
-                        new SolutionItemContextMenuItem(
-                            chatContextItem.ContextUIDescription,
-                            _actionCommand,
-                            new Tuple<IChatContextItem, object>(
-                                chatContextItem,
-                                part.GetContextForAdditionalCommand()
-                                )
-                            )
-                        );
+                    //todo log
                 }
-
-                MenuCommandBridge<SolutionItemContextMenuItem>.ShowContextMenu<SolutionItemsContextMenuCommandBridge>(
-                    button,
-                    menuItems
-                    );
             };
 
             return button;
         }
-    }
 
-    public sealed class SolutionItemsContextMenuCommandBridge : MenuCommandBridge<SolutionItemContextMenuItem>
-    {
-        protected override int GetMenuID() => PackageIds.SolutionItemsContextMenu;
-
-        public sealed class SolutionItemContextMenuItem
+        private async Task ReplaceDocumentBodyAsync(
+            IPart part
+            )
         {
-            public string Title
+            var chat = _chatFunc();
+            if (chat is null)
             {
-                get;
+                return;
             }
 
-            public ICommand Command
+            var chosenContextItem = await VisualStudioContextMenuCommandBridge.ShowAsync<IChatContextItem>(
+                "Choose context item to replace:",
+                chat.ChatContext.Items
+                    .ConvertAll(i => (i.ContextUIDescription, (object)i))
+                );
+            if (chosenContextItem is null)
             {
-                get;
+                return;
             }
 
-            public Tuple<IChatContextItem, object> CommandParameter
-            {
-                get;
-            }
-
-            public SolutionItemContextMenuItem(
-                string title,
-                ICommand command,
-                Tuple<IChatContextItem, object> commandParameter
-                )
-            {
-                if (string.IsNullOrEmpty(title))
-                {
-                    throw new ArgumentException($"'{nameof(title)}' cannot be null or empty.", nameof(title));
-                }
-
-                if (command is null)
-                {
-                    throw new ArgumentNullException(nameof(command));
-                }
-
-                if (commandParameter is null)
-                {
-                    throw new ArgumentNullException(nameof(commandParameter));
-                }
-
-                Title = title;
-                Command = command;
-                CommandParameter = commandParameter;
-            }
-
-            public void InvokeCommand()
-            {
-                if (Command.CanExecute(CommandParameter))
-                {
-                    Command.Execute(CommandParameter);
-                }
-            }
-
-            public override string ToString()
-            {
-                return Title;
-            }
+            _actionCommand.Execute(
+                new Tuple<IChatContextItem, object>(
+                    chosenContextItem,
+                    part.GetContextForAdditionalCommand()
+                    )
+                );
         }
     }
+
 }
