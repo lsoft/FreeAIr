@@ -1,4 +1,4 @@
-using DataObject.Entity;
+﻿using DataObject.Entity;
 using DataObject.Repo;
 using System;
 using System.Collections.Generic;
@@ -13,6 +13,7 @@ namespace DataObject.BLogic
     {
         private readonly Repository _repository;
 
+        // * Constructor initializes the repository.
         public TransferSearcher(
             Repository repository
             )
@@ -22,23 +23,24 @@ namespace DataObject.BLogic
             _repository = repository;
         }
 
-        public IReadOnlyList<Voyage> SearchFor(
-            Voyage firstVoyage,
-            DateTime voyageDate
-            )
-        {
-            var allVoyagesAtDate = _repository
-                .ReadAllVoyages()
-                .FindAll(v => v.VoyageDate == voyageDate)
-                ;
+       // * Search for voyages that match the given date and conditions.
+       public IReadOnlyList<Voyage> SearchFor(
+           Voyage firstVoyage,
+           DateTime voyageDate
+           )
+       {
+           var allVoyagesAtDate = _repository
+               .ReadAllVoyages()
+               .FindAll(v => v.VoyageDate == voyageDate)
+               ;
 
-            allVoyagesAtDate.Remove(firstVoyage);
+           allVoyagesAtDate.Remove(firstVoyage);
 
-            var allowedVoyages = allVoyagesAtDate
-                .FindAll(v => v.Route.StationList[0] == firstVoyage.Route.StationList.Last())
-                ;
+           var allowedVoyages = allVoyagesAtDate
+               .FindAll(v => v.Route.StationList[0] == firstVoyage.Route.StationList.Last())
+               ;
 
-            return allowedVoyages;
-        }
+           return allowedVoyages;
+       }
     }
 }

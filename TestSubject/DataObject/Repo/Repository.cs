@@ -9,6 +9,7 @@ namespace DataObject.Repo
 {
     public class Repository
     {
+        // * Reads all stations and returns them as a list.
         public List<Station> ReadAllStations()
         {
             return
@@ -20,6 +21,7 @@ namespace DataObject.Repo
                     new Station(5, "5"),
                 ];
         }
+        // * Reads all edges by referencing stations and returns them as a list.
         public List<Edge> ReadAllEdges()
         {
             var stations = ReadAllStations();
@@ -32,6 +34,7 @@ namespace DataObject.Repo
                     new Edge(stations[3], stations[4]),
                 ];
         }
+        // * Reads all routes by referencing stations and returns them as a list.
         public List<Route> ReadAllRoutes()
         {
             var stations = ReadAllStations();
@@ -42,6 +45,7 @@ namespace DataObject.Repo
                     new Route(2, [stations[2], stations[3]]),
                 ];
         }
+        // * Reads all train information and returns it as a list.
         public List<TrainInfo> ReadAllTrainInfos()
         {
             return
@@ -50,6 +54,7 @@ namespace DataObject.Repo
                     new TrainInfo(2, "2"),
                 ];
         }
+        // * Reads all voyages by referencing routes and train information and returns them as a list.
         public List<Voyage> ReadAllVoyages()
         {
             var routes = ReadAllRoutes();

@@ -37,6 +37,7 @@ namespace DataObject.Entity
             VoyageDate = voyageDate;
         }
 
+        // * Voyage class represents a voyage with unique properties.
         public override bool Equals(object? obj)
         {
             return obj is Voyage voyage
@@ -52,6 +53,7 @@ namespace DataObject.Entity
         }
     }
 
+    // * TrainInfo class represents train information.
     public class TrainInfo
     {
         public int Id
@@ -86,6 +88,7 @@ namespace DataObject.Entity
         }
     }
 
+    // * Route class represents a route with a list of stations.
     public class Route
     {
         private readonly List<Station> _stationList;

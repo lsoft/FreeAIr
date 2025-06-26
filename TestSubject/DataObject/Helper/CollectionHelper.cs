@@ -8,6 +8,7 @@ namespace DataObject.Helper
 {
     public static class CollectionHelper
     {
+        // * Check if two collections are equal.
         public static bool IsCollectionEquals<T>(
             IReadOnlyList<T>? first,
             IReadOnlyList<T>? second
