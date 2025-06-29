@@ -1,7 +1,9 @@
 ﻿using FreeAIr.Embedding.Json;
+using FreeAIr.Git;
 using FreeAIr.NLOutline.Json;
 using FreeAIr.NLOutline.Tree;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -144,6 +146,34 @@ namespace FreeAIr.Embedding
             return new EmbeddingContainer(
                 jsonObject
                 );
+        }
+
+        public static async System.Threading.Tasks.Task<string> GenerateFilePathAsync()
+        {
+            var repositoryFolder = await GitRepositoryProvider.GetRepositoryFolderAsync();
+            var jsonEmbeddingFolderPath = System.IO.Path.Combine(
+                repositoryFolder,
+                ".freeair"
+                );
+            if (!System.IO.Directory.Exists(jsonEmbeddingFolderPath))
+            {
+                System.IO.Directory.CreateDirectory(jsonEmbeddingFolderPath);
+            }
+
+            var solution = await VS.Solutions.GetCurrentSolutionAsync();
+            var solutionFileInfo = new FileInfo(solution.Name);
+
+            var solutionName = solution.Name;
+            if (solutionFileInfo.Extension.Length > 0)
+            {
+                solutionName = solutionName.Substring(0, solutionName.Length - solutionFileInfo.Extension.Length);
+            }
+
+            var jsonEmbeddingFilePath = System.IO.Path.Combine(
+                jsonEmbeddingFolderPath,
+                $"{solutionName}_embeddings.json"
+                );
+            return jsonEmbeddingFilePath;
         }
 
         private static Dictionary<Guid, Triple> FillTriples(

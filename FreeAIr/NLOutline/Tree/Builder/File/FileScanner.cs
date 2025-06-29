@@ -3,6 +3,7 @@ using FreeAIr.BLogic;
 using FreeAIr.BLogic.Context.Item;
 using FreeAIr.Embedding;
 using FreeAIr.Git.Parser;
+using FreeAIr.Shared.Helper;
 using Microsoft.VisualStudio.ComponentModelHost;
 using System;
 using System.Collections.Generic;
@@ -13,21 +14,49 @@ using System.Threading.Tasks;
 
 namespace FreeAIr.NLOutline.Tree.Builder.File
 {
-    /// <summary>
-    /// Default file outline tree node builder. Used for unknown language (or file type).
-    /// LLM produces outlines actually.
-    /// </summary>
-    public class FileBuilder
+    public interface IFileScanner
     {
-        public static readonly FileBuilder DefaultInstance = new();
-
-        public List<string> FileExtensions
+        string Name
         {
             get;
-            protected set;
         }
 
-        public FileBuilder()
+        string Description
+        {
+            get;
+        }
+
+        IReadOnlyList<string> FileExtensions
+        {
+            get;
+        }
+
+        Task BuildAsync(
+            Agent agent,
+            List<SolutionItem> items,
+            OutlineTree root
+            );
+    }
+
+    /// <summary>
+    /// Default file outline tree node scanner. Used for unknown language (or file type).
+    /// LLM produces outlines actually.
+    /// </summary>
+    public sealed class FileScanner : IFileScanner
+    {
+        public static readonly FileScanner DefaultInstance = new();
+
+
+        public string Name => "Default file scanner";
+
+        public string Description => "Default scanner for NLO. It asks LLM to produce NLO tree for the file.";
+
+        public IReadOnlyList<string> FileExtensions
+        {
+            get;
+        }
+
+        public FileScanner()
         {
             FileExtensions = new List<string>();
         }
@@ -45,7 +74,7 @@ namespace FreeAIr.NLOutline.Tree.Builder.File
                 );
         }
 
-        protected virtual async Task BuildInternalAsync(
+        private async Task BuildInternalAsync(
             Agent agent,
             List<SolutionItem> items,
             OutlineTree root
@@ -122,11 +151,11 @@ namespace FreeAIr.NLOutline.Tree.Builder.File
     }
 
     ///// <summary>
-    ///// C# outline tree node builder. Used Roslyn to extract all outlines from source code.
+    ///// C# outline tree node scanner. Used Roslyn to extract all outlines from source code.
     ///// </summary>
-    //public sealed class CSharpFileBuilder : FileBuilder
+    //public sealed class CSharpFileScanner : IFileScanner
     //{
-    //    public static readonly CSharpFileBuilder Instance = new();
+    //    public static readonly CSharpFileScanner Instance = new();
 
     //    public CSharpFileBuilder()
     //    {
@@ -142,14 +171,14 @@ namespace FreeAIr.NLOutline.Tree.Builder.File
     //}
 
 
-    public static class FileBuilderFactory
+    public static class FileScannerFactory
     {
-        private static readonly List<FileBuilder> _factories =
+        public static readonly IReadOnlyList<IFileScanner> Scanners =
         [
             //CSharpFileBuilder.Instance
         ];
 
-        public static async Task CreateFileTreesAsync(
+        public static async Task CreateFileTreeAsync(
             Agent agent,
             OutlineTree root,
             List<SolutionItem> items
@@ -170,9 +199,9 @@ namespace FreeAIr.NLOutline.Tree.Builder.File
                 throw new ArgumentNullException(nameof(items));
             }
 
-            var dict = new Dictionary<FileBuilder, List<SolutionItem>>();
-            dict.Add(FileBuilder.DefaultInstance, []);
-            _factories.ForEach(f => dict.Add(f, []));
+            var dict = new Dictionary<IFileScanner, List<SolutionItem>>();
+            dict.Add(FileScanner.DefaultInstance, []);
+            Scanners.ForEach(f => dict.Add(f, []));
 
             foreach (var item in items)
             {
@@ -185,7 +214,7 @@ namespace FreeAIr.NLOutline.Tree.Builder.File
                         continue;
                     }
 
-                    dict[FileBuilder.DefaultInstance].Add(item);
+                    dict[FileScanner.DefaultInstance].Add(item);
                 }
             }
 

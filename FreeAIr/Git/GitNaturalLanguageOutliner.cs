@@ -45,33 +45,13 @@ namespace FreeAIr.Git
         private static async System.Threading.Tasks.Task<List<SolutionItemChatContextItem>> CreateChosenSolutionItemsAsync(
             )
         {
+            var diff = await GitDiffCreator.BuildGitDiffAsync();
+            if (diff is null)
+            {
+                return [];
+            }
+
             var contextItems = new List<SolutionItemChatContextItem>();
-
-            var backgroundTask = new GitCollectBackgroundTask(
-                );
-            var w = new WaitForTaskWindow(
-                backgroundTask
-                );
-            await w.ShowDialogAsync();
-
-            var gitDiffString = backgroundTask.Result;
-            if (string.IsNullOrEmpty(gitDiffString))
-            {
-                await ShowErrorAsync("Cannot collect git patch. Please post outlines manually.");
-                return contextItems;
-            }
-
-            var repositoryFolder = await GitRepositoryProvider.GetRepositoryFolderAsync();
-            if (string.IsNullOrEmpty(repositoryFolder))
-            {
-                await ShowErrorAsync("Cannot determine git repository path. Please post outlines manually.");
-                return contextItems;
-            }
-
-            var diff = new GitDiff(
-                repositoryFolder,
-                gitDiffString
-                );
 
             foreach (var diffFile in diff.Files)
             {

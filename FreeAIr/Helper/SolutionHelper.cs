@@ -41,6 +41,55 @@ namespace FreeAIr.Helper
             return result;
         }
 
+        public static T ConvertRecursivelyFor<T>(
+            this SolutionItem item,
+            Func<SolutionItem, T?> converter,
+            Action<T, T> childAdder,
+            CancellationToken cancellationToken
+            )
+            where T : class
+        {
+            //https://github.com/VsixCommunity/Community.VisualStudio.Toolkit/issues/401
+            item.GetItemInfo(out IVsHierarchy hierarchy, out uint itemID, out _);
+            if (HierarchyUtilities.TryGetHierarchyProperty(hierarchy, itemID, (int)__VSHPROPID.VSHPROPID_IsNonMemberItem, out bool isNonMemberItem))
+            {
+                if (isNonMemberItem)
+                {
+                    // The item is not usually visible. Skip it.
+                    return null;
+                }
+            }
+
+            var root = converter(item);
+            if (root is null)
+            {
+                return null;
+            }
+
+            foreach (var child in item.Children)
+            {
+                if (child == null)
+                {
+                    continue;
+                }
+
+                var cChild = ConvertRecursivelyFor(
+                    child,
+                    converter,
+                    childAdder,
+                    cancellationToken
+                    );
+                if (cChild is null)
+                {
+                    continue;
+                }
+
+                childAdder(root, cChild);
+            }
+
+            return root;
+        }
+
 
 
         public static async Task<List<FoundSolutionItem>> ProcessDownRecursivelyForAsync(

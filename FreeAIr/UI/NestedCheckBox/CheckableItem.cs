@@ -1,107 +1,33 @@
 ﻿using FreeAIr.Shared.Helper;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
+using System.Windows.Media;
 using WpfHelpers;
 
 namespace FreeAIr.UI.NestedCheckBox
 {
-    public class CheckableItem : BaseViewModel
+    public sealed class SingleCheckedCheckableItem : CheckableItem
     {
-        protected bool _isChecked;
-
-        public event EventHandler? OnCheckedChanged;
-
-        public string Name
-        {
-            get;
-        }
-
-        public string Description
-        {
-            get;
-        }
-        
-        public object? Tag
-        {
-            get;
-        }
-
-        public bool IsChecked
-        {
-            get => _isChecked;
-            set
-            {
-                if (_isChecked == value)
-                {
-                    return;
-                }
-
-                HasChanged = true;
-                _isChecked = value;
-                OnPropertyChanged();
-                OnCheckedChanged?.Invoke(this, EventArgs.Empty);
-            }
-        }
-
-        public bool IsEnabled
-        {
-            get;
-        }
-
-        public bool HasChanged
-        {
-            get;
-            private set;
-        }
-
-        public CheckableItem(
+        public SingleCheckedCheckableItem(
             string name,
             string description,
             bool isChecked,
-            object? tag,
-            bool isEnabled
+            Brush? foreground,
+            object tag
             )
+            : base(name, description, isChecked, foreground, tag)
         {
-            if (name is null)
-            {
-                throw new ArgumentNullException(nameof(name));
-            }
-
-            if (description is null)
-            {
-                throw new ArgumentNullException(nameof(description));
-            }
-
-            Name = name;
-            Description = description;
-            _isChecked = isChecked;
-            Tag = tag;
-            IsEnabled = isEnabled;
         }
 
-        public virtual void SetChecked(bool isChecked)
-        {
-            if (_isChecked == isChecked)
-            {
-                return;
-            }
-
-            HasChanged = true;
-            _isChecked = isChecked;
-            OnPropertyChanged();
-        }
-    }
-
-
-    public sealed class SingleSelectedChildGroup : CheckableGroup
-    {
-        public SingleSelectedChildGroup(
+        public SingleCheckedCheckableItem(
             string name,
             string description,
-            object? tag,
-            IReadOnlyList<CheckableItem> children,
-            bool isGroupEnabled
-            ) : base(name, description, tag, children, isGroupEnabled)
+            Brush? foreground,
+            object tag,
+            List<CheckableItem> children
+            )
+            : base(name, description, foreground, tag, children)
         {
         }
 
@@ -113,54 +39,148 @@ namespace FreeAIr.UI.NestedCheckBox
         }
     }
 
-    public class CheckableGroup : CheckableItem
+    public class CheckableItem : BaseViewModel
     {
-        public ObservableCollection2<CheckableItem> Children
+        private bool _isChecked;
+        private readonly Brush _foreground;
+
+        public string Name
         {
             get;
-        } = new();
+        }
 
-        public CheckableGroup(
+        public string Description
+        {
+            get;
+        }
+
+        public Brush? Foreground => _foreground;
+
+        public Brush? Foreground2 => Brushes.Blue;
+
+        public object? Tag
+        {
+            get;
+        }
+
+        public ObservableCollection<CheckableItem> Children
+        {
+            get;
+        }
+
+        public event EventHandler? OnCheckedChangedEvent;
+
+        public bool IsChecked
+        {
+            get => _isChecked;
+            set
+            {
+                if (_isChecked == value)
+                    return;
+
+                _isChecked = value;
+                OnPropertyChanged();
+                FireCheckedChanged();
+
+                // Обновляем всех детей при изменении родителя
+                foreach (var child in Children)
+                {
+                    child.SetChecked(value);
+                }
+            }
+        }
+
+        public CheckableItem(
             string name,
             string description,
-            object? tag,
-            IReadOnlyList<CheckableItem> children,
-            bool isGroupEnabled
-            ) : base(name, description, children.All(c => c.IsChecked), tag, isGroupEnabled)
+            bool isChecked,
+            Brush? foreground,
+            object? tag
+            )
         {
-            Children.AddRange(children);
+            Name = name ?? throw new ArgumentNullException(nameof(name));
+            Description = description ?? throw new ArgumentNullException(nameof(description));
+            _isChecked = isChecked;
+            _foreground = foreground;
+            Tag = tag;
+            Children = new ObservableCollection<CheckableItem>();
+        }
 
-            if (isGroupEnabled)
-            {
-                //когда изменяется состояние группы — обновляем всех детей
-                this.OnCheckedChanged += (sender, args) =>
-                {
-                    if (sender is not CheckableGroup group)
-                    {
-                        return;
-                    }
+        public CheckableItem(
+            string name,
+            string description,
+            Brush? foreground,
+            object? tag,
+            List<CheckableItem> children
+            )
+        {
+            Name = name ?? throw new ArgumentNullException(nameof(name));
+            Description = description ?? throw new ArgumentNullException(nameof(description));
+            _foreground = foreground;
+            _isChecked = children.Any(c => c.IsChecked);
+            Tag = tag;
+            Children = new ObservableCollection<CheckableItem>(children);
 
-                    foreach (var child in Children)
-                    {
-                        child.SetChecked(
-                            group.IsChecked
-                            );
-                    }
-                };
-            }
-
-            //подписываемся на изменения каждого дочернего пункта
             foreach (var child in Children)
             {
-                child.OnCheckedChanged += Child_OnCheckedChanged;
+                child.OnCheckedChangedEvent += Child_OnCheckedChanged;
             }
         }
 
-        protected virtual void Child_OnCheckedChanged(object sender, EventArgs e)
+        public void AddChild(
+            CheckableItem child
+            )
         {
-            _isChecked = Children.All(c => c.IsChecked);
+            if (child is null)
+            {
+                throw new ArgumentNullException(nameof(child));
+            }
+
+            Children.Add(child);
+            child.OnCheckedChangedEvent += Child_OnCheckedChanged;
+            UpdateCheckedStatusFromChildren();
+        }
+
+        public void SetChecked(bool isChecked)
+        {
+            if (_isChecked == isChecked)
+            {
+                return;
+            }
+
+            _isChecked = isChecked;
             OnPropertyChanged();
+
+            foreach (var child in Children)
+            {
+                child.SetChecked(isChecked);
+            }
+        }
+
+        protected virtual void Child_OnCheckedChanged(object? sender, EventArgs e)
+        {
+            UpdateCheckedStatusFromChildren();
+        }
+
+        private void UpdateCheckedStatusFromChildren()
+        {
+            // Если все дети выбраны — родитель выбран
+            // Если ни один — родитель не выбран
+            // Если частично — можно сделать дополнительную логику, например IsThreeState (необязательно)
+            var isChecked = Children.Any(c => c.IsChecked);
+            if (_isChecked == isChecked)
+            {
+                return;
+            }
+
+            _isChecked = isChecked;
+            FireCheckedChanged();
+            OnPropertyChanged(nameof(IsChecked));
+        }
+
+        private void FireCheckedChanged()
+        {
+            OnCheckedChangedEvent?.Invoke(this, EventArgs.Empty);
         }
     }
-
 }

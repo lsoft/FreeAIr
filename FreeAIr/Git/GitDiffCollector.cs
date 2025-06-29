@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace FreeAIr.Git
 {
-    public static class GitDiffCombiner
+    public static class GitDiffCollector
     {
         public static async Task<string?> CombineDiffAsync(
             CancellationToken cancellationToken = default

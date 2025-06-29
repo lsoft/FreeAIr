@@ -24,6 +24,23 @@ namespace FreeAIr.Git.Parser
             get;
         }
 
+        public GitDiffFileStatusEnum Status
+        {
+            get
+            {
+                if (OriginalFullPath is null)
+                {
+                    return GitDiffFileStatusEnum.Added;
+                }
+                if (NewFullPath is null)
+                {
+                    return GitDiffFileStatusEnum.Deleted;
+                }
+
+                return GitDiffFileStatusEnum.Updated;
+            }
+        }
+
         public IReadOnlyList<GitDiffChunk> Chunks => _chunks;
 
         public GitDiffFile(
@@ -94,5 +111,12 @@ namespace FreeAIr.Git.Parser
 
             return result;
         }
+    }
+
+    public enum GitDiffFileStatusEnum
+    {
+        Added,
+        Updated,
+        Deleted
     }
 }

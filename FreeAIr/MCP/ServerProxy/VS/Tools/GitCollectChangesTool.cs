@@ -29,7 +29,7 @@ namespace FreeAIr.MCP.McpServerProxy.VS.Tools
         {
             await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
 
-            var diffs = await GitDiffCombiner.CollectDiffAsync(
+            var diffs = await GitDiffCollector.CollectDiffAsync(
                 cancellationToken
                 );
             if (diffs is null || diffs.Count == 0)

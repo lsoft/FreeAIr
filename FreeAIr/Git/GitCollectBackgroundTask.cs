@@ -24,7 +24,7 @@ namespace FreeAIr.BLogic
             //in case of exception set it null first
             Result = null;
 
-            Result = await GitDiffCombiner.CombineDiffAsync(_cancellationTokenSource.Token);
+            Result = await GitDiffCollector.CombineDiffAsync(_cancellationTokenSource.Token);
         }
     }
 }

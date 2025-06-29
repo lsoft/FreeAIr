@@ -2,81 +2,58 @@
     x:Class="FreeAIr.UI.NestedCheckBox.NestedCheckBoxList"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="clr-namespace:FreeAIr.UI.NestedCheckBox"
+    xmlns:ui="clr-namespace:FreeAIr.UI"
     x:Name="NestedCheckBoxListName"
     >
+    <UserControl.Resources>
+        <ui:NullToUnsetValueConverter x:Key="NullToUnsetValueConverter" />
+    </UserControl.Resources>
+
     <ScrollViewer
-        HorizontalScrollBarVisibility="Auto"
         VerticalScrollBarVisibility="Auto"
+        HorizontalScrollBarVisibility="Auto"
         Focusable="False"
         >
-
-        <ItemsControl
-            ItemsSource="{Binding Groups}"
-            >
-            <ItemsControl.ItemTemplate>
-                <DataTemplate>
-                    <StackPanel
-                        Margin="0,5"
-                        >
-                        <!-- Первый уровень -->
+        <ItemsControl ItemsSource="{Binding Groups}">
+            <ItemsControl.Resources>
+                <HierarchicalDataTemplate DataType="{x:Type local:CheckableItem}" ItemsSource="{Binding Children}">
+                    <StackPanel Margin="4,2">
+                        <Button
+                            Visibility="Collapsed"
+                            Width="0"
+                            Height="0"
+                            Name="ForegroundButton"
+                            />
                         <CheckBox
                             IsChecked="{Binding IsChecked, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                             Focusable="False"
-                            IsEnabled="{Binding IsEnabled}"
                             >
-                            <ContentControl>
-                                <StackPanel
-                                    Orientation="Horizontal"
-                                    >
-                                    <TextBlock
-                                        FontWeight="Bold"
-                                        Text="{Binding Name}"
-                                        />
-                                    <TextBlock
-                                        Margin="20,0,0,0"
-                                        Text="{Binding Description}"
-                                        />
-                                </StackPanel>
-                            </ContentControl>
+                            <CheckBox.Foreground>
+                                <PriorityBinding>
+                                    <Binding Path="Foreground" Converter="{StaticResource NullToUnsetValueConverter}" />
+                                    <Binding ElementName="ForegroundButton" Path="Foreground" />
+                                </PriorityBinding>
+                            </CheckBox.Foreground>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock FontWeight="Bold" Text="{Binding Name}" />
+                                <TextBlock Margin="10,0,0,0" Text="{Binding Description}" />
+                            </StackPanel>
                         </CheckBox>
-
-                        <!-- Второй уровень -->
-                        <ItemsControl ItemsSource="{Binding Children}" Margin="12,0,0,0">
+                        
+                        <!-- Контейнер для рекурсивного отображения -->
+                        <ItemsControl ItemsSource="{Binding Children}" Margin="20,0,0,0">
                             <ItemsControl.ItemTemplate>
-                                <DataTemplate>
-                                    <CheckBox
-                                        IsChecked="{Binding IsChecked, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                        VerticalAlignment="Top"
-                                        Focusable="False"
-                                        >
-                                        <ContentControl>
-                                            <Grid
-                                                >
-                                                <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition Width="auto" />
-                                                    <ColumnDefinition />
-                                                </Grid.ColumnDefinitions>
-                                                <TextBlock
-                                                    Grid.Column="0"
-                                                    VerticalAlignment="Center"
-                                                    FontWeight="Bold"
-                                                    Text="{Binding Name}"
-                                                    />
-                                                <TextBlock
-                                                    Grid.Column="1"
-                                                    VerticalAlignment="Center"
-                                                    Margin="20,0,0,0"
-                                                    Text="{Binding Description}"
-                                                    />
-                                            </Grid>
-                                        </ContentControl>
-                                    </CheckBox>
-                                </DataTemplate>
+                                <HierarchicalDataTemplate DataType="{x:Type local:CheckableItem}" ItemsSource="{Binding Children}">
+                                    <ContentPresenter Content="{Binding}"/>
+                                </HierarchicalDataTemplate>
                             </ItemsControl.ItemTemplate>
                         </ItemsControl>
+                        
                     </StackPanel>
-                </DataTemplate>
-            </ItemsControl.ItemTemplate>
+                </HierarchicalDataTemplate>
+            </ItemsControl.Resources>
         </ItemsControl>
     </ScrollViewer>
 </UserControl>
+    

@@ -16,7 +16,7 @@ namespace FreeAIr.UI.ViewModels
 
         public string Header => "Choose the MCP tools you want to provide to LLM:";
 
-        public ObservableCollection2<CheckableGroup> Groups
+        public ObservableCollection2<CheckableItem> Groups
         {
             get;
             set;
@@ -77,21 +77,21 @@ namespace FreeAIr.UI.ViewModels
                 throw new ArgumentNullException(nameof(toolContainer));
             }
 
-            Groups = new ObservableCollection2<CheckableGroup>();
+            Groups = new ObservableCollection2<CheckableItem>();
 
             _toolContainer = toolContainer;
 
             var tools = McpServerProxyCollection.GetTools(_toolContainer);
 
-            var groups = new Dictionary<string, CheckableGroup>();
+            var groups = new Dictionary<string, CheckableItem>();
             foreach (var toolsStatus in tools.ToolsStatuses)
             {
-                groups[toolsStatus.McpServerProxyName] = new CheckableGroup(
+                groups[toolsStatus.McpServerProxyName] = new CheckableItem(
                     toolsStatus.McpServerProxyName,
                     string.Empty,
                     null,
-                    toolsStatus.Tools.Select(t => new CheckableItem(t.Tool.ToolName, t.Tool.Description, t.Enabled, t, true)).ToList(),
-                    true
+                    null,
+                    toolsStatus.Tools.Select(t => new CheckableItem(t.Tool.ToolName, t.Tool.Description, t.Enabled, null, t)).ToList()
                     );
             }
             Groups.AddRange(groups.Values);

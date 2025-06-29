@@ -65,7 +65,7 @@ namespace FreeAIr.NLOutline.Tree.Builder
                     cancellationToken
                     );
 
-                await FileBuilderFactory.CreateFileTreesAsync(
+                await FileScannerFactory.CreateFileTreeAsync(
                     agent,
                     projectRoot,
                     files

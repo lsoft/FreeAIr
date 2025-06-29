@@ -18,7 +18,7 @@ namespace FreeAIr.UI.ViewModels
 
         public string Header => "Choose the available agent:";
 
-        public ObservableCollection2<CheckableGroup> Groups
+        public ObservableCollection2<CheckableItem> Groups
         {
             get;
             set;
@@ -55,46 +55,28 @@ namespace FreeAIr.UI.ViewModels
             AgentCollection chatAgents
             )
         {
-            Groups = new ObservableCollection2<CheckableGroup>();
+            Groups = new ObservableCollection2<CheckableItem>();
 
             _chatAgents = chatAgents;
 
             Groups.Add(
-                new SingleSelectedChildGroup(
+                new SingleCheckedCheckableItem(
                     "Available agents:",
                     "",
+                    null,
                     chatAgents,
                     _chatAgents.Agents.Select(agent =>
                         new CheckableItem(
                             agent.Name,
                             string.Empty,
                             agent.IsDefault,
-                            agent,
-                            true
+                            null,
+                            agent
                             )
-                        ).ToList(),
-                    false
+                        ).ToList()
                     )
                 );
             _chatAgents = chatAgents;
         }
-
-        //public sealed class OptionAgentCheckableItem : CheckableItem
-        //{
-        //    public OptionAgentCheckableItem(
-        //        string name, 
-        //        OptionAgent optionAgent
-        //        ) : base(name, string.Empty, optionAgent.IsDefault, optionAgent, true)
-        //    {
-        //    }
-
-        //    public override void SetChecked(bool isChecked)
-        //    {
-        //        base.SetChecked(isChecked);
-
-        //        var optionAgent = Tag as OptionAgent;
-        //        optionAgent.se
-        //    }
-        //}
     }
 }

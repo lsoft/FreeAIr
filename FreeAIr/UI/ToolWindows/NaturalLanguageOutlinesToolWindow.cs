@@ -25,7 +25,6 @@ namespace FreeAIr.UI.ToolWindows
                 );
 
             return control;
-
         }
 
         [Guid("bff6aa5d-7e90-4068-b4e8-fb58eb759c44")]

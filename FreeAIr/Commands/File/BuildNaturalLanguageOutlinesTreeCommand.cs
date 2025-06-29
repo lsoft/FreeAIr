@@ -6,6 +6,7 @@ using FreeAIr.Git;
 using FreeAIr.Helper;
 using FreeAIr.NLOutline;
 using FreeAIr.NLOutline.Tree.Builder;
+using FreeAIr.UI;
 using FreeAIr.UI.ContextMenu;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,6 +26,11 @@ namespace FreeAIr.Commands.File
         protected override async Task ExecuteAsync(OleMenuCmdEventArgs e)
         {
             await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+
+            await BuildNaturalLanguageOutlinesJsonFileToolWindow.ShowPaneAsync(
+                true
+                );
+            return;
 
             var extractAgent = await VisualStudioContextMenuCommandBridge.ShowAsync<Agent>(
                 "Choose agent to build NL outline tree:",
@@ -52,31 +58,11 @@ namespace FreeAIr.Commands.File
             var eg = new EmbeddingGenerator(generateEmbeddingAgent);
             await eg.GenerateEmbeddingsAsync(embeddingContainer);
 
-            var jsonEmbeddingFilePath = await GenerateFilePathAsync();
+            var jsonEmbeddingFilePath = await EmbeddingContainer.GenerateFilePathAsync();
 
             await embeddingContainer.SerializeAsync(
                 jsonEmbeddingFilePath
                 );
         }
-
-        private static async System.Threading.Tasks.Task<string> GenerateFilePathAsync()
-        {
-            var repositoryFolder = await GitRepositoryProvider.GetRepositoryFolderAsync();
-            var jsonEmbeddingFolderPath = System.IO.Path.Combine(
-                repositoryFolder,
-                ".freeair"
-                );
-            if (!System.IO.Directory.Exists(jsonEmbeddingFolderPath))
-            {
-                System.IO.Directory.CreateDirectory(jsonEmbeddingFolderPath);
-            }
-
-            var jsonEmbeddingFilePath = System.IO.Path.Combine(
-                jsonEmbeddingFolderPath,
-                "embeddings.json"
-                );
-            return jsonEmbeddingFilePath;
-        }
-
     }
 }

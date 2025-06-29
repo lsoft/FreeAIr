@@ -45,7 +45,10 @@ namespace FreeAIr.BLogic
             Agent agent
             )
         {
+            await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+
             var componentModel = (IComponentModel)await FreeAIrPackage.Instance.GetServiceAsync(typeof(SComponentModel));
+
             var gitWindowModifier = componentModel.GetService<GitWindowModifier>();
 
             var backgroundTask = new GitCollectBackgroundTask(
