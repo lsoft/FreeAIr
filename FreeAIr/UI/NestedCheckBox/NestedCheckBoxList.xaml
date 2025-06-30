@@ -36,7 +36,7 @@
                                 </PriorityBinding>
                             </CheckBox.Foreground>
                             <StackPanel Orientation="Horizontal">
-                                <TextBlock FontWeight="Bold" Text="{Binding Name}" />
+                                <TextBlock TextDecorations="{Binding TextDecoration}" FontWeight="Bold" Text="{Binding Name}" />
                                 <TextBlock Margin="10,0,0,0" Text="{Binding Description}" />
                             </StackPanel>
                         </CheckBox>

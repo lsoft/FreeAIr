@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Runtime.InteropServices;
+using System.Windows;
 using System.Windows.Media;
 using WpfHelpers;
 
@@ -13,21 +15,21 @@ namespace FreeAIr.UI.NestedCheckBox
             string name,
             string description,
             bool isChecked,
-            Brush? foreground,
+            CheckableItemStyle style,
             object tag
             )
-            : base(name, description, isChecked, foreground, tag)
+            : base(name, description, isChecked, style, tag)
         {
         }
 
         public SingleCheckedCheckableItem(
             string name,
             string description,
-            Brush? foreground,
+            CheckableItemStyle style,
             object tag,
             List<CheckableItem> children
             )
-            : base(name, description, foreground, tag, children)
+            : base(name, description, style, tag, children)
         {
         }
 
@@ -42,7 +44,7 @@ namespace FreeAIr.UI.NestedCheckBox
     public class CheckableItem : BaseViewModel
     {
         private bool _isChecked;
-        private readonly Brush _foreground;
+        private readonly CheckableItemStyle _style;
 
         public string Name
         {
@@ -54,9 +56,20 @@ namespace FreeAIr.UI.NestedCheckBox
             get;
         }
 
-        public Brush? Foreground => _foreground;
+        public Brush? Foreground
+        {
+            get
+            {
+                if (_style.DisabledForeground is null)
+                {
+                    return _style.Foreground;
+                }
 
-        public Brush? Foreground2 => Brushes.Blue;
+                return IsChecked ? _style.Foreground : _style.DisabledForeground;
+            }
+        }
+
+        public TextDecorationCollection TextDecoration => _style.TextDecoration;
 
         public object? Tag
         {
@@ -79,14 +92,15 @@ namespace FreeAIr.UI.NestedCheckBox
                     return;
 
                 _isChecked = value;
-                OnPropertyChanged();
-                FireCheckedChanged();
 
                 // Обновляем всех детей при изменении родителя
                 foreach (var child in Children)
                 {
                     child.SetChecked(value);
                 }
+
+                OnPropertyChanged();
+                FireCheckedChanged();
             }
         }
 
@@ -94,14 +108,14 @@ namespace FreeAIr.UI.NestedCheckBox
             string name,
             string description,
             bool isChecked,
-            Brush? foreground,
+            CheckableItemStyle style,
             object? tag
             )
         {
             Name = name ?? throw new ArgumentNullException(nameof(name));
             Description = description ?? throw new ArgumentNullException(nameof(description));
             _isChecked = isChecked;
-            _foreground = foreground;
+            _style = style;
             Tag = tag;
             Children = new ObservableCollection<CheckableItem>();
         }
@@ -109,14 +123,14 @@ namespace FreeAIr.UI.NestedCheckBox
         public CheckableItem(
             string name,
             string description,
-            Brush? foreground,
+            CheckableItemStyle style,
             object? tag,
             List<CheckableItem> children
             )
         {
             Name = name ?? throw new ArgumentNullException(nameof(name));
             Description = description ?? throw new ArgumentNullException(nameof(description));
-            _foreground = foreground;
+            _style = style;
             _isChecked = children.Any(c => c.IsChecked);
             Tag = tag;
             Children = new ObservableCollection<CheckableItem>(children);
@@ -149,12 +163,13 @@ namespace FreeAIr.UI.NestedCheckBox
             }
 
             _isChecked = isChecked;
-            OnPropertyChanged();
 
             foreach (var child in Children)
             {
                 child.SetChecked(isChecked);
             }
+
+            OnPropertyChanged();
         }
 
         protected virtual void Child_OnCheckedChanged(object? sender, EventArgs e)
@@ -175,12 +190,42 @@ namespace FreeAIr.UI.NestedCheckBox
 
             _isChecked = isChecked;
             FireCheckedChanged();
-            OnPropertyChanged(nameof(IsChecked));
+            OnPropertyChanged();
         }
 
         private void FireCheckedChanged()
         {
             OnCheckedChangedEvent?.Invoke(this, EventArgs.Empty);
+        }
+    }
+
+    public readonly struct CheckableItemStyle
+    {
+        public static readonly CheckableItemStyle Empty = new CheckableItemStyle(null, null, new TextDecorationCollection());
+
+        public readonly Brush? Foreground;
+        public readonly Brush? DisabledForeground;
+        public readonly TextDecorationCollection TextDecoration;
+
+        public CheckableItemStyle(
+            Brush foreground,
+            Brush disabledForeground
+            )
+        {
+            Foreground = foreground;
+            DisabledForeground = disabledForeground;
+            TextDecoration = new TextDecorationCollection();
+        }
+
+        public CheckableItemStyle(
+            Brush foreground,
+            Brush disabledForeground,
+            TextDecorationCollection textDecoration
+            )
+        {
+            Foreground = foreground;
+            DisabledForeground = disabledForeground;
+            TextDecoration = textDecoration;
         }
     }
 }

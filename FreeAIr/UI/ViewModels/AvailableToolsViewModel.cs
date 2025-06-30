@@ -89,9 +89,9 @@ namespace FreeAIr.UI.ViewModels
                 groups[toolsStatus.McpServerProxyName] = new CheckableItem(
                     toolsStatus.McpServerProxyName,
                     string.Empty,
+                    CheckableItemStyle.Empty,
                     null,
-                    null,
-                    toolsStatus.Tools.Select(t => new CheckableItem(t.Tool.ToolName, t.Tool.Description, t.Enabled, null, t)).ToList()
+                    toolsStatus.Tools.Select(t => new CheckableItem(t.Tool.ToolName, t.Tool.Description, t.Enabled, CheckableItemStyle.Empty, t)).ToList()
                     );
             }
             Groups.AddRange(groups.Values);

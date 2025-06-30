@@ -28,11 +28,11 @@ namespace FreeAIr.Git.Parser
         {
             get
             {
-                if (OriginalFullPath is null)
+                if (string.IsNullOrEmpty(OriginalFullPath))
                 {
                     return GitDiffFileStatusEnum.Added;
                 }
-                if (NewFullPath is null)
+                if (string.IsNullOrEmpty(NewFullPath))
                 {
                     return GitDiffFileStatusEnum.Deleted;
                 }

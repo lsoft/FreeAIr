@@ -63,14 +63,14 @@ namespace FreeAIr.UI.ViewModels
                 new SingleCheckedCheckableItem(
                     "Available agents:",
                     "",
-                    null,
+                    CheckableItemStyle.Empty,
                     chatAgents,
                     _chatAgents.Agents.Select(agent =>
                         new CheckableItem(
                             agent.Name,
                             string.Empty,
                             agent.IsDefault,
-                            null,
+                            CheckableItemStyle.Empty,
                             agent
                             )
                         ).ToList()

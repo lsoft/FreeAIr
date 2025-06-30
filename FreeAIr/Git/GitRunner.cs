@@ -15,7 +15,7 @@ namespace FreeAIr.Git
             var result = await ProcessHelper.RunSilentlyAsync(
                 await GitRepositoryProvider.GetRepositoryFolderAsync(),
                 "git.exe",
-                @"diff",
+                @"diff HEAD",
                 cancellationToken
                 );
             if (result.ExitCode != 0)

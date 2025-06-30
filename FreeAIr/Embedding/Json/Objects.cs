@@ -4,6 +4,7 @@ using FreeAIr.NLOutline.Tree;
 using SharpCompress.Common;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -206,7 +207,7 @@ namespace FreeAIr.Embedding.Json
 
             return Path.Combine(
                 fi.Directory.FullName,
-                fi.Name + ".outlineTree" + fi.Extension
+                fi.Name.Substring(0, fi.Name.Length - fi.Extension.Length) + ".outlineTree" + fi.Extension
                 );
         }
 
@@ -216,7 +217,7 @@ namespace FreeAIr.Embedding.Json
 
             return Path.Combine(
                 fi.Directory.FullName,
-                fi.Name + ".outlines" + fi.Extension
+                fi.Name.Substring(0, fi.Name.Length - fi.Extension.Length) + ".outlines" + fi.Extension
                 );
         }
 
@@ -227,7 +228,7 @@ namespace FreeAIr.Embedding.Json
 
             return Path.Combine(
                 fi.Directory.FullName,
-                fi.Name + ".embeddings" + fi.Extension
+                fi.Name.Substring(0, fi.Name.Length - fi.Extension.Length) + ".embeddings" + fi.Extension
                 );
         }
 

@@ -24,8 +24,8 @@
             <RowDefinition />
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="auto"/>
-            <ColumnDefinition />
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="3*" />
         </Grid.ColumnDefinitions>
 
         <Grid
@@ -47,12 +47,16 @@
                 VerticalAlignment="Center"
                 Text="Natural Language Outlines file path: "
                 />
-            <TextBlock
+            <Button
                 Grid.Column="1"
                 FontFamily="Cascadia Code"
                 FontWeight="Bold"
                 VerticalAlignment="Center"
-                Text="{Binding JsonFilePath}"
+                Cursor="Hand"
+                Foreground="#569CD6"
+                Content="{Binding JsonFilePath}"
+                Command="{Binding OpenJsonFolderCommand}"
+                Style="{DynamicResource TextBlockLikeButtonStyle}"
                 />
             <Button
                 Grid.Column="2"
@@ -86,8 +90,11 @@
         <Grid
             Grid.Row="2"
             Grid.Column="1"
+            Margin="2"
             >
             <Grid.RowDefinitions>
+                <RowDefinition Height="auto" />
+                <RowDefinition Height="auto" />
                 <RowDefinition Height="auto" />
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
@@ -100,15 +107,15 @@
                 Grid.Column="0"
                 FontFamily="Cascadia Code"
                 VerticalAlignment="Center"
-                Text="NLO scanner: "
+                Text="NLO extract agent: "
                 />
             <ComboBox
                 Grid.Row="0"
                 Grid.Column="1"
                 FontFamily="Cascadia Code"
                 VerticalAlignment="Center"
-                ItemsSource="{Binding NLOScannerList}"
-                SelectedItem="{Binding SelectedScanner}"
+                ItemsSource="{Binding GenerateNLOAgentList}"
+                SelectedItem="{Binding SelectedGenerateNLOAgent}"
                 >
                 <ComboBox.ItemTemplate>
                     <DataTemplate>
@@ -121,25 +128,74 @@
                             <TextBlock
                                 Grid.Row="0"
                                 FontWeight="Bold"
-                                Text="{Binding ScannerName}"
+                                Text="{Binding AgentName}"
                                 />
                             <TextBlock
                                 Grid.Row="1"
                                 Margin="10,0,0,0"
-                                Text="{Binding ScannerDescription}"
+                                Text="{Binding Technical}"
                                 />
                         </Grid>
                     </DataTemplate>
                 </ComboBox.ItemTemplate>
             </ComboBox>
-            <!--
-                Foreground="#569CD6"
-            -->
 
+            <TextBlock
+                Grid.Row="1"
+                Grid.Column="0"
+                FontFamily="Cascadia Code"
+                VerticalAlignment="Center"
+                Text="Embedding generate agent: "
+                />
+            <ComboBox
+                Grid.Row="1"
+                Grid.Column="1"
+                FontFamily="Cascadia Code"
+                VerticalAlignment="Center"
+                ItemsSource="{Binding GenerateEmbeddingAgentList}"
+                SelectedItem="{Binding SelectedGenerateEmbeddingAgent}"
+                >
+                <ComboBox.ItemTemplate>
+                    <DataTemplate>
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition/>
+                                <RowDefinition/>
+                            </Grid.RowDefinitions>
+
+                            <TextBlock
+                                Grid.Row="0"
+                                FontWeight="Bold"
+                                Text="{Binding AgentName}"
+                                />
+                            <TextBlock
+                                Grid.Row="1"
+                                Margin="10,0,0,0"
+                                Text="{Binding Technical}"
+                                />
+                        </Grid>
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+            </ComboBox>
             
-            
-            
-            
+            <Button
+                Grid.Row="2"
+                Grid.Column="0"
+                Grid.ColumnSpan="2"
+                Margin="2"
+                HorizontalAlignment="Right"
+                Cursor="Hand"
+                Background="Transparent"
+                FontFamily="Cascadia Code"
+                Content="{Binding UpdateJsonFileCommandContent}"
+                ToolTip="Start process to actualize NLO Json file. Log of the process is in Visual Studio output pane."
+                Command="{Binding UpdateJsonFileCommand}"
+                Style="{DynamicResource TextBlockLikeButtonStyle}"
+                />
+
+
+
+
         </Grid>
     </Grid>
 </UserControl>
