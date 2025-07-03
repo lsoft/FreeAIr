@@ -1,13 +1,10 @@
-﻿using FreeAIr.Helper;
+﻿using FreeAIr.Git;
+using FreeAIr.Helper;
 using FreeAIr.NLOutline.Json;
 using FreeAIr.NLOutline.Tree;
-using SharpCompress.Common;
-using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
@@ -55,30 +52,27 @@ namespace FreeAIr.Embedding.Json
         }
 
         public EmbeddingOutlineJsonObject(
-            OutlineTreeJsonObject outlineTree,
-            OutlinesItselfJsonObject outlines,
-            EmbeddingsJsonObject embeddings
+            OutlineNode root
             )
         {
-            if (outlineTree is null)
+            if (root is null)
             {
-                throw new ArgumentNullException(nameof(outlineTree));
+                throw new ArgumentNullException(nameof(root));
             }
 
-            if (outlines is null)
-            {
-                throw new ArgumentNullException(nameof(outlines));
-            }
-
-            if (embeddings is null)
-            {
-                throw new ArgumentNullException(nameof(embeddings));
-            }
-
-            OutlineTree = outlineTree;
-            Outlines = outlines;
-            Embeddings = embeddings;
+            OutlineTree = new OutlineTreeJsonObject(
+                OutlineNodeJsonObject.Create(
+                    root
+                    )
+                );
+            Outlines = new OutlinesItselfJsonObject(
+                root
+                );
+            Embeddings = new EmbeddingsJsonObject(
+                root
+                );
             GenerateDateTime = DateTime.Now;
+
         }
 
         public async Task SerializeAsync(
@@ -122,7 +116,8 @@ namespace FreeAIr.Embedding.Json
                 return;
             }
 
-            Outlines = await OutlinesItselfJsonObject.DeserializeAsync(FilePath);
+            var oFilePath = GetOutlinesFileName();
+            Outlines = await OutlinesItselfJsonObject.DeserializeAsync(oFilePath);
         }
 
         public async Task LoadOutlineTreeAsync()
@@ -132,7 +127,8 @@ namespace FreeAIr.Embedding.Json
                 return;
             }
 
-            OutlineTree = await OutlineTreeJsonObject.DeserializeAsync(FilePath);
+            var otFilePath = GetOutlineTreeFileName();
+            OutlineTree = await OutlineTreeJsonObject.DeserializeAsync(otFilePath);
         }
 
         public async Task LoadEmbeddingsAsync()
@@ -142,7 +138,8 @@ namespace FreeAIr.Embedding.Json
                 return;
             }
 
-            Embeddings = await EmbeddingsJsonObject.DeserializeAsync(FilePath);
+            var eFilePath = GetEmbeddingsFileName();
+            Embeddings = await EmbeddingsJsonObject.DeserializeAsync(eFilePath);
         }
 
         public static async Task<EmbeddingOutlineJsonObject> DeserializeAsync(
@@ -201,6 +198,65 @@ namespace FreeAIr.Embedding.Json
         }
 
 
+        public static async System.Threading.Tasks.Task<string> GenerateFilePathAsync()
+        {
+            var repositoryFolder = await GitRepositoryProvider.GetRepositoryFolderAsync();
+            var jsonEmbeddingFolderPath = System.IO.Path.Combine(
+                repositoryFolder,
+                ".freeair"
+                );
+            if (!System.IO.Directory.Exists(jsonEmbeddingFolderPath))
+            {
+                System.IO.Directory.CreateDirectory(jsonEmbeddingFolderPath);
+            }
+
+            var solution = await VS.Solutions.GetCurrentSolutionAsync();
+            var solutionFileInfo = new FileInfo(solution.Name);
+
+            var solutionName = solution.Name;
+            if (solutionFileInfo.Extension.Length > 0)
+            {
+                solutionName = solutionName.Substring(0, solutionName.Length - solutionFileInfo.Extension.Length);
+            }
+
+            var jsonEmbeddingFilePath = System.IO.Path.Combine(
+                jsonEmbeddingFolderPath,
+                $"{solutionName}_embeddings.json"
+                );
+            return jsonEmbeddingFilePath;
+        }
+
+        public IReadOnlyDictionary<Guid, Triple> CreateTripleDictionary(
+            )
+        {
+            var od = Outlines.Outlines.ToDictionary(o => o.Id, o => o);
+            var otd = new Dictionary<Guid, OutlineNodeJsonObject>();
+            OutlineTree.ApplyRecursive(
+                o => otd[o.Id] = o
+                );
+            var ed = Embeddings.Embeddings.ToDictionary(e => e.Id, e => e);
+
+            var triples = new Dictionary<Guid, Triple>();
+            foreach (var odi in od)
+            {
+                if (!otd.TryGetValue(odi.Key, out var otdi))
+                {
+                    continue;
+                }
+
+                ed.TryGetValue(odi.Key, out var edi);
+
+                triples[odi.Key] = new Triple(
+                    odi.Value,
+                    otdi,
+                    edi
+                    );
+            }
+
+            return triples;
+        }
+
+
         private string GetOutlineTreeFileName()
         {
             var fi = new FileInfo(FilePath);
@@ -231,23 +287,6 @@ namespace FreeAIr.Embedding.Json
                 fi.Name.Substring(0, fi.Name.Length - fi.Extension.Length) + ".embeddings" + fi.Extension
                 );
         }
-
-        public static EmbeddingOutlineJsonObject CreateFromScratch(
-            OutlineDescriptor outline
-            )
-        {
-            var result = new EmbeddingOutlineJsonObject
-            {
-                FilePath = string.Empty,
-                GenerateDateTime = DateTime.Now,
-                Outlines = OutlinesItselfJsonObject.CreateFromScratch(
-                    outline
-                    ),
-                OutlineTree = OutlineTreeJsonObject.CreateFromScratch(outline),
-                Embeddings = EmbeddingsJsonObject.CreateEmpty()
-            };
-            return result;
-        }
     }
 
     public sealed class EmbeddingsJsonObject
@@ -263,9 +302,25 @@ namespace FreeAIr.Embedding.Json
         {
         }
 
-        public EmbeddingsJsonObject(List<EmbeddingItselfJsonObject> embeddings)
+        public EmbeddingsJsonObject(
+            OutlineNode root
+            )
         {
-            Embeddings = embeddings;
+            if (root is null)
+            {
+                throw new ArgumentNullException(nameof(root));
+            }
+
+            Embeddings = new List<EmbeddingItselfJsonObject>();
+
+            root.ApplyRecursive(
+                node => Embeddings.Add(
+                    new EmbeddingItselfJsonObject(
+                        node.Id,
+                        node.Embedding
+                        )
+                    )
+                );
         }
 
         public async Task SerializeAsync(
@@ -296,15 +351,7 @@ namespace FreeAIr.Embedding.Json
             }
 
             using var fs = new FileStream(filePath, FileMode.Open);
-            return await System.Text.Json.JsonSerializer.DeserializeAsync<EmbeddingsJsonObject>(fs);
-        }
-
-        public static EmbeddingsJsonObject CreateEmpty()
-        {
-            var result = new EmbeddingsJsonObject
-            {
-                Embeddings = new()
-            };
+            var result = await System.Text.Json.JsonSerializer.DeserializeAsync<EmbeddingsJsonObject>(fs);
             return result;
         }
     }
@@ -333,6 +380,48 @@ namespace FreeAIr.Embedding.Json
         {
             Id = id;
             Embedding = embedding;
+        }
+    }
+
+
+    public sealed class Triple
+    {
+        public OutlineItselfJsonObject OutlineItself
+        {
+            get;
+        }
+
+        public OutlineNodeJsonObject OutlineNode
+        {
+            get;
+        }
+
+        public EmbeddingItselfJsonObject? EmbeddingItself
+        {
+            get;
+            private set;
+        }
+
+        public Triple(
+            OutlineItselfJsonObject outlineItself,
+            OutlineNodeJsonObject outlineNode,
+            EmbeddingItselfJsonObject? embeddingItself
+            )
+        {
+            if (outlineItself is null)
+            {
+                throw new ArgumentNullException(nameof(outlineItself));
+            }
+
+            if (outlineNode is null)
+            {
+                throw new ArgumentNullException(nameof(outlineNode));
+            }
+
+
+            OutlineItself = outlineItself;
+            OutlineNode = outlineNode;
+            EmbeddingItself = embeddingItself;
         }
     }
 }

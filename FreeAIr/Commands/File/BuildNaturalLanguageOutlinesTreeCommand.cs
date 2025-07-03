@@ -30,39 +30,6 @@ namespace FreeAIr.Commands.File
             await BuildNaturalLanguageOutlinesJsonFileToolWindow.ShowPaneAsync(
                 true
                 );
-            return;
-
-            var extractAgent = await VisualStudioContextMenuCommandBridge.ShowAsync<Agent>(
-                "Choose agent to build NL outline tree:",
-                InternalPage.Instance.GetAgentCollection().Agents.ConvertAll(a => (a.Name, (object)a))
-                );
-            if (extractAgent is null)
-            {
-                return;
-            }
-
-            var generateEmbeddingAgent = await VisualStudioContextMenuCommandBridge.ShowAsync<Agent>(
-                "Choose agent to generate embeddings:",
-                InternalPage.Instance.GetAgentCollection().Agents.ConvertAll(a => (a.Name, (object)a))
-                );
-            if (generateEmbeddingAgent is null)
-            {
-                return;
-            }
-
-            var embeddingContainer = await TreeBuilder.BuildAsync(
-                extractAgent,
-                CancellationToken.None
-                );
-
-            var eg = new EmbeddingGenerator(generateEmbeddingAgent);
-            await eg.GenerateEmbeddingsAsync(embeddingContainer);
-
-            var jsonEmbeddingFilePath = await EmbeddingContainer.GenerateFilePathAsync();
-
-            await embeddingContainer.SerializeAsync(
-                jsonEmbeddingFilePath
-                );
         }
     }
 }

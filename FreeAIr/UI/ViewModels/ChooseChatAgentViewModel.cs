@@ -37,7 +37,7 @@ namespace FreeAIr.UI.ViewModels
                             foreach (var agentCheckableItem in agentCheckableItems.Children)
                             {
                                 var optionAgent = agentCheckableItem.Tag as Agent;
-                                optionAgent.IsDefault = agentCheckableItem.IsChecked;
+                                optionAgent.IsDefault = agentCheckableItem.IsChecked.GetValueOrDefault(false);
                             }
 
                             if (CloseWindow is not null)

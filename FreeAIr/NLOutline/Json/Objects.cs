@@ -1,4 +1,6 @@
 ﻿using FreeAIr.NLOutline.Tree;
+using FreeAIr.Shared.Helper;
+using Json.Path;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -38,13 +40,17 @@ namespace FreeAIr.NLOutline.Json
         [System.Text.Json.Serialization.JsonIgnore]
         public Guid EmbeddingId => Id;
 
+        public OutlineItselfJsonObject()
+        {
+        }
+
         public OutlineItselfJsonObject(
-            OutlineDescriptor outline
+            OutlineNode outline
             )
         {
             Id = outline.Id;
             Kind = outline.Kind;
-            FullPath = outline.FullPath;
+            FullPath = outline.RelativePath;
             OutlineText = outline.OutlineText;
         }
     }
@@ -63,12 +69,35 @@ namespace FreeAIr.NLOutline.Json
             set;
         }
 
+        public OutlineNodeJsonObject()
+        {
+        }
+
         public OutlineNodeJsonObject(
-            OutlineDescriptor outline
+            OutlineNode outline
             )
         {
             Id = outline.Id;
             Children = new();
+        }
+
+        public static OutlineNodeJsonObject Create(
+            OutlineNode source
+            )
+        {
+            if (source is null)
+            {
+                throw new ArgumentNullException(nameof(source));
+            }
+
+            var target = new OutlineNodeJsonObject(source);
+            foreach (var childSource in source.Children)
+            {
+                var childTarget = Create(childSource);
+                target.Children.Add(childTarget);
+            }
+
+            return target;
         }
 
         public void ApplyRecursive(
@@ -101,9 +130,20 @@ namespace FreeAIr.NLOutline.Json
         {
         }
 
-        public OutlinesItselfJsonObject(List<OutlineItselfJsonObject> outlines)
+        public OutlinesItselfJsonObject(
+            OutlineNode root
+            )
         {
-            Outlines = outlines;
+            if (root is null)
+            {
+                throw new ArgumentNullException(nameof(root));
+            }
+
+            Outlines = new List<OutlineItselfJsonObject>();
+
+            root.ApplyRecursive(
+                node => Outlines.Add(new OutlineItselfJsonObject(node))
+                );
         }
 
         public async Task SerializeAsync(
@@ -138,7 +178,7 @@ namespace FreeAIr.NLOutline.Json
         }
 
         public static OutlinesItselfJsonObject CreateFromScratch(
-            OutlineDescriptor outline
+            OutlineNode outline
             )
         {
             var result = new OutlinesItselfJsonObject
@@ -200,18 +240,6 @@ namespace FreeAIr.NLOutline.Json
 
             using var fs = new FileStream(filePath, FileMode.Open);
             return await System.Text.Json.JsonSerializer.DeserializeAsync<OutlineTreeJsonObject>(fs);
-        }
-
-        public static OutlineTreeJsonObject CreateFromScratch(
-            OutlineDescriptor outline
-            )
-        {
-            var result = new OutlineTreeJsonObject
-            {
-                Root = new OutlineNodeJsonObject(outline)
-            };
-
-            return result;
         }
 
         public void ApplyRecursive(

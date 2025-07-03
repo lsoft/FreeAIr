@@ -41,7 +41,8 @@ namespace FreeAIr.Helper
                 throw new JsonException("Длина массива байт не кратна размеру float.");
             }
 
-            var bytes = ArrayPool<byte>.Shared.Rent(hexSpan.Length / 2);
+            var sizeInBytes = hexSpan.Length / 2;
+            var bytes = ArrayPool<byte>.Shared.Rent(sizeInBytes);
             for (int i = 0; i < hexSpan.Length; i += 2)
             {
                 var value = ParseHexByte(
@@ -52,7 +53,7 @@ namespace FreeAIr.Helper
                 bytes[i / 2] = value;
             }
 
-            var floatSpan = MemoryMarshal.Cast<byte, float>(bytes.AsSpan());
+            var floatSpan = MemoryMarshal.Cast<byte, float>(bytes.AsSpan(0, sizeInBytes));
             var result = floatSpan.ToArray();
 
             //no finally for performance reasons

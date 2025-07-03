@@ -52,7 +52,7 @@ namespace FreeAIr.UI.ViewModels
                                     _toolContainer.AddTool(
                                         toolGroupName,
                                         tool.Name,
-                                        tool.IsChecked
+                                        tool.IsChecked.GetValueOrDefault(false)
                                         );
                                 }
                             }

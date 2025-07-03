@@ -3,10 +3,12 @@ using FreeAIr.BLogic;
 using FreeAIr.BLogic.Context.Item;
 using FreeAIr.Embedding;
 using FreeAIr.Git.Parser;
+using FreeAIr.Helper;
 using FreeAIr.Shared.Helper;
 using Microsoft.VisualStudio.ComponentModelHost;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.Composition;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -16,6 +18,11 @@ namespace FreeAIr.NLOutline.Tree.Builder.File
 {
     public interface IFileScanner
     {
+        int Order
+        {
+            get;
+        }
+
         string Name
         {
             get;
@@ -33,8 +40,9 @@ namespace FreeAIr.NLOutline.Tree.Builder.File
 
         Task BuildAsync(
             Agent agent,
+            string rootPath,
             List<SolutionItem> items,
-            OutlineTree root
+            OutlineNode root
             );
     }
 
@@ -42,11 +50,11 @@ namespace FreeAIr.NLOutline.Tree.Builder.File
     /// Default file outline tree node scanner. Used for unknown language (or file type).
     /// LLM produces outlines actually.
     /// </summary>
+    [Export(typeof(IFileScanner))]
     public sealed class FileScanner : IFileScanner
     {
-        public static readonly FileScanner DefaultInstance = new();
-
-
+        public int Order => int.MaxValue;
+        
         public string Name => "Default file scanner";
 
         public string Description => "Default scanner for NLO. It asks LLM to produce NLO tree for the file.";
@@ -63,12 +71,14 @@ namespace FreeAIr.NLOutline.Tree.Builder.File
 
         public async Task BuildAsync(
             Agent agent,
+            string rootPath,
             List<SolutionItem> items,
-            OutlineTree root
+            OutlineNode root
             )
         {
             await BuildInternalAsync(
                 agent,
+                rootPath,
                 items,
                 root
                 );
@@ -76,8 +86,9 @@ namespace FreeAIr.NLOutline.Tree.Builder.File
 
         private async Task BuildInternalAsync(
             Agent agent,
+            string rootPath,
             List<SolutionItem> items,
-            OutlineTree root
+            OutlineNode root
             )
         {
             if (agent is null)
@@ -125,28 +136,33 @@ namespace FreeAIr.NLOutline.Tree.Builder.File
                     );
                 chat.ChatContext.AddItem(contextItem);
 
-                var prompt = UserPrompt.CreateFileOutlinesPrompt(
-                    item.FullPath
-                    );
-                chat.AddPrompt(prompt);
-
-                var fileOutline = await chat.WaitForPromptCleanAnswerAsync(
-                    Environment.NewLine
-                    );
-                if (string.IsNullOrEmpty(fileOutline))
+                var fileOutline = await ProcessOutlinePromptAsync(chat, item);
+                if (!string.IsNullOrEmpty(fileOutline))
                 {
-                    continue;
+                    root.AddChild(
+                        OutlineKindEnum.File,
+                        item.FullPath.MakeRelativeAgainst(rootPath),
+                        fileOutline
+                        );
                 }
-
-                root.AddChild(
-                    OutlineKindEnum.File,
-                    item.FullPath,
-                    fileOutline
-                    );
 
                 chat.ChatContext.RemoveItem(contextItem);
                 chat.ArchiveAllPrompts();
             }
+        }
+
+        private static async Task<string> ProcessOutlinePromptAsync(Chat chat, SolutionItem item)
+        {
+            var prompt = UserPrompt.CreateFileOutlinesPrompt(
+                item.FullPath
+                );
+            chat.AddPrompt(prompt);
+
+            var fileOutline = await chat.WaitForPromptCleanAnswerAsync(
+                Environment.NewLine
+                );
+
+            return fileOutline;
         }
     }
 
@@ -155,8 +171,6 @@ namespace FreeAIr.NLOutline.Tree.Builder.File
     ///// </summary>
     //public sealed class CSharpFileScanner : IFileScanner
     //{
-    //    public static readonly CSharpFileScanner Instance = new();
-
     //    public CSharpFileBuilder()
     //    {
     //        FileExtensions = [".cs"];
@@ -171,61 +185,110 @@ namespace FreeAIr.NLOutline.Tree.Builder.File
     //}
 
 
-    public static class FileScannerFactory
+    [Export(typeof(FileOutlineTreeProcessor))]
+    public sealed class FileOutlineTreeProcessor
     {
-        public static readonly IReadOnlyList<IFileScanner> Scanners =
-        [
-            //CSharpFileBuilder.Instance
-        ];
+        private readonly IFileScanner[] _scanners;
 
-        public static async Task CreateFileTreeAsync(
-            Agent agent,
-            OutlineTree root,
-            List<SolutionItem> items
+        [ImportingConstructor]
+        public FileOutlineTreeProcessor(
+            [ImportMany] IFileScanner[] scanners
             )
         {
-            if (agent is null)
+            if (scanners is null)
             {
-                throw new ArgumentNullException(nameof(agent));
+                throw new ArgumentNullException(nameof(scanners));
             }
 
-            if (root is null)
+            _scanners = scanners;
+        }
+
+
+        public async Task CreateFileTreesAsync(
+            TreeBuilderParameters parameters,
+            string rootPath,
+            OutlineNode newOutlineRoot,
+            List<SolutionItem> fileItems
+            )
+        {
+            if (parameters is null)
             {
-                throw new ArgumentNullException(nameof(root));
+                throw new ArgumentNullException(nameof(parameters));
             }
 
-            if (items is null)
+            if (newOutlineRoot is null)
             {
-                throw new ArgumentNullException(nameof(items));
+                throw new ArgumentNullException(nameof(newOutlineRoot));
             }
 
-            var dict = new Dictionary<IFileScanner, List<SolutionItem>>();
-            dict.Add(FileScanner.DefaultInstance, []);
-            Scanners.ForEach(f => dict.Add(f, []));
+            if (fileItems is null)
+            {
+                throw new ArgumentNullException(nameof(fileItems));
+            }
 
-            foreach (var item in items)
+            var splittedItems = SplitItemsByScanners(fileItems);
+
+            foreach (var pair in splittedItems)
+            {
+                var solutionItems = pair.SolutionItems;
+
+                //use the old file node if the current file node is not checked
+                if (parameters.OldOutlineRoot is not null)
+                {
+                    for (var i = solutionItems.Count - 1; i >= 0; i--)
+                    {
+                        var solutionItem = solutionItems[i];
+                        if (parameters.TryGetFileOutlineNode(
+                            solutionItem.FullPath.MakeRelativeAgainst(rootPath),
+                            out var oldOutlineNode)
+                            )
+                        {
+                            newOutlineRoot.AddChild(
+                                oldOutlineNode
+                                );
+                            solutionItems.RemoveAt(i);
+                        }
+                    }
+                }
+
+                if (solutionItems.Count > 0)
+                {
+                    await pair.FileScanner.BuildAsync(
+                        parameters.Agent,
+                        rootPath,
+                        solutionItems,
+                        newOutlineRoot
+                        );
+                }
+            }
+        }
+
+        private List<(IFileScanner FileScanner, List<SolutionItem> SolutionItems)> SplitItemsByScanners(
+            List<SolutionItem> fileItems
+            )
+        {
+            var list = _scanners
+                .OrderBy(f => f.Order)
+                .Select(f => (FileScanner: f, SolutionItems: new List<SolutionItem>()))
+                .ToList()
+                ;
+
+            foreach (var item in fileItems)
             {
                 var extension = new FileInfo(item.FullPath).Extension;
-                foreach (var pair in dict)
+                foreach (var pair in list)
                 {
-                    if (pair.Key.FileExtensions.Contains(extension))
+                    if (pair.FileScanner.FileExtensions.Count == 0
+                        || pair.FileScanner.FileExtensions.Contains(extension)
+                        )
                     {
-                        pair.Value.Add(item);
-                        continue;
+                        pair.SolutionItems.Add(item);
+                        break;
                     }
-
-                    dict[FileScanner.DefaultInstance].Add(item);
                 }
             }
 
-            foreach (var pair in dict.OrderBy(p => p.Key.GetType().Name))
-            {
-                await pair.Key.BuildAsync(
-                    agent,
-                    pair.Value,
-                    root
-                    );
-            }
+            return list;
         }
     }
 }

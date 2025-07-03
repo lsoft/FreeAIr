@@ -75,7 +75,6 @@
     <Compile Include="BLogic\ChatKindEnum.cs" />
     <Compile Include="BLogic\ChatStatusEnum.cs" />
     <Compile Include="Commands\File\BuildNaturalLanguageOutlinesTreeCommand.cs" />
-    <Compile Include="Embedding\EmbeddingContainer.cs" />
     <Compile Include="Embedding\EmbeddingGenerator.cs" />
     <Compile Include="Embedding\Json\Objects.cs" />
     <Compile Include="Find\DoSearch.cs" />
@@ -186,7 +185,7 @@
     <Compile Include="NLOutline\NaturalLanguageOutlineCollection.cs" />
     <Compile Include="NLOutline\Tree\Builder\File\FileScanner.cs" />
     <Compile Include="NLOutline\Tree\Builder\TreeBuilder.cs" />
-    <Compile Include="NLOutline\Tree\OutlineDescriptor.cs" />
+    <Compile Include="NLOutline\Tree\OutlineNode.cs" />
     <Compile Include="Options\InternalPage.cs" />
     <Compile Include="Options\OptionsProvider.cs" />
     <Compile Include="Options\ResponsePage.cs" />
@@ -277,6 +276,7 @@
     <Compile Include="UI\ViewModels\BuildNaturalLanguageOutlinesJsonFileToolViewModel.cs" />
     <Compile Include="UI\ViewModels\NaturalLanguageOutlinesViewModel.cs" />
     <Compile Include="UI\ViewModels\NaturalLanguageResultsViewModel.cs" />
+    <Compile Include="UI\ViewModels\OutlineEmbeddingOutputPanel.cs" />
     <Compile Include="UI\Windows\AgentConfigureWindow.xaml.cs">
       <DependentUpon>AgentConfigureWindow.xaml</DependentUpon>
     </Compile>

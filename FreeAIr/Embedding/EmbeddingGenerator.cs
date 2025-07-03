@@ -40,25 +40,38 @@ namespace FreeAIr.Embedding
         }
 
         public async Task GenerateEmbeddingsAsync(
-            EmbeddingContainer container
+            OutlineNode outline
             )
         {
-            if (container is null)
+            if (outline is null)
             {
-                throw new ArgumentNullException(nameof(container));
+                throw new ArgumentNullException(nameof(outline));
             }
 
-            var outlines = container.GetOutlineList();
+            var outlinesIdBody = new List<(OutlineNode, string)>();
 
-            var embeddings = await _embeddingClient.GenerateEmbeddingsAsync(
-                outlines.ConvertAll(n => n.OutlineText) //TODO split by LLM context size
+            outline.ApplyRecursive(
+                node =>
+                {
+                    if (node.Embedding is null)
+                    {
+                        outlinesIdBody.Add((node, node.OutlineText));
+                    }
+                }
                 );
 
-            for (var i = 0; i < outlines.Count; i++)
+            if (outlinesIdBody.Count > 0)
             {
-                outlines[i].AddEmbedding(
-                    embeddings.Value[i].ToFloats().ToArray()
+                var embeddings = await _embeddingClient.GenerateEmbeddingsAsync(
+                    outlinesIdBody.ConvertAll(n => n.Item2) //TODO split by LLM context size
                     );
+
+                for (var i = 0; i < outlinesIdBody.Count; i++)
+                {
+                    outlinesIdBody[i].Item1.AddEmbedding(
+                        embeddings.Value[i].ToFloats().ToArray()
+                        );
+                }
             }
         }
     }

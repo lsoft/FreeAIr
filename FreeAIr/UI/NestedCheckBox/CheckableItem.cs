@@ -43,7 +43,7 @@ namespace FreeAIr.UI.NestedCheckBox
 
     public class CheckableItem : BaseViewModel
     {
-        private bool _isChecked;
+        private bool? _isChecked;
         private readonly CheckableItemStyle _style;
 
         public string Name
@@ -60,16 +60,18 @@ namespace FreeAIr.UI.NestedCheckBox
         {
             get
             {
-                if (_style.DisabledForeground is null)
+                if (_style.UncheckedForeground is null)
                 {
                     return _style.Foreground;
                 }
 
-                return IsChecked ? _style.Foreground : _style.DisabledForeground;
+                return IsChecked.GetValueOrDefault(false) ? _style.Foreground : _style.UncheckedForeground;
             }
         }
 
         public TextDecorationCollection TextDecoration => _style.TextDecoration;
+
+        public bool IsEnabled => _style.IsEnabled;
 
         public object? Tag
         {
@@ -83,7 +85,7 @@ namespace FreeAIr.UI.NestedCheckBox
 
         public event EventHandler? OnCheckedChangedEvent;
 
-        public bool IsChecked
+        public bool? IsChecked
         {
             get => _isChecked;
             set
@@ -131,7 +133,7 @@ namespace FreeAIr.UI.NestedCheckBox
             Name = name ?? throw new ArgumentNullException(nameof(name));
             Description = description ?? throw new ArgumentNullException(nameof(description));
             _style = style;
-            _isChecked = children.Any(c => c.IsChecked);
+            _isChecked = GetIsCheckedFromChildren(children);
             Tag = tag;
             Children = new ObservableCollection<CheckableItem>(children);
 
@@ -155,7 +157,7 @@ namespace FreeAIr.UI.NestedCheckBox
             UpdateCheckedStatusFromChildren();
         }
 
-        public void SetChecked(bool isChecked)
+        public void SetChecked(bool? isChecked)
         {
             if (_isChecked == isChecked)
             {
@@ -181,8 +183,12 @@ namespace FreeAIr.UI.NestedCheckBox
         {
             // Если все дети выбраны — родитель выбран
             // Если ни один — родитель не выбран
-            // Если частично — можно сделать дополнительную логику, например IsThreeState (необязательно)
-            var isChecked = Children.Any(c => c.IsChecked);
+            // Если частично — в среднем состоянии
+            // Если хотя бы один потомок в среднем состоянии - в среднем состоянии
+            var isChecked = GetIsCheckedFromChildren(
+                Children
+                );
+
             if (_isChecked == isChecked)
             {
                 return;
@@ -193,6 +199,35 @@ namespace FreeAIr.UI.NestedCheckBox
             OnPropertyChanged();
         }
 
+        private static bool? GetIsCheckedFromChildren(
+            IReadOnlyList<CheckableItem> children
+            )
+        {
+            bool? isChecked;
+            if (children.Count == 0)
+            {
+                isChecked = false;
+            }
+            else if (children.Any(c => !c.IsChecked.HasValue))
+            {
+                isChecked = null;
+            }
+            else if (children.All(c => c.IsChecked.GetValueOrDefault(false)))
+            {
+                isChecked = true;
+            }
+            else if (children.All(c => !c.IsChecked.GetValueOrDefault(true)))
+            {
+                isChecked = false;
+            }
+            else
+            {
+                isChecked = null;
+            }
+
+            return isChecked;
+        }
+
         private void FireCheckedChanged()
         {
             OnCheckedChangedEvent?.Invoke(this, EventArgs.Empty);
@@ -201,30 +236,35 @@ namespace FreeAIr.UI.NestedCheckBox
 
     public readonly struct CheckableItemStyle
     {
-        public static readonly CheckableItemStyle Empty = new CheckableItemStyle(null, null, new TextDecorationCollection());
+        public static readonly CheckableItemStyle Empty = new CheckableItemStyle(null, null, true, new TextDecorationCollection());
 
         public readonly Brush? Foreground;
-        public readonly Brush? DisabledForeground;
+        public readonly Brush? UncheckedForeground;
+        public readonly bool IsEnabled;
         public readonly TextDecorationCollection TextDecoration;
 
         public CheckableItemStyle(
             Brush foreground,
-            Brush disabledForeground
+            Brush uncheckedForeground,
+            bool isEnabled
             )
         {
             Foreground = foreground;
-            DisabledForeground = disabledForeground;
+            UncheckedForeground = uncheckedForeground;
+            IsEnabled = isEnabled;
             TextDecoration = new TextDecorationCollection();
         }
 
         public CheckableItemStyle(
             Brush foreground,
-            Brush disabledForeground,
+            Brush uncheckedForeground,
+            bool isEnabled,
             TextDecorationCollection textDecoration
             )
         {
             Foreground = foreground;
-            DisabledForeground = disabledForeground;
+            UncheckedForeground = uncheckedForeground;
+            IsEnabled = isEnabled;
             TextDecoration = textDecoration;
         }
     }

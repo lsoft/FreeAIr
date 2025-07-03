@@ -28,6 +28,7 @@
                         <CheckBox
                             IsChecked="{Binding IsChecked, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                             Focusable="False"
+                            IsEnabled="{Binding IsEnabled}"
                             >
                             <CheckBox.Foreground>
                                 <PriorityBinding>

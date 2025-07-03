@@ -24,12 +24,21 @@ namespace FreeAIr.UI.ContextMenu
             private set;
         }
 
-        private async Task<VisualStudioContextMenuItem> ShowAsync(
+        private async Task<VisualStudioContextMenuItem?> ShowAsync(
             List<VisualStudioContextMenuItem> menuItems,
             int x,
             int y
             )
         {
+            if (menuItems.Count == 0)
+            {
+                return null;
+            }
+            if (menuItems.Count == 1)
+            {
+                return menuItems[0];
+            }
+
             await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
 
             ChosenItem = null;
@@ -105,7 +114,6 @@ namespace FreeAIr.UI.ContextMenu
             }
             catch (Exception excp)
             {
-                int g = 0;
                 //todo log
             }
 

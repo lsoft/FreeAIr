@@ -1,23 +1,20 @@
 ﻿using FreeAIr.Agents;
 using FreeAIr.Embedding;
+using FreeAIr.Embedding.Json;
 using FreeAIr.Git;
 using FreeAIr.Git.Parser;
 using FreeAIr.Helper;
+using FreeAIr.NLOutline.Tree;
 using FreeAIr.NLOutline.Tree.Builder;
-using FreeAIr.NLOutline.Tree.Builder.File;
 using FreeAIr.Shared.Helper;
 using FreeAIr.UI.NestedCheckBox;
-using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.ComponentModel.Composition;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
 using WpfHelpers;
@@ -92,7 +89,7 @@ namespace FreeAIr.UI.ViewModels
             {
                 _completeRebuild = value;
 
-                UpdatePageAsync()
+                UpdatePageAsync(false)
                     .FileAndForget(nameof(UpdatePageAsync));
             }
         }
@@ -150,47 +147,52 @@ namespace FreeAIr.UI.ViewModels
                         {
                             try
                             {
-                                var outputPane = await VS.Windows.CreateOutputWindowPaneAsync("FreeAIr NLO Json file generation");
-                                await outputPane.ActivateAsync();
-                                await outputPane.WriteLineAsync();
-                                await outputPane.WriteLineAsync(new string('-', 80));
-                                await outputPane.WriteLineAsync(DateTime.Now.ToString());
+                                var outputPanel = await OutlineEmbeddingOutputPanel.CreateOrGetAsync();
+                                await outputPanel.ActivateAsync();
+                                await outputPanel.WriteLineAsync();
+                                await outputPanel.WriteLineAsync(new string('-', 80));
+                                await outputPanel.WriteLineAsync(DateTime.Now.ToString());
 
                                 try
                                 {
-                                    if (_completeRebuild)
+                                    await outputPanel.WriteLineAsync("Starting...");
+
+                                    HashSet<string>? checkedPaths = null;
+                                    OutlineNode? existingOutlineRoot = null;
+                                    if (!_completeRebuild)
                                     {
-                                        await outputPane.WriteLineAsync("Starting complete rebuild...");
-
-                                        var embeddingContainer = await TreeBuilder.BuildAsync(
-                                            SelectedGenerateNLOAgent.Agent,
-                                            CancellationToken.None
-                                            );
-
-                                        var eg = new EmbeddingGenerator(SelectedGenerateEmbeddingAgent.Agent);
-                                        await eg.GenerateEmbeddingsAsync(embeddingContainer);
-
-                                        var jsonEmbeddingFilePath = await EmbeddingContainer.GenerateFilePathAsync();
-
-                                        await embeddingContainer.SerializeAsync(
-                                            jsonEmbeddingFilePath
-                                            );
-                                    }
-                                    else
-                                    {
-                                        await outputPane.WriteLineAsync("Starting update...");
-
-                                        await VS.MessageBox.ShowAsync("Not implemented");
+                                        (checkedPaths, existingOutlineRoot) = await GetExistingInformationAsync();
                                     }
 
-                                    await outputPane.WriteLineAsync("Process SUCESSFULLY completed.");
-                                    await outputPane.HideAsync();
+                                    var outlineRoot = await TreeBuilder.BuildAsync(
+                                        parameters: new TreeBuilderParameters(
+                                            agent: SelectedGenerateNLOAgent.Agent,
+                                            checkedPaths: checkedPaths,
+                                            oldOutlineRoot: existingOutlineRoot
+                                            ),
+                                        cancellationToken: CancellationToken.None
+                                        );
+
+                                    var eg = new EmbeddingGenerator(
+                                        SelectedGenerateEmbeddingAgent.Agent
+                                        );
+                                    await eg.GenerateEmbeddingsAsync(
+                                        outlineRoot
+                                        );
+
+                                    var jsonObject = new EmbeddingOutlineJsonObject(outlineRoot);
+                                    await jsonObject.SerializeAsync(
+                                        JsonFilePath
+                                        );
+
+                                    await outputPanel.WriteLineAsync("Process SUCESSFULLY completed.");
+                                    //await outputPane.HideAsync();
                                 }
                                 catch (Exception excp)
                                 {
-                                    await outputPane.WriteLineAsync("Error:");
-                                    await outputPane.WriteLineAsync(excp.Message);
-                                    await outputPane.WriteLineAsync(excp.StackTrace);
+                                    await outputPanel.WriteLineAsync("Error:");
+                                    await outputPanel.WriteLineAsync(excp.Message);
+                                    await outputPanel.WriteLineAsync(excp.StackTrace);
                                     throw;
                                 }
                             }
@@ -202,6 +204,7 @@ namespace FreeAIr.UI.ViewModels
                                     + excp.StackTrace
                                     );
                             }
+
                         },
                         a =>
                         {
@@ -230,11 +233,16 @@ namespace FreeAIr.UI.ViewModels
             GenerateEmbeddingAgentList = new ObservableCollection2<AgentWrapper>();
         }
 
-        public async Task UpdatePageAsync()
+        public async Task UpdatePageAsync(
+            bool fillAgents = true
+            )
         {
-            JsonFilePath = await EmbeddingContainer.GenerateFilePathAsync();
+            JsonFilePath = await EmbeddingOutlineJsonObject.GenerateFilePathAsync();
 
-            FillAgents();
+            if (fillAgents)
+            {
+                FillAgents();
+            }
 
             if (_completeRebuild)
             {
@@ -263,6 +271,72 @@ namespace FreeAIr.UI.ViewModels
                     .ConvertAll(a => new AgentWrapper(a))
                     );
             SelectedGenerateEmbeddingAgent = GenerateEmbeddingAgentList.FirstOrDefault();
+        }
+
+        private async Task<(HashSet<string> checkedPaths, OutlineNode existingOutlineRoot)> GetExistingInformationAsync(
+            )
+        {
+            var solution = await VS.Solutions.GetCurrentSolutionAsync();
+            var rootPath = solution.FullPath;
+
+            #region local recursive function
+
+            void ProcessItem(
+                HashSet<string> checkedPaths,
+                CheckableItem item
+                )
+            {
+                if (item.IsChecked.HasValue && !item.IsChecked.Value)
+                {
+                    return;
+                }
+
+                if (item.IsChecked.HasValue && item.IsChecked.Value)
+                {
+                    var path = item.Tag as string;
+                    if (path is null)
+                    {
+                        if (item.Tag is SolutionItem si)
+                        {
+                            if (si.Type.In(SolutionItemType.Solution, SolutionItemType.Project, SolutionItemType.PhysicalFile))
+                            {
+                                path = si.FullPath;
+                            }
+                        }
+                    }
+
+                    if (!string.IsNullOrEmpty(path))
+                    {
+                        checkedPaths.Add(
+                            path.MakeRelativeAgainst(rootPath)
+                            );
+                    }
+                }
+
+                foreach (var child in item.Children)
+                {
+                    ProcessItem(checkedPaths, child);
+                }
+            }
+
+            #endregion
+
+            var checkedPaths = new HashSet<string>();
+            foreach (var item in Groups)
+            {
+                ProcessItem(checkedPaths, item);
+            }
+
+            var jsonEmbeddingFilePath = await EmbeddingOutlineJsonObject.GenerateFilePathAsync();
+            var existingJson = await EmbeddingOutlineJsonObject.DeserializeAsync(
+                jsonEmbeddingFilePath
+                );
+            await existingJson.LoadEmbeddingsAsync();
+            await existingJson.LoadOutlinesAsync();
+            await existingJson.LoadOutlineTreeAsync();
+            var existingOutlineRoot = OutlineNode.Create(existingJson);
+
+            return (checkedPaths, existingOutlineRoot);
         }
 
         private async Task FillGroupsFromGitChangesAsync()
@@ -295,8 +369,10 @@ namespace FreeAIr.UI.ViewModels
             Dictionary<string, GitDiffFile>? deletedFiles = null
             )
         {
+            Groups.Clear();
+
             var solution = VS.Solutions.GetCurrentSolution();
-            var root = solution.ConvertRecursivelyFor<CheckableItem>(
+            var addedUpdatedRoot = solution.ConvertRecursivelyFor<CheckableItem>(
                 item =>
                 {
                     if (item.Type.NotIn(SolutionItemType.SolutionFolder, SolutionItemType.Solution, SolutionItemType.Project, SolutionItemType.PhysicalFolder, SolutionItemType.PhysicalFile))
@@ -316,25 +392,25 @@ namespace FreeAIr.UI.ViewModels
                         itemName = fi.Name;
                     }
 
-                    var fullPath = item.FullPath ?? item.Name;
+                    var fullPathOrName = item.FullPath ?? item.Name;
 
                     Brush? foreground = null;
-                    if (addedFiles is not null && addedFiles.ContainsKey(fullPath))
+                    if (addedFiles is not null && addedFiles.ContainsKey(fullPathOrName))
                     {
                         foreground = Brushes.Green;
                     }
-                    if (deletedFiles is not null && deletedFiles.ContainsKey(fullPath))
+                    if (deletedFiles is not null && deletedFiles.ContainsKey(fullPathOrName))
                     {
                         foreground = Brushes.Red;
                     }
 
                     Brush? disabledForeground = null;
                     var isChecked = true;
-                    if (addedFiles is not null && !addedFiles.ContainsKey(fullPath))
+                    if (addedFiles is not null && !addedFiles.ContainsKey(fullPathOrName))
                     {
-                        if (updatedFiles is not null && !updatedFiles.ContainsKey(fullPath))
+                        if (updatedFiles is not null && !updatedFiles.ContainsKey(fullPathOrName))
                         {
-                            if (deletedFiles is not null && !deletedFiles.ContainsKey(fullPath))
+                            if (deletedFiles is not null && !deletedFiles.ContainsKey(fullPathOrName))
                             {
                                 disabledForeground = Brushes.DarkGray;
                                 isChecked = false;
@@ -348,7 +424,8 @@ namespace FreeAIr.UI.ViewModels
                         isChecked,
                         new CheckableItemStyle(
                             foreground,
-                            disabledForeground
+                            disabledForeground,
+                            false
                             ),
                         item
                         );
@@ -356,32 +433,7 @@ namespace FreeAIr.UI.ViewModels
                 (root, child) => root.AddChild(child),
                 CancellationToken.None
                 );
-
-            if (deletedFiles is not null)
-            {
-                foreach (var pair in deletedFiles)
-                {
-                    var filePath = pair.Key;
-                    var fileInfo = new FileInfo(filePath);
-
-                    root.AddChild(
-                        new CheckableItem(
-                            fileInfo.Name,
-                            filePath,
-                            true,
-                            new CheckableItemStyle(
-                                Brushes.Red,
-                                null,
-                                TextDecorations.Strikethrough
-                                ),
-                            filePath
-                            )
-                        );
-                }
-            }
-
-            Groups.Clear();
-            Groups.Add(root);
+            Groups.Add(addedUpdatedRoot);
         }
     }
 
