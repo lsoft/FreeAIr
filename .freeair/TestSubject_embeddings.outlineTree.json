@@ -1,0 +1,41 @@
+{
+  "Root": {
+    "Id": "00000000-0000-0000-0000-000000000000",
+    "Children": [
+      {
+        "Id": "e0668eb8-3b77-0d6a-f1a5-4242f25b027f",
+        "Children": [
+          {
+            "Id": "6e2385ca-e7b0-01f6-d937-a45d65a90884",
+            "Children": []
+          },
+          {
+            "Id": "e7566cae-f875-e6f2-0a62-eca9e8bc1572",
+            "Children": []
+          },
+          {
+            "Id": "fbe52c11-a22f-9753-4f8d-42f3fbcd15e2",
+            "Children": []
+          },
+          {
+            "Id": "c9fff85b-42ea-e94d-e966-bad4e8bb6140",
+            "Children": []
+          }
+        ]
+      },
+      {
+        "Id": "dfe11ef6-1267-6f49-559e-0ad2cadc8303",
+        "Children": [
+          {
+            "Id": "a12c76bd-9b02-6e8a-c3e1-630a77610c38",
+            "Children": []
+          },
+          {
+            "Id": "a78506c8-3844-3f51-4c9f-c2dafe1a0da2",
+            "Children": []
+          }
+        ]
+      }
+    ]
+  }
+}
