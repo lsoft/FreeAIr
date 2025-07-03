@@ -8,6 +8,7 @@ using FreeAIr.NLOutline.Tree;
 using FreeAIr.NLOutline.Tree.Builder;
 using FreeAIr.Shared.Helper;
 using FreeAIr.UI.NestedCheckBox;
+using FreeAIr.UI.Windows;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Diagnostics;
@@ -15,6 +16,7 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
 using WpfHelpers;
@@ -147,54 +149,17 @@ namespace FreeAIr.UI.ViewModels
                         {
                             try
                             {
-                                var outputPanel = await OutlineEmbeddingOutputPanel.CreateOrGetAsync();
-                                await outputPanel.ActivateAsync();
-                                await outputPanel.WriteLineAsync();
-                                await outputPanel.WriteLineAsync(new string('-', 80));
-                                await outputPanel.WriteLineAsync(DateTime.Now.ToString());
-
-                                try
-                                {
-                                    await outputPanel.WriteLineAsync("Starting...");
-
-                                    HashSet<string>? checkedPaths = null;
-                                    OutlineNode? existingOutlineRoot = null;
-                                    if (!_completeRebuild)
-                                    {
-                                        (checkedPaths, existingOutlineRoot) = await GetExistingInformationAsync();
-                                    }
-
-                                    var outlineRoot = await TreeBuilder.BuildAsync(
-                                        parameters: new TreeBuilderParameters(
-                                            agent: SelectedGenerateNLOAgent.Agent,
-                                            checkedPaths: checkedPaths,
-                                            oldOutlineRoot: existingOutlineRoot
-                                            ),
-                                        cancellationToken: CancellationToken.None
-                                        );
-
-                                    var eg = new EmbeddingGenerator(
-                                        SelectedGenerateEmbeddingAgent.Agent
-                                        );
-                                    await eg.GenerateEmbeddingsAsync(
-                                        outlineRoot
-                                        );
-
-                                    var jsonObject = new EmbeddingOutlineJsonObject(outlineRoot);
-                                    await jsonObject.SerializeAsync(
-                                        JsonFilePath
-                                        );
-
-                                    await outputPanel.WriteLineAsync("Process SUCESSFULLY completed.");
-                                    //await outputPane.HideAsync();
-                                }
-                                catch (Exception excp)
-                                {
-                                    await outputPanel.WriteLineAsync("Error:");
-                                    await outputPanel.WriteLineAsync(excp.Message);
-                                    await outputPanel.WriteLineAsync(excp.StackTrace);
-                                    throw;
-                                }
+                                var backgroundTask = new GenerateEmbeddingOutlineFilesBackgroundTask(
+                                    SelectedGenerateNLOAgent.Agent,
+                                    SelectedGenerateEmbeddingAgent.Agent,
+                                    _completeRebuild,
+                                    JsonFilePath,
+                                    Groups
+                                    );
+                                var w = new WaitForTaskWindow(
+                                    backgroundTask
+                                    );
+                                await w.ShowDialogAsync();
                             }
                             catch (Exception excp)
                             {
@@ -271,72 +236,6 @@ namespace FreeAIr.UI.ViewModels
                     .ConvertAll(a => new AgentWrapper(a))
                     );
             SelectedGenerateEmbeddingAgent = GenerateEmbeddingAgentList.FirstOrDefault();
-        }
-
-        private async Task<(HashSet<string> checkedPaths, OutlineNode existingOutlineRoot)> GetExistingInformationAsync(
-            )
-        {
-            var solution = await VS.Solutions.GetCurrentSolutionAsync();
-            var rootPath = solution.FullPath;
-
-            #region local recursive function
-
-            void ProcessItem(
-                HashSet<string> checkedPaths,
-                CheckableItem item
-                )
-            {
-                if (item.IsChecked.HasValue && !item.IsChecked.Value)
-                {
-                    return;
-                }
-
-                if (item.IsChecked.HasValue && item.IsChecked.Value)
-                {
-                    var path = item.Tag as string;
-                    if (path is null)
-                    {
-                        if (item.Tag is SolutionItem si)
-                        {
-                            if (si.Type.In(SolutionItemType.Solution, SolutionItemType.Project, SolutionItemType.PhysicalFile))
-                            {
-                                path = si.FullPath;
-                            }
-                        }
-                    }
-
-                    if (!string.IsNullOrEmpty(path))
-                    {
-                        checkedPaths.Add(
-                            path.MakeRelativeAgainst(rootPath)
-                            );
-                    }
-                }
-
-                foreach (var child in item.Children)
-                {
-                    ProcessItem(checkedPaths, child);
-                }
-            }
-
-            #endregion
-
-            var checkedPaths = new HashSet<string>();
-            foreach (var item in Groups)
-            {
-                ProcessItem(checkedPaths, item);
-            }
-
-            var jsonEmbeddingFilePath = await EmbeddingOutlineJsonObject.GenerateFilePathAsync();
-            var existingJson = await EmbeddingOutlineJsonObject.DeserializeAsync(
-                jsonEmbeddingFilePath
-                );
-            await existingJson.LoadEmbeddingsAsync();
-            await existingJson.LoadOutlinesAsync();
-            await existingJson.LoadOutlineTreeAsync();
-            var existingOutlineRoot = OutlineNode.Create(existingJson);
-
-            return (checkedPaths, existingOutlineRoot);
         }
 
         private async Task FillGroupsFromGitChangesAsync()
@@ -461,4 +360,210 @@ namespace FreeAIr.UI.ViewModels
         }
 
     }
+
+
+    public sealed class GenerateEmbeddingOutlineFilesBackgroundTask : BackgroundTask
+    {
+        private readonly Agent _nloAgent;
+        private readonly Agent _embeddingAgent;
+        private readonly bool _completeRebuild;
+        private readonly string _jsonFilePath;
+        private readonly IReadOnlyList<CheckableItem> _tree;
+
+        public override string TaskDescription => "Please wait for generating files...";
+
+        public string? Result
+        {
+            get;
+            private set;
+        }
+
+        public GenerateEmbeddingOutlineFilesBackgroundTask(
+            Agent nloAgent,
+            Agent embeddingAgent,
+            bool completeRebuild,
+            string jsonFilePath,
+            IReadOnlyList<CheckableItem> tree
+            )
+        {
+            if (nloAgent is null)
+            {
+                throw new ArgumentNullException(nameof(nloAgent));
+            }
+
+            if (embeddingAgent is null)
+            {
+                throw new ArgumentNullException(nameof(embeddingAgent));
+            }
+
+            if (jsonFilePath is null)
+            {
+                throw new ArgumentNullException(nameof(jsonFilePath));
+            }
+
+            if (tree is null)
+            {
+                throw new ArgumentNullException(nameof(tree));
+            }
+
+            _nloAgent = nloAgent;
+            _embeddingAgent = embeddingAgent;
+            _completeRebuild = completeRebuild;
+            _jsonFilePath = jsonFilePath;
+            _tree = tree;
+            StartAsyncTask();
+        }
+
+        protected override async Task RunWorkingTaskAsync(
+            )
+        {
+            //in case of exception set it null first
+            Result = null;
+
+            try
+            {
+                var outputPanel = await OutlineEmbeddingOutputPanel.CreateOrGetAsync();
+                await outputPanel.ActivateAsync();
+                await outputPanel.WriteLineAsync();
+                await outputPanel.WriteLineAsync(new string('-', 80));
+                await outputPanel.WriteLineAsync(DateTime.Now.ToString());
+
+                try
+                {
+                    await ShowMessageAsync(outputPanel, "Starting...");
+
+                    await ShowMessageAsync(outputPanel, "Start NLO extraction...");
+
+                    HashSet<string>? checkedPaths = null;
+                    OutlineNode? existingOutlineRoot = null;
+                    if (!_completeRebuild)
+                    {
+                        (checkedPaths, existingOutlineRoot) = await GetExistingInformationAsync();
+                    }
+
+                    var outlineRoot = await TreeBuilder.BuildAsync(
+                        parameters: new TreeBuilderParameters(
+                            agent: _nloAgent,
+                            checkedPaths: checkedPaths,
+                            oldOutlineRoot: existingOutlineRoot
+                            ),
+                        cancellationToken: _cancellationTokenSource.Token
+                        );
+
+                    await ShowMessageAsync(outputPanel, "Start embedding generation...");
+
+                    var eg = new EmbeddingGenerator(
+                        _embeddingAgent
+                        );
+                    await eg.GenerateEmbeddingsAsync(
+                        outlineRoot,
+                        _cancellationTokenSource.Token
+                        );
+
+                    var jsonObject = new EmbeddingOutlineJsonObject(outlineRoot);
+                    await jsonObject.SerializeAsync(
+                        _jsonFilePath,
+                        CancellationToken.None //cannot be stopped in the middle!
+                        );
+
+                    await ShowMessageAsync(outputPanel, "Process SUCESSFULLY completed.");
+                    //await outputPane.HideAsync();
+                }
+                catch (Exception excp)
+                {
+                    await outputPanel.WriteLineAsync("Error:");
+                    await outputPanel.WriteLineAsync(excp.Message);
+                    await outputPanel.WriteLineAsync(excp.StackTrace);
+                    throw;
+                }
+            }
+            catch (OperationCanceledException)
+            {
+                //this is ok, nothing to do
+            }
+            catch (Exception excp)
+            {
+                await VS.MessageBox.ShowErrorAsync(
+                    $"Error: {excp.Message}"
+                    + Environment.NewLine
+                    + excp.StackTrace
+                    );
+            }
+        }
+
+        private async Task ShowMessageAsync(
+            OutputWindowPane panel,
+            string message)
+        {
+            SetNewStatus(message);
+            await panel.WriteLineAsync(message);
+        }
+
+        private async Task<(HashSet<string> checkedPaths, OutlineNode existingOutlineRoot)> GetExistingInformationAsync(
+            )
+        {
+            var solution = await VS.Solutions.GetCurrentSolutionAsync();
+            var rootPath = solution.FullPath;
+
+            #region local recursive function
+
+            void ProcessItem(
+                HashSet<string> checkedPaths,
+                CheckableItem item
+                )
+            {
+                if (item.IsChecked.HasValue && !item.IsChecked.Value)
+                {
+                    return;
+                }
+
+                if (item.IsChecked.HasValue && item.IsChecked.Value)
+                {
+                    var path = item.Tag as string;
+                    if (path is null)
+                    {
+                        if (item.Tag is SolutionItem si)
+                        {
+                            if (si.Type.In(SolutionItemType.Solution, SolutionItemType.Project, SolutionItemType.PhysicalFile))
+                            {
+                                path = si.FullPath;
+                            }
+                        }
+                    }
+
+                    if (!string.IsNullOrEmpty(path))
+                    {
+                        checkedPaths.Add(
+                            path.MakeRelativeAgainst(rootPath)
+                            );
+                    }
+                }
+
+                foreach (var child in item.Children)
+                {
+                    ProcessItem(checkedPaths, child);
+                }
+            }
+
+            #endregion
+
+            var checkedPaths = new HashSet<string>();
+            foreach (var root in _tree)
+            {
+                ProcessItem(checkedPaths, root);
+            }
+
+            var jsonEmbeddingFilePath = await EmbeddingOutlineJsonObject.GenerateFilePathAsync();
+            var existingJson = await EmbeddingOutlineJsonObject.DeserializeAsync(
+                jsonEmbeddingFilePath
+                );
+            await existingJson.LoadEmbeddingsAsync();
+            await existingJson.LoadOutlinesAsync();
+            await existingJson.LoadOutlineTreeAsync();
+            var existingOutlineRoot = OutlineNode.Create(existingJson);
+
+            return (checkedPaths, existingOutlineRoot);
+        }
+    }
+
 }

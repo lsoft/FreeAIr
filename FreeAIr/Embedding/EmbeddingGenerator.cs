@@ -9,6 +9,7 @@ using System.ClientModel;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace FreeAIr.Embedding
@@ -40,7 +41,8 @@ namespace FreeAIr.Embedding
         }
 
         public async Task GenerateEmbeddingsAsync(
-            OutlineNode outline
+            OutlineNode outline,
+            CancellationToken cancellationToken
             )
         {
             if (outline is null)
@@ -63,7 +65,8 @@ namespace FreeAIr.Embedding
             if (outlinesIdBody.Count > 0)
             {
                 var embeddings = await _embeddingClient.GenerateEmbeddingsAsync(
-                    outlinesIdBody.ConvertAll(n => n.Item2) //TODO split by LLM context size
+                    outlinesIdBody.ConvertAll(n => n.Item2), //TODO split by LLM context size
+                    cancellationToken: cancellationToken
                     );
 
                 for (var i = 0; i < outlinesIdBody.Count; i++)

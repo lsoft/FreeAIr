@@ -7,6 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace FreeAIr.NLOutline.Json
@@ -147,7 +148,8 @@ namespace FreeAIr.NLOutline.Json
         }
 
         public async Task SerializeAsync(
-            string filePath
+            string filePath,
+            CancellationToken cancellationToken
             )
         {
             if (filePath is null)
@@ -160,7 +162,8 @@ namespace FreeAIr.NLOutline.Json
             await System.Text.Json.JsonSerializer.SerializeAsync(
                 fs,
                 this,
-                new JsonSerializerOptions { WriteIndented = true }
+                new JsonSerializerOptions { WriteIndented = true },
+                cancellationToken
                 );
         }
 
@@ -212,7 +215,8 @@ namespace FreeAIr.NLOutline.Json
         }
 
         public async Task SerializeAsync(
-            string filePath
+            string filePath,
+            CancellationToken cancellationToken
             )
         {
             if (filePath is null)
@@ -225,7 +229,8 @@ namespace FreeAIr.NLOutline.Json
             await System.Text.Json.JsonSerializer.SerializeAsync(
                 fs,
                 this,
-                new JsonSerializerOptions { WriteIndented = true }
+                new JsonSerializerOptions { WriteIndented = true },
+                cancellationToken
                 );
         }
 

@@ -7,6 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace FreeAIr.Embedding.Json
@@ -76,7 +77,8 @@ namespace FreeAIr.Embedding.Json
         }
 
         public async Task SerializeAsync(
-            string filePath
+            string filePath,
+            CancellationToken cancellationToken
             )
         {
             if (filePath is null)
@@ -88,24 +90,28 @@ namespace FreeAIr.Embedding.Json
 
             var otFilePath = GetOutlineTreeFileName();
             await OutlineTree.SerializeAsync(
-                otFilePath
+                otFilePath,
+                cancellationToken
                 );
 
             var oFilePath = GetOutlinesFileName();
             await Outlines.SerializeAsync(
-                oFilePath
+                oFilePath,
+                cancellationToken
                 );
 
             var eFilePath = GetEmbeddingsFileName();
             await Embeddings.SerializeAsync(
-                eFilePath
+                eFilePath,
+                cancellationToken
                 );
 
             using var fs = new FileStream(filePath, FileMode.Create);
             await System.Text.Json.JsonSerializer.SerializeAsync(
                 fs,
                 this,
-                new JsonSerializerOptions { WriteIndented = true }
+                new JsonSerializerOptions { WriteIndented = true },
+                cancellationToken
                 );
         }
 
@@ -324,7 +330,8 @@ namespace FreeAIr.Embedding.Json
         }
 
         public async Task SerializeAsync(
-            string filePath
+            string filePath,
+            CancellationToken cancellationToken
             )
         {
             if (filePath is null)
@@ -337,7 +344,8 @@ namespace FreeAIr.Embedding.Json
             await System.Text.Json.JsonSerializer.SerializeAsync(
                 fs,
                 this,
-                new JsonSerializerOptions { WriteIndented = true }
+                new JsonSerializerOptions { WriteIndented = true },
+                cancellationToken
                 );
         }
 

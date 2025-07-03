@@ -20,8 +20,25 @@ namespace FreeAIr.UI.Windows
             InitializeComponent();
 
             _backgroundTask = backgroundTask;
+            _backgroundTask.ShowStatusEvent += StatusChangesAsync;
+
+            StatusChangesAsync(_backgroundTask.CurrentStatus);
 
             TaskDescriptionTextBlock.Text = backgroundTask.TaskDescription;
+        }
+
+        private async void StatusChangesAsync(string status)
+        {
+            try
+            {
+                await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+
+                TaskStatusTextBlock.Text = status;
+            }
+            catch (Exception excp)
+            {
+                //todo log
+            }
         }
 
         private void CancelButton_Click(object sender, RoutedEventArgs e)
@@ -69,11 +86,21 @@ namespace FreeAIr.UI.Windows
             get;
         }
 
+        public string CurrentStatus
+        {
+            get;
+            private set;
+        }
+
+        public event ShowStatusDelegate ShowStatusEvent;
+
         public BackgroundTask(
             )
         {
             _cancellationTokenSource = new();
         }
+
+
 
         protected void StartAsyncTask()
         {
@@ -112,6 +139,13 @@ namespace FreeAIr.UI.Windows
             _cancellationTokenSource.Dispose();
         }
 
+        protected void SetNewStatus(string status)
+        {
+            CurrentStatus = status;
+            ShowStatusEvent?.Invoke(status);
+        }
     }
+
+    public delegate void ShowStatusDelegate(string status);
 
 }

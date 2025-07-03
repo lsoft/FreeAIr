@@ -20,6 +20,7 @@
         <Grid.RowDefinitions>
             <RowDefinition/>
             <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
         </Grid.RowDefinitions>
 
         <TextBlock
@@ -33,8 +34,19 @@
             TextWrapping="Wrap"
             />
 
-        <Button
+        <TextBlock
             Grid.Row="1"
+            HorizontalAlignment="Center"
+            VerticalAlignment="Top"
+            FontSize="12"
+            Margin="2,2,2,20"
+            Name="TaskStatusTextBlock"
+            Foreground="{Binding ElementName=CancelButton, Path=Foreground}"
+            TextWrapping="Wrap"
+            />
+
+        <Button
+            Grid.Row="2"
             HorizontalAlignment="Right"
             Margin="2"
             Padding="10,5,10,5"
