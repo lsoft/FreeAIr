@@ -13,6 +13,23 @@ namespace FreeAIr.Helper
 {
     public static class SolutionHelper
     {
+        public static bool TryGetSolution(out Solution solution)
+        {
+            solution = VS.Solutions.GetCurrentSolution();
+            if (solution is null)
+            {
+                return false;
+            }
+            if (string.IsNullOrEmpty(solution.Name))
+            {
+                solution = null;
+                return false;
+            }
+
+            return true;
+        }
+
+
         public static async System.Threading.Tasks.Task<List<FoundSolutionItem>> ProcessDownRecursivelyForSelectedAsync(
             Predicate<SolutionItem> predicate,
             bool includeSelection,

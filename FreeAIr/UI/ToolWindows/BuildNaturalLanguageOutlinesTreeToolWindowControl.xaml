@@ -17,6 +17,7 @@
     Name="GenerateNaturalLanguageOutlineToolWindow"
     >
     <Grid
+        IsEnabled="{Binding GlobalEnabled}"
         >
         <Grid.RowDefinitions>
             <RowDefinition Height="auto" />
@@ -76,8 +77,10 @@
             Grid.Column="0"
             Grid.ColumnSpan="2"
             Margin="2,2,2,10"
+            VerticalContentAlignment="Center"
             Content="Complete rebuild"
             FontFamily="Cascadia Code"
+            IsEnabled="{Binding GitRepoExists}"
             IsChecked="{Binding CompleteRebuild}"
             />
 
@@ -97,21 +100,35 @@
                 <RowDefinition Height="auto" />
                 <RowDefinition Height="auto" />
                 <RowDefinition Height="auto" />
+                <RowDefinition Height="auto" />
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="auto"/>
                 <ColumnDefinition />
             </Grid.ColumnDefinitions>
 
-            <TextBlock
+            <CheckBox
                 Grid.Row="0"
+                Grid.Column="0"
+                Grid.ColumnSpan="2"
+                Margin="2"
+                VerticalAlignment="Center"
+                HorizontalAlignment="Right"
+                VerticalContentAlignment="Center"
+                Content="Force use chosen NLO agent"
+                FontFamily="Cascadia Code"
+                IsChecked="{Binding ForceUseNLOAgent}"
+                />
+
+            <TextBlock
+                Grid.Row="1"
                 Grid.Column="0"
                 FontFamily="Cascadia Code"
                 VerticalAlignment="Center"
                 Text="NLO extract agent: "
                 />
             <ComboBox
-                Grid.Row="0"
+                Grid.Row="1"
                 Grid.Column="1"
                 FontFamily="Cascadia Code"
                 VerticalAlignment="Center"
@@ -142,14 +159,14 @@
             </ComboBox>
 
             <TextBlock
-                Grid.Row="1"
+                Grid.Row="2"
                 Grid.Column="0"
                 FontFamily="Cascadia Code"
                 VerticalAlignment="Center"
                 Text="Embedding generate agent: "
                 />
             <ComboBox
-                Grid.Row="1"
+                Grid.Row="2"
                 Grid.Column="1"
                 FontFamily="Cascadia Code"
                 VerticalAlignment="Center"
@@ -180,7 +197,7 @@
             </ComboBox>
             
             <Button
-                Grid.Row="2"
+                Grid.Row="3"
                 Grid.Column="0"
                 Grid.ColumnSpan="2"
                 Margin="2"
@@ -195,7 +212,7 @@
                 />
 
             <StackPanel
-                Grid.Row="3"
+                Grid.Row="4"
                 Grid.Column="0"
                 Grid.ColumnSpan="2"
                 Margin="2,20,2,2"
@@ -208,7 +225,7 @@
                     TextWrapping="Wrap"
                     Padding="0"
                     Margin="0"
-                    Text="NLO embedding file(s) path depends on solution name. These files are useful for natural language search feature of FreeAIr. FreeAIr will use these embeddings to narrow down the search scope. It is recommended to actualize these files before every commit to keep embeddings in sync with your codebase."
+                    Text=" NLO embedding file(s) path depends on solution name. These files are useful for natural language search feature of FreeAIr. FreeAIr will use these embeddings to narrow down the search scope. It is recommended to actualize these files before every commit to keep embeddings in sync with your codebase."
                     />
 
                 <TextBlock
@@ -218,7 +235,7 @@
                     TextWrapping="Wrap"
                     Padding="0"
                     Margin="0"
-                    Text="Checked tree items will be updated with a new embeddings, unchecked items will reuse the existing embeddings."
+                    Text=" Checked tree items will be updated with a new embeddings, unchecked items will reuse the existing embeddings."
                     />
 
                 <TextBlock
@@ -228,9 +245,19 @@
                     TextWrapping="Wrap"
                     Padding="0"
                     Margin="0"
-                    Text="'NLO extract agent' is an agent to extract natural language outlines from source file. 'Embedding generate agent' is an agent to generate the embeddings from gathered natural language outlines."
+                    Text=" FreeAIr process C# files with Roslyn, for any other file 'NLO extract agent' is used. This is an agent to extract natural language outlines from a source file if FreeAIr does not know its syntax tree and cannot extract NLOs from its body natively. If you choose 'Force use chosen NLO agent' then selected agent will be used for every processed file."
                     />
-                
+
+                <TextBlock
+                    HorizontalAlignment="Stretch"
+                    Background="Transparent"
+                    FontFamily="Cascadia Code"
+                    TextWrapping="Wrap"
+                    Padding="0"
+                    Margin="0"
+                    Text=" 'Embedding generate agent' is an agent to generate the embeddings from gathered natural language outlines."
+                    />
+
             </StackPanel>
             
 

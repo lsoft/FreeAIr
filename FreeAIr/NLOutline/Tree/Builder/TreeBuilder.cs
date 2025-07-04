@@ -32,6 +32,7 @@ namespace FreeAIr.NLOutline.Tree.Builder
             var root = new OutlineNode(
                 OutlineKindEnum.Solution,
                 string.Empty,
+                solution.Name,
                 string.Empty,
                 null,
                 []
@@ -58,6 +59,7 @@ namespace FreeAIr.NLOutline.Tree.Builder
                 var projectRoot = root.AddChild(
                     OutlineKindEnum.Project,
                     project.FullPath.MakeRelativeAgainst(rootPath),
+                    project.Name,
                     string.Empty
                     );
 
@@ -97,6 +99,11 @@ namespace FreeAIr.NLOutline.Tree.Builder
         {
             get;
         }
+        
+        public bool ForceUseNLOAgent
+        {
+            get;
+        }
 
         public HashSet<string> CheckedPaths
         {
@@ -110,6 +117,7 @@ namespace FreeAIr.NLOutline.Tree.Builder
 
         public TreeBuilderParameters(
             Agent agent,
+            bool forceUseNLOAgent,
             HashSet<string>? checkedPaths,
             OutlineNode? oldOutlineRoot
             )
@@ -120,6 +128,7 @@ namespace FreeAIr.NLOutline.Tree.Builder
             }
 
             Agent = agent;
+            ForceUseNLOAgent = forceUseNLOAgent;
             CheckedPaths = checkedPaths;
             OldOutlineRoot = oldOutlineRoot;
         }

@@ -32,6 +32,12 @@ namespace FreeAIr.NLOutline.Json
             set;
         }
 
+        public string Target
+        {
+            get;
+            set;
+        }
+
         public string OutlineText
         {
             get;
@@ -52,6 +58,7 @@ namespace FreeAIr.NLOutline.Json
             Id = outline.Id;
             Kind = outline.Kind;
             FullPath = outline.RelativePath;
+            Target = outline.Target;
             OutlineText = outline.OutlineText;
         }
     }

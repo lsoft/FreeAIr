@@ -44,6 +44,11 @@ namespace FreeAIr.NLOutline.Tree
             get;
         }
 
+        public string Target
+        {
+            get;
+        }
+
         public string OutlineText
         {
             get;
@@ -61,6 +66,7 @@ namespace FreeAIr.NLOutline.Tree
             Guid id,
             OutlineKindEnum kind,
             string relativePath,
+            string target,
             string outlineText,
             float[]? embedding,
             List<OutlineNode> children
@@ -69,6 +75,7 @@ namespace FreeAIr.NLOutline.Tree
             Id = id;
             Kind = kind;
             RelativePath = relativePath;
+            Target = target;
             OutlineText = outlineText;
             Embedding = embedding;
             _children = children;
@@ -77,13 +84,15 @@ namespace FreeAIr.NLOutline.Tree
         public OutlineNode(
             OutlineKindEnum kind,
             string relativePath,
+            string target,
             string outlineText,
             float[]? embedding,
             List<OutlineNode> children
             ) : this(
-                GenerateGuid(relativePath),
+                GenerateGuid(kind, target, relativePath),
                 kind,
                 relativePath,
+                target,
                 outlineText,
                 embedding,
                 children
@@ -92,9 +101,13 @@ namespace FreeAIr.NLOutline.Tree
         }
 
         private static Guid GenerateGuid(
-            string? s
+            OutlineKindEnum kind,
+            string target,
+            string? relativePath
             )
         {
+            var s = kind.ToString() + ":" + target + ":" + relativePath;
+
             if (string.IsNullOrEmpty(s))
             {
                 return Guid.Empty;
@@ -125,12 +138,14 @@ namespace FreeAIr.NLOutline.Tree
         public OutlineNode AddChild(
             OutlineKindEnum kind,
             string relativePath,
+            string target,
             string outlineText
             )
         {
             var result = new OutlineNode(
                 kind,
                 relativePath,
+                target,
                 outlineText,
                 null,
                 []
@@ -244,6 +259,7 @@ namespace FreeAIr.NLOutline.Tree
                 root.Id,
                 triple.OutlineItself.Kind,
                 triple.OutlineItself.FullPath,
+                triple.OutlineItself.Target,
                 triple.OutlineItself.OutlineText,
                 triple.EmbeddingItself.Embedding,
                 root.Children

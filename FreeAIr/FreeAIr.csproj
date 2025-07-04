@@ -74,7 +74,7 @@
     <Compile Include="BLogic\ChatHelper.cs" />
     <Compile Include="BLogic\ChatKindEnum.cs" />
     <Compile Include="BLogic\ChatStatusEnum.cs" />
-    <Compile Include="Commands\File\BuildNaturalLanguageOutlinesTreeCommand.cs" />
+    <Compile Include="Commands\Other\OpenBuildingNaturalLanguageOutlinesWindowCommand.cs" />
     <Compile Include="Embedding\EmbeddingGenerator.cs" />
     <Compile Include="Embedding\Json\Objects.cs" />
     <Compile Include="Find\DoSearch.cs" />

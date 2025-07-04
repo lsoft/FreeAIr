@@ -32,6 +32,14 @@ namespace FreeAIr.UI.ViewModels
         private ICommand _openJsonFolderCommand;
         private ICommand _updateJsonFileCommand;
 
+        public bool GlobalEnabled
+        {
+            get
+            {
+                return SolutionHelper.TryGetSolution(out _);
+            }
+        }
+
         public string JsonFilePath
         {
             get => _jsonFilePath;
@@ -84,6 +92,13 @@ namespace FreeAIr.UI.ViewModels
             }
         }
 
+
+        public bool GitRepoExists
+        {
+            get;
+            private set;
+        }
+
         public bool CompleteRebuild
         {
             get => _completeRebuild;
@@ -101,12 +116,18 @@ namespace FreeAIr.UI.ViewModels
             get;
         }
 
+        public bool ForceUseNLOAgent
+        {
+            get;
+            set;
+        }
+
         public ObservableCollection2<AgentWrapper> GenerateNLOAgentList
         {
             get;
         }
 
-        public AgentWrapper SelectedGenerateNLOAgent
+        public AgentWrapper? SelectedGenerateNLOAgent
         {
             get;
             set;
@@ -117,7 +138,9 @@ namespace FreeAIr.UI.ViewModels
             get;
         }
 
-        public AgentWrapper SelectedGenerateEmbeddingAgent
+        private readonly SolutionEvents _solutionEvents;
+
+        public AgentWrapper? SelectedGenerateEmbeddingAgent
         {
             get;
             set;
@@ -151,6 +174,7 @@ namespace FreeAIr.UI.ViewModels
                             {
                                 var backgroundTask = new GenerateEmbeddingOutlineFilesBackgroundTask(
                                     SelectedGenerateNLOAgent.Agent,
+                                    ForceUseNLOAgent,
                                     SelectedGenerateEmbeddingAgent.Agent,
                                     _completeRebuild,
                                     JsonFilePath,
@@ -173,11 +197,19 @@ namespace FreeAIr.UI.ViewModels
                         },
                         a =>
                         {
+                            if (string.IsNullOrEmpty(JsonFilePath))
+                            {
+                                return false;
+                            }
                             if (SelectedGenerateNLOAgent is null)
                             {
                                 return false;
                             }
                             if (SelectedGenerateEmbeddingAgent is null)
+                            {
+                                return false;
+                            }
+                            if (!SolutionHelper.TryGetSolution(out _))
                             {
                                 return false;
                             }
@@ -196,12 +228,64 @@ namespace FreeAIr.UI.ViewModels
             Groups = new ObservableCollection2<CheckableItem>();
             GenerateNLOAgentList = new ObservableCollection2<AgentWrapper>();
             GenerateEmbeddingAgentList = new ObservableCollection2<AgentWrapper>();
+
+            _solutionEvents = VS.Events.SolutionEvents;
+            _solutionEvents.OnAfterOpenSolution += OnAfterOpenSolution;
+            _solutionEvents.OnAfterCloseSolution += OnAfterCloseSolution;
+        }
+
+        private async void OnAfterOpenSolution(Solution obj)
+        {
+            try
+            {
+                await Task.Delay(1000);
+
+                UpdatePageAsync(true)
+                    .FileAndForget(nameof(UpdatePageAsync));
+            }
+            catch (Exception excp)
+            {
+                //todo log
+            }
+        }
+
+        private async void OnAfterCloseSolution()
+        {
+            try
+            {
+                await Task.Delay(1000);
+
+                UpdatePageAsync(false)
+                    .FileAndForget(nameof(UpdatePageAsync));
+            }
+            catch (Exception excp)
+            {
+                //todo log
+            }
         }
 
         public async Task UpdatePageAsync(
             bool fillAgents = true
             )
         {
+            if (!SolutionHelper.TryGetSolution(out _))
+            {
+                ClearAgents();
+                ClearGroups();
+
+                OnPropertyChanged();
+                return;
+            }
+            if (!await GitRepositoryProvider.IsGitRepositoryExistsAsync())
+            {
+                GitRepoExists = false;
+                _completeRebuild = true;
+            }
+            else
+            {
+                GitRepoExists = true;
+            }
+
             JsonFilePath = await EmbeddingOutlineJsonObject.GenerateFilePathAsync();
 
             if (fillAgents)
@@ -209,7 +293,7 @@ namespace FreeAIr.UI.ViewModels
                 FillAgents();
             }
 
-            if (_completeRebuild)
+            if (_completeRebuild || !await GitRepositoryProvider.IsGitRepositoryExistsAsync())
             {
                 FillGroupsFromSolution();
             }
@@ -223,14 +307,14 @@ namespace FreeAIr.UI.ViewModels
 
         private void FillAgents()
         {
-            GenerateNLOAgentList.Clear();
+            ClearAgents();
+
             GenerateNLOAgentList.AddRange(
                 InternalPage.Instance.GetAgentCollection().Agents
                     .ConvertAll(a => new AgentWrapper(a))
                     );
             SelectedGenerateNLOAgent = GenerateNLOAgentList.FirstOrDefault();
 
-            GenerateEmbeddingAgentList.Clear();
             GenerateEmbeddingAgentList.AddRange(
                 InternalPage.Instance.GetAgentCollection().Agents
                     .ConvertAll(a => new AgentWrapper(a))
@@ -238,22 +322,38 @@ namespace FreeAIr.UI.ViewModels
             SelectedGenerateEmbeddingAgent = GenerateEmbeddingAgentList.FirstOrDefault();
         }
 
+        private void ClearAgents()
+        {
+            GenerateNLOAgentList.Clear();
+            SelectedGenerateNLOAgent = null;
+
+            GenerateEmbeddingAgentList.Clear();
+            SelectedGenerateEmbeddingAgent = null;
+        }
+
         private async Task FillGroupsFromGitChangesAsync()
         {
             var diff = await GitDiffCreator.BuildGitDiffAsync();
 
-            Dictionary<string, GitDiffFile> addedFiles = diff.Files
-                .FindAll(f => f.Status == GitDiffFileStatusEnum.Added)
-                .ToDictionary(f => f.NewFullPath, f => f)
-                ;
-            Dictionary<string, GitDiffFile> updatedFiles = diff.Files
-                .FindAll(f => f.Status == GitDiffFileStatusEnum.Updated)
-                .ToDictionary(f => f.OriginalFullPath, f => f)
-                ;
-            Dictionary<string, GitDiffFile> deletedFiles = diff.Files
-                .FindAll(f => f.Status == GitDiffFileStatusEnum.Deleted)
-                .ToDictionary(f => f.OriginalFullPath, f => f)
-                ;
+            Dictionary<string, GitDiffFile>? addedFiles = null;
+            Dictionary<string, GitDiffFile> updatedFiles = null;
+            Dictionary<string, GitDiffFile>? deletedFiles = null;
+
+            if (diff is not null)
+            {
+                addedFiles = diff.Files
+                    .FindAll(f => f.Status == GitDiffFileStatusEnum.Added)
+                    .ToDictionary(f => f.NewFullPath, f => f)
+                    ;
+                updatedFiles = diff.Files
+                    .FindAll(f => f.Status == GitDiffFileStatusEnum.Updated)
+                    .ToDictionary(f => f.OriginalFullPath, f => f)
+                    ;
+                deletedFiles = diff.Files
+                    .FindAll(f => f.Status == GitDiffFileStatusEnum.Deleted)
+                    .ToDictionary(f => f.OriginalFullPath, f => f)
+                    ;
+            }
 
             FillGroupsFromSolution(
                 addedFiles,
@@ -268,9 +368,13 @@ namespace FreeAIr.UI.ViewModels
             Dictionary<string, GitDiffFile>? deletedFiles = null
             )
         {
-            Groups.Clear();
+            ClearGroups();
 
-            var solution = VS.Solutions.GetCurrentSolution();
+            if (!SolutionHelper.TryGetSolution(out var solution))
+            {
+                return;
+            }
+
             var addedUpdatedRoot = solution.ConvertRecursivelyFor<CheckableItem>(
                 item =>
                 {
@@ -334,6 +438,11 @@ namespace FreeAIr.UI.ViewModels
                 );
             Groups.Add(addedUpdatedRoot);
         }
+
+        private void ClearGroups()
+        {
+            Groups.Clear();
+        }
     }
 
     public sealed class AgentWrapper : BaseViewModel
@@ -365,6 +474,7 @@ namespace FreeAIr.UI.ViewModels
     public sealed class GenerateEmbeddingOutlineFilesBackgroundTask : BackgroundTask
     {
         private readonly Agent _nloAgent;
+        private readonly bool _forceUseNLOAgent;
         private readonly Agent _embeddingAgent;
         private readonly bool _completeRebuild;
         private readonly string _jsonFilePath;
@@ -380,6 +490,7 @@ namespace FreeAIr.UI.ViewModels
 
         public GenerateEmbeddingOutlineFilesBackgroundTask(
             Agent nloAgent,
+            bool forceUseNLOAgent,
             Agent embeddingAgent,
             bool completeRebuild,
             string jsonFilePath,
@@ -407,6 +518,7 @@ namespace FreeAIr.UI.ViewModels
             }
 
             _nloAgent = nloAgent;
+            _forceUseNLOAgent = forceUseNLOAgent;
             _embeddingAgent = embeddingAgent;
             _completeRebuild = completeRebuild;
             _jsonFilePath = jsonFilePath;
@@ -444,6 +556,7 @@ namespace FreeAIr.UI.ViewModels
                     var outlineRoot = await TreeBuilder.BuildAsync(
                         parameters: new TreeBuilderParameters(
                             agent: _nloAgent,
+                            forceUseNLOAgent: _forceUseNLOAgent,
                             checkedPaths: checkedPaths,
                             oldOutlineRoot: existingOutlineRoot
                             ),
@@ -499,10 +612,14 @@ namespace FreeAIr.UI.ViewModels
             await panel.WriteLineAsync(message);
         }
 
-        private async Task<(HashSet<string> checkedPaths, OutlineNode existingOutlineRoot)> GetExistingInformationAsync(
+        private async Task<(HashSet<string>? checkedPaths, OutlineNode? existingOutlineRoot)> GetExistingInformationAsync(
             )
         {
-            var solution = await VS.Solutions.GetCurrentSolutionAsync();
+            if (!SolutionHelper.TryGetSolution(out var solution))
+            {
+                return (null, null);
+            }
+
             var rootPath = solution.FullPath;
 
             #region local recursive function

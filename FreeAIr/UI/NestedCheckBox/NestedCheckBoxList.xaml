@@ -29,6 +29,7 @@
                             IsChecked="{Binding IsChecked, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                             Focusable="False"
                             IsEnabled="{Binding IsEnabled}"
+                            VerticalContentAlignment="Center"
                             >
                             <CheckBox.Foreground>
                                 <PriorityBinding>

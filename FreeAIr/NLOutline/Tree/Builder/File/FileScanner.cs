@@ -334,14 +334,16 @@ namespace FreeAIr.NLOutline.Tree.Builder.File
 
                     var memberName = GetMemberName(member);
                     var memberComment = GetOutlineText(member);
+                    var typeMemberNames = $"{typeName}.{memberName}";
                     var memberOutlineText = string.IsNullOrEmpty(memberComment)
-                        ? $"{typeName}.{memberName}"
-                        : memberComment;
+                        ? typeMemberNames
+                        : memberComment
+                        ;
 
                     var memberNode = new OutlineNode(
                         OutlineKindEnum.MethodOfClassOrSimilarPart,
                         _document.FilePath.MakeRelativeAgainst(_rootPath),
-                        memberName,
+                        typeMemberNames,
                         memberOutlineText,
                         null,
                         []

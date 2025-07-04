@@ -204,25 +204,29 @@ namespace FreeAIr.Embedding.Json
         }
 
 
-        public static async System.Threading.Tasks.Task<string> GenerateFilePathAsync()
+        public static async System.Threading.Tasks.Task<string?> GenerateFilePathAsync()
         {
-            var repositoryFolder = await GitRepositoryProvider.GetRepositoryFolderAsync();
-            var jsonEmbeddingFolderPath = System.IO.Path.Combine(
-                repositoryFolder,
-                ".freeair"
-                );
-            if (!System.IO.Directory.Exists(jsonEmbeddingFolderPath))
+            var solution = await VS.Solutions.GetCurrentSolutionAsync();
+            if (solution is null)
             {
-                System.IO.Directory.CreateDirectory(jsonEmbeddingFolderPath);
+                return null;
             }
 
-            var solution = await VS.Solutions.GetCurrentSolutionAsync();
             var solutionFileInfo = new FileInfo(solution.Name);
 
             var solutionName = solution.Name;
             if (solutionFileInfo.Extension.Length > 0)
             {
                 solutionName = solutionName.Substring(0, solutionName.Length - solutionFileInfo.Extension.Length);
+            }
+
+            var jsonEmbeddingFolderPath = System.IO.Path.Combine(
+                solutionFileInfo.Directory.FullName,
+                ".freeair"
+                );
+            if (!System.IO.Directory.Exists(jsonEmbeddingFolderPath))
+            {
+                System.IO.Directory.CreateDirectory(jsonEmbeddingFolderPath);
             }
 
             var jsonEmbeddingFilePath = System.IO.Path.Combine(

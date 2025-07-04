@@ -13,12 +13,12 @@ using System.Linq;
 using System.Text.Json;
 using System.Threading;
 
-namespace FreeAIr.Commands.File
+namespace FreeAIr.Commands.Other
 {
-    [Command(PackageIds.BuildNaturalLanguageOutlinesTreeCommandId)]
-    public sealed class BuildNaturalLanguageOutlinesTreeCommand : BaseCommand<BuildNaturalLanguageOutlinesTreeCommand>
+    [Command(PackageIds.OpenBuildingNaturalLanguageOutlinesWindowCommandId)]
+    public sealed class OpenBuildingNaturalLanguageOutlinesWindowCommand : BaseCommand<OpenBuildingNaturalLanguageOutlinesWindowCommand>
     {
-        public BuildNaturalLanguageOutlinesTreeCommand(
+        public OpenBuildingNaturalLanguageOutlinesWindowCommand(
             )
         {
         }

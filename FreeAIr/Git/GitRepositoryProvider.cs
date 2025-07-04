@@ -6,6 +6,12 @@ namespace FreeAIr.Git
 {
     public static class GitRepositoryProvider
     {
+        public static async Task<bool> IsGitRepositoryExistsAsync()
+        {
+            var gitExt = (IGitExt)await FreeAIrPackage.Instance.GetServiceAsync(typeof(IGitExt));
+            return gitExt is not null && gitExt.ActiveRepositories.Count > 0;
+        }
+
         public static async Task<string?> GetRepositoryFolderAsync()
         {
             var defaultPath = await GetDefaultPathAsync();

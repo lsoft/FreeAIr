@@ -116,7 +116,15 @@
           <ButtonText>Open natural search result window...</ButtonText>
         </Strings>
       </Button>
-      <Button guid="FreeAIr" id="ShowReleaseNotesCommandId" priority="0x0102" type="Button">
+      <Button guid="FreeAIr" id="OpenBuildingNaturalLanguageOutlinesWindowCommandId" priority="0x0102" type="Button">
+        <Parent guid="FreeAIr" id="SubExtensionMenuGroup" />
+        <Icon guid="ImageCatalogGuid" id="CommentCode" />
+        <CommandFlag>IconIsMoniker</CommandFlag>
+        <Strings>
+          <ButtonText>Open building natural language outlines window...</ButtonText>
+        </Strings>
+      </Button>
+      <Button guid="FreeAIr" id="ShowReleaseNotesCommandId" priority="0x0103" type="Button">
         <Parent guid="FreeAIr" id="SubExtensionMenuGroup" />
          <Icon guid="ImageCatalogGuid" id="MarkdownFile" />
         <CommandFlag>IconIsMoniker</CommandFlag>
@@ -124,7 +132,7 @@
           <ButtonText>Show release notes...</ButtonText>
         </Strings>
       </Button>
-      <Button guid="FreeAIr" id="OpenControlCenterCommandId" priority="0x0102" type="Button">
+      <Button guid="FreeAIr" id="OpenControlCenterCommandId" priority="0x0104" type="Button">
         <Parent guid="FreeAIr" id="SubExtensionMenuGroup" />
         <Icon guid="ImageCatalogGuid" id="Settings" />
         <CommandFlag>IconIsMoniker</CommandFlag>
@@ -212,14 +220,6 @@
         <CommandFlag>IconIsMoniker</CommandFlag>
         <Strings>
           <ButtonText>Add natural language outlines</ButtonText>
-        </Strings>
-      </Button>
-      <Button guid="FreeAIr" id="BuildNaturalLanguageOutlinesTreeCommandId" priority="0x0100" type="Button">
-        <Parent guid="FreeAIr" id="SolutionContextGroup" />
-        <Icon guid="ImageCatalogGuid" id="CommentCode" />
-        <CommandFlag>IconIsMoniker</CommandFlag>
-        <Strings>
-          <ButtonText>Build natural language outlines json file</ButtonText>
         </Strings>
       </Button>
 
@@ -320,7 +320,7 @@
 
       <!-- natural language outlines -->
       <IDSymbol name="AddNaturalLanguageOutlinesCommandId" value="0x1052"/>
-      <IDSymbol name="BuildNaturalLanguageOutlinesTreeCommandId" value="0x1053"/>
+      <IDSymbol name="OpenBuildingNaturalLanguageOutlinesWindowCommandId" value="0x1053"/>
 
       <!-- context menu -->
       <IDSymbol name="VisualStudioContextMenu" value="0x8000"/>
