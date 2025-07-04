@@ -5,7 +5,12 @@ using FreeAIr.Embedding;
 using FreeAIr.Git.Parser;
 using FreeAIr.Helper;
 using FreeAIr.Shared.Helper;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.VisualStudio.ComponentModelHost;
+using Microsoft.VisualStudio.LanguageServices;
+using Microsoft.VisualStudio.Shell.Interop;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
@@ -139,9 +144,12 @@ namespace FreeAIr.NLOutline.Tree.Builder.File
                 var fileOutline = await ProcessOutlinePromptAsync(chat, item);
                 if (!string.IsNullOrEmpty(fileOutline))
                 {
+                    var relative = item.FullPath.MakeRelativeAgainst(rootPath);
+
                     root.AddChild(
                         OutlineKindEnum.File,
-                        item.FullPath.MakeRelativeAgainst(rootPath),
+                        relative,
+                        relative,
                         fileOutline
                         );
                 }
@@ -166,23 +174,272 @@ namespace FreeAIr.NLOutline.Tree.Builder.File
         }
     }
 
-    ///// <summary>
-    ///// C# outline tree node scanner. Used Roslyn to extract all outlines from source code.
-    ///// </summary>
-    //public sealed class CSharpFileScanner : IFileScanner
-    //{
-    //    public CSharpFileBuilder()
-    //    {
-    //        FileExtensions = [".cs"];
-    //    }
+    /// <summary>
+    /// C# outline tree node scanner. Uses Roslyn to extract all outlines from source code.
+    /// </summary>
+    [Export(typeof(IFileScanner))]
+    public sealed class CSharpFileScanner : IFileScanner
+    {
+        public int Order => 1000;
 
-    //    //protected override async Task<OutlineTree?> BuildInternalAsync()
-    //    //{
-    //    //    await base.BuildInternalAsync();
+        public string Name => "C# code file scanner";
+
+        public string Description => "Scanner for NLO in C# source code. It uses Roslyn to extract all embedded NLO in the file.";
+
+        public IReadOnlyList<string> FileExtensions
+        {
+            get;
+        }
+
+        public CSharpFileScanner()
+        {
+            FileExtensions = [".cs"];
+        }
+
+        public async Task BuildAsync(
+            Agent agent,
+            string rootPath,
+            List<SolutionItem> items,
+            OutlineNode root
+            )
+        {
+            if (agent is null)
+            {
+                throw new ArgumentNullException(nameof(agent));
+            }
+
+            if (items is null)
+            {
+                throw new ArgumentNullException(nameof(items));
+            }
+
+            if (root is null)
+            {
+                throw new ArgumentNullException(nameof(root));
+            }
+
+            var componentModel = (IComponentModel)(await FreeAIrPackage.Instance.GetServiceAsync(typeof(SComponentModel)))!;
+            if (componentModel == null)
+            {
+                throw new InvalidOperationException("Can't create a component model");
+            }
+
+            var workspace = componentModel.GetService<VisualStudioWorkspace>();
+            if (workspace == null)
+            {
+                throw new InvalidOperationException("Can't create a workspace");
+            }
+
+            foreach (var item in items)
+            {
+                var document = workspace.GetDocument(item.FullPath);
+                if (document is null)
+                {
+                    continue;
+                }
+
+                var tb = new FileOutlineTreeBuilder(
+                    rootPath,
+                    document
+                    );
+                var fileRoot = await tb.CreateOutlineTreeAsync();
+                root.AddChild(fileRoot);
+            }
+        }
+
+        public sealed class FileOutlineTreeBuilder
+        {
+            private readonly string _rootPath;
+            private readonly Document _document;
+
+            public FileOutlineTreeBuilder(
+                string rootPath,
+                Document document
+                )
+            {
+                if (rootPath is null)
+                {
+                    throw new ArgumentNullException(nameof(rootPath));
+                }
+
+                if (document is null)
+                {
+                    throw new ArgumentNullException(nameof(document));
+                }
+
+                _rootPath = rootPath;
+                _document = document;
+            }
+
+            public async Task<OutlineNode> CreateOutlineTreeAsync()
+            {
+                var relative = _document.FilePath.MakeRelativeAgainst(_rootPath);
+
+                var rootSyntax = await _document.GetSyntaxRootAsync();
+                var fileNode = new OutlineNode(
+                    OutlineKindEnum.File,
+                    relative,
+                    relative,
+                    string.Empty,
+                    null,
+                    []
+                    );
+
+                // Find all top-level types (not nested)
+                var rootTypes = new List<TypeDeclarationSyntax>();
+
+                foreach (var node in rootSyntax.DescendantNodes())
+                {
+                    if (node is TypeDeclarationSyntax typeDecl && !IsNestedType(typeDecl))
+                    {
+                        rootTypes.Add(typeDecl);
+                    }
+                }
+
+                foreach (var typeDecl in rootTypes)
+                {
+                    var typeNode = ProcessTypeDeclaration(typeDecl);
+                    fileNode.AddChild(typeNode);
+                }
+
+                return fileNode;
+            }
+
+            private bool IsNestedType(TypeDeclarationSyntax typeDecl)
+            {
+                // A nested type is inside another type
+                return typeDecl.Parent is TypeDeclarationSyntax;
+            }
+
+            private OutlineNode ProcessTypeDeclaration(TypeDeclarationSyntax typeDecl)
+            {
+                var typeName = typeDecl.Identifier.Text;
+
+                var commentText = GetOutlineText(typeDecl);
+                var outlineText = string.IsNullOrEmpty(commentText) ? typeName : commentText;
+
+                var typeNode = new OutlineNode(
+                    OutlineKindEnum.ClassOrSimilarEntity,
+                    _document.FilePath.MakeRelativeAgainst(_rootPath),
+                    typeName,
+                    outlineText,
+                    null,
+                    []
+                    );
+
+                foreach (var member in typeDecl.Members)
+                {
+                    if (member is not (BaseMethodDeclarationSyntax or PropertyDeclarationSyntax or FieldDeclarationSyntax or ConstructorDeclarationSyntax))
+                        continue;
+
+                    var memberName = GetMemberName(member);
+                    var memberComment = GetOutlineText(member);
+                    var memberOutlineText = string.IsNullOrEmpty(memberComment)
+                        ? $"{typeName}.{memberName}"
+                        : memberComment;
+
+                    var memberNode = new OutlineNode(
+                        OutlineKindEnum.MethodOfClassOrSimilarPart,
+                        _document.FilePath.MakeRelativeAgainst(_rootPath),
+                        memberName,
+                        memberOutlineText,
+                        null,
+                        []
+                        );
+
+                    typeNode.AddChild(memberNode);
+                }
+
+                foreach (var nestedType in typeDecl.Members.OfType<TypeDeclarationSyntax>())
+                {
+                    var nestedNode = ProcessTypeDeclaration(nestedType);
+                    typeNode.AddChild(nestedNode);
+                }
+
+                return typeNode;
+            }
+
+            private string GetOutlineText(SyntaxNode node)
+            {
+                var triviaList = node.GetLeadingTrivia();
+                var comments = new List<string>();
+
+                foreach (var trivia in triviaList)
+                {
+                    if (trivia.IsKind(SyntaxKind.SingleLineCommentTrivia))
+                    {
+                        var text = trivia.ToString().TrimStart();
+
+                        if (text.StartsWith("// * "))
+                        {
+                            comments.Add(text.Substring(5).Trim());
+                        }
+                        else
+                        {
+                            comments.Add(text.Substring(2).Trim());
+                        }
+                    }
+                    else if (trivia.IsKind(SyntaxKind.MultiLineCommentTrivia))
+                    {
+                        var text = trivia.ToString();
+                        var content = text.Substring(2, text.Length - 4).Trim();
+                        comments.Add(content);
+                    }
+                    else if (trivia.IsKind(SyntaxKind.SingleLineDocumentationCommentTrivia))
+                    {
+                        if (trivia.GetStructure() is DocumentationCommentTriviaSyntax docComment)
+                        {
+                            foreach (var child in docComment.Content)
+                            {
+                                if (child is XmlElementSyntax xmlElement &&
+                                    xmlElement.StartTag?.Name?.ToString() == "summary")
+                                {
+                                    var xmlChildren = xmlElement
+                                        .ChildNodes()
+                                        .OfType<XmlTextSyntax>()
+                                        .ToList();
+
+                                    var su = string.Join(
+                                        " ",
+                                        xmlChildren.SelectMany(
+                                            x => x
+                                                .GetText()
+                                                .ToString()
+                                                .Split('\r', '\n')
+                                                .Select(p => p.Trim('\r', '\n', ' ', '\t', '/'))
+                                            )
+                                        ).Trim();
+
+                                    comments.Add(su);
+                                }
+                            }
+                        }
+                    }
+                }
+
+                return string.Join(Environment.NewLine, comments);
+            }
 
 
-    //    //}
-    //}
+            private string GetMemberName(MemberDeclarationSyntax member)
+            {
+                return member switch
+                {
+                    PropertyDeclarationSyntax property => property.Identifier.Text,
+                    FieldDeclarationSyntax field when field.Declaration.Variables.Count > 0 =>
+                        field.Declaration.Variables[0].Identifier.Text,
+                    ConstructorDeclarationSyntax => "constructor",
+                    DestructorDeclarationSyntax => "destructor",
+                    EventDeclarationSyntax @event => @event.Identifier.Text,
+                    IndexerDeclarationSyntax => "this[]",
+                    OperatorDeclarationSyntax op => op.OperatorToken.Text,
+                    ConversionOperatorDeclarationSyntax conv => conv.Type?.ToString() ?? "conversion",
+                    MethodDeclarationSyntax method => method.Identifier.Text,
+                    _ => "unknown"
+                };
+            }
+        }
+    }
 
 
     [Export(typeof(FileOutlineTreeProcessor))]
@@ -226,7 +483,10 @@ namespace FreeAIr.NLOutline.Tree.Builder.File
                 throw new ArgumentNullException(nameof(fileItems));
             }
 
-            var splittedItems = SplitItemsByScanners(fileItems);
+            var splittedItems = SplitItemsByScanners(
+                parameters,
+                fileItems
+                );
 
             foreach (var pair in splittedItems)
             {
@@ -264,14 +524,28 @@ namespace FreeAIr.NLOutline.Tree.Builder.File
         }
 
         private List<(IFileScanner FileScanner, List<SolutionItem> SolutionItems)> SplitItemsByScanners(
+            TreeBuilderParameters parameters,
             List<SolutionItem> fileItems
             )
         {
-            var list = _scanners
-                .OrderBy(f => f.Order)
-                .Select(f => (FileScanner: f, SolutionItems: new List<SolutionItem>()))
-                .ToList()
-                ;
+            List<(IFileScanner FileScanner, List<SolutionItem> SolutionItems)> list;
+
+            if (parameters.ForceUseNLOAgent)
+            {
+                list = _scanners
+                    .Where(s => s.Order == int.MaxValue) //take the last, based on LLM
+                    .Select(f => (FileScanner: f, SolutionItems: new List<SolutionItem>()))
+                    .ToList()
+                    ;
+            }
+            else
+            {
+                list = _scanners
+                    .OrderBy(f => f.Order)
+                    .Select(f => (FileScanner: f, SolutionItems: new List<SolutionItem>()))
+                    .ToList()
+                    ;
+            }
 
             foreach (var item in fileItems)
             {

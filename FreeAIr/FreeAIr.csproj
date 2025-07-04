@@ -155,6 +155,7 @@
     <Compile Include="BLogic\UserPrompt.cs" />
     <Compile Include="Helper\RoslynDocumentHelper.cs" />
     <Compile Include="Helper\SuggestionHijackHelper.cs" />
+    <Compile Include="Helper\WorkspaceHelper.cs" />
     <Compile Include="ImageMonikers.cs" />
     <Compile Include="InfoBar\InfoBarService.cs" />
     <Compile Include="InfoBar\ReleaseNotesInfoBarService.cs" />

@@ -1,0 +1,41 @@
+{
+  "Root": {
+    "Id": "e534b8d1-1212-4646-21ac-8cb7b9ba50cd",
+    "Children": [
+      {
+        "Id": "f1602b05-1aa4-b94e-3312-2788a61e2cc9",
+        "Children": [
+          {
+            "Id": "36d30da8-52dd-8abb-9a04-6ab53a5fb924",
+            "Children": []
+          },
+          {
+            "Id": "b830cb74-d3f6-cea1-d10b-ff08885c3541",
+            "Children": []
+          },
+          {
+            "Id": "1b2483d4-0cdd-dc8c-ea01-b0d32682657e",
+            "Children": []
+          },
+          {
+            "Id": "59179160-4de6-78ab-db38-bbba2c6eee0a",
+            "Children": []
+          }
+        ]
+      },
+      {
+        "Id": "6b2736c6-9072-78f0-1c3b-2b018b08ea4b",
+        "Children": [
+          {
+            "Id": "916ded0d-d66d-cfcc-503f-d54350b7c420",
+            "Children": []
+          },
+          {
+            "Id": "d732bc2b-6f42-1e77-a20f-5b06470189f7",
+            "Children": []
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -1,0 +1,67 @@
+{
+  "Outlines": [
+    {
+      "Id": "e534b8d1-1212-4646-21ac-8cb7b9ba50cd",
+      "Kind": 1,
+      "FullPath": "",
+      "Target": "TestSubject.sln",
+      "OutlineText": ""
+    },
+    {
+      "Id": "f1602b05-1aa4-b94e-3312-2788a61e2cc9",
+      "Kind": 2,
+      "FullPath": "DataObject\\DataObject.csproj",
+      "Target": "DataObject",
+      "OutlineText": ""
+    },
+    {
+      "Id": "36d30da8-52dd-8abb-9a04-6ab53a5fb924",
+      "Kind": 3,
+      "FullPath": "DataObject\\BLogic\\TransferSearcher.cs",
+      "Target": "DataObject\\BLogic\\TransferSearcher.cs",
+      "OutlineText": "The file TransferSearcher.cs in the DataObject.BLogic namespace of the project \u0022FreeAIr\u0022 is a class named TransferSearcher. This class is designed to search for voyages that match specific date and conditions, based on the Repository instance it is initialized with. \r\n\r\nThe TransferSearcher class has a private Repository field _repository to access and manipulate data. \r\n\r\nThe class has a constructor that takes a Repository instance as an argument, and it initializes the _repository field with the provided instance. If the provided instance is null, it throws an ArgumentNullException.\r\n\r\nThe SearchFor method is used to search for voyages that match the given date and conditions. It takes a Voyage instance and a DateTime as arguments. It retrieves all the voyages on the provided date from the repository, removes the first voyage from the list (to exclude the same voyage as the provided one), and then finds all voyages that have the first station of their route equal to the last station of the first voyage\u0027s route. Finally, it returns the list of these allowed voyages."
+    },
+    {
+      "Id": "b830cb74-d3f6-cea1-d10b-ff08885c3541",
+      "Kind": 3,
+      "FullPath": "DataObject\\Entity\\Station.cs",
+      "Target": "DataObject\\Entity\\Station.cs",
+      "OutlineText": "This file, Station.cs, represents a railway station. It contains a class named Station that represents a station. This class has two properties: Id and Name. The Id property represents the unique identifier for the station, while the Name property represents the name of the station. The class includes constructor for creating a Station object, and overridden methods for Equals and GetHashCode. The Equals method checks if two Station objects are equal based on their Id and Name properties, while the GetHashCode method returns a hash code based on these properties."
+    },
+    {
+      "Id": "1b2483d4-0cdd-dc8c-ea01-b0d32682657e",
+      "Kind": 3,
+      "FullPath": "DataObject\\Helper\\CollectionHelper.cs",
+      "Target": "DataObject\\Helper\\CollectionHelper.cs",
+      "OutlineText": "The file CollectionHelper.cs in the DataObject.Helper namespace is a C# class containing a static method for comparing two collections for equality. This class is primarily used for comparison of lists or arrays of objects for equality, based on the implementation of the IEquatable interface in the generic type T.\r\n\r\nIt provides a static method named IsCollectionEquals that accepts two parameters of type IReadOnlyList\u003CT\u003E. The method performs a series of checks to see if the two collections are the same instance, if either one of them is null, or if their element counts are not equal. If any of these conditions are met, it returns false. If the collections are not the same instance and have the same element counts, the method iterates over the collections, comparing each pair of elements. If all elements are equal, the method returns true. If any pair of elements are not equal, the method returns false.\r\n\r\nThe purpose of this helper class is to provide a more concise and readable way to compare collections for equality, especially useful in situations where you need to compare collections of complex types."
+    },
+    {
+      "Id": "59179160-4de6-78ab-db38-bbba2c6eee0a",
+      "Kind": 3,
+      "FullPath": "DataObject\\Repo\\Repository.cs",
+      "Target": "DataObject\\Repo\\Repository.cs",
+      "OutlineText": "This file, Repository.cs, is a part of the DataObject.Repo namespace and is responsible for managing the data of various types. It provides methods for reading data in various forms such as stations, edges, routes, train information, and voyages. The methods return the read data as lists. The file is written in C#."
+    },
+    {
+      "Id": "6b2736c6-9072-78f0-1c3b-2b018b08ea4b",
+      "Kind": 2,
+      "FullPath": "TestSubject\\TestSubject.csproj",
+      "Target": "TestSubject",
+      "OutlineText": ""
+    },
+    {
+      "Id": "916ded0d-d66d-cfcc-503f-d54350b7c420",
+      "Kind": 3,
+      "FullPath": "TestSubject\\Empty.cs",
+      "Target": "TestSubject\\Empty.cs",
+      "OutlineText": "The file Empty.cs in the TestSubject namespace of the project is an empty C# file. It contains an empty namespace declaration, which likely exists solely to allow for the organization of related classes and interfaces. It currently does not contain any classes, interfaces, or other code elements. This file might be left over from an earlier project state and could be safely deleted if it\u0027s not being used in the current context."
+    },
+    {
+      "Id": "d732bc2b-6f42-1e77-a20f-5b06470189f7",
+      "Kind": 3,
+      "FullPath": "TestSubject\\Program.cs",
+      "Target": "TestSubject\\Program.cs",
+      "OutlineText": "This file, Program.cs, is the main entry point of the application. It demonstrates how to create an instance of a repository, initialize a transfer searcher with the repository, and use it to search for second voyages based on a specified date. The results are then printed to the console."
+    }
+  ]
+}
