@@ -17,6 +17,9 @@ namespace FreeAIr.UI.ViewModels
         private ICommand _addNewAgentCommand;
         private ICommand _deleteAgentCommand;
         private ICommand _applyAndCloseCommand;
+        private ICommand _replaceGeneralSystemPromptCommand;
+        private ICommand _replaceGenerateNLOSystemPromptCommand;
+        private ICommand _replaceExtractNLOSystemPromptCommand;
 
         public Action<bool>? CloseWindow
         {
@@ -130,6 +133,86 @@ namespace FreeAIr.UI.ViewModels
             }
         }
 
+        public ICommand ReplaceGeneralSystemPromptCommand
+        {
+            get
+            {
+                if (_replaceGeneralSystemPromptCommand is null)
+                {
+                    _replaceGeneralSystemPromptCommand = new AsyncRelayCommand(
+                        async a =>
+                        {
+                            SelectedAgent.SystemPrompt = AgentCollectionJson.DefaultSystemPrompt;
+                            OnPropertyChanged();
+                        },
+                        a =>
+                        {
+                            if (SelectedAgent is null)
+                            {
+                                return false;
+                            }
+
+                            return true;
+                        });
+                }
+
+                return _replaceGeneralSystemPromptCommand;
+            }
+        }
+
+        public ICommand ReplaceGenerateNLOSystemPromptCommand
+        {
+            get
+            {
+                if (_replaceGenerateNLOSystemPromptCommand is null)
+                {
+                    _replaceGenerateNLOSystemPromptCommand = new AsyncRelayCommand(
+                        async a =>
+                        {
+                            SelectedAgent.SystemPrompt = AgentCollectionJson.CreateNewOutlinesSystemPrompt;
+                            OnPropertyChanged();
+                        },
+                        a =>
+                        {
+                            if (SelectedAgent is null)
+                            {
+                                return false;
+                            }
+
+                            return true;
+                        });
+                }
+
+                return _replaceGenerateNLOSystemPromptCommand;
+            }
+        }
+
+        public ICommand ReplaceExtractNLOSystemPromptCommand
+        {
+            get
+            {
+                if (_replaceExtractNLOSystemPromptCommand is null)
+                {
+                    _replaceExtractNLOSystemPromptCommand = new AsyncRelayCommand(
+                        async a =>
+                        {
+                            SelectedAgent.SystemPrompt = AgentCollectionJson.ExtractFileOutlinesSystemPrompt;
+                            OnPropertyChanged();
+                        },
+                        a =>
+                        {
+                            if (SelectedAgent is null)
+                            {
+                                return false;
+                            }
+
+                            return true;
+                        });
+                }
+
+                return _replaceExtractNLOSystemPromptCommand;
+            }
+        }
 
         public AgentConfigureViewModel(
             AgentCollectionJson agentCollection

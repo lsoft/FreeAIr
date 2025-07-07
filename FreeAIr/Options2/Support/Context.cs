@@ -1,5 +1,4 @@
 ﻿using FreeAIr.BuildErrors;
-using Microsoft.DiaSymReader;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,7 +10,6 @@ namespace FreeAIr.Options2.Support
     public enum SupportContextVariableEnum
     {
         Unknown,
-        CodeSubject,
         ContextItemFilePath,
         BuildErrorMessage,
         BuildErrorLine,
@@ -21,7 +19,6 @@ namespace FreeAIr.Options2.Support
 
     public static class SupportContextVariableHelper
     {
-        private const string CodeSubject = "{CODE_SUBJECT}";
         private const string ContextItemFilePath = "{CONTEXT_ITEM_FILEPATH}";
         private const string BuildErrorMessage = "{BUILD_ERROR_MESSAGE}";
         private const string BuildErrorLine = "{BUILD_ERROR_LINE}";
@@ -30,7 +27,6 @@ namespace FreeAIr.Options2.Support
 
         public static readonly string[] Anchors =
             [
-                CodeSubject,
                 ContextItemFilePath,
                 BuildErrorMessage,
                 BuildErrorLine,
@@ -44,8 +40,6 @@ namespace FreeAIr.Options2.Support
         {
             switch (anchor)
             {
-                case CodeSubject:
-                    return SupportContextVariableEnum.CodeSubject;
                 case ContextItemFilePath:
                     return SupportContextVariableEnum.ContextItemFilePath;
                 case BuildErrorMessage:
@@ -67,8 +61,6 @@ namespace FreeAIr.Options2.Support
         {
             switch (variable)
             {
-                case SupportContextVariableEnum.CodeSubject:
-                    return CodeSubject;
                 case SupportContextVariableEnum.ContextItemFilePath:
                     return ContextItemFilePath;
                 case SupportContextVariableEnum.BuildErrorMessage:

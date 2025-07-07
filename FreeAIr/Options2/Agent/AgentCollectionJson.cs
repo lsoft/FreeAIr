@@ -161,7 +161,7 @@ Your environment:
 #1 Your user is a software engineer.
 #2 You are working inside Visual Studio. Visual Studio is a program for a software developing.
 #3 Visual Studio contains an object named Solution.
-#4 Solution is a tree of items. Pair, document, file are synonyms that mean the same thing.
+#4 Solution is a tree of items. Item, document, file are synonyms that mean the same thing.
 #5 Items come in different types: project, physical file, physical folder, and others. Physical file and file are synonyms that mean the same thing. Physical folder, folder, directory are synonyms that mean the same thing.
 #6 Each item has a name, type, and content. Content, text, body are synonyms that mean the same thing. An item can also have a full path.
 
@@ -175,7 +175,7 @@ Your behavior against available functions:
 #7 If user asks to analyze the database or its data, you should compose appropriate SQL query and then use available functions to execute the SQL query. If you need information (metadata) about a table (or database) structure, gather it first via available functions.
 ";
         
-        private const string ExtractFileOutlinesSystemPrompt =
+        public const string ExtractFileOutlinesSystemPrompt =
 """
 SYSTEM INSTRUCTIONS:
 #1 You are an expert programmer.
@@ -194,7 +194,7 @@ Follow these rules:
 #8 Your respond must contain only plain text, avoid add anything other.
 """;
 
-        private const string CreateNewOutlinesSystemPrompt =
+        public const string CreateNewOutlinesSystemPrompt =
 """
 SYSTEM INSTRUCTIONS:
 #1 You are an expert programmer.

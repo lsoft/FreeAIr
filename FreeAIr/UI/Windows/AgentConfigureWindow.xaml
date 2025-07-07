@@ -121,6 +121,7 @@
                 <!-- system prompt -->
                 <RowDefinition Height="auto"/>
                 <RowDefinition Height="auto"/>
+                <RowDefinition Height="auto"/>
 
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
@@ -239,6 +240,54 @@
                     />
 
             </ScrollViewer>
+
+            <WrapPanel
+                Grid.Row="7"
+                Grid.Column="0"
+                Grid.ColumnSpan="2"
+                HorizontalAlignment="Right"
+                >
+
+                <Button
+                    Margin="10,2,10,2"
+                    FontFamily="Cascadia Code"
+                    FontWeight="Bold"
+                    VerticalAlignment="Center"
+                    Cursor="Hand"
+                    Foreground="#569CD6"
+                    Content="Replace with general system prompt..."
+                    Command="{Binding ReplaceGeneralSystemPromptCommand}"
+                    Style="{DynamicResource TextBlockLikeButtonStyle}"
+                    ToolTip="Replace this system prompt with default system prompt of general purpose"
+                    />
+
+                <Button
+                    Margin="10,2,10,2"
+                    FontFamily="Cascadia Code"
+                    FontWeight="Bold"
+                    VerticalAlignment="Center"
+                    Cursor="Hand"
+                    Foreground="#569CD6"
+                    Content="Replace with generate NLO system prompt..."
+                    Command="{Binding ReplaceGenerateNLOSystemPromptCommand}"
+                    Style="{DynamicResource TextBlockLikeButtonStyle}"
+                    ToolTip="Replace this system prompt with default system prompt of generate new or update existing natural language outlines"
+                    />
+
+                <Button
+                    Margin="10,2,10,2"
+                    FontFamily="Cascadia Code"
+                    FontWeight="Bold"
+                    VerticalAlignment="Center"
+                    Cursor="Hand"
+                    Foreground="#569CD6"
+                    Content="Replace with extract NLO system prompt..."
+                    Command="{Binding ReplaceExtractNLOSystemPromptCommand}"
+                    Style="{DynamicResource TextBlockLikeButtonStyle}"
+                    ToolTip="Replace this system prompt with default system prompt of extract natural language outlines from documents."
+                    />
+            
+            </WrapPanel>
 
         </Grid>
 
