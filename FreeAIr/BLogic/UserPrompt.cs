@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace FreeAIr.BLogic
 {
@@ -66,11 +67,11 @@ namespace FreeAIr.BLogic
         /// <param name="userCodeFileName">Имя файла с кодом</param>
         /// <param name="userCode">Текст кода</param>
         /// <returns>Новый объект UserPrompt</returns>
-        public static UserPrompt CreateCodeBasedPrompt(ChatKindEnum kind, string userCodeFileName, string userCode)
+        public static async Task<UserPrompt> CreateCodeBasedPromptAsync(ChatKindEnum kind, string userCodeFileName, string userCode)
         {
             var fi = new FileInfo(userCodeFileName);
             return new UserPrompt(
-                kind.AsPromptString()
+                await kind.AsPromptStringAsync()
                 + Environment.NewLine
                 + Environment.NewLine
                 + "```"
@@ -88,7 +89,7 @@ namespace FreeAIr.BLogic
         /// <param name="kind">Тип диалога</param>
         /// <param name="chatContextItemNames">Имена итемов из контекста чата</param>
         /// <returns>Новый объект UserPrompt</returns>
-        public static UserPrompt CreateContextItemBasedPrompt(
+        public static async Task<UserPrompt> CreateContextItemBasedPromptAsync(
             ChatKindEnum kind,
             IReadOnlyList<string> chatContextItemNames
             )
@@ -97,7 +98,7 @@ namespace FreeAIr.BLogic
 
             foreach (var chatContextItemName in chatContextItemNames)
             {
-                sb.Append(kind.AsPromptString());
+                sb.Append(await kind.AsPromptStringAsync());
                 sb.Append(" ");
                 sb.Append(
                     string.Join(
@@ -128,9 +129,9 @@ namespace FreeAIr.BLogic
         /// </summary>
         /// <param name="gitPatch">Текст патча</param>
         /// <returns>Новый объект UserPrompt</returns>
-        public static UserPrompt CreateCommitMessagePrompt(string gitPatch) =>
+        public static async Task<UserPrompt> CreateCommitMessagePromptAsync(string gitPatch) =>
             new UserPrompt(
-                ChatKindEnum.GenerateCommitMessage.AsPromptString()
+                await ChatKindEnum.GenerateCommitMessage.AsPromptStringAsync()
                 + Environment.NewLine
                 + Environment.NewLine
                 + "```patch"
@@ -147,15 +148,15 @@ namespace FreeAIr.BLogic
         /// <param name="documentText">Полный текст документа</param>
         /// <param name="caretPosition">Позиция курсора для вставки якоря</param>
         /// <returns>Новый объект UserPrompt</returns>
-        public static UserPrompt CreateSuggestWholeLine(string userCodeFileName, string documentText, int caretPosition)
+        public static async Task<UserPrompt> CreateSuggestWholeLineAsync(string userCodeFileName, string documentText, int caretPosition)
         {
             var fi = new FileInfo(userCodeFileName);
-            var anchor = "ChatKindEnum_SuggestWholeLine_Anchor".GetLocalizedResourceByName();
+            var anchor = await "ChatKindEnum_SuggestWholeLine_Anchor".GetLocalizedResourceByNameAsync();
 
             documentText = documentText.Insert(caretPosition, anchor);
 
             return new UserPrompt(
-                ChatKindEnum.SuggestWholeLine.AsPromptString()
+                await ChatKindEnum.SuggestWholeLine.AsPromptStringAsync()
                 + Environment.NewLine
                 + Environment.NewLine
                 + "```"
@@ -167,7 +168,7 @@ namespace FreeAIr.BLogic
             );
         }
 
-        public static UserPrompt CreateFixBuildErrorPrompt(
+        public static async Task<UserPrompt> CreateFixBuildErrorPromptAsync(
             string errorDescription,
             string fileName,
             string filePath
@@ -176,7 +177,7 @@ namespace FreeAIr.BLogic
             var fi = new FileInfo(filePath);
 
             return new UserPrompt(
-                ChatKindEnum.FixBuildError.AsPromptString()
+                await ChatKindEnum.FixBuildError.AsPromptStringAsync()
                 + Environment.NewLine
                 + Environment.NewLine
                 + "```"
@@ -187,12 +188,12 @@ namespace FreeAIr.BLogic
                 );
         }
 
-        public static UserPrompt CreateNaturalLanguageSearchPrompt(
+        public static async Task<UserPrompt> CreateNaturalLanguageSearchPromptAsync(
             string searchText
             )
         {
             return new UserPrompt(
-                ChatKindEnum.NaturalLanguageSearch.AsPromptString()
+                await ChatKindEnum.NaturalLanguageSearch.AsPromptStringAsync()
                 + Environment.NewLine
                 + ""
                 + searchText

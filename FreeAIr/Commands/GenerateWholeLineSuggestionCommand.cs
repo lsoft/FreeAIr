@@ -1,6 +1,7 @@
 ﻿using EnvDTE;
 using FreeAIr.BLogic;
 using FreeAIr.Helper;
+using FreeAIr.Options2;
 
 namespace FreeAIr.Commands
 {
@@ -16,7 +17,7 @@ namespace FreeAIr.Commands
         {
             await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
 
-            if (!InternalPage.Instance.IsActiveAgentHasToken())
+            if (!await FreeAIrOptions.IsActiveAgentHasTokenAsync())
             {
                 await VS.MessageBox.ShowErrorAsync(
                     Resources.Resources.Error,

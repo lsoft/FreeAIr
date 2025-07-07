@@ -6,35 +6,11 @@ namespace FreeAIr.UI.Windows
 {
     public partial class ControlCenterWindow : Window
     {
-        private readonly ControlCenterSectionEnum _scrollTo;
 
         public ControlCenterWindow(
-            ControlCenterSectionEnum scrollTo
             )
         {
-            _scrollTo = scrollTo;
-            
             InitializeComponent();
-        }
-
-        private void Window_Loaded(object sender, RoutedEventArgs e)
-        {
-            switch (_scrollTo)
-            {
-                case ControlCenterSectionEnum.None:
-                    break;
-                case ControlCenterSectionEnum.ModelContextProtocol:
-                    ModelContextProtocolLabel.BringIntoView();
-                    break;
-                case ControlCenterSectionEnum.SystemPrompt:
-                    MCPAppyButton.BringIntoView();
-                    break;
-                case ControlCenterSectionEnum.Agents:
-                    AgentsAppyButton.BringIntoView();
-                    break;
-                default:
-                    break;
-            }
         }
 
         private void ScrollViewer_PreviewMouseWheel(object sender, System.Windows.Input.MouseWheelEventArgs e)
@@ -58,14 +34,6 @@ namespace FreeAIr.UI.Windows
                 e.Handled = true;
             }
         }
-    }
-
-    public enum ControlCenterSectionEnum
-    {
-        None,
-        ModelContextProtocol,
-        SystemPrompt,
-        Agents
     }
 
 }

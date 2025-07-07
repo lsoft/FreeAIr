@@ -220,20 +220,20 @@ namespace FreeAIr.Embedding.Json
                 solutionName = solutionName.Substring(0, solutionName.Length - solutionFileInfo.Extension.Length);
             }
 
-            var jsonEmbeddingFolderPath = System.IO.Path.Combine(
+            var folderPath = System.IO.Path.Combine(
                 solutionFileInfo.Directory.FullName,
                 ".freeair"
                 );
-            if (!System.IO.Directory.Exists(jsonEmbeddingFolderPath))
+            if (!System.IO.Directory.Exists(folderPath))
             {
-                System.IO.Directory.CreateDirectory(jsonEmbeddingFolderPath);
+                System.IO.Directory.CreateDirectory(folderPath);
             }
 
-            var jsonEmbeddingFilePath = System.IO.Path.Combine(
-                jsonEmbeddingFolderPath,
+            var filePath = System.IO.Path.Combine(
+                folderPath,
                 $"{solutionName}_embeddings.json"
                 );
-            return jsonEmbeddingFilePath;
+            return filePath;
         }
 
         public IReadOnlyDictionary<Guid, Triple> CreateTripleDictionary(

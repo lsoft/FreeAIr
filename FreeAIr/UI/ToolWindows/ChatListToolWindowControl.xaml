@@ -107,23 +107,12 @@
 
                 <Button
                     Margin="5,2,0,2"
-                    Content="Edit global agents..."
+                    Content="Open contol center..."
                     HorizontalAlignment="Right"
                     VerticalAlignment="Center"
                     FontFamily="Cascadia Code"
-                    ToolTip="Edit globally available agents metadata, include their endpoint, token etc. These changes do not affects opened chats."
-                    Command="{Binding ElementName=ChatListToolWindow, Path=DataContext.EditGlobalAgentsCommand}"
-                    Style="{DynamicResource TextBlockLikeButtonStyle}"
-                    />
-
-                <Button
-                    Margin="5,2,0,2"
-                    Content="Edit global MCP tools..."
-                    HorizontalAlignment="Right"
-                    VerticalAlignment="Center"
-                    FontFamily="Cascadia Code"
-                    ToolTip="Edit globally available model context protocol tools. These changes do not affects opened chats."
-                    Command="{Binding ElementName=ChatListToolWindow, Path=DataContext.EditGlobalToolsCommand}"
+                    ToolTip="Edit FreeAIr options. Changes that made do not affects your opened chats."
+                    Command="{Binding ElementName=ChatListToolWindow, Path=DataContext.OpenControlCenterCommand}"
                     Style="{DynamicResource TextBlockLikeButtonStyle}"
                     />
 

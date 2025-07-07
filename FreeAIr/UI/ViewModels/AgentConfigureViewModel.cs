@@ -1,4 +1,5 @@
-﻿using FreeAIr.Agents;
+﻿using FreeAIr.Options2;
+using FreeAIr.Options2.Agent;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,23 +13,29 @@ namespace FreeAIr.UI.ViewModels
 {
     public sealed class AgentConfigureViewModel : BaseViewModel
     {
-        private Agent _selectedAgent;
+        private AgentJson _selectedAgent;
         private ICommand _addNewAgentCommand;
         private ICommand _deleteAgentCommand;
-        private ICommand _saveAndCloseCommand;
+        private ICommand _applyAndCloseCommand;
 
-        public AgentCollection AgentCollection
+        public Action<bool>? CloseWindow
+        {
+            get;
+            set;
+        }
+
+        public AgentCollectionJson AgentCollection
         {
             get;
             private set;
         }
 
-        public ObservableCollection2<Agent> AvailableAgents
+        public ObservableCollection2<AgentJson> AvailableAgents
         {
             get;
         }
 
-        public Agent SelectedAgent
+        public AgentJson SelectedAgent
         {
             get => _selectedAgent;
             set
@@ -100,7 +107,7 @@ namespace FreeAIr.UI.ViewModels
                     _addNewAgentCommand = new RelayCommand(
                         a =>
                         {
-                            var newAgent = new Agent
+                            var newAgent = new AgentJson
                             {
                                 Name = DateTime.Now.ToString("ddMMyyyy HH:mm:ss")
                             };
@@ -140,26 +147,30 @@ namespace FreeAIr.UI.ViewModels
             }
         }
 
-        public ICommand SaveAndCloseCommand
+        public ICommand ApplyAndCloseCommand
         {
             get
             {
-                if (_saveAndCloseCommand is null)
+                if (_applyAndCloseCommand is null)
                 {
-                    _saveAndCloseCommand = new AsyncRelayCommand(
+                    _applyAndCloseCommand = new AsyncRelayCommand(
                         async a =>
                         {
-                            await InternalPage.Instance.SaveAgentsAsync(AgentCollection);
+
+                            if (CloseWindow is not null)
+                            {
+                                CloseWindow(true);
+                            }
                         });
                 }
 
-                return _saveAndCloseCommand;
+                return _applyAndCloseCommand;
             }
         }
 
 
         public AgentConfigureViewModel(
-            AgentCollection agentCollection
+            AgentCollectionJson agentCollection
             )
         {
             if (agentCollection is null)
@@ -168,7 +179,7 @@ namespace FreeAIr.UI.ViewModels
             }
 
             AgentCollection = agentCollection;
-            AvailableAgents = new ObservableCollection2<Agent>(agentCollection.Agents);
+            AvailableAgents = new ObservableCollection2<AgentJson>(agentCollection.Agents);
         }
     }
 }

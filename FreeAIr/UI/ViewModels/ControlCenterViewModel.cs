@@ -1,28 +1,22 @@
-﻿using FreeAIr.Agents;
-using FreeAIr.Commands.Other;
-using FreeAIr.MCP.McpServerProxy;
-using FreeAIr.MCP.McpServerProxy.External;
+﻿using FreeAIr.MCP.McpServerProxy;
 using FreeAIr.MCP.McpServerProxy.Github;
+using FreeAIr.Options2;
 using FreeAIr.UI.Windows;
-using Microsoft.VisualStudio.PlatformUI;
 using Microsoft.VisualStudio.Shell.Interop;
 using System.Collections.Generic;
 using System.Linq;
-using System.Management.Instrumentation;
-using System.Runtime.InteropServices.WindowsRuntime;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
 using WpfHelpers;
+using static FreeAIr.Options2.FreeAIrOptions;
 
 namespace FreeAIr.UI.ViewModels
 {
     public sealed class ControlCenterViewModel : BaseViewModel
     {
         private bool? _githubMcpServerStatus;
-        private string _externalMcpServerJson;
-        private string _agentsJson;
-
-        #region Model Context Protocol
+        private string _optionsJson;
 
         public string GithubMcpServerStatusMessage
         {
@@ -47,45 +41,50 @@ namespace FreeAIr.UI.ViewModels
             get;
         }
 
-
-        public string GitHubToken
+        public string OptionsJson
         {
-            get
-            {
-                return InternalPage.Instance.GitHubToken;
-            }
-
+            get => _optionsJson;
             set
             {
-                InternalPage.Instance.GitHubToken = value;
-                InternalPage.Instance.Save();
-            }
-        }
-
-        public string ExternalMcpServerJson
-        {
-            get => _externalMcpServerJson;
-            set
-            {
-                _externalMcpServerJson = value;
+                _optionsJson = value;
                 OnPropertyChanged();
             }
         }
 
-        public Brush ExternalMcpServerJsonBorder
+        public Brush OptionsJsonBorder
         {
             get
             {
-                if (!ExternalMcpServersJsonParser.TryParse(_externalMcpServerJson, out _))
+                if (FreeAIrOptions.TryDeserializeFromString(_optionsJson, out _))
                 {
-                    return Brushes.Red;
+                    return Brushes.Green;
                 }
 
-                return Brushes.Green;
+                return Brushes.Red;
             }
         }
 
-        public ApplyExternalMcpServerChangesCmd ApplyExternalMcpServerChangesCommand
+        public StoreOptionsCmd StoreOptionsCommand
+        {
+            get;
+        }
+
+        public StoreOptionsCmd StoreOptionsToFileCommand
+        {
+            get;
+        }
+
+        public DeleteOptionsFileCmd DeleteOptionsFileCommand
+        {
+            get;
+        }
+
+        public StoreOptionsCmd StoreAsVSOptionsCommand
+        {
+            get;
+        }
+
+        public ClearVSOptionsCmd ClearVSOptionsCommand
         {
             get;
         }
@@ -95,55 +94,33 @@ namespace FreeAIr.UI.ViewModels
             get;
         }
 
-        #endregion
-
-        #region Agents
-
-        public string AgentsJson
-        {
-            get => _agentsJson;
-            set
-            {
-                _agentsJson = value;
-                OnPropertyChanged();
-            }
-        }
-
-        public Brush AgentsJsonBorder
-        {
-            get
-            {
-                if (!AgentCollection.TryParse(_agentsJson, out _))
-                {
-                    return Brushes.Red;
-                }
-
-                return Brushes.Green;
-            }
-        }
-
-        public ApplyAgentsJsonCmd ApplyAgentsJsonCommand
-        {
-            get;
-        }
-
         public EditAgentCmd EditAgentCommand
         {
             get;
         }
 
-        #endregion
 
-        public ControlCenterViewModel()
+        public ControlCenterViewModel(
+            FreeAIrOptions options
+            )
         {
+            if (options is null)
+            {
+                throw new ArgumentNullException(nameof(options));
+            }
+
             _githubMcpServerStatus = null;
-            ExternalMcpServerJson = InternalPage.Instance.ExternalMCPServers;
-            AgentsJson = InternalPage.Instance.Agents;
+            OptionsJson = FreeAIrOptions.SerializeToString(
+                options
+                );
 
             InstallGithubMCPServerCommand = new(this);
-            ApplyExternalMcpServerChangesCommand = new(this);
+            StoreOptionsCommand = new(this, null);
+            StoreOptionsToFileCommand = new(this, OptionsPlaceEnum.SolutionRelatedFilePath);
+            DeleteOptionsFileCommand = new(this);
+            StoreAsVSOptionsCommand = new(this, OptionsPlaceEnum.VisualStudioOption);
+            ClearVSOptionsCommand = new(this);
             EditGlobalToolsCommand = new(this);
-            ApplyAgentsJsonCommand = new(this);
             EditAgentCommand = new(this);
 
             UpdateGithubMcpStatusAsync()
@@ -195,11 +172,11 @@ namespace FreeAIr.UI.ViewModels
                 var installResult = backgroundTask.SuccessfullyInstalled;
                 if (installResult)
                 {
-                    var toolContainer = AvailableToolContainer.ReadSystem();
+                    var toolContainer = await AvailableToolContainer.ReadSystemAsync();
 
                     if (await McpServerProxyCollection.ProcessMcpServerProxyAsync(toolContainer, GithubMcpServerProxy.Instance))
                     {
-                        toolContainer.SaveToSystem();
+                        await toolContainer.SaveToSystemAsync();
                         _viewModel._githubMcpServerStatus = true;
 
                         await VS.MessageBox.ShowAsync(
@@ -223,11 +200,11 @@ namespace FreeAIr.UI.ViewModels
             }
         }
 
-        public sealed class ApplyAgentsJsonCmd : AsyncBaseRelayCommand
+        public sealed class ClearVSOptionsCmd : AsyncBaseRelayCommand
         {
             private readonly ControlCenterViewModel _viewModel;
 
-            public ApplyAgentsJsonCmd(
+            public ClearVSOptionsCmd(
                 ControlCenterViewModel viewModel
                 )
             {
@@ -241,19 +218,128 @@ namespace FreeAIr.UI.ViewModels
 
             protected override async Task ExecuteInternalAsync(object parameter)
             {
-                if (!AgentCollection.TryParse(_viewModel._agentsJson, out var optionAgents))
+                try
+                {
+                    InternalPage.Instance.Options = string.Empty;
+
+                    await VS.MessageBox.ShowAsync(
+                        $"Options from Visual Studio has been deleted.",
+                        buttons: OLEMSGBUTTON.OLEMSGBUTTON_OK
+                        );
+                }
+                catch (Exception excp)
+                {
+                    //todo log
+                    await VS.MessageBox.ShowErrorAsync(
+                        Resources.Resources.Error,
+                        excp.Message + Environment.NewLine + excp.StackTrace
+                        );
+                }
+
+                _viewModel.OnPropertyChanged();
+            }
+
+        }
+
+        public sealed class DeleteOptionsFileCmd : AsyncBaseRelayCommand
+        {
+            private readonly ControlCenterViewModel _viewModel;
+
+            public DeleteOptionsFileCmd(
+                ControlCenterViewModel viewModel
+                )
+            {
+                if (viewModel is null)
+                {
+                    throw new ArgumentNullException(nameof(viewModel));
+                }
+
+                _viewModel = viewModel;
+            }
+
+            protected override async Task ExecuteInternalAsync(object parameter)
+            {
+                try
+                {
+                    var filePath = await FreeAIrOptions.ComposeFilePathAsync();
+                    if (System.IO.File.Exists(filePath))
+                    {
+                        System.IO.File.Delete(filePath);
+                    }
+
+                    await VS.MessageBox.ShowAsync(
+                        $"Options file {filePath} has been deleted.",
+                        buttons: OLEMSGBUTTON.OLEMSGBUTTON_OK
+                        );
+                }
+                catch (Exception excp)
+                {
+                    //todo log
+                    await VS.MessageBox.ShowErrorAsync(
+                        Resources.Resources.Error,
+                        excp.Message + Environment.NewLine + excp.StackTrace
+                        );
+                }
+
+                _viewModel.OnPropertyChanged();
+            }
+
+        }
+
+        public sealed class StoreOptionsCmd : AsyncBaseRelayCommand
+        {
+            private readonly ControlCenterViewModel _viewModel;
+            private readonly OptionsPlaceEnum? _place;
+
+            public StoreOptionsCmd(
+                ControlCenterViewModel viewModel,
+                OptionsPlaceEnum? place
+                )
+            {
+                if (viewModel is null)
+                {
+                    throw new ArgumentNullException(nameof(viewModel));
+                }
+
+                _viewModel = viewModel;
+                _place = place;
+            }
+
+            protected override async Task ExecuteInternalAsync(object parameter)
+            {
+                if (!FreeAIrOptions.TryDeserializeFromString(_viewModel._optionsJson, out var options))
                 {
                     await VS.MessageBox.ShowErrorAsync(
                         Resources.Resources.Error,
-                        $"Invalid json (1). Fix json and try again."
+                        $"Invalid json. Fix json and try again."
                         );
                     return;
                 }
 
                 try
                 {
-                    InternalPage.Instance.Agents = _viewModel._agentsJson;
-                    await InternalPage.Instance.SaveAsync();
+                    if (!await ApplyMcpServerNodeAsync(options))
+                    {
+                        return;
+                    }
+
+                    var place = await options.SerializeAsync(_place);
+
+                    var destination = "<<unknown>>";
+                    switch (place)
+                    {
+                        case OptionsPlaceEnum.SolutionRelatedFilePath:
+                            destination = $"file {await FreeAIrOptions.ComposeFilePathAsync()}";
+                            break;
+                        case OptionsPlaceEnum.VisualStudioOption:
+                            destination = "VS options";
+                            break;
+                    }
+
+                    await VS.MessageBox.ShowAsync(
+                        $"Every MCP server is found, and pinged successfully. Changes was saved to {destination}.",
+                        buttons: OLEMSGBUTTON.OLEMSGBUTTON_OK
+                        );
                 }
                 catch (Exception excp)
                 {
@@ -267,106 +353,55 @@ namespace FreeAIr.UI.ViewModels
 
             protected override bool CanExecuteInternal(object parameter)
             {
-                if (string.IsNullOrEmpty(_viewModel._agentsJson))
+                if (string.IsNullOrEmpty(_viewModel._optionsJson))
                 {
                     return false;
                 }
-                if (!AgentCollection.TryParse(_viewModel._agentsJson, out _))
+                if (!FreeAIrOptions.TryDeserializeFromString(_viewModel._optionsJson, out _))
                 {
                     return false;
                 }
 
                 return true;
             }
-        }
 
-        public sealed class ApplyExternalMcpServerChangesCmd : AsyncBaseRelayCommand
-        {
-            private readonly ControlCenterViewModel _viewModel;
 
-            public ApplyExternalMcpServerChangesCmd(
-                ControlCenterViewModel viewModel
+            private async Task<bool> ApplyMcpServerNodeAsync(
+                FreeAIrOptions options
                 )
             {
-                if (viewModel is null)
+                if (options is null)
                 {
-                    throw new ArgumentNullException(nameof(viewModel));
+                    throw new ArgumentNullException(nameof(options));
                 }
 
-                _viewModel = viewModel;
-            }
-
-            protected override async Task ExecuteInternalAsync(object parameter)
-            {
-                if (!ExternalMcpServersJsonParser.TryParse(_viewModel._externalMcpServerJson, out var mcpServers))
+                var setupResult = await McpServerProxyApplication.UpdateExternalServersAsync(
+                    options.AvailableMcpServers
+                    );
+                if (setupResult is null)
                 {
                     await VS.MessageBox.ShowErrorAsync(
                         Resources.Resources.Error,
-                        $"Invalid json (1). Fix json and try again."
+                        $"Invalid MCP servers json subnode. Fix json and try again."
                         );
-                    return;
-                }
-
-                try
-                {
-                    var setupResult = await McpServerProxyApplication.UpdateExternalServersAsync(
-                        mcpServers
-                        );
-
-                    var failedServerNames = new List<string>();
-                    foreach (var mcpServer in mcpServers.Servers)
-                    {
-                        if (setupResult.SuccessStartedMcpServers.All(a => a.Name != mcpServer.Key))
-                        {
-                            //этот сервер не был инициализирован по какой-то причине
-                            failedServerNames.Add(mcpServer.Key);
-                        }
-                    }
-
-                    if (setupResult is null)
-                    {
-                        await VS.MessageBox.ShowErrorAsync(
-                            Resources.Resources.Error,
-                            $"Invalid json (2). Fix json and try again."
-                            );
-                    }
-                    if (failedServerNames.Count > 0)
-                    {
-                        await VS.MessageBox.ShowErrorAsync(
-                            Resources.Resources.Error,
-                            $"Some MCP servers failed to start: {string.Join(",", failedServerNames)}. Changes did not saved."
-                            );
-                    }
-                    else
-                    {
-                        InternalPage.Instance.SaveExternalMCPServers(_viewModel._externalMcpServerJson);
-
-                        setupResult.ToolContainer.SaveToSystem();
-
-                        await VS.MessageBox.ShowAsync(
-                            $"Every MCP server is found, and pinged successfully. Changes was saved.",
-                            buttons: OLEMSGBUTTON.OLEMSGBUTTON_OK
-                            );
-                    }
-                }
-                catch (Exception excp)
-                {
-                    //todo log
-                    await VS.MessageBox.ShowErrorAsync(
-                        Resources.Resources.Error,
-                        excp.Message + Environment.NewLine + excp.StackTrace
-                        );
-                }
-            }
-
-            protected override bool CanExecuteInternal(object parameter)
-            {
-                if (string.IsNullOrEmpty(_viewModel._externalMcpServerJson))
-                {
                     return false;
                 }
-                if (!ExternalMcpServersJsonParser.TryParse(_viewModel._externalMcpServerJson, out _))
+
+                var failedServerNames = new List<string>();
+                foreach (var mcpServer in options.AvailableMcpServers.Servers)
                 {
+                    if (setupResult.SuccessStartedMcpServers.All(a => a.Name != mcpServer.Key))
+                    {
+                        //этот сервер не был инициализирован по какой-то причине
+                        failedServerNames.Add(mcpServer.Key);
+                    }
+                }
+                if (failedServerNames.Count > 0)
+                {
+                    await VS.MessageBox.ShowErrorAsync(
+                        Resources.Resources.Error,
+                        $"Some MCP servers failed to start: {string.Join(",", failedServerNames)}. Changes did not saved."
+                        );
                     return false;
                 }
 
@@ -392,7 +427,11 @@ namespace FreeAIr.UI.ViewModels
 
             protected override async Task ExecuteInternalAsync(object parameter)
             {
-                var toolContainer = AvailableToolContainer.ReadSystem();
+                var optionJson = _viewModel._optionsJson;
+
+                var toolContainer = AvailableToolContainer.ReadFromOptions(
+                    optionJson
+                    );
 
                 var w = new NestedCheckBoxWindow();
                 w.DataContext = new AvailableToolsViewModel(
@@ -400,10 +439,22 @@ namespace FreeAIr.UI.ViewModels
                     );
                 if ((await w.ShowDialogAsync()).GetValueOrDefault())
                 {
-                    toolContainer.SaveToSystem();
+                    _viewModel._optionsJson = toolContainer.SaveTo(
+                        optionJson
+                        );
                 }
 
                 _viewModel.OnPropertyChanged();
+            }
+
+            protected override bool CanExecuteInternal(object parameter)
+            {
+                if (string.IsNullOrEmpty(_viewModel._optionsJson))
+                {
+                    return false;
+                }
+
+                return FreeAIrOptions.TryDeserializeFromString(_viewModel._optionsJson, out _);
             }
         }
 
@@ -425,28 +476,33 @@ namespace FreeAIr.UI.ViewModels
 
             protected override async Task ExecuteInternalAsync(object parameter)
             {
-                if (!AgentCollection.TryParse(_viewModel._agentsJson, out var agentCollection))
-                {
-                    return;
-                }
+                var optionJson = _viewModel._optionsJson;
 
-                await ShowAgentConfigureCommand.ShowAsync(
-                    agentCollection
+                var options = FreeAIrOptions.DeserializeFromString(
+                    optionJson
                     );
 
-                _viewModel.AgentsJson = InternalPage.Instance.Agents;
+                var w = new AgentConfigureWindow(
+                    );
+                w.DataContext = new AgentConfigureViewModel(
+                    options.AgentCollection
+                    );
+                if ((await w.ShowDialogAsync()).GetValueOrDefault())
+                {
+                    _viewModel._optionsJson = FreeAIrOptions.SerializeToString(options);
+                }
 
                 _viewModel.OnPropertyChanged();
             }
 
             protected override bool CanExecuteInternal(object parameter)
             {
-                if (!AgentCollection.TryParse(_viewModel._agentsJson, out _))
+                if (string.IsNullOrEmpty(_viewModel._optionsJson))
                 {
                     return false;
                 }
 
-                return true;
+                return FreeAIrOptions.TryDeserializeFromString(_viewModel._optionsJson, out _);
             }
         }
     }

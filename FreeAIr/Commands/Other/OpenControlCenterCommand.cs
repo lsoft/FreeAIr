@@ -1,4 +1,5 @@
-﻿using FreeAIr.UI.ViewModels;
+﻿using FreeAIr.Options2;
+using FreeAIr.UI.ViewModels;
 using FreeAIr.UI.Windows;
 using System.Windows;
 
@@ -12,18 +13,17 @@ namespace FreeAIr.Commands.Other
             await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
 
             await ShowAsync(
-                ControlCenterSectionEnum.None
                 );
         }
 
         public static async Task ShowAsync(
-            ControlCenterSectionEnum section
             )
         {
             var w = new ControlCenterWindow(
-                section
                 );
-            var vm = new ControlCenterViewModel();
+            var vm = new ControlCenterViewModel(
+                await FreeAIrOptions.DeserializeAsync()
+                );
             w.DataContext = vm;
             _ = await w.ShowDialogAsync();
         }

@@ -1,4 +1,5 @@
 ﻿using Dto;
+using FreeAIr.Options2;
 using System.Collections.Generic;
 using System.IO;
 
@@ -8,34 +9,34 @@ namespace FreeAIr.MCP.McpServerProxy.Github
     {
         public const string MCPServerFolderName = @"MCP\Server";
 
-        public static IsInstalledRequest IsInstalledRequest(
+        public static async System.Threading.Tasks.Task<IsInstalledRequest> IsInstalledRequestAsync(
             )
         {
             return new IsInstalledRequest(
                 GithubMcpServerProxy.PublicMCPServerName,
-                GetMcpServerSpecificArguments()
+                await GetMcpServerSpecificArgumentsAsync()
                 );
         }
 
-        public static InstallRequest InstallRequest(
+        public static async System.Threading.Tasks.Task<InstallRequest> InstallRequestAsync(
             )
         {
             return new InstallRequest(
                 GithubMcpServerProxy.PublicMCPServerName,
-                GetMcpServerSpecificArguments()
+                await GetMcpServerSpecificArgumentsAsync()
                 );
         }
 
-        public static GetToolsRequest GetToolsRequest(
+        public static async System.Threading.Tasks.Task<GetToolsRequest> GetToolsRequestAsync(
             )
         {
             return new GetToolsRequest(
                 GithubMcpServerProxy.PublicMCPServerName,
-                GetMcpServerSpecificArguments()
+                await GetMcpServerSpecificArgumentsAsync()
                 );
         }
 
-        public static CallToolRequest CallToolRequest(
+        public static async System.Threading.Tasks.Task<CallToolRequest> CallToolRequestAsync(
             string toolName,
             Dictionary<string, object?>? arguments
            )
@@ -49,7 +50,7 @@ namespace FreeAIr.MCP.McpServerProxy.Github
                 GithubMcpServerProxy.PublicMCPServerName,
                 toolName,
                 arguments,
-                GetMcpServerSpecificArguments()
+                await GetMcpServerSpecificArgumentsAsync()
                 );
         }
 
@@ -64,12 +65,12 @@ namespace FreeAIr.MCP.McpServerProxy.Github
             }
         }
 
-        private static Dictionary<string, string> GetMcpServerSpecificArguments()
+        private static async System.Threading.Tasks.Task<Dictionary<string, string>> GetMcpServerSpecificArgumentsAsync()
         {
             return new Dictionary<string, string>
             {
                 ["MCPServerFolderPath"] = MCPServerFolderPath,
-                ["GitHubToken"] = InternalPage.Instance.GitHubToken,
+                ["GitHubToken"] = (await FreeAIrOptions.DeserializeUnsortedAsync()).GitHubToken,
             };
         }
 

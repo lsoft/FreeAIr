@@ -1,30 +1,22 @@
-﻿using FreeAIr.Antlr.Answer;
-using FreeAIr.Antlr.Answer.Parts;
-using FreeAIr.BLogic;
+﻿using FreeAIr.BLogic;
 using FreeAIr.BLogic.Context;
 using FreeAIr.BLogic.Context.Item;
-using FreeAIr.Commands.Other;
 using FreeAIr.Helper;
-using FreeAIr.MCP.McpServerProxy;
+using FreeAIr.Options2;
+using FreeAIr.Options2.Agent;
 using FreeAIr.Shared.Helper;
+using FreeAIr.UI.ContextMenu;
 using FreeAIr.UI.Embedillo.Answer.Parser;
 using FreeAIr.UI.Windows;
-using ICSharpCode.AvalonEdit.Editing;
-using Microsoft.Extensions.AI;
 using Microsoft.VisualStudio.Imaging;
 using Microsoft.VisualStudio.Imaging.Interop;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.Win32;
-using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
-using System.IO;
 using System.Linq;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
 using System.Windows.Input;
-using System.Windows.Media;
 using WpfHelpers;
 
 namespace FreeAIr.UI.ViewModels
@@ -47,9 +39,8 @@ namespace FreeAIr.UI.ViewModels
         private ICommand _removeAllAutomaticItemsFromContextCommand;
         private ICommand _addRelatedItemsToContextCommand;
         private ICommand _addCustomFileToContextCommand;
-        private ICommand _editGlobalToolsCommand;
         private ICommand _editChatToolsCommand;
-        private ICommand _editGlobalAgentsCommand;
+        private ICommand _openControlCenterCommand;
         private ICommand _chooseChatAgentCommand;
 
         public event Action ContextControlFocus;
@@ -220,15 +211,27 @@ namespace FreeAIr.UI.ViewModels
                     _startChatCommand = new AsyncRelayCommand(
                         async a =>
                         {
-                            if (!await InternalPage.Instance.VerifyAgentAndShowErrorIfNotAsync())
+                            if (!await FreeAIrOptions.VerifyAgentAndShowErrorIfNotAsync())
                             {
                                 return;
                             }
 
+                            //var chosenAgent = await VisualStudioContextMenuCommandBridge.ShowAsync<AgentJson>(
+                            //    "Choose agent (with a non-empty token) for a chat:",
+                            //    (await FreeAIrOptions.DeserializeAgentCollectionAsync())
+                            //        .Agents
+                            //        .FindAll(a => !string.IsNullOrEmpty(a.Technical.Token))
+                            //        .ConvertAll(a => (a.Name, a as object))
+                            //    );
+                            //if (chosenAgent is null)
+                            //{
+                            //    return;
+                            //}
+
                             _ = await _chatContainer.StartChatAsync(
                                 new ChatDescription(ChatKindEnum.Discussion, null),
                                 null,
-                                FreeAIr.BLogic.ChatOptions.Default
+                                await FreeAIr.BLogic.ChatOptions.GetDefaultAsync()
                                 );
 
                             FocusPromptControl();
@@ -571,53 +574,23 @@ namespace FreeAIr.UI.ViewModels
             }
         }
 
-        public ICommand EditGlobalAgentsCommand
+        public ICommand OpenControlCenterCommand
         {
             get
             {
-                if (_editGlobalAgentsCommand == null)
+                if (_openControlCenterCommand == null)
                 {
-                    _editGlobalAgentsCommand = new AsyncRelayCommand(
+                    _openControlCenterCommand = new AsyncRelayCommand(
                         async a =>
                         {
-                            await OpenControlCenterCommand.ShowAsync(
-                                ControlCenterSectionEnum.Agents
+                            await Commands.Other.OpenControlCenterCommand.ShowAsync(
                                 );
                             OnPropertyChanged();
                         }
                         );
                 }
 
-                return _editGlobalAgentsCommand;
-            }
-        }
-
-        public ICommand EditGlobalToolsCommand
-        {
-            get
-            {
-                if (_editGlobalToolsCommand == null)
-                {
-                    _editGlobalToolsCommand = new AsyncRelayCommand(
-                        async a =>
-                        {
-                            var toolContainer = AvailableToolContainer.ReadSystem();
-
-                            var w = new NestedCheckBoxWindow();
-                            w.DataContext = new AvailableToolsViewModel(
-                                toolContainer
-                                );
-                            if ((await w.ShowDialogAsync()).GetValueOrDefault())
-                            {
-                                toolContainer.SaveToSystem();
-                            }
-
-                            OnPropertyChanged();
-                        }
-                        );
-                }
-
-                return _editGlobalToolsCommand;
+                return _openControlCenterCommand;
             }
         }
 

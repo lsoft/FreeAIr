@@ -40,7 +40,7 @@ namespace FreeAIr.Commands
                     null
                     ),
                 null,
-                FreeAIr.BLogic.ChatOptions.Default
+                await FreeAIr.BLogic.ChatOptions.GetDefaultAsync()
                 );
             if (chat is null)
             {

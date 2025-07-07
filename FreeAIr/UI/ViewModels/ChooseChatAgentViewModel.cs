@@ -1,4 +1,4 @@
-﻿using FreeAIr.Agents;
+﻿using FreeAIr.Options2.Agent;
 using FreeAIr.MCP.McpServerProxy;
 using FreeAIr.Shared.Helper;
 using FreeAIr.UI.NestedCheckBox;
@@ -12,7 +12,7 @@ namespace FreeAIr.UI.ViewModels
 {
     public sealed class ChooseChatAgentViewModel : NestedCheckBoxViewModel
     {
-        private readonly AgentCollection _chatAgents;
+        private readonly AgentCollectionJson _chatAgents;
         
         private ICommand _saveCommand;
 
@@ -36,7 +36,7 @@ namespace FreeAIr.UI.ViewModels
                             var agentCheckableItems = Groups[0];
                             foreach (var agentCheckableItem in agentCheckableItems.Children)
                             {
-                                var optionAgent = agentCheckableItem.Tag as Agent;
+                                var optionAgent = agentCheckableItem.Tag as AgentJson;
                                 optionAgent.IsDefault = agentCheckableItem.IsChecked.GetValueOrDefault(false);
                             }
 
@@ -52,7 +52,7 @@ namespace FreeAIr.UI.ViewModels
         }
 
         public ChooseChatAgentViewModel(
-            AgentCollection chatAgents
+            AgentCollectionJson chatAgents
             )
         {
             Groups = new ObservableCollection2<CheckableItem>();

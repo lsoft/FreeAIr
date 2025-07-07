@@ -1,4 +1,5 @@
 ﻿using FreeAIr.Helper;
+using FreeAIr.Options2;
 using Microsoft.VisualStudio.ComponentModelHost;
 using Microsoft.VisualStudio.Language.Intellisense;
 using Microsoft.VisualStudio.Language.Intellisense.AsyncCompletion;
@@ -88,7 +89,7 @@ namespace FreeAIr.BLogic
                 var documentFilePath = _textView.TextBuffer.GetFileName();
                 var documentText = _textView.TextSnapshot.GetText();
 
-                var userPrompt = UserPrompt.CreateSuggestWholeLine(
+                var userPrompt = await UserPrompt.CreateSuggestWholeLineAsync(
                     documentFilePath,
                     documentText,
                     caretPosition
@@ -104,7 +105,7 @@ namespace FreeAIr.BLogic
                         null
                         ),
                     userPrompt,
-                    ChatOptions.NoToolAutoProcessedTextResponse()
+                    await ChatOptions.NoToolAutoProcessedTextResponseAsync()
                     );
                 if (chat is null)
                 {
@@ -195,7 +196,9 @@ namespace FreeAIr.BLogic
             CancellationToken cancel
             )
         {
-            if (!ResponsePage.Instance.IsImplicitWholeLineCompletionEnabled)
+            var unsorted = await FreeAIrOptions.DeserializeUnsortedAsync();
+
+            if (!unsorted.IsImplicitWholeLineCompletionEnabled)
             {
                 return null;
             }

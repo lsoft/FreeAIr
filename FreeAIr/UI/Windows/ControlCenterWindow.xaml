@@ -12,7 +12,6 @@
     ui:VsTheme.UseVsTheme="True"
     ShowInTaskbar="False"
     Title="FreeAIr Control Center"
-    Loaded="Window_Loaded"
     >
     <ScrollViewer
         HorizontalAlignment="Stretch"
@@ -24,121 +23,22 @@
         >
         <Grid>
             <Grid.RowDefinitions>
-
-                <!-- Model Context Protocol -->
                 <RowDefinition Height="auto"/> <!-- 0 -->
                 <RowDefinition Height="auto"/> <!-- 1 -->
                 <RowDefinition Height="auto"/> <!-- 2 -->
                 <RowDefinition Height="auto"/> <!-- 3 -->
                 <RowDefinition Height="auto"/> <!-- 4 -->
-                <RowDefinition Height="auto"/> <!-- 5 -->
-
-                <!-- agents -->
-                <RowDefinition Height="auto"/> <!-- 6 -->
-                <RowDefinition Height="auto"/> <!-- 7 -->
-                <RowDefinition Height="auto"/> <!-- 8 -->
-
             </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="auto"/>
+                <ColumnDefinition Width="auto"/>
+                <ColumnDefinition />
+            </Grid.ColumnDefinitions>
 
-            <!-- Model Context Protocol -->
-            <Label
+            <ScrollViewer
                 Grid.Row="0"
-                HorizontalAlignment="Left"
-                VerticalAlignment="Center"
-                FontWeight="Bold"
-                FontSize="18"
-                Margin="2"
-                Content="Model Context Protocol"
-                Name="ModelContextProtocolLabel"
-                />
-
-            <Grid
-                Grid.Row="1"
-                HorizontalAlignment="Stretch"
-                >
-                <Grid.RowDefinitions>
-                    <RowDefinition />
-                    <RowDefinition />
-                </Grid.RowDefinitions>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="auto"/>
-                    <ColumnDefinition Width="auto"/>
-                    <ColumnDefinition />
-                </Grid.ColumnDefinitions>
-
-                <Label
-                    Grid.Row="0"
-                    Grid.Column="0"
-                    HorizontalAlignment="Left"
-                    VerticalAlignment="Center"
-                    FontSize="12"
-                    FontFamily="Cascadia Code"
-                    Margin="2"
-                    Content="Github MCP Server status:"
-                    />
-
-                <Label
-                    Grid.Row="0"
-                    Grid.Column="1"
-                    Margin="0,0,0,0"
-                    Padding="0"
-                    HorizontalAlignment="Left"
-                    VerticalAlignment="Center"
-                    FontSize="12"
-                    FontFamily="Cascadia Code"
-                    Content="{Binding GithubMcpServerStatusMessage}"
-                    />
-
-                <Button
-                    Grid.Row="0"
-                    Grid.Column="2"
-                    HorizontalAlignment="Right"
-                    VerticalAlignment="Center"
-                    Margin="2"
-                    FontSize="12"
-                    FontFamily="Cascadia Code"
-                    Content="Install Github MCP server..."
-                    Command="{Binding InstallGithubMCPServerCommand}"
-                    Style="{DynamicResource TextBlockLikeButtonStyle}"
-                    />
-
-                <Label
-                    Grid.Row="1"
-                    Grid.Column="0"
-                    Grid.ColumnSpan="2"
-                    HorizontalAlignment="Left"
-                    VerticalAlignment="Center"
-                    FontSize="12"
-                    FontFamily="Cascadia Code"
-                    Margin="2"
-                    Content="Github token:"
-                    />
-
-                <TextBox
-                    Grid.Row="1"
-                    Grid.Column="2"
-                    HorizontalAlignment="Stretch"
-                    VerticalAlignment="Center"
-                    Margin="2"
-                    FontSize="12"
-                    FontFamily="Cascadia Code"
-                    Text="{Binding GitHubToken, UpdateSourceTrigger=PropertyChanged}"
-                    />
-
-            </Grid>
-
-            <Label
-                Grid.Row="2"
-                HorizontalAlignment="Left"
-                VerticalAlignment="Center"
-                FontSize="12"
-                FontFamily="Cascadia Code"
-                Margin="2"
-                Content="Configuration of external MCP servers:"
-                />
-
-            <ScrollViewer
-                Grid.Row="3"
+                Grid.Column="0"
+                Grid.ColumnSpan="3"
                 MaxHeight="350"
                 HorizontalScrollBarVisibility="Auto"
                 VerticalScrollBarVisibility="Auto"
@@ -146,70 +46,12 @@
                 >
                 <TextBox
                     HorizontalAlignment="Stretch"
-                    VerticalAlignment="Stretch"
+                    VerticalAlignment="Center"
+                    Margin="2"
                     FontSize="12"
                     FontFamily="Cascadia Code"
-                    Margin="6"
-                    Text="{Binding ExternalMcpServerJson, UpdateSourceTrigger=PropertyChanged}"
-                    BorderBrush="{Binding ExternalMcpServerJsonBorder}"
-                    BorderThickness="1"
-                    MinHeight="150"
-                    AcceptsReturn="True"
-                    />
-            </ScrollViewer>
-
-            <Button
-                Grid.Row="4"
-                HorizontalAlignment="Right"
-                VerticalAlignment="Center"
-                Margin="0,0,8,0"
-                FontSize="12"
-                FontFamily="Cascadia Code"
-                Content="Apply changes..."
-                Command="{Binding ApplyExternalMcpServerChangesCommand}"
-                Style="{DynamicResource TextBlockLikeButtonStyle}"
-                />
-
-            <Button
-                Grid.Row="5"
-                HorizontalAlignment="Right"
-                VerticalAlignment="Center"
-                FontSize="12"
-                FontFamily="Cascadia Code"
-                Margin="0,20,8,0"
-                Content="Edit global MCP tools..."
-                Command="{Binding EditGlobalToolsCommand}"
-                Style="{DynamicResource TextBlockLikeButtonStyle}"
-                Name="MCPAppyButton"
-                />
-
-            <!-- Agents -->
-            <Label
-                Grid.Row="6"
-                HorizontalAlignment="Left"
-                VerticalAlignment="Center"
-                FontWeight="Bold"
-                FontSize="18"
-                Margin="2"
-                Content="Agents"
-                Name="AgentslLabel"
-                />
-
-            <ScrollViewer
-                Grid.Row="7"
-                MaxHeight="350"
-                HorizontalScrollBarVisibility="Auto"
-                VerticalScrollBarVisibility="Auto"
-                PreviewMouseWheel="ScrollViewer_PreviewMouseWheel"
-                >
-                <TextBox
-                    HorizontalAlignment="Stretch"
-                    VerticalAlignment="Stretch"
-                    FontSize="12"
-                    FontFamily="Cascadia Code"
-                    Margin="6"
-                    Text="{Binding AgentsJson, UpdateSourceTrigger=PropertyChanged}"
-                    BorderBrush="{Binding AgentsJsonBorder}"
+                    Text="{Binding OptionsJson, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                    BorderBrush="{Binding OptionsJsonBorder}"
                     BorderThickness="1"
                     MinHeight="150"
                     AcceptsReturn="True"
@@ -217,33 +59,136 @@
             </ScrollViewer>
 
             <StackPanel
-                Grid.Row="8"
-                HorizontalAlignment="Right"
-                VerticalAlignment="Center"
+                Grid.Row="1"
+                Grid.Column="0"
+                Grid.ColumnSpan="3"
+                Margin="0,0,8,0"
                 Orientation="Horizontal"
+                HorizontalAlignment="Right"
                 >
 
                 <Button
-                    Margin="0,0,8,0"
+                    HorizontalAlignment="Right"
+                    VerticalAlignment="Center"
                     FontSize="12"
+                    Margin="10,0,10,0"
                     FontFamily="Cascadia Code"
-                    Content="Edit agents in UI..."
-                    Command="{Binding EditAgentCommand}"
+                    Content="Store options..."
+                    Command="{Binding StoreOptionsCommand}"
                     Style="{DynamicResource TextBlockLikeButtonStyle}"
                     />
 
                 <Button
-                    Margin="0,0,8,0"
+                    HorizontalAlignment="Right"
+                    VerticalAlignment="Center"
                     FontSize="12"
+                    Margin="10,0,10,0"
                     FontFamily="Cascadia Code"
-                    Content="Apply changes..."
-                    Command="{Binding ApplyAgentsJsonCommand}"
+                    Content="Store to options file..."
+                    Command="{Binding StoreOptionsToFileCommand}"
                     Style="{DynamicResource TextBlockLikeButtonStyle}"
-                    Name="AgentsAppyButton"
                     />
-                
+
+                <Button
+                    HorizontalAlignment="Right"
+                    VerticalAlignment="Center"
+                    FontSize="12"
+                    Margin="10,0,10,0"
+                    FontFamily="Cascadia Code"
+                    Content="Delete options file..."
+                    Command="{Binding DeleteOptionsFileCommand}"
+                    Style="{DynamicResource TextBlockLikeButtonStyle}"
+                    />
+
+                <Button
+                    HorizontalAlignment="Right"
+                    VerticalAlignment="Center"
+                    FontSize="12"
+                    Margin="10,0,10,0"
+                    FontFamily="Cascadia Code"
+                    Content="Store as VS options..."
+                    Command="{Binding StoreAsVSOptionsCommand}"
+                    Style="{DynamicResource TextBlockLikeButtonStyle}"
+                    />
+
+                <Button
+                    HorizontalAlignment="Right"
+                    VerticalAlignment="Center"
+                    FontSize="12"
+                    Margin="10,0,10,0"
+                    FontFamily="Cascadia Code"
+                    Content="Clear VS options..."
+                    Command="{Binding ClearVSOptionsCommand}"
+                    Style="{DynamicResource TextBlockLikeButtonStyle}"
+                    />
+
             </StackPanel>
 
+
+            <Button
+                Grid.Row="2"
+                Grid.Column="0"
+                Grid.ColumnSpan="3"
+                Margin="0,20,8,0"
+                HorizontalAlignment="Right"
+                VerticalAlignment="Center"
+                FontSize="12"
+                FontFamily="Cascadia Code"
+                Content="Edit agents..."
+                Command="{Binding EditAgentCommand}"
+                Style="{DynamicResource TextBlockLikeButtonStyle}"
+                />
+
+            <Button
+                Grid.Row="3"
+                Grid.Column="0"
+                Grid.ColumnSpan="3"
+                HorizontalAlignment="Right"
+                VerticalAlignment="Center"
+                Margin="0,0,8,0"
+                FontSize="12"
+                FontFamily="Cascadia Code"
+                Content="Edit global MCP tools..."
+                Command="{Binding EditGlobalToolsCommand}"
+                Style="{DynamicResource TextBlockLikeButtonStyle}"
+                Name="MCPAppyButton"
+                />
+
+            <Label
+                Grid.Row="4"
+                Grid.Column="0"
+                HorizontalAlignment="Left"
+                VerticalAlignment="Center"
+                FontSize="12"
+                FontFamily="Cascadia Code"
+                Margin="0,20,8,0"
+                Content="Github MCP Server status:"
+                />
+
+            <Label
+                Grid.Row="4"
+                Grid.Column="1"
+                Margin="0,20,8,0"
+                Padding="0"
+                HorizontalAlignment="Left"
+                VerticalAlignment="Center"
+                FontSize="12"
+                FontFamily="Cascadia Code"
+                Content="{Binding GithubMcpServerStatusMessage}"
+                />
+
+            <Button
+                Grid.Row="4"
+                Grid.Column="2"
+                HorizontalAlignment="Right"
+                VerticalAlignment="Center"
+                Margin="0,20,8,0"
+                FontSize="12"
+                FontFamily="Cascadia Code"
+                Content="Install Github MCP server..."
+                Command="{Binding InstallGithubMCPServerCommand}"
+                Style="{DynamicResource TextBlockLikeButtonStyle}"
+                />
         </Grid>
     </ScrollViewer>
 </Window>

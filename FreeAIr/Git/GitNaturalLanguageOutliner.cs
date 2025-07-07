@@ -1,4 +1,4 @@
-﻿using FreeAIr.Agents;
+﻿using FreeAIr.Options2.Agent;
 using FreeAIr.BLogic;
 using FreeAIr.BLogic.Context.Item;
 using FreeAIr.Commands.File;
@@ -11,6 +11,7 @@ using FreeAIr.UI.ViewModels;
 using FreeAIr.UI.Windows;
 using System.Collections.Generic;
 using System.Windows;
+using FreeAIr.Options2;
 
 namespace FreeAIr.Git
 {
@@ -23,9 +24,11 @@ namespace FreeAIr.Git
             {
                 await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
 
-                var chosenAgent = await VisualStudioContextMenuCommandBridge.ShowAsync<Agent>(
+                var agentCollection = await FreeAIrOptions.DeserializeAgentCollectionAsync();
+
+                var chosenAgent = await VisualStudioContextMenuCommandBridge.ShowAsync<AgentJson>(
                     "Choose agent to add NL outlines to changed files:",
-                    InternalPage.Instance.GetAgentCollection().Agents.ConvertAll(a => (a.Name, (object)a))
+                    agentCollection.Agents.ConvertAll(a => (a.Name, (object)a))
                     );
                 if (chosenAgent is null)
                 {

@@ -1,4 +1,5 @@
-﻿using FreeAIr.UI.Embedillo.Answer.Parser;
+﻿using FreeAIr.Options2;
+using FreeAIr.UI.Embedillo.Answer.Parser;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.VisualStudio.ComponentModelHost;
@@ -24,7 +25,8 @@ namespace FreeAIr.BLogic.Context.Composer
                 throw new ArgumentNullException(nameof(filePath));
             }
 
-            var timeout = ntimeout.GetValueOrDefault(TimeSpan.FromMilliseconds(ResponsePage.Instance.AutomaticSearchForContextItemsTimeoutMsec));
+            var unsorted = await FreeAIrOptions.DeserializeUnsortedAsync();
+            var timeout = ntimeout.GetValueOrDefault(TimeSpan.FromMilliseconds(unsorted.AutomaticSearchForContextItemsTimeoutMsec));
 
             var context = new ContextComposeResult(
                 );
@@ -103,7 +105,8 @@ namespace FreeAIr.BLogic.Context.Composer
             TimeSpan? ntimeout = null
             )
         {
-            var timeout = ntimeout.GetValueOrDefault(TimeSpan.FromMilliseconds(ResponsePage.Instance.AutomaticSearchForContextItemsTimeoutMsec));
+            var unsorted = await FreeAIrOptions.DeserializeUnsortedAsync();
+            var timeout = ntimeout.GetValueOrDefault(TimeSpan.FromMilliseconds(unsorted.AutomaticSearchForContextItemsTimeoutMsec));
 
             var context = new ContextComposeResult(
                 );

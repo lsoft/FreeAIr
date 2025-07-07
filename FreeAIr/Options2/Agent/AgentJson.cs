@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FreeAIr.Agents
+namespace FreeAIr.Options2.Agent
 {
-    public sealed class Agent
+    public sealed class AgentJson : ICloneable
     {
         /// <summary>
         /// Agent name.
@@ -43,22 +43,34 @@ namespace FreeAIr.Agents
             set;
         }
 
-        public Agent()
+        public AgentJson()
         {
             Name = string.Empty;
             IsDefault = false;
             Technical = new();
-            SystemPrompt = InternalPage.DefaultSystemPrompt;
+            SystemPrompt = AgentCollectionJson.DefaultSystemPrompt;
         }
 
-        public string GetFormattedSystemPrompt()
+        public object Clone()
         {
-            var result = SystemPrompt.Replace("{CULTURE}", ResponsePage.GetAnswerCultureName());
+            return new AgentJson
+            {
+                Name = Name,
+                IsDefault = IsDefault,
+                Technical = (AgentTechnical)Technical.Clone(),
+                SystemPrompt = SystemPrompt
+            };
+        }
+
+        public async Task<string> GetFormattedSystemPromptAsync()
+        {
+            var unsorted = await FreeAIrOptions.DeserializeUnsortedAsync();
+            var result = SystemPrompt.Replace("{CULTURE}", unsorted.GetAnswerCultureName());
             return result;
         }
     }
 
-    public sealed class AgentTechnical
+    public sealed class AgentTechnical : ICloneable
     {
         /// <summary>
         /// An endpoint of LLM API provider.
@@ -100,7 +112,19 @@ namespace FreeAIr.Agents
         {
             Endpoint = "http://localhost:5001/v1";
             Token = string.Empty;
+            ChosenModel = string.Empty;
             ContextSize = 8192;
+        }
+
+        public object Clone()
+        {
+            return new AgentTechnical
+            {
+                Endpoint = Endpoint,
+                Token = Token,
+                ChosenModel = ChosenModel,
+                ContextSize = ContextSize
+            };
         }
 
         public bool HasToken() => !string.IsNullOrEmpty(Token);

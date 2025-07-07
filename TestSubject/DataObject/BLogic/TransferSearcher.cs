@@ -28,6 +28,7 @@ namespace DataObject.BLogic
            Voyage firstVoyage,
            DateTime voyageDate
            )
+       // * Ищет рейсы, соответствующие заданной дате и условиям.
        {
            var allVoyagesAtDate = _repository
                .ReadAllVoyages()

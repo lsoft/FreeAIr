@@ -12,6 +12,17 @@ namespace FreeAIr.UI.Windows
             InitializeComponent();
         }
 
+        private void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+            var vm = this.DataContext as AgentConfigureViewModel;
+            if (vm is not null)
+            {
+                vm.CloseWindow = result =>
+                {
+                    DialogResult = result;
+                };
+            }
+        }
     }
 
 }

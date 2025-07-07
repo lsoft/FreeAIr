@@ -8,7 +8,7 @@ namespace DataObject.Helper
 {
     public static class CollectionHelper
     {
-        // * Check if two collections are equal.
+        // * Проверяет равенство двух коллекций.
         public static bool IsCollectionEquals<T>(
             IReadOnlyList<T>? first,
             IReadOnlyList<T>? second
@@ -22,6 +22,7 @@ namespace DataObject.Helper
             {
                 return true;
             }
+            // * Обрабатывает случаи, когда одна из коллекций равна null.
             if (first is null)
             {
                 return false;
@@ -31,6 +32,7 @@ namespace DataObject.Helper
                 return false;
             }
 
+            // * Сравнивает элементы коллекций попарно.
             for (var i = 0; i < first.Count; i++)
             {
                 var fs = first[i];

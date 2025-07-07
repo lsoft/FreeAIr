@@ -1,8 +1,9 @@
 ﻿using EnvDTE;
-using FreeAIr.Agents;
 using FreeAIr.BLogic.Context.Item;
 using FreeAIr.Helper;
 using FreeAIr.NLOutline;
+using FreeAIr.Options2;
+using FreeAIr.Options2.Agent;
 using FreeAIr.UI.ContextMenu;
 using FreeAIr.UI.ToolWindows;
 using FreeAIr.UI.ViewModels;
@@ -25,9 +26,9 @@ namespace FreeAIr.Commands.File
         {
             await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
 
-            var chosenAgent = await VisualStudioContextMenuCommandBridge.ShowAsync<Agent>(
+            var chosenAgent = await VisualStudioContextMenuCommandBridge.ShowAsync<AgentJson>(
                 "Choose agent to add NL outlines:",
-                InternalPage.Instance.GetAgentCollection().Agents.ConvertAll(a => (a.Name, a as object))
+                (await FreeAIrOptions.DeserializeAgentCollectionAsync()).Agents.ConvertAll(a => (a.Name, a as object))
                 );
             if (chosenAgent is null)
             {

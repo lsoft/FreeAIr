@@ -258,6 +258,16 @@
                     Text=" 'Embedding generate agent' is an agent to generate the embeddings from gathered natural language outlines."
                     />
 
+                <TextBlock
+                    HorizontalAlignment="Stretch"
+                    Background="Transparent"
+                    FontFamily="Cascadia Code"
+                    TextWrapping="Wrap"
+                    Padding="0"
+                    Margin="0"
+                    Text=" Natural language outlines are used to apply RAG (retrieval augmented generation) for natural language search, and based on the paper https://arxiv.org/html/2408.04820v4"
+                    />
+
             </StackPanel>
             
 

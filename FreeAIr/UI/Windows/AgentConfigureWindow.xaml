@@ -13,6 +13,7 @@
     ui:VsTheme.UseVsTheme="True"
     ShowInTaskbar="False"
     Title="FreeAIr Agent Configuration Window"
+    Loaded="Window_Loaded"
     >
     <Grid>
         <Grid.RowDefinitions>
@@ -62,14 +63,14 @@
                 />
             <Button
                 Grid.Column="2"
-                Content="Save changes"
+                Content="Apply changes"
                 Margin="5,0,5,0"
                 FontSize="12"
                 FontFamily="Cascadia Code"
                 HorizontalAlignment="Right"
                 VerticalAlignment="Center"
-                ToolTip="Save changes"
-                Command="{Binding SaveAndCloseCommand}"
+                ToolTip="Apply changes"
+                Command="{Binding ApplyAndCloseCommand}"
                 Style="{DynamicResource TextBlockLikeButtonStyle}"
                 />
 

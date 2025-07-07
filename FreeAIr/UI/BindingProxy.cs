@@ -10,7 +10,7 @@ namespace FreeAIr.UI
         }
 
         public static readonly DependencyProperty DataProperty = DependencyProperty.Register(
-            "Data",
+            "_cached",
             typeof(object),
             typeof(BindingProxy),
             new UIPropertyMetadata(null)

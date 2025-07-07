@@ -1,9 +1,9 @@
-﻿using FreeAIr.Agents;
-using FreeAIr.BLogic;
+﻿using FreeAIr.BLogic;
 using FreeAIr.BLogic.Context.Item;
 using FreeAIr.Embedding;
 using FreeAIr.Git.Parser;
 using FreeAIr.Helper;
+using FreeAIr.Options2.Agent;
 using FreeAIr.Shared.Helper;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -44,7 +44,7 @@ namespace FreeAIr.NLOutline.Tree.Builder.File
         }
 
         Task BuildAsync(
-            Agent agent,
+            AgentJson agent,
             string rootPath,
             List<SolutionItem> items,
             OutlineNode root
@@ -60,9 +60,9 @@ namespace FreeAIr.NLOutline.Tree.Builder.File
     {
         public int Order => int.MaxValue;
         
-        public string Name => "Default file scanner";
+        public string Name => "GetDefaultAsync file scanner";
 
-        public string Description => "Default scanner for NLO. It asks LLM to produce NLO tree for the file.";
+        public string Description => "GetDefaultAsync scanner for NLO. It asks LLM to produce NLO tree for the file.";
 
         public IReadOnlyList<string> FileExtensions
         {
@@ -75,7 +75,7 @@ namespace FreeAIr.NLOutline.Tree.Builder.File
         }
 
         public async Task BuildAsync(
-            Agent agent,
+            AgentJson agent,
             string rootPath,
             List<SolutionItem> items,
             OutlineNode root
@@ -90,7 +90,7 @@ namespace FreeAIr.NLOutline.Tree.Builder.File
         }
 
         private async Task BuildInternalAsync(
-            Agent agent,
+            AgentJson agent,
             string rootPath,
             List<SolutionItem> items,
             OutlineNode root
@@ -121,7 +121,7 @@ namespace FreeAIr.NLOutline.Tree.Builder.File
                     null
                     ),
                 null,
-                ChatOptions.NoToolAutoProcessedTextResponse(agent)
+                await ChatOptions.NoToolAutoProcessedTextResponseAsync(agent)
                 );
 
             if (chat is null)
@@ -197,7 +197,7 @@ namespace FreeAIr.NLOutline.Tree.Builder.File
         }
 
         public async Task BuildAsync(
-            Agent agent,
+            AgentJson agent,
             string rootPath,
             List<SolutionItem> items,
             OutlineNode root

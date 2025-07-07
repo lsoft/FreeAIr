@@ -29,7 +29,7 @@ namespace FreeAIr.MCP.McpServerProxy.Github
 
             var response = await McpServerProxyApplication.HttpClient.PostAsJsonAsync<IsInstalledRequest>(
                 "/is_installed",
-                GithubRequestFactory.IsInstalledRequest(
+                await GithubRequestFactory.IsInstalledRequestAsync(
                     )
                 );
             response.EnsureSuccessStatusCode();
@@ -47,7 +47,7 @@ namespace FreeAIr.MCP.McpServerProxy.Github
 
             var response = await McpServerProxyApplication.HttpClient.PostAsJsonAsync<InstallRequest>(
                 "/install",
-                GithubRequestFactory.InstallRequest(
+                await GithubRequestFactory.InstallRequestAsync(
                     )
                 );
             response.EnsureSuccessStatusCode();
@@ -68,7 +68,7 @@ namespace FreeAIr.MCP.McpServerProxy.Github
 
             var response = await McpServerProxyApplication.HttpClient.PostAsJsonAsync<GetToolsRequest>(
                 "/get_tools",
-                GithubRequestFactory.GetToolsRequest(
+                await GithubRequestFactory.GetToolsRequestAsync(
                     )
                 );
             response.EnsureSuccessStatusCode();
@@ -100,7 +100,7 @@ namespace FreeAIr.MCP.McpServerProxy.Github
             {
                 var response = await McpServerProxyApplication.HttpClient.PostAsJsonAsync<CallToolRequest>(
                     "/call_tool",
-                    GithubRequestFactory.CallToolRequest(
+                    await GithubRequestFactory.CallToolRequestAsync(
                         toolName,
                         arguments
                         ),

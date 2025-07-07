@@ -19,11 +19,9 @@ namespace FreeAIr.UI.Embedillo.Answer.Parser
             Kind = kind;
         }
 
-        public Task<string> AsPromptStringAsync()
+        public async Task<string> AsPromptStringAsync()
         {
-            return Task.FromResult(
-                Kind.AsPromptString()
-                );
+            return await Kind.AsPromptStringAsync();
         }
 
         public IChatContextItem TryCreateChatContextItem()

@@ -1,7 +1,8 @@
-using FreeAIr.Agents;
 using FreeAIr.BLogic.Context.Item;
 using FreeAIr.Find;
 using FreeAIr.Git;
+using FreeAIr.Options2;
+using FreeAIr.Options2.Agent;
 using FreeAIr.UI.ContextMenu;
 using FreeAIr.UI.ToolWindows;
 using FreeAIr.UI.ViewModels;
@@ -22,9 +23,10 @@ namespace FreeAIr.BLogic
             {
                 await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
 
-                var chosenAgent = await VisualStudioContextMenuCommandBridge.ShowAsync<Agent>(
+                var agentCollection = await FreeAIrOptions.DeserializeAgentCollectionAsync();
+                var chosenAgent = await VisualStudioContextMenuCommandBridge.ShowAsync<AgentJson>(
                     "Choose agent for commit message generation:",
-                    InternalPage.Instance.GetAgentCollection().Agents.ConvertAll(a => (a.Name, (object)a))
+                    agentCollection.Agents.ConvertAll(a => (a.Name, (object)a))
                     );
                 if (chosenAgent is null)
                 {
@@ -42,7 +44,7 @@ namespace FreeAIr.BLogic
         }
 
         private static async Task BuildCommitMessageAsync(
-            Agent agent
+            AgentJson agent
             )
         {
             await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
@@ -72,8 +74,8 @@ namespace FreeAIr.BLogic
                     ChatKindEnum.GenerateCommitMessage,
                     null
                     ),
-                UserPrompt.CreateCommitMessagePrompt(gitDiff),
-                ChatOptions.NoToolAutoProcessedTextResponse(agent)
+                await UserPrompt.CreateCommitMessagePromptAsync(gitDiff),
+                await ChatOptions.NoToolAutoProcessedTextResponseAsync(agent)
                 );
 
             if (chat is not null)

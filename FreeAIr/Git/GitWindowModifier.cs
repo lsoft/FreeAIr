@@ -1,6 +1,6 @@
 using EnvDTE;
 using EnvDTE80;
-using FreeAIr.Agents;
+using FreeAIr.Options2.Agent;
 using FreeAIr.Git;
 using Microsoft.VisualStudio.Imaging;
 using System.ComponentModel.Composition;

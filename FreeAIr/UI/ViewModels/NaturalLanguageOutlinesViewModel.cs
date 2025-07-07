@@ -1,10 +1,10 @@
 ﻿using EnvDTE80;
-using FreeAIr.Agents;
 using FreeAIr.BLogic;
 using FreeAIr.BLogic.Context;
 using FreeAIr.BLogic.Context.Item;
 using FreeAIr.Helper;
 using FreeAIr.NLOutline;
+using FreeAIr.Options2.Agent;
 using FreeAIr.Shared.Helper;
 using FreeAIr.UI.ToolWindows;
 using Microsoft.VisualStudio.ComponentModelHost;
@@ -224,7 +224,7 @@ namespace FreeAIr.UI.ViewModels
         }
 
         public async Task SetNewChatAsync(
-            Agent defaultAgent,
+            AgentJson defaultAgent,
             List<SolutionItemChatContextItem> chosenSolutionItems
             )
         {
@@ -255,7 +255,7 @@ namespace FreeAIr.UI.ViewModels
                     null
                     ),
                 null,
-                FreeAIr.BLogic.ChatOptions.NoToolAutoProcessedJsonResponse(defaultAgent)
+                await FreeAIr.BLogic.ChatOptions.NoToolAutoProcessedJsonResponseAsync(defaultAgent)
                 );
             if (_chat is null)
             {
@@ -277,7 +277,7 @@ namespace FreeAIr.UI.ViewModels
         }
 
         public async Task ProcessSolutionDocumentsAsync(
-            Agent defaultAgent,
+            AgentJson defaultAgent,
             List<SolutionItemChatContextItem> chosenSolutionItems
             )
         {
@@ -494,7 +494,7 @@ Identify the logical sections of the code inside following files and summarize t
 
 
         public static async Task ShowPanelAsync(
-            Agent agent,
+            AgentJson agent,
             List<SolutionItemChatContextItem> chosenSolutionItems
             )
         {

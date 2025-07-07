@@ -1,6 +1,7 @@
 ﻿using FreeAIr.BLogic;
 using FreeAIr.BLogic.Context.Composer;
 using FreeAIr.BLogic.Context.Item;
+using FreeAIr.Options2;
 using FreeAIr.UI.ToolWindows;
 using Microsoft.VisualStudio.ComponentModelHost;
 using System.Linq;
@@ -21,7 +22,7 @@ namespace FreeAIr.Commands.File
         {
             await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
 
-            if (!InternalPage.Instance.IsActiveAgentHasToken())
+            if (!await FreeAIrOptions.IsActiveAgentHasTokenAsync())
             {
                 await VS.MessageBox.ShowErrorAsync(
                     Resources.Resources.Error,
@@ -48,7 +49,7 @@ namespace FreeAIr.Commands.File
                     null
                     ),
                 null,
-                FreeAIr.BLogic.ChatOptions.Default
+                await FreeAIr.BLogic.ChatOptions.GetDefaultAsync()
                 );
             if (chat is null)
             {
@@ -83,7 +84,7 @@ namespace FreeAIr.Commands.File
             }
 
             chat.AddPrompt(
-                UserPrompt.CreateContextItemBasedPrompt(
+                await UserPrompt.CreateContextItemBasedPromptAsync(
                     kind,
                     selections.ConvertAll(s => s.FullPath)
                     )

@@ -44,7 +44,7 @@ namespace FreeAIr.Commands.BuildError
                     wfd
                     ),
                 null,
-                FreeAIr.BLogic.ChatOptions.Default
+                await FreeAIr.BLogic.ChatOptions.GetDefaultAsync()
                 );
             if (chat is null)
             {
@@ -69,7 +69,7 @@ namespace FreeAIr.Commands.BuildError
             var fi = new FileInfo(errorInformation.FilePath);
 
             chat.AddPrompt(
-                UserPrompt.CreateFixBuildErrorPrompt(errorInformation.ErrorDescription, fi.Name, errorInformation.FilePath)
+                await UserPrompt.CreateFixBuildErrorPromptAsync(errorInformation.ErrorDescription, fi.Name, errorInformation.FilePath)
                 );
 
             await ChatListToolWindow.ShowIfEnabledAsync();

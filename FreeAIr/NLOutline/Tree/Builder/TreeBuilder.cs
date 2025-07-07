@@ -1,4 +1,4 @@
-﻿using FreeAIr.Agents;
+﻿using FreeAIr.Options2.Agent;
 using FreeAIr.BLogic;
 using FreeAIr.Embedding;
 using FreeAIr.Embedding.Json;
@@ -95,7 +95,7 @@ namespace FreeAIr.NLOutline.Tree.Builder
 
     public sealed class TreeBuilderParameters
     {
-        public Agent Agent
+        public AgentJson Agent
         {
             get;
         }
@@ -116,7 +116,7 @@ namespace FreeAIr.NLOutline.Tree.Builder
         }
 
         public TreeBuilderParameters(
-            Agent agent,
+            AgentJson agent,
             bool forceUseNLOAgent,
             HashSet<string>? checkedPaths,
             OutlineNode? oldOutlineRoot

@@ -1,4 +1,5 @@
-﻿using FreeAIr.UI.ToolWindows;
+﻿using FreeAIr.Options2;
+using FreeAIr.UI.ToolWindows;
 
 namespace FreeAIr.Commands.Other
 {
@@ -9,7 +10,7 @@ namespace FreeAIr.Commands.Other
         {
             await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
 
-            if (!InternalPage.Instance.IsActiveAgentHasToken())
+            if (!await FreeAIrOptions.IsActiveAgentHasTokenAsync())
             {
                 await VS.MessageBox.ShowErrorAsync(
                     Resources.Resources.Error,

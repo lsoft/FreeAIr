@@ -3,7 +3,7 @@ global using Microsoft.VisualStudio.Shell;
 global using System;
 global using Task = System.Threading.Tasks.Task;
 using EnvDTE80;
-using FreeAIr.Agents;
+using FreeAIr.Options2.Agent;
 using FreeAIr.BLogic;
 using FreeAIr.Extension.CodeLens;
 using FreeAIr.Find;
@@ -34,7 +34,6 @@ namespace FreeAIr
     [Guid(PackageGuids.FreeAIrString)]
     [ProvideAutoLoad(VSConstants.UICONTEXT.NoSolution_string, PackageAutoLoadFlags.BackgroundLoad)]
     [ProvideAutoLoad(VSConstants.UICONTEXT.SolutionExistsAndFullyLoaded_string, PackageAutoLoadFlags.BackgroundLoad)]
-    [ProvideOptionPage(typeof(OptionsProvider.ResponsePageOptions), "FreeAIr", "Response", 0, 0, true, SupportsProfiles = true)]
     [ProvideOptionPage(typeof(OptionsProvider.InternalPageOptions), "FreeAIr", "Internal", 0, 0, true, SupportsProfiles = true)]
     [ProvideToolWindow(typeof(ChatListToolWindow.Pane), Style = VsDockStyle.Tabbed, Window = WindowGuids.DocumentWell)]
     [ProvideToolWindow(typeof(ChooseModelToolWindow.Pane), Style = VsDockStyle.Tabbed, Window = WindowGuids.DocumentWell)]

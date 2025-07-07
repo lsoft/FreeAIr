@@ -1,4 +1,4 @@
-﻿using FreeAIr.Agents;
+﻿using FreeAIr.Options2.Agent;
 using FreeAIr.Embedding;
 using FreeAIr.Embedding.Json;
 using FreeAIr.Git;
@@ -20,6 +20,7 @@ using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
 using WpfHelpers;
+using FreeAIr.Options2;
 
 namespace FreeAIr.UI.ViewModels
 {
@@ -290,7 +291,7 @@ namespace FreeAIr.UI.ViewModels
 
             if (fillAgents)
             {
-                FillAgents();
+                await FillAgentsAsync();
             }
 
             if (_completeRebuild || !await GitRepositoryProvider.IsGitRepositoryExistsAsync())
@@ -305,18 +306,20 @@ namespace FreeAIr.UI.ViewModels
             OnPropertyChanged();
         }
 
-        private void FillAgents()
+        private async Task FillAgentsAsync()
         {
             ClearAgents();
 
+            var agentCollection = await FreeAIrOptions.DeserializeAgentCollectionAsync();
+
             GenerateNLOAgentList.AddRange(
-                InternalPage.Instance.GetAgentCollection().Agents
+                agentCollection.Agents
                     .ConvertAll(a => new AgentWrapper(a))
                     );
             SelectedGenerateNLOAgent = GenerateNLOAgentList.FirstOrDefault();
 
             GenerateEmbeddingAgentList.AddRange(
-                InternalPage.Instance.GetAgentCollection().Agents
+                agentCollection.Agents
                     .ConvertAll(a => new AgentWrapper(a))
                     );
             SelectedGenerateEmbeddingAgent = GenerateEmbeddingAgentList.FirstOrDefault();
@@ -447,7 +450,7 @@ namespace FreeAIr.UI.ViewModels
 
     public sealed class AgentWrapper : BaseViewModel
     {
-        public Agent Agent
+        public AgentJson Agent
         {
             get;
         }
@@ -457,7 +460,7 @@ namespace FreeAIr.UI.ViewModels
         public string Technical => $"{Agent.Technical.ChosenModel} ({Agent.Technical.Endpoint})";
 
         public AgentWrapper(
-            Agent agent
+            AgentJson agent
             )
         {
             if (agent is null)
@@ -473,9 +476,9 @@ namespace FreeAIr.UI.ViewModels
 
     public sealed class GenerateEmbeddingOutlineFilesBackgroundTask : BackgroundTask
     {
-        private readonly Agent _nloAgent;
+        private readonly AgentJson _nloAgent;
         private readonly bool _forceUseNLOAgent;
-        private readonly Agent _embeddingAgent;
+        private readonly AgentJson _embeddingAgent;
         private readonly bool _completeRebuild;
         private readonly string _jsonFilePath;
         private readonly IReadOnlyList<CheckableItem> _tree;
@@ -489,9 +492,9 @@ namespace FreeAIr.UI.ViewModels
         }
 
         public GenerateEmbeddingOutlineFilesBackgroundTask(
-            Agent nloAgent,
+            AgentJson nloAgent,
             bool forceUseNLOAgent,
-            Agent embeddingAgent,
+            AgentJson embeddingAgent,
             bool completeRebuild,
             string jsonFilePath,
             IReadOnlyList<CheckableItem> tree

@@ -1,7 +1,7 @@
-﻿using FreeAIr.Shared.Helper;
+﻿using FreeAIr.Options2;
+using FreeAIr.Options2.Mcp;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.Json;
 
 namespace FreeAIr.MCP.McpServerProxy
 {
@@ -11,13 +11,34 @@ namespace FreeAIr.MCP.McpServerProxy
     /// </summary>
     public sealed class AvailableToolContainer
     {
-        private readonly AvailableMcpServers _servers;
+        private readonly AvailableMcpServersJson _servers;
 
-        public static AvailableToolContainer ReadSystem() => new AvailableToolContainer();
-
-        private AvailableToolContainer()
+        public static async System.Threading.Tasks.Task<AvailableToolContainer> ReadSystemAsync()
         {
-            _servers = Read();
+            var tools = await FreeAIrOptions.DeserializeAvailableToolsAsync();
+            var c = new AvailableToolContainer(tools);
+            return c;
+        }
+
+        public static AvailableToolContainer ReadFromOptions(
+            string optionsJson
+            )
+        {
+            var options = FreeAIrOptions.DeserializeFromString(optionsJson);
+            var c = new AvailableToolContainer(options.AvailableTools);
+            return c;
+        }
+
+        private AvailableToolContainer(
+            AvailableMcpServersJson servers
+            )
+        {
+            if (servers is null)
+            {
+                throw new ArgumentNullException(nameof(servers));
+            }
+
+            _servers = servers;
         }
 
         public bool GetToolStatus(
@@ -43,7 +64,7 @@ namespace FreeAIr.MCP.McpServerProxy
 
         public void AddServer(string serverName)
         {
-            _servers.Servers.Add(new AvailableMcpServer(serverName, []));
+            _servers.Servers.Add(new AvailableMcpServerJson(serverName, []));
         }
 
         public void DeleteServer(string serverName)
@@ -60,7 +81,7 @@ namespace FreeAIr.MCP.McpServerProxy
             var server = _servers.Servers.FirstOrDefault(s => s.Name == serverName);
             if (server is null)
             {
-                server = new AvailableMcpServer(
+                server = new AvailableMcpServerJson(
                     serverName,
                     toolNames
                     );
@@ -107,178 +128,27 @@ namespace FreeAIr.MCP.McpServerProxy
             var tool = server.Tools.FirstOrDefault(t => t.Name == toolName);
             if (tool is null)
             {
-                server.Tools.Add(new AvailableMcpServerTool(toolName, enabled));
+                server.Tools.Add(new AvailableMcpServerToolJson(toolName, enabled));
                 return;
             }
 
             tool.Enabled = enabled;
         }
 
-        public void SaveToSystem()
+        public async Task SaveToSystemAsync()
         {
-            InternalPage.Instance.SaveExternalMCPTools(
+            await FreeAIrOptions.SaveExternalMCPToolsAsync(
                 _servers
                 );
         }
 
-        private static AvailableMcpServers Read()
+        public string SaveTo(
+            string optionsJson
+            )
         {
-            var json = InternalPage.Instance.AvailableTools;
-            if (string.IsNullOrEmpty(json))
-            {
-                return new AvailableMcpServers();
-            }
-
-            try
-            {
-                var result = JsonSerializer.Deserialize<AvailableMcpServers>(json);
-                return result;
-            }
-            catch (Exception excp)
-            {
-                //todo log
-            }
-
-            return new AvailableMcpServers();
-        }
-
-        public sealed class AvailableMcpServers
-        {
-            public List<AvailableMcpServer> Servers
-            {
-                get;
-                set;
-            }
-
-            public AvailableMcpServers()
-            {
-                Servers = [];
-            }
-
-            public void Add(AvailableMcpServer server)
-            {
-                if (server is null)
-                {
-                    throw new ArgumentNullException(nameof(server));
-                }
-
-                Servers.Add(server);
-            }
-
-            public bool DeleteAllToolsForServer(string serverName)
-            {
-                var lengthBeforeDelete = Servers.Count;
-                Servers.RemoveAll(a => a.Name == serverName);
-                return Servers.Count != lengthBeforeDelete;
-            }
-        }
-
-        public sealed class AvailableMcpServer
-        {
-            public string Name
-            {
-                get;
-                set;
-            }
-
-            public List<AvailableMcpServerTool> Tools
-            {
-                get;
-                set;
-            }
-
-            public AvailableMcpServer()
-            {
-                Name = string.Empty;
-                Tools = [];
-            }
-
-            public AvailableMcpServer(
-                string name,
-                IReadOnlyList<string> toolNames
-                )
-            {
-                if (name is null)
-                {
-                    throw new ArgumentNullException(nameof(name));
-                }
-
-                Name = name;
-                Tools = toolNames.ConvertAll(t => new AvailableMcpServerTool(t));
-            }
-
-            public void AddToolsIfNotExists(
-                IReadOnlyList<string> toolNames
-                )
-            {
-                //here is O(N*N), but this is not a problem: there are max 20-30 tools in the list
-
-                var tools = Tools.ToList();
-                tools.RemoveAll(t => !toolNames.Contains(t.Name)); //delete tools which is non existent now
-
-                foreach (var toolName in toolNames)
-                {
-                    var tool = tools.FirstOrDefault(t => t.Name == toolName);
-                    if (tool is not null)
-                    {
-                        tool.Enabled = true;
-                    }
-                    else
-                    {
-                        tools.Add(new AvailableMcpServerTool(toolName));
-                    }
-                }
-
-                Tools = tools;
-            }
-
-            public void UpdateAllTools(bool enabled)
-            {
-                Tools.ForEach(t => t.Enabled = enabled);
-            }
-        }
-
-        public sealed class AvailableMcpServerTool
-        {
-            public bool Enabled
-            {
-                get;
-                set;
-            }
-
-            public string Name
-            {
-                get;
-                set;
-            }
-
-            public AvailableMcpServerTool()
-            {
-                Enabled = false;
-                Name = string.Empty;
-            }
-
-            public AvailableMcpServerTool(string name)
-            {
-                if (name is null)
-                {
-                    throw new ArgumentNullException(nameof(name));
-                }
-
-                Enabled = true;
-                Name = name;
-            }
-
-            public AvailableMcpServerTool(string name, bool enabled)
-            {
-                if (name is null)
-                {
-                    throw new ArgumentNullException(nameof(name));
-                }
-
-                Name = name;
-                Enabled = enabled;
-            }
+            var options = FreeAIrOptions.DeserializeFromString(optionsJson);
+            options.AvailableTools = this._servers;
+            return FreeAIrOptions.SerializeToString(options);
         }
     }
 }

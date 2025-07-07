@@ -1,4 +1,4 @@
-﻿using FreeAIr.Agents;
+﻿using FreeAIr.Options2.Agent;
 using FreeAIr.Embedding.Json;
 using FreeAIr.NLOutline.Tree;
 using FreeAIr.Shared.Helper;
@@ -19,7 +19,7 @@ namespace FreeAIr.Embedding
         private readonly EmbeddingClient _embeddingClient;
 
         public EmbeddingGenerator(
-            Agent agent
+            AgentJson agent
             )
         {
             if (agent is null)

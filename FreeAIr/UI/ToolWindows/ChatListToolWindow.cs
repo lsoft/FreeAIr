@@ -1,4 +1,5 @@
-﻿using FreeAIr.UI.ViewModels;
+﻿using FreeAIr.Options2;
+using FreeAIr.UI.ViewModels;
 using Microsoft.VisualStudio.ComponentModelHost;
 using Microsoft.VisualStudio.Imaging;
 using System.Runtime.InteropServices;
@@ -28,7 +29,8 @@ namespace FreeAIr.UI.ToolWindows
 
         public static async Task ShowIfEnabledAsync()
         {
-            if (ResponsePage.Instance.SwitchToTaskWindow)
+            var unsorted = await FreeAIrOptions.DeserializeUnsortedAsync();
+            if (unsorted.SwitchToTaskWindow)
             {
                 _ = await ChatListToolWindow.ShowAsync();
             }

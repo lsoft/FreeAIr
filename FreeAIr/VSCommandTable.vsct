@@ -253,15 +253,6 @@
         </Strings>
       </Button>
 
-      <Button guid="FreeAIr" id="ShowAgentConfigureCommandId" priority="0x0100" type="Button">
-        <Parent guid="FreeAIr" id="SubExtensionMenuGroup" />
-        <Icon guid="ImageCatalogGuid" id="ConfigurationEditor" />
-        <CommandFlag>IconIsMoniker</CommandFlag>
-        <Strings>
-          <ButtonText>Configure agents...</ButtonText>
-        </Strings>
-      </Button>
-
     </Buttons>
 
     <Bitmaps>
@@ -315,8 +306,6 @@
       <IDSymbol name="OpenNaturalSearchToolWindowCommandId" value="0x1041" />
       <IDSymbol name="ShowReleaseNotesCommandId" value="0x1042" />
       <IDSymbol name="OpenControlCenterCommandId" value="0x1043" />
-
-      <IDSymbol name="ShowAgentConfigureCommandId" value="0x1044"/>
 
       <!-- natural language outlines -->
       <IDSymbol name="AddNaturalLanguageOutlinesCommandId" value="0x1052"/>

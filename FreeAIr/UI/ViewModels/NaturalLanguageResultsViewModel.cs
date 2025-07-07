@@ -3,6 +3,7 @@ using FreeAIr.BLogic.Context;
 using FreeAIr.BLogic.Context.Item;
 using FreeAIr.Find;
 using FreeAIr.Helper;
+using FreeAIr.Options2;
 using FreeAIr.Shared.Helper;
 using FreeAIr.UI.ToolWindows;
 using FuzzySharp;
@@ -236,7 +237,7 @@ namespace FreeAIr.UI.ViewModels
                     null
                     ),
                 null,
-                ChatOptions.NoToolAutoProcessedJsonResponse()
+                await ChatOptions.NoToolAutoProcessedJsonResponseAsync()
                 );
             if (_chat is null)
             {
@@ -309,7 +310,7 @@ namespace FreeAIr.UI.ViewModels
             {
                 var processedItemCount = 0;
 
-                var agent = InternalPage.Instance.GetActiveAgent();
+                var agent = await FreeAIrOptions.GetActiveAgentAsync();
                 foreach (var portion in foundRootItems.SplitByItemsSize(agent.Technical.ContextSize))
                 {
                     Status = $"In progress ({processedItemCount}/{foundRootItems.Count})...";
@@ -335,7 +336,7 @@ namespace FreeAIr.UI.ViewModels
                     _chat.ChatContext.AddItems(contextItems);
 
                     _chat.AddPrompt(
-                        UserPrompt.CreateNaturalLanguageSearchPrompt(
+                        await UserPrompt.CreateNaturalLanguageSearchPromptAsync(
                             searchText
                             )
                         );

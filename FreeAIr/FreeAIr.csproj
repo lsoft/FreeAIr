@@ -46,8 +46,8 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="Agents\Agent.cs" />
-    <Compile Include="Agents\AgentCollection.cs" />
+    <Compile Include="Options2\Agent\AgentJson.cs" />
+    <Compile Include="Options2\Agent\AgentCollectionJson.cs" />
     <Compile Include="Antlr\Answer\AdditionalCommand.cs" />
     <Compile Include="Antlr\Answer\AnswerMarkdownListener.cs" />
     <Compile Include="Antlr\Answer\AnswerParser.cs" />
@@ -94,7 +94,6 @@
     <Compile Include="Commands\BuildError\BuildErrorWindowFixErrorCommand.cs" />
     <Compile Include="BuildErrors\BuildResultInformation.cs" />
     <Compile Include="Commands\File\AddNaturalLanguageOutlinesCommand.cs" />
-    <Compile Include="Commands\Other\ShowAgentConfigureCommand.cs" />
     <Compile Include="Commands\Other\OpenControlCenterCommand.cs" />
     <Compile Include="Commands\Other\ShowReleaseNotesCommand.cs" />
     <Compile Include="Commands\Other\OpenNaturalSearchToolWindowCommand.cs" />
@@ -187,7 +186,12 @@
     <Compile Include="NLOutline\Tree\Builder\File\FileScanner.cs" />
     <Compile Include="NLOutline\Tree\Builder\TreeBuilder.cs" />
     <Compile Include="NLOutline\Tree\OutlineNode.cs" />
+    <Compile Include="Options2\FreeAIrOptions.cs" />
+    <Compile Include="Options2\Mcp\McpServersJson.cs" />
+    <Compile Include="Helper\DataPieceCache.cs" />
+    <Compile Include="Options2\Unsorted\UnsortedJson.cs" />
     <Compile Include="Options\InternalPage.cs" />
+    <Compile Include="Options2\JsonDescriptionCommentConverter.cs" />
     <Compile Include="Options\OptionsProvider.cs" />
     <Compile Include="Options\ResponsePage.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

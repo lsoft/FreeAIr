@@ -9,6 +9,7 @@ using System.Net.Http;
 using System.Net.Http.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using FreeAIr.Options2;
 
 namespace FreeAIr.MCP.McpServerProxy
 {
@@ -71,10 +72,13 @@ namespace FreeAIr.MCP.McpServerProxy
         {
             if (mcpServers is null)
             {
-                if (!ExternalMcpServersJsonParser.TryParse(
-                    InternalPage.Instance.ExternalMCPServers,
-                    out mcpServers))
+                try
                 {
+                    mcpServers = await FreeAIrOptions.DeserializeMcpServersAsync();
+                }
+                catch (Exception excp)
+                {
+                    //todo log
                     return null;
                 }
             }
@@ -95,7 +99,7 @@ namespace FreeAIr.MCP.McpServerProxy
 
             var approvedExternalMcpServers = reply.McpServers;
 
-            var toolContainer = AvailableToolContainer.ReadSystem();
+            var toolContainer = await AvailableToolContainer.ReadSystemAsync();
 
             var setupResult = await McpServerProxyCollection.SetupConfigurationAsync(
                 toolContainer,

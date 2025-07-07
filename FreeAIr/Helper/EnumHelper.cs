@@ -1,13 +1,18 @@
 ﻿using FreeAIr.BLogic;
+using FreeAIr.Options2;
+using System.Threading.Tasks;
 
 namespace FreeAIr.Helper
 {
     public static class EnumHelper
     {
-        public static string AsPromptString(
+        public static async Task<string> AsPromptStringAsync(
             this ChatKindEnum kind
             )
         {
+            var unsorted = await FreeAIrOptions.DeserializeUnsortedAsync();
+            var culture = unsorted.GetAnswerCulture();
+
             switch (kind)
             {
                 case ChatKindEnum.ExplainCode:
@@ -19,20 +24,20 @@ namespace FreeAIr.Helper
                 case ChatKindEnum.NaturalLanguageSearch:
                     return FreeAIr.Resources.Resources.ResourceManager.GetString(
                         nameof(ChatKindEnum) + "_" + kind.ToString(),
-                        ResponsePage.GetAnswerCulture()
+                        culture
                         );
                 case ChatKindEnum.Discussion:
                     return string.Empty;
                 case ChatKindEnum.SuggestWholeLine:
                     {
-                        var prompt = "ChatKindEnum_SuggestWholeLine".GetLocalizedResourceByName();
-                        var anchor = "ChatKindEnum_SuggestWholeLine_Anchor".GetLocalizedResourceByName();
+                        var prompt = await "ChatKindEnum_SuggestWholeLine".GetLocalizedResourceByNameAsync();
+                        var anchor = await "ChatKindEnum_SuggestWholeLine_Anchor".GetLocalizedResourceByNameAsync();
                         return string.Format(prompt, anchor);
                     }
                 case ChatKindEnum.GenerateUnitTests:
                     {
-                        var prompt = "ChatKindEnum_GenerateUnitTests".GetLocalizedResourceByName();
-                        var anchor = ResponsePage.Instance.PreferredUnitTestFramework;
+                        var prompt = await "ChatKindEnum_GenerateUnitTests".GetLocalizedResourceByNameAsync();
+                        var anchor = unsorted.PreferredUnitTestFramework;
                         return string.Format(prompt, anchor);
                     }
                 default:

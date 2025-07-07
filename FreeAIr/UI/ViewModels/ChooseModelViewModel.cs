@@ -1,4 +1,5 @@
 ﻿using FreeAIr.Dto.OpenRouter;
+using FreeAIr.Options2;
 using FreeAIr.Shared.Helper;
 using System.ComponentModel.Composition;
 using System.Linq;
@@ -81,7 +82,7 @@ namespace FreeAIr.UI.ViewModels
                             ModelList.ForEach(m => m.IsSelected = false);
                             _selectedModel.IsSelected = true;
 
-                            var agents = InternalPage.Instance.GetAgentCollection();
+                            var agents = await FreeAIrOptions.DeserializeAgentCollectionAsync();
                             var activeAgent = agents.GetActiveAgent();
                             if (!activeAgent.Technical.IsOpenRouterAgent())
                             {
@@ -89,7 +90,7 @@ namespace FreeAIr.UI.ViewModels
                             }
 
                             activeAgent.Technical.ChosenModel = _selectedModel.ModelId;
-                            await InternalPage.Instance.SaveAgentsAsync(agents);
+                            await FreeAIrOptions.SaveAgentsAsync(agents);
                         },
                         a => _selectedModel is not null && !_selectedModel.IsSelected
                         );
@@ -149,7 +150,7 @@ namespace FreeAIr.UI.ViewModels
                     .ToList()
                     ;
 
-                var activeAgent = InternalPage.Instance.GetActiveAgent();
+                var activeAgent = await FreeAIrOptions.GetActiveAgentAsync();
                 var chosenModel = activeAgent.Technical.ChosenModel;
 
                 ModelList.AddRange(
