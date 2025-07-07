@@ -9,13 +9,13 @@
   <Commands package="FreeAIr">
 
     <Menus>
-      
-      <Menu guid="FreeAIr" id="SourceCodeContextMenu" priority="0x0000" type="Menu">
+
+      <!--<Menu guid="FreeAIr" id="SourceCodeContextMenu" priority="0x0000" type="Menu">
         <Parent guid="VSMainMenu" id="CodeWindow.LanguageGroupGroup" />
         <Strings>
           <ButtonText>FreeAIr support</ButtonText>
         </Strings>
-      </Menu>
+      </Menu>-->
 
       <Menu guid="FreeAIr" id="SubExtensionMenu" priority="0x0100" type="Menu">
         <Parent guid="FreeAIr" id="ExtensionMenuGroup" />
@@ -64,10 +64,10 @@
     </Menus>
 
     <Groups>
-      
-      <Group guid="FreeAIr" id="SourceCodeContextGroup" priority="0x0600">
-        <Parent guid="FreeAIr" id="SourceCodeContextMenu" />
-      </Group>
+
+      <!--<Group guid="FreeAIr" id="SourceCodeContextGroup" priority="0x0600">
+        <Parent guid="VSMainMenu" id="CodeWindow.LanguageGroupGroup" />
+      </Group>-->
 
       <Group guid="FreeAIr" id="ExtensionMenuGroup" priority="0x0000">
         <Parent guid="VSMainMenu" id="Extensions"/>
@@ -126,7 +126,7 @@
       </Button>
       <Button guid="FreeAIr" id="ShowReleaseNotesCommandId" priority="0x0103" type="Button">
         <Parent guid="FreeAIr" id="SubExtensionMenuGroup" />
-         <Icon guid="ImageCatalogGuid" id="MarkdownFile" />
+        <Icon guid="ImageCatalogGuid" id="MarkdownFile" />
         <CommandFlag>IconIsMoniker</CommandFlag>
         <Strings>
           <ButtonText>Show release notes...</ButtonText>
@@ -141,7 +141,32 @@
         </Strings>
       </Button>
 
-      <Button guid="FreeAIr" id="ExplainCommandId" priority="0x0100" type="Button">
+      <Button guid="FreeAIr" id="ApplySupportCommandId" priority="0x0000" type="Button">
+        <Parent guid="VSMainMenu" id="CodeWindow.LanguageGroupGroup" />
+        <Icon guid="ImageCatalogGuid" id="ApplyCodeChanges" />
+        <CommandFlag>IconIsMoniker</CommandFlag>
+        <Strings>
+          <ButtonText>FreeAIr support action...</ButtonText>
+        </Strings>
+      </Button>
+      <Button guid="FreeAIr" id="StartDiscussionCommandId" priority="0x0001" type="Button">
+        <Parent guid="VSMainMenu" id="CodeWindow.LanguageGroupGroup" />
+        <Icon guid="ImageCatalogGuid" id="ApplyCodeChanges" />
+        <CommandFlag>IconIsMoniker</CommandFlag>
+        <Strings>
+          <ButtonText>FreeAIr start discussion with...</ButtonText>
+        </Strings>
+      </Button>
+      <Button guid="FreeAIr" id="GenerateWholeLineSuggestionCommand" priority="0x0002" type="Button">
+        <Parent guid="VSMainMenu" id="CodeWindow.LanguageGroupGroup" />
+        <Icon guid="ImageCatalogGuid" id="ApplyCodeChanges" />
+        <CommandFlag>IconIsMoniker</CommandFlag>
+        <Strings>
+          <ButtonText>FreeAIr generate whole line suggestion...</ButtonText>
+        </Strings>
+      </Button>
+
+      <!--<Button guid="FreeAIr" id="ExplainCommandId" priority="0x0100" type="Button">
         <Parent guid="FreeAIr" id="SourceCodeContextGroup" />
         <Icon guid="ImageCatalogGuid" id="SQLServerObjectExplorer" />
         <CommandFlag>IconIsMoniker</CommandFlag>
@@ -189,14 +214,14 @@
           <ButtonText>Generate whole line suggestion...</ButtonText>
         </Strings>
       </Button>
-        <Button guid="FreeAIr" id="GenerateUnitTestsCommandId" priority="0x0100" type="Button">
+      <Button guid="FreeAIr" id="GenerateUnitTestsCommandId" priority="0x0100" type="Button">
         <Parent guid="FreeAIr" id="SourceCodeContextGroup" />
         <Icon guid="ImageCatalogGuid" id="TestGroup" />
         <CommandFlag>IconIsMoniker</CommandFlag>
         <Strings>
           <ButtonText>Generate unit tests</ButtonText>
         </Strings>
-      </Button>
+      </Button>-->
 
       <Button guid="FreeAIr" id="ExplainFileCommandId" priority="0x0100" type="Button">
         <Parent guid="FreeAIr" id="SolutionContextGroup" />
@@ -241,7 +266,7 @@
         <Icon guid="ImageCatalogGuid" id="LogPopulationError" />
         <CommandFlag>IconIsMoniker</CommandFlag>
         <Strings>
-          <ButtonText>FreeAIr try to fix...</ButtonText>
+          <ButtonText>FreeAIr support action...</ButtonText>
         </Strings>
       </Button>
 
@@ -262,30 +287,35 @@
   </Commands>
 
   <KeyBindings>
-    <KeyBinding guid="FreeAIr" id="ExplainCommandId" key1="L" mod1="ALT" editor="guidVSStd97" />
+    <KeyBinding guid="FreeAIr" id="ApplySupportCommandId" key1="L" mod1="ALT" editor="guidVSStd97" />
+    <KeyBinding guid="FreeAIr" id="StartDiscussionCommandId" key1="C" mod1="ALT" editor="guidVSStd97" />
+    <KeyBinding guid="FreeAIr" id="GenerateWholeLineSuggestionCommand" key1="A" mod1="ALT" editor="guidVSStd97" />
+
+    <!--<KeyBinding guid="FreeAIr" id="ExplainCommandId" key1="L" mod1="ALT" editor="guidVSStd97" />
     <KeyBinding guid="FreeAIr" id="AddXmlCommentsCommandId" key1="C" mod1="ALT" editor="guidVSStd97" />
     <KeyBinding guid="FreeAIr" id="CompleteCodeByCommentsCommandId" key1="M" mod1="ALT" editor="guidVSStd97" />
-    <KeyBinding guid="FreeAIr" id="GenerateWholeLineSuggestionCommand" key1="A" mod1="ALT" editor="guidVSStd97" />
-    <KeyBinding guid="FreeAIr" id="GenerateUnitTestsCommandId" key1="U" mod1="ALT" editor="guidVSStd97" />
+    <KeyBinding guid="FreeAIr" id="GenerateUnitTestsCommandId" key1="U" mod1="ALT" editor="guidVSStd97" />-->
   </KeyBindings>
 
   <Symbols>
     <GuidSymbol name="FreeAIr" value="{faec8da8-74ca-4afa-8b7d-64be3914fbac}">
 
-      <IDSymbol name="SourceCodeContextMenu" value="0x1001" />
+      <!--<IDSymbol name="SourceCodeContextMenu" value="0x1001" />-->
 
-      <IDSymbol name="SourceCodeContextGroup" value="0x1011" />
+      <!--<IDSymbol name="SourceCodeContextGroup" value="0x1011" />-->
       <IDSymbol name="ExtensionMenuGroup" value="0x1012" />
       <IDSymbol name="SubExtensionMenuGroup" value="0x1013" />
 
       <IDSymbol name="SubExtensionMenu" value="0x1014" />
 
-      <IDSymbol name="ExplainCommandId" value="0x1021" />
-      <IDSymbol name="AddXmlCommentsCommandId" value="0x1022" />
-      <IDSymbol name="OptimizeCommandId" value="0x1023" />
-      <IDSymbol name="CompleteCodeByCommentsCommandId" value="0x1025" />
+      <IDSymbol name="ApplySupportCommandId" value="0x1021" />
       <IDSymbol name="StartDiscussionCommandId" value="0x1026" />
       <IDSymbol name="GenerateWholeLineSuggestionCommand" value="0x1027" />
+
+      <!--<IDSymbol name="ExplainCommandId" value="0x1021" />
+      <IDSymbol name="AddXmlCommentsCommandId" value="0x1022" />
+      <IDSymbol name="OptimizeCommandId" value="0x1023" />
+      <IDSymbol name="CompleteCodeByCommentsCommandId" value="0x1025" /> -->
 
       <IDSymbol name="ChooseModelCommandId" value="0x1028" />
       <IDSymbol name="OpenChatListToolWindowCommandId" value="0x1029" />
@@ -302,7 +332,7 @@
 
       <IDSymbol name="BuildErrorWindowGroup" value="0x1039" />
       <IDSymbol name="BuildErrorWindowFixErrorCommandId" value="0x1040" />
-      
+
       <IDSymbol name="OpenNaturalSearchToolWindowCommandId" value="0x1041" />
       <IDSymbol name="ShowReleaseNotesCommandId" value="0x1042" />
       <IDSymbol name="OpenControlCenterCommandId" value="0x1043" />
@@ -324,7 +354,6 @@
     <GuidSymbol name="FreeAIrImages32" value="{93BCC0EB-7C0F-41EA-88E4-DC07CB510FAF}" >
       <IDSymbol name="Icon32" value="1" />
     </GuidSymbol>
-    
 
   </Symbols>
 </CommandTable>

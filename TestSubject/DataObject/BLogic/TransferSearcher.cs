@@ -8,7 +8,6 @@ using System.Threading.Tasks;
 
 namespace DataObject.BLogic
 {
-    // * need to be replaced
     public class TransferSearcher
     {
         private readonly Repository _repository;

@@ -34,9 +34,6 @@ namespace FreeAIr.Extension
             CodeLensTarget target
             )
         {
-            ////switch to background thread
-            //await TaskScheduler.Default;
-
             return new CodeLensUnitInfo
             {
                 UnitInfo = new UnitInfo(

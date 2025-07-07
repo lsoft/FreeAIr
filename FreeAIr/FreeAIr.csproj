@@ -46,6 +46,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Commands\ApplySupportCommand.cs" />
     <Compile Include="Options2\Agent\AgentJson.cs" />
     <Compile Include="Options2\Agent\AgentCollectionJson.cs" />
     <Compile Include="Antlr\Answer\AdditionalCommand.cs" />
@@ -123,18 +124,12 @@
     <Compile Include="BLogic\TextDescriptor.cs" />
     <Compile Include="CodeLens\CodeLensConnectionHandler.cs" />
     <Compile Include="CodeLens\CodeLensListener.cs" />
-    <Compile Include="Commands\AddXmlCommentsCommand.cs" />
     <Compile Include="Commands\File\AddCommentsToFileCommand.cs" />
     <Compile Include="Commands\Other\ChooseModelCommand.cs" />
-    <Compile Include="Commands\CompleteCodeByCommentsCommand.cs" />
-    <Compile Include="Commands\ExplainCodeCommand.cs" />
     <Compile Include="Commands\File\ExplainFileCommand.cs" />
-    <Compile Include="Commands\GenerateUnitTestsCommand.cs" />
     <Compile Include="Commands\GenerateWholeLineSuggestionCommand.cs" />
-    <Compile Include="Commands\InvokeLLMCommand.cs" />
     <Compile Include="Commands\File\InvokeLLMFileCommand.cs" />
     <Compile Include="Commands\Other\OpenChatListToolWindowCommand.cs" />
-    <Compile Include="Commands\OptimizeCodeCommand.cs" />
     <Compile Include="Commands\StartDiscussionCommand.cs" />
     <Compile Include="Dto\OpenRouter\Model.cs" />
     <Compile Include="Helper\AnswerHelper.cs" />
@@ -189,11 +184,13 @@
     <Compile Include="Options2\FreeAIrOptions.cs" />
     <Compile Include="Options2\Mcp\McpServersJson.cs" />
     <Compile Include="Helper\DataPieceCache.cs" />
+    <Compile Include="Options2\Support\Context.cs" />
+    <Compile Include="Options2\Support\StringEnumConverter.cs" />
+    <Compile Include="Options2\Support\SupportCollectionJson.cs" />
     <Compile Include="Options2\Unsorted\UnsortedJson.cs" />
     <Compile Include="Options\InternalPage.cs" />
     <Compile Include="Options2\JsonDescriptionCommentConverter.cs" />
     <Compile Include="Options\OptionsProvider.cs" />
-    <Compile Include="Options\ResponsePage.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="FreeAIrPackage.cs" />
     <Compile Include="Resources\Resources.Designer.cs">
@@ -210,6 +207,7 @@
     </Compile>
     <Compile Include="UI\BindingProxy.cs" />
     <Compile Include="UI\ContextMenu\AgentContextMenu.cs" />
+    <Compile Include="UI\ContextMenu\SupportContextMenu.cs" />
     <Compile Include="UI\ContextMenu\VisualStudioContextMenuItem.cs" />
     <Compile Include="UI\ContextMenu\VisualStudioContextMenuCommandBridge.cs" />
     <Compile Include="UI\ContextMenu\VisualStudioContextMenu_DynamicCommand.cs" />

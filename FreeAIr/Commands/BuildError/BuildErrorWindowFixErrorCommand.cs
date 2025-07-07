@@ -3,6 +3,7 @@ using FreeAIr.BLogic;
 using FreeAIr.BLogic.Context.Composer;
 using FreeAIr.BLogic.Context.Item;
 using FreeAIr.Helper;
+using FreeAIr.Options2.Support;
 using FreeAIr.UI.ContextMenu;
 using FreeAIr.UI.ToolWindows;
 using Microsoft.VisualStudio.ComponentModelHost;
@@ -23,8 +24,22 @@ namespace FreeAIr.Commands.BuildError
                 return;
             }
 
+            var chosenSupport = await SupportContextMenu.ChooseSupportAsync(
+                "Choose support:",
+                SupportScopeEnum.BuildErrorWindow
+                );
+            if (chosenSupport is null)
+            {
+                return;
+            }
+
+            var supportContext = await SupportContext.WithErrorInformationAsync(
+                errorInformation
+                );
+
             var chosenAgent = await AgentContextMenu.ChooseAgentWithTokenAsync(
-                "Choose agent:"
+                "Choose agent:",
+                chosenSupport.AgentName
                 );
             if (chosenAgent is null)
             {
@@ -67,7 +82,7 @@ namespace FreeAIr.Commands.BuildError
                         null
                         ),
                     false,
-                    AddLineNumbersMode.NotRequired
+                    AddLineNumbersMode.RequiredAllInScope
                     )
                 );
 
@@ -75,10 +90,14 @@ namespace FreeAIr.Commands.BuildError
                 contextItems
                 );
 
-            var fi = new FileInfo(errorInformation.FilePath);
+            var promptText = supportContext.ApplyVariablesToPrompt(
+                chosenSupport.Prompt
+                );
 
             chat.AddPrompt(
-                await UserPrompt.CreateFixBuildErrorPromptAsync(errorInformation.ErrorDescription, fi.Name, errorInformation.FilePath)
+                UserPrompt.CreateTextBasedPrompt(
+                    promptText
+                    )
                 );
 
             await ChatListToolWindow.ShowIfEnabledAsync();

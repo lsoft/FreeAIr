@@ -135,21 +135,6 @@ namespace FreeAIr.CodeLens
                             : new List<object>(),
                     PaneNavigationCommands = 
                         null,
-                        //new List<CodeLensDetailPaneCommand>()
-                        //{
-                        //     new CodeLensDetailPaneCommand
-                        //     {
-                        //         CommandDisplayName = "Add XML comment",
-                        //         CommandId = AddXmlCommentCommand,
-                        //         CommandArgs = new object[] { _codeLensUnitInfo! }
-                        //     },
-                        //     new CodeLensDetailPaneCommand
-                        //     {
-                        //         CommandDisplayName = "Generate unit tests",
-                        //         CommandId = GenerateUnitTestsCommand,
-                        //         CommandArgs = new object[] { _codeLensUnitInfo! }
-                        //     },
-                        //},
                 };
 
                 return result;

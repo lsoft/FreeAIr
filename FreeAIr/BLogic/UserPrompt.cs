@@ -2,7 +2,6 @@
 using OpenAI.Chat;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -58,29 +57,6 @@ namespace FreeAIr.BLogic
         public void Archive()
         {
             IsArchived = true;
-        }
-
-        /// <summary>
-        /// Создает промпт на основе кода с указанием языка в markdown
-        /// </summary>
-        /// <param name="kind">Тип диалога</param>
-        /// <param name="userCodeFileName">Имя файла с кодом</param>
-        /// <param name="userCode">Текст кода</param>
-        /// <returns>Новый объект UserPrompt</returns>
-        public static async Task<UserPrompt> CreateCodeBasedPromptAsync(ChatKindEnum kind, string userCodeFileName, string userCode)
-        {
-            var fi = new FileInfo(userCodeFileName);
-            return new UserPrompt(
-                await kind.AsPromptStringAsync()
-                + Environment.NewLine
-                + Environment.NewLine
-                + "```"
-                + LanguageHelper.GetMarkdownLanguageCodeBlockNameBasedOnFileExtension(fi.Extension)
-                + Environment.NewLine
-                + userCode
-                + Environment.NewLine 
-                + "```"
-            );
         }
 
         /// <summary>
@@ -166,26 +142,6 @@ namespace FreeAIr.BLogic
                 + Environment.NewLine
                 + "```"
             );
-        }
-
-        public static async Task<UserPrompt> CreateFixBuildErrorPromptAsync(
-            string errorDescription,
-            string fileName,
-            string filePath
-            )
-        {
-            var fi = new FileInfo(filePath);
-
-            return new UserPrompt(
-                await ChatKindEnum.FixBuildError.AsPromptStringAsync()
-                + Environment.NewLine
-                + Environment.NewLine
-                + "```"
-                + Environment.NewLine
-                + errorDescription
-                + Environment.NewLine
-                + "```"
-                );
         }
 
         public static async Task<UserPrompt> CreateNaturalLanguageSearchPromptAsync(

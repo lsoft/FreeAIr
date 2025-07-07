@@ -11,6 +11,5 @@ namespace FreeAIr.UI.CodeLens
         {
             InitializeComponent();
         }
-
     }
 }

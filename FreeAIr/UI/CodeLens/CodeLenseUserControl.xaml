@@ -7,7 +7,6 @@
     xmlns:ui="clr-namespace:FreeAIr.UI"
     xmlns:imaging="clr-namespace:Microsoft.VisualStudio.Imaging;assembly=Microsoft.VisualStudio.Imaging"
     xmlns:freeair="clr-namespace:FreeAIr"
-    xmlns:platformui="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Shell.15.0"
     mc:Ignorable="d" 
     d:DesignHeight="450" d:DesignWidth="800"
     ui:VsTheme.UseVsTheme="True"
@@ -25,13 +24,13 @@
             >
 
             <Image
-                Source="/FreeAIr;component/Resources/Icon32.png"
+                Source="/FreeAIr;component/Resources/Icon16.png"
                 RenderOptions.BitmapScalingMode="HighQuality"
                 SnapsToDevicePixels="True"
                 />
 
             <Label
-                FontSize="20"
+                FontSize="14"
                 FontWeight="Bold"
                 VerticalAlignment="Center"
                 Margin="2,0,0,0"
@@ -40,79 +39,38 @@
 
         </StackPanel>
 
-        <StackPanel
+        <ListView
             Grid.Row="1"
-            Orientation="Vertical"
             Margin="2,2,2,2"
+            ItemsSource="{Binding CommandList}"
             >
-            <Label
-                Margin="5,2,0,2"
-                Content="✓   Explain the code of chosen code block"
-                Foreground="#569CD6"
-                Cursor="Hand"
-                FontFamily="Cascadia Code"
-                >
-                <Label.InputBindings>
-                    <MouseBinding Command="{Binding ExplainCodeCommand}" MouseAction="LeftClick" />
-                </Label.InputBindings>
-            </Label>
-            <Label
-                Margin="5,2,0,2"
-                Content="✓   Add XML comments to the code of chosen code block"
-                Foreground="#569CD6"
-                Cursor="Hand"
-                FontFamily="Cascadia Code"
-                >
-                <Label.InputBindings>
-                    <MouseBinding Command="{Binding AddXmlCommentsCommand}" MouseAction="LeftClick" />
-                </Label.InputBindings>
-            </Label>
-            <Label
-                Margin="5,2,0,2"
-                Content="✓   Optimize code of the chosen code block"
-                Foreground="#569CD6"
-                Cursor="Hand"
-                FontFamily="Cascadia Code"
-                >
-                <Label.InputBindings>
-                    <MouseBinding Command="{Binding OptimizeCodeCommand}" MouseAction="LeftClick" />
-                </Label.InputBindings>
-            </Label>
-            <Label
-                Margin="5,2,0,2"
-                Content="✓   Generate unit tests for chose code block"
-                Foreground="#569CD6"
-                Cursor="Hand"
-                FontFamily="Cascadia Code"
-                >
-                <Label.InputBindings>
-                    <MouseBinding Command="{Binding GenerateUnitTestsCommand}" MouseAction="LeftClick" />
-                </Label.InputBindings>
-            </Label>
-            <Label
-                Margin="5,2,0,2"
-                Content="✓   Complete the code of chosen code block according to its comments"
-                Foreground="#569CD6"
-                Cursor="Hand"
-                FontFamily="Cascadia Code"
-                >
-                <Label.InputBindings>
-                    <MouseBinding Command="{Binding CompleteCodeByCommentsCommand}" MouseAction="LeftClick" />
-                </Label.InputBindings>
-            </Label>
-            <Label
-                Margin="5,2,0,2"
-                Content="✓   Start discussion with the code of the chosen code block"
-                Foreground="#569CD6"
-                Cursor="Hand"
-                FontFamily="Cascadia Code"
-                >
-                <Label.InputBindings>
-                    <MouseBinding Command="{Binding StartDiscussionCommand}" MouseAction="LeftClick" />
-                </Label.InputBindings>
-            </Label>
-
-        </StackPanel>
+            <ListView.ItemContainerStyle>
+                <Style TargetType="ListViewItem">
+                    <Setter Property="Template">
+                        <Setter.Value>
+                            <ControlTemplate TargetType="{x:Type ListViewItem}">
+                                <ContentPresenter />
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
+                </Style>
+            </ListView.ItemContainerStyle>
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <Button
+                        FontFamily="Cascadia Code"
+                        FontWeight="Bold"
+                        VerticalAlignment="Center"
+                        Cursor="Hand"
+                        Margin="10,5,0,5"
+                        Foreground="#569CD6"
+                        Content="{Binding CommandName}"
+                        Command="{Binding ApplyCommand}"
+                        Style="{DynamicResource TextBlockLikeButtonStyle}"
+                        />
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
 
     </Grid>
 </UserControl>

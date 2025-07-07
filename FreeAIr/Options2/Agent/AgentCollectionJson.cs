@@ -69,7 +69,19 @@ namespace FreeAIr.Options2.Agent
             [
                 new AgentJson
                 {
-                    Name = "KoboldCpp general (local)",
+                    Name = "Yandex General",
+                    SystemPrompt = DefaultSystemPrompt,
+                    Technical = new AgentTechnical
+                    {
+                        Endpoint = "https://llm.api.cloud.yandex.net/v1",
+                        Token = "",
+                        ChosenModel = "unknown",
+                        ContextSize = 16384
+                    }
+                },
+                new AgentJson
+                {
+                    Name = "KoboldCpp General (local)",
                     SystemPrompt = DefaultSystemPrompt,
                     Technical = new AgentTechnical
                     {
@@ -81,7 +93,7 @@ namespace FreeAIr.Options2.Agent
                 },
                 new AgentJson
                 {
-                    Name = "KoboldCpp create new outlines (local)",
+                    Name = "KoboldCpp Create New Outlines (local)",
                     SystemPrompt = CreateNewOutlinesSystemPrompt,
                     Technical = new AgentTechnical
                     {
@@ -93,7 +105,7 @@ namespace FreeAIr.Options2.Agent
                 },
                 new AgentJson
                 {
-                    Name = "KoboldCpp extract file outlines (local)",
+                    Name = "KoboldCpp Extract File Outlines (local)",
                     SystemPrompt = ExtractFileOutlinesSystemPrompt,
                     Technical = new AgentTechnical
                     {
@@ -105,7 +117,7 @@ namespace FreeAIr.Options2.Agent
                 },
                 new AgentJson
                 {
-                    Name = "openrouter (network)",
+                    Name = "Openrouter.ai General",
                     SystemPrompt = DefaultSystemPrompt,
                     Technical = new AgentTechnical
                     {

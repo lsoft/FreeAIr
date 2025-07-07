@@ -2,6 +2,7 @@
 using FreeAIr.Helper;
 using FreeAIr.Options2.Agent;
 using FreeAIr.Options2.Mcp;
+using FreeAIr.Options2.Support;
 using FreeAIr.Options2.Unsorted;
 using System.IO;
 using System.Text.Encodings.Web;
@@ -23,6 +24,7 @@ namespace FreeAIr.Options2
             {
                 ReadCommentHandling = JsonCommentHandling.Skip
             };
+            _readOptions.Converters.Add(new StringEnumConverter<SupportScopeEnum>());
 
             _writeOptions = new JsonSerializerOptions
             {
@@ -30,6 +32,7 @@ namespace FreeAIr.Options2
                 ReadCommentHandling = JsonCommentHandling.Skip,
                 Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
             };
+            _writeOptions.Converters.Add(new StringEnumConverter<SupportScopeEnum>());
         }
 
         #endregion
@@ -58,12 +61,19 @@ namespace FreeAIr.Options2
             set;
         }
 
+        public SupportCollectionJson Supports
+        {
+            get;
+            set;
+        }
+
         public FreeAIrOptions()
         {
             Unsorted = new();
             AgentCollection = new();
             AvailableMcpServers = new();
             AvailableTools = new();
+            Supports = new();
         }
 
         public object Clone()
@@ -73,7 +83,8 @@ namespace FreeAIr.Options2
                 Unsorted = (UnsortedJson)Unsorted.Clone(),
                 AgentCollection = (AgentCollectionJson)AgentCollection.Clone(),
                 AvailableMcpServers = (McpServers)AvailableMcpServers.Clone(),
-                AvailableTools = (AvailableMcpServersJson)AvailableTools.Clone()
+                AvailableTools = (AvailableMcpServersJson)AvailableTools.Clone(),
+                Supports = (SupportCollectionJson)Supports.Clone(),
             };
         }
 
@@ -102,6 +113,12 @@ namespace FreeAIr.Options2
         {
             var options = await DeserializeAsync();
             return options.AgentCollection;
+        }
+
+        public static async Task<SupportCollectionJson> DeserializeSupportCollectionAsync()
+        {
+            var options = await DeserializeAsync();
+            return options.Supports;
         }
         
         public static async Task<FreeAIrOptions> DeserializeAsync()

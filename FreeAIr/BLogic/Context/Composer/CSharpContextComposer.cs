@@ -1,4 +1,5 @@
-﻿using FreeAIr.Options2;
+﻿using FreeAIr.Helper;
+using FreeAIr.Options2;
 using FreeAIr.UI.Embedillo.Answer.Parser;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -228,11 +229,8 @@ namespace FreeAIr.BLogic.Context.Composer
                     return context;
                 }
 
-                var selectedNode = foundToken
-                    .Parent
-                    .AncestorsAndSelf()
-                    .OfType<MethodDeclarationSyntax>()
-                    .FirstOrDefault()
+                var selectedNode = foundToken.Parent.UpTo(typeof(MethodDeclarationSyntax), typeof(BaseTypeDeclarationSyntax), typeof(NamespaceDeclarationSyntax), typeof(CompilationUnitSyntax))
+                    ?? foundToken.Parent
                     ;
                 if (selectedNode is null)
                 {
