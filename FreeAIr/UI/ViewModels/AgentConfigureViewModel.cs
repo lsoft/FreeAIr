@@ -46,44 +46,6 @@ namespace FreeAIr.UI.ViewModels
         }
 
 
-        public bool IsDefaultAgent
-        {
-            get => _selectedAgent?.IsDefault ?? false;
-            set
-            {
-                if (_selectedAgent is null)
-                {
-                    return;
-                }
-                if (AgentCollection.Agents.Count == 0)
-                {
-                    return;
-                }
-
-                if (value)
-                {
-                    foreach (var agent in AgentCollection.Agents)
-                    {
-                        agent.IsDefault = ReferenceEquals(agent, _selectedAgent);
-                    }
-                }
-                else
-                {
-                    foreach (var agent in AgentCollection.Agents)
-                    {
-                        agent.IsDefault = false;
-                    }
-                    var notSelected = AgentCollection.Agents.FirstOrDefault(a => !ReferenceEquals(a, _selectedAgent));
-                    if (notSelected is not null)
-                    {
-                        notSelected.IsDefault = true;
-                    }
-                }
-
-                OnPropertyChanged();
-            }
-        }
-
         public Visibility ShowAgentPanel
         {
             get

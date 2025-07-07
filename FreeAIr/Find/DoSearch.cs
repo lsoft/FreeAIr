@@ -34,13 +34,22 @@ namespace FreeAIr.Find
                     return;
                 }
 
+                var chosenAgent = await AgentContextMenu.ChooseAgentWithTokenAsync(
+                    "Choose agent for natural language search:"
+                    );
+                if (chosenAgent is null)
+                {
+                    return;
+                }
+
                 //закрываем окно поиска
                 CloseFindWindow();
 
                 await NaturalLanguageResultsViewModel.ShowPanelAsync(
                     fileTypesFilterText,
                     subjectToSearchText,
-                    chosenScope.Scope
+                    chosenScope.Scope,
+                    chosenAgent
                     );
             }
             catch (Exception excp)

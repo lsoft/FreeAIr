@@ -24,6 +24,12 @@ namespace FreeAIr.UI.ViewModels
             set;
         }
 
+        public AgentJson? ChosenAgent
+        {
+            get;
+            private set;
+        }
+
         public ICommand SaveCommand
         {
             get
@@ -37,7 +43,11 @@ namespace FreeAIr.UI.ViewModels
                             foreach (var agentCheckableItem in agentCheckableItems.Children)
                             {
                                 var optionAgent = agentCheckableItem.Tag as AgentJson;
-                                optionAgent.IsDefault = agentCheckableItem.IsChecked.GetValueOrDefault(false);
+                                if (agentCheckableItem.IsChecked.GetValueOrDefault(false))
+                                {
+                                    ChosenAgent = optionAgent;
+                                    break;
+                                }
                             }
 
                             if (CloseWindow is not null)
@@ -52,13 +62,14 @@ namespace FreeAIr.UI.ViewModels
         }
 
         public ChooseChatAgentViewModel(
-            AgentCollectionJson chatAgents
+            AgentCollectionJson chatAgents,
+            AgentJson? chosenAgent
             )
         {
             Groups = new ObservableCollection2<CheckableItem>();
 
             _chatAgents = chatAgents;
-
+            ChosenAgent = chosenAgent;
             Groups.Add(
                 new SingleCheckedCheckableItem(
                     "Available agents:",
@@ -69,7 +80,7 @@ namespace FreeAIr.UI.ViewModels
                         new CheckableItem(
                             agent.Name,
                             string.Empty,
-                            agent.IsDefault,
+                            agent.Name == ChosenAgent?.Name,
                             CheckableItemStyle.Empty,
                             agent
                             )

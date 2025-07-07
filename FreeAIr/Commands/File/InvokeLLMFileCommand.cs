@@ -2,6 +2,8 @@
 using FreeAIr.BLogic.Context.Composer;
 using FreeAIr.BLogic.Context.Item;
 using FreeAIr.Options2;
+using FreeAIr.Options2.Agent;
+using FreeAIr.UI.ContextMenu;
 using FreeAIr.UI.ToolWindows;
 using Microsoft.VisualStudio.ComponentModelHost;
 using System.Linq;
@@ -22,12 +24,11 @@ namespace FreeAIr.Commands.File
         {
             await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
 
-            if (!await FreeAIrOptions.IsActiveAgentHasTokenAsync())
+            var chosenAgent = await AgentContextMenu.ChooseAgentWithTokenAsync(
+                "Choose agent:"
+                );
+            if (chosenAgent is null)
             {
-                await VS.MessageBox.ShowErrorAsync(
-                    Resources.Resources.Error,
-                    Resources.Resources.Code_NoToken
-                    );
                 return;
             }
 
@@ -49,7 +50,7 @@ namespace FreeAIr.Commands.File
                     null
                     ),
                 null,
-                await FreeAIr.BLogic.ChatOptions.GetDefaultAsync()
+                await FreeAIr.BLogic.ChatOptions.GetDefaultAsync(chosenAgent)
                 );
             if (chat is null)
             {

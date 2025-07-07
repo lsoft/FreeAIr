@@ -223,15 +223,6 @@ namespace FreeAIr.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Reload....
-        /// </summary>
-        public static string UI_Reload {
-            get {
-                return ResourceManager.GetString("UI_Reload", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Remove chat.
         /// </summary>
         public static string UI_RemoveChat {
@@ -255,6 +246,15 @@ namespace FreeAIr.Resources {
         public static string UI_StopWaiting {
             get {
                 return ResourceManager.GetString("UI_StopWaiting", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Update page....
+        /// </summary>
+        public static string UI_UpdatePage {
+            get {
+                return ResourceManager.GetString("UI_UpdatePage", resourceCulture);
             }
         }
     }

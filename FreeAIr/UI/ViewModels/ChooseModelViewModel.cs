@@ -1,6 +1,8 @@
 ﻿using FreeAIr.Dto.OpenRouter;
 using FreeAIr.Options2;
+using FreeAIr.Options2.Agent;
 using FreeAIr.Shared.Helper;
+using Microsoft.VisualStudio.Debugger.Interop;
 using System.ComponentModel.Composition;
 using System.Linq;
 using System.Net.Http;
@@ -20,7 +22,19 @@ namespace FreeAIr.UI.ViewModels
         private ModelWrapper _selectedModel;
 
         private ICommand _chooseCommand;
-        private ICommand _reloadListCommand;
+        private ICommand _updatePageCommand;
+        private AgentJson _chosenAgent;
+
+        public ObservableCollection2<AgentJson> AgentList
+        {
+            get;
+        }
+
+        public AgentJson? ChosenAgent
+        {
+            get => _chosenAgent;
+            set => _chosenAgent = value;
+        }
 
         public ObservableCollection2<ModelWrapper> ModelList
         {
@@ -83,29 +97,32 @@ namespace FreeAIr.UI.ViewModels
                             _selectedModel.IsSelected = true;
 
                             var agents = await FreeAIrOptions.DeserializeAgentCollectionAsync();
-                            var activeAgent = agents.GetActiveAgent();
-                            if (!activeAgent.Technical.IsOpenRouterAgent())
+                            if (!_chosenAgent.Technical.IsOpenRouterAgent())
                             {
                                 return;
                             }
 
-                            activeAgent.Technical.ChosenModel = _selectedModel.ModelId;
+                            _chosenAgent.Technical.ChosenModel = _selectedModel.ModelId;
                             await FreeAIrOptions.SaveAgentsAsync(agents);
                         },
-                        a => _selectedModel is not null && !_selectedModel.IsSelected
+                        a =>
+                            _chosenAgent is not null
+                            && _chosenAgent.Technical.IsOpenRouterAgent()
+                            && _selectedModel is not null
+                            && !_selectedModel.IsSelected
                         );
                 }
 
                 return _chooseCommand;
             }
         }
-        public ICommand ReloadListCommand
+        public ICommand UpdatePageCommand
         {
             get
             {
-                if (_reloadListCommand == null)
+                if (_updatePageCommand == null)
                 {
-                    _reloadListCommand = new RelayCommand(
+                    _updatePageCommand = new RelayCommand(
                         a =>
                         {
                             Task.Run(LoadModelListAsync)
@@ -114,7 +131,7 @@ namespace FreeAIr.UI.ViewModels
                         );
                 }
 
-                return _reloadListCommand;
+                return _updatePageCommand;
             }
         }
         
@@ -124,6 +141,7 @@ namespace FreeAIr.UI.ViewModels
         public ChooseModelViewModel(
             )
         {
+            AgentList = new ObservableCollection2<AgentJson>();
             ModelList = new ObservableCollection2<ModelWrapper>();
             _loadFreeModels = true;
 
@@ -136,6 +154,13 @@ namespace FreeAIr.UI.ViewModels
             try
             {
                 await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+
+                AgentList.AddRange(
+                    (await FreeAIrOptions.DeserializeAsync()).AgentCollection
+                        .Agents
+                        .FindAll(a => a.Technical.IsOpenRouterAgent())
+                    );
+                ChosenAgent = null;
 
                 ModelList.Clear();
 
@@ -150,8 +175,7 @@ namespace FreeAIr.UI.ViewModels
                     .ToList()
                     ;
 
-                var activeAgent = await FreeAIrOptions.GetActiveAgentAsync();
-                var chosenModel = activeAgent.Technical.ChosenModel;
+                var chosenModel = _chosenAgent?.Technical.ChosenModel;
 
                 ModelList.AddRange(
                     models

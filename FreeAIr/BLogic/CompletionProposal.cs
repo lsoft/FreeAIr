@@ -79,6 +79,9 @@ namespace FreeAIr.BLogic
         {
             try
             {
+                var options = await FreeAIrOptions.DeserializeAsync();
+                var chosenAgent = options.AgentCollection.GetCompletionProposalAgent();
+
                 var componentModel = (IComponentModel)await FreeAIrPackage.Instance.GetServiceAsync(typeof(SComponentModel));
 
                 await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
@@ -105,7 +108,7 @@ namespace FreeAIr.BLogic
                         null
                         ),
                     userPrompt,
-                    await ChatOptions.NoToolAutoProcessedTextResponseAsync()
+                    await ChatOptions.NoToolAutoProcessedTextResponseAsync(chosenAgent)
                     );
                 if (chat is null)
                 {

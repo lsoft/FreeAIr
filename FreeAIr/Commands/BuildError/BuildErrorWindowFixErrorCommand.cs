@@ -3,6 +3,7 @@ using FreeAIr.BLogic;
 using FreeAIr.BLogic.Context.Composer;
 using FreeAIr.BLogic.Context.Item;
 using FreeAIr.Helper;
+using FreeAIr.UI.ContextMenu;
 using FreeAIr.UI.ToolWindows;
 using Microsoft.VisualStudio.ComponentModelHost;
 using System.IO;
@@ -18,6 +19,14 @@ namespace FreeAIr.Commands.BuildError
 
             var errorInformation = await FreeAIr.BuildErrors.BuildResultProvider.GetSelectedErrorInformationAsync();
             if (errorInformation is null)
+            {
+                return;
+            }
+
+            var chosenAgent = await AgentContextMenu.ChooseAgentWithTokenAsync(
+                "Choose agent:"
+                );
+            if (chosenAgent is null)
             {
                 return;
             }
@@ -44,7 +53,7 @@ namespace FreeAIr.Commands.BuildError
                     wfd
                     ),
                 null,
-                await FreeAIr.BLogic.ChatOptions.GetDefaultAsync()
+                await FreeAIr.BLogic.ChatOptions.GetDefaultAsync(chosenAgent)
                 );
             if (chat is null)
             {

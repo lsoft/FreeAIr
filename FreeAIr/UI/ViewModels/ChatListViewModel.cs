@@ -211,27 +211,18 @@ namespace FreeAIr.UI.ViewModels
                     _startChatCommand = new AsyncRelayCommand(
                         async a =>
                         {
-                            if (!await FreeAIrOptions.VerifyAgentAndShowErrorIfNotAsync())
+                            var chosenAgent = await AgentContextMenu.ChooseAgentWithTokenAsync(
+                                "Choose agent (with a non-empty token) for a chat:"
+                                );
+                            if (chosenAgent is null)
                             {
                                 return;
                             }
 
-                            //var chosenAgent = await VisualStudioContextMenuCommandBridge.ShowAsync<AgentJson>(
-                            //    "Choose agent (with a non-empty token) for a chat:",
-                            //    (await FreeAIrOptions.DeserializeAgentCollectionAsync())
-                            //        .Agents
-                            //        .FindAll(a => !string.IsNullOrEmpty(a.Technical.Token))
-                            //        .ConvertAll(a => (a.Name, a as object))
-                            //    );
-                            //if (chosenAgent is null)
-                            //{
-                            //    return;
-                            //}
-
                             _ = await _chatContainer.StartChatAsync(
                                 new ChatDescription(ChatKindEnum.Discussion, null),
                                 null,
-                                await FreeAIr.BLogic.ChatOptions.GetDefaultAsync()
+                                await FreeAIr.BLogic.ChatOptions.GetDefaultAsync(chosenAgent)
                                 );
 
                             FocusPromptControl();
@@ -600,9 +591,8 @@ namespace FreeAIr.UI.ViewModels
             {
                 if (_selectedChat is not null)
                 {
-                    var agents = _selectedChat.Chat.Options.ChatAgents;
-                    var agent = agents.TryGetActiveAgent();
-                    if (!string.IsNullOrEmpty(agent.Name))
+                    var agent = _selectedChat.Chat.Options.ChosenAgent;
+                    if (agent is not null && !string.IsNullOrEmpty(agent.Name))
                     {
                         return $"Change chat agent ({agent.Name})...";
                     }
@@ -622,10 +612,16 @@ namespace FreeAIr.UI.ViewModels
                         async a =>
                         {
                             var w = new NestedCheckBoxWindow();
-                            w.DataContext = new ChooseChatAgentViewModel(
-                                _selectedChat.Chat.Options.ChatAgents
+                            var vm = new ChooseChatAgentViewModel(
+                                _selectedChat.Chat.Options.ChatAgents,
+                                _selectedChat.Chat.Options.ChosenAgent
                                 );
+                            w.DataContext = vm;
                             _ = await w.ShowDialogAsync();
+
+                            _selectedChat.Chat.Options.ChangeChosenAgent(
+                                vm.ChosenAgent
+                                );
 
                             OnPropertyChanged();
                         },

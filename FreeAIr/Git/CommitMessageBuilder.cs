@@ -24,9 +24,8 @@ namespace FreeAIr.BLogic
                 await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
 
                 var agentCollection = await FreeAIrOptions.DeserializeAgentCollectionAsync();
-                var chosenAgent = await VisualStudioContextMenuCommandBridge.ShowAsync<AgentJson>(
-                    "Choose agent for commit message generation:",
-                    agentCollection.Agents.ConvertAll(a => (a.Name, (object)a))
+                var chosenAgent = await AgentContextMenu.ChooseAgentWithTokenAsync(
+                    "Choose agent for commit message generation:"
                     );
                 if (chosenAgent is null)
                 {

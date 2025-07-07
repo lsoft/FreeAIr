@@ -26,9 +26,8 @@ namespace FreeAIr.Commands.File
         {
             await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
 
-            var chosenAgent = await VisualStudioContextMenuCommandBridge.ShowAsync<AgentJson>(
-                "Choose agent to add NL outlines:",
-                (await FreeAIrOptions.DeserializeAgentCollectionAsync()).Agents.ConvertAll(a => (a.Name, a as object))
+            var chosenAgent = await AgentContextMenu.ChooseAgentWithTokenAsync(
+                "Choose agent to add NL outlines:"
                 );
             if (chosenAgent is null)
             {

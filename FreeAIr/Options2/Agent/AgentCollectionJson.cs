@@ -1,12 +1,24 @@
-﻿using System.Collections.Generic;
+﻿using FreeAIr.Options2.Unsorted;
+using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace FreeAIr.Options2.Agent
 {
+    [JsonConverter(typeof(JsonDescriptionCommentConverter<AgentCollectionJson>))]
     public sealed class AgentCollectionJson : ICloneable
     {
+        [Description("Agent name for a completion proposal feature.")]
+        public string CompletionProposalAgentName
+        {
+            get;
+            set;
+        } = string.Empty;
+
+
         public List<AgentJson> Agents
         {
             get;
@@ -28,22 +40,6 @@ namespace FreeAIr.Options2.Agent
             };
         }
 
-        public AgentJson GetActiveAgent()
-        {
-            return TryGetActiveAgent() ?? new AgentJson();
-        }
-
-        public AgentJson? TryGetActiveAgent()
-        {
-            if (Agents.Count == 0)
-            {
-                return null;
-            }
-
-            return Agents.FirstOrDefault(a => a.IsDefault) ?? Agents[0];
-        }
-
-
         public static bool TryParse(
             string optionAgentsJson,
             out AgentCollectionJson? agents
@@ -64,56 +60,16 @@ namespace FreeAIr.Options2.Agent
             return false;
         }
 
-        public async Task<bool> VerifyAgentAndShowErrorIfNotAsync()
+        public AgentJson? GetCompletionProposalAgent()
         {
-            var optionAgent = TryGetActiveAgent();
-            if (optionAgent is null)
-            {
-                return false;
-            }
-
-            return await optionAgent.Technical.VerifyAgentAndShowErrorIfNotAsync();
+            return Agents.FirstOrDefault(a => a.Name == CompletionProposalAgentName);
         }
-
-        public Uri? TryBuildEndpointUri()
-        {
-            var optionAgent = TryGetActiveAgent();
-            if (optionAgent is null)
-            {
-                return null;
-            }
-
-            return optionAgent.Technical.TryBuildEndpointUri();
-        }
-
-        public void SetDefaultAgent(AgentJson agent)
-        {
-            var foundAgent = Agents.FirstOrDefault(a => a.Name == agent.Name); //ReferenceEquals may not work, if Agents are different objects for the same agent itself (from different deserialization)
-            if (foundAgent is null)
-            {
-                return;
-            }
-
-            Agents.ForEach(a => a.IsDefault = ReferenceEquals(foundAgent, a));
-        }
-
-        public void RemoveWithNoTokenAvailable()
-        {
-            Agents.RemoveAll(a => !a.Technical.HasToken());
-        }
-
-        public void SortByDefaultState()
-        {
-            Agents.Sort((a, b) => b.IsDefault.CompareTo(a.IsDefault));
-        }
-
 
         private static List<AgentJson> GetDefaultAgents() =>
             [
                 new AgentJson
                 {
                     Name = "KoboldCpp general (local)",
-                    IsDefault = true,
                     SystemPrompt = DefaultSystemPrompt,
                     Technical = new AgentTechnical
                     {
@@ -126,7 +82,6 @@ namespace FreeAIr.Options2.Agent
                 new AgentJson
                 {
                     Name = "KoboldCpp create new outlines (local)",
-                    IsDefault = false,
                     SystemPrompt = CreateNewOutlinesSystemPrompt,
                     Technical = new AgentTechnical
                     {
@@ -139,7 +94,6 @@ namespace FreeAIr.Options2.Agent
                 new AgentJson
                 {
                     Name = "KoboldCpp extract file outlines (local)",
-                    IsDefault = false,
                     SystemPrompt = ExtractFileOutlinesSystemPrompt,
                     Technical = new AgentTechnical
                     {
@@ -152,7 +106,6 @@ namespace FreeAIr.Options2.Agent
                 new AgentJson
                 {
                     Name = "openrouter (network)",
-                    IsDefault = false,
                     SystemPrompt = DefaultSystemPrompt,
                     Technical = new AgentTechnical
                     {
@@ -163,7 +116,6 @@ namespace FreeAIr.Options2.Agent
                     }
                 },
             ];
-
 
         public const string DefaultSystemPrompt = @"
 Your general rules:

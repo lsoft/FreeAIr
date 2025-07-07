@@ -165,8 +165,8 @@
   <data name="UI_Prompt" xml:space="preserve">
     <value>Prompt</value>
   </data>
-  <data name="UI_Reload" xml:space="preserve">
-    <value>Reload...</value>
+  <data name="UI_UpdatePage" xml:space="preserve">
+    <value>Update page...</value>
   </data>
   <data name="UI_RemoveChat" xml:space="preserve">
     <value>Remove chat</value>

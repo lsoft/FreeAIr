@@ -225,16 +225,16 @@ namespace FreeAIr.BLogic
             {
                 Status = ChatStatusEnum.WaitingForAnswer;
 
-                var activeAgent = this.Options.ChatAgents.GetActiveAgent();
+                var chosenAgent = this.Options.ChosenAgent;
                 var chatClient = new ChatClient(
-                    model: activeAgent.Technical.ChosenModel,
+                    model: chosenAgent.Technical.ChosenModel,
                     new ApiKeyCredential(
-                        activeAgent.Technical.Token
+                        chosenAgent.Technical.Token
                         ),
                     new OpenAIClientOptions
                     {
                         NetworkTimeout = TimeSpan.FromHours(1),
-                        Endpoint = activeAgent.Technical.TryBuildEndpointUri(),
+                        Endpoint = chosenAgent.Technical.TryBuildEndpointUri(),
                     }
                     );
 
@@ -707,7 +707,7 @@ namespace FreeAIr.BLogic
                 Chat chat
                 )
             {
-                var formattedSystemPrompt = await chat.Options.GetActiveAgent().GetFormattedSystemPromptAsync();
+                var formattedSystemPrompt = await chat.Options.ChosenAgent.GetFormattedSystemPromptAsync();
                 var dialog = new Dialog(
                     resultFilePath,
                     chat,
@@ -796,44 +796,40 @@ namespace FreeAIr.BLogic
 
     public sealed class ChatOptions
     {
-        public static async Task<ChatOptions> GetDefaultAsync() => new ChatOptions(
-            ChatToolChoice.CreateAutoChoice(),
-            await FreeAIrOptions.DeserializeAgentCollectionAsync(),
-            OpenAI.Chat.ChatResponseFormat.CreateTextFormat(),
-            false
-            );
+        public static async Task<ChatOptions> GetDefaultAsync(AgentJson? chosenAgent) =>
+            new ChatOptions(
+                ChatToolChoice.CreateAutoChoice(),
+                await FreeAIrOptions.DeserializeAgentCollectionAsync(),
+                chosenAgent,
+                OpenAI.Chat.ChatResponseFormat.CreateTextFormat(),
+                false
+                );
 
         public static async Task<ChatOptions> NoToolAutoProcessedTextResponseAsync(
-            AgentJson? defaultAgent = null
+            AgentJson? chosenAgent
             )
         {
             var agentCollection = await FreeAIrOptions.DeserializeAgentCollectionAsync();
-            if (defaultAgent is not null)
-            {
-                agentCollection.SetDefaultAgent(defaultAgent);
-            }
 
             return new ChatOptions(
                 ChatToolChoice.CreateNoneChoice(),
                 agentCollection,
+                chosenAgent,
                 OpenAI.Chat.ChatResponseFormat.CreateTextFormat(),
                 true
                 );
         }
 
         public static async Task<ChatOptions> NoToolAutoProcessedJsonResponseAsync(
-            AgentJson? defaultAgent = null
+            AgentJson? chosenAgent
             )
         {
             var agentCollection = await FreeAIrOptions.DeserializeAgentCollectionAsync();
-            if (defaultAgent is not null)
-            {
-                agentCollection.SetDefaultAgent(defaultAgent);
-            }
 
             return new ChatOptions(
                 ChatToolChoice.CreateNoneChoice(),
                 agentCollection,
+                chosenAgent,
                 OpenAI.Chat.ChatResponseFormat.CreateJsonObjectFormat(),
                 true
                 );
@@ -849,6 +845,12 @@ namespace FreeAIr.BLogic
             get;
         }
 
+        public AgentJson ChosenAgent
+        {
+            get;
+            private set;
+        }
+
         public OpenAI.Chat.ChatResponseFormat ResponseFormat
         {
             get;
@@ -862,6 +864,7 @@ namespace FreeAIr.BLogic
         private ChatOptions(
             ChatToolChoice toolChoice,
             AgentCollectionJson chatAgents,
+            AgentJson? chosenAgent,
             OpenAI.Chat.ChatResponseFormat responseFormat,
             bool automaticallyProcessed
             )
@@ -883,13 +886,19 @@ namespace FreeAIr.BLogic
 
             ToolChoice = toolChoice;
             ChatAgents = chatAgents;
+            ChosenAgent = chosenAgent ?? chatAgents.Agents[0];
             ResponseFormat = responseFormat;
             AutomaticallyProcessed = automaticallyProcessed;
         }
 
-        public AgentJson GetActiveAgent()
+        public void ChangeChosenAgent(AgentJson chosenAgent)
         {
-            return ChatAgents.GetActiveAgent();
+            if (chosenAgent is null)
+            {
+                throw new ArgumentNullException(nameof(chosenAgent));
+            }
+
+            ChosenAgent = chosenAgent;
         }
     }
 }

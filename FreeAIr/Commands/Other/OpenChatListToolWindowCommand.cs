@@ -1,4 +1,5 @@
 ﻿using FreeAIr.Options2;
+using FreeAIr.UI.ContextMenu;
 using FreeAIr.UI.ToolWindows;
 
 namespace FreeAIr.Commands.Other
@@ -9,15 +10,6 @@ namespace FreeAIr.Commands.Other
         protected override async Task ExecuteAsync(OleMenuCmdEventArgs e)
         {
             await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
-
-            if (!await FreeAIrOptions.IsActiveAgentHasTokenAsync())
-            {
-                await VS.MessageBox.ShowErrorAsync(
-                    Resources.Resources.Error,
-                    Resources.Resources.Code_NoToken
-                    );
-                return;
-            }
 
             _ = await ChatListToolWindow.ShowAsync();
         }

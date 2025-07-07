@@ -9,26 +9,6 @@ namespace FreeAIr.Commands.Other
     {
         protected override async Task ExecuteAsync(OleMenuCmdEventArgs e)
         {
-            var activeAgent = await FreeAIrOptions.GetActiveAgentAsync();
-            if (activeAgent is null)
-            {
-                await VS.MessageBox.ShowErrorAsync(
-                    "Set openrouter agent as active.",
-                    Resources.Resources.Error
-                    );
-                return;
-            }
-
-            var uri = activeAgent.Technical.TryBuildEndpointUri();
-            if (!activeAgent.Technical.IsOpenRouterAgent())
-            {
-                await VS.MessageBox.ShowErrorAsync(
-                    "Set openrouter agent as active.",
-                    Resources.Resources.Error
-                    );
-                return;
-            }
-
             _ = await ChooseModelToolWindow.ShowAsync();
         }
 

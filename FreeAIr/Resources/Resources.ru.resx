@@ -165,8 +165,8 @@
   <data name="UI_Prompt" xml:space="preserve">
     <value>Запрос</value>
   </data>
-  <data name="UI_Reload" xml:space="preserve">
-    <value>Перезагрузить...</value>
+  <data name="UI_UpdatePage" xml:space="preserve">
+    <value>Обновить страницу...</value>
   </data>
   <data name="UI_RemoveChat" xml:space="preserve">
     <value>Удалить чат</value>

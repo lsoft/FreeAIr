@@ -31,10 +31,20 @@
             Orientation="Horizontal"
             >
 
+            <ComboBox
+                Margin="2"
+                ItemsSource="{Binding AgentList}"
+                SelectedItem="{Binding ChosenAgent}"
+                VerticalAlignment="Center"
+                VerticalContentAlignment="Center"
+                />
+
             <Button
                 Margin="2"
-                Content="{x:Static resources:Resources.UI_Reload}"
-                Command="{Binding ReloadListCommand}"
+                Content="{x:Static resources:Resources.UI_UpdatePage}"
+                Command="{Binding UpdatePageCommand}"
+                VerticalAlignment="Center"
+                VerticalContentAlignment="Center"
                 />
 
             <CheckBox

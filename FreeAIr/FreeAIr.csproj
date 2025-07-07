@@ -209,6 +209,7 @@
       <DependentUpon>source.extension.vsixmanifest</DependentUpon>
     </Compile>
     <Compile Include="UI\BindingProxy.cs" />
+    <Compile Include="UI\ContextMenu\AgentContextMenu.cs" />
     <Compile Include="UI\ContextMenu\VisualStudioContextMenuItem.cs" />
     <Compile Include="UI\ContextMenu\VisualStudioContextMenuCommandBridge.cs" />
     <Compile Include="UI\ContextMenu\VisualStudioContextMenu_DynamicCommand.cs" />

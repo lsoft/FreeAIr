@@ -17,15 +17,6 @@ namespace FreeAIr.Options2.Agent
         }
 
         /// <summary>
-        /// This agent is the default choice for any new chat.
-        /// </summary>
-        public bool IsDefault
-        {
-            get;
-            set;
-        }
-
-        /// <summary>
         /// Technical info about this agent.
         /// </summary>
         public AgentTechnical Technical
@@ -46,7 +37,6 @@ namespace FreeAIr.Options2.Agent
         public AgentJson()
         {
             Name = string.Empty;
-            IsDefault = false;
             Technical = new();
             SystemPrompt = AgentCollectionJson.DefaultSystemPrompt;
         }
@@ -56,7 +46,6 @@ namespace FreeAIr.Options2.Agent
             return new AgentJson
             {
                 Name = Name,
-                IsDefault = IsDefault,
                 Technical = (AgentTechnical)Technical.Clone(),
                 SystemPrompt = SystemPrompt
             };
@@ -67,6 +56,11 @@ namespace FreeAIr.Options2.Agent
             var unsorted = await FreeAIrOptions.DeserializeUnsortedAsync();
             var result = SystemPrompt.Replace("{CULTURE}", unsorted.GetAnswerCultureName());
             return result;
+        }
+
+        public async Task<bool> VerifyAgentAndShowErrorIfNotAsync()
+        {
+            return await Technical.VerifyAgentAndShowErrorIfNotAsync();
         }
     }
 

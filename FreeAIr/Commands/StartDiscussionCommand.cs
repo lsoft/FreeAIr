@@ -2,6 +2,7 @@
 using FreeAIr.BLogic;
 using FreeAIr.BLogic.Context.Item;
 using FreeAIr.Helper;
+using FreeAIr.UI.ContextMenu;
 using FreeAIr.UI.ToolWindows;
 using Microsoft.VisualStudio.ComponentModelHost;
 
@@ -32,6 +33,14 @@ namespace FreeAIr.Commands
                 return;
             }
 
+            var chosenAgent = await AgentContextMenu.ChooseAgentWithTokenAsync(
+                "Choose agent:"
+                );
+            if (chosenAgent is null)
+            {
+                return;
+            }
+
             var kind = ChatKindEnum.Discussion;
 
             var chat = await chatContainer.StartChatAsync(
@@ -40,7 +49,7 @@ namespace FreeAIr.Commands
                     null
                     ),
                 null,
-                await FreeAIr.BLogic.ChatOptions.GetDefaultAsync()
+                await FreeAIr.BLogic.ChatOptions.GetDefaultAsync(chosenAgent)
                 );
             if (chat is null)
             {

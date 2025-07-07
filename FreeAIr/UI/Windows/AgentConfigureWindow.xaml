@@ -106,9 +106,6 @@
                 <!-- name -->
                 <RowDefinition Height="auto"/>
                 
-                <!-- is default -->
-                <RowDefinition Height="auto"/>
-
                 <!-- endpoint -->
                 <RowDefinition Height="auto"/>
                 
@@ -152,27 +149,11 @@
                 Grid.Column="0"
                 HorizontalAlignment="Left"
                 VerticalAlignment="Center"
-                Content="Is Default Agent:"
-                />
-
-            <CheckBox
-                Grid.Row="1"
-                Grid.Column="1"
-                HorizontalAlignment="Stretch"
-                VerticalAlignment="Center"
-                IsChecked="{Binding IsDefaultAgent}"
-                />
-
-            <Label
-                Grid.Row="2"
-                Grid.Column="0"
-                HorizontalAlignment="Left"
-                VerticalAlignment="Center"
                 Content="Endpoint:"
                 />
 
             <TextBox
-                Grid.Row="2"
+                Grid.Row="1"
                 Grid.Column="1"
                 HorizontalAlignment="Stretch"
                 VerticalAlignment="Center"
@@ -180,7 +161,7 @@
                 />
 
             <Label
-                Grid.Row="3"
+                Grid.Row="2"
                 Grid.Column="0"
                 HorizontalAlignment="Left"
                 VerticalAlignment="Center"
@@ -188,7 +169,7 @@
                 />
 
             <TextBox
-                Grid.Row="3"
+                Grid.Row="2"
                 Grid.Column="1"
                 HorizontalAlignment="Stretch"
                 VerticalAlignment="Center"
@@ -196,7 +177,7 @@
                 />
 
             <Label
-                Grid.Row="4"
+                Grid.Row="3"
                 Grid.Column="0"
                 HorizontalAlignment="Left"
                 VerticalAlignment="Center"
@@ -204,7 +185,7 @@
                 />
 
             <TextBox
-                Grid.Row="4"
+                Grid.Row="3"
                 Grid.Column="1"
                 HorizontalAlignment="Stretch"
                 VerticalAlignment="Center"
@@ -212,7 +193,7 @@
                 />
 
             <Label
-                Grid.Row="5"
+                Grid.Row="4"
                 Grid.Column="0"
                 HorizontalAlignment="Left"
                 VerticalAlignment="Center"
@@ -221,7 +202,7 @@
                 />
 
             <et:IntegerUpDown
-                Grid.Row="5"
+                Grid.Row="4"
                 Grid.Column="1"
                 HorizontalAlignment="Left"
                 VerticalAlignment="Center"
@@ -233,7 +214,7 @@
 
 
             <Label
-                Grid.Row="6"
+                Grid.Row="5"
                 Grid.Column="0"
                 HorizontalAlignment="Left"
                 VerticalAlignment="Center"
@@ -241,7 +222,7 @@
                 />
 
             <ScrollViewer
-                Grid.Row="7"
+                Grid.Row="6"
                 Grid.Column="0"
                 Grid.ColumnSpan="2"
                 MaxHeight="350"

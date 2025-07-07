@@ -4,6 +4,7 @@ using FreeAIr.BLogic.Context.Item;
 using FreeAIr.Find;
 using FreeAIr.Helper;
 using FreeAIr.Options2;
+using FreeAIr.Options2.Agent;
 using FreeAIr.Shared.Helper;
 using FreeAIr.UI.ToolWindows;
 using FuzzySharp;
@@ -201,10 +202,16 @@ namespace FreeAIr.UI.ViewModels
 
         public async Task SetNewChatAsync(
             NaturalSearchScopeEnum scope,
+            AgentJson chosenAgent,
             string searchText,
             string fileTypesFilterText
             )
         {
+            if (chosenAgent is null)
+            {
+                throw new ArgumentNullException(nameof(chosenAgent));
+            }
+
             if (searchText is null)
             {
                 throw new ArgumentNullException(nameof(searchText));
@@ -237,7 +244,7 @@ namespace FreeAIr.UI.ViewModels
                     null
                     ),
                 null,
-                await ChatOptions.NoToolAutoProcessedJsonResponseAsync()
+                await ChatOptions.NoToolAutoProcessedJsonResponseAsync(chosenAgent)
                 );
             if (_chat is null)
             {
@@ -254,6 +261,7 @@ namespace FreeAIr.UI.ViewModels
 
             _processingTask = ProcessSolutionDocumentsAsync(
                 scope,
+                chosenAgent,
                 searchText,
                 filesTypeFilters
                 );
@@ -261,6 +269,7 @@ namespace FreeAIr.UI.ViewModels
 
         private async Task ProcessSolutionDocumentsAsync(
             NaturalSearchScopeEnum scope,
+            AgentJson chosenAgent,
             string searchText,
             FileTypesFilter filesTypeFilters
             )
@@ -310,8 +319,7 @@ namespace FreeAIr.UI.ViewModels
             {
                 var processedItemCount = 0;
 
-                var agent = await FreeAIrOptions.GetActiveAgentAsync();
-                foreach (var portion in foundRootItems.SplitByItemsSize(agent.Technical.ContextSize))
+                foreach (var portion in foundRootItems.SplitByItemsSize(chosenAgent.Technical.ContextSize))
                 {
                     Status = $"In progress ({processedItemCount}/{foundRootItems.Count})...";
 
@@ -507,7 +515,8 @@ $"""
         public static async Task ShowPanelAsync(
             string fileTypesFilterText,
             string subjectToSearchText,
-            NaturalSearchScopeEnum chosenScope
+            NaturalSearchScopeEnum chosenScope,
+            AgentJson chosenAgent
             )
         {
             if (fileTypesFilterText is null)
@@ -520,10 +529,15 @@ $"""
                 throw new ArgumentNullException(nameof(subjectToSearchText));
             }
 
+            if (chosenAgent is null)
+            {
+                throw new ArgumentNullException(nameof(chosenAgent));
+            }
+
             var pane = await NaturalLanguageResultsToolWindow.ShowAsync();
             var toolWindow = pane.Content as NaturalLanguageResultsToolWindowControl;
             var viewModel = toolWindow.DataContext as NaturalLanguageResultsViewModel;
-            viewModel.SetNewChatAsync(chosenScope, subjectToSearchText, fileTypesFilterText)
+            viewModel.SetNewChatAsync(chosenScope, chosenAgent, subjectToSearchText, fileTypesFilterText)
                 .FileAndForget(nameof(NaturalLanguageResultsViewModel.SetNewChatAsync));
         }
     }

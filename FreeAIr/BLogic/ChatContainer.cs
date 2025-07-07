@@ -58,7 +58,7 @@ namespace FreeAIr.BLogic
                 throw new ArgumentNullException(nameof(options));
             }
 
-            if (!await options.ChatAgents.VerifyAgentAndShowErrorIfNotAsync())
+            if (!await options.ChosenAgent.VerifyAgentAndShowErrorIfNotAsync())
             {
                 return null;
             }

@@ -3,7 +3,6 @@ using FreeAIr.Helper;
 using FreeAIr.Options2.Agent;
 using FreeAIr.Options2.Mcp;
 using FreeAIr.Options2.Unsorted;
-using SharpCompress.Common;
 using System.IO;
 using System.Text.Encodings.Web;
 using System.Text.Json;
@@ -80,34 +79,6 @@ namespace FreeAIr.Options2
 
 
         #region deserialize and related
-
-        public static async Task<bool> IsActiveAgentHasTokenAsync()
-        {
-            try
-            {
-                var optionAgents = await DeserializeAgentCollectionAsync();
-                var agent = optionAgents.TryGetActiveAgent();
-                if (agent is null)
-                {
-                    return false;
-                }
-
-                return agent.Technical.HasToken();
-            }
-            catch
-            {
-                //todo log
-            }
-
-            return false;
-        }
-
-        public static async Task<AgentJson> GetActiveAgentAsync()
-        {
-            var optionAgents = await DeserializeAgentCollectionAsync();
-            var agent = optionAgents.GetActiveAgent();
-            return agent;
-        }
 
         public static async Task<AvailableMcpServersJson> DeserializeAvailableToolsAsync()
         {
@@ -223,11 +194,6 @@ namespace FreeAIr.Options2
             return JsonSerializer.Deserialize<FreeAIrOptions>(optionsJson, _readOptions);
         }
 
-        public static async Task<bool> VerifyAgentAndShowErrorIfNotAsync()
-        {
-            var optionAgents = await DeserializeAgentCollectionAsync();
-            return await optionAgents.VerifyAgentAndShowErrorIfNotAsync();
-        }
 
         #endregion
 

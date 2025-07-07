@@ -26,9 +26,8 @@ namespace FreeAIr.Git
 
                 var agentCollection = await FreeAIrOptions.DeserializeAgentCollectionAsync();
 
-                var chosenAgent = await VisualStudioContextMenuCommandBridge.ShowAsync<AgentJson>(
-                    "Choose agent to add NL outlines to changed files:",
-                    agentCollection.Agents.ConvertAll(a => (a.Name, (object)a))
+                var chosenAgent = await AgentContextMenu.ChooseAgentWithTokenAsync(
+                    "Choose agent to add NL outlines to changed files:"
                     );
                 if (chosenAgent is null)
                 {

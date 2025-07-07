@@ -17,15 +17,6 @@ namespace FreeAIr.Commands
         {
             await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
 
-            if (!await FreeAIrOptions.IsActiveAgentHasTokenAsync())
-            {
-                await VS.MessageBox.ShowErrorAsync(
-                    Resources.Resources.Error,
-                    Resources.Resources.Code_NoToken
-                    );
-                return;
-            }
-
             var documentView = await VS.Documents.GetActiveDocumentViewAsync();
             if (documentView == null)
             {
