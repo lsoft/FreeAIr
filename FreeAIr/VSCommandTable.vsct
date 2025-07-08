@@ -73,7 +73,10 @@
         <Parent guid="VSMainMenu" id="Extensions"/>
       </Group>
 
-      <Group guid="FreeAIr" id="SubExtensionMenuGroup" priority="0x0000">
+      <Group guid="FreeAIr" id="SubExtensionMenuGroup1" priority="0x0000">
+        <Parent guid="FreeAIr" id="SubExtensionMenu" />
+      </Group>
+      <Group guid="FreeAIr" id="SubExtensionMenuGroup2" priority="0x0001">
         <Parent guid="FreeAIr" id="SubExtensionMenu" />
       </Group>
 
@@ -93,7 +96,7 @@
 
     <Buttons>
       <Button guid="FreeAIr" id="ChooseModelCommandId" priority="0x0100" type="Button">
-        <Parent guid="FreeAIr" id="SubExtensionMenuGroup" />
+        <Parent guid="FreeAIr" id="SubExtensionMenuGroup1" />
         <Icon guid="ImageCatalogGuid" id="CodeReviewWizard" />
         <CommandFlag>IconIsMoniker</CommandFlag>
         <Strings>
@@ -101,7 +104,7 @@
         </Strings>
       </Button>
       <Button guid="FreeAIr" id="OpenChatListToolWindowCommandId" priority="0x0101" type="Button">
-        <Parent guid="FreeAIr" id="SubExtensionMenuGroup" />
+        <Parent guid="FreeAIr" id="SubExtensionMenuGroup2" />
         <Icon guid="ImageCatalogGuid" id="ComparePerformanceReports" />
         <CommandFlag>IconIsMoniker</CommandFlag>
         <Strings>
@@ -109,7 +112,7 @@
         </Strings>
       </Button>
       <Button guid="FreeAIr" id="OpenNaturalSearchToolWindowCommandId" priority="0x0101" type="Button">
-        <Parent guid="FreeAIr" id="SubExtensionMenuGroup" />
+        <Parent guid="FreeAIr" id="SubExtensionMenuGroup2" />
         <Icon guid="ImageCatalogGuid" id="FindInFile" />
         <CommandFlag>IconIsMoniker</CommandFlag>
         <Strings>
@@ -117,7 +120,7 @@
         </Strings>
       </Button>
       <Button guid="FreeAIr" id="OpenBuildingNaturalLanguageOutlinesWindowCommandId" priority="0x0102" type="Button">
-        <Parent guid="FreeAIr" id="SubExtensionMenuGroup" />
+        <Parent guid="FreeAIr" id="SubExtensionMenuGroup2" />
         <Icon guid="ImageCatalogGuid" id="CommentCode" />
         <CommandFlag>IconIsMoniker</CommandFlag>
         <Strings>
@@ -125,7 +128,7 @@
         </Strings>
       </Button>
       <Button guid="FreeAIr" id="ShowReleaseNotesCommandId" priority="0x0103" type="Button">
-        <Parent guid="FreeAIr" id="SubExtensionMenuGroup" />
+        <Parent guid="FreeAIr" id="SubExtensionMenuGroup1" />
         <Icon guid="ImageCatalogGuid" id="MarkdownFile" />
         <CommandFlag>IconIsMoniker</CommandFlag>
         <Strings>
@@ -133,11 +136,19 @@
         </Strings>
       </Button>
       <Button guid="FreeAIr" id="OpenControlCenterCommandId" priority="0x0104" type="Button">
-        <Parent guid="FreeAIr" id="SubExtensionMenuGroup" />
+        <Parent guid="FreeAIr" id="SubExtensionMenuGroup2" />
         <Icon guid="ImageCatalogGuid" id="Settings" />
         <CommandFlag>IconIsMoniker</CommandFlag>
         <Strings>
           <ButtonText>Open Control Center...</ButtonText>
+        </Strings>
+      </Button>
+      <Button guid="FreeAIr" id="OpenPropertiesCommandId" priority="0x0105" type="Button">
+        <Parent guid="FreeAIr" id="SubExtensionMenuGroup2" />
+        <Icon guid="ImageCatalogGuid" id="Property" />
+        <CommandFlag>IconIsMoniker</CommandFlag>
+        <Strings>
+          <ButtonText>Open FreeAIr properties...</ButtonText>
         </Strings>
       </Button>
 
@@ -232,11 +243,12 @@
 
       <!--<IDSymbol name="SourceCodeContextMenu" value="0x1001" />-->
 
-      <!--<IDSymbol name="SourceCodeContextGroup" value="0x1011" />-->
-      <IDSymbol name="ExtensionMenuGroup" value="0x1012" />
-      <IDSymbol name="SubExtensionMenuGroup" value="0x1013" />
+      <!--<IDSymbol name="SourceCodeContextGroup" value="0x1002" />-->
+      <IDSymbol name="ExtensionMenuGroup" value="0x1003" />
+      <IDSymbol name="SubExtensionMenuGroup1" value="0x1004" />
+      <IDSymbol name="SubExtensionMenuGroup2" value="0x1005" />
 
-      <IDSymbol name="SubExtensionMenu" value="0x1014" />
+      <IDSymbol name="SubExtensionMenu" value="0x1006" />
 
       <IDSymbol name="ApplySupportCommandId" value="0x1021" />
       <IDSymbol name="StartDiscussionCommandId" value="0x1022" />
@@ -266,9 +278,10 @@
       <IDSymbol name="AddNaturalLanguageOutlinesCommandId" value="0x1052"/>
       <IDSymbol name="OpenBuildingNaturalLanguageOutlinesWindowCommandId" value="0x1053"/>
 
-      
-      
-      
+      <IDSymbol name="OpenPropertiesCommandId" value="0x1054" />
+
+
+
       <!-- context menu -->
       <IDSymbol name="VisualStudioContextMenu" value="0x8000"/>
       <IDSymbol name="VisualStudioContextMenuGroup" value="0x8001"/>

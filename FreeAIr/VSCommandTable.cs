@@ -28,9 +28,10 @@ namespace FreeAIr
     /// </summary>
     internal sealed partial class PackageIds
     {
-        public const int ExtensionMenuGroup = 0x1012;
-        public const int SubExtensionMenuGroup = 0x1013;
-        public const int SubExtensionMenu = 0x1014;
+        public const int ExtensionMenuGroup = 0x1003;
+        public const int SubExtensionMenuGroup1 = 0x1004;
+        public const int SubExtensionMenuGroup2 = 0x1005;
+        public const int SubExtensionMenu = 0x1006;
         public const int ApplySupportCommandId = 0x1021;
         public const int StartDiscussionCommandId = 0x1022;
         public const int GenerateWholeLineSuggestionCommand = 0x1023;
@@ -49,6 +50,7 @@ namespace FreeAIr
         public const int OpenControlCenterCommandId = 0x1043;
         public const int AddNaturalLanguageOutlinesCommandId = 0x1052;
         public const int OpenBuildingNaturalLanguageOutlinesWindowCommandId = 0x1053;
+        public const int OpenPropertiesCommandId = 0x1054;
         public const int VisualStudioContextMenu = 0x8000;
         public const int VisualStudioContextMenuGroup = 0x8001;
         public const int VisualStudioContextMenuDynamicCommandId = 0x8002;

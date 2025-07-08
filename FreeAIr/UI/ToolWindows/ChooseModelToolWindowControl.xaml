@@ -37,6 +37,7 @@
                 SelectedItem="{Binding ChosenAgent}"
                 VerticalAlignment="Center"
                 VerticalContentAlignment="Center"
+                DisplayMemberPath="Name"
                 />
 
             <Button

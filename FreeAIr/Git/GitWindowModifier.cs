@@ -120,7 +120,7 @@ namespace FreeAIr.BLogic
                                 HorizontalContentAlignment = HorizontalAlignment.Center,
                                 Margin = new System.Windows.Thickness(0),
                                 Style = dcButton.Style,
-                                ToolTip = "FreeAIr support: add natural language outlines inside the diff below."
+                                ToolTip = "FreeAIr support: add natural language outlines related to the diff below."
                             };
                             addNaturalLanguageOutlinesButton.Click += AddNaturalLanguageOutlinesButton_Click;
                             vsPanel.Children.Insert(0, addNaturalLanguageOutlinesButton);

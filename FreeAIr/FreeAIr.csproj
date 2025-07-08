@@ -48,6 +48,7 @@
   <ItemGroup>
     <Compile Include="Commands\ApplySupportCommand.cs" />
     <Compile Include="Commands\File\ApplyFileSupportCommand.cs" />
+    <Compile Include="Commands\Other\OpenPropertiesCommand.cs" />
     <Compile Include="Helper\KnownMonikersHelper.cs" />
     <Compile Include="Options2\Agent\AgentJson.cs" />
     <Compile Include="Options2\Agent\AgentCollectionJson.cs" />

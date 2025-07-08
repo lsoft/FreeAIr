@@ -15,6 +15,7 @@ namespace FreeAIr.Find
     public static class DoSearch
     {
         public static async Task SearchAsync(
+            bool useRAG,
             string fileTypesFilterText,
             string subjectToSearchText
             )
@@ -58,11 +59,14 @@ namespace FreeAIr.Find
                 CloseFindWindow();
 
                 await NaturalLanguageResultsViewModel.ShowPanelAsync(
-                    fileTypesFilterText,
-                    subjectToSearchText,
-                    chosenScope.Scope,
-                    chosenSupportAction,
-                    chosenAgent
+                    new NaturalLanguageSearchParameters(
+                        useRAG,
+                        fileTypesFilterText,
+                        subjectToSearchText,
+                        chosenScope.Scope,
+                        chosenSupportAction,
+                        chosenAgent
+                        )
                     );
             }
             catch (Exception excp)
@@ -101,6 +105,73 @@ namespace FreeAIr.Find
             )
         {
             Scope = scope;
+        }
+
+    }
+
+
+    public sealed class NaturalLanguageSearchParameters
+    {
+        public bool UseRAG
+        {
+            get;
+        }
+        public string FileTypesFilterText
+        {
+            get;
+        }
+        public string SearchText
+        {
+            get;
+        }
+        public NaturalSearchScopeEnum ChosenScope
+        {
+            get;
+        }
+        public SupportActionJson ChosenAction
+        {
+            get;
+        }
+        public AgentJson ChosenAgent
+        {
+            get;
+        }
+
+        public NaturalLanguageSearchParameters(
+            bool useRAG,
+            string fileTypesFilterText,
+            string searchText,
+            NaturalSearchScopeEnum chosenScope,
+            SupportActionJson chosenAction,
+            AgentJson chosenAgent
+            )
+        {
+            if (string.IsNullOrEmpty(fileTypesFilterText))
+            {
+                throw new ArgumentException($"'{nameof(fileTypesFilterText)}' cannot be null or empty.", nameof(fileTypesFilterText));
+            }
+
+            if (string.IsNullOrEmpty(searchText))
+            {
+                throw new ArgumentException($"'{nameof(searchText)}' cannot be null or empty.", nameof(searchText));
+            }
+
+            if (chosenAction is null)
+            {
+                throw new ArgumentNullException(nameof(chosenAction));
+            }
+
+            if (chosenAgent is null)
+            {
+                throw new ArgumentNullException(nameof(chosenAgent));
+            }
+
+            UseRAG = useRAG;
+            FileTypesFilterText = fileTypesFilterText;
+            SearchText = searchText;
+            ChosenScope = chosenScope;
+            ChosenAction = chosenAction;
+            ChosenAgent = chosenAgent;
         }
 
     }

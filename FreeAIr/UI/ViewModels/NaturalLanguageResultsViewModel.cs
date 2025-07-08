@@ -203,31 +203,12 @@ namespace FreeAIr.UI.ViewModels
         }
 
         public async Task SetNewChatAsync(
-            NaturalSearchScopeEnum scope,
-            SupportActionJson chosenAction,
-            AgentJson chosenAgent,
-            string searchText,
-            string fileTypesFilterText
+            NaturalLanguageSearchParameters parameters
             )
         {
-            if (chosenAction is null)
+            if (parameters is null)
             {
-                throw new ArgumentNullException(nameof(chosenAction));
-            }
-
-            if (chosenAgent is null)
-            {
-                throw new ArgumentNullException(nameof(chosenAgent));
-            }
-
-            if (searchText is null)
-            {
-                throw new ArgumentNullException(nameof(searchText));
-            }
-
-            if (fileTypesFilterText is null)
-            {
-                throw new ArgumentNullException(nameof(fileTypesFilterText));
+                throw new ArgumentNullException(nameof(parameters));
             }
 
             var oldChat = Interlocked.Exchange(ref _chat, null);
@@ -238,7 +219,7 @@ namespace FreeAIr.UI.ViewModels
             _cancellationTokenSource?.Dispose();
 
             var filesTypeFilters = new FileTypesFilter(
-                fileTypesFilterText
+                parameters.FileTypesFilterText
                     .Split(';')
                     .ConvertAll(f => new FileTypeFilter(f))
                 );
@@ -251,7 +232,7 @@ namespace FreeAIr.UI.ViewModels
                     null
                     ),
                 null,
-                await ChatOptions.NoToolAutoProcessedJsonResponseAsync(chosenAgent)
+                await ChatOptions.NoToolAutoProcessedJsonResponseAsync(parameters.ChosenAgent)
                 );
             if (_chat is null)
             {
@@ -267,30 +248,19 @@ namespace FreeAIr.UI.ViewModels
                 });
 
             _processingTask = ProcessSolutionDocumentsAsync(
-                scope,
-                chosenAction,
-                chosenAgent,
-                searchText,
+                parameters,
                 filesTypeFilters
                 );
         }
 
         private async Task ProcessSolutionDocumentsAsync(
-            NaturalSearchScopeEnum scope,
-            SupportActionJson chosenAction,
-            AgentJson chosenAgent,
-            string searchText,
+            NaturalLanguageSearchParameters parameters,
             FileTypesFilter filesTypeFilters
             )
         {
-            if (chosenAction is null)
+            if (parameters is null)
             {
-                throw new ArgumentNullException(nameof(chosenAction));
-            }
-
-            if (searchText is null)
-            {
-                throw new ArgumentNullException(nameof(searchText));
+                throw new ArgumentNullException(nameof(parameters));
             }
 
             if (filesTypeFilters is null)
@@ -300,7 +270,7 @@ namespace FreeAIr.UI.ViewModels
 
             var cancellationToken = _cancellationTokenSource.Token;
 
-            var root = await DetermineRootAsync(scope);
+            var root = await DetermineRootAsync(parameters.ChosenScope);
             var foundRootItems = await root.ProcessDownRecursivelyForAsync(
                 item =>
                 {
@@ -333,7 +303,12 @@ namespace FreeAIr.UI.ViewModels
             {
                 var processedItemCount = 0;
 
-                foreach (var portion in foundRootItems.SplitByItemsSize(chosenAgent.Technical.ContextSize))
+                //todo неправильно считается размер порции: не учитываются relatex context items
+                //которые будут добавлены в контекст чата по референсам для C#
+                //надо добавлять по одному файлу, добавлять все референс-файлы и оценивать размер
+                //если размер стал слишком большим - откатывать последний файл и его референс файлы
+                //и использовать их на следующей итерации
+                foreach (var portion in foundRootItems.SplitByItemsSize(parameters.ChosenAgent.Technical.ContextSize))
                 {
                     Status = $"In progress ({processedItemCount}/{foundRootItems.Count})...";
 
@@ -357,13 +332,12 @@ namespace FreeAIr.UI.ViewModels
                     }
                     _chat.ChatContext.AddItems(contextItems);
 
-
                     var supportContext = await SupportContext.WithNaturalLanguageSearchQueryAsync(
-                        searchText
+                        parameters.SearchText
                         );
 
                     var promptText = supportContext.ApplyVariablesToPrompt(
-                        chosenAction.Prompt
+                        parameters.ChosenAction.Prompt
                         );
 
                     _chat.AddPrompt(
@@ -536,32 +510,18 @@ $"""
         }
 
         public static async Task ShowPanelAsync(
-            string fileTypesFilterText,
-            string subjectToSearchText,
-            NaturalSearchScopeEnum chosenScope,
-            SupportActionJson chosenAction,
-            AgentJson chosenAgent
+            NaturalLanguageSearchParameters parameters
             )
         {
-            if (fileTypesFilterText is null)
+            if (parameters is null)
             {
-                throw new ArgumentNullException(nameof(fileTypesFilterText));
-            }
-
-            if (subjectToSearchText is null)
-            {
-                throw new ArgumentNullException(nameof(subjectToSearchText));
-            }
-
-            if (chosenAgent is null)
-            {
-                throw new ArgumentNullException(nameof(chosenAgent));
+                throw new ArgumentNullException(nameof(parameters));
             }
 
             var pane = await NaturalLanguageResultsToolWindow.ShowAsync();
             var toolWindow = pane.Content as NaturalLanguageResultsToolWindowControl;
             var viewModel = toolWindow.DataContext as NaturalLanguageResultsViewModel;
-            viewModel.SetNewChatAsync(chosenScope, chosenAction, chosenAgent, subjectToSearchText, fileTypesFilterText)
+            viewModel.SetNewChatAsync(parameters)
                 .FileAndForget(nameof(NaturalLanguageResultsViewModel.SetNewChatAsync));
         }
     }

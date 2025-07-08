@@ -40,6 +40,9 @@ namespace FreeAIr.Find
                         var textBoxes = new List<TextBox>();
                         findFilesDialogControl.GetRecursiveByType(ref textBoxes);
 
+                        var checkBoxes = new List<CheckBox>();
+                        findFilesDialogControl.GetRecursiveByType(ref checkBoxes);
+
                         var sortedTextBoxes = (
                             from textBox in textBoxes
                             where textBox.GetType() == typeof(TextBox)
@@ -51,33 +54,18 @@ namespace FreeAIr.Find
                         var subjectToSearchTextBox = sortedTextBoxes[0];
                         var fileTypesFilterTextBox = sortedTextBoxes[2];
 
-                        var naturalSearchButton = new Button
-                        {
-                            Margin = findAllButton.Margin,
-                            VerticalAlignment = findAllButton.VerticalAlignment,
-                            VerticalContentAlignment = findAllButton.VerticalContentAlignment,
-                            Height = findAllButton.ActualHeight,
-                            Content = "Find using natural language",
-                            ToolTip = "Find using natural language in every file of current solution",
-                            Style = findAllButton.Style
-                        };
-
-                        naturalSearchButton.Click += (sender, e) =>
-                        {
-                            DoSearch.SearchAsync(
-                                fileTypesFilterTextBox.Text,
-                                subjectToSearchTextBox.Text
-                                )
-                                .FileAndForget(nameof(DoSearch.SearchAsync));
-                        };
-
-                        subjectToSearchTextBox.TextChanged += (sender, e) =>
-                        {
-                            naturalSearchButton.IsEnabled = !string.IsNullOrEmpty(subjectToSearchTextBox.Text);
-                        };
-
-                        //do it for first time manually:
-                        naturalSearchButton.IsEnabled = !string.IsNullOrEmpty(subjectToSearchTextBox.Text);
+                        var ragCheckBox = CreateUseRAGCheckBox(
+                            checkBoxes.FirstOrDefault(),
+                            findAllButton,
+                            subjectToSearchTextBox,
+                            fileTypesFilterTextBox
+                            );
+                        var naturalSearchButton = CreateNaturalLanguageSearchButton(
+                            ragCheckBox,
+                            findAllButton,
+                            subjectToSearchTextBox,
+                            fileTypesFilterTextBox
+                            );
 
                         //put the new button
                         var parent = VisualTreeHelper.GetParent(findAllButton) as WrapPanel;
@@ -85,6 +73,12 @@ namespace FreeAIr.Find
                             0,
                             naturalSearchButton
                             );
+                        parent.Children.Insert(
+                            0,
+                            ragCheckBox
+                            );
+
+
                         return;
                     }
 
@@ -104,6 +98,74 @@ namespace FreeAIr.Find
             {
                 //todo logging
             }
+        }
+
+        private static CheckBox CreateUseRAGCheckBox(
+            CheckBox? styleSourceCheckBox,
+            Button findAllButton,
+            TextBox subjectToSearchTextBox,
+            TextBox fileTypesFilterTextBox
+            )
+        {
+            var useRAGCheckBox = new CheckBox
+            {
+                Margin = findAllButton.Margin,
+                VerticalAlignment = findAllButton.VerticalAlignment,
+                VerticalContentAlignment = findAllButton.VerticalContentAlignment,
+                Height = findAllButton.ActualHeight,
+                Content = "Use RAG",
+                ToolTip = "Use NLO embedding JSON files to narrow down search scope, if the files exists for this solution",
+                Style = styleSourceCheckBox?.Style
+            };
+
+            useRAGCheckBox.IsEnabled = false;
+
+            return useRAGCheckBox;
+        }
+
+        private static Button CreateNaturalLanguageSearchButton(
+            CheckBox ragCheckBox,
+            Button findAllButton,
+            TextBox subjectToSearchTextBox,
+            TextBox fileTypesFilterTextBox
+            )
+        {
+            var naturalSearchButton = new Button
+            {
+                Margin = findAllButton.Margin,
+                VerticalAlignment = findAllButton.VerticalAlignment,
+                VerticalContentAlignment = findAllButton.VerticalContentAlignment,
+                Height = findAllButton.ActualHeight,
+                Content = "Find using natural language",
+                ToolTip = "Find using natural language in current solution or the current project",
+                Style = findAllButton.Style
+            };
+
+            naturalSearchButton.Click += (sender, e) =>
+            {
+                DoSearch.SearchAsync(
+                    ragCheckBox.IsChecked.GetValueOrDefault(false),
+                    fileTypesFilterTextBox.Text,
+                    subjectToSearchTextBox.Text
+                    )
+                    .FileAndForget(nameof(DoSearch.SearchAsync));
+            };
+
+            static bool CheckEnabledStatus(TextBox subjectToSearchTextBox)
+            {
+                return string.IsNullOrEmpty(subjectToSearchTextBox.Text);
+            }
+
+            subjectToSearchTextBox.TextChanged += (sender, e) =>
+            {
+                naturalSearchButton.IsEnabled = !CheckEnabledStatus(subjectToSearchTextBox);
+            };
+
+            //do it for first time manually:
+            naturalSearchButton.IsEnabled = !CheckEnabledStatus(subjectToSearchTextBox);
+
+            return naturalSearchButton;
+
         }
     }
 

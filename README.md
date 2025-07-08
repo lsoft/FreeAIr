@@ -124,4 +124,5 @@ If you are banned from any remote LLM then run LLM locally, which is very easy, 
 - [CCodeAI](https://github.com/TimChen44/CCodeAI) for inspiration.
 - [L.AI](https://github.com/cntseesharp/L.AI) for inspiration.
 - [KoboldCpp](https://github.com/LostRuins/koboldcpp/) for testing without daily limits.
+- [Yandex](https://ya.ru) for supporting grant to access Yandex LLMs.
 - to you, visitor. Thanks for reading this. If you are enjoying it please consider give it a ★ in the github repo and ★★★★★ rating on the Visual Studio Marketplace.
