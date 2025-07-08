@@ -187,6 +187,7 @@
     <Compile Include="Options2\Support\StringEnumConverter.cs" />
     <Compile Include="Options2\Support\SupportCollectionJson.cs" />
     <Compile Include="Options2\Unsorted\UnsortedJson.cs" />
+    <Compile Include="Options\FontSizePage.cs" />
     <Compile Include="Options\InternalPage.cs" />
     <Compile Include="Options2\JsonDescriptionCommentConverter.cs" />
     <Compile Include="Options\OptionsProvider.cs" />

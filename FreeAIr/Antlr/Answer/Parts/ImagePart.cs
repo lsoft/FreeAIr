@@ -52,7 +52,7 @@ namespace FreeAIr.Antlr.Answer.Parts
             {
                 return [ new Run
                     {
-                        FontSize = 12,
+                        FontSize = FontSizePage.Instance.TextSize,
                         Text = Text
                     }
                 ];

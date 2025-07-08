@@ -58,7 +58,7 @@ namespace FreeAIr.Antlr.Answer.Parts
         {
             yield return new Run
             {
-                FontSize = 12,
+                FontSize = FontSizePage.Instance.TextSize,
                 Foreground = Brushes.Red,
                 Text = Text
             };

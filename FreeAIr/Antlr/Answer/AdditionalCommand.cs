@@ -93,10 +93,12 @@ namespace FreeAIr.Antlr.Answer
         {
             get;
         }
+
         public string ToolTip
         {
             get;
         }
+
         public ICommand? ActionCommand
         {
             get;
@@ -139,7 +141,7 @@ namespace FreeAIr.Antlr.Answer
             var control = new Button
             {
                 Margin = new Thickness(2, 0, 2, 0),
-                FontSize = 12,
+                FontSize = FontSizePage.Instance.ContextButtonSize,
                 FontFamily = new FontFamily("Cascadia Code"),
                 ToolTip = ToolTip,
                 FontWeight = FontWeights.Bold,

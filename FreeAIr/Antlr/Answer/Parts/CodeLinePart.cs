@@ -44,7 +44,7 @@ namespace FreeAIr.Antlr.Answer.Parts
             {
                 FontFamily = new FontFamily("Cascadia Code"),
                 Foreground = _foregroundBrush,
-                FontSize = 12,
+                FontSize = FontSizePage.Instance.CodeLineSize,
                 Text = Text
             };
         }

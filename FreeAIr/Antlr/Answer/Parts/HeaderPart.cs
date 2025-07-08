@@ -6,8 +6,6 @@ namespace FreeAIr.Antlr.Answer.Parts
 {
     public sealed class HeaderPart : IPart
     {
-        private static readonly int[] _fontSizes = [24, 22, 20, 18, 16, 14];
-
         public PartTypeEnum Type => PartTypeEnum.Header;
 
         public int Level
@@ -54,7 +52,7 @@ namespace FreeAIr.Antlr.Answer.Parts
 
             yield return new Run
             {
-                FontSize = _fontSizes[level],
+                FontSize = FontSizePage.Instance.GetHeaderFontSize(level),
                 Text = Header
             };
         }

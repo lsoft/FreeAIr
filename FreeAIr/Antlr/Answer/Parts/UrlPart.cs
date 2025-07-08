@@ -73,7 +73,7 @@ namespace FreeAIr.Antlr.Answer.Parts
                 new Run(Description)
                 )
             {
-                FontSize = 12,
+                FontSize = FontSizePage.Instance.TextSize,
                 NavigateUri = new Uri(Link),
                 ToolTip = Title
             };
