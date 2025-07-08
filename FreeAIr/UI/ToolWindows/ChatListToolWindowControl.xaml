@@ -138,10 +138,6 @@
                     <StackPanel
                         >
                         <TextBlock
-                            Margin="0,1,0,1"
-                            Text="{Binding Path=FirstRow, Mode=OneWay}"
-                            />
-                        <TextBlock
                             Text="{Binding Path=SecondRow, Mode=OneWay}"
                             />
                         <TextBlock

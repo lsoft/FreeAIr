@@ -1046,14 +1046,6 @@ namespace FreeAIr.UI.ViewModels
                 }
             }
 
-            public string FirstRow
-            {
-                get
-                {
-                    return Chat.Description.Kind.AsUIString();
-                }
-            }
-
             public string SecondRow
             {
                 get

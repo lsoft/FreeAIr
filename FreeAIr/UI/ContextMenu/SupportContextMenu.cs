@@ -28,13 +28,13 @@ namespace FreeAIr.UI.ContextMenu
                 return filteredEntities[0];
             }
 
-            var chosenSupport = await VisualStudioContextMenuCommandBridge.ShowAsync<SupportActionJson>(
+            var chosenSupportAction = await VisualStudioContextMenuCommandBridge.ShowAsync<SupportActionJson>(
                 title,
                 filteredEntities
                     .ConvertAll(e => (e.Name, e as object))
                 );
 
-            return chosenSupport;
+            return chosenSupportAction;
         }
 
     }

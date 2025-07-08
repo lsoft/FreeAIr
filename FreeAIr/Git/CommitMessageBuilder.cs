@@ -1,15 +1,9 @@
-using FreeAIr.BLogic.Context.Item;
-using FreeAIr.Find;
-using FreeAIr.Git;
-using FreeAIr.Options2;
 using FreeAIr.Options2.Agent;
+using FreeAIr.Options2.Support;
 using FreeAIr.UI.ContextMenu;
 using FreeAIr.UI.ToolWindows;
-using FreeAIr.UI.ViewModels;
 using FreeAIr.UI.Windows;
-using Microsoft.Build.Utilities;
 using Microsoft.VisualStudio.ComponentModelHost;
-using System.Collections.Generic;
 using System.Windows;
 
 namespace FreeAIr.BLogic
@@ -23,9 +17,18 @@ namespace FreeAIr.BLogic
             {
                 await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
 
-                var agentCollection = await FreeAIrOptions.DeserializeAgentCollectionAsync();
+                var chosenSupportAction = await SupportContextMenu.ChooseSupportAsync(
+                    "Choose support action:",
+                    SupportScopeEnum.CommitMessageBuilding
+                    );
+                if (chosenSupportAction is null)
+                {
+                    return;
+                }
+
                 var chosenAgent = await AgentContextMenu.ChooseAgentWithTokenAsync(
-                    "Choose agent for commit message generation:"
+                    "Choose agent for commit message generation:",
+                    chosenSupportAction.AgentName
                     );
                 if (chosenAgent is null)
                 {
@@ -33,6 +36,7 @@ namespace FreeAIr.BLogic
                 }
 
                 await BuildCommitMessageAsync(
+                    chosenSupportAction,
                     chosenAgent
                     );
             }
@@ -43,6 +47,7 @@ namespace FreeAIr.BLogic
         }
 
         private static async Task BuildCommitMessageAsync(
+            SupportActionJson action,
             AgentJson agent
             )
         {
@@ -66,6 +71,14 @@ namespace FreeAIr.BLogic
                 return;
             }
 
+            var supportContext = await SupportContext.WithGitDiffAsync(
+                gitDiff
+                );
+
+            var promptText = supportContext.ApplyVariablesToPrompt(
+                action.Prompt
+                );
+
             var chatContainer = componentModel.GetService<ChatContainer>();
 
             var chat = await chatContainer.StartChatAsync(
@@ -73,7 +86,7 @@ namespace FreeAIr.BLogic
                     ChatKindEnum.GenerateCommitMessage,
                     null
                     ),
-                await UserPrompt.CreateCommitMessagePromptAsync(gitDiff),
+                UserPrompt.CreateTextBasedPrompt(promptText),
                 await ChatOptions.NoToolAutoProcessedTextResponseAsync(agent)
                 );
 

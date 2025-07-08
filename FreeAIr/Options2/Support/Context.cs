@@ -16,7 +16,9 @@ namespace FreeAIr.Options2.Support
         BuildErrorMessage,
         BuildErrorLine,
         BuildErrorColumn,
-        UnitTestFramework
+        UnitTestFramework,
+        GitDiff,
+        NaturalLanguageSearchQuery
     }
 
     public static class SupportContextVariableHelper
@@ -26,6 +28,8 @@ namespace FreeAIr.Options2.Support
         private const string BuildErrorLine = "{BUILD_ERROR_LINE}";
         private const string BuildErrorColumn = "{BUILD_ERROR_COLUMN}";
         private const string UnitTestFramework = "{UNIT_TEST_FRAMEWORK}";
+        private const string GitDiff = "{GIT_DIFF}";
+        private const string NaturalLanguageSearchQuery = "{NATURAL_LANGUAGE_SEARCH_QUERY}";
 
         public static readonly string[] Anchors =
             [
@@ -34,6 +38,8 @@ namespace FreeAIr.Options2.Support
                 BuildErrorLine,
                 BuildErrorColumn,
                 UnitTestFramework,
+                GitDiff,
+                NaturalLanguageSearchQuery
             ];
 
         public static SupportContextVariableEnum GetVariableEnum(
@@ -52,6 +58,10 @@ namespace FreeAIr.Options2.Support
                     return SupportContextVariableEnum.BuildErrorColumn;
                 case UnitTestFramework:
                     return SupportContextVariableEnum.UnitTestFramework;
+                case GitDiff:
+                    return SupportContextVariableEnum.GitDiff;
+                case NaturalLanguageSearchQuery:
+                    return SupportContextVariableEnum.NaturalLanguageSearchQuery;
             }
 
             return SupportContextVariableEnum.Unknown;
@@ -73,6 +83,10 @@ namespace FreeAIr.Options2.Support
                     return BuildErrorColumn;
                 case SupportContextVariableEnum.UnitTestFramework:
                     return UnitTestFramework;
+                case SupportContextVariableEnum.GitDiff:
+                    return GitDiff;
+                case SupportContextVariableEnum.NaturalLanguageSearchQuery:
+                    return NaturalLanguageSearchQuery;
             }
 
             return string.Empty;
@@ -116,10 +130,65 @@ namespace FreeAIr.Options2.Support
             return result;
         }
 
+        public static async Task<SupportContext> WithGitDiffAsync(
+            string gitDiff
+            )
+        {
+            if (gitDiff is null)
+            {
+                throw new ArgumentNullException(nameof(gitDiff));
+            }
+
+            var unsorted = await FreeAIrOptions.DeserializeUnsortedAsync();
+
+            var result = new SupportContext();
+
+            result.AddContextVariable(
+                SupportContextVariableEnum.GitDiff,
+                gitDiff
+                );
+            result.AddContextVariable(
+                SupportContextVariableEnum.UnitTestFramework,
+                unsorted.PreferredUnitTestFramework
+                );
+
+            return result;
+        }
+
+        public static async Task<SupportContext> WithNaturalLanguageSearchQueryAsync(
+            string searchQuery
+            )
+        {
+            if (searchQuery is null)
+            {
+                throw new ArgumentNullException(nameof(searchQuery));
+            }
+
+            var unsorted = await FreeAIrOptions.DeserializeUnsortedAsync();
+
+            var result = new SupportContext();
+
+            result.AddContextVariable(
+                SupportContextVariableEnum.NaturalLanguageSearchQuery,
+                searchQuery
+                );
+            result.AddContextVariable(
+                SupportContextVariableEnum.UnitTestFramework,
+                unsorted.PreferredUnitTestFramework
+                );
+
+            return result;
+        }
+
         public static async Task<SupportContext> WithSelectedFilesAsync(
             List<SolutionItem> selections
             )
         {
+            if (selections is null)
+            {
+                throw new ArgumentNullException(nameof(selections));
+            }
+
             var unsorted = await FreeAIrOptions.DeserializeUnsortedAsync();
 
             var result = new SupportContext();
@@ -140,6 +209,11 @@ namespace FreeAIr.Options2.Support
             string filePath
             )
         {
+            if (filePath is null)
+            {
+                throw new ArgumentNullException(nameof(filePath));
+            }
+
             var unsorted = await FreeAIrOptions.DeserializeUnsortedAsync();
 
             var result = new SupportContext();
@@ -160,6 +234,11 @@ namespace FreeAIr.Options2.Support
             BuildResultInformation errorInformation
             )
         {
+            if (errorInformation is null)
+            {
+                throw new ArgumentNullException(nameof(errorInformation));
+            }
+
             var unsorted = await FreeAIrOptions.DeserializeUnsortedAsync();
 
             var result = new SupportContext();

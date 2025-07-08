@@ -24,11 +24,11 @@ namespace FreeAIr.Commands.BuildError
                 return;
             }
 
-            var chosenSupport = await SupportContextMenu.ChooseSupportAsync(
-                "Choose support:",
+            var chosenSupportAction = await SupportContextMenu.ChooseSupportAsync(
+                "Choose support action:",
                 SupportScopeEnum.BuildErrorWindow
                 );
-            if (chosenSupport is null)
+            if (chosenSupportAction is null)
             {
                 return;
             }
@@ -39,7 +39,7 @@ namespace FreeAIr.Commands.BuildError
 
             var chosenAgent = await AgentContextMenu.ChooseAgentWithTokenAsync(
                 "Choose agent:",
-                chosenSupport.AgentName
+                chosenSupportAction.AgentName
                 );
             if (chosenAgent is null)
             {
@@ -91,7 +91,7 @@ namespace FreeAIr.Commands.BuildError
                 );
 
             var promptText = supportContext.ApplyVariablesToPrompt(
-                chosenSupport.Prompt
+                chosenSupportAction.Prompt
                 );
 
             chat.AddPrompt(

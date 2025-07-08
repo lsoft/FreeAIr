@@ -70,23 +70,6 @@ namespace FreeAIr.BLogic
                 );
 
         /// <summary>
-        /// Создает промпт для генерации сообщения коммита на основе git-патча
-        /// </summary>
-        /// <param name="gitPatch">Текст патча</param>
-        /// <returns>Новый объект UserPrompt</returns>
-        public static async Task<UserPrompt> CreateCommitMessagePromptAsync(string gitPatch) =>
-            new UserPrompt(
-                await ChatKindEnum.GenerateCommitMessage.AsPromptStringAsync()
-                + Environment.NewLine
-                + Environment.NewLine
-                + "```patch"
-                + Environment.NewLine
-                + gitPatch
-                + Environment.NewLine
-                + "```"
-            );
-
-        /// <summary>
         /// Создает промпт для предложения целой строки кода в указанной позиции
         /// </summary>
         /// <param name="userCodeFileName">Имя файла с кодом</param>
@@ -101,7 +84,7 @@ namespace FreeAIr.BLogic
             documentText = documentText.Insert(caretPosition, anchor);
 
             return new UserPrompt(
-                await ChatKindEnum.SuggestWholeLine.AsPromptStringAsync()
+                await GetSuggestWholeLinePromptAsync()
                 + Environment.NewLine
                 + Environment.NewLine
                 + "```"
@@ -113,16 +96,11 @@ namespace FreeAIr.BLogic
             );
         }
 
-        public static async Task<UserPrompt> CreateNaturalLanguageSearchPromptAsync(
-            string searchText
-            )
+        private static async Task<string> GetSuggestWholeLinePromptAsync()
         {
-            return new UserPrompt(
-                await ChatKindEnum.NaturalLanguageSearch.AsPromptStringAsync()
-                + Environment.NewLine
-                + ""
-                + searchText
-                );
+            var prompt = await "SuggestWholeLine".GetLocalizedResourceByNameAsync();
+            var anchor = await "SuggestWholeLine_Anchor".GetLocalizedResourceByNameAsync();
+            return string.Format(prompt, anchor);
         }
 
         public static UserPrompt CreateFileOutlinesPrompt(

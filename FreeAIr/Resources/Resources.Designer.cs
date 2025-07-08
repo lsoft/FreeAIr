@@ -115,38 +115,11 @@ namespace FreeAIr.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Using the search query given to you, carefully examine all the attached files and find all the places that match the query. Your response should be a list in the following JSON format: `{ &quot;matches&quot;: [ {&quot;fullpath&quot;: &quot;full path to the file&quot;, &quot;found_text&quot;:&quot;a matched word sequence from document&quot;, &quot;confidence_level&quot;:a_level_of_your_confidence, &quot;line&quot;:line_number_of_found_text, &quot;reason&quot;:&quot;a reason why you include this item to your result&quot;} ] }`. `found_text` - 5-10 words from the document that you think match the s [rest of string was truncated]&quot;;.
-        /// </summary>
-        public static string ChatKindEnum_NaturalLanguageSearch {
-            get {
-                return ResourceManager.GetString("ChatKindEnum_NaturalLanguageSearch", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Optimize the following code:.
         /// </summary>
         public static string ChatKindEnum_OptimizeCode {
             get {
                 return ResourceManager.GetString("ChatKindEnum_OptimizeCode", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Suggest filling the whole line where `{0}` is written in the following code. Give in your reply only new piece of code without additional information and without the code I provide you..
-        /// </summary>
-        public static string ChatKindEnum_SuggestWholeLine {
-            get {
-                return ResourceManager.GetString("ChatKindEnum_SuggestWholeLine", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to &lt;｜fim▁hole｜&gt;.
-        /// </summary>
-        public static string ChatKindEnum_SuggestWholeLine_Anchor {
-            get {
-                return ResourceManager.GetString("ChatKindEnum_SuggestWholeLine_Anchor", resourceCulture);
             }
         }
         
@@ -174,6 +147,24 @@ namespace FreeAIr.Resources {
         public static string Error {
             get {
                 return ResourceManager.GetString("Error", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Suggest filling the whole line where `{0}` is written in the following code. Give in your reply only new piece of code without additional information and without the code I provide you..
+        /// </summary>
+        public static string SuggestWholeLine {
+            get {
+                return ResourceManager.GetString("SuggestWholeLine", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &lt;｜fim▁hole｜&gt;.
+        /// </summary>
+        public static string SuggestWholeLine_Anchor {
+            get {
+                return ResourceManager.GetString("SuggestWholeLine_Anchor", resourceCulture);
             }
         }
         

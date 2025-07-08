@@ -32,11 +32,11 @@ namespace FreeAIr.Commands.File
                 return;
             }
 
-            var chosenSupport = await SupportContextMenu.ChooseSupportAsync(
-                "Choose support:",
+            var chosenSupportAction = await SupportContextMenu.ChooseSupportAsync(
+                "Choose support action:",
                 SupportScopeEnum.FileInSolutionTree
                 );
-            if (chosenSupport is null)
+            if (chosenSupportAction is null)
             {
                 return;
             }
@@ -47,7 +47,7 @@ namespace FreeAIr.Commands.File
 
             var chosenAgent = await AgentContextMenu.ChooseAgentWithTokenAsync(
                 "Choose agent:",
-                chosenSupport.AgentName
+                chosenSupportAction.AgentName
                 );
             if (chosenAgent is null)
             {
@@ -97,7 +97,7 @@ namespace FreeAIr.Commands.File
             }
 
             var promptText = supportContext.ApplyVariablesToPrompt(
-                chosenSupport.Prompt
+                chosenSupportAction.Prompt
                 );
 
             chat.AddPrompt(

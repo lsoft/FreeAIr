@@ -1,4 +1,5 @@
 ﻿using FreeAIr.Options2.Agent;
+using FreeAIr.Options2.Support;
 using FreeAIr.Shared.Helper;
 using FreeAIr.UI.ContextMenu;
 using FreeAIr.UI.ToolWindows;
@@ -34,8 +35,19 @@ namespace FreeAIr.Find
                     return;
                 }
 
+                var chosenSupportAction = await SupportContextMenu.ChooseSupportAsync(
+                    "Choose support action:",
+                    SupportScopeEnum.NaturalLanguageSearch
+                    );
+                if (chosenSupportAction is null)
+                {
+                    return;
+                }
+
+
                 var chosenAgent = await AgentContextMenu.ChooseAgentWithTokenAsync(
-                    "Choose agent for natural language search:"
+                    "Choose agent for natural language search:",
+                    chosenSupportAction.AgentName
                     );
                 if (chosenAgent is null)
                 {
@@ -49,6 +61,7 @@ namespace FreeAIr.Find
                     fileTypesFilterText,
                     subjectToSearchText,
                     chosenScope.Scope,
+                    chosenSupportAction,
                     chosenAgent
                     );
             }

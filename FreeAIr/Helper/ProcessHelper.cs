@@ -1,5 +1,6 @@
 using RunProcessAsTask;
 using System.Diagnostics;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -21,7 +22,9 @@ namespace FreeAIr.Helper
                         FileName = exeName,
                         Arguments = arguments,
                         CreateNoWindow = true,
-                        WindowStyle = ProcessWindowStyle.Hidden
+                        WindowStyle = ProcessWindowStyle.Hidden,
+                        StandardOutputEncoding = Encoding.UTF8,
+                        StandardErrorEncoding = Encoding.UTF8
                     },
                     cancellationToken
                     );

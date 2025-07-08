@@ -94,7 +94,24 @@ namespace FreeAIr.Options2.Support
                     Prompt = $@"The compiler reported an error `{SupportContextVariableEnum.BuildErrorMessage.GetAnchor()}` in the file `{SupportContextVariableEnum.ContextItemFilePath.GetAnchor()}`, line {SupportContextVariableEnum.BuildErrorLine.GetAnchor()}, column {SupportContextVariableEnum.BuildErrorColumn.GetAnchor()}. Help fix the code.",
                     KnownMoniker = null
                 },
-               
+
+                new SupportActionJson
+                {
+                    Scopes = [ SupportScopeEnum.CommitMessageBuilding ],
+                    Name = "Build commit message",
+                    AgentName = null,
+                    Prompt = $@"Generate commit message according the following git patch. Give in your reply only the commit message without additional information. Do not wrap the whole answer in any quotes.{Environment.NewLine}{Environment.NewLine}`{SupportContextVariableEnum.GitDiff.GetAnchor()}`",
+                    KnownMoniker = nameof(KnownMonikers.GitRepository)
+                },
+
+                new SupportActionJson
+                {
+                    Scopes = [ SupportScopeEnum.NaturalLanguageSearch ],
+                    Name = "Search by natural language",
+                    AgentName = null,
+                    Prompt = $@"Using the search query given to you, carefully examine all the attached files and find all the places that match the query. Your response should be a list in the following JSON format: `{{ ""matches"": [ {{""fullpath"": ""full path to the file"", ""found_text"":""a matched word sequence from document"", ""confidence_level"":a_level_of_your_confidence, ""line"":line_number_of_found_text, ""reason"":""a reason why you include this item to your result""}} ] }}`. `found_text` - 5-10 words from the document that you think match the search query, `confidence_level` is an integer, the level of your confidence that `found_text` matches the search query, where 0 is the minimum confidence, 100 is the maximum confidence, `line_number` is the line number where `found_text` was found.{Environment.NewLine}Search query:`{SupportContextVariableEnum.NaturalLanguageSearchQuery.GetAnchor()}`",
+                    KnownMoniker = nameof(KnownMonikers.Search)
+                },
             ];
 
     }
@@ -161,6 +178,8 @@ namespace FreeAIr.Options2.Support
         CodelensInDocument,
         FileInSolutionTree,
         BuildErrorWindow,
-        EnterPromptControl
+        EnterPromptControl,
+        CommitMessageBuilding,
+        NaturalLanguageSearch
     }
 }

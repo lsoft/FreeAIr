@@ -135,10 +135,10 @@
   <data name="ChatKindEnum_GenerateUnitTests" xml:space="preserve">
     <value>Generate a set of unit tests for the following code. Provide only one code snippet in your answer, without any additional information. Add XML comments for each test that describe what the test checks. Write code for the {0} test framework.</value>
   </data>
-  <data name="ChatKindEnum_SuggestWholeLine" xml:space="preserve">
+  <data name="SuggestWholeLine" xml:space="preserve">
     <value>Suggest filling the whole line where `{0}` is written in the following code. Give in your reply only new piece of code without additional information and without the code I provide you.</value>
   </data>
-  <data name="ChatKindEnum_SuggestWholeLine_Anchor" xml:space="preserve">
+  <data name="SuggestWholeLine_Anchor" xml:space="preserve">
     <value>&lt;｜fim▁hole｜&gt;</value>
   </data>
   <data name="Code_NoSelectedCode" xml:space="preserve">
@@ -179,9 +179,5 @@
   </data>
   <data name="ChatKindEnum_FixBuildError" xml:space="preserve">
     <value>The compiler reported an error in the source code. Help fix the code. Error: </value>
-  </data>
-  <data name="ChatKindEnum_NaturalLanguageSearch" xml:space="preserve">
-    <value>Using the search query given to you, carefully examine all the attached files and find all the places that match the query. Your response should be a list in the following JSON format: `{ "matches": [ {"fullpath": "full path to the file", "found_text":"a matched word sequence from document", "confidence_level":a_level_of_your_confidence, "line":line_number_of_found_text, "reason":"a reason why you include this item to your result"} ] }`. `found_text` - 5-10 words from the document that you think match the search query, `confidence_level` is an integer, the level of your confidence that `found_text` matches the search query, where 0 is the minimum confidence, 100 is the maximum confidence, `line_number` is the line number where `found_text` was found.
-Search query:</value>
   </data>
 </root>

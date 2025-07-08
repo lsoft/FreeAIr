@@ -5,6 +5,7 @@ using FreeAIr.Find;
 using FreeAIr.Helper;
 using FreeAIr.Options2;
 using FreeAIr.Options2.Agent;
+using FreeAIr.Options2.Support;
 using FreeAIr.Shared.Helper;
 using FreeAIr.UI.ToolWindows;
 using FuzzySharp;
@@ -13,6 +14,7 @@ using Json.Path;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.ComponentModelHost;
 using Microsoft.VisualStudio.TextManager.Interop;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Linq;
@@ -202,11 +204,17 @@ namespace FreeAIr.UI.ViewModels
 
         public async Task SetNewChatAsync(
             NaturalSearchScopeEnum scope,
+            SupportActionJson chosenAction,
             AgentJson chosenAgent,
             string searchText,
             string fileTypesFilterText
             )
         {
+            if (chosenAction is null)
+            {
+                throw new ArgumentNullException(nameof(chosenAction));
+            }
+
             if (chosenAgent is null)
             {
                 throw new ArgumentNullException(nameof(chosenAgent));
@@ -261,6 +269,7 @@ namespace FreeAIr.UI.ViewModels
 
             _processingTask = ProcessSolutionDocumentsAsync(
                 scope,
+                chosenAction,
                 chosenAgent,
                 searchText,
                 filesTypeFilters
@@ -269,11 +278,17 @@ namespace FreeAIr.UI.ViewModels
 
         private async Task ProcessSolutionDocumentsAsync(
             NaturalSearchScopeEnum scope,
+            SupportActionJson chosenAction,
             AgentJson chosenAgent,
             string searchText,
             FileTypesFilter filesTypeFilters
             )
         {
+            if (chosenAction is null)
+            {
+                throw new ArgumentNullException(nameof(chosenAction));
+            }
+
             if (searchText is null)
             {
                 throw new ArgumentNullException(nameof(searchText));
@@ -343,9 +358,18 @@ namespace FreeAIr.UI.ViewModels
                     }
                     _chat.ChatContext.AddItems(contextItems);
 
+
+                    var supportContext = await SupportContext.WithNaturalLanguageSearchQueryAsync(
+                        searchText
+                        );
+
+                    var promptText = supportContext.ApplyVariablesToPrompt(
+                        chosenAction.Prompt
+                        );
+
                     _chat.AddPrompt(
-                        await UserPrompt.CreateNaturalLanguageSearchPromptAsync(
-                            searchText
+                        UserPrompt.CreateTextBasedPrompt(
+                            promptText
                             )
                         );
 
@@ -516,6 +540,7 @@ $"""
             string fileTypesFilterText,
             string subjectToSearchText,
             NaturalSearchScopeEnum chosenScope,
+            SupportActionJson chosenAction,
             AgentJson chosenAgent
             )
         {
@@ -537,7 +562,7 @@ $"""
             var pane = await NaturalLanguageResultsToolWindow.ShowAsync();
             var toolWindow = pane.Content as NaturalLanguageResultsToolWindowControl;
             var viewModel = toolWindow.DataContext as NaturalLanguageResultsViewModel;
-            viewModel.SetNewChatAsync(chosenScope, chosenAgent, subjectToSearchText, fileTypesFilterText)
+            viewModel.SetNewChatAsync(chosenScope, chosenAction, chosenAgent, subjectToSearchText, fileTypesFilterText)
                 .FileAndForget(nameof(NaturalLanguageResultsViewModel.SetNewChatAsync));
         }
     }

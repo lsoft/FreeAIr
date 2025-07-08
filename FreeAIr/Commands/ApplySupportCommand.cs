@@ -31,11 +31,11 @@ namespace FreeAIr.Commands
         protected override async System.Threading.Tasks.Task<SupportActionJson> ChooseSupportAsync(
             )
         {
-            var chosenSupport = await SupportContextMenu.ChooseSupportAsync(
-                "Choose support:",
+            var chosenSupportAction = await SupportContextMenu.ChooseSupportAsync(
+                "Choose support action:",
                 SupportScopeEnum.SelectedCodeInDocument
                 );
-            return chosenSupport;
+            return chosenSupportAction;
         }
     }
 
@@ -64,8 +64,8 @@ namespace FreeAIr.Commands
                 return;
             }
 
-            var chosenSupport = await ChooseSupportAsync();
-            if (chosenSupport is null)
+            var chosenSupportAction = await ChooseSupportAsync();
+            if (chosenSupportAction is null)
             {
                 return;
             }
@@ -76,7 +76,7 @@ namespace FreeAIr.Commands
 
             var chosenAgent = await AgentContextMenu.ChooseAgentWithTokenAsync(
                 "Choose agent:",
-                chosenSupport.AgentName
+                chosenSupportAction.AgentName
                 );
             if (chosenAgent is null)
             {
@@ -104,7 +104,7 @@ namespace FreeAIr.Commands
                 );
 
             var promptText = supportContext.ApplyVariablesToPrompt(
-                chosenSupport.Prompt
+                chosenSupportAction.Prompt
                 );
 
             chat.AddPrompt(
