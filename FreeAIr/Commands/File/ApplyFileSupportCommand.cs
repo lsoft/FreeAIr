@@ -1,8 +1,8 @@
-﻿using FreeAIr.BLogic;
+﻿using EnvDTE;
+using FreeAIr.BLogic;
 using FreeAIr.BLogic.Context.Composer;
 using FreeAIr.BLogic.Context.Item;
-using FreeAIr.Options2;
-using FreeAIr.Options2.Agent;
+using FreeAIr.Options2.Support;
 using FreeAIr.UI.ContextMenu;
 using FreeAIr.UI.ToolWindows;
 using Microsoft.VisualStudio.ComponentModelHost;
@@ -10,27 +10,17 @@ using System.Linq;
 
 namespace FreeAIr.Commands.File
 {
-    public abstract class InvokeLLMFileCommand<T> : BaseCommand<T>
-        where T : InvokeLLMFileCommand<T>, new()
+    [Command(PackageIds.ApplyFileSupportCommandId)]
+    internal sealed class ApplyFileSupportCommand : BaseCommand<ApplyFileSupportCommand>
     {
-        public InvokeLLMFileCommand(
+        public ApplyFileSupportCommand(
             )
         {
         }
 
-        protected abstract ChatKindEnum GetChatKind();
-
         protected override async Task ExecuteAsync(OleMenuCmdEventArgs e)
         {
             await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
-
-            var chosenAgent = await AgentContextMenu.ChooseAgentWithTokenAsync(
-                "Choose agent:"
-                );
-            if (chosenAgent is null)
-            {
-                return;
-            }
 
             var componentModel = (IComponentModel)await FreeAIrPackage.Instance.GetServiceAsync(typeof(SComponentModel));
             var chatContainer = componentModel.GetService<ChatContainer>();
@@ -42,7 +32,29 @@ namespace FreeAIr.Commands.File
                 return;
             }
 
-            var kind = GetChatKind();
+            var chosenSupport = await SupportContextMenu.ChooseSupportAsync(
+                "Choose support:",
+                SupportScopeEnum.FileInSolutionTree
+                );
+            if (chosenSupport is null)
+            {
+                return;
+            }
+
+            var supportContext = await SupportContext.WithSelectedFilesAsync(
+                selections
+                );
+
+            var chosenAgent = await AgentContextMenu.ChooseAgentWithTokenAsync(
+                "Choose agent:",
+                chosenSupport.AgentName
+                );
+            if (chosenAgent is null)
+            {
+                return;
+            }
+
+            var kind = ChatKindEnum.Discussion;
 
             var chat = await chatContainer.StartChatAsync(
                 new ChatDescription(
@@ -84,16 +96,17 @@ namespace FreeAIr.Commands.File
                     );
             }
 
+            var promptText = supportContext.ApplyVariablesToPrompt(
+                chosenSupport.Prompt
+                );
+
             chat.AddPrompt(
-                await UserPrompt.CreateContextItemBasedPromptAsync(
-                    kind,
-                    selections.ConvertAll(s => s.FullPath)
+                UserPrompt.CreateTextBasedPrompt(
+                    promptText
                     )
                 );
 
             await ChatListToolWindow.ShowIfEnabledAsync();
         }
-
     }
-
 }

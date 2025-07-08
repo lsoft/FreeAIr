@@ -47,6 +47,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Commands\ApplySupportCommand.cs" />
+    <Compile Include="Commands\File\ApplyFileSupportCommand.cs" />
     <Compile Include="Options2\Agent\AgentJson.cs" />
     <Compile Include="Options2\Agent\AgentCollectionJson.cs" />
     <Compile Include="Antlr\Answer\AdditionalCommand.cs" />
@@ -124,11 +125,8 @@
     <Compile Include="BLogic\TextDescriptor.cs" />
     <Compile Include="CodeLens\CodeLensConnectionHandler.cs" />
     <Compile Include="CodeLens\CodeLensListener.cs" />
-    <Compile Include="Commands\File\AddCommentsToFileCommand.cs" />
     <Compile Include="Commands\Other\ChooseModelCommand.cs" />
-    <Compile Include="Commands\File\ExplainFileCommand.cs" />
     <Compile Include="Commands\GenerateWholeLineSuggestionCommand.cs" />
-    <Compile Include="Commands\File\InvokeLLMFileCommand.cs" />
     <Compile Include="Commands\Other\OpenChatListToolWindowCommand.cs" />
     <Compile Include="Commands\StartDiscussionCommand.cs" />
     <Compile Include="Dto\OpenRouter\Model.cs" />

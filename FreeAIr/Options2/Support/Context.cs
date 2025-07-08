@@ -1,4 +1,5 @@
 ﻿using FreeAIr.BuildErrors;
+using SharpCompress.Common;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -106,6 +107,26 @@ namespace FreeAIr.Options2.Support
             return prompt;
         }
 
+
+        public static async Task<SupportContext> WithSelectedFilesAsync(
+            List<SolutionItem> selections
+            )
+        {
+            var unsorted = await FreeAIrOptions.DeserializeUnsortedAsync();
+
+            var result = new SupportContext();
+
+            result.AddContextVariable(
+                SupportContextVariableEnum.ContextItemFilePath,
+                string.Join(", ", selections.Select(s => $"`{s.FullPath}`"))
+                );
+            result.AddContextVariable(
+                SupportContextVariableEnum.UnitTestFramework,
+                unsorted.PreferredUnitTestFramework
+                );
+
+            return result;
+        }
 
         public static async Task<SupportContext> WithContextCodeAsync(
             string filePath

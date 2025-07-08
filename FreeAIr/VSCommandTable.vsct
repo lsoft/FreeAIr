@@ -166,77 +166,12 @@
         </Strings>
       </Button>
 
-      <!--<Button guid="FreeAIr" id="ExplainCommandId" priority="0x0100" type="Button">
-        <Parent guid="FreeAIr" id="SourceCodeContextGroup" />
-        <Icon guid="ImageCatalogGuid" id="SQLServerObjectExplorer" />
-        <CommandFlag>IconIsMoniker</CommandFlag>
-        <Strings>
-          <ButtonText>Explain code</ButtonText>
-        </Strings>
-      </Button>
-      <Button guid="FreeAIr" id="AddXmlCommentsCommandId" priority="0x0100" type="Button">
-        <Parent guid="FreeAIr" id="SourceCodeContextGroup" />
-        <Icon guid="ImageCatalogGuid" id="CodeReviewWizard" />
-        <CommandFlag>IconIsMoniker</CommandFlag>
-        <Strings>
-          <ButtonText>Add XML comments</ButtonText>
-        </Strings>
-      </Button>
-      <Button guid="FreeAIr" id="OptimizeCommandId" priority="0x0100" type="Button">
-        <Parent guid="FreeAIr" id="SourceCodeContextGroup" />
-        <Icon guid="ImageCatalogGuid" id="CodeMetrics" />
-        <CommandFlag>IconIsMoniker</CommandFlag>
-        <Strings>
-          <ButtonText>Optimize code</ButtonText>
-        </Strings>
-      </Button>
-      <Button guid="FreeAIr" id="CompleteCodeByCommentsCommandId" priority="0x0100" type="Button">
-        <Parent guid="FreeAIr" id="SourceCodeContextGroup" />
-        <Icon guid="ImageCatalogGuid" id="Writeable" />
-        <CommandFlag>IconIsMoniker</CommandFlag>
-        <Strings>
-          <ButtonText>Complete the code according to the comments</ButtonText>
-        </Strings>
-      </Button>
-      <Button guid="FreeAIr" id="StartDiscussionCommandId" priority="0x0100" type="Button">
-        <Parent guid="FreeAIr" id="SourceCodeContextGroup" />
-        <Icon guid="ImageCatalogGuid" id="UserTask" />
-        <CommandFlag>IconIsMoniker</CommandFlag>
-        <Strings>
-          <ButtonText>Start discussion with...</ButtonText>
-        </Strings>
-      </Button>
-      <Button guid="FreeAIr" id="GenerateWholeLineSuggestionCommand" priority="0x0100" type="Button">
-        <Parent guid="FreeAIr" id="SourceCodeContextGroup" />
-        <Icon guid="ImageCatalogGuid" id="UserTask" />
-        <CommandFlag>IconIsMoniker</CommandFlag>
-        <Strings>
-          <ButtonText>Generate whole line suggestion...</ButtonText>
-        </Strings>
-      </Button>
-      <Button guid="FreeAIr" id="GenerateUnitTestsCommandId" priority="0x0100" type="Button">
-        <Parent guid="FreeAIr" id="SourceCodeContextGroup" />
-        <Icon guid="ImageCatalogGuid" id="TestGroup" />
-        <CommandFlag>IconIsMoniker</CommandFlag>
-        <Strings>
-          <ButtonText>Generate unit tests</ButtonText>
-        </Strings>
-      </Button>-->
-
-      <Button guid="FreeAIr" id="ExplainFileCommandId" priority="0x0100" type="Button">
+      <Button guid="FreeAIr" id="ApplyFileSupportCommandId" priority="0x0100" type="Button">
         <Parent guid="FreeAIr" id="SolutionContextGroup" />
-        <Icon guid="ImageCatalogGuid" id="SQLServerObjectExplorer" />
+        <Icon guid="ImageCatalogGuid" id="ApplyCodeChanges" />
         <CommandFlag>IconIsMoniker</CommandFlag>
         <Strings>
-          <ButtonText>Explain code</ButtonText>
-        </Strings>
-      </Button>
-      <Button guid="FreeAIr" id="AddCommentsToFileCommandId" priority="0x0100" type="Button">
-        <Parent guid="FreeAIr" id="SolutionContextGroup" />
-        <Icon guid="ImageCatalogGuid" id="CodeReviewWizard" />
-        <CommandFlag>IconIsMoniker</CommandFlag>
-        <Strings>
-          <ButtonText>Add comments</ButtonText>
+          <ButtonText>FreeAIr support action...</ButtonText>
         </Strings>
       </Button>
       <Button guid="FreeAIr" id="AddNaturalLanguageOutlinesCommandId" priority="0x0100" type="Button">
@@ -244,7 +179,7 @@
         <Icon guid="ImageCatalogGuid" id="CommentCode" />
         <CommandFlag>IconIsMoniker</CommandFlag>
         <Strings>
-          <ButtonText>Add natural language outlines</ButtonText>
+          <ButtonText>Add natural language outlines...</ButtonText>
         </Strings>
       </Button>
 
@@ -290,11 +225,6 @@
     <KeyBinding guid="FreeAIr" id="ApplySupportCommandId" key1="L" mod1="ALT" editor="guidVSStd97" />
     <KeyBinding guid="FreeAIr" id="StartDiscussionCommandId" key1="C" mod1="ALT" editor="guidVSStd97" />
     <KeyBinding guid="FreeAIr" id="GenerateWholeLineSuggestionCommand" key1="A" mod1="ALT" editor="guidVSStd97" />
-
-    <!--<KeyBinding guid="FreeAIr" id="ExplainCommandId" key1="L" mod1="ALT" editor="guidVSStd97" />
-    <KeyBinding guid="FreeAIr" id="AddXmlCommentsCommandId" key1="C" mod1="ALT" editor="guidVSStd97" />
-    <KeyBinding guid="FreeAIr" id="CompleteCodeByCommentsCommandId" key1="M" mod1="ALT" editor="guidVSStd97" />
-    <KeyBinding guid="FreeAIr" id="GenerateUnitTestsCommandId" key1="U" mod1="ALT" editor="guidVSStd97" />-->
   </KeyBindings>
 
   <Symbols>
@@ -309,21 +239,16 @@
       <IDSymbol name="SubExtensionMenu" value="0x1014" />
 
       <IDSymbol name="ApplySupportCommandId" value="0x1021" />
-      <IDSymbol name="StartDiscussionCommandId" value="0x1026" />
-      <IDSymbol name="GenerateWholeLineSuggestionCommand" value="0x1027" />
+      <IDSymbol name="StartDiscussionCommandId" value="0x1022" />
+      <IDSymbol name="GenerateWholeLineSuggestionCommand" value="0x1023" />
 
-      <!--<IDSymbol name="ExplainCommandId" value="0x1021" />
-      <IDSymbol name="AddXmlCommentsCommandId" value="0x1022" />
-      <IDSymbol name="OptimizeCommandId" value="0x1023" />
-      <IDSymbol name="CompleteCodeByCommentsCommandId" value="0x1025" /> -->
+      <IDSymbol name="ChooseModelCommandId" value="0x1024" />
+      <IDSymbol name="OpenChatListToolWindowCommandId" value="0x1025" />
 
-      <IDSymbol name="ChooseModelCommandId" value="0x1028" />
-      <IDSymbol name="OpenChatListToolWindowCommandId" value="0x1029" />
+      <IDSymbol name="SolutionContextMenu" value="0x1026" />
+      <IDSymbol name="SolutionContextGroup" value="0x1027" />
 
-      <IDSymbol name="SolutionContextMenu" value="0x1031" />
-      <IDSymbol name="SolutionContextGroup" value="0x1032" />
-      <IDSymbol name="ExplainFileCommandId" value="0x1033" />
-      <IDSymbol name="AddCommentsToFileCommandId" value="0x1034" />
+      <IDSymbol name="ApplyFileSupportCommandId" value="0x1028" />
 
       <IDSymbol name="GenerateUnitTestsCommandId" value="0x1035" />
 
@@ -341,6 +266,9 @@
       <IDSymbol name="AddNaturalLanguageOutlinesCommandId" value="0x1052"/>
       <IDSymbol name="OpenBuildingNaturalLanguageOutlinesWindowCommandId" value="0x1053"/>
 
+      
+      
+      
       <!-- context menu -->
       <IDSymbol name="VisualStudioContextMenu" value="0x8000"/>
       <IDSymbol name="VisualStudioContextMenuGroup" value="0x8001"/>

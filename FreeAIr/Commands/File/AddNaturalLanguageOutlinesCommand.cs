@@ -14,8 +14,7 @@ using System.Threading;
 namespace FreeAIr.Commands.File
 {
     [Command(PackageIds.AddNaturalLanguageOutlinesCommandId)]
-    public sealed class AddNaturalLanguageOutlinesCommand
-        : BaseCommand<AddNaturalLanguageOutlinesCommand>
+    public sealed class AddNaturalLanguageOutlinesCommand : BaseCommand<AddNaturalLanguageOutlinesCommand>
     {
         public AddNaturalLanguageOutlinesCommand(
             )

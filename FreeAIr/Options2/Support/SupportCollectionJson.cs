@@ -32,14 +32,14 @@ namespace FreeAIr.Options2.Support
             [
                 new SupportActionJson
                 {
-                    Scopes = [ SupportScopeEnum.SelectedCodeInDocument, SupportScopeEnum.CodelensInDocument ],
+                    Scopes = [ SupportScopeEnum.SelectedCodeInDocument, SupportScopeEnum.CodelensInDocument, SupportScopeEnum.FileInSolutionTree ],
                     Name = "Explain code",
                     AgentName = null,
                     Prompt = $@"Explain the code in the file: `{SupportContextVariableEnum.ContextItemFilePath.GetAnchor()}`."
                 },
                 new SupportActionJson
                 {
-                    Scopes = [ SupportScopeEnum.SelectedCodeInDocument, SupportScopeEnum.CodelensInDocument ],
+                    Scopes = [ SupportScopeEnum.SelectedCodeInDocument, SupportScopeEnum.CodelensInDocument, SupportScopeEnum.FileInSolutionTree ],
                     Name = "Add XML comments",
                     AgentName = null,
                     Prompt = $@"Add XML comments that match the code in the file `{SupportContextVariableEnum.ContextItemFilePath.GetAnchor()}`. Do not shorten the source code."
@@ -53,7 +53,7 @@ namespace FreeAIr.Options2.Support
                 },
                 new SupportActionJson
                 {
-                    Scopes = [ SupportScopeEnum.SelectedCodeInDocument, SupportScopeEnum.CodelensInDocument ],
+                    Scopes = [ SupportScopeEnum.SelectedCodeInDocument, SupportScopeEnum.CodelensInDocument, SupportScopeEnum.FileInSolutionTree ],
                     Name = "Generate unit tests",
                     AgentName = null,
                     Prompt = $@"Generate a set of unit tests for the code in the file `{SupportContextVariableEnum.ContextItemFilePath.GetAnchor()}`. Provide only one code snippet in your answer, without any additional information. Add XML comments for each test that describe what the test checks. Write code for the {SupportContextVariableEnum.UnitTestFramework.GetAnchor()} test framework."
