@@ -4,6 +4,7 @@ using FreeAIr.Embedding;
 using FreeAIr.Git.Parser;
 using FreeAIr.Helper;
 using FreeAIr.Options2.Agent;
+using FreeAIr.Options2.Support;
 using FreeAIr.Shared.Helper;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -44,6 +45,7 @@ namespace FreeAIr.NLOutline.Tree.Builder.File
         }
 
         Task BuildAsync(
+            SupportActionJson action,
             AgentJson agent,
             string rootPath,
             List<SolutionItem> items,
@@ -75,6 +77,7 @@ namespace FreeAIr.NLOutline.Tree.Builder.File
         }
 
         public async Task BuildAsync(
+            SupportActionJson action,
             AgentJson agent,
             string rootPath,
             List<SolutionItem> items,
@@ -82,6 +85,7 @@ namespace FreeAIr.NLOutline.Tree.Builder.File
             )
         {
             await BuildInternalAsync(
+                action,
                 agent,
                 rootPath,
                 items,
@@ -90,12 +94,18 @@ namespace FreeAIr.NLOutline.Tree.Builder.File
         }
 
         private async Task BuildInternalAsync(
+            SupportActionJson action,
             AgentJson agent,
             string rootPath,
             List<SolutionItem> items,
             OutlineNode root
             )
         {
+            if (action is null)
+            {
+                throw new ArgumentNullException(nameof(action));
+            }
+
             if (agent is null)
             {
                 throw new ArgumentNullException(nameof(agent));
@@ -141,7 +151,7 @@ namespace FreeAIr.NLOutline.Tree.Builder.File
                     );
                 chat.ChatContext.AddItem(contextItem);
 
-                var fileOutline = await ProcessOutlinePromptAsync(chat, item);
+                var fileOutline = await ProcessOutlinePromptAsync(action, chat, item);
                 if (!string.IsNullOrEmpty(fileOutline))
                 {
                     var relative = item.FullPath.MakeRelativeAgainst(rootPath);
@@ -159,11 +169,20 @@ namespace FreeAIr.NLOutline.Tree.Builder.File
             }
         }
 
-        private static async Task<string> ProcessOutlinePromptAsync(Chat chat, SolutionItem item)
+        private static async Task<string> ProcessOutlinePromptAsync(
+            SupportActionJson action,
+            Chat chat,
+            SolutionItem item
+            )
         {
-            var prompt = UserPrompt.CreateFileOutlinesPrompt(
-                item.FullPath
+            var supportContext = await SupportContext.WithContextItemAsync(item.FullPath);
+
+            var promptText = supportContext.ApplyVariablesToPrompt(
+                action.Prompt
                 );
+
+            var prompt = UserPrompt.CreateTextBasedPrompt(promptText);
+
             chat.AddPrompt(prompt);
 
             var fileOutline = await chat.WaitForPromptCleanAnswerAsync(
@@ -197,12 +216,18 @@ namespace FreeAIr.NLOutline.Tree.Builder.File
         }
 
         public async Task BuildAsync(
+            SupportActionJson action,
             AgentJson agent,
             string rootPath,
             List<SolutionItem> items,
             OutlineNode root
             )
         {
+            if (action is null)
+            {
+                throw new ArgumentNullException(nameof(action));
+            }
+
             if (agent is null)
             {
                 throw new ArgumentNullException(nameof(agent));
@@ -516,6 +541,7 @@ namespace FreeAIr.NLOutline.Tree.Builder.File
                 if (solutionItems.Count > 0)
                 {
                     await pair.FileScanner.BuildAsync(
+                        parameters.Action,
                         parameters.Agent,
                         rootPath,
                         solutionItems,

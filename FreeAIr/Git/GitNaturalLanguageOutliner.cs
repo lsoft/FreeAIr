@@ -1,17 +1,18 @@
-﻿using FreeAIr.Options2.Agent;
-using FreeAIr.BLogic;
+﻿using FreeAIr.BLogic;
 using FreeAIr.BLogic.Context.Item;
 using FreeAIr.Commands.File;
 using FreeAIr.Git.Parser;
 using FreeAIr.Helper;
 using FreeAIr.NLOutline;
+using FreeAIr.Options2;
+using FreeAIr.Options2.Agent;
+using FreeAIr.Options2.Support;
 using FreeAIr.Shared.Helper;
 using FreeAIr.UI.ContextMenu;
 using FreeAIr.UI.ViewModels;
 using FreeAIr.UI.Windows;
 using System.Collections.Generic;
 using System.Windows;
-using FreeAIr.Options2;
 
 namespace FreeAIr.Git
 {
@@ -24,10 +25,18 @@ namespace FreeAIr.Git
             {
                 await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
 
-                var agentCollection = await FreeAIrOptions.DeserializeAgentCollectionAsync();
+                var chosenSupportAction = await SupportContextMenu.ChooseSupportAsync(
+                    "Choose support action:",
+                    SupportScopeEnum.GenerateNaturalLanguageOutlines
+                    );
+                if (chosenSupportAction is null)
+                {
+                    return;
+                }
 
                 var chosenAgent = await AgentContextMenu.ChooseAgentWithTokenAsync(
-                    "Choose agent to add NL outlines to changed files:"
+                    "Choose agent to add NL outlines to changed files:",
+                    chosenSupportAction.AgentName
                     );
                 if (chosenAgent is null)
                 {
@@ -36,7 +45,11 @@ namespace FreeAIr.Git
 
                 var chosenSolutionItems = await CreateChosenSolutionItemsAsync();
 
-                await NaturalLanguageOutlinesViewModel.ShowPanelAsync(chosenAgent, chosenSolutionItems);
+                await NaturalLanguageOutlinesViewModel.ShowPanelAsync(
+                    chosenSupportAction,
+                    chosenAgent,
+                    chosenSolutionItems
+                    );
             }
             catch (Exception excp)
             {

@@ -21,6 +21,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using WpfHelpers;
 using FreeAIr.Options2;
+using FreeAIr.Options2.Support;
 
 namespace FreeAIr.UI.ViewModels
 {
@@ -123,6 +124,18 @@ namespace FreeAIr.UI.ViewModels
             set;
         }
 
+        public ObservableCollection2<SupportActionWrapper> SupportActionList
+        {
+            get;
+        }
+
+        public SupportActionWrapper? SelectedSupportAction
+        {
+            get;
+            set;
+        }
+
+
         public ObservableCollection2<AgentWrapper> GenerateNLOAgentList
         {
             get;
@@ -174,6 +187,7 @@ namespace FreeAIr.UI.ViewModels
                             try
                             {
                                 var backgroundTask = new GenerateEmbeddingOutlineFilesBackgroundTask(
+                                    SelectedSupportAction.SupportAction,
                                     SelectedGenerateNLOAgent.Agent,
                                     ForceUseNLOAgent,
                                     SelectedGenerateEmbeddingAgent.Agent,
@@ -202,6 +216,10 @@ namespace FreeAIr.UI.ViewModels
                             {
                                 return false;
                             }
+                            if (SelectedSupportAction is null)
+                            {
+                                return false;
+                            }
                             if (SelectedGenerateNLOAgent is null)
                             {
                                 return false;
@@ -227,6 +245,7 @@ namespace FreeAIr.UI.ViewModels
             )
         {
             Groups = new ObservableCollection2<CheckableItem>();
+            SupportActionList = new ObservableCollection2<SupportActionWrapper>();
             GenerateNLOAgentList = new ObservableCollection2<AgentWrapper>();
             GenerateEmbeddingAgentList = new ObservableCollection2<AgentWrapper>();
 
@@ -266,11 +285,12 @@ namespace FreeAIr.UI.ViewModels
         }
 
         public async Task UpdatePageAsync(
-            bool fillAgents = true
+            bool reloadFromOptions = true
             )
         {
             if (!SolutionHelper.TryGetSolution(out _))
             {
+                ClearSupportActions();
                 ClearAgents();
                 ClearGroups();
 
@@ -289,8 +309,9 @@ namespace FreeAIr.UI.ViewModels
 
             JsonFilePath = await EmbeddingOutlineJsonObject.GenerateFilePathAsync();
 
-            if (fillAgents)
+            if (reloadFromOptions)
             {
+                await FillSupportActionsAsync();
                 await FillAgentsAsync();
             }
 
@@ -304,6 +325,26 @@ namespace FreeAIr.UI.ViewModels
             }
 
             OnPropertyChanged();
+        }
+
+        private async Task FillSupportActionsAsync()
+        {
+            ClearSupportActions();
+
+            var supportActionsCollection = await FreeAIrOptions.DeserializeSupportCollectionAsync();
+
+            SupportActionList.AddRange(
+                supportActionsCollection.Actions
+                    .FindAll(a => a.Scopes.Contains(SupportScopeEnum.BuildNaturalLanguageOutlines))
+                    .ConvertAll(a => new SupportActionWrapper(a))
+                    );
+            SelectedSupportAction = SupportActionList.FirstOrDefault();
+        }
+
+        private void ClearSupportActions()
+        {
+            SupportActionList.Clear();
+            SelectedSupportAction = null;
         }
 
         private async Task FillAgentsAsync()
@@ -448,6 +489,29 @@ namespace FreeAIr.UI.ViewModels
         }
     }
 
+    public sealed class SupportActionWrapper : BaseViewModel
+    {
+        public SupportActionJson SupportAction
+        {
+            get;
+        }
+
+        public string SupportActionName => SupportAction.Name;
+
+        public SupportActionWrapper(
+            SupportActionJson supportAction
+            )
+        {
+            if (supportAction is null)
+            {
+                throw new ArgumentNullException(nameof(supportAction));
+            }
+
+            SupportAction = supportAction;
+        }
+
+    }
+
     public sealed class AgentWrapper : BaseViewModel
     {
         public AgentJson Agent
@@ -476,6 +540,7 @@ namespace FreeAIr.UI.ViewModels
 
     public sealed class GenerateEmbeddingOutlineFilesBackgroundTask : BackgroundTask
     {
+        private readonly SupportActionJson _nloAction;
         private readonly AgentJson _nloAgent;
         private readonly bool _forceUseNLOAgent;
         private readonly AgentJson _embeddingAgent;
@@ -492,6 +557,7 @@ namespace FreeAIr.UI.ViewModels
         }
 
         public GenerateEmbeddingOutlineFilesBackgroundTask(
+            SupportActionJson nloAction,
             AgentJson nloAgent,
             bool forceUseNLOAgent,
             AgentJson embeddingAgent,
@@ -500,6 +566,11 @@ namespace FreeAIr.UI.ViewModels
             IReadOnlyList<CheckableItem> tree
             )
         {
+            if (nloAction is null)
+            {
+                throw new ArgumentNullException(nameof(nloAction));
+            }
+
             if (nloAgent is null)
             {
                 throw new ArgumentNullException(nameof(nloAgent));
@@ -520,6 +591,7 @@ namespace FreeAIr.UI.ViewModels
                 throw new ArgumentNullException(nameof(tree));
             }
 
+            _nloAction = nloAction;
             _nloAgent = nloAgent;
             _forceUseNLOAgent = forceUseNLOAgent;
             _embeddingAgent = embeddingAgent;
@@ -558,6 +630,7 @@ namespace FreeAIr.UI.ViewModels
 
                     var outlineRoot = await TreeBuilder.BuildAsync(
                         parameters: new TreeBuilderParameters(
+                            action: _nloAction,
                             agent: _nloAgent,
                             forceUseNLOAgent: _forceUseNLOAgent,
                             checkedPaths: checkedPaths,

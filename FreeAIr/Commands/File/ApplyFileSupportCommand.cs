@@ -41,7 +41,7 @@ namespace FreeAIr.Commands.File
                 return;
             }
 
-            var supportContext = await SupportContext.WithSelectedFilesAsync(
+            var supportContext = await SupportContext.WithSolutionItemsAsync(
                 selections
                 );
 

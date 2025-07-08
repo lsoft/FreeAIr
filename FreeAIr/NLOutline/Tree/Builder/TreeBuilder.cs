@@ -11,6 +11,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using FreeAIr.Options2.Support;
 
 namespace FreeAIr.NLOutline.Tree.Builder
 {
@@ -51,11 +52,6 @@ namespace FreeAIr.NLOutline.Tree.Builder
             {
                 var project = foundProject.SolutionItem;
 
-                //if (allowedPaths is not null && !allowedPaths.Contains(project.FullPath))
-                //{
-                //    continue;
-                //}
-
                 var projectRoot = root.AddChild(
                     OutlineKindEnum.Project,
                     project.FullPath.MakeRelativeAgainst(rootPath),
@@ -95,6 +91,11 @@ namespace FreeAIr.NLOutline.Tree.Builder
 
     public sealed class TreeBuilderParameters
     {
+        public SupportActionJson Action
+        {
+            get;
+        }
+
         public AgentJson Agent
         {
             get;
@@ -116,17 +117,24 @@ namespace FreeAIr.NLOutline.Tree.Builder
         }
 
         public TreeBuilderParameters(
+            SupportActionJson action,
             AgentJson agent,
             bool forceUseNLOAgent,
             HashSet<string>? checkedPaths,
             OutlineNode? oldOutlineRoot
             )
         {
+            if (action is null)
+            {
+                throw new ArgumentNullException(nameof(action));
+            }
+
             if (agent is null)
             {
                 throw new ArgumentNullException(nameof(agent));
             }
 
+            Action = action;
             Agent = agent;
             ForceUseNLOAgent = forceUseNLOAgent;
             CheckedPaths = checkedPaths;

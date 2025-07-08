@@ -1,4 +1,5 @@
-﻿using FreeAIr.BuildErrors;
+﻿using FreeAIr.BLogic.Context.Item;
+using FreeAIr.BuildErrors;
 using SharpCompress.Common;
 using System;
 using System.CodeDom;
@@ -12,7 +13,7 @@ namespace FreeAIr.Options2.Support
     public enum SupportContextVariableEnum
     {
         Unknown,
-        ContextItemFilePath,
+        ContextItemName,
         BuildErrorMessage,
         BuildErrorLine,
         BuildErrorColumn,
@@ -23,7 +24,7 @@ namespace FreeAIr.Options2.Support
 
     public static class SupportContextVariableHelper
     {
-        private const string ContextItemFilePath = "{CONTEXT_ITEM_FILEPATH}";
+        private const string ContextItemName = "{CONTEXT_ITEM_NAME}";
         private const string BuildErrorMessage = "{BUILD_ERROR_MESSAGE}";
         private const string BuildErrorLine = "{BUILD_ERROR_LINE}";
         private const string BuildErrorColumn = "{BUILD_ERROR_COLUMN}";
@@ -33,7 +34,7 @@ namespace FreeAIr.Options2.Support
 
         public static readonly string[] Anchors =
             [
-                ContextItemFilePath,
+                ContextItemName,
                 BuildErrorMessage,
                 BuildErrorLine,
                 BuildErrorColumn,
@@ -48,8 +49,8 @@ namespace FreeAIr.Options2.Support
         {
             switch (anchor)
             {
-                case ContextItemFilePath:
-                    return SupportContextVariableEnum.ContextItemFilePath;
+                case ContextItemName:
+                    return SupportContextVariableEnum.ContextItemName;
                 case BuildErrorMessage:
                     return SupportContextVariableEnum.BuildErrorMessage;
                 case BuildErrorLine:
@@ -73,8 +74,8 @@ namespace FreeAIr.Options2.Support
         {
             switch (variable)
             {
-                case SupportContextVariableEnum.ContextItemFilePath:
-                    return ContextItemFilePath;
+                case SupportContextVariableEnum.ContextItemName:
+                    return ContextItemName;
                 case SupportContextVariableEnum.BuildErrorMessage:
                     return BuildErrorMessage;
                 case SupportContextVariableEnum.BuildErrorLine:
@@ -123,7 +124,7 @@ namespace FreeAIr.Options2.Support
         }
 
 
-        public static SupportContext InsidePromptControl()
+        public static SupportContext WithPrompt()
         {
             var result = new SupportContext();
 
@@ -180,13 +181,13 @@ namespace FreeAIr.Options2.Support
             return result;
         }
 
-        public static async Task<SupportContext> WithSelectedFilesAsync(
-            List<SolutionItem> selections
+        public static async Task<SupportContext> WithContextItemAsync(
+            IReadOnlyList<SolutionItemChatContextItem> contextItems
             )
         {
-            if (selections is null)
+            if (contextItems is null)
             {
-                throw new ArgumentNullException(nameof(selections));
+                throw new ArgumentNullException(nameof(contextItems));
             }
 
             var unsorted = await FreeAIrOptions.DeserializeUnsortedAsync();
@@ -194,8 +195,8 @@ namespace FreeAIr.Options2.Support
             var result = new SupportContext();
 
             result.AddContextVariable(
-                SupportContextVariableEnum.ContextItemFilePath,
-                string.Join(", ", selections.Select(s => $"`{s.FullPath}`"))
+                SupportContextVariableEnum.ContextItemName,
+                string.Join(", ", contextItems.Select(s => $"`{s.SelectedIdentifier.FilePath}`"))
                 );
             result.AddContextVariable(
                 SupportContextVariableEnum.UnitTestFramework,
@@ -205,13 +206,13 @@ namespace FreeAIr.Options2.Support
             return result;
         }
 
-        public static async Task<SupportContext> WithContextCodeAsync(
-            string filePath
+        public static async Task<SupportContext> WithSolutionItemsAsync(
+            List<SolutionItem> solutionItems
             )
         {
-            if (filePath is null)
+            if (solutionItems is null)
             {
-                throw new ArgumentNullException(nameof(filePath));
+                throw new ArgumentNullException(nameof(solutionItems));
             }
 
             var unsorted = await FreeAIrOptions.DeserializeUnsortedAsync();
@@ -219,8 +220,33 @@ namespace FreeAIr.Options2.Support
             var result = new SupportContext();
 
             result.AddContextVariable(
-                SupportContextVariableEnum.ContextItemFilePath,
-                filePath
+                SupportContextVariableEnum.ContextItemName,
+                string.Join(", ", solutionItems.Select(s => $"`{s.FullPath}`"))
+                );
+            result.AddContextVariable(
+                SupportContextVariableEnum.UnitTestFramework,
+                unsorted.PreferredUnitTestFramework
+                );
+
+            return result;
+        }
+
+        public static async Task<SupportContext> WithContextItemAsync(
+            string contextItemName
+            )
+        {
+            if (contextItemName is null)
+            {
+                throw new ArgumentNullException(nameof(contextItemName));
+            }
+
+            var unsorted = await FreeAIrOptions.DeserializeUnsortedAsync();
+
+            var result = new SupportContext();
+
+            result.AddContextVariable(
+                SupportContextVariableEnum.ContextItemName,
+                $"`{contextItemName}`"
                 );
             result.AddContextVariable(
                 SupportContextVariableEnum.UnitTestFramework,
@@ -244,8 +270,8 @@ namespace FreeAIr.Options2.Support
             var result = new SupportContext();
 
             result.AddContextVariable(
-                SupportContextVariableEnum.ContextItemFilePath,
-                errorInformation.FilePath
+                SupportContextVariableEnum.ContextItemName,
+                "`" + errorInformation.FilePath + "`"
                 );
             result.AddContextVariable(
                 SupportContextVariableEnum.BuildErrorMessage,

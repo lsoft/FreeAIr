@@ -101,6 +101,7 @@
                 <RowDefinition Height="auto" />
                 <RowDefinition Height="auto" />
                 <RowDefinition Height="auto" />
+                <RowDefinition Height="auto" />
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="auto"/>
@@ -125,10 +126,27 @@
                 Grid.Column="0"
                 FontFamily="Cascadia Code"
                 VerticalAlignment="Center"
-                Text="NLO extract agent: "
+                Text="NLO extract action: "
                 />
             <ComboBox
                 Grid.Row="1"
+                Grid.Column="1"
+                FontFamily="Cascadia Code"
+                VerticalAlignment="Center"
+                ItemsSource="{Binding SupportActionList}"
+                SelectedItem="{Binding SelectedSupportAction}"
+                DisplayMemberPath="SupportActionName"
+                />
+
+            <TextBlock
+                Grid.Row="2"
+                Grid.Column="0"
+                FontFamily="Cascadia Code"
+                VerticalAlignment="Center"
+                Text="NLO extract agent: "
+                />
+            <ComboBox
+                Grid.Row="2"
                 Grid.Column="1"
                 FontFamily="Cascadia Code"
                 VerticalAlignment="Center"
@@ -159,14 +177,14 @@
             </ComboBox>
 
             <TextBlock
-                Grid.Row="2"
+                Grid.Row="3"
                 Grid.Column="0"
                 FontFamily="Cascadia Code"
                 VerticalAlignment="Center"
                 Text="Embedding generate agent: "
                 />
             <ComboBox
-                Grid.Row="2"
+                Grid.Row="3"
                 Grid.Column="1"
                 FontFamily="Cascadia Code"
                 VerticalAlignment="Center"
@@ -197,7 +215,7 @@
             </ComboBox>
             
             <Button
-                Grid.Row="3"
+                Grid.Row="4"
                 Grid.Column="0"
                 Grid.ColumnSpan="2"
                 Margin="2"
@@ -212,7 +230,7 @@
                 />
 
             <StackPanel
-                Grid.Row="4"
+                Grid.Row="5"
                 Grid.Column="0"
                 Grid.ColumnSpan="2"
                 Margin="2,20,2,2"

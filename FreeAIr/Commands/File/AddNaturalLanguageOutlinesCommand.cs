@@ -4,6 +4,7 @@ using FreeAIr.Helper;
 using FreeAIr.NLOutline;
 using FreeAIr.Options2;
 using FreeAIr.Options2.Agent;
+using FreeAIr.Options2.Support;
 using FreeAIr.UI.ContextMenu;
 using FreeAIr.UI.ToolWindows;
 using FreeAIr.UI.ViewModels;
@@ -25,8 +26,18 @@ namespace FreeAIr.Commands.File
         {
             await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
 
+            var chosenSupportAction = await SupportContextMenu.ChooseSupportAsync(
+                "Choose support action:",
+                SupportScopeEnum.GenerateNaturalLanguageOutlines
+                );
+            if (chosenSupportAction is null)
+            {
+                return;
+            }
+
             var chosenAgent = await AgentContextMenu.ChooseAgentWithTokenAsync(
-                "Choose agent to add NL outlines:"
+                "Choose agent to add NL outlines:",
+                chosenSupportAction.AgentName
                 );
             if (chosenAgent is null)
             {
@@ -35,7 +46,11 @@ namespace FreeAIr.Commands.File
 
             var chosenSolutionItems = await CreateChosenSolutionItemsAsync();
 
-            await NaturalLanguageOutlinesViewModel.ShowPanelAsync(chosenAgent, chosenSolutionItems);
+            await NaturalLanguageOutlinesViewModel.ShowPanelAsync(
+                chosenSupportAction,
+                chosenAgent,
+                chosenSolutionItems
+                );
         }
 
         private async System.Threading.Tasks.Task<List<SolutionItemChatContextItem>> CreateChosenSolutionItemsAsync(

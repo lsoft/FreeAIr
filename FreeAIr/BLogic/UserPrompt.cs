@@ -79,7 +79,7 @@ namespace FreeAIr.BLogic
         public static async Task<UserPrompt> CreateSuggestWholeLineAsync(string userCodeFileName, string documentText, int caretPosition)
         {
             var fi = new FileInfo(userCodeFileName);
-            var anchor = await "ChatKindEnum_SuggestWholeLine_Anchor".GetLocalizedResourceByNameAsync();
+            var anchor = await "SuggestWholeLine_Anchor".GetLocalizedResourceByNameAsync();
 
             documentText = documentText.Insert(caretPosition, anchor);
 
@@ -101,19 +101,6 @@ namespace FreeAIr.BLogic
             var prompt = await "SuggestWholeLine".GetLocalizedResourceByNameAsync();
             var anchor = await "SuggestWholeLine_Anchor".GetLocalizedResourceByNameAsync();
             return string.Format(prompt, anchor);
-        }
-
-        public static UserPrompt CreateFileOutlinesPrompt(
-            string filePath
-            )
-        {
-            return new UserPrompt(
-                "Please provide summary description for the file "
-                + Environment.NewLine
-                + "`"
-                + filePath
-                + "`. Take into account existing comments. Provide only description, without adding code snippets or anything else."
-                );
         }
     }
 

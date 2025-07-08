@@ -70,7 +70,7 @@ namespace FreeAIr.Commands
                 return;
             }
 
-            var supportContext = await SupportContext.WithContextCodeAsync(
+            var supportContext = await SupportContext.WithContextItemAsync(
                 std.FilePath
                 );
 

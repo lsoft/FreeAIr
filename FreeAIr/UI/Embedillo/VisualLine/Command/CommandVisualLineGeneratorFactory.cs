@@ -44,7 +44,7 @@ namespace FreeAIr.UI.Embedillo.VisualLine.Command
         {
             var suggestion = _suggestions?.First(s => StringComparer.CurrentCultureIgnoreCase.Compare(s.PublicData, partPayload) == 0);
 
-            var supportContext = SupportContext.InsidePromptControl(
+            var supportContext = SupportContext.WithPrompt(
                 );
 
             var promptText = supportContext.ApplyVariablesToPrompt(

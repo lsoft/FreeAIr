@@ -5,6 +5,7 @@ using FreeAIr.BLogic.Context.Item;
 using FreeAIr.Helper;
 using FreeAIr.NLOutline;
 using FreeAIr.Options2.Agent;
+using FreeAIr.Options2.Support;
 using FreeAIr.Shared.Helper;
 using FreeAIr.UI.ToolWindows;
 using Microsoft.VisualStudio.ComponentModelHost;
@@ -224,10 +225,16 @@ namespace FreeAIr.UI.ViewModels
         }
 
         public async Task SetNewChatAsync(
+            SupportActionJson action,
             AgentJson defaultAgent,
             List<SolutionItemChatContextItem> chosenSolutionItems
             )
         {
+            if (action is null)
+            {
+                throw new ArgumentNullException(nameof(action));
+            }
+
             if (defaultAgent is null)
             {
                 throw new ArgumentNullException(nameof(defaultAgent));
@@ -271,16 +278,23 @@ namespace FreeAIr.UI.ViewModels
                 });
 
             _processingTask = ProcessSolutionDocumentsAsync(
+                action,
                 defaultAgent,
                 chosenSolutionItems
                 );
         }
 
         public async Task ProcessSolutionDocumentsAsync(
+            SupportActionJson action,
             AgentJson defaultAgent,
             List<SolutionItemChatContextItem> chosenSolutionItems
             )
         {
+            if (action is null)
+            {
+                throw new ArgumentNullException(nameof(action));
+            }
+
             if (defaultAgent is null)
             {
                 throw new ArgumentNullException(nameof(defaultAgent));
@@ -323,14 +337,15 @@ namespace FreeAIr.UI.ViewModels
                     }
                     _chat.ChatContext.AddItems(textContextualItems);
 
+                    var supportContext = await SupportContext.WithContextItemAsync(
+                        portionSolutionItems
+                        );
 
+                    var promptText = supportContext.ApplyVariablesToPrompt(
+                        action.Prompt
+                        );
                     _chat.AddPrompt(
-                        UserPrompt.CreateTextBasedPrompt(
-$$$"""
-Identify the logical sections of the code inside following files and summarize these sections by generating comments:
-{{{string.Join(", ", portionSolutionItems.ConvertAll(s => s.SelectedIdentifier.FilePath))}}}
-"""
-                            )
+                        UserPrompt.CreateTextBasedPrompt(promptText)
                         );
 
                     var cleanAnswer = await _chat.WaitForPromptCleanAnswerAsync(
@@ -494,6 +509,7 @@ Identify the logical sections of the code inside following files and summarize t
 
 
         public static async Task ShowPanelAsync(
+            SupportActionJson action,
             AgentJson agent,
             List<SolutionItemChatContextItem> chosenSolutionItems
             )
@@ -502,6 +518,7 @@ Identify the logical sections of the code inside following files and summarize t
             var toolWindow = pane.Content as NaturalLanguageOutlinesToolWindowControl;
             var viewModel = toolWindow.DataContext as NaturalLanguageOutlinesViewModel;
             viewModel.SetNewChatAsync(
+                action,
                 agent,
                 chosenSolutionItems
                 )
