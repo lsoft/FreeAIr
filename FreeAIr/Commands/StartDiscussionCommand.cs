@@ -41,11 +41,8 @@ namespace FreeAIr.Commands
                 return;
             }
 
-            var kind = ChatKindEnum.Discussion;
-
             var chat = await chatContainer.StartChatAsync(
                 new ChatDescription(
-                    kind,
                     null
                     ),
                 null,

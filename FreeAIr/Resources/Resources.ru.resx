@@ -117,24 +117,6 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="ChatKindEnum_AddXmlComments" xml:space="preserve">
-    <value>Добавь к следующему коду XML комментарии, которые описывают, что код делает. Не сокращай исходный код.</value>
-  </data>
-  <data name="ChatKindEnum_CompleteCodeAccordingComments" xml:space="preserve">
-    <value>Дополните следующий код в соответствии с комментариями в нём:</value>
-  </data>
-  <data name="ChatKindEnum_ExplainCode" xml:space="preserve">
-    <value>Объясни, как работает следующий код:</value>
-  </data>
-  <data name="ChatKindEnum_GenerateCommitMessage" xml:space="preserve">
-    <value>Создай описание камита по нижеследующим правкам. Дай в своем ответе только commit message без дополнительной информации. Не оборачивай весь свой ответ в любые кавычки.</value>
-  </data>
-  <data name="ChatKindEnum_OptimizeCode" xml:space="preserve">
-    <value>Оптимизируй следующий код:</value>
-  </data>
-  <data name="ChatKindEnum_GenerateUnitTests" xml:space="preserve">
-    <value>Сгенерируй набор юнит тестов для следующего кода. Приведи в ответе только один фрагмент кода без дополнительной информации. Добавь XML комментарии для каждого теста, в котором описывается,что тест проверяет. Напиши код для тестового фреймворка {0}.</value>
-  </data>
   <data name="SuggestWholeLine" xml:space="preserve">
     <value>Предложи дополнение целой строки в том месте, где написано `{0}` в следующем коде. Дай в своем ответе только новый код без дополнительной информации и без того кода, что дал я.</value>
   </data>
@@ -176,8 +158,5 @@
   </data>
   <data name="UI_StopWaiting" xml:space="preserve">
     <value>Остановить ожидание ответа</value>
-  </data>
-  <data name="ChatKindEnum_FixBuildError" xml:space="preserve">
-    <value>Компилятор сообщил об ошибке в исходном коде. Помоги исправить код. Ошибка: </value>
   </data>
 </root>

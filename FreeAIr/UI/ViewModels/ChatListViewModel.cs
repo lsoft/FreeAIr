@@ -220,7 +220,7 @@ namespace FreeAIr.UI.ViewModels
                             }
 
                             _ = await _chatContainer.StartChatAsync(
-                                new ChatDescription(ChatKindEnum.Discussion, null),
+                                new ChatDescription(null),
                                 null,
                                 await FreeAIr.BLogic.ChatOptions.GetDefaultAsync(chosenAgent)
                                 );

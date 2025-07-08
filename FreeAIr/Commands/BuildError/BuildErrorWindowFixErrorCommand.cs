@@ -64,7 +64,6 @@ namespace FreeAIr.Commands.BuildError
 
             var chat = await chatContainer.StartChatAsync(
                 new ChatDescription(
-                    ChatKindEnum.FixBuildError,
                     wfd
                     ),
                 null,

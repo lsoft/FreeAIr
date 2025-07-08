@@ -83,7 +83,6 @@ namespace FreeAIr.BLogic
 
             var chat = await chatContainer.StartChatAsync(
                 new ChatDescription(
-                    ChatKindEnum.GenerateCommitMessage,
                     null
                     ),
                 UserPrompt.CreateTextBasedPrompt(promptText),

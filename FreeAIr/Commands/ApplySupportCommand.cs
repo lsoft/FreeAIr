@@ -88,7 +88,6 @@ namespace FreeAIr.Commands
 
             var chat = await chatContainer.StartChatAsync(
                 new ChatDescription(
-                    ChatKindEnum.Discussion,
                     std
                     ),
                 null,

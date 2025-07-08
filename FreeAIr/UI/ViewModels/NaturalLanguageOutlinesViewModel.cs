@@ -258,7 +258,6 @@ namespace FreeAIr.UI.ViewModels
 
             _chat = await chatContainer.StartChatAsync(
                 new ChatDescription(
-                    ChatKindEnum.Discussion,
                     null
                     ),
                 null,

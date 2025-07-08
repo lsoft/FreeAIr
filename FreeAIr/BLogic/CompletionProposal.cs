@@ -104,7 +104,6 @@ namespace FreeAIr.BLogic
 
                 var chat = await chatContainer.StartChatAsync(
                     new ChatDescription(
-                        ChatKindEnum.SuggestWholeLine,
                         null
                         ),
                     userPrompt,

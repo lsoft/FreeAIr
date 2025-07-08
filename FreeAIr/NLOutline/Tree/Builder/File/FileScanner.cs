@@ -127,7 +127,6 @@ namespace FreeAIr.NLOutline.Tree.Builder.File
 
             var chat = await chatContainer.StartChatAsync(
                 new ChatDescription(
-                    ChatKindEnum.Discussion,
                     null
                     ),
                 null,

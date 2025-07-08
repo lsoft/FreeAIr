@@ -61,69 +61,6 @@ namespace FreeAIr.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Add XML comments that match the following code. Do not shorten the source code..
-        /// </summary>
-        public static string ChatKindEnum_AddXmlComments {
-            get {
-                return ResourceManager.GetString("ChatKindEnum_AddXmlComments", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Complete the following code according its comments:.
-        /// </summary>
-        public static string ChatKindEnum_CompleteCodeAccordingComments {
-            get {
-                return ResourceManager.GetString("ChatKindEnum_CompleteCodeAccordingComments", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Explain the following code:.
-        /// </summary>
-        public static string ChatKindEnum_ExplainCode {
-            get {
-                return ResourceManager.GetString("ChatKindEnum_ExplainCode", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to The compiler reported an error in the source code. Help fix the code. Error: .
-        /// </summary>
-        public static string ChatKindEnum_FixBuildError {
-            get {
-                return ResourceManager.GetString("ChatKindEnum_FixBuildError", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Generate commit message according the following git patch. Give in your reply only the commit message without additional information. Do not wrap the whole answer in any quotes..
-        /// </summary>
-        public static string ChatKindEnum_GenerateCommitMessage {
-            get {
-                return ResourceManager.GetString("ChatKindEnum_GenerateCommitMessage", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Generate a set of unit tests for the following code. Provide only one code snippet in your answer, without any additional information. Add XML comments for each test that describe what the test checks. Write code for the {0} test framework..
-        /// </summary>
-        public static string ChatKindEnum_GenerateUnitTests {
-            get {
-                return ResourceManager.GetString("ChatKindEnum_GenerateUnitTests", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Optimize the following code:.
-        /// </summary>
-        public static string ChatKindEnum_OptimizeCode {
-            get {
-                return ResourceManager.GetString("ChatKindEnum_OptimizeCode", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Cannot obtain selected block of code..
         /// </summary>
         public static string Code_NoSelectedCode {
