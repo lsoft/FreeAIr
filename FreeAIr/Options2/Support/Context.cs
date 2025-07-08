@@ -1,6 +1,7 @@
 ﻿using FreeAIr.BuildErrors;
 using SharpCompress.Common;
 using System;
+using System.CodeDom;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -108,6 +109,13 @@ namespace FreeAIr.Options2.Support
         }
 
 
+        public static SupportContext InsidePromptControl()
+        {
+            var result = new SupportContext();
+
+            return result;
+        }
+
         public static async Task<SupportContext> WithSelectedFilesAsync(
             List<SolutionItem> selections
             )
@@ -192,5 +200,6 @@ namespace FreeAIr.Options2.Support
 
             return value;
         }
+
     }
 }

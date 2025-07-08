@@ -1,8 +1,14 @@
-﻿using FreeAIr.BLogic;
+﻿using EnvDTE;
+using FreeAIr.BLogic;
+using FreeAIr.Helper;
+using FreeAIr.Options2;
+using FreeAIr.Options2.Support;
 using FreeAIr.UI.Embedillo.Answer.Parser;
 using Microsoft.VisualStudio.Imaging;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -27,6 +33,7 @@ namespace FreeAIr.UI.Embedillo.VisualLine.Command
     public sealed class CommandVisualLineGenerator : MentionVisualLineGenerator
     {
         public const char Anchor = '/';
+        private List<CommandSuggestion>? _suggestions;
 
         public CommandVisualLineGenerator(
             ) : base(Anchor)
@@ -35,23 +42,29 @@ namespace FreeAIr.UI.Embedillo.VisualLine.Command
 
         public override IParsedPart CreatePart(string partPayload)
         {
-            var kind = (ChatKindEnum)Enum.Parse(typeof(ChatKindEnum), partPayload);
-            return new CommandAnswerPart(kind);
+            var suggestion = _suggestions?.First(s => StringComparer.CurrentCultureIgnoreCase.Compare(s.PublicData, partPayload) == 0);
+
+            var supportContext = SupportContext.InsidePromptControl(
+                );
+
+            var promptText = supportContext.ApplyVariablesToPrompt(
+                suggestion.SupportAction.Prompt
+                );
+
+            return new CommandAnswerPart(promptText);
         }
 
-        public override System.Threading.Tasks.Task<List<ISuggestion>> GetSuggestionsAsync()
+        public override async System.Threading.Tasks.Task<List<ISuggestion>> GetSuggestionsAsync()
         {
-            var suggestions = GenerateSuggestions();
-
-            return Task.FromResult(suggestions);
+            _suggestions = await GenerateSuggestionsAsync();
+            return _suggestions.ConvertAll(s => (ISuggestion)s);
         }
 
         protected override UIElement CreateControl(string command)
         {
             command = command.TrimStart(Anchor);
 
-            var suggestions = GenerateSuggestions();
-            var suggestion = suggestions.FirstOrDefault(s => StringComparer.CurrentCultureIgnoreCase.Compare(s.PublicData, command) == 0);
+            var suggestion = _suggestions?.FirstOrDefault(s => StringComparer.CurrentCultureIgnoreCase.Compare(s.PublicData, command) == 0);
 
             UIElement child;
             if (suggestion is not null)
@@ -59,7 +72,7 @@ namespace FreeAIr.UI.Embedillo.VisualLine.Command
                 var sp = new Grid
                 {
                     Margin = new Thickness(5, 0, 5, 0),
-                    ToolTip = suggestion.FullData,
+                    ToolTip = GenerateTooltip(suggestion.SupportAction),
                 };
                 sp.ColumnDefinitions.Add(new ColumnDefinition());
                 sp.ColumnDefinitions.Add(new ColumnDefinition());
@@ -78,9 +91,9 @@ namespace FreeAIr.UI.Embedillo.VisualLine.Command
                 var tb1 = new TextBlock
                 {
                     Padding = new Thickness(0),
-                    Text = suggestion.PublicData,
+                    Text = suggestion.SupportAction.Name,
                     VerticalAlignment = VerticalAlignment.Bottom,
-                    ToolTip = suggestion.FullData
+                    ToolTip = GenerateTooltip(suggestion.SupportAction)
                 };
                 sp.Children.Add(tb1);
                 Grid.SetColumn(tb1, 1);
@@ -134,33 +147,63 @@ namespace FreeAIr.UI.Embedillo.VisualLine.Command
             return border;
         }
 
-        private static List<ISuggestion> GenerateSuggestions()
+        private static async Task<List<CommandSuggestion>> GenerateSuggestionsAsync()
         {
-            var suggestions = new List<ISuggestion>();
+            var suggestions = new List<CommandSuggestion>();
 
-            suggestions.Add(
-                new CommandSuggestion(
-                    KnownMonikers.SQLServerObjectExplorer,
-                    "ExplainCode",
-                    "ExplainCode"
-                    )
-                );
-            suggestions.Add(
-                new CommandSuggestion(
-                    KnownMonikers.CodeReviewWizard,
-                    "AddXmlComments",
-                    "AddXmlComments"
-                    )
-                );
-            suggestions.Add(
-                new CommandSuggestion(
-                    KnownMonikers.TestGroup,
-                    "GenerateUnitTests",
-                    "GenerateUnitTests"
-                    )
-                );
+            var support = await FreeAIrOptions.DeserializeSupportCollectionAsync();
+            foreach (var action in support.Actions)
+            {
+                if (!action.Scopes.Contains(SupportScopeEnum.EnterPromptControl))
+                {
+                    continue;
+                }
+
+                var transformedName = TransformSupportActionName(action.Name);
+
+                suggestions.Add(
+                    new CommandSuggestion(
+                        KnownMonikersHelper.GetMoniker(action.KnownMoniker),
+                        transformedName,
+                        transformedName,
+                        action
+                        )
+                    );
+            }
 
             return suggestions;
+        }
+
+        private static string GenerateTooltip(SupportActionJson action)
+        {
+            return
+$"""
+{action.Name}
+Its prompt template:
+{action.Prompt}
+""";
+
+        }
+
+        private static string TransformSupportActionName(string name)
+        {
+            var sb = new StringBuilder();
+
+            foreach (var part in name.Split(' ', '\t'))
+            {
+                if (string.IsNullOrEmpty(part))
+                {
+                    continue;
+                }
+
+                sb.Append(char.ToUpper(part[0]));
+                if (part.Length > 1)
+                {
+                    sb.Append(part.Substring(1));
+                }
+            }
+
+            return sb.ToString();
         }
     }
 }

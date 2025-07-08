@@ -1,9 +1,7 @@
-﻿using System;
+﻿using Microsoft.VisualStudio.Imaging;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Controls;
+using System.ComponentModel;
+using System.Text.Json.Serialization;
 
 namespace FreeAIr.Options2.Support
 {
@@ -32,31 +30,60 @@ namespace FreeAIr.Options2.Support
             [
                 new SupportActionJson
                 {
+                    Scopes = [ SupportScopeEnum.EnterPromptControl ],
+                    Name = "Explain code",
+                    AgentName = null,
+                    Prompt = $@"Explain the code in the file(s):",
+                    KnownMoniker = nameof(KnownMonikers.SQLServerObjectExplorer)
+                },
+                new SupportActionJson
+                {
+                    Scopes = [ SupportScopeEnum.EnterPromptControl ],
+                    Name = "Add XML comments",
+                    AgentName = null,
+                    Prompt = $@"Add XML comments that match the code in the file(s):",
+                    KnownMoniker = nameof(KnownMonikers.CodeReviewWizard)
+                },
+                new SupportActionJson
+                {
+                    Scopes = [ SupportScopeEnum.FileInSolutionTree ],
+                    Name = "Generate unit tests",
+                    AgentName = null,
+                    Prompt = $@"I am using XUnit test framework. You need to generate a set of unit tests. Provide only one code snippet in your answer, without any additional information. Add XML comments for each test that describe what the test checks. Here are the file(s) you need to generate unit tests for: ",
+                    KnownMoniker = nameof(KnownMonikers.TestGroup)
+                },
+
+                new SupportActionJson
+                {
                     Scopes = [ SupportScopeEnum.SelectedCodeInDocument, SupportScopeEnum.CodelensInDocument, SupportScopeEnum.FileInSolutionTree ],
                     Name = "Explain code",
                     AgentName = null,
-                    Prompt = $@"Explain the code in the file: `{SupportContextVariableEnum.ContextItemFilePath.GetAnchor()}`."
+                    Prompt = $@"Explain the code in the file: `{SupportContextVariableEnum.ContextItemFilePath.GetAnchor()}`.",
+                    KnownMoniker = nameof(KnownMonikers.SQLServerObjectExplorer)
                 },
                 new SupportActionJson
                 {
                     Scopes = [ SupportScopeEnum.SelectedCodeInDocument, SupportScopeEnum.CodelensInDocument, SupportScopeEnum.FileInSolutionTree ],
                     Name = "Add XML comments",
                     AgentName = null,
-                    Prompt = $@"Add XML comments that match the code in the file `{SupportContextVariableEnum.ContextItemFilePath.GetAnchor()}`. Do not shorten the source code."
+                    Prompt = $@"Add XML comments that match the code in the file `{SupportContextVariableEnum.ContextItemFilePath.GetAnchor()}`. Do not shorten the source code.",
+                    KnownMoniker = nameof(KnownMonikers.CodeReviewWizard)
                 },
                 new SupportActionJson
                 {
                     Scopes = [ SupportScopeEnum.SelectedCodeInDocument, SupportScopeEnum.CodelensInDocument ],
                     Name = "Complete the code according to the comments",
                     AgentName = null,
-                    Prompt = $@"Complete the code in the file `{SupportContextVariableEnum.ContextItemFilePath.GetAnchor()}` according its comments."
+                    Prompt = $@"Complete the code in the file `{SupportContextVariableEnum.ContextItemFilePath.GetAnchor()}` according its comments.",
+                    KnownMoniker = null
                 },
                 new SupportActionJson
                 {
                     Scopes = [ SupportScopeEnum.SelectedCodeInDocument, SupportScopeEnum.CodelensInDocument, SupportScopeEnum.FileInSolutionTree ],
                     Name = "Generate unit tests",
                     AgentName = null,
-                    Prompt = $@"Generate a set of unit tests for the code in the file `{SupportContextVariableEnum.ContextItemFilePath.GetAnchor()}`. Provide only one code snippet in your answer, without any additional information. Add XML comments for each test that describe what the test checks. Write code for the {SupportContextVariableEnum.UnitTestFramework.GetAnchor()} test framework."
+                    Prompt = $@"Generate a set of unit tests for the code in the file `{SupportContextVariableEnum.ContextItemFilePath.GetAnchor()}`. Provide only one code snippet in your answer, without any additional information. Add XML comments for each test that describe what the test checks. Write code for the {SupportContextVariableEnum.UnitTestFramework.GetAnchor()} test framework.",
+                    KnownMoniker = nameof(KnownMonikers.TestGroup)
                 },
 
                 new SupportActionJson
@@ -64,13 +91,15 @@ namespace FreeAIr.Options2.Support
                     Scopes = [ SupportScopeEnum.BuildErrorWindow ],
                     Name = "Fix build error",
                     AgentName = null,
-                    Prompt = $@"The compiler reported an error `{SupportContextVariableEnum.BuildErrorMessage.GetAnchor()}` in the file `{SupportContextVariableEnum.ContextItemFilePath.GetAnchor()}`, line {SupportContextVariableEnum.BuildErrorLine.GetAnchor()}, column {SupportContextVariableEnum.BuildErrorColumn.GetAnchor()}. Help fix the code."
+                    Prompt = $@"The compiler reported an error `{SupportContextVariableEnum.BuildErrorMessage.GetAnchor()}` in the file `{SupportContextVariableEnum.ContextItemFilePath.GetAnchor()}`, line {SupportContextVariableEnum.BuildErrorLine.GetAnchor()}, column {SupportContextVariableEnum.BuildErrorColumn.GetAnchor()}. Help fix the code.",
+                    KnownMoniker = null
                 },
                
             ];
 
     }
 
+    [JsonConverter(typeof(JsonDescriptionCommentConverter<SupportActionJson>))]
     public sealed class SupportActionJson : ICloneable
     {
         public HashSet<SupportScopeEnum> Scopes
@@ -97,12 +126,20 @@ namespace FreeAIr.Options2.Support
             set;
         }
 
+        [Description("Install KnownMonikers Explorer Visual Studio extension to choose correct image moniker.")]
+        public string? KnownMoniker
+        {
+            get;
+            set;
+        }
+
         public SupportActionJson()
         {
             Scopes = new();
             Name = string.Empty;
             AgentName = null;
             Prompt = string.Empty;
+            KnownMoniker = null;
         }
 
         public object Clone()
@@ -112,7 +149,8 @@ namespace FreeAIr.Options2.Support
                 Scopes = new(Scopes),
                 Name = Name,
                 AgentName = AgentName,
-                Prompt = Prompt
+                Prompt = Prompt,
+                KnownMoniker = KnownMoniker
             };
         }
     }
@@ -122,6 +160,7 @@ namespace FreeAIr.Options2.Support
         SelectedCodeInDocument,
         CodelensInDocument,
         FileInSolutionTree,
-        BuildErrorWindow
+        BuildErrorWindow,
+        EnterPromptControl
     }
 }

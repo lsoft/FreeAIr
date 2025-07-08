@@ -30,7 +30,7 @@ namespace FreeAIr.Options2
             {
                 WriteIndented = true,
                 ReadCommentHandling = JsonCommentHandling.Skip,
-                Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
+                Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
             };
             _writeOptions.Converters.Add(new StringEnumConverter<SupportScopeEnum>());
         }

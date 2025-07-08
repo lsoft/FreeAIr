@@ -1,4 +1,5 @@
-﻿using Microsoft.VisualStudio.Imaging.Interop;
+﻿using FreeAIr.Options2.Support;
+using Microsoft.VisualStudio.Imaging.Interop;
 
 namespace FreeAIr.UI.Embedillo.VisualLine.Command
 {
@@ -19,11 +20,16 @@ namespace FreeAIr.UI.Embedillo.VisualLine.Command
             get;
         }
 
+        public SupportActionJson SupportAction
+        {
+            get;
+        }
 
         public CommandSuggestion(
             ImageMoniker image,
             string fullData,
-            string publicData
+            string publicData,
+            SupportActionJson supportAction
             )
         {
             if (string.IsNullOrEmpty(fullData))
@@ -39,6 +45,7 @@ namespace FreeAIr.UI.Embedillo.VisualLine.Command
             Image = image;
             FullData = fullData;
             PublicData = publicData;
+            SupportAction = supportAction;
         }
 
     }

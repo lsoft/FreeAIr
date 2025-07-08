@@ -7,21 +7,21 @@ namespace FreeAIr.UI.Embedillo.Answer.Parser
 {
     public sealed class CommandAnswerPart : IParsedPart
     {
-        public ChatKindEnum Kind
+        public string Prompt
         {
             get;
         }
 
         public CommandAnswerPart(
-            ChatKindEnum kind
+            string prompt
             )
         {
-            Kind = kind;
+            Prompt = prompt;
         }
 
-        public async Task<string> AsPromptStringAsync()
+        public Task<string> AsPromptStringAsync()
         {
-            return await Kind.AsPromptStringAsync();
+            return Task.FromResult(Prompt);
         }
 
         public IChatContextItem TryCreateChatContextItem()
