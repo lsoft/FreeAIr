@@ -69,12 +69,14 @@ namespace FreeAIr.Antlr.Answer.Parts
 
         public IEnumerable<Inline> GetInlines(bool isInProgress)
         {
+            _ = Uri.TryCreate(Link, UriKind.RelativeOrAbsolute, out var uri);
+
             var hl = new Hyperlink(
                 new Run(Description)
                 )
             {
                 FontSize = FontSizePage.Instance.TextSize,
-                NavigateUri = new Uri(Link),
+                NavigateUri = uri,
                 ToolTip = Title
             };
             hl.Click += (sender, e) =>

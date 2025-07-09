@@ -68,7 +68,7 @@ namespace FreeAIr.BLogic
                 options
                 );
             chat.ChatStatusChangedEvent += ChatStatusChanged;
-            chat.PromptStateChangedEvent += PromptStateChanged;
+            chat.PromptStateChangedEvent.Event += PromptStateChanged;
 
             lock (_locker)
             {

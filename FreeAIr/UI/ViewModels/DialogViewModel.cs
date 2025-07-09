@@ -1,12 +1,13 @@
 ﻿using EnvDTE;
-using FreeAIr.Options2.Agent;
 using FreeAIr.Antlr.Answer;
 using FreeAIr.Antlr.Answer.Parts;
 using FreeAIr.BLogic;
 using FreeAIr.BLogic.Context;
 using FreeAIr.Helper;
+using FreeAIr.Options2.Agent;
 using FreeAIr.Shared.Helper;
 using FreeAIr.UI.ContextMenu;
+using Microsoft.VisualStudio.ComponentModelHost;
 using Microsoft.VisualStudio.Threading;
 using Microsoft.Xaml.Behaviors.Core;
 using System;
@@ -27,6 +28,8 @@ namespace FreeAIr.UI.ViewModels
 {
     public class DialogViewModel : BaseViewModel
     {
+        private readonly IAnswerParser _answerParser;
+
         private ChatWrapper? _selectedChat;
 
         public ObservableCollection2<Replic> Dialog
@@ -45,6 +48,10 @@ namespace FreeAIr.UI.ViewModels
             {
                 throw new ArgumentNullException(nameof(chatContainer));
             }
+
+            var componentModel = FreeAIrPackage.Instance.GetService<SComponentModel, IComponentModel>();
+            _answerParser = componentModel.GetService<IAnswerParser>();
+
 
             #region AdditionalCommandContainer
 
@@ -292,7 +299,7 @@ namespace FreeAIr.UI.ViewModels
                 case PromptChangeKindEnum.PromptAdded:
                     {
                         var promptReplic = new Replic(
-                            AnswerParser.Parse(prompt.PromptBody),
+                            _answerParser.Parse(prompt.PromptBody),
                             prompt,
                             true,
                             AdditionalCommandContainer,
@@ -301,7 +308,7 @@ namespace FreeAIr.UI.ViewModels
                         Dialog.Add(promptReplic);
 
                         var answerReplic = new Replic(
-                            AnswerParser.Parse(prompt.Answer.GetUserVisibleAnswer()),
+                            _answerParser.Parse(prompt.Answer.GetUserVisibleAnswer()),
                             prompt,
                             false,
                             AdditionalCommandContainer,
@@ -316,7 +323,7 @@ namespace FreeAIr.UI.ViewModels
                         if (replic is not null)
                         {
                             replic.Update(
-                                AnswerParser.Parse(
+                                _answerParser.Parse(
                                     prompt.Answer.GetUserVisibleAnswer()
                                     ),
                                 true

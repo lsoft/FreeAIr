@@ -1,12 +1,57 @@
 ﻿using Antlr4.Runtime;
 using Antlr4.Runtime.Tree;
 using System;
+using System.ComponentModel.Composition;
 
 namespace FreeAIr.Antlr.Answer
 {
-    public static class AnswerParser
+    public interface IAnswerParser
     {
-        public static ParsedAnswer Parse(string text)
+        IParsedAnswer Parse(string text);
+    }
+
+    [Export(typeof(IAnswerParser))]
+    public sealed class CachedAnswerParser : IAnswerParser
+    {
+        private readonly object _locker = new();
+
+        private readonly DirectAnswerParser _answerParser;
+
+        private string? _previousText;
+        private IParsedAnswer? _previousAnswer;
+
+        [ImportingConstructor]
+        public CachedAnswerParser(
+            DirectAnswerParser answerParser
+            )
+        {
+            if (answerParser is null)
+            {
+                throw new ArgumentNullException(nameof(answerParser));
+            }
+
+            _answerParser = answerParser;
+        }
+
+        public IParsedAnswer Parse(string text)
+        {
+            lock (_locker)
+            {
+                if (_previousText is null || _previousText != text)
+                {
+                    _previousAnswer = _answerParser.Parse(text);
+                    _previousText = text;
+                }
+
+                return _previousAnswer;
+            }
+        }
+    }
+
+    [Export(typeof(DirectAnswerParser))]
+    public sealed class DirectAnswerParser : IAnswerParser
+    {
+        public IParsedAnswer Parse(string text)
         {
             if (text is null)
             {

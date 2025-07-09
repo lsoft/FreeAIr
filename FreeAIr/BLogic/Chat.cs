@@ -44,7 +44,11 @@ namespace FreeAIr.BLogic
         public IReadOnlyList<UserPrompt> Prompts => _prompts;
 
         public event ChatStatusChangedDelegate ChatStatusChangedEvent;
-        public event PromptStateChangedDelegate PromptStateChangedEvent;
+
+        public TimeoutEventProxy<PromptEventArgs> PromptStateChangedEvent
+        {
+            get;
+        }
 
         public ChatDescription Description
         {
@@ -104,7 +108,32 @@ namespace FreeAIr.BLogic
             ChatTools = chatTools;
             _status = ChatStatusEnum.NotStarted;
 
-            
+            PromptStateChangedEvent = new TimeoutEventProxy<PromptEventArgs>(
+                250,
+                this,
+                (pa0, pa1) =>
+                {
+                    if (pa0 is null && pa1 is null)
+                    {
+                        return ArgsActionKindEnum.ReplaceLastArgs;
+                    }
+                    if (pa0 is null)
+                    {
+                        return ArgsActionKindEnum.AddToQueue;
+                    }
+                    if (pa1 is null)
+                    {
+                        return ArgsActionKindEnum.ReplaceLastArgs;
+                    }
+
+                    if (pa0.Kind == pa1.Kind)
+                    {
+                        return ArgsActionKindEnum.ReplaceLastArgs;
+                    }
+
+                    return ArgsActionKindEnum.AddToQueue;
+                }
+                );
 
             Started = DateTime.Now;
 
@@ -191,6 +220,8 @@ namespace FreeAIr.BLogic
             DeleteResultFile();
 
             Description.Dispose();
+
+            PromptStateChangedEvent.Dispose();
         }
 
         private async Task WaitForTaskAsync()
@@ -273,6 +304,8 @@ namespace FreeAIr.BLogic
 
                     foreach (StreamingChatCompletionUpdate completionUpdate in completionUpdates)
                     {
+                        //completionUpdate.Usage.OutputTokenDetails.
+
                         if (completionUpdate.CompletionId is null)
                         {
                             dialog.UpdateUserVisibleAnswer("Server returns error.");
@@ -407,11 +440,9 @@ namespace FreeAIr.BLogic
             PromptChangeKindEnum kind
             )
         {
-            var e = PromptStateChangedEvent;
-            if (e is not null)
-            {
-                e(this, new PromptEventArgs(this, prompt, kind));
-            }
+            PromptStateChangedEvent.Fire(
+                new PromptEventArgs(this, prompt, kind)
+                );
         }
 
         private void StatusChanged()
@@ -760,6 +791,7 @@ namespace FreeAIr.BLogic
         {
             get;
         }
+
         public PromptChangeKindEnum Kind
         {
             get;

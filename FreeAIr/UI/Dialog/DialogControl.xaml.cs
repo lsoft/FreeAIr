@@ -211,7 +211,7 @@ namespace FreeAIr.UI.Dialog
             private readonly AdditionalCommandContainer? _acc;
             private FlowDocument _document;
 
-            public ParsedAnswer ParsedAnswer
+            public IParsedAnswer ParsedAnswer
             {
                 get;
                 private set;
@@ -247,7 +247,7 @@ namespace FreeAIr.UI.Dialog
             }
 
             public Replic(
-                ParsedAnswer parsedAnswer,
+                IParsedAnswer parsedAnswer,
                 UserPrompt prompt,
                 bool isPrompt,
                 AdditionalCommandContainer? acc,
@@ -264,7 +264,7 @@ namespace FreeAIr.UI.Dialog
             }
 
             public void Update(
-                ParsedAnswer parsedAnswer,
+                IParsedAnswer parsedAnswer,
                 bool inProgress
                 )
             {

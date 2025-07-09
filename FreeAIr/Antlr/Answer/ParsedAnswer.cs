@@ -6,9 +6,13 @@ using System.Windows.Input;
 
 namespace FreeAIr.Antlr.Answer
 {
-    public sealed class ParsedAnswer
+    public sealed class ParsedAnswer : IParsedAnswer
     {
+        private readonly object _locker = new();
+
         private readonly List<Block> _blocks = new();
+
+        private FlowDocument? _flowDocument;
 
         private Block _lastBlock => _blocks.Last();
 
@@ -73,6 +77,19 @@ namespace FreeAIr.Antlr.Answer
             bool isInProgress
             )
         {
+            lock (_locker)
+            {
+                if (_flowDocument is null)
+                {
+                    _flowDocument = CreateFlowDocument(acc, isInProgress);
+                }
+
+                return _flowDocument;
+            }
+        }
+
+        private FlowDocument CreateFlowDocument(AdditionalCommandContainer acc, bool isInProgress)
+        {
             var document = new FlowDocument();
 
             foreach (var block in Blocks)
@@ -87,6 +104,5 @@ namespace FreeAIr.Antlr.Answer
 
             return document;
         }
-
     }
 }
