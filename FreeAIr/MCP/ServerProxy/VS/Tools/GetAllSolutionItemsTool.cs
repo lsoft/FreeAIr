@@ -29,31 +29,38 @@ namespace FreeAIr.MCP.McpServerProxy.VS.Tools
             CancellationToken cancellationToken = default
             )
         {
-            await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
-
-            var solution = await Community.VisualStudio.Toolkit.VS.Solutions.GetCurrentSolutionAsync();
-            var items = await solution.ProcessDownRecursivelyForAsync(
-                item => !item.IsNonVisibleItem,
-                false,
-                cancellationToken
-                );
-
-            var converted = items
-                .Select(i => new SolutionItemJson
-                {
-                    ItemName = i.SolutionItem.Name,
-                    ItemType = i.SolutionItem.Type.ToString(),
-                    ItemFullPath = i.SolutionItem.FullPath,
-                })
-                .ToArray();
-            var packed = new SolutionItemsJson
+            try
             {
-                SolutionItems = converted
-            };
+                await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
 
-            var result = JsonSerializer.Serialize(packed);
+                var solution = await Community.VisualStudio.Toolkit.VS.Solutions.GetCurrentSolutionAsync();
+                var items = await solution.ProcessDownRecursivelyForAsync(
+                    item => !item.IsNonVisibleItem,
+                    false,
+                    cancellationToken
+                    );
 
-            return new McpServerProxyToolCallResult([result]);
+                var converted = items
+                    .Select(i => new SolutionItemJson
+                    {
+                        ItemName = i.SolutionItem.Name,
+                        ItemType = i.SolutionItem.Type.ToString(),
+                        ItemFullPath = i.SolutionItem.FullPath,
+                    })
+                    .ToArray();
+                var packed = new SolutionItemsJson
+                {
+                    SolutionItems = converted
+                };
+
+                var result = JsonSerializer.Serialize(packed);
+
+                return new McpServerProxyToolCallResult([result]);
+            }
+            catch (Exception excp)
+            {
+                throw;
+            }
         }
 
         private sealed class SolutionItemsJson

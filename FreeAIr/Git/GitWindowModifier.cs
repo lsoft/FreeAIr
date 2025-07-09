@@ -1,7 +1,8 @@
 using EnvDTE;
 using EnvDTE80;
-using FreeAIr.Options2.Agent;
 using FreeAIr.Git;
+using FreeAIr.Options2.Agent;
+using FreeAIr.UI;
 using Microsoft.VisualStudio.Imaging;
 using System.ComponentModel.Composition;
 using System.Threading;
@@ -32,6 +33,12 @@ namespace FreeAIr.BLogic
         }
 
         public Button? AddNaturalLanguageOutlinesButton
+        {
+            get;
+            private set;
+        }
+
+        public Button? BuildNLOJsonFileButton
         {
             get;
             private set;
@@ -114,7 +121,7 @@ namespace FreeAIr.BLogic
                             {
                                 Content = new CrispImage
                                 {
-                                    Moniker = KnownMonikers.CommentCode
+                                    Moniker = KnownMonikers.DocumentOutline
                                 },
                                 HorizontalAlignment = HorizontalAlignment.Center,
                                 HorizontalContentAlignment = HorizontalAlignment.Center,
@@ -125,6 +132,22 @@ namespace FreeAIr.BLogic
                             addNaturalLanguageOutlinesButton.Click += AddNaturalLanguageOutlinesButton_Click;
                             vsPanel.Children.Insert(0, addNaturalLanguageOutlinesButton);
                             AddNaturalLanguageOutlinesButton = addNaturalLanguageOutlinesButton;
+
+                            var buildNLOJsonFileButton = new Button
+                            {
+                                Content = new CrispImage
+                                {
+                                    Moniker = KnownMonikers.ValidationSummary
+                                },
+                                HorizontalAlignment = HorizontalAlignment.Center,
+                                HorizontalContentAlignment = HorizontalAlignment.Center,
+                                Margin = new System.Windows.Thickness(0),
+                                Style = dcButton.Style,
+                                ToolTip = "FreeAIr support: build natural language outlines json file related to the diff below."
+                            };
+                            buildNLOJsonFileButton.Click += BuildNLOJsonFileButton_Click;
+                            vsPanel.Children.Insert(0, buildNLOJsonFileButton);
+                            BuildNLOJsonFileButton = buildNLOJsonFileButton;
 
                             return;
                         }
@@ -150,12 +173,26 @@ namespace FreeAIr.BLogic
             }
         }
 
+        private void BuildNLOJsonFileButton_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                BuildNaturalLanguageOutlinesJsonFileToolWindow.ShowPaneAsync(
+                    false
+                    ).FileAndForget(nameof(BuildNaturalLanguageOutlinesJsonFileToolWindow));
+            }
+            catch (Exception excp)
+            {
+                //todo log
+            }
+        }
+
         private void AddNaturalLanguageOutlinesButton_Click(object sender, RoutedEventArgs e)
         {
             try
             {
                 GitNaturalLanguageOutliner.CollectOutlinesAsync(
-                    ).FileAndForget(nameof(GitNaturalLanguageOutliner.CollectOutlinesAsync));
+                    ).FileAndForget(nameof(GitNaturalLanguageOutliner));
             }
             catch (Exception excp)
             {
@@ -166,7 +203,7 @@ namespace FreeAIr.BLogic
         private void BuildCommitMessageButton_Click(object sender, RoutedEventArgs e)
         {
             CommitMessageBuilder.ChooseAgentAsync(
-                ).FileAndForget(nameof(CommitMessageBuilder.ChooseAgentAsync));
+                ).FileAndForget(nameof(CommitMessageBuilder));
         }
     }
 

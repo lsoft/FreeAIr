@@ -164,9 +164,13 @@ namespace FreeAIr.Helper
                 cancellationToken.ThrowIfCancellationRequested();
 
                 //check for selection for this file
-                var documentView = await VS.Documents.GetDocumentViewAsync(
-                    item.FullPath
-                    );
+                DocumentView? documentView = null;
+                if (item.FullPath is not null)
+                {
+                    documentView = await VS.Documents.GetDocumentViewAsync(
+                        item.FullPath
+                        );
+                }
 
                 //if the document is selected, put it in the head of the list
                 if (documentView is not null)
@@ -307,7 +311,7 @@ namespace FreeAIr.Helper
             public override int GetHashCode()
             {
                 var hashCode = 1617180218;
-                hashCode = hashCode * -1521134295 + (int)SolutionItem.Type + SolutionItem.FullPath.GetHashCode();
+                hashCode = hashCode * -1521134295 + (int)SolutionItem.Type + (SolutionItem.FullPath?.GetHashCode() ?? 0);
                 hashCode = hashCode * -1521134295 + (Selection?.GetHashCode() ?? 0);
                 return hashCode;
             }

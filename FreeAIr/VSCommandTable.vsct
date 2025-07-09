@@ -121,10 +121,10 @@
       </Button>
       <Button guid="FreeAIr" id="OpenBuildingNaturalLanguageOutlinesWindowCommandId" priority="0x0102" type="Button">
         <Parent guid="FreeAIr" id="SubExtensionMenuGroup2" />
-        <Icon guid="ImageCatalogGuid" id="CommentCode" />
+        <Icon guid="ImageCatalogGuid" id="ValidationSummary" />
         <CommandFlag>IconIsMoniker</CommandFlag>
         <Strings>
-          <ButtonText>Open building natural language outlines window...</ButtonText>
+          <ButtonText>Open building NLO JSON file window...</ButtonText>
         </Strings>
       </Button>
       <Button guid="FreeAIr" id="ShowReleaseNotesCommandId" priority="0x0103" type="Button">
@@ -187,10 +187,10 @@
       </Button>
       <Button guid="FreeAIr" id="AddNaturalLanguageOutlinesCommandId" priority="0x0100" type="Button">
         <Parent guid="FreeAIr" id="SolutionContextGroup" />
-        <Icon guid="ImageCatalogGuid" id="CommentCode" />
+        <Icon guid="ImageCatalogGuid" id="DocumentOutline" />
         <CommandFlag>IconIsMoniker</CommandFlag>
         <Strings>
-          <ButtonText>Add natural language outlines...</ButtonText>
+          <ButtonText>Generate and add natural language outlines...</ButtonText>
         </Strings>
       </Button>
 
