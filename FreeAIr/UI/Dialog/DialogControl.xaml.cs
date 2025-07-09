@@ -4,6 +4,7 @@ using FreeAIr.Helper;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
+using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
@@ -15,6 +16,7 @@ namespace FreeAIr.UI.Dialog
 {
     public partial class DialogControl : UserControl
     {
+        private readonly object _locker = new();
         private bool _isScrolledToBottom = true;
 
         #region Dialog property
@@ -143,20 +145,38 @@ namespace FreeAIr.UI.Dialog
 
         private void OnLastReplicChangedRaised()
         {
-            if (_isScrolledToBottom)
+            var locked = false;
+            try
             {
-                ScrollViewerName.ScrollToBottom();
+                Monitor.TryEnter(_locker, ref locked);
+                if (locked)
+                {
+                    if (_isScrolledToBottom)
+                    {
+                        ScrollViewerName.ScrollToBottom();
+                    }
+                }
+            }
+            finally
+            {
+                if (locked)
+                {
+                    Monitor.Exit(_locker);
+                }
             }
         }
 
         private void OnFlowDocumentScrollViewerPreviewMouseWheel(object sender, MouseWheelEventArgs e)
         {
-            var scrollViewer = FindAncestor<ScrollViewer>(sender as DependencyObject);
-            if (scrollViewer != null)
+            lock (_locker)
             {
-                scrollViewer.ScrollToVerticalOffset(scrollViewer.VerticalOffset - e.Delta);
-                _isScrolledToBottom = ScrollViewerName.IsScrolledToBottom();
-                e.Handled = true;
+                var scrollViewer = FindAncestor<ScrollViewer>(sender as DependencyObject);
+                if (scrollViewer != null)
+                {
+                    scrollViewer.ScrollToVerticalOffset(scrollViewer.VerticalOffset - e.Delta);
+                    _isScrolledToBottom = ScrollViewerName.IsScrolledToBottom();
+                    e.Handled = true;
+                }
             }
         }
 

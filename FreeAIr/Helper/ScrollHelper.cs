@@ -8,6 +8,11 @@ namespace FreeAIr.Helper
             this ScrollViewer scrollViewer
             )
         {
+            if (scrollViewer is null)
+            {
+                throw new ArgumentNullException(nameof(scrollViewer));
+            }
+
             return scrollViewer.VerticalOffset >= scrollViewer.ExtentHeight - scrollViewer.ViewportHeight;
         }
     }
