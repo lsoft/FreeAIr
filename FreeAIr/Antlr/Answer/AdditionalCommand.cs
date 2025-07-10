@@ -149,7 +149,8 @@ namespace FreeAIr.Antlr.Answer
                 Cursor = Cursors.Hand,
                 Content = Title,
                 Command = ActionCommand,
-                CommandParameter = part.GetContextForAdditionalCommand()
+                CommandParameter = part.GetContextForAdditionalCommand(),
+                Focusable = false
             };
             if (Foreground is not null)
             {
