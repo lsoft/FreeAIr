@@ -87,17 +87,6 @@
                     FontSize="12"
                     Margin="10,0,10,0"
                     FontFamily="Cascadia Code"
-                    Content="Store options..."
-                    Command="{Binding StoreOptionsCommand}"
-                    Style="{DynamicResource TextBlockLikeButtonStyle}"
-                    />
-
-                <Button
-                    HorizontalAlignment="Right"
-                    VerticalAlignment="Center"
-                    FontSize="12"
-                    Margin="10,0,10,0"
-                    FontFamily="Cascadia Code"
                     Content="Store to options file..."
                     Command="{Binding StoreOptionsToFileCommand}"
                     Style="{DynamicResource TextBlockLikeButtonStyle}"

@@ -93,11 +93,6 @@ namespace FreeAIr.UI.ViewModels
             }
         }
 
-        public StoreOptionsCmd StoreOptionsCommand
-        {
-            get;
-        }
-
         public StoreOptionsCmd StoreOptionsToFileCommand
         {
             get;
@@ -148,7 +143,6 @@ namespace FreeAIr.UI.ViewModels
                 );
 
             InstallGithubMCPServerCommand = new(this);
-            StoreOptionsCommand = new(this, null);
             StoreOptionsToFileCommand = new(this, OptionsPlaceEnum.SolutionRelatedFilePath);
             DeleteOptionsFileCommand = new(this);
             StoreAsVSOptionsCommand = new(this, OptionsPlaceEnum.VisualStudioOption);
