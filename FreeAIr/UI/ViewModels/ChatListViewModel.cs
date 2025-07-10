@@ -14,6 +14,7 @@ using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.Win32;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
+using System.IO;
 using System.Linq;
 using System.Windows;
 using System.Windows.Input;
@@ -777,8 +778,8 @@ namespace FreeAIr.UI.ViewModels
             {
                 if (_addCustomFileToContextCommand == null)
                 {
-                    _addCustomFileToContextCommand = new RelayCommand(
-                        a =>
+                    _addCustomFileToContextCommand = new AsyncRelayCommand(
+                        async a =>
                         {
                             if (_selectedChat is null)
                             {
@@ -799,21 +800,40 @@ namespace FreeAIr.UI.ViewModels
                             var ofd = new OpenFileDialog();
                             ofd.CheckFileExists = true;
                             ofd.CheckPathExists = true;
-                            ofd.Filter = "TXT Files(*.txt;)|*.txt;|Other Files(*.*)|*.*";
+                            ofd.Multiselect = true;
+                            ofd.Filter =
+                                "All Files(*.*)|*.*"
+                                + "|Text Files|"
+                                + string.Join(
+                                    ";",
+                                    FileTypeHelper.TextFileExtensions.Select(e => "*" + e)
+                                    )
+                                ;
+
+                            var solution = await VS.Solutions.GetCurrentSolutionAsync();
+                            if (solution is not null)
+                            {
+                                var sfi = new FileInfo(solution.FullPath);
+                                ofd.InitialDirectory = sfi.Directory.FullName;
+                            }
+
                             var sw = ofd.ShowDialog();
                             if (!sw.GetValueOrDefault(false))
                             {
                                 return;
                             }
 
-                            var contextItem = new CustomFileContextItem(
-                                ofd.FileName,
-                                false
-                                );
+                            foreach (var fileName in ofd.FileNames)
+                            {
+                                var contextItem = new CustomFileContextItem(
+                                    fileName,
+                                    false
+                                    );
 
-                            chat.ChatContext.AddItem(
-                                contextItem
-                                );
+                                chat.ChatContext.AddItem(
+                                    contextItem
+                                    );
+                            }
 
                             FocusContextControl();
 

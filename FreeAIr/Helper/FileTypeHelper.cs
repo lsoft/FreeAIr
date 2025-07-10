@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 
 namespace FreeAIr.Helper
@@ -7,13 +8,21 @@ namespace FreeAIr.Helper
     public static class FileTypeHelper
     {
         // Список известных текстовых расширений
-        private static readonly HashSet<string> _textFileExtensions = new (StringComparer.OrdinalIgnoreCase)
+        public static readonly IReadOnlyCollection<string> TextFileExtensions = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
         {
-            ".txt", ".csv", ".json", ".xml", ".yaml", ".yml", ".toml", ".ini", ".log",
-            ".md", ".html", ".css", ".js", ".ts", ".py", ".java", ".cs", ".sh", ".sql",
-            ".cfg", ".conf", ".env", ".properties", ".gitignore", ".editorconfig",
-            ".rst", ".adoc", ".tex", ".bib", ".nfo", ".todo", ".notes", ".mail", ".url",
-            ".props", ".cpp", ".h", ".bat"
+            ".ada", ".adoc", ".ampl", ".asp", ".aspx", ".babelcache", ".babelignore", ".babelrc", ".bas",
+            ".bash", ".bat", ".bib", ".c", ".cfg", ".cmd", ".conf", ".cpp", ".cs", ".css", ".csv", ".dart",
+            ".dockerfile", ".dockerignore", ".editorconfig", ".env", ".erl", ".erlang", ".eslintcache",
+            ".eslintignore", ".eslintrc", ".ex", ".exs", ".fs", ".gemfile", ".gitattributes", ".gitignore",
+            ".go", ".groovy", ".h", ".hs", ".html", ".ini", ".java", ".jest", ".jestcache", ".jestignore",
+            ".js", ".json", ".jsp", ".jspx", ".kt", ".less", ".lock", ".log", ".lua", ".m", ".mail",
+            ".makefile", ".matlab", ".md", ".ml", ".mli", ".mochacache", ".mochaiignore", ".mocharc", ".nfo",
+            ".notes", ".npmignore", ".npmrc", ".nt", ".nyccache", ".nycignore", ".nycrc", ".octave", ".php",
+            ".pl", ".plist", ".plpgsql", ".prettiercache", ".prettierignore", ".prettierrc", ".pro",
+            ".properties", ".props", ".psql", ".py", ".r", ".rb", ".reg", ".rs", ".rss", ".rst", ".sass",
+            ".scss", ".sh", ".sql", ".stylelintcache", ".stylelintignore", ".stylelintrc", ".svg", ".swift",
+            ".tcl", ".tex", ".todo", ".toml", ".ts", ".txt", ".url", ".vb", ".vbs", ".vhdl", ".xaml", ".xhtml",
+            ".xml", ".yaml", ".yarnrc", ".yml", ".zsh"
         };
 
         public static FileTypeEnum GetFileType(
@@ -74,7 +83,7 @@ namespace FreeAIr.Helper
         private static bool IsTextExtension(string filePath)
         {
             var ext = Path.GetExtension(filePath);
-            return !string.IsNullOrEmpty(ext) && _textFileExtensions.Contains(ext);
+            return !string.IsNullOrEmpty(ext) && TextFileExtensions.Contains(ext);
         }
 
         private static bool HasNullByte(byte[] buffer, int length)

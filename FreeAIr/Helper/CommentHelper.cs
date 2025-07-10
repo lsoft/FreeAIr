@@ -81,6 +81,11 @@ namespace FreeAIr.Helper
             { "scss", "// * {0}" }
         };
 
+        public static List<string> GetTextFileExtensions()
+        {
+            return _commentTemplateMap.Keys.ToList();
+        }
+
         /// <summary>
         /// Возвращает шаблон однострочного комментария для заданного расширения файла.
         /// </summary>
