@@ -47,16 +47,8 @@ namespace FreeAIr.Options2
 
                         if (jsonName == propertyName)
                         {
-                            try
-                            {
-                                var value = JsonSerializer.Deserialize(ref reader, prop.PropertyType, options);
-                                prop.SetValue(instance, value);
-                            }
-                            catch (Exception ex)
-                            {
-                                Console.WriteLine($"Error deserializing {propertyName}: {ex.Message}");
-                                reader.Skip();
-                            }
+                            var value = JsonSerializer.Deserialize(ref reader, prop.PropertyType, options);
+                            prop.SetValue(instance, value);
                             break;
                         }
                     }

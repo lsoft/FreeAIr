@@ -187,17 +187,20 @@ namespace FreeAIr.Options2
 
         public static bool TryDeserializeFromString(
             string optionsJson,
-            out FreeAIrOptions? options
+            out FreeAIrOptions? options,
+            out string? errorMessage
             )
         {
             try
             {
                 options = DeserializeFromString(optionsJson);
+                errorMessage = null;
                 return true;
             }
-            catch
+            catch(Exception excp)
             {
                 options = null;
+                errorMessage = excp.Message;
                 return false;
             }
         }

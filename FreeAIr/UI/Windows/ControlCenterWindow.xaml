@@ -29,6 +29,7 @@
                 <RowDefinition Height="auto"/> <!-- 3 -->
                 <RowDefinition Height="auto"/> <!-- 4 -->
                 <RowDefinition Height="auto"/> <!-- 5 -->
+                <RowDefinition Height="auto"/> <!-- 6 -->
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="auto"/>
@@ -59,8 +60,20 @@
                     />
             </ScrollViewer>
 
-            <StackPanel
+            <TextBlock
                 Grid.Row="1"
+                Grid.Column="0"
+                Grid.ColumnSpan="3"
+                HorizontalAlignment="Right"
+                Foreground="Red"
+                Text="{Binding OptionsJsonError}"
+                TextWrapping="Wrap"
+                TextAlignment="Right"
+                Visibility="{Binding OptionsJsonVisibility}"
+                />
+
+            <StackPanel
+                Grid.Row="2"
                 Grid.Column="0"
                 Grid.ColumnSpan="3"
                 Margin="0,0,8,0"
@@ -127,7 +140,7 @@
 
 
             <Button
-                Grid.Row="2"
+                Grid.Row="3"
                 Grid.Column="0"
                 Grid.ColumnSpan="3"
                 Margin="0,20,8,2"
@@ -141,7 +154,7 @@
                 />
 
             <Button
-                Grid.Row="3"
+                Grid.Row="4"
                 Grid.Column="0"
                 Grid.ColumnSpan="3"
                 Margin="0,2,8,2"
@@ -155,7 +168,7 @@
                 />
 
             <Button
-                Grid.Row="4"
+                Grid.Row="5"
                 Grid.Column="0"
                 Grid.ColumnSpan="3"
                 HorizontalAlignment="Right"
@@ -170,7 +183,7 @@
                 />
 
             <Label
-                Grid.Row="5"
+                Grid.Row="6"
                 Grid.Column="0"
                 HorizontalAlignment="Left"
                 VerticalAlignment="Center"
@@ -181,7 +194,7 @@
                 />
 
             <Label
-                Grid.Row="5"
+                Grid.Row="6"
                 Grid.Column="1"
                 Margin="0,20,8,0"
                 Padding="0"
@@ -193,7 +206,7 @@
                 />
 
             <Button
-                Grid.Row="5"
+                Grid.Row="6"
                 Grid.Column="2"
                 HorizontalAlignment="Right"
                 VerticalAlignment="Center"

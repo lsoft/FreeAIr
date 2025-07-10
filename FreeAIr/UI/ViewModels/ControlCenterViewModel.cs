@@ -5,6 +5,7 @@ using FreeAIr.UI.Windows;
 using Microsoft.VisualStudio.Shell.Interop;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
@@ -15,6 +16,8 @@ namespace FreeAIr.UI.ViewModels
 {
     public sealed class ControlCenterViewModel : BaseViewModel
     {
+        private readonly CachedDeserializer _cachedDeserializer = new();
+
         private bool? _githubMcpServerStatus;
         private string _optionsJson;
 
@@ -55,12 +58,38 @@ namespace FreeAIr.UI.ViewModels
         {
             get
             {
-                if (FreeAIrOptions.TryDeserializeFromString(_optionsJson, out _))
+                if (_cachedDeserializer.TryDeserializeFromString(_optionsJson, out _, out _))
                 {
                     return Brushes.Green;
                 }
 
                 return Brushes.Red;
+            }
+        }
+
+        public string OptionsJsonError
+        {
+            get
+            {
+                if (!_cachedDeserializer.TryDeserializeFromString(_optionsJson, out _, out var errorMessage))
+                {
+                    return errorMessage;
+                }
+
+                return string.Empty;
+            }
+        }
+
+        public Visibility OptionsJsonVisibility
+        {
+            get
+            {
+                if (!_cachedDeserializer.TryDeserializeFromString(_optionsJson, out _, out _))
+                {
+                    return Visibility.Visible;
+                }
+
+                return Visibility.Collapsed;
             }
         }
 
@@ -146,7 +175,13 @@ namespace FreeAIr.UI.ViewModels
 
             await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
 
-            OnPropertyChanged();
+            OnGithubPropertyChanged();
+        }
+
+        private void OnGithubPropertyChanged()
+        {
+            OnPropertyChanged(nameof(GithubMcpServerStatusMessage));
+            OnPropertyChanged(nameof(InstallGithubMCPServerCommand));
         }
 
         public sealed class InstallGithubMCPServerCmd : AsyncBaseRelayCommand
@@ -201,7 +236,7 @@ namespace FreeAIr.UI.ViewModels
                         );
                 }
 
-                _viewModel.OnPropertyChanged();
+                _viewModel.OnGithubPropertyChanged();
             }
         }
 
@@ -240,8 +275,6 @@ namespace FreeAIr.UI.ViewModels
                         excp.Message + Environment.NewLine + excp.StackTrace
                         );
                 }
-
-                _viewModel.OnPropertyChanged();
             }
 
         }
@@ -285,8 +318,6 @@ namespace FreeAIr.UI.ViewModels
                         excp.Message + Environment.NewLine + excp.StackTrace
                         );
                 }
-
-                _viewModel.OnPropertyChanged();
             }
 
         }
@@ -312,7 +343,7 @@ namespace FreeAIr.UI.ViewModels
 
             protected override async Task ExecuteInternalAsync(object parameter)
             {
-                if (!FreeAIrOptions.TryDeserializeFromString(_viewModel._optionsJson, out var options))
+                if (!_viewModel._cachedDeserializer.TryDeserializeFromString(_viewModel._optionsJson, out var options, out _))
                 {
                     await VS.MessageBox.ShowErrorAsync(
                         Resources.Resources.Error,
@@ -362,7 +393,7 @@ namespace FreeAIr.UI.ViewModels
                 {
                     return false;
                 }
-                if (!FreeAIrOptions.TryDeserializeFromString(_viewModel._optionsJson, out _))
+                if (!_viewModel._cachedDeserializer.TryDeserializeFromString(_viewModel._optionsJson, out _, out _))
                 {
                     return false;
                 }
@@ -459,7 +490,7 @@ namespace FreeAIr.UI.ViewModels
                     return false;
                 }
 
-                return FreeAIrOptions.TryDeserializeFromString(_viewModel._optionsJson, out _);
+                return _viewModel._cachedDeserializer.TryDeserializeFromString(_viewModel._optionsJson, out _, out _);
             }
         }
 
@@ -507,7 +538,7 @@ namespace FreeAIr.UI.ViewModels
                     return false;
                 }
 
-                return FreeAIrOptions.TryDeserializeFromString(_viewModel._optionsJson, out _);
+                return _viewModel._cachedDeserializer.TryDeserializeFromString(_viewModel._optionsJson, out _, out _);
             }
         }
 
@@ -555,9 +586,36 @@ namespace FreeAIr.UI.ViewModels
                     return false;
                 }
 
-                return FreeAIrOptions.TryDeserializeFromString(_viewModel._optionsJson, out _);
+                return _viewModel._cachedDeserializer.TryDeserializeFromString(_viewModel._optionsJson, out _, out _);
             }
         }
 
+        public sealed class CachedDeserializer
+        {
+            private string? _optionsJson;
+
+            private bool _result;
+            private FreeAIrOptions? _options;
+            private string? _errorMessage;
+
+            public bool TryDeserializeFromString(
+                string optionsJson,
+                out FreeAIrOptions? options,
+                out string? errorMessage
+                )
+            {
+                if (_optionsJson != optionsJson)
+                {
+                    _optionsJson = optionsJson;
+                    _result = FreeAIrOptions.TryDeserializeFromString(_optionsJson, out _options, out _errorMessage);
+                }
+
+                options = _options;
+                errorMessage = _errorMessage;
+                return _result;
+            }
+
+        }
     }
+
 }
