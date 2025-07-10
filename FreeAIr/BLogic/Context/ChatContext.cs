@@ -1,4 +1,5 @@
-﻿using FreeAIr.BLogic.Context.Item;
+﻿using Antlr4.Runtime.Misc;
+using FreeAIr.BLogic.Context.Item;
 using FreeAIr.Git;
 using System.Collections.Generic;
 using System.IO;
@@ -55,6 +56,11 @@ namespace FreeAIr.BLogic.Context
             }
 
             var solution = await VS.Solutions.GetCurrentSolutionAsync();
+            if (solution is null)
+            {
+                return null;
+            }
+
             var solutionFolder = new FileInfo(solution.FullPath).Directory.FullName;
             var solutionFullPath = Path.GetFullPath(
                 Path.Combine(solutionFolder, CopilotInstructionFilePath)

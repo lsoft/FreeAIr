@@ -15,7 +15,7 @@ namespace FreeAIr.MCP.McpServerProxy.VS.Tools
         {
         }
 
-        public abstract Task<McpServerProxyToolCallResult> CallToolAsync(
+        public abstract Task<McpServerProxyToolCallResult?> CallToolAsync(
             string toolName,
             IReadOnlyDictionary<string, object?>? arguments = null,
             CancellationToken cancellationToken = default

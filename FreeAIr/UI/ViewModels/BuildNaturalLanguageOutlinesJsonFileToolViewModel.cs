@@ -638,6 +638,10 @@ namespace FreeAIr.UI.ViewModels
                             ),
                         cancellationToken: _cancellationTokenSource.Token
                         );
+                    if (outlineRoot is null)
+                    {
+                        return;
+                    }
 
                     await ShowMessageAsync(outputPanel, "Start embedding generation...");
 

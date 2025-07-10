@@ -17,7 +17,7 @@ namespace FreeAIr.NLOutline.Tree.Builder
 {
     public static class TreeBuilder
     {
-        public static async Task<OutlineNode> BuildAsync(
+        public static async Task<OutlineNode?> BuildAsync(
             TreeBuilderParameters parameters,
             CancellationToken cancellationToken
             )
@@ -28,6 +28,11 @@ namespace FreeAIr.NLOutline.Tree.Builder
             }
 
             var solution = await VS.Solutions.GetCurrentSolutionAsync();
+            if (solution is null)
+            {
+                return null;
+            }
+
             var rootPath = solution.FullPath;
 
             var root = new OutlineNode(

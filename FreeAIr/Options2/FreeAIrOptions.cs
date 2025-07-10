@@ -126,30 +126,33 @@ namespace FreeAIr.Options2
             try
             {
                 var filePath = await ComposeFilePathAsync();
-                var fileResult = await DataPieceCache.GetValueAsync<FreeAIrOptions>(
-                    filePath,
-                    (fp) => File.Exists(fp),
-                    (fp) =>
-                    {
-                        var fileInfo = new FileInfo(fp);
-                        var newSignature = fileInfo.LastWriteTimeUtc;
-                        return newSignature;
-                    },
-                    async (fp) =>
-                    {
-                        if (!File.Exists(fp))
-                        {
-                            return null;
-                        }
-
-                        using var fs = new FileStream(fp, FileMode.Open);
-                        var options = await JsonSerializer.DeserializeAsync<FreeAIrOptions>(fs, _readOptions);
-                        return options;
-                    }
-                    );
-                if (fileResult is not null)
+                if (!string.IsNullOrEmpty(filePath))
                 {
-                    return fileResult;
+                    var fileResult = await DataPieceCache.GetValueAsync<FreeAIrOptions>(
+                        filePath,
+                        (fp) => File.Exists(fp),
+                        (fp) =>
+                        {
+                            var fileInfo = new FileInfo(fp);
+                            var newSignature = fileInfo.LastWriteTimeUtc;
+                            return newSignature;
+                        },
+                        async (fp) =>
+                        {
+                            if (!File.Exists(fp))
+                            {
+                                return null;
+                            }
+
+                            using var fs = new FileStream(fp, FileMode.Open);
+                            var options = await JsonSerializer.DeserializeAsync<FreeAIrOptions>(fs, _readOptions);
+                            return options;
+                        }
+                        );
+                    if (fileResult is not null)
+                    {
+                        return fileResult;
+                    }
                 }
                 //file does not exists
 

@@ -33,7 +33,7 @@ namespace FreeAIr.MCP.McpServerProxy.VS.Tools
         {
         }
 
-        public override async Task<McpServerProxyToolCallResult> CallToolAsync(
+        public override async Task<McpServerProxyToolCallResult?> CallToolAsync(
             string toolName,
             IReadOnlyDictionary<string, object?>? arguments = null,
             CancellationToken cancellationToken = default

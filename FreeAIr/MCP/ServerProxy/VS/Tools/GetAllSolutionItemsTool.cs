@@ -23,7 +23,7 @@ namespace FreeAIr.MCP.McpServerProxy.VS.Tools
         {
         }
 
-        public override async Task<McpServerProxyToolCallResult> CallToolAsync(
+        public override async Task<McpServerProxyToolCallResult?> CallToolAsync(
             string toolName,
             IReadOnlyDictionary<string, object?>? arguments = null,
             CancellationToken cancellationToken = default
@@ -34,6 +34,11 @@ namespace FreeAIr.MCP.McpServerProxy.VS.Tools
                 await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
 
                 var solution = await Community.VisualStudio.Toolkit.VS.Solutions.GetCurrentSolutionAsync();
+                if (solution is null)
+                {
+                    return null;
+                }
+
                 var items = await solution.ProcessDownRecursivelyForAsync(
                     item => !item.IsNonVisibleItem,
                     false,

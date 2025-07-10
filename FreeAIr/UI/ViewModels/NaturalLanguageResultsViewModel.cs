@@ -271,6 +271,11 @@ namespace FreeAIr.UI.ViewModels
             var cancellationToken = _cancellationTokenSource.Token;
 
             var root = await DetermineRootAsync(parameters.ChosenScope);
+            if (root is null)
+            {
+                return;
+            }
+
             var foundRootItems = await root.ProcessDownRecursivelyForAsync(
                 item =>
                 {
@@ -386,7 +391,7 @@ namespace FreeAIr.UI.ViewModels
             OnPropertyChanged();
         }
 
-        private static async Task<SolutionItem> DetermineRootAsync(
+        private static async Task<SolutionItem?> DetermineRootAsync(
             NaturalSearchScopeEnum scope
             )
         {
