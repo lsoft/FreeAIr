@@ -28,7 +28,6 @@ namespace FreeAIr.UI.ViewModels
 
         private ChatWrapper _selectedChat;
         
-        private ICommand _openInEditorCommand;
         private ICommand _removeCommand;
         private ICommand _stopCommand;
         private ICommand _createPromptCommand;
@@ -113,39 +112,6 @@ namespace FreeAIr.UI.ViewModels
             }
         }
 
-
-        public ICommand OpenInEditorCommand
-        {
-            get
-            {
-                if (_openInEditorCommand == null)
-                {
-                    _openInEditorCommand = new AsyncRelayCommand(
-                        async a =>
-                        {
-                            var wrapper = a as ChatWrapper;
-                            if (wrapper is null)
-                            {
-                                return;
-                            }
-
-                            await VS.Documents.OpenAsync(wrapper.Chat.ResultFilePath);
-                        },
-                        a =>
-                        {
-                            var wrapper = a as ChatWrapper;
-                            if (wrapper is null)
-                            {
-                                return false;
-                            }
-
-                            return wrapper.Chat.Status.In(ChatStatusEnum.Ready, ChatStatusEnum.Failed);
-                        });
-                }
-
-                return _openInEditorCommand;
-            }
-        }
 
         public ICommand RemoveCommand
         {

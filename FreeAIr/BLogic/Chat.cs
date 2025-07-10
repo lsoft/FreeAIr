@@ -55,11 +55,6 @@ namespace FreeAIr.BLogic
             get;
         }
 
-        public string ResultFilePath
-        {
-            get;
-        }
-
         public DateTime? Started
         {
             get;
@@ -137,11 +132,6 @@ namespace FreeAIr.BLogic
 
             Started = DateTime.Now;
 
-            ResultFilePath = Path.Combine(
-                Path.GetTempPath(),
-                Guid.NewGuid().ToString() + ".md"
-                );
-
             ChatContext.ChatContextChangedEvent += ChatContextChangedRaised;
         }
 
@@ -184,16 +174,6 @@ namespace FreeAIr.BLogic
             return WaitForTaskAsync();
         }
 
-        public string ReadResponse()
-        {
-            if (File.Exists(ResultFilePath))
-            {
-                return ReadResponseFile();
-            }
-
-            return "Chat is not started yet.";
-        }
-
         public async Task StopAsync()
         {
             _cancellationTokenSource?.Cancel();
@@ -217,8 +197,6 @@ namespace FreeAIr.BLogic
 
         public void Dispose()
         {
-            DeleteResultFile();
-
             Description.Dispose();
 
             PromptStateChangedEvent.Dispose();
@@ -247,10 +225,8 @@ namespace FreeAIr.BLogic
             var cancellationToken = _cancellationTokenSource.Token;
 
             var dialog = await Dialog.CreateAsync(
-                ResultFilePath,
                 this
                 );
-            await dialog.InitAsync();
 
             try
             {
@@ -412,29 +388,6 @@ namespace FreeAIr.BLogic
             }
         }
 
-
-        private string ReadResponseFile()
-        {
-            using var fs = new FileStream(
-                ResultFilePath,
-                FileMode.Open,
-                FileAccess.Read,
-                FileShare.ReadWrite
-                );
-
-            using var sr = new StreamReader(fs);
-
-            return sr.ReadToEnd();
-        }
-
-        private void DeleteResultFile()
-        {
-            if (File.Exists(ResultFilePath))
-            {
-                File.Delete(ResultFilePath);
-            }
-        }
-
         private void PromptStateChanged(
             UserPrompt prompt,
             PromptChangeKindEnum kind
@@ -476,23 +429,16 @@ namespace FreeAIr.BLogic
 
         public sealed class Dialog
         {
-            private readonly string _resultFilePath;
             private readonly Chat _chat;
             private readonly SystemChatMessage _systemChatMessage;
 
             private UserPrompt _lastPrompt => _chat.Prompts.Last();
 
             private Dialog(
-                string resultFilePath,
                 Chat chat,
                 string formattedSystemPrompt
                 )
             {
-                if (resultFilePath is null)
-                {
-                    throw new ArgumentNullException(nameof(resultFilePath));
-                }
-
                 if (chat is null)
                 {
                     throw new ArgumentNullException(nameof(chat));
@@ -503,28 +449,10 @@ namespace FreeAIr.BLogic
                     throw new ArgumentNullException(nameof(formattedSystemPrompt));
                 }
 
-                _resultFilePath = resultFilePath;
                 _chat = chat;
                 _systemChatMessage = new SystemChatMessage(
                     formattedSystemPrompt
                     );
-            }
-
-            public async Task InitAsync()
-            {
-                AppendTextToFile(
-                    Environment.NewLine + Environment.NewLine
-                    );
-                AppendTextToFile(
-                    $"> {await "UI_Prompt".GetLocalizedResourceByNameAsync()}:" + Environment.NewLine
-                    );
-                AppendTextToFile(
-                    _lastPrompt.PromptBody + Environment.NewLine + Environment.NewLine
-                    );
-                AppendTextToFile(
-                    $"> {await "UI_Answer".GetLocalizedResourceByNameAsync()}:" + Environment.NewLine
-                    );
-
             }
 
             public void AppendAssistantReply(
@@ -582,26 +510,12 @@ namespace FreeAIr.BLogic
                 _chat.PromptStateChanged(_lastPrompt, PromptChangeKindEnum.AnswerUpdated);
             }
 
-            public void AppendTextToFile(string helperText)
-            {
-                if (string.IsNullOrEmpty(helperText))
-                {
-                    return;
-                }
-
-                AppendToFile(
-                    helperText
-                    );
-            }
-
             public void UpdateUserVisibleAnswer(string helperText)
             {
                 if (string.IsNullOrEmpty(helperText))
                 {
                     return;
                 }
-
-                AppendTextToFile(helperText);
 
                 _lastPrompt.Answer.UpdateUserVisibleAnswer(
                     helperText
@@ -612,16 +526,6 @@ namespace FreeAIr.BLogic
 
             public void AppendException(Exception excp)
             {
-                AppendToFile(
-                    excp.Message
-                    + Environment.NewLine
-                    + "```"
-                    + Environment.NewLine
-                    + excp.StackTrace
-                    + Environment.NewLine
-                    + "```"
-                    );
-
                 _lastPrompt.Answer.UpdateUserVisibleAnswer(
                     $"Error: {excp.Message}"
                     );
@@ -634,20 +538,6 @@ namespace FreeAIr.BLogic
                 StreamingChatToolCallUpdate toolCall
                 )
             {
-                AppendToFile(
-                    Environment.NewLine
-                    + "<ToolCall>"
-                    + Environment.NewLine
-                    + toolCall.FunctionName
-                    + Environment.NewLine
-                    + (toolCall.FunctionArgumentsUpdate.ToMemory().Length > 0
-                        ? toolCall.FunctionArgumentsUpdate.ToString()
-                        : string.Empty)
-                    + Environment.NewLine
-                    + "</ToolCall>"
-                    + Environment.NewLine
-                    );
-
                 _lastPrompt.Answer.UpdateUserVisibleAnswer(
                      Environment.NewLine + $"> Tool {toolCall.FunctionName} has been called and the tool is FAILED." + Environment.NewLine + Environment.NewLine
                     );
@@ -667,26 +557,6 @@ namespace FreeAIr.BLogic
                 string[] toolResult
                 )
             {
-                AppendToFile(
-                    Environment.NewLine
-                    + "<ToolCall>"
-                    + Environment.NewLine
-                    + toolCall.FunctionName
-                    + Environment.NewLine
-                    + (toolCall.FunctionArgumentsUpdate.ToMemory().Length > 0
-                        ? toolCall.FunctionArgumentsUpdate.ToString()
-                        : string.Empty)
-                    + Environment.NewLine
-                    + Environment.NewLine
-                    + string.Join(
-                        Environment.NewLine,
-                        toolResult
-                        )
-                    + Environment.NewLine
-                    + "</ToolCall>"
-                    + Environment.NewLine
-                    );
-
                 _lastPrompt.Answer.UpdateUserVisibleAnswer(
                      Environment.NewLine + $"> Tool {toolCall.FunctionName} has been called SUCESSFULLY." + Environment.NewLine + Environment.NewLine
                     );
@@ -734,13 +604,11 @@ namespace FreeAIr.BLogic
 
 
             public static async Task<Dialog> CreateAsync(
-                string resultFilePath,
                 Chat chat
                 )
             {
                 var formattedSystemPrompt = await chat.Options.ChosenAgent.GetFormattedSystemPromptAsync();
                 var dialog = new Dialog(
-                    resultFilePath,
                     chat,
                     formattedSystemPrompt
                     );
@@ -768,10 +636,6 @@ namespace FreeAIr.BLogic
                 }
             }
 
-            private void AppendToFile(string contentPart)
-            {
-                File.AppendAllText(_resultFilePath, contentPart);
-            }
         }
 
     }

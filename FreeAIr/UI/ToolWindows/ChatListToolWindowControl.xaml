@@ -167,16 +167,6 @@
                             </Grid.ColumnDefinitions>
 
                             <Button
-                                Grid.Column="0"
-                                Margin="0,0,2,0"
-                                Content="{x:Static resources:Resources.UI_OpenInEditor}"
-                                HorizontalAlignment="Left"
-                                Command="{Binding ElementName=ChatListToolWindow, Path=DataContext.OpenInEditorCommand}"
-                                CommandParameter="{Binding}"
-                                Style="{DynamicResource TextBlockLikeButtonStyle}"
-                                />
-
-                            <Button
                                 Grid.Column="1"
                                 Margin="2,0,0,0"
                                 Content="{x:Static resources:Resources.UI_StopWaiting}"
