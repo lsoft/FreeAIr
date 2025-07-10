@@ -1,8 +1,11 @@
-﻿using FreeAIr.Options2;
+﻿using FreeAIr.Commands.Other;
+using FreeAIr.Options2;
 using FreeAIr.Options2.Agent;
+using FreeAIr.UI.ContextMenu;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -20,6 +23,7 @@ namespace FreeAIr.UI.ViewModels
         private ICommand _replaceGeneralSystemPromptCommand;
         private ICommand _replaceGenerateNLOSystemPromptCommand;
         private ICommand _replaceExtractNLOSystemPromptCommand;
+        private ICommand _chooseModelCommand;
 
         public Action<bool>? CloseWindow
         {
@@ -130,6 +134,45 @@ namespace FreeAIr.UI.ViewModels
                 }
 
                 return _applyAndCloseCommand;
+            }
+        }
+
+        public ICommand ChooseModelCommand
+        {
+            get
+            {
+                if (_chooseModelCommand is null)
+                {
+                    _chooseModelCommand = new AsyncRelayCommand(
+                        async a =>
+                        {
+                            var chosenModelId = await ModelContextMenu.ChooseModelFromProviderAsync(
+                                token: SelectedAgent.Technical.Token,
+                                endpoint: SelectedAgent.Technical.Endpoint,
+                                title: "Choose model from this api endpoint:",
+                                null
+                                );
+                            if (string.IsNullOrEmpty(chosenModelId))
+                            {
+                                return;
+                            }
+
+                            SelectedAgent.Technical.ChosenModel = chosenModelId;
+
+                            OnPropertyChanged();
+                        },
+                        a =>
+                        {
+                            if (SelectedAgent is null)
+                            {
+                                return false;
+                            }
+
+                            return true;
+                        });
+                }
+
+                return _chooseModelCommand;
             }
         }
 

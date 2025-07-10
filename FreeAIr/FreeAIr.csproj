@@ -52,6 +52,7 @@
     <Compile Include="Commands\Other\OpenPropertiesCommand.cs" />
     <Compile Include="Helper\KnownMonikersHelper.cs" />
     <Compile Include="Helper\TimeoutEventProxy.cs" />
+    <Compile Include="Helper\UriHelper.cs" />
     <Compile Include="Options2\Agent\AgentJson.cs" />
     <Compile Include="Options2\Agent\AgentCollectionJson.cs" />
     <Compile Include="Antlr\Answer\AdditionalCommand.cs" />
@@ -209,6 +210,7 @@
     </Compile>
     <Compile Include="UI\BindingProxy.cs" />
     <Compile Include="UI\ContextMenu\AgentContextMenu.cs" />
+    <Compile Include="UI\ContextMenu\ModelContextMenu.cs" />
     <Compile Include="UI\ContextMenu\SupportContextMenu.cs" />
     <Compile Include="UI\ContextMenu\VisualStudioContextMenuItem.cs" />
     <Compile Include="UI\ContextMenu\VisualStudioContextMenuCommandBridge.cs" />

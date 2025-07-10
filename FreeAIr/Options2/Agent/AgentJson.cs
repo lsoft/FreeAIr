@@ -1,4 +1,5 @@
-﻿using System;
+﻿using FreeAIr.Helper;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
@@ -148,16 +149,7 @@ namespace FreeAIr.Options2.Agent
 
         public Uri? TryBuildEndpointUri()
         {
-            try
-            {
-                return new Uri(Endpoint);
-            }
-            catch (Exception excp)
-            {
-                //todo log
-            }
-
-            return null;
+            return UriHelper.TryBuildEndpointUri(Endpoint);
         }
 
         public bool IsOpenRouterAgent()
