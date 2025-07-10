@@ -30,6 +30,20 @@ namespace FreeAIr.UI.Embedillo
                 new PropertyMetadata(default(bool), OnControlEnabledChanged)
                 );
 
+        public static readonly DependencyProperty MaxHeightProperty =
+            DependencyProperty.Register(
+                nameof(MaxHeight),
+                typeof(int),
+                typeof(EmbedilloControl),
+                new PropertyMetadata(default(int), OnControlEnabledChanged)
+                );
+
+        public int MaxHeight
+        {
+            get => (int)GetValue(MaxHeightProperty);
+            set => SetValue(MaxHeightProperty, value);
+        }
+
         public bool ControlEnabled
         {
             get => (bool)GetValue(ControlEnabledProperty);

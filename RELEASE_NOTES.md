@@ -13,6 +13,7 @@ If you are enjoying FreeAIr to the enough level to donate, there are many [small
 - Added chat chosen agent.
 - Added a solution-related or VS-related configuration file of FreeAIr.
 - Added user-defined prompts.
+- Fixed various bugs.
 
 ## 2.5.0
 

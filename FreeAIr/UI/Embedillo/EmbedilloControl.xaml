@@ -24,6 +24,7 @@
             FontFamily="{Binding ElementName=EmbedilloInternalName, Path=FontFamily}"
             FontSize="{Binding ElementName=EmbedilloInternalName, Path=FontSize}"
             IsEnabled="{Binding ElementName=EmbedilloInternalName, Path=ControlEnabled}"
+            MaxHeight="{Binding ElementName=EmbedilloInternalName, Path=MaxHeight}"
             Margin="0"
             HorizontalScrollBarVisibility="Auto"
             VerticalScrollBarVisibility="Auto"

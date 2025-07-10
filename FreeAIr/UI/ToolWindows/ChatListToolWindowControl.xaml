@@ -427,8 +427,8 @@
                             HintText="Press # to enter context items here. Press Ctrl + Enter to add items to context."
                             EnterCommand="{Binding AddItemToContextCommand}"
                             ControlEnabled="{Binding IsReadyToAcceptNewPrompt}"
-                            >
-                            </embedillo:EmbedilloControl>
+                            MaxHeight="100"
+                            />
 
                     </Grid>
 
@@ -474,8 +474,9 @@
                 EnterCommand="{Binding CreatePromptCommand}"
                 HintText="Enter your prompt here. Press / to open commands. Press # to choose solution item. Press Ctrl + Enter to send your prompt."
                 ControlEnabled="{Binding IsReadyToAcceptNewPrompt}"
-                >
-            </embedillo:EmbedilloControl>
+                MaxHeight="100000"
+                />
+
 
             <Button
                 Grid.Row="3"
