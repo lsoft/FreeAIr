@@ -99,6 +99,10 @@ namespace FreeAIr.UI.ViewModels
             get;
         }
 
+        public EditActionCmd EditActionCommand
+        {
+            get;
+        }
 
         public ControlCenterViewModel(
             FreeAIrOptions options
@@ -122,6 +126,7 @@ namespace FreeAIr.UI.ViewModels
             ClearVSOptionsCommand = new(this);
             EditGlobalToolsCommand = new(this);
             EditAgentCommand = new(this);
+            EditActionCommand = new(this);
 
             UpdateGithubMcpStatusAsync()
                 .FileAndForget(nameof(UpdateGithubMcpStatusAsync));
@@ -505,5 +510,54 @@ namespace FreeAIr.UI.ViewModels
                 return FreeAIrOptions.TryDeserializeFromString(_viewModel._optionsJson, out _);
             }
         }
+
+        public sealed class EditActionCmd : AsyncBaseRelayCommand
+        {
+            private readonly ControlCenterViewModel _viewModel;
+
+            public EditActionCmd(
+                ControlCenterViewModel viewModel
+                )
+            {
+                if (viewModel is null)
+                {
+                    throw new ArgumentNullException(nameof(viewModel));
+                }
+
+                _viewModel = viewModel;
+            }
+
+            protected override async Task ExecuteInternalAsync(object parameter)
+            {
+                var optionJson = _viewModel._optionsJson;
+
+                var options = FreeAIrOptions.DeserializeFromString(
+                    optionJson
+                    );
+
+                var w = new ActionConfigureWindow(
+                    );
+                w.DataContext = new ActionConfigureViewModel(
+                    options.Supports
+                    );
+                if ((await w.ShowDialogAsync()).GetValueOrDefault())
+                {
+                    _viewModel._optionsJson = FreeAIrOptions.SerializeToString(options);
+                }
+
+                _viewModel.OnPropertyChanged();
+            }
+
+            protected override bool CanExecuteInternal(object parameter)
+            {
+                if (string.IsNullOrEmpty(_viewModel._optionsJson))
+                {
+                    return false;
+                }
+
+                return FreeAIrOptions.TryDeserializeFromString(_viewModel._optionsJson, out _);
+            }
+        }
+
     }
 }

@@ -11,17 +11,48 @@ namespace FreeAIr.Helper
 {
     public static class KnownMonikersHelper
     {
-        private static readonly Dictionary<string, PropertyInfo> _propertyDictionary;
+        private static readonly Dictionary<string, ImageMoniker> _propertyByName;
+        //private static readonly Dictionary<ImageMoniker, string> _propertyByMoniker;
 
         static KnownMonikersHelper()
         {
-            _propertyDictionary = (
+            var propertyList =
                 from property in typeof(KnownMonikers).GetProperties(BindingFlags.Static | BindingFlags.Public)
                 where property.PropertyType == typeof(ImageMoniker)
                 where property.GetMethod is not null
-                select property
-                ).ToDictionary(p => p.Name, p => p);
+                select property;
+
+            _propertyByName = propertyList.ToDictionary(p => p.Name, p => GetMoniker(p));
+            //_propertyByMoniker = propertyList.ToDictionary(p => GetMoniker(p), p => p.Name);
         }
+
+        public static List<string> GetAllMonikerNames()
+        {
+            return _propertyByName
+                .Keys
+                .ToList()
+                ;
+        }
+
+        public static List<ImageMoniker> GetAllMonikers()
+        {
+            return _propertyByName
+                .Values
+                .ToList()
+                ;
+        }
+
+        //public static string GetMonikerName(
+        //    ImageMoniker moniker
+        //    )
+        //{
+        //    if (!_propertyByMoniker.TryGetValue(moniker, out var monikerName))
+        //    {
+        //        return nameof(KnownMonikers.BlockError);
+        //    }
+
+        //    return monikerName;
+        //}
 
         public static ImageMoniker GetMoniker(
             string monikerName
@@ -32,13 +63,18 @@ namespace FreeAIr.Helper
                 return KnownMonikers.QuestionMark;
             }
 
-            if (!_propertyDictionary.TryGetValue(monikerName, out var property))
+            if (!_propertyByName.TryGetValue(monikerName, out var moniker))
             {
                 return KnownMonikers.BlockError;
             }
 
-            var result = (ImageMoniker)property.GetValue(null);
-            return result;
+            return moniker;
         }
+
+        private static ImageMoniker GetMoniker(PropertyInfo p)
+        {
+            return (ImageMoniker)p.GetValue(null);
+        }
+
     }
 }

@@ -1,8 +1,6 @@
 ﻿using FreeAIr.BLogic.Context.Item;
 using FreeAIr.BuildErrors;
-using SharpCompress.Common;
 using System;
-using System.CodeDom;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;

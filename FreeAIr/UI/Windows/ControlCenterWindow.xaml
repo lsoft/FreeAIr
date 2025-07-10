@@ -28,6 +28,7 @@
                 <RowDefinition Height="auto"/> <!-- 2 -->
                 <RowDefinition Height="auto"/> <!-- 3 -->
                 <RowDefinition Height="auto"/> <!-- 4 -->
+                <RowDefinition Height="auto"/> <!-- 5 -->
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="auto"/>
@@ -129,7 +130,7 @@
                 Grid.Row="2"
                 Grid.Column="0"
                 Grid.ColumnSpan="3"
-                Margin="0,20,8,0"
+                Margin="0,20,8,2"
                 HorizontalAlignment="Right"
                 VerticalAlignment="Center"
                 FontSize="12"
@@ -143,9 +144,23 @@
                 Grid.Row="3"
                 Grid.Column="0"
                 Grid.ColumnSpan="3"
+                Margin="0,2,8,2"
                 HorizontalAlignment="Right"
                 VerticalAlignment="Center"
-                Margin="0,0,8,0"
+                FontSize="12"
+                FontFamily="Cascadia Code"
+                Content="Edit actions..."
+                Command="{Binding EditActionCommand}"
+                Style="{DynamicResource TextBlockLikeButtonStyle}"
+                />
+
+            <Button
+                Grid.Row="4"
+                Grid.Column="0"
+                Grid.ColumnSpan="3"
+                HorizontalAlignment="Right"
+                VerticalAlignment="Center"
+                Margin="0,2,8,2"
                 FontSize="12"
                 FontFamily="Cascadia Code"
                 Content="Edit global MCP tools..."
@@ -155,7 +170,7 @@
                 />
 
             <Label
-                Grid.Row="4"
+                Grid.Row="5"
                 Grid.Column="0"
                 HorizontalAlignment="Left"
                 VerticalAlignment="Center"
@@ -166,7 +181,7 @@
                 />
 
             <Label
-                Grid.Row="4"
+                Grid.Row="5"
                 Grid.Column="1"
                 Margin="0,20,8,0"
                 Padding="0"
@@ -178,7 +193,7 @@
                 />
 
             <Button
-                Grid.Row="4"
+                Grid.Row="5"
                 Grid.Column="2"
                 HorizontalAlignment="Right"
                 VerticalAlignment="Center"
