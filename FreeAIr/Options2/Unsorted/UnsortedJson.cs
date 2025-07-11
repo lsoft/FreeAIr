@@ -48,12 +48,25 @@ namespace FreeAIr.Options2.Unsorted
             set;
         } = 1500;
 
-        [Description("A github.com MCP server token.")]
+        [Description("A secret token for github.com MCP server. You can store here your token directly, or you can store your token in MY_VAR environment variable, and use here {$MY_VAR} value to retrieve your token from env vars. Do not forget to restart VS after setting the env var.")]
         public string GitHubToken
         {
             get;
             set;
         } = "place your github.com token here";
+
+        public string GetGitHubToken()
+        {
+            if (GitHubToken.StartsWith("{$") && GitHubToken.EndsWith("}"))
+            {
+                //it's a env var!
+                var varName = GitHubToken.Substring(2, GitHubToken.Length - 3);
+                var result = Environment.GetEnvironmentVariable(varName);
+                return result;
+            }
+
+            return GitHubToken;
+        }
 
         [Description("If you are using a free model, it means slow response (a few seconds) and daily limit for prompt count. In this case you do not want FreeAIr make whole line completion prompts automatically. If so, keep this in 'False', you still able to invoke this explicitly with Alt+A.")]
         public bool IsImplicitWholeLineCompletionEnabled

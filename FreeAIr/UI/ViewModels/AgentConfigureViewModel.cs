@@ -24,6 +24,8 @@ namespace FreeAIr.UI.ViewModels
         private ICommand _replaceGenerateNLOSystemPromptCommand;
         private ICommand _replaceExtractNLOSystemPromptCommand;
         private ICommand _chooseModelCommand;
+        private ICommand _upAgentCommand;
+        private ICommand _downAgentCommand;
 
         public Action<bool>? CloseWindow
         {
@@ -116,6 +118,88 @@ namespace FreeAIr.UI.ViewModels
             }
         }
 
+        public ICommand UpAgentCommand
+        {
+            get
+            {
+                if (_upAgentCommand is null)
+                {
+                    _upAgentCommand = new RelayCommand(
+                        a =>
+                        {
+                            var index = AgentCollection.Agents.IndexOf(_selectedAgent);
+                            AgentCollection.Agents.RemoveAt(index);
+                            AgentCollection.Agents.Insert(index - 1, _selectedAgent);
+                            _selectedAgent = null;
+
+                            var aa = AvailableAgents[index];
+                            AvailableAgents.RemoveAt(index);
+                            AvailableAgents.Insert(index - 1, aa);
+
+                            OnPropertyChanged();
+                        },
+                        a =>
+                        {
+                            if (_selectedAgent is null)
+                            {
+                                return false;
+                            }
+
+                            var index = AgentCollection.Agents.IndexOf(_selectedAgent);
+                            if (index <= 0)
+                            {
+                                return false;
+                            }
+
+                            return true;
+                        });
+                }
+
+                return _upAgentCommand;
+            }
+        }
+
+        public ICommand DownAgentCommand
+        {
+            get
+            {
+                if (_downAgentCommand is null)
+                {
+                    _downAgentCommand = new RelayCommand(
+                        a =>
+                        {
+                            var index = AgentCollection.Agents.IndexOf(_selectedAgent);
+                            AgentCollection.Agents.RemoveAt(index);
+                            AgentCollection.Agents.Insert(index + 1, _selectedAgent);
+                            _selectedAgent = null;
+
+                            var aa = AvailableAgents[index];
+                            AvailableAgents.RemoveAt(index);
+                            AvailableAgents.Insert(index + 1, aa);
+
+                            OnPropertyChanged();
+                        },
+                        a =>
+                        {
+                            if (_selectedAgent is null)
+                            {
+                                return false;
+                            }
+
+                            var index = AgentCollection.Agents.IndexOf(_selectedAgent);
+                            if (index >= AgentCollection.Agents.Count - 1)
+                            {
+                                return false;
+                            }
+
+                            return true;
+                        });
+                }
+
+                return _downAgentCommand;
+            }
+        }
+
         public ICommand ApplyAndCloseCommand
         {
             get
@@ -147,7 +231,7 @@ namespace FreeAIr.UI.ViewModels
                         async a =>
                         {
                             var chosenModelId = await ModelContextMenu.ChooseModelFromProviderAsync(
-                                token: SelectedAgent.Technical.Token,
+                                token: SelectedAgent.Technical.GetToken(),
                                 endpoint: SelectedAgent.Technical.Endpoint,
                                 title: "Choose model from this api endpoint:",
                                 null

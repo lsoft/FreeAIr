@@ -1,7 +1,9 @@
 ﻿using FreeAIr.Helper;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace FreeAIr.Options2.Agent
@@ -65,6 +67,7 @@ namespace FreeAIr.Options2.Agent
         }
     }
 
+    [JsonConverter(typeof(JsonDescriptionCommentConverter<AgentTechnical>))]
     public sealed class AgentTechnical : ICloneable
     {
         /// <summary>
@@ -79,10 +82,24 @@ namespace FreeAIr.Options2.Agent
         /// <summary>
         /// A token of LLM API provider.
         /// </summary>
+        [Description("A secret token for this agent. You can store here your token directly, or you can store your token in MY_VAR environment variable, and use here {$MY_VAR} value to retrieve your token from env vars. Do not forget to restart VS after setting the env var.")]
         public string Token
         {
             get;
             set;
+        }
+
+        public string GetToken()
+        {
+            if (Token.StartsWith("{$") && Token.EndsWith("}"))
+            {
+                //it's a env var!
+                var varName = Token.Substring(2, Token.Length - 3);
+                var result = Environment.GetEnvironmentVariable(varName);
+                return result;
+            }
+
+            return Token;
         }
 
         /// <summary>

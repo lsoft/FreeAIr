@@ -24,31 +24,31 @@
         </Strings>
       </Menu>
 
-      <Menu guid="FreeAIr" id="SolutionContextMenu" priority="0x0000" type="Menu">
+      <Menu guid="FreeAIr" id="SolutionTreeContextMenu" priority="0x0000" type="Menu">
         <Parent guid="VSMainMenu" id="ItemNode.OpenGroup" />
         <Strings>
           <ButtonText>FreeAIr support</ButtonText>
         </Strings>
       </Menu>
-      <Menu guid="FreeAIr" id="SolutionContextMenu" priority="0x0000" type="Menu">
+      <Menu guid="FreeAIr" id="SolutionTreeContextMenu" priority="0x0000" type="Menu">
         <Parent guid="VSMainMenu" id="FolderNode.AddGroup" />
         <Strings>
           <ButtonText>FreeAIr support</ButtonText>
         </Strings>
       </Menu>
-      <Menu guid="FreeAIr" id="SolutionContextMenu" priority="0x0000" type="Menu">
+      <Menu guid="FreeAIr" id="SolutionTreeContextMenu" priority="0x0000" type="Menu">
         <Parent guid="VSMainMenu" id="ProjectNode.BuildGroup" />
         <Strings>
           <ButtonText>FreeAIr support</ButtonText>
         </Strings>
       </Menu>
-      <Menu guid="FreeAIr" id="SolutionContextMenu" priority="0x0000" type="Menu">
+      <Menu guid="FreeAIr" id="SolutionTreeContextMenu" priority="0x0000" type="Menu">
         <Parent guid="VSMainMenu" id="SolutionNode.BuildGroup" />
         <Strings>
           <ButtonText>FreeAIr support</ButtonText>
         </Strings>
       </Menu>
-      <Menu guid="FreeAIr" id="SolutionContextMenu" priority="0x0000" type="Menu">
+      <Menu guid="FreeAIr" id="SolutionTreeContextMenu" priority="0x0000" type="Menu">
         <Parent guid="VSMainMenu" id="SolutionFolder.BuildGroup" />
         <Strings>
           <ButtonText>FreeAIr support</ButtonText>
@@ -80,8 +80,8 @@
         <Parent guid="FreeAIr" id="SubExtensionMenu" />
       </Group>
 
-      <Group guid="FreeAIr" id="SolutionContextGroup" priority="0x0600">
-        <Parent guid="FreeAIr" id="SolutionContextMenu" />
+      <Group guid="FreeAIr" id="SolutionTreeContextGroup" priority="0x0600">
+        <Parent guid="FreeAIr" id="SolutionTreeContextMenu" />
       </Group>
 
       <Group guid="FreeAIr" id="BuildErrorWindowGroup" priority="0x0600">
@@ -178,7 +178,7 @@
       </Button>
 
       <Button guid="FreeAIr" id="ApplyFileSupportCommandId" priority="0x0100" type="Button">
-        <Parent guid="FreeAIr" id="SolutionContextGroup" />
+        <Parent guid="FreeAIr" id="SolutionTreeContextGroup" />
         <Icon guid="ImageCatalogGuid" id="ApplyCodeChanges" />
         <CommandFlag>IconIsMoniker</CommandFlag>
         <Strings>
@@ -186,7 +186,7 @@
         </Strings>
       </Button>
       <Button guid="FreeAIr" id="AddNaturalLanguageOutlinesCommandId" priority="0x0100" type="Button">
-        <Parent guid="FreeAIr" id="SolutionContextGroup" />
+        <Parent guid="FreeAIr" id="SolutionTreeContextGroup" />
         <Icon guid="ImageCatalogGuid" id="DocumentOutline" />
         <CommandFlag>IconIsMoniker</CommandFlag>
         <Strings>
@@ -250,19 +250,17 @@
 
       <IDSymbol name="SubExtensionMenu" value="0x1006" />
 
-      <IDSymbol name="ApplySupportCommandId" value="0x1021" />
-      <IDSymbol name="StartDiscussionCommandId" value="0x1022" />
-      <IDSymbol name="GenerateWholeLineSuggestionCommand" value="0x1023" />
+      <IDSymbol name="ApplySupportCommandId" value="0x1011" />
+      <IDSymbol name="StartDiscussionCommandId" value="0x1012" />
+      <IDSymbol name="GenerateWholeLineSuggestionCommand" value="0x1013" />
 
-      <IDSymbol name="ChooseModelCommandId" value="0x1024" />
-      <IDSymbol name="OpenChatListToolWindowCommandId" value="0x1025" />
+      <IDSymbol name="ChooseModelCommandId" value="0x1014" />
+      <IDSymbol name="OpenChatListToolWindowCommandId" value="0x1015" />
 
-      <IDSymbol name="SolutionContextMenu" value="0x1026" />
-      <IDSymbol name="SolutionContextGroup" value="0x1027" />
+      <IDSymbol name="SolutionTreeContextMenu" value="0x1026" />
+      <IDSymbol name="SolutionTreeContextGroup" value="0x1027" />
 
       <IDSymbol name="ApplyFileSupportCommandId" value="0x1028" />
-
-      <IDSymbol name="GenerateUnitTestsCommandId" value="0x1035" />
 
       <IDSymbol name="CodeLens_AddXmlCommentCommandId" value="0x1036" />
       <IDSymbol name="CodeLens_GenerateUnitTestsCommandId" value="0x1037" />

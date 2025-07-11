@@ -2,11 +2,14 @@
 using FreeAIr.BLogic;
 using FreeAIr.BLogic.Context.Composer;
 using FreeAIr.BLogic.Context.Item;
+using FreeAIr.Helper;
 using FreeAIr.Options2.Support;
 using FreeAIr.UI.ContextMenu;
 using FreeAIr.UI.ToolWindows;
 using Microsoft.VisualStudio.ComponentModelHost;
+using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 
 namespace FreeAIr.Commands.File
 {
@@ -25,12 +28,7 @@ namespace FreeAIr.Commands.File
             var componentModel = (IComponentModel)await FreeAIrPackage.Instance.GetServiceAsync(typeof(SComponentModel));
             var chatContainer = componentModel.GetService<ChatContainer>();
 
-            var sew = await VS.Windows.GetSolutionExplorerWindowAsync();
-            var selections = (await sew.GetSelectionAsync()).ToList();
-            if (selections.Count == 0)
-            {
-                return;
-            }
+            var allSelectedFiles = await GetSelectedFilesAsync();
 
             var chosenSupportAction = await SupportContextMenu.ChooseSupportAsync(
                 "Choose support action:",
@@ -42,7 +40,7 @@ namespace FreeAIr.Commands.File
             }
 
             var supportContext = await SupportContext.WithSolutionItemsAsync(
-                selections
+                allSelectedFiles
                 );
 
             var chosenAgent = await AgentContextMenu.ChooseAgentWithTokenAsync(
@@ -66,21 +64,21 @@ namespace FreeAIr.Commands.File
                 return;
             }
 
-            foreach (var selection in selections)
+            foreach (var selectedFile in allSelectedFiles)
             {
-                if (selection.Type != SolutionItemType.PhysicalFile)
+                if (selectedFile.Type != SolutionItemType.PhysicalFile)
                 {
                     continue;
                 }
 
                 var contextItems = (await CSharpContextComposer.ComposeFromFilePathAsync(
-                    selection.FullPath
+                    selectedFile.FullPath
                     )).ConvertToChatContextItem();
 
                 chat.ChatContext.AddItem(
                     new SolutionItemChatContextItem(
                         new UI.Embedillo.Answer.Parser.SelectedIdentifier(
-                            selection.FullPath,
+                            selectedFile.FullPath,
                             null
                             ),
                         false,
@@ -104,6 +102,29 @@ namespace FreeAIr.Commands.File
                 );
 
             await ChatListToolWindow.ShowIfEnabledAsync();
+        }
+
+        private static async System.Threading.Tasks.Task<List<SolutionItem>> GetSelectedFilesAsync()
+        {
+            var sew = await VS.Windows.GetSolutionExplorerWindowAsync();
+            var selections = await sew.GetSelectionAsync();
+
+            var allChildren = new List<SolutionItem>();
+            foreach (var selection in selections)
+            {
+                var children = await selection.ProcessDownRecursivelyForAsync(
+                    item =>
+                        !item.IsNonVisibleItem
+                        && item.Type == SolutionItemType.PhysicalFile
+                        && item.FullPath.GetFileType() == FileTypeEnum.Text
+                        ,
+                    false,
+                    CancellationToken.None
+                    );
+                allChildren.AddRange(children.Select(c => c.SolutionItem));
+            }
+
+            return allChildren;
         }
     }
 }

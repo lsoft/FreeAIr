@@ -70,7 +70,7 @@ namespace FreeAIr.MCP.McpServerProxy.Github
             return new Dictionary<string, string>
             {
                 ["MCPServerFolderPath"] = MCPServerFolderPath,
-                ["GitHubToken"] = (await FreeAIrOptions.DeserializeUnsortedAsync()).GitHubToken,
+                ["GitHubToken"] = (await FreeAIrOptions.DeserializeUnsortedAsync()).GetGitHubToken(),
             };
         }
 

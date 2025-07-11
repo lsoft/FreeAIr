@@ -236,7 +236,7 @@ namespace FreeAIr.BLogic
                 var chatClient = new ChatClient(
                     model: chosenAgent.Technical.ChosenModel,
                     new ApiKeyCredential(
-                        chosenAgent.Technical.Token
+                        chosenAgent.Technical.GetToken()
                         ),
                     new OpenAIClientOptions
                     {

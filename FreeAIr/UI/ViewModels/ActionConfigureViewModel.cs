@@ -1,6 +1,4 @@
 ﻿using FreeAIr.Helper;
-using FreeAIr.Options2;
-using FreeAIr.Options2.Agent;
 using FreeAIr.Options2.Support;
 using Microsoft.VisualStudio.Imaging;
 using Microsoft.VisualStudio.Imaging.Interop;
@@ -22,6 +20,8 @@ namespace FreeAIr.UI.ViewModels
         private ICommand _deleteActionCommand;
         private ICommand _applyAndCloseCommand;
         private ICommand _addAnchorCommand;
+        private ICommand _downActionCommand;
+        private ICommand _upActionCommand;
 
         public Action<bool>? CloseWindow
         {
@@ -123,6 +123,88 @@ namespace FreeAIr.UI.ViewModels
                 }
 
                 return _deleteActionCommand;
+            }
+        }
+
+        public ICommand UpActionCommand
+        {
+            get
+            {
+                if (_upActionCommand is null)
+                {
+                    _upActionCommand = new RelayCommand(
+                        a =>
+                        {
+                            var index = ActionCollection.Actions.IndexOf(_selectedAction);
+                            ActionCollection.Actions.RemoveAt(index);
+                            ActionCollection.Actions.Insert(index - 1, _selectedAction);
+                            _selectedAction = null;
+
+                            var aa = AvailableActions[index];
+                            AvailableActions.RemoveAt(index);
+                            AvailableActions.Insert(index - 1, aa);
+
+                            OnPropertyChanged();
+                        },
+                        a =>
+                        {
+                            if (_selectedAction is null)
+                            {
+                                return false;
+                            }
+
+                            var index = ActionCollection.Actions.IndexOf(_selectedAction);
+                            if (index <= 0)
+                            {
+                                return false;
+                            }
+
+                            return true;
+                        });
+                }
+
+                return _upActionCommand;
+            }
+        }
+
+        public ICommand DownActionCommand
+        {
+            get
+            {
+                if (_downActionCommand is null)
+                {
+                    _downActionCommand = new RelayCommand(
+                        a =>
+                        {
+                            var index = ActionCollection.Actions.IndexOf(_selectedAction);
+                            ActionCollection.Actions.RemoveAt(index);
+                            ActionCollection.Actions.Insert(index + 1, _selectedAction);
+                            _selectedAction = null;
+
+                            var aa = AvailableActions[index];
+                            AvailableActions.RemoveAt(index);
+                            AvailableActions.Insert(index + 1, aa);
+
+                            OnPropertyChanged();
+                        },
+                        a =>
+                        {
+                            if (_selectedAction is null)
+                            {
+                                return false;
+                            }
+
+                            var index = ActionCollection.Actions.IndexOf(_selectedAction);
+                            if (index >= ActionCollection.Actions.Count - 1)
+                            {
+                                return false;
+                            }
+
+                            return true;
+                        });
+                }
+
+                return _downActionCommand;
             }
         }
 

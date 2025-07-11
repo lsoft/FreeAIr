@@ -35,6 +35,8 @@
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="auto" />
                 <ColumnDefinition Width="auto" />
+                <ColumnDefinition Width="auto" />
+                <ColumnDefinition Width="auto" />
                 <ColumnDefinition />
             </Grid.ColumnDefinitions>
 
@@ -62,8 +64,32 @@
                 Command="{Binding DeleteAgentCommand}"
                 Style="{DynamicResource TextBlockLikeButtonStyle}"
                 />
+
             <Button
                 Grid.Column="2"
+                Content="↑"
+                Margin="15,0,5,0"
+                FontSize="12"
+                FontFamily="Cascadia Code"
+                VerticalAlignment="Center"
+                ToolTip="Move selected agent up"
+                Command="{Binding UpAgentCommand}"
+                Style="{DynamicResource TextBlockLikeButtonStyle}"
+                />
+            <Button
+                Grid.Column="3"
+                Content="↓"
+                Margin="5,0,5,0"
+                FontSize="12"
+                FontFamily="Cascadia Code"
+                VerticalAlignment="Center"
+                ToolTip="Move selected agent down"
+                Command="{Binding DownAgentCommand}"
+                Style="{DynamicResource TextBlockLikeButtonStyle}"
+                />
+
+            <Button
+                Grid.Column="4"
                 Content="Apply changes"
                 Margin="5,0,5,0"
                 FontSize="12"

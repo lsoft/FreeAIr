@@ -1,15 +1,10 @@
 ﻿using EnvDTE;
 using FreeAIr.BLogic.Context.Item;
 using FreeAIr.Helper;
-using FreeAIr.NLOutline;
-using FreeAIr.Options2;
-using FreeAIr.Options2.Agent;
 using FreeAIr.Options2.Support;
 using FreeAIr.UI.ContextMenu;
-using FreeAIr.UI.ToolWindows;
 using FreeAIr.UI.ViewModels;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 
 namespace FreeAIr.Commands.File
@@ -20,6 +15,11 @@ namespace FreeAIr.Commands.File
         public AddNaturalLanguageOutlinesCommand(
             )
         {
+        }
+
+        protected override void BeforeQueryStatus(EventArgs e)
+        {
+            this.Command.Enabled = DTEHelper.CheckIfOnlySolutionSelected();
         }
 
         protected override async Task ExecuteAsync(OleMenuCmdEventArgs e)

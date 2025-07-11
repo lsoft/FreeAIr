@@ -1,7 +1,35 @@
-﻿namespace FreeAIr.Helper
+﻿using EnvDTE;
+using EnvDTE80;
+
+namespace FreeAIr.Helper
 {
     public static class DTEHelper
     {
+        public static bool CheckIfOnlySolutionSelected(
+            )
+        {
+            ThreadHelper.ThrowIfNotOnUIThread();
+
+            var dte = AsyncPackage.GetGlobalService(typeof(EnvDTE.DTE)) as DTE2;
+
+            UIHierarchy solutionExplorer = dte.ToolWindows.SolutionExplorer;
+            UIHierarchyItem[] selectedItems = (UIHierarchyItem[])solutionExplorer.SelectedItems;
+
+            if (selectedItems.Length != 1)
+            {
+                return false;
+            }
+
+            UIHierarchyItem item = selectedItems[0];
+            var solutionItem = item.Object as EnvDTE.Solution;
+            if (solutionItem is null)
+            {
+                return false;
+            }
+
+            return true;
+        }
+
         public static EnvDTE.Project? TryFindProject(
             this EnvDTE.DTE dte,
             string projectName

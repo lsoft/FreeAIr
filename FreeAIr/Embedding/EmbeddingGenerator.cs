@@ -30,7 +30,7 @@ namespace FreeAIr.Embedding
             _embeddingClient = new EmbeddingClient(
                 agent.Technical.ChosenModel,
                 new ApiKeyCredential(
-                    agent.Technical.Token
+                    agent.Technical.GetToken()
                     ),
                 new OpenAIClientOptions
                 {

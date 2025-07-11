@@ -74,7 +74,7 @@ namespace FreeAIr.Options2.Agent
                     Technical = new AgentTechnical
                     {
                         Endpoint = "https://llm.api.cloud.yandex.net/v1",
-                        Token = "",
+                        Token = "{$MY_YANDEX_TOKEN}",
                         ChosenModel = "unknown",
                         ContextSize = 16384
                     }
