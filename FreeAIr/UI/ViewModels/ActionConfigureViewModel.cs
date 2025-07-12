@@ -1,4 +1,5 @@
 ﻿using FreeAIr.Helper;
+using FreeAIr.Options2.Agent;
 using FreeAIr.Options2.Support;
 using Microsoft.VisualStudio.Imaging;
 using Microsoft.VisualStudio.Imaging.Interop;
@@ -22,6 +23,7 @@ namespace FreeAIr.UI.ViewModels
         private ICommand _addAnchorCommand;
         private ICommand _downActionCommand;
         private ICommand _upActionCommand;
+        private ICommand _cloneActionCommand;
 
         public Action<bool>? CloseWindow
         {
@@ -205,6 +207,37 @@ namespace FreeAIr.UI.ViewModels
                 }
 
                 return _downActionCommand;
+            }
+        }
+
+        public ICommand CloneActionCommand
+        {
+            get
+            {
+                if (_cloneActionCommand is null)
+                {
+                    _cloneActionCommand = new RelayCommand(
+                        a =>
+                        {
+                            var clone = (SupportActionJson)_selectedAction.Clone();
+                            clone.Name += " (cloned)";
+                            ActionCollection.Actions.Add(clone);
+                            AvailableActions.Add(clone);
+
+                            OnPropertyChanged();
+                        },
+                        a =>
+                        {
+                            if (_selectedAction is null)
+                            {
+                                return false;
+                            }
+
+                            return true;
+                        });
+                }
+
+                return _cloneActionCommand;
             }
         }
 

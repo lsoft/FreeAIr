@@ -22,7 +22,6 @@ namespace FreeAIr.Commands.Other
             var w = new ControlCenterWindow(
                 );
             var vm = new ControlCenterViewModel(
-                await FreeAIrOptions.DeserializeAsync()
                 );
             w.DataContext = vm;
             _ = await w.ShowDialogAsync();

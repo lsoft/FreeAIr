@@ -53,7 +53,7 @@ namespace FreeAIr.Options2.Unsorted
         {
             get;
             set;
-        } = "place your github.com token here";
+        } = "{$MY_GITHUB_TOKEN}";
 
         public string GetGitHubToken()
         {

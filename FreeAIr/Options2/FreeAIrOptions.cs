@@ -93,71 +93,80 @@ namespace FreeAIr.Options2
 
         public static async Task<AvailableMcpServersJson> DeserializeAvailableToolsAsync()
         {
-            var options = await DeserializeAsync();
+            var options = await DeserializeAsync(null);
             return options.AvailableTools;
         }
 
         public static async Task<McpServers> DeserializeMcpServersAsync()
         {
-            var options = await DeserializeAsync();
+            var options = await DeserializeAsync(null);
             return options.AvailableMcpServers;
         }
 
         public static async Task<UnsortedJson> DeserializeUnsortedAsync()
         {
-            var options = await DeserializeAsync();
+            var options = await DeserializeAsync(null);
             return options.Unsorted;
         }
 
         public static async Task<AgentCollectionJson> DeserializeAgentCollectionAsync()
         {
-            var options = await DeserializeAsync();
+            var options = await DeserializeAsync(null);
             return options.AgentCollection;
         }
 
         public static async Task<SupportCollectionJson> DeserializeSupportCollectionAsync()
         {
-            var options = await DeserializeAsync();
+            var options = await DeserializeAsync(null);
             return options.Supports;
         }
         
-        public static async Task<FreeAIrOptions> DeserializeAsync()
+        public static async Task<FreeAIrOptions> DeserializeAsync(
+            OptionsPlaceEnum? place = null
+            )
         {
             try
             {
-                var filePath = await ComposeFilePathAsync();
-                if (!string.IsNullOrEmpty(filePath))
+                if (!place.HasValue || place.Value == OptionsPlaceEnum.SolutionRelatedFilePath)
                 {
-                    var fileResult = await DataPieceCache.GetValueAsync<FreeAIrOptions>(
-                        filePath,
-                        (fp) => File.Exists(fp),
-                        (fp) =>
-                        {
-                            var fileInfo = new FileInfo(fp);
-                            var newSignature = fileInfo.LastWriteTimeUtc;
-                            return newSignature;
-                        },
-                        async (fp) =>
-                        {
-                            if (!File.Exists(fp))
-                            {
-                                return null;
-                            }
-
-                            using var fs = new FileStream(fp, FileMode.Open);
-                            var options = await JsonSerializer.DeserializeAsync<FreeAIrOptions>(fs, _readOptions);
-                            return options;
-                        }
-                        );
-                    if (fileResult is not null)
+                    var filePath = await ComposeFilePathAsync();
+                    if (!string.IsNullOrEmpty(filePath))
                     {
-                        return fileResult;
+                        var fileResult = await DataPieceCache.GetValueAsync<FreeAIrOptions>(
+                            filePath,
+                            (fp) => File.Exists(fp),
+                            (fp) =>
+                            {
+                                var fileInfo = new FileInfo(fp);
+                                var newSignature = fileInfo.LastWriteTimeUtc;
+                                return newSignature;
+                            },
+                            async (fp) =>
+                            {
+                                if (!File.Exists(fp))
+                                {
+                                    return null;
+                                }
+
+                                using var fs = new FileStream(fp, FileMode.Open);
+                                var options = await JsonSerializer.DeserializeAsync<FreeAIrOptions>(fs, _readOptions);
+                                return options;
+                            }
+                            );
+                        if (fileResult is not null
+                            || (place.HasValue && place.Value == OptionsPlaceEnum.SolutionRelatedFilePath)
+                            )
+                        {
+                            return fileResult;
+                        }
                     }
                 }
                 //file does not exists
 
-                //trying to load options from Visual Studio
-                var vsResult = await DataPieceCache.GetValueAsync<FreeAIrOptions>(
+                if (!place.HasValue || place.Value == OptionsPlaceEnum.VisualStudioOption)
+                {
+                    //trying to load options from Visual Studio
+                    var vsResult = await DataPieceCache.GetValueAsync<FreeAIrOptions>(
                     "::VSOptions", //just a key which cannot be a file path
                     (o) => !string.IsNullOrEmpty(InternalPage.Instance.Options),
                     (o) =>
@@ -170,9 +179,12 @@ namespace FreeAIr.Options2
                         return Task.FromResult((ICloneable)result.Clone());
                     }
                     );
-                if (vsResult is not null)
-                {
-                    return vsResult;
+                    if (vsResult is not null
+                        || (place.HasValue && place.Value == OptionsPlaceEnum.VisualStudioOption)
+                        )
+                    {
+                        return vsResult;
+                    }
                 }
             }
             catch (Exception excp)
@@ -263,22 +275,8 @@ namespace FreeAIr.Options2
                 throw new ArgumentNullException(nameof(tools));
             }
 
-            var options = await FreeAIrOptions.DeserializeAsync();
+            var options = await FreeAIrOptions.DeserializeAsync(null);
             options.AvailableTools = tools;
-            await options.SerializeAsync(null);
-        }
-
-        public static async Task SaveMcpServersAsync(
-            McpServers servers
-            )
-        {
-            if (servers is null)
-            {
-                throw new ArgumentNullException(nameof(servers));
-            }
-
-            var options = await FreeAIrOptions.DeserializeAsync();
-            options.AvailableMcpServers = servers;
             await options.SerializeAsync(null);
         }
 
@@ -291,7 +289,7 @@ namespace FreeAIr.Options2
                 throw new ArgumentNullException(nameof(agentCollection));
             }
 
-            var options = await FreeAIrOptions.DeserializeAsync();
+            var options = await FreeAIrOptions.DeserializeAsync(null);
             options.AgentCollection = agentCollection;
             await options.SerializeAsync(null);
         }

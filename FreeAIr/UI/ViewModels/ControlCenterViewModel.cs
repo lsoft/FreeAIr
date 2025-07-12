@@ -4,6 +4,7 @@ using FreeAIr.Options2;
 using FreeAIr.UI.Windows;
 using Microsoft.VisualStudio.Shell.Interop;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
@@ -20,6 +21,7 @@ namespace FreeAIr.UI.ViewModels
 
         private bool? _githubMcpServerStatus;
         private string _optionsJson;
+        private string _originalJson;
 
         public string GithubMcpServerStatusMessage
         {
@@ -54,16 +56,21 @@ namespace FreeAIr.UI.ViewModels
             }
         }
 
-        public Brush OptionsJsonBorder
+        public Brush StatusJsonBorder
         {
             get
             {
-                if (_cachedDeserializer.TryDeserializeFromString(_optionsJson, out _, out _))
+                if (!_cachedDeserializer.TryDeserializeFromString(_optionsJson, out _, out _))
                 {
-                    return Brushes.Green;
+                    return Brushes.Red;
                 }
 
-                return Brushes.Red;
+                if (_originalJson != _optionsJson)
+                {
+                    return Brushes.Orange;
+                }
+
+                return Brushes.Green;
             }
         }
 
@@ -74,6 +81,11 @@ namespace FreeAIr.UI.ViewModels
                 if (!_cachedDeserializer.TryDeserializeFromString(_optionsJson, out _, out var errorMessage))
                 {
                     return errorMessage;
+                }
+
+                if (_originalJson != _optionsJson)
+                {
+                    return "Current json is different from the used one. Consider saving your changes to the appropriate place (file or VS).";
                 }
 
                 return string.Empty;
@@ -88,9 +100,23 @@ namespace FreeAIr.UI.ViewModels
                 {
                     return Visibility.Visible;
                 }
+                if (_originalJson != _optionsJson)
+                {
+                    return Visibility.Visible;
+                }
 
                 return Visibility.Collapsed;
             }
+        }
+
+        public SetDefaultOptionsCmd SetDefaultOptionsCommand
+        {
+            get;
+        }
+
+        public LoadOptionsCmd LoadOptionsFromFileCommand
+        {
+            get;
         }
 
         public StoreOptionsCmd StoreOptionsToFileCommand
@@ -99,6 +125,11 @@ namespace FreeAIr.UI.ViewModels
         }
 
         public DeleteOptionsFileCmd DeleteOptionsFileCommand
+        {
+            get;
+        }
+
+        public LoadOptionsCmd LoadOptionsFromVSCommand
         {
             get;
         }
@@ -129,24 +160,25 @@ namespace FreeAIr.UI.ViewModels
         }
 
         public ControlCenterViewModel(
-            FreeAIrOptions options
             )
         {
-            if (options is null)
-            {
-                throw new ArgumentNullException(nameof(options));
-            }
-
             _githubMcpServerStatus = null;
-            OptionsJson = FreeAIrOptions.SerializeToString(
-                options
-                );
+
+            _optionsJson = string.Empty;
+            _originalJson = string.Empty;
 
             InstallGithubMCPServerCommand = new(this);
+
+            SetDefaultOptionsCommand = new SetDefaultOptionsCmd(this);
+
+            LoadOptionsFromFileCommand = new(this, OptionsPlaceEnum.SolutionRelatedFilePath);
             StoreOptionsToFileCommand = new(this, OptionsPlaceEnum.SolutionRelatedFilePath);
             DeleteOptionsFileCommand = new(this);
+
+            LoadOptionsFromVSCommand = new(this, OptionsPlaceEnum.VisualStudioOption);
             StoreAsVSOptionsCommand = new(this, OptionsPlaceEnum.VisualStudioOption);
             ClearVSOptionsCommand = new(this);
+
             EditGlobalToolsCommand = new(this);
             EditAgentCommand = new(this);
             EditActionCommand = new(this);
@@ -176,6 +208,26 @@ namespace FreeAIr.UI.ViewModels
         {
             OnPropertyChanged(nameof(GithubMcpServerStatusMessage));
             OnPropertyChanged(nameof(InstallGithubMCPServerCommand));
+        }
+
+        private async Task AcceptOptionsAsync(
+            FreeAIrOptions? options
+            )
+        {
+            if (options is null)
+            {
+                OptionsJson = string.Empty;
+            }
+            else
+            {
+                OptionsJson = FreeAIrOptions.SerializeToString(options);
+            }
+
+            _originalJson = FreeAIrOptions.SerializeToString(
+                await FreeAIrOptions.DeserializeAsync()
+                );
+
+            OnPropertyChanged();
         }
 
         public sealed class InstallGithubMCPServerCmd : AsyncBaseRelayCommand
@@ -234,11 +286,11 @@ namespace FreeAIr.UI.ViewModels
             }
         }
 
-        public sealed class ClearVSOptionsCmd : AsyncBaseRelayCommand
+        public sealed class SetDefaultOptionsCmd : AsyncBaseRelayCommand
         {
             private readonly ControlCenterViewModel _viewModel;
 
-            public ClearVSOptionsCmd(
+            public SetDefaultOptionsCmd(
                 ControlCenterViewModel viewModel
                 )
             {
@@ -254,12 +306,18 @@ namespace FreeAIr.UI.ViewModels
             {
                 try
                 {
-                    InternalPage.Instance.Options = string.Empty;
+                    if (!string.IsNullOrEmpty(_viewModel.OptionsJson))
+                    {
+                        if (!await VS.MessageBox.ShowConfirmAsync(
+                            $"Options json is not empty. Overwrite?"
+                            )
+                            )
+                        {
+                            return;
+                        }
+                    }
 
-                    await VS.MessageBox.ShowAsync(
-                        $"Options from Visual Studio has been deleted.",
-                        buttons: OLEMSGBUTTON.OLEMSGBUTTON_OK
-                        );
+                    await _viewModel.AcceptOptionsAsync(new FreeAIrOptions());
                 }
                 catch (Exception excp)
                 {
@@ -273,12 +331,14 @@ namespace FreeAIr.UI.ViewModels
 
         }
 
-        public sealed class DeleteOptionsFileCmd : AsyncBaseRelayCommand
+        public sealed class LoadOptionsCmd : AsyncBaseRelayCommand
         {
             private readonly ControlCenterViewModel _viewModel;
+            private readonly OptionsPlaceEnum? _place;
 
-            public DeleteOptionsFileCmd(
-                ControlCenterViewModel viewModel
+            public LoadOptionsCmd(
+                ControlCenterViewModel viewModel,
+                OptionsPlaceEnum? place
                 )
             {
                 if (viewModel is null)
@@ -287,22 +347,48 @@ namespace FreeAIr.UI.ViewModels
                 }
 
                 _viewModel = viewModel;
+                _place = place;
             }
 
             protected override async Task ExecuteInternalAsync(object parameter)
             {
                 try
                 {
-                    var filePath = await FreeAIrOptions.ComposeFilePathAsync();
-                    if (System.IO.File.Exists(filePath))
+                    if (!string.IsNullOrEmpty(_viewModel.OptionsJson))
                     {
-                        System.IO.File.Delete(filePath);
+                        if (!await VS.MessageBox.ShowConfirmAsync(
+                            $"Options json is not empty. Overwrite?"
+                            )
+                            )
+                        {
+                            return;
+                        }
                     }
 
-                    await VS.MessageBox.ShowAsync(
-                        $"Options file {filePath} has been deleted.",
-                        buttons: OLEMSGBUTTON.OLEMSGBUTTON_OK
-                        );
+                    if (_place.HasValue && _place.Value == OptionsPlaceEnum.SolutionRelatedFilePath)
+                    {
+                        var filePath = await FreeAIrOptions.ComposeFilePathAsync();
+                        if (!File.Exists(filePath))
+                        {
+                            await VS.MessageBox.ShowErrorAsync(
+                                $"FreeAIr options file does not found: {filePath}"
+                                );
+                            return;
+                        }
+                    }
+                    else if (_place.HasValue && _place.Value == OptionsPlaceEnum.VisualStudioOption)
+                    {
+                        if (string.IsNullOrEmpty(InternalPage.Instance.Options))
+                        {
+                            await VS.MessageBox.ShowErrorAsync(
+                                $"Visual studio has to active FreeAIr options."
+                                );
+                            return;
+                        }
+                    }
+
+                    var options = await FreeAIrOptions.DeserializeAsync(_place);
+                    await _viewModel.AcceptOptionsAsync(options);
                 }
                 catch (Exception excp)
                 {
@@ -314,6 +400,10 @@ namespace FreeAIr.UI.ViewModels
                 }
             }
 
+            protected override bool CanExecuteInternal(object parameter)
+            {
+                return true;
+            }
         }
 
         public sealed class StoreOptionsCmd : AsyncBaseRelayCommand
@@ -437,6 +527,88 @@ namespace FreeAIr.UI.ViewModels
 
                 return true;
             }
+        }
+
+        public sealed class ClearVSOptionsCmd : AsyncBaseRelayCommand
+        {
+            private readonly ControlCenterViewModel _viewModel;
+
+            public ClearVSOptionsCmd(
+                ControlCenterViewModel viewModel
+                )
+            {
+                if (viewModel is null)
+                {
+                    throw new ArgumentNullException(nameof(viewModel));
+                }
+
+                _viewModel = viewModel;
+            }
+
+            protected override async Task ExecuteInternalAsync(object parameter)
+            {
+                try
+                {
+                    InternalPage.Instance.Options = string.Empty;
+
+                    await VS.MessageBox.ShowAsync(
+                        $"Options from Visual Studio has been deleted.",
+                        buttons: OLEMSGBUTTON.OLEMSGBUTTON_OK
+                        );
+                }
+                catch (Exception excp)
+                {
+                    //todo log
+                    await VS.MessageBox.ShowErrorAsync(
+                        Resources.Resources.Error,
+                        excp.Message + Environment.NewLine + excp.StackTrace
+                        );
+                }
+            }
+
+        }
+
+        public sealed class DeleteOptionsFileCmd : AsyncBaseRelayCommand
+        {
+            private readonly ControlCenterViewModel _viewModel;
+
+            public DeleteOptionsFileCmd(
+                ControlCenterViewModel viewModel
+                )
+            {
+                if (viewModel is null)
+                {
+                    throw new ArgumentNullException(nameof(viewModel));
+                }
+
+                _viewModel = viewModel;
+            }
+
+            protected override async Task ExecuteInternalAsync(object parameter)
+            {
+                try
+                {
+                    var filePath = await FreeAIrOptions.ComposeFilePathAsync();
+                    if (System.IO.File.Exists(filePath))
+                    {
+                        System.IO.File.Delete(filePath);
+                    }
+
+                    await VS.MessageBox.ShowAsync(
+                        $"Options file {filePath} has been deleted.",
+                        buttons: OLEMSGBUTTON.OLEMSGBUTTON_OK
+                        );
+                }
+                catch (Exception excp)
+                {
+                    //todo log
+                    await VS.MessageBox.ShowErrorAsync(
+                        Resources.Resources.Error,
+                        excp.Message + Environment.NewLine + excp.StackTrace
+                        );
+                }
+            }
+
         }
 
         public sealed class EditGlobalToolsCmd : AsyncBaseRelayCommand

@@ -42,7 +42,7 @@
                 Grid.Column="0"
                 Grid.ColumnSpan="3"
                 MaxHeight="350"
-                HorizontalScrollBarVisibility="Auto"
+                HorizontalScrollBarVisibility="Disabled"
                 VerticalScrollBarVisibility="Auto"
                 PreviewMouseWheel="ScrollViewer_PreviewMouseWheel"
                 >
@@ -53,9 +53,10 @@
                     FontSize="12"
                     FontFamily="Cascadia Code"
                     Text="{Binding OptionsJson, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                    BorderBrush="{Binding OptionsJsonBorder}"
+                    BorderBrush="{Binding StatusJsonBorder}"
                     BorderThickness="1"
                     MinHeight="150"
+                    TextWrapping="Wrap"
                     AcceptsReturn="True"
                     />
             </ScrollViewer>
@@ -65,7 +66,7 @@
                 Grid.Column="0"
                 Grid.ColumnSpan="3"
                 HorizontalAlignment="Right"
-                Foreground="Red"
+                Foreground="{Binding StatusJsonBorder}"
                 Text="{Binding OptionsJsonError}"
                 TextWrapping="Wrap"
                 TextAlignment="Right"
@@ -87,8 +88,8 @@
                     FontSize="12"
                     Margin="10,0,10,0"
                     FontFamily="Cascadia Code"
-                    Content="Store to options file..."
-                    Command="{Binding StoreOptionsToFileCommand}"
+                    Content="Use default..."
+                    Command="{Binding SetDefaultOptionsCommand}"
                     Style="{DynamicResource TextBlockLikeButtonStyle}"
                     />
 
@@ -98,7 +99,27 @@
                     FontSize="12"
                     Margin="10,0,10,0"
                     FontFamily="Cascadia Code"
-                    Content="Delete options file..."
+                    Content="Load from file..."
+                    Command="{Binding LoadOptionsFromFileCommand}"
+                    Style="{DynamicResource TextBlockLikeButtonStyle}"
+                    />
+                <Button
+                    HorizontalAlignment="Right"
+                    VerticalAlignment="Center"
+                    FontSize="12"
+                    Margin="10,0,10,0"
+                    FontFamily="Cascadia Code"
+                    Content="Save to file..."
+                    Command="{Binding StoreOptionsToFileCommand}"
+                    Style="{DynamicResource TextBlockLikeButtonStyle}"
+                    />
+                <Button
+                    HorizontalAlignment="Right"
+                    VerticalAlignment="Center"
+                    FontSize="12"
+                    Margin="10,0,10,0"
+                    FontFamily="Cascadia Code"
+                    Content="Delete file..."
                     Command="{Binding DeleteOptionsFileCommand}"
                     Style="{DynamicResource TextBlockLikeButtonStyle}"
                     />
@@ -109,18 +130,27 @@
                     FontSize="12"
                     Margin="10,0,10,0"
                     FontFamily="Cascadia Code"
-                    Content="Store as VS options..."
-                    Command="{Binding StoreAsVSOptionsCommand}"
+                    Content="Load from VS..."
+                    Command="{Binding LoadOptionsFromVSCommand}"
                     Style="{DynamicResource TextBlockLikeButtonStyle}"
                     />
-
                 <Button
                     HorizontalAlignment="Right"
                     VerticalAlignment="Center"
                     FontSize="12"
                     Margin="10,0,10,0"
                     FontFamily="Cascadia Code"
-                    Content="Clear VS options..."
+                    Content="Save into VS..."
+                    Command="{Binding StoreAsVSOptionsCommand}"
+                    Style="{DynamicResource TextBlockLikeButtonStyle}"
+                    />
+                <Button
+                    HorizontalAlignment="Right"
+                    VerticalAlignment="Center"
+                    FontSize="12"
+                    Margin="10,0,10,0"
+                    FontFamily="Cascadia Code"
+                    Content="Clear from VS..."
                     Command="{Binding ClearVSOptionsCommand}"
                     Style="{DynamicResource TextBlockLikeButtonStyle}"
                     />

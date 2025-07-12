@@ -38,6 +38,7 @@
                 <ColumnDefinition Width="auto" />
                 <ColumnDefinition Width="auto" />
                 <ColumnDefinition Width="auto" />
+                <ColumnDefinition Width="auto" />
                 <ColumnDefinition />
             </Grid.ColumnDefinitions>
 
@@ -92,6 +93,18 @@
 
             <Button
                 Grid.Column="4"
+                Content="📋"
+                Margin="15,0,5,0"
+                FontSize="12"
+                FontFamily="Cascadia Code"
+                VerticalAlignment="Center"
+                ToolTip="Clone"
+                Command="{Binding CloneActionCommand}"
+                Style="{DynamicResource TextBlockLikeButtonStyle}"
+                />
+
+            <Button
+                Grid.Column="5"
                 Content="Apply changes"
                 Margin="5,0,5,0"
                 FontSize="12"

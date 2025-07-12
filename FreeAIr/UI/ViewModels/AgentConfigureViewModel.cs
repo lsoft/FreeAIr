@@ -26,6 +26,7 @@ namespace FreeAIr.UI.ViewModels
         private ICommand _chooseModelCommand;
         private ICommand _upAgentCommand;
         private ICommand _downAgentCommand;
+        private ICommand _cloneAgentCommand;
 
         public Action<bool>? CloseWindow
         {
@@ -197,6 +198,37 @@ namespace FreeAIr.UI.ViewModels
                 }
 
                 return _downAgentCommand;
+            }
+        }
+
+        public ICommand CloneAgentCommand
+        {
+            get
+            {
+                if (_cloneAgentCommand is null)
+                {
+                    _cloneAgentCommand = new RelayCommand(
+                        a =>
+                        {
+                            var clone = (AgentJson)_selectedAgent.Clone();
+                            clone.Name += " (cloned)";
+                            AgentCollection.Agents.Add(clone);
+                            AvailableAgents.Add(clone);
+
+                            OnPropertyChanged();
+                        },
+                        a =>
+                        {
+                            if (_selectedAgent is null)
+                            {
+                                return false;
+                            }
+
+                            return true;
+                        });
+                }
+
+                return _cloneAgentCommand;
             }
         }
 
