@@ -246,6 +246,7 @@ namespace FreeAIr.Options2
                 await JsonSerializer.SerializeAsync(fs, this, _writeOptions);
                 return OptionsPlaceEnum.SolutionRelatedFilePath;
             }
+
             //serialize to VS option
             InternalPage.Instance.Options = SerializeToString(this);
             await InternalPage.Instance.SaveAsync();
@@ -327,14 +328,36 @@ namespace FreeAIr.Options2
                 );
             return filePath;
         }
+    }
 
-        /// <summary>
-        /// Where to store options.
-        /// </summary>
-        public enum OptionsPlaceEnum
+    /// <summary>
+    /// Where to store options.
+    /// </summary>
+    public enum OptionsPlaceEnum
+    {
+        SolutionRelatedFilePath,
+        VisualStudioOption
+    }
+
+
+    public static class OptionsPlaceHelper
+    {
+        public static string GetTitle(this OptionsPlaceEnum? place)
         {
-            SolutionRelatedFilePath,
-            VisualStudioOption
+            if (!place.HasValue)
+            {
+                return "Active options";
+            }
+
+            switch (place.Value)
+            {
+                case OptionsPlaceEnum.SolutionRelatedFilePath:
+                    return "Solution-related json file";
+                case OptionsPlaceEnum.VisualStudioOption:
+                    return "Visual Studio options";
+            }
+
+            throw new InvalidOperationException(place.Value.ToString());
         }
     }
 }

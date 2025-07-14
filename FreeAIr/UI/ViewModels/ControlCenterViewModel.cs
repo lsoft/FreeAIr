@@ -11,7 +11,6 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
 using WpfHelpers;
-using static FreeAIr.Options2.FreeAIrOptions;
 
 namespace FreeAIr.UI.ViewModels
 {
@@ -22,6 +21,34 @@ namespace FreeAIr.UI.ViewModels
         private bool? _githubMcpServerStatus;
         private string _optionsJson;
         private string _originalJson;
+        private PlaceViewModel _selectedPlace;
+
+        public bool PageEnabled
+        {
+            get;
+            set;
+        }
+
+        public ObservableCollection2<PlaceViewModel> PlaceList
+        {
+            get;
+        }
+
+        public PlaceViewModel SelectedPlace
+        {
+            get => _selectedPlace;
+            set
+            {
+                _selectedPlace = value;
+
+                PageEnabled = false;
+
+                AcceptOptionsAsync()
+                    .FileAndForget(nameof(AcceptOptionsAsync));
+
+                OnPropertyChanged();
+            }
+        }
 
         public string GithubMcpServerStatusMessage
         {
@@ -85,7 +112,7 @@ namespace FreeAIr.UI.ViewModels
 
                 if (_originalJson != _optionsJson)
                 {
-                    return "Current json is different from the used one. Consider saving your changes to the appropriate place (file or VS).";
+                    return "Current json is different from the saved one. Consider saving your changes.";
                 }
 
                 return string.Empty;
@@ -114,32 +141,17 @@ namespace FreeAIr.UI.ViewModels
             get;
         }
 
-        public LoadOptionsCmd LoadOptionsFromFileCommand
+        public LoadOptionsCmd LoadOptionsCommand
         {
             get;
         }
 
-        public StoreOptionsCmd StoreOptionsToFileCommand
+        public StoreOptionsCmd StoreOptionsCommand
         {
             get;
         }
 
-        public DeleteOptionsFileCmd DeleteOptionsFileCommand
-        {
-            get;
-        }
-
-        public LoadOptionsCmd LoadOptionsFromVSCommand
-        {
-            get;
-        }
-
-        public StoreOptionsCmd StoreAsVSOptionsCommand
-        {
-            get;
-        }
-
-        public ClearVSOptionsCmd ClearVSOptionsCommand
+        public DeleteOptionsCmd DeleteOptionsCommand
         {
             get;
         }
@@ -162,6 +174,13 @@ namespace FreeAIr.UI.ViewModels
         public ControlCenterViewModel(
             )
         {
+            PlaceList = new ObservableCollection2<PlaceViewModel>([
+                new (null),
+                new (OptionsPlaceEnum.SolutionRelatedFilePath),
+                new (OptionsPlaceEnum.VisualStudioOption)
+                ]);
+            _selectedPlace = PlaceList.First();
+
             _githubMcpServerStatus = null;
 
             _optionsJson = string.Empty;
@@ -171,13 +190,9 @@ namespace FreeAIr.UI.ViewModels
 
             SetDefaultOptionsCommand = new SetDefaultOptionsCmd(this);
 
-            LoadOptionsFromFileCommand = new(this, OptionsPlaceEnum.SolutionRelatedFilePath);
-            StoreOptionsToFileCommand = new(this, OptionsPlaceEnum.SolutionRelatedFilePath);
-            DeleteOptionsFileCommand = new(this);
-
-            LoadOptionsFromVSCommand = new(this, OptionsPlaceEnum.VisualStudioOption);
-            StoreAsVSOptionsCommand = new(this, OptionsPlaceEnum.VisualStudioOption);
-            ClearVSOptionsCommand = new(this);
+            LoadOptionsCommand = new(this);
+            StoreOptionsCommand = new(this);
+            DeleteOptionsCommand = new(this);
 
             EditGlobalToolsCommand = new(this);
             EditAgentCommand = new(this);
@@ -185,6 +200,9 @@ namespace FreeAIr.UI.ViewModels
 
             UpdateGithubMcpStatusAsync()
                 .FileAndForget(nameof(UpdateGithubMcpStatusAsync));
+
+            AcceptOptionsAsync()
+                .FileAndForget(nameof(AcceptOptionsAsync));
         }
 
         private async Task UpdateGithubMcpStatusAsync()
@@ -211,21 +229,30 @@ namespace FreeAIr.UI.ViewModels
         }
 
         private async Task AcceptOptionsAsync(
-            FreeAIrOptions? options
             )
         {
-            if (options is null)
+            try
             {
-                OptionsJson = string.Empty;
+                _optionsJson = FreeAIrOptions.SerializeToString(
+                    await FreeAIrOptions.DeserializeAsync(
+                        SelectedPlace.Place
+                        )
+                    );
+
+                _originalJson = OptionsJson;
             }
-            else
+            catch (Exception excp)
             {
-                OptionsJson = FreeAIrOptions.SerializeToString(options);
+                await VS.MessageBox.ShowErrorAsync(
+                    "Json cannot be deserialized because of:"
+                    + Environment.NewLine
+                    + excp.Message
+                    );
+                _optionsJson = string.Empty;
+                _originalJson = string.Empty;
             }
 
-            _originalJson = FreeAIrOptions.SerializeToString(
-                await FreeAIrOptions.DeserializeAsync()
-                );
+            PageEnabled = true;
 
             OnPropertyChanged();
         }
@@ -309,15 +336,19 @@ namespace FreeAIr.UI.ViewModels
                     if (!string.IsNullOrEmpty(_viewModel.OptionsJson))
                     {
                         if (!await VS.MessageBox.ShowConfirmAsync(
-                            $"Options json is not empty. Overwrite?"
-                            )
+                                $"Options json is not empty. Overwrite?"
+                                )
                             )
                         {
                             return;
                         }
                     }
 
-                    await _viewModel.AcceptOptionsAsync(new FreeAIrOptions());
+                    _viewModel._optionsJson = FreeAIrOptions.SerializeToString(
+                        new FreeAIrOptions()
+                        );
+
+                    _viewModel.OnPropertyChanged();
                 }
                 catch (Exception excp)
                 {
@@ -334,11 +365,9 @@ namespace FreeAIr.UI.ViewModels
         public sealed class LoadOptionsCmd : AsyncBaseRelayCommand
         {
             private readonly ControlCenterViewModel _viewModel;
-            private readonly OptionsPlaceEnum? _place;
 
             public LoadOptionsCmd(
-                ControlCenterViewModel viewModel,
-                OptionsPlaceEnum? place
+                ControlCenterViewModel viewModel
                 )
             {
                 if (viewModel is null)
@@ -347,7 +376,6 @@ namespace FreeAIr.UI.ViewModels
                 }
 
                 _viewModel = viewModel;
-                _place = place;
             }
 
             protected override async Task ExecuteInternalAsync(object parameter)
@@ -365,7 +393,9 @@ namespace FreeAIr.UI.ViewModels
                         }
                     }
 
-                    if (_place.HasValue && _place.Value == OptionsPlaceEnum.SolutionRelatedFilePath)
+                    var place = _viewModel.SelectedPlace.Place;
+
+                    if (place.HasValue && place.Value == OptionsPlaceEnum.SolutionRelatedFilePath)
                     {
                         var filePath = await FreeAIrOptions.ComposeFilePathAsync();
                         if (!File.Exists(filePath))
@@ -376,19 +406,18 @@ namespace FreeAIr.UI.ViewModels
                             return;
                         }
                     }
-                    else if (_place.HasValue && _place.Value == OptionsPlaceEnum.VisualStudioOption)
+                    else if (place.HasValue && place.Value == OptionsPlaceEnum.VisualStudioOption)
                     {
                         if (string.IsNullOrEmpty(InternalPage.Instance.Options))
                         {
                             await VS.MessageBox.ShowErrorAsync(
-                                $"Visual studio has to active FreeAIr options."
+                                $"Visual studio has no active FreeAIr options."
                                 );
                             return;
                         }
                     }
 
-                    var options = await FreeAIrOptions.DeserializeAsync(_place);
-                    await _viewModel.AcceptOptionsAsync(options);
+                    await _viewModel.AcceptOptionsAsync();
                 }
                 catch (Exception excp)
                 {
@@ -409,11 +438,9 @@ namespace FreeAIr.UI.ViewModels
         public sealed class StoreOptionsCmd : AsyncBaseRelayCommand
         {
             private readonly ControlCenterViewModel _viewModel;
-            private readonly OptionsPlaceEnum? _place;
 
             public StoreOptionsCmd(
-                ControlCenterViewModel viewModel,
-                OptionsPlaceEnum? place
+                ControlCenterViewModel viewModel
                 )
             {
                 if (viewModel is null)
@@ -422,7 +449,6 @@ namespace FreeAIr.UI.ViewModels
                 }
 
                 _viewModel = viewModel;
-                _place = place;
             }
 
             protected override async Task ExecuteInternalAsync(object parameter)
@@ -443,21 +469,12 @@ namespace FreeAIr.UI.ViewModels
                         return;
                     }
 
-                    var place = await options.SerializeAsync(_place);
+                    var place = _viewModel.SelectedPlace.Place;
 
-                    var destination = "<<unknown>>";
-                    switch (place)
-                    {
-                        case OptionsPlaceEnum.SolutionRelatedFilePath:
-                            destination = $"file {await FreeAIrOptions.ComposeFilePathAsync()}";
-                            break;
-                        case OptionsPlaceEnum.VisualStudioOption:
-                            destination = "VS options";
-                            break;
-                    }
+                    _ = await options.SerializeAsync(place);
 
                     await VS.MessageBox.ShowAsync(
-                        $"Every MCP server is found, and pinged successfully. Changes was saved to {destination}.",
+                        $"Every MCP server is found, and pinged successfully. Changes was saved successfully.",
                         buttons: OLEMSGBUTTON.OLEMSGBUTTON_OK
                         );
                 }
@@ -529,11 +546,11 @@ namespace FreeAIr.UI.ViewModels
             }
         }
 
-        public sealed class ClearVSOptionsCmd : AsyncBaseRelayCommand
+        public sealed class DeleteOptionsCmd : AsyncBaseRelayCommand
         {
             private readonly ControlCenterViewModel _viewModel;
 
-            public ClearVSOptionsCmd(
+            public DeleteOptionsCmd(
                 ControlCenterViewModel viewModel
                 )
             {
@@ -549,55 +566,38 @@ namespace FreeAIr.UI.ViewModels
             {
                 try
                 {
-                    InternalPage.Instance.Options = string.Empty;
+                    var place = _viewModel.SelectedPlace.Place;
 
-                    await VS.MessageBox.ShowAsync(
-                        $"Options from Visual Studio has been deleted.",
-                        buttons: OLEMSGBUTTON.OLEMSGBUTTON_OK
-                        );
-                }
-                catch (Exception excp)
-                {
-                    //todo log
-                    await VS.MessageBox.ShowErrorAsync(
-                        Resources.Resources.Error,
-                        excp.Message + Environment.NewLine + excp.StackTrace
-                        );
-                }
-            }
-
-        }
-
-        public sealed class DeleteOptionsFileCmd : AsyncBaseRelayCommand
-        {
-            private readonly ControlCenterViewModel _viewModel;
-
-            public DeleteOptionsFileCmd(
-                ControlCenterViewModel viewModel
-                )
-            {
-                if (viewModel is null)
-                {
-                    throw new ArgumentNullException(nameof(viewModel));
-                }
-
-                _viewModel = viewModel;
-            }
-
-            protected override async Task ExecuteInternalAsync(object parameter)
-            {
-                try
-                {
-                    var filePath = await FreeAIrOptions.ComposeFilePathAsync();
-                    if (System.IO.File.Exists(filePath))
+                    if (!place.HasValue || place.Value == OptionsPlaceEnum.SolutionRelatedFilePath)
                     {
-                        System.IO.File.Delete(filePath);
+                        var filePath = await FreeAIrOptions.ComposeFilePathAsync();
+                        if (System.IO.File.Exists(filePath))
+                        {
+                            System.IO.File.Delete(filePath);
+
+                            await VS.MessageBox.ShowAsync(
+                                $"Options file {filePath} has been deleted.",
+                                buttons: OLEMSGBUTTON.OLEMSGBUTTON_OK
+                                );
+                            return;
+                        }
+
+                        if (place.HasValue && place.Value == OptionsPlaceEnum.SolutionRelatedFilePath)
+                        {
+                            return;
+                        }
                     }
 
-                    await VS.MessageBox.ShowAsync(
-                        $"Options file {filePath} has been deleted.",
-                        buttons: OLEMSGBUTTON.OLEMSGBUTTON_OK
-                        );
+                    if (!place.HasValue || place.Value == OptionsPlaceEnum.VisualStudioOption)
+                    {
+                        InternalPage.Instance.Options = string.Empty;
+
+                        await VS.MessageBox.ShowAsync(
+                            $"Options inside Visual Studio has been deleted.",
+                            buttons: OLEMSGBUTTON.OLEMSGBUTTON_OK
+                            );
+                    }
+
                 }
                 catch (Exception excp)
                 {
@@ -779,6 +779,24 @@ namespace FreeAIr.UI.ViewModels
                 options = _options;
                 errorMessage = _errorMessage;
                 return _result;
+            }
+
+        }
+
+        public sealed class PlaceViewModel
+        {
+            public OptionsPlaceEnum? Place
+            {
+                get;
+            }
+
+            public string Title => Place.GetTitle();
+
+            public PlaceViewModel(
+                OptionsPlaceEnum? place
+                )
+            {
+                Place = place;
             }
 
         }

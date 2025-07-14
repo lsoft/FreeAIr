@@ -68,7 +68,7 @@ namespace FreeAIr.Options2.Unsorted
             return GitHubToken;
         }
 
-        [Description("If you are using a free model, it means slow response (a few seconds) and daily limit for prompt count. In this case you do not want FreeAIr make whole line completion prompts automatically. If so, keep this in 'False', you still able to invoke this explicitly with Alt+A.")]
+        [Description("If you are using a free model, it usually means slow response (a few seconds) and daily limit for prompt count. In this case you do not want FreeAIr make whole line completion prompts automatically. If so, keep this in 'False', you still able to invoke this explicitly with Alt+A.")]
         public bool IsImplicitWholeLineCompletionEnabled
         {
             get;

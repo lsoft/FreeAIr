@@ -114,7 +114,8 @@ namespace FreeAIr.Find
                 VerticalContentAlignment = findAllButton.VerticalContentAlignment,
                 Height = findAllButton.ActualHeight,
                 Content = "Use RAG",
-                ToolTip = "Use NLO embedding JSON files to narrow down search scope, if the files exists for this solution",
+                //ToolTip = "Use NLO embedding JSON files to narrow down search scope, if the files exists for this solution",
+                ToolTip = "DOES NOT IMPLEMENTED YET",
                 Style = styleSourceCheckBox?.Style
             };
 

@@ -20,6 +20,7 @@
         VerticalScrollBarVisibility="Auto"
         Margin="5,5,5,30"
         Name="MainScrollViewerName"
+        IsEnabled="{Binding PageEnabled}"
         >
         <Grid>
             <Grid.RowDefinitions>
@@ -30,6 +31,8 @@
                 <RowDefinition Height="auto"/> <!-- 4 -->
                 <RowDefinition Height="auto"/> <!-- 5 -->
                 <RowDefinition Height="auto"/> <!-- 6 -->
+                <RowDefinition Height="auto"/> <!-- 7 -->
+                <RowDefinition Height="auto"/> <!-- 8 -->
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="auto"/>
@@ -37,8 +40,19 @@
                 <ColumnDefinition />
             </Grid.ColumnDefinitions>
 
-            <ScrollViewer
+            <ComboBox
                 Grid.Row="0"
+                Grid.Column="0"
+                Grid.ColumnSpan="3"
+                Margin="2"
+                HorizontalAlignment="Stretch"
+                DisplayMemberPath="Title"
+                ItemsSource="{Binding PlaceList}"
+                SelectedItem="{Binding SelectedPlace}"
+                />
+
+            <ScrollViewer
+                Grid.Row="1"
                 Grid.Column="0"
                 Grid.ColumnSpan="3"
                 MaxHeight="350"
@@ -62,7 +76,7 @@
             </ScrollViewer>
 
             <TextBlock
-                Grid.Row="1"
+                Grid.Row="2"
                 Grid.Column="0"
                 Grid.ColumnSpan="3"
                 HorizontalAlignment="Right"
@@ -74,7 +88,7 @@
                 />
 
             <StackPanel
-                Grid.Row="2"
+                Grid.Row="3"
                 Grid.Column="0"
                 Grid.ColumnSpan="3"
                 Margin="0,0,8,0"
@@ -99,8 +113,8 @@
                     FontSize="12"
                     Margin="10,0,10,0"
                     FontFamily="Cascadia Code"
-                    Content="Load from file..."
-                    Command="{Binding LoadOptionsFromFileCommand}"
+                    Content="Reload"
+                    Command="{Binding LoadOptionsCommand}"
                     Style="{DynamicResource TextBlockLikeButtonStyle}"
                     />
                 <Button
@@ -109,8 +123,8 @@
                     FontSize="12"
                     Margin="10,0,10,0"
                     FontFamily="Cascadia Code"
-                    Content="Save to file..."
-                    Command="{Binding StoreOptionsToFileCommand}"
+                    Content="Save"
+                    Command="{Binding StoreOptionsCommand}"
                     Style="{DynamicResource TextBlockLikeButtonStyle}"
                     />
                 <Button
@@ -119,47 +133,15 @@
                     FontSize="12"
                     Margin="10,0,10,0"
                     FontFamily="Cascadia Code"
-                    Content="Delete file..."
-                    Command="{Binding DeleteOptionsFileCommand}"
-                    Style="{DynamicResource TextBlockLikeButtonStyle}"
-                    />
-
-                <Button
-                    HorizontalAlignment="Right"
-                    VerticalAlignment="Center"
-                    FontSize="12"
-                    Margin="10,0,10,0"
-                    FontFamily="Cascadia Code"
-                    Content="Load from VS..."
-                    Command="{Binding LoadOptionsFromVSCommand}"
-                    Style="{DynamicResource TextBlockLikeButtonStyle}"
-                    />
-                <Button
-                    HorizontalAlignment="Right"
-                    VerticalAlignment="Center"
-                    FontSize="12"
-                    Margin="10,0,10,0"
-                    FontFamily="Cascadia Code"
-                    Content="Save into VS..."
-                    Command="{Binding StoreAsVSOptionsCommand}"
-                    Style="{DynamicResource TextBlockLikeButtonStyle}"
-                    />
-                <Button
-                    HorizontalAlignment="Right"
-                    VerticalAlignment="Center"
-                    FontSize="12"
-                    Margin="10,0,10,0"
-                    FontFamily="Cascadia Code"
-                    Content="Clear from VS..."
-                    Command="{Binding ClearVSOptionsCommand}"
+                    Content="Delete"
+                    Command="{Binding DeleteOptionsCommand}"
                     Style="{DynamicResource TextBlockLikeButtonStyle}"
                     />
 
             </StackPanel>
 
-
             <Button
-                Grid.Row="3"
+                Grid.Row="4"
                 Grid.Column="0"
                 Grid.ColumnSpan="3"
                 Margin="0,20,8,2"
@@ -173,7 +155,7 @@
                 />
 
             <Button
-                Grid.Row="4"
+                Grid.Row="5"
                 Grid.Column="0"
                 Grid.ColumnSpan="3"
                 Margin="0,2,8,2"
@@ -187,7 +169,7 @@
                 />
 
             <Button
-                Grid.Row="5"
+                Grid.Row="6"
                 Grid.Column="0"
                 Grid.ColumnSpan="3"
                 HorizontalAlignment="Right"
@@ -202,18 +184,19 @@
                 />
 
             <Label
-                Grid.Row="6"
+                Grid.Row="7"
                 Grid.Column="0"
                 HorizontalAlignment="Left"
                 VerticalAlignment="Center"
                 FontSize="12"
                 FontFamily="Cascadia Code"
                 Margin="0,20,8,0"
+                Name="GithubStatusLabel"
                 Content="Github MCP Server status:"
                 />
 
             <Label
-                Grid.Row="6"
+                Grid.Row="7"
                 Grid.Column="1"
                 Margin="0,20,8,0"
                 Padding="0"
@@ -225,7 +208,7 @@
                 />
 
             <Button
-                Grid.Row="6"
+                Grid.Row="7"
                 Grid.Column="2"
                 HorizontalAlignment="Right"
                 VerticalAlignment="Center"
@@ -236,6 +219,82 @@
                 Command="{Binding InstallGithubMCPServerCommand}"
                 Style="{DynamicResource TextBlockLikeButtonStyle}"
                 />
+
+            <StackPanel
+                Grid.Row="8"
+                Grid.Column="0"
+                Grid.ColumnSpan="3"
+                Margin="2,20,2,2"
+                >
+
+                <TextBlock
+                    HorizontalAlignment="Stretch"
+                    Background="Transparent"
+                    FontFamily="Cascadia Code"
+                    TextWrapping="Wrap"
+                    Padding="0"
+                    Margin="0"
+                    Foreground="{Binding ElementName=GithubStatusLabel, Path=Foreground}"
+                    Text=" FreeAIr options can be saved into 2 locations:"
+                    />
+
+                <TextBlock
+                    HorizontalAlignment="Stretch"
+                    Background="Transparent"
+                    FontFamily="Cascadia Code"
+                    TextWrapping="Wrap"
+                    Padding="0"
+                    Margin="0"
+                    Foreground="{Binding ElementName=GithubStatusLabel, Path=Foreground}"
+                    Text="1. Json file (solution-related approach)."
+                    />
+
+                <TextBlock
+                    HorizontalAlignment="Stretch"
+                    Background="Transparent"
+                    FontFamily="Cascadia Code"
+                    TextWrapping="Wrap"
+                    Padding="0"
+                    Margin="0"
+                    Foreground="{Binding ElementName=GithubStatusLabel, Path=Foreground}"
+                    Text="2. Inside your Visual Studio (developer-related approach)."
+                    />
+
+                <TextBlock
+                    HorizontalAlignment="Stretch"
+                    Background="Transparent"
+                    FontFamily="Cascadia Code"
+                    TextWrapping="Wrap"
+                    Padding="0"
+                    Margin="0"
+                    Foreground="{Binding ElementName=GithubStatusLabel, Path=Foreground}"
+                    Text=" Json file is placed in the folder of your solution + '.freeair' folder + 'your_solution_name>_options.json' filename. This file is a subject of committing to the git repo. This is useful for a command working, when every member of the team can use the same FreeAIr options, for example, connection to the company's LLM."
+                    />
+
+                <TextBlock
+                    HorizontalAlignment="Stretch"
+                    Background="Transparent"
+                    FontFamily="Cascadia Code"
+                    TextWrapping="Wrap"
+                    Padding="0"
+                    Margin="0"
+                    Foreground="{Binding ElementName=GithubStatusLabel, Path=Foreground}"
+                    Text=" Visual Studio is a developer-related way, no FreeAIr artifacts falls in your github repo. The same FreeAIr options will be applied for every solution you opened."
+                    />
+                
+                <TextBlock
+                    HorizontalAlignment="Stretch"
+                    Background="Transparent"
+                    FontFamily="Cascadia Code"
+                    TextWrapping="Wrap"
+                    Padding="0"
+                    Margin="0"
+                    Foreground="{Binding ElementName=GithubStatusLabel, Path=Foreground}"
+                    Text=" If you have both (json file and VS options) FreeAIr will use json file options. If you have nothing FreeAIr will use the default (embedded) options, which are useless for chat with LLM."
+                    />
+
+            </StackPanel>
+
         </Grid>
     </ScrollViewer>
 </Window>
