@@ -566,6 +566,13 @@ namespace FreeAIr.UI.ViewModels
             {
                 try
                 {
+                    if (!await VS.MessageBox.ShowConfirmAsync(
+                        "You are going to delete stored options. Please, confirm.")
+                        )
+                    {
+                        return;
+                    }
+
                     var place = _viewModel.SelectedPlace.Place;
 
                     if (!place.HasValue || place.Value == OptionsPlaceEnum.SolutionRelatedFilePath)

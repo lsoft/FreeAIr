@@ -115,219 +115,219 @@ Main functions:
 
 # Getting started
 
-- Установите расширение через магазин [Visual Studio](https://marketplace.visualstudio.com/items?itemName=lsoft.FreeAIr).
-- Если Вы хотите использовать локальный инференс, запустите свою модель и получите её `endpoint`, `token` и имя модели.
-- Запустите `Visual Studio` и откройте ваш solution.
-- Нажмите `Extensions` -> `FreeAIr` -> `Open control center`.
-- В открывшемся окне нажмите `Edit agents`.
-- Выберите любого агента (например, `Yandex General`) и настройте `endpoint`, `token`, `chosen model`. Также вы можете исправить системный промпт, но для начала используйте кнопку `Replace with general system prompt`.
-- Нажмите `Apply changes` и окно закроется.
-- Вы вернетесь в окно control center, и внесенные Вами изменения будут видны в json тексте. Сохраните измененный документ в файле, используя `Store to options file`.
-- Нажмите `Extensions` -> `FreeAIr` -> `Open chat list window`.
-- В открывшемся окне выберите `Start chat`, и выберите модель, которую настраивали. Окно выбора модели может не показываться, если у вас одна модель или только у одной модели задан токен.
-- Начинайте общаться с LLM.
+- Install the extension through the [Visual Studio Marketplace](https://marketplace.visualstudio.com/items?itemName=lsoft.FreeAIr).
+- If you want to use local inference, run your model and get its `endpoint`, `token` and model name.
+- Run `Visual Studio` and open your solution.
+- Click `Extensions` -> `FreeAIr` -> `Open control center`.
+- In the window that opens, click `Edit agents`.
+- Select any agent (for example, `Yandex General`) and configure `endpoint`, `token`, `chosen model`. You can also fix the system prompt, but first use the `Replace with general system prompt` button.
+- Click `Apply changes` and the window will close.
+- You will return to the control center window, and the changes you made will be visible in the json text. Save the modified document to a file using `Store to options file`.
+- Click `Extensions` -> `FreeAIr` -> `Open chat list window`.
+- In the window that opens, select `Start chat`, and select the model you configured. The model selection window may not appear if you have one model or only one model has a token set.
+- Start chatting with LLM.
 
-# Основные понятия FreeAIr
+# Basic concepts of FreeAIr
 
-- Агент - это конкретное сочетание `endpoint`, `token`, имени модели и ее системного промпта. Одна и та же LLM может выступать в разных ролях, роль определяется её системным промптом (например, `Ты - опытный программист...`, `Ты - программист баз данных...`). В таком случае у Вас будет два агента, у которых одинаковые `endpoint`, `token` и имя модели, но разные системные промпты.
-- Чат - это диалог с LLM. Вы можете вести несколько диалогов и удалять устаревшие.
-- Контекст чата - это дополнительная информация, которая доступна LLM, туда добавляются разные файлы, selections и т.п. Это удобнее, чем приводить тексты в самом промпте.
-- Natural Language Search - это фича FreeAIr, которая позволяет искать по вашей кодовой базе на естесственном человеческом языке.
-- Natural Language Outlines - это комментарии внутри документов Вашего solution. В конечном итоге, они используются в Natural Language Search для ускорения поиска.
-- Support Action - это действие, которое может предпринять FreeAIr в ответ на действия пользователя в Visual Studio.
-- MCP Servers - это Model Context Protocol сервера, которые предоставляют для LLM доп. возможности.
-- Tools - это возможности, которые предлагают выбранные MCP Servers.
+- Agent is a specific combination of `endpoint`, `token`, model name and its system prompt. The same LLM can act in different roles, the role is defined by its system prompt (for example, `You are an experienced programmer...`, `You are a database programmer...`). In this case, you will have two agents that have the same `endpoint`, `token` and model name, but different system prompts.
+- Chat is a dialogue with LLM. You can have several dialogues and delete obsolete ones.
+- Chat context is additional information that is available to LLM, various files, selections, etc. are added there. This is more convenient than providing texts in the prompt itself.
+- Natural Language Search is a FreeAIr feature that allows you to search your code base in natural human language.
+- Natural Language Outlines are comments inside your solution documents. They are ultimately used by Natural Language Search to speed up searches.
+- Support Action is an action that FreeAIr can take in response to user actions in Visual Studio.
+- MCP Servers are Model Context Protocol servers that provide additional capabilities to LLM.
+- Tools are capabilities that selected MCP Servers offer.
 
-## Настройки FreeAIr
+## FreeAIr settings
 
-Настройки FreeAIr делятся на две категории:
+FreeAIr settings are divided into two categories:
 
-- Json настройки, которые по смыслу применяются к solution
-- Настройки для конкретного пользователя Visual Studio
+- Json settings that apply to the solution
+- Settings for a specific Visual Studio user
 
-## Настройки для конкретного пользователя Visual Studio
+## Visual Studio User-Specific Settings
 
-Это - группа настроек для конкретного пользователя. Эти настройки каждый член Вашей команды может настраивать под себя, они сохраняются только локально в инстансе Visual Studio.
+This is a group of user-specific settings. Each member of your team can customize these settings for themselves, they are saved only locally in the Visual Studio instance.
 
-К примеру, это настройки размера шрифта для диалога с LLM. Их можно открыть через `Extensions` -> `FreeAIr` -> `Open FreeAIr properties`.
+For example, these are font size settings for the LLM dialog. They can be opened via `Extensions` -> `FreeAIr` -> `Open FreeAIr properties`.
 
 ## FreeAIr JSON settings
 
-Это - группа настроек, которые имеет смысл держать общими для всех членов Вашей команды. Эти настройки могут быть сохранены в json файл, который рекомендуется закомитить в git репозиторий. Также, эти настройки можно сохранить внутрь Visual Studio, если, по каким-то причинам, нежелательно создавать файл.
+This is a group of settings that makes sense to keep common for all members of your team. These settings can be saved in a json file, which is recommended to be committed to the git repository. Also, these settings can be saved inside Visual Studio, if, for some reason, it is undesirable to create a file.
 
-Эти настройки содержат:
-- настройки агентов
-- настройки MCP servers and their tools
-- настройки support action
-- прочие настройки, смысл которых описан прямо в Json файле.
+These settings contain:
+- agent settings
+- MCP servers and their tools settings
+- support action settings
+- other settings, the meaning of which is described directly in the Json file.
 
 ## Agents
 
-Агент - это конкретное сочетание `endpoint`, `token`, имени модели и ее системного промпта. Одна и та же LLM может выступать в разных ролях, роль определяется её системным промптом (например, `Ты - опытный программист...`, `Ты - программист баз данных...`). В таком случае у Вас будет два агента, у которых одинаковые `endpoint`, `token` и имя модели, но разные системные промпты.
+An agent is a specific combination of `endpoint`, `token`, model name and its system prompt. The same LLM can act in different roles, the role is determined by its system prompt (e.g. `You are an experienced programmer...`, `You are a database programmer...`). In this case, you will have two agents with the same `endpoint`, `token` and model name, but different system prompts.
 
-Вы можете редактировать существующие или добавлять собственных агентов. Если у агента не задан token - агент считается неактивным.
+You can edit existing agents or add your own. If an agent does not have a token, the agent is considered inactive.
 
-## Чат
+## Chat
 
-Чат - это основной элемент FreeAIr, где происходит общение с LLM и кодогенерация. 
+Chat is the core element of FreeAIr, where communication with LLM and code generation takes place.
 
 <a href="https://raw.githubusercontent.com/lsoft/FreeAIr/main/chatwindow.png" target="_blank">
   <img src="https://raw.githubusercontent.com/lsoft/FreeAIr/main/chatwindow.png" style="height: 150px; width: auto; object-fit: contain; border: 1px solid #ccc;" alt="Chat window" />
 </a>
 
-Чат состоит из трех элементов:
-- область диалога, где содержается промпты пользователя и ответы LLM
-- область для вводимого промпта
-- область контекста чата
+The chat consists of three elements:
+- the dialog area, which contains the user's prompts and LLM responses
+- the area for the input prompt
+- the chat context area
 
-### Область диалога чата
+### Chat Dialog Area
 
-В этой области отображаются:
-- отправленные промпты
-- полученные ответы от LLM
-- служебная информация (например, вызовы MCP Server Tools)
+This area displays:
+- Sent prompts
+- Received responses from LLM
+- Service information (e.g. MCP Server Tools calls)
 
-Размер этих элементов регулируется в `Tools` -> `Options` -> `FreeAIr`.
+The size of these elements is adjusted in `Tools` -> `Options` -> `FreeAIr`.
 
-Для некоторых элементов диалога (куски кода, картинки и пр). к тексту добавляются специальные кнопки, которые позволяют удобно оперировать этими элементами:
+For some dialog elements (code chunks, images, etc.) special buttons are added to the text that allow you to conveniently operate these elements:
 
 - Copy to clipboard
 - Choose context item to replace its content
 - Replace the selected block of the code in the VS document
 - Create new file with this
 
-Размер этих кнопок также регулируется в `Tools` -> `Options` -> `FreeAIr`.
+The size of these buttons is also adjusted in `Tools` -> `Options` -> `FreeAIr`.
 
-### Область для вводимого промпта
+### Prompt input area
 
-Это - область для введения нового промпта. Чтобы отправить введенный промпт надо нажать Ctrl+Enter, после чего начнется ожидание ответа от LLM. Ожидание ответа можно прервать кнопкой `Stop`.
+This is the area for entering a new prompt. To send the entered prompt, press Ctrl+Enter, after which the LLM will wait for a response. You can interrupt the response by pressing the `Stop` button.
 
-Также в эту область можно дополнительно вводить:
-- actions for FreeAIr: для этого необходимо ввести `/` и выбрать action из списка; список доступных support actions задается в JSON настройках.
-- документы солюшена: для этого необходимо ввести `#` и выбрать необходимый документ.
+You can also enter the following in this area:
+- actions for FreeAIr: to do this, enter `/` and select an action from the list; the list of available support actions is specified in the JSON settings.
+- solution documents: to do this, enter `#` and select the required document.
 
-### Контекст чата
+### Chat context
 
-Контекст чата - это дополнительная информация для LLM, например, в контекст часто добавляются документы Вашего solution. Вы можете добавить в контекст:
+The chat context is additional information for LLM, for example, documents from your solution are often added to the context. You can add to the context:
 
-- документ вашего солюшена, для этого наберите `#`, выберите документ из списка и нажмите Ctrl+Enter.
-- внешний документ, для этого нажмите на кнопку `Add custom file`.
+- your solution document, to do this, type `#`, select a document from the list and press Ctrl+Enter.
+- an external document, to do this, click the `Add custom file` button.
 
-Если Ваш проект настроен под использование Microsoft Copilot, то файл `copilot-instructions.md` будет автоматически добавлен в контекст чата при создании чата.
+If your project is configured to use Microsoft Copilot, the `copilot-instructions.md` file will be automatically added to the chat context when creating a chat.
 
-Если Ваш проект написан на C#, то Вы можете добавлять в контекст чата все файлы, зависимые от уже добавленного файла, чтобы LLM получала больше контекста. Для этого есть соответствующая кнопка рядом с именем документа.
+If your project is written in C#, you can add all files dependent on the already added file to the chat context so that LLM gets more context. There is a corresponding button next to the document name for this.
 
 ## Support Action
 
-Действия, которые FreeAIr способны предложить пользователю не закодированы в коде FreeAIr. Список действий - это часть Json файла настроек в секции `Supports/Actions`.
+The actions that FreeAIr can offer the user are not encoded in the FreeAIr code. The list of actions is part of the Json settings file in the `Supports/Actions` section.
 
-Каждое действие состоит из:
-- имени.
-- коллекции scope: при каких действиях пользователя это support action надо применять (например, при работе с кодом документа; внутри codelens; при работе с файлами в Solution Explorer; при формировании commit message и другие).
-- промпта с якорями.
-- имени агента, который должен выполнить это действие. Если имя агента не задано, FreeAIr будет предлагать пользователю выбрать агента вручную.
-- image moniker - используется как иконка для отображения в контроле ввода промпта в чате FreeAIr.
+Each action consists of:
+- name.
+- scope collection: for which user actions this support action should be applied (for example, when working with the document code; inside codelens; when working with files in Solution Explorer; when forming a commit message, etc.).
+- prompt with anchors.
+- name of the agent who should perform this action. If the agent name is not specified, FreeAIr will offer the user to select an agent manually.
+- image moniker - used as an icon to display in the prompt input control in the FreeAIr chat.
 
-Якори - это placeholder, в который добавляется соответствующая контекстная информация. Они бывают:
-- имя документа(ов) в контекте чата.
-- текст ошибки компиляции.
-- строка, где произошла ошибка компиляции.
-- колонка, где произошла ошибка компиляции.
-- предпочтительный unit test framework.
-- git diff с Вашими изменениями.
-- natural language search query.
+Anchors are placeholders in which the corresponding contextual information is added. They can be:
+- name of the document(s) in the chat context.
+- text of the compilation error.
+- the line where the compilation error occurred.
+- the column where the compilation error occurred.
+- the preferred unit test framework.
+- a git diff with your changes.
+- a natural language search query.
 
-Вы можете редактировать существующие и добавлять свои собственные support actions.
+You can edit existing and add your own support actions.
 
 ## MCP Servers and their tools
 
-MCP Servers - это Model Context Protocol servers, которые предоставляют для LLM дополнительные возможности (например, доступ в БД, или доступ до git). FreeAIr полностью поддерживает MCP Servers.
+MCP Servers are Model Context Protocol servers that provide additional capabilities for LLM (e.g. database access, or git access). FreeAIr fully supports MCP Servers.
 
-Существует три категории MCP servers:
+There are three categories of MCP servers:
 
-- Visual Studio Embedded MCP server - встроенный в FreeAIr MCP сервер, который предоставляет LLM возможность выполнять действия внутри Visual Studio (например, компилировать проект, изменять текст документа и пр.).
-- GitHub.com MCP server - это стандартный github.com MCP сервер; установить его можно из FreeAIr Control Panel.
-- Прочие MCP сервера - их можно "установить", отредактировав соотв-ю секцию FreeAIr Json settings. Формат - стандартный формат Claude.
+- Visual Studio Embedded MCP server - a FreeAIr built-in MCP server that provides LLM with the ability to perform actions inside Visual Studio (e.g. compile a project, change the text of a document, etc.).
+- GitHub.com MCP server - this is a standard github.com MCP server; you can install it from the FreeAIr Control Panel.
+- Other MCP servers - they can be "installed" by editing the corresponding section of FreeAIr Json settings. The format is the standard Claude format.
 
-Каждый MCP server предоставляет свой набор tools. Вы можете отредактировать набор MCP серверов и их tools и закомитить этот файл в репозиторий. При создании чата, выбранные tools копируются в чат и Вы можете включать\выключать tools внутри чата, это никак не влияет на статус глобальных tools.
+Each MCP server provides its own set of tools. You can edit the set of MCP servers and their tools and commit this file to the repository. When creating a chat, the selected tools are copied to the chat and you can enable/disable tools inside the chat, this does not affect the status of global tools.
 
-Примеры промптов, которые LLM может выполнить, если ей предоставить соответствующие tools:
+Examples of prompts that LLM can execute if it is provided with the appropriate tools:
 
 - `commit my changes with message "newcommit"`
 - `install a 3.3.6 version of "Ninject" nuget package in TestSubject project`
 
 ### Embedded Visual Studio MCP server
 
-Этот MCP сервер предоставляет для LLM возможности по работе внутри Visual Studio, например:
-- сделать git commit.
+This MCP server provides LLM with the ability to work inside Visual Studio, such as:
+- make a git commit.
 - build solution and collect errors.
 - install nuget package.
 - get solution tree structure.
 - get document body.
 - replace document body.
-- и другие.
+- and others.
 
-Этот MCP сервер доступен сразу и не требует никаких действий по настройке.
+This MCP server is available immediately and does not require any configuration steps.
 
 ### Github.com MCP server
 
-Github.com MCP server - это сервер, который предоставляет LLM возможности по работе с репозиторием на github.com. Например, через этот сервер можно попросить LLM получить список issue и попросить LLM исправить один из них.
+Github.com MCP server is a server that provides LLM with the ability to work with a repository on github.com. For example, through this server you can ask LLM to get a list of issues and ask LLM to fix one of them.
 
-Чтобы установить этот сервер, нажмите соответствующую кнопку в FreeAIr Command Center. Скачается и установится наиболее свежая версия github.com MCP server.
+To install this server, click the corresponding button in the FreeAIr Command Center. The latest version of github.com MCP server will be downloaded and installed.
 
 ## Commit message building
 
-FreeAIr позволяет пользователю Visual Studio использовать LLM для генерации commit message. Для этого необходимо переключиться на вкладку `Git Changes` и нажать соответствующую кнопку. Запустится новый чат с LLM, когда ответ будет получен, commit message будет скопирован в поле `Enter a message`.
+FreeAIr allows a Visual Studio user to use LLM to generate a commit message. To do this, switch to the `Git Changes` tab and click the corresponding button. A new chat with LLM will start, and when a response is received, the commit message will be copied to the `Enter a message` field.
 
 <a href="https://raw.githubusercontent.com/lsoft/FreeAIr/main/commitmessage.png" target="_blank">
   <img src="https://raw.githubusercontent.com/lsoft/FreeAIr/main/commitmessage.png" style="height: 150px; width: auto; object-fit: contain; border: 1px solid #ccc;" alt="Commit message" />
 </a>
 
-Пример промпта: `suggest me the best commit message for my uncommitted changes`.
+An example of a prompt: `suggest me the best commit message for my uncommitted changes`.
 
 ## Natural Language Search
 
-Использование естесственного языка в поиске по солюшену или проекту помогает искать код с помощью нечетких запросов, ориентированных на смысл кода, а не на его текст.
+Using natural language to search for a solution or project helps you search code using fuzzy queries that focus on the meaning of the code rather than its text.
 
 <a href="https://raw.githubusercontent.com/lsoft/FreeAIr/main/nlos0.png" target="_blank">
   <img src="https://raw.githubusercontent.com/lsoft/FreeAIr/main/nlos0.png" style="height: 150px; width: auto; object-fit: contain; border: 1px solid #ccc;" alt="Searching with natural language" />
 </a>
 
-Каждый текстовый файл из солюшена (проекта) передается в LLM вместе с поисковым запросов и LLM определяет, есть ли что-то подходящее в этом файле. После обработки всех файлов, результаты собираются в окне результатов поиска:
+Each text file from the solution (project) is passed to LLM along with a search query, and LLM determines whether there is anything suitable in that file. After all files are processed, the results are collected in the search results window:
 
 <a href="https://raw.githubusercontent.com/lsoft/FreeAIr/main/nlos1.png" target="_blank">
   <img src="https://raw.githubusercontent.com/lsoft/FreeAIr/main/nlos1.png" style="height: 150px; width: auto; object-fit: contain; border: 1px solid #ccc;" alt="Searching with natural language" />
 </a>
 
-Так как обрабатываются все файлы проекта, поиск может занимать значительное время. Чтобы ускорить его, FreeAIr поддерживает RAG с использованием natural language outlines.
+Since all project files are processed, searching can take a considerable amount of time. To speed it up, FreeAIr supports RAG using natural language outlines.
 
 ## Natural Language Outlines
 
-Natural Language Outlines - это комментарии специального вида, встроенные прямо в исходный код. Эти комментарии создаются LLM, и использнуются для создания эмбеддингов, которые используются в RAG. Во FreeAIr NLO реализованы в соответствии со [статьей](https://arxiv.org/html/2408.04820v4).
+Natural Language Outlines are a special kind of comments embedded directly into the source code. These comments are generated by LLM, and are used to create embeddings that are used in RAG. In FreeAIr, NLOs are implemented according to [paper](https://arxiv.org/html/2408.04820v4).
 
 ### Generating NLO
 
-Первым этапом необходимо сгенерировать NLO и добавить их в файлы исходного кода. При начале этой работы следует сгенерировать NLO для всего солюшена через данное меню:
+The first step is to generate NLOs and add them to the source code files. When starting this work, you should generate NLOs for the entire solution via this menu:
 
 <a href="https://raw.githubusercontent.com/lsoft/FreeAIr/main/wholefilecommand.png" target="_blank">
   <img src="https://raw.githubusercontent.com/lsoft/FreeAIr/main/wholefilecommand.png" style="height: 150px; width: auto; object-fit: contain; border: 1px solid #ccc;" alt="Whole file commands" />
 </a>
 
-Далее, Вы можете инкрементально добавлять NLO только в те файлы, что были изменены, используя это меню:
+Next, you can incrementally add NLOs to only those files that have been modified using this menu:
 
 <a href="https://raw.githubusercontent.com/lsoft/FreeAIr/main/commitmessage.png" target="_blank">
   <img src="https://raw.githubusercontent.com/lsoft/FreeAIr/main/commitmessage.png" style="height: 150px; width: auto; object-fit: contain; border: 1px solid #ccc;" alt="Commit message" />
 </a>
 
-Само окно просмотра и сохранения NLO устроено тривиально:
+The NLO viewing and saving window itself is designed trivially:
 
 <a href="https://raw.githubusercontent.com/lsoft/FreeAIr/main/nlog0.png" target="_blank">
   <img src="https://raw.githubusercontent.com/lsoft/FreeAIr/main/nlog0.png" style="height: 150px; width: auto; object-fit: contain; border: 1px solid #ccc;" alt="List of generated outlines" />
 </a>
 
-Снимая галочку, Вы можете включать или отключать добавление конкретного outline. Нажав `Apply` Вы сохраните outlines с проставленными галочками.
+By unchecking the box, you can enable or disable adding a specific outline. By clicking `Apply` you will save the outlines with the checkboxes set.
 
-Щелкая левой кнопкой мыши по имени файла или самому outline Вы можете просматривать предлагаемые изменения:
+By left-clicking on the file name or the outline itself, you can view the proposed changes:
 
 <a href="https://raw.githubusercontent.com/lsoft/FreeAIr/main/nlog1.png" target="_blank">
   <img src="https://raw.githubusercontent.com/lsoft/FreeAIr/main/nlog1.png" style="height: 150px; width: auto; object-fit: contain; border: 1px solid #ccc;" alt="Show the difference created by the outlines" />
@@ -335,38 +335,40 @@ Natural Language Outlines - это комментарии специальног
 
 ### Building NLO Json file
 
-После добавления (актуализации) NLO в файлах исходного кода, необходимо создать (обновить) JSON файлы специального вида: NLO-embedding Json files. Это можно сделать для всего солюшена через меню:
+After adding (updating) NLO in the source code files, it is necessary to create (update) JSON files of a special type: NLO-embedding Json files. This can be done for the entire solution via the menu:
 
 <a href="https://raw.githubusercontent.com/lsoft/FreeAIr/main/mainmenu.png" target="_blank">
   <img src="https://raw.githubusercontent.com/lsoft/FreeAIr/main/mainmenu.png" style="height: 150px; width: auto; object-fit: contain; border: 1px solid #ccc;" alt="Main menu" />
 </a>
 
-или только для измененных файлов через меню:
+or only for modified files via the menu:
 
 <a href="https://raw.githubusercontent.com/lsoft/FreeAIr/main/commitmessage.png" target="_blank">
   <img src="https://raw.githubusercontent.com/lsoft/FreeAIr/main/commitmessage.png" style="height: 150px; width: auto; object-fit: contain; border: 1px solid #ccc;" alt="Commit message" />
 </a>
 
-В любом случае, откроется окно:
+In any case, a window will open:
 
 <a href="https://raw.githubusercontent.com/lsoft/FreeAIr/main/nlof0.png" target="_blank">
   <img src="https://raw.githubusercontent.com/lsoft/FreeAIr/main/nlof0.png" style="height: 150px; width: auto; object-fit: contain; border: 1px solid #ccc;" alt="Generate NLO-embedding json files" />
 </a>
 
-Настройте всё необходимое и создайте (обновите) json файлы. В этих файлах содержится:
+Set up everything you need and create (update) json files. These files contain:
 
-- информация обо всех NLO (а также об обычных комментариях в коде)
-- эмбеддинги всех NLO
+- information about all NLOs (as well as regular comments in the code)
+- embeddings of all NLOs
 
-Если файлы созданы, то в меню
+If the files are created, then in the menu
 
 <a href="https://raw.githubusercontent.com/lsoft/FreeAIr/main/nlos0.png" target="_blank">
   <img src="https://raw.githubusercontent.com/lsoft/FreeAIr/main/nlos0.png" style="height: 150px; width: auto; object-fit: contain; border: 1px solid #ccc;" alt="Searching with natural language" />
 </a>
 
-чекбокс `Use RAG` станет доступным. При его выборе, FreeAIr сначала выбирает подходящие эмбеддинги, по ним восстанавливает документы, в которых содержатся NLO, связанные с выбранными эмбеддингами и передает эти документы в поисковый движок (вместо всех документов солюшена или проекта).
+the `Use RAG` checkbox will become available. When selected, FreeAIr first selects suitable embeddings, reconstructs documents containing NLOs associated with the selected embeddings, and passes these documents to the search engine (instead of all solution or project documents).
 
-Эти Json файлы рекомендуется сохранять в git репозиторий, чтобы функция natural language search работала для всех членов команды.
+It is recommended to save these Json files to a git repository so that the natural language search function works for all team members.
+
+WARNING: In the 3.0 version of FreeAIr the checkbox `Use RAG` DOES NOT IMPLEMENTED YET.
 
 # How I can access to AI if my country is banned from Copilot and from any other LLM provider?
 
