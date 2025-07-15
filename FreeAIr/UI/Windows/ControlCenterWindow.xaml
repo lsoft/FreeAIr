@@ -51,29 +51,25 @@
                 SelectedItem="{Binding SelectedPlace}"
                 />
 
-            <ScrollViewer
+            <TextBox
                 Grid.Row="1"
                 Grid.Column="0"
                 Grid.ColumnSpan="3"
+                Margin="2"
+                MinHeight="150"
                 MaxHeight="350"
+                HorizontalAlignment="Stretch"
+                VerticalAlignment="Center"
+                FontSize="12"
+                FontFamily="Cascadia Code"
+                BorderBrush="{Binding StatusJsonBorder}"
+                BorderThickness="1"
                 HorizontalScrollBarVisibility="Disabled"
                 VerticalScrollBarVisibility="Auto"
-                PreviewMouseWheel="ScrollViewer_PreviewMouseWheel"
-                >
-                <TextBox
-                    HorizontalAlignment="Stretch"
-                    VerticalAlignment="Center"
-                    Margin="2"
-                    FontSize="12"
-                    FontFamily="Cascadia Code"
-                    Text="{Binding OptionsJson, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                    BorderBrush="{Binding StatusJsonBorder}"
-                    BorderThickness="1"
-                    MinHeight="150"
-                    TextWrapping="Wrap"
-                    AcceptsReturn="True"
-                    />
-            </ScrollViewer>
+                AcceptsReturn="True"
+                TextWrapping="Wrap"
+                Text="{Binding OptionsJson, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                />
 
             <TextBlock
                 Grid.Row="2"

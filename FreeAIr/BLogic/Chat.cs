@@ -245,15 +245,19 @@ namespace FreeAIr.BLogic
                     }
                     );
 
+                var toolCollection = McpServerProxyCollection.GetTools(ChatTools);
+                var activeTools = toolCollection.GetActiveToolList();
+
                 var cco = new ChatCompletionOptions
                 {
-                    ToolChoice = Options.ToolChoice,
+                    ToolChoice =
+                        activeTools.Count > 0
+                        ? Options.ToolChoice
+                        : ChatToolChoice.CreateNoneChoice(),
                     ResponseFormat = Options.ResponseFormat,
                     MaxOutputTokenCount = (await FreeAIrOptions.DeserializeUnsortedAsync()).MaxOutputTokenCount,
                 };
 
-                var toolCollection = McpServerProxyCollection.GetTools(ChatTools);
-                var activeTools = toolCollection.GetActiveToolList();
                 foreach (var tool in activeTools)
                 {
                     cco.Tools.Add(

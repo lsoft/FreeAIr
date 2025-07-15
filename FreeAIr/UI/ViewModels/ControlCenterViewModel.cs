@@ -473,6 +473,8 @@ namespace FreeAIr.UI.ViewModels
 
                     _ = await options.SerializeAsync(place);
 
+                    await _viewModel.AcceptOptionsAsync();
+
                     await VS.MessageBox.ShowAsync(
                         $"Every MCP server is found, and pinged successfully. Changes was saved successfully.",
                         buttons: OLEMSGBUTTON.OLEMSGBUTTON_OK
