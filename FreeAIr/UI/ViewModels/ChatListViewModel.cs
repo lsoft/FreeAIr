@@ -42,9 +42,20 @@ namespace FreeAIr.UI.ViewModels
         private ICommand _editChatToolsCommand;
         private ICommand _openControlCenterCommand;
         private ICommand _chooseChatAgentCommand;
+        private bool _showOnlyUserChats;
 
         public event Action ContextControlFocus;
         public event Action PromptControlFocus;
+
+        public bool ShowOnlyUserChats
+        {
+            get => _showOnlyUserChats;
+            set
+            {
+                _showOnlyUserChats = value;
+                UpdateControl();
+            }
+        }
 
         public ObservableCollection2<ChatWrapper> ChatList
         {
@@ -913,6 +924,8 @@ namespace FreeAIr.UI.ViewModels
             chatContainer.ChatCollectionChangedEvent += ChatCollectionChanged;
             chatContainer.ChatStatusChangedEvent += ChatStatusChanged;
 
+            _showOnlyUserChats = true;
+
             ChatList = new ObservableCollection2<ChatWrapper>();
 
             DialogViewModel = new DialogViewModel(
@@ -989,9 +1002,26 @@ namespace FreeAIr.UI.ViewModels
         private void UpdateControl()
         {
             ChatList.Clear();
-            ChatList.AddRange(
-                _chatContainer.Chats.Reverse().Select(t => new ChatWrapper(t))
-                );
+
+            if (_showOnlyUserChats)
+            {
+                ChatList.AddRange(
+                    _chatContainer.Chats
+                        .Where(c => !c.Options.AutomaticallyProcessed)
+                        .OrderByDescending(c => c.Started)
+                        .Select(t => new ChatWrapper(t))
+                    );
+            }
+            else
+            {
+                ChatList.AddRange(
+                    _chatContainer.Chats
+                        .OrderByDescending(c => c.Options.AutomaticallyProcessed)
+                        .ThenBy(c => c.Started)
+                        .Reverse()
+                        .Select(t => new ChatWrapper(t))
+                    );
+            }
 
             SelectedChat = ChatList.FirstOrDefault();
         }
@@ -1032,6 +1062,17 @@ namespace FreeAIr.UI.ViewModels
                 }
             }
 
+            public Visibility SecondRowVisibility
+            {
+                get
+                {
+                    return string.IsNullOrEmpty(SecondRow)
+                        ? Visibility.Collapsed
+                        : Visibility.Visible
+                        ;
+                }
+            }
+
             public string SecondRow
             {
                 get
@@ -1056,6 +1097,19 @@ namespace FreeAIr.UI.ViewModels
                 get
                 {
                     return Chat.Status.AsUIString();
+                }
+            }
+
+            public double OpacityLevel
+            {
+                get
+                {
+                    if (Chat.Options.AutomaticallyProcessed)
+                    {
+                        return 0.3;
+                    }
+
+                    return 1.0;
                 }
             }
 
