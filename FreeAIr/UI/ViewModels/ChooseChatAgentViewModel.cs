@@ -12,8 +12,6 @@ namespace FreeAIr.UI.ViewModels
 {
     public sealed class ChooseChatAgentViewModel : NestedCheckBoxViewModel
     {
-        private readonly AgentCollectionJson _chatAgents;
-        
         private ICommand _saveCommand;
 
         public string Header => "Choose the available agent:";
@@ -68,15 +66,16 @@ namespace FreeAIr.UI.ViewModels
         {
             Groups = new ObservableCollection2<CheckableItem>();
 
-            _chatAgents = chatAgents;
+            var agents = chatAgents.Agents.FindAll(a => a.Technical.HasToken());
+
             ChosenAgent = chosenAgent;
             Groups.Add(
                 new SingleCheckedCheckableItem(
                     "Available agents:",
                     "",
                     CheckableItemStyle.Empty,
-                    chatAgents,
-                    _chatAgents.Agents.Select(agent =>
+                    null,
+                    agents.Select(agent =>
                         new CheckableItem(
                             agent.Name,
                             string.Empty,
@@ -87,7 +86,6 @@ namespace FreeAIr.UI.ViewModels
                         ).ToList()
                     )
                 );
-            _chatAgents = chatAgents;
         }
     }
 }

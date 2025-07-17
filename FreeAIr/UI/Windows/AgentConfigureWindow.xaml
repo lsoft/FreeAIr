@@ -182,6 +182,7 @@
                 Grid.Column="1"
                 HorizontalAlignment="Stretch"
                 VerticalAlignment="Center"
+                FontFamily="Cascadia Code"
                 Text="{Binding SelectedAgent.Name, UpdateSourceTrigger=PropertyChanged}"
                 />
 
@@ -198,6 +199,7 @@
                 Grid.Column="1"
                 HorizontalAlignment="Stretch"
                 VerticalAlignment="Center"
+                FontFamily="Cascadia Code"
                 Text="{Binding SelectedAgent.Technical.Endpoint, UpdateSourceTrigger=PropertyChanged}"
                 />
 
@@ -214,6 +216,7 @@
                 Grid.Column="1"
                 HorizontalAlignment="Stretch"
                 VerticalAlignment="Center"
+                FontFamily="Cascadia Code"
                 Text="{Binding SelectedAgent.Technical.Token, UpdateSourceTrigger=PropertyChanged}"
                 />
 
@@ -240,6 +243,7 @@
                     Grid.Column="0"
                     HorizontalAlignment="Stretch"
                     VerticalAlignment="Center"
+                    FontFamily="Cascadia Code"
                     Text="{Binding SelectedAgent.Technical.ChosenModel, UpdateSourceTrigger=PropertyChanged}"
                     />
 
@@ -289,25 +293,21 @@
                 Content="Agent system prompt:"
                 />
 
-            <ScrollViewer
+            <TextBox
                 Grid.Row="6"
                 Grid.Column="0"
                 Grid.ColumnSpan="2"
-                MaxHeight="350"
                 HorizontalAlignment="Stretch"
-                HorizontalScrollBarVisibility="Auto"
-                VerticalScrollBarVisibility="Auto"
-                >
-
-                <TextBox
-                    HorizontalAlignment="Stretch"
-                    VerticalAlignment="Center"
-                    AcceptsReturn="True"
-                    TextWrapping="Wrap"
-                    Text="{Binding SelectedAgent.SystemPrompt, UpdateSourceTrigger=PropertyChanged}"
-                    />
-
-            </ScrollViewer>
+                VerticalAlignment="Center"
+                AcceptsReturn="True"
+                TextWrapping="Wrap"
+                FontFamily="Cascadia Code"
+                MinHeight="150"
+                MaxHeight="350"
+                ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                ScrollViewer.VerticalScrollBarVisibility="Auto"
+                Text="{Binding SelectedAgent.SystemPrompt, UpdateSourceTrigger=PropertyChanged}"
+                />
 
             <WrapPanel
                 Grid.Row="7"

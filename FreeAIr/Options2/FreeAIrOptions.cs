@@ -1,10 +1,13 @@
 ﻿using Dto;
 using FreeAIr.Helper;
+using FreeAIr.MCP.McpServerProxy;
 using FreeAIr.Options2.Agent;
 using FreeAIr.Options2.Mcp;
 using FreeAIr.Options2.Support;
 using FreeAIr.Options2.Unsorted;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -297,6 +300,63 @@ namespace FreeAIr.Options2
 
         #endregion
 
+        public static async Task<bool> ApplyMcpServerNodeAsync(
+            McpServers servers
+            )
+        {
+            if (servers is null)
+            {
+                throw new ArgumentNullException(nameof(servers));
+            }
+
+            try
+            {
+                var setupResult = await McpServerProxyApplication.UpdateExternalServersAsync(
+                    servers
+                    );
+                if (setupResult is null)
+                {
+                    await VS.MessageBox.ShowErrorAsync(
+                        Resources.Resources.Error,
+                        $"Invalid MCP servers json subnode. Fix json and try again."
+                        );
+                    return false;
+                }
+
+                var failedServerNames = new List<string>();
+                foreach (var mcpServer in servers.Servers)
+                {
+                    if (setupResult.SuccessStartedMcpServers.All(a => a.Name != mcpServer.Key))
+                    {
+                        //этот сервер не был инициализирован по какой-то причине
+                        failedServerNames.Add(mcpServer.Key);
+                    }
+                }
+                if (failedServerNames.Count > 0)
+                {
+                    await VS.MessageBox.ShowErrorAsync(
+                        Resources.Resources.Error,
+                        $"Some MCP servers failed to start: {string.Join(",", failedServerNames)}. Changes did not saved."
+                        );
+                    return false;
+                }
+
+                return true;
+            }
+            catch (Exception excp)
+            {
+                //todo log
+                await VS.MessageBox.ShowErrorAsync(
+                    Resources.Resources.Error,
+                    excp.Message
+                    + Environment.NewLine
+                    + excp.StackTrace
+                    );
+            }
+
+            return false;
+        }
+
         public static async Task<string> ComposeFilePathAsync()
         {
             var solution = await VS.Solutions.GetCurrentSolutionAsync();
@@ -346,7 +406,7 @@ namespace FreeAIr.Options2
         {
             if (!place.HasValue)
             {
-                return "Active options";
+                return "Active servers";
             }
 
             switch (place.Value)
@@ -354,7 +414,7 @@ namespace FreeAIr.Options2
                 case OptionsPlaceEnum.SolutionRelatedFilePath:
                     return "Solution-related json file";
                 case OptionsPlaceEnum.VisualStudioOption:
-                    return "Visual Studio options";
+                    return "Visual Studio servers";
             }
 
             throw new InvalidOperationException(place.Value.ToString());

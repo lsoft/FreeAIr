@@ -56,6 +56,9 @@ namespace Dto
 
         public McpServer()
         {
+            Command = string.Empty;
+            Args = [];
+            Env = [];
         }
 
         public object Clone()

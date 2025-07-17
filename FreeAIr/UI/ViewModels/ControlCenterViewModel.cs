@@ -156,6 +156,11 @@ namespace FreeAIr.UI.ViewModels
             get;
         }
 
+        public EditMcpServersCmd EditMcpServersCommand
+        {
+            get;
+        }
+
         public EditGlobalToolsCmd EditGlobalToolsCommand
         {
             get;
@@ -194,7 +199,9 @@ namespace FreeAIr.UI.ViewModels
             StoreOptionsCommand = new(this);
             DeleteOptionsCommand = new(this);
 
+            EditMcpServersCommand = new(this);
             EditGlobalToolsCommand = new(this);
+
             EditAgentCommand = new(this);
             EditActionCommand = new(this);
 
@@ -464,7 +471,9 @@ namespace FreeAIr.UI.ViewModels
 
                 try
                 {
-                    if (!await ApplyMcpServerNodeAsync(options))
+                    if (!await FreeAIrOptions.ApplyMcpServerNodeAsync(
+                        options.AvailableMcpServers
+                        ))
                     {
                         return;
                     }
@@ -504,48 +513,6 @@ namespace FreeAIr.UI.ViewModels
                 return true;
             }
 
-
-            private async Task<bool> ApplyMcpServerNodeAsync(
-                FreeAIrOptions options
-                )
-            {
-                if (options is null)
-                {
-                    throw new ArgumentNullException(nameof(options));
-                }
-
-                var setupResult = await McpServerProxyApplication.UpdateExternalServersAsync(
-                    options.AvailableMcpServers
-                    );
-                if (setupResult is null)
-                {
-                    await VS.MessageBox.ShowErrorAsync(
-                        Resources.Resources.Error,
-                        $"Invalid MCP servers json subnode. Fix json and try again."
-                        );
-                    return false;
-                }
-
-                var failedServerNames = new List<string>();
-                foreach (var mcpServer in options.AvailableMcpServers.Servers)
-                {
-                    if (setupResult.SuccessStartedMcpServers.All(a => a.Name != mcpServer.Key))
-                    {
-                        //этот сервер не был инициализирован по какой-то причине
-                        failedServerNames.Add(mcpServer.Key);
-                    }
-                }
-                if (failedServerNames.Count > 0)
-                {
-                    await VS.MessageBox.ShowErrorAsync(
-                        Resources.Resources.Error,
-                        $"Some MCP servers failed to start: {string.Join(",", failedServerNames)}. Changes did not saved."
-                        );
-                    return false;
-                }
-
-                return true;
-            }
         }
 
         public sealed class DeleteOptionsCmd : AsyncBaseRelayCommand
@@ -618,6 +585,54 @@ namespace FreeAIr.UI.ViewModels
                 }
             }
 
+        }
+
+        public sealed class EditMcpServersCmd : AsyncBaseRelayCommand
+        {
+            private readonly ControlCenterViewModel _viewModel;
+
+            public EditMcpServersCmd(
+                ControlCenterViewModel viewModel
+                )
+            {
+                if (viewModel is null)
+                {
+                    throw new ArgumentNullException(nameof(viewModel));
+                }
+
+                _viewModel = viewModel;
+            }
+
+            protected override async Task ExecuteInternalAsync(object parameter)
+            {
+                var optionJson = _viewModel._optionsJson;
+
+                var options = FreeAIrOptions.DeserializeFromString(optionJson);
+
+                var w = new McpServerConfigureWindow(
+                    );
+                var viewModel = new McpServerConfigureViewModel(
+                    options.AvailableMcpServers.Servers
+                    );
+                w.DataContext = viewModel;
+                if ((await w.ShowDialogAsync()).GetValueOrDefault())
+                {
+                    options.AvailableMcpServers.Servers = viewModel.BuildServerDictionary();
+                    _viewModel._optionsJson = FreeAIrOptions.SerializeToString(options);
+                }
+
+                _viewModel.OnPropertyChanged();
+            }
+
+            protected override bool CanExecuteInternal(object parameter)
+            {
+                if (string.IsNullOrEmpty(_viewModel._optionsJson))
+                {
+                    return false;
+                }
+
+                return _viewModel._cachedDeserializer.TryDeserializeFromString(_viewModel._optionsJson, out _, out _);
+            }
         }
 
         public sealed class EditGlobalToolsCmd : AsyncBaseRelayCommand

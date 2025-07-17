@@ -278,6 +278,7 @@
       <DependentUpon>NaturalLanguageResultsToolWindowControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\ViewModels\ActionConfigureViewModel.cs" />
+    <Compile Include="UI\ViewModels\McpServerConfigureViewModel.cs" />
     <Compile Include="UI\ViewModels\AgentConfigureViewModel.cs" />
     <Compile Include="UI\ViewModels\ChooseChatAgentViewModel.cs" />
     <Compile Include="UI\ViewModels\ControlCenterViewModel.cs" />
@@ -288,6 +289,9 @@
     <Compile Include="UI\ViewModels\OutlineEmbeddingOutputPanel.cs" />
     <Compile Include="UI\Windows\ActionConfigureWindow.xaml.cs">
       <DependentUpon>ActionConfigureWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\Windows\McpServerConfigureWindow.xaml.cs">
+      <DependentUpon>McpServerConfigureWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\Windows\AgentConfigureWindow.xaml.cs">
       <DependentUpon>AgentConfigureWindow.xaml</DependentUpon>
@@ -539,6 +543,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UI\Windows\ActionConfigureWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI\Windows\McpServerConfigureWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

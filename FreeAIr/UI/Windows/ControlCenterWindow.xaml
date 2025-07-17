@@ -33,6 +33,7 @@
                 <RowDefinition Height="auto"/> <!-- 6 -->
                 <RowDefinition Height="auto"/> <!-- 7 -->
                 <RowDefinition Height="auto"/> <!-- 8 -->
+                <RowDefinition Height="auto"/> <!-- 9 -->
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="auto"/>
@@ -173,14 +174,27 @@
                 Margin="0,2,8,2"
                 FontSize="12"
                 FontFamily="Cascadia Code"
+                Content="Edit MCP servers..."
+                Command="{Binding EditMcpServersCommand}"
+                Style="{DynamicResource TextBlockLikeButtonStyle}"
+                />
+
+            <Button
+                Grid.Row="7"
+                Grid.Column="0"
+                Grid.ColumnSpan="3"
+                HorizontalAlignment="Right"
+                VerticalAlignment="Center"
+                Margin="0,2,8,2"
+                FontSize="12"
+                FontFamily="Cascadia Code"
                 Content="Edit global MCP tools..."
                 Command="{Binding EditGlobalToolsCommand}"
                 Style="{DynamicResource TextBlockLikeButtonStyle}"
-                Name="MCPAppyButton"
                 />
 
             <Label
-                Grid.Row="7"
+                Grid.Row="8"
                 Grid.Column="0"
                 HorizontalAlignment="Left"
                 VerticalAlignment="Center"
@@ -192,7 +206,7 @@
                 />
 
             <Label
-                Grid.Row="7"
+                Grid.Row="8"
                 Grid.Column="1"
                 Margin="0,20,8,0"
                 Padding="0"
@@ -204,7 +218,7 @@
                 />
 
             <Button
-                Grid.Row="7"
+                Grid.Row="8"
                 Grid.Column="2"
                 HorizontalAlignment="Right"
                 VerticalAlignment="Center"
@@ -217,7 +231,7 @@
                 />
 
             <StackPanel
-                Grid.Row="8"
+                Grid.Row="9"
                 Grid.Column="0"
                 Grid.ColumnSpan="3"
                 Margin="2,20,2,2"
