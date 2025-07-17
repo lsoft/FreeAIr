@@ -41,6 +41,7 @@
                 <ColumnDefinition Width="auto" />
                 <ColumnDefinition Width="auto" />
                 <ColumnDefinition Width="auto" />
+                <ColumnDefinition Width="auto" />
                 <ColumnDefinition />
             </Grid.ColumnDefinitions>
 
@@ -106,6 +107,23 @@
 
             <Button
                 Grid.Column="5"
+                Margin="15,0,5,0"
+                FontSize="12"
+                FontFamily="Cascadia Code"
+                VerticalAlignment="Center"
+                ToolTip="Search for MCP servers in Docker registry..."
+                Command="{Binding SearchCommand}"
+                Style="{DynamicResource TextBlockLikeButtonStyle}"
+                >
+                <Button.Content>
+                    <imaging:CrispImage
+                        Moniker="{x:Static imaging1:KnownMonikers.Docker}"
+                        />
+                </Button.Content>
+            </Button>
+
+            <Button
+                Grid.Column="6"
                 Content="Apply changes"
                 Margin="5,0,5,0"
                 FontSize="12"

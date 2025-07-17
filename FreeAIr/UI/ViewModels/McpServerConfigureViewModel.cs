@@ -1,5 +1,7 @@
 ﻿using Dto;
 using FreeAIr.Options2;
+using FreeAIr.UI.Windows;
+using ICSharpCode.AvalonEdit.Search;
 using Microsoft.VisualStudio.PlatformUI;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.TextManager.Interop;
@@ -26,6 +28,7 @@ namespace FreeAIr.UI.ViewModels
         private ICommand _cloneCommand;
         private ICommand _checkForConnectionCommand;
         private bool _formEnabled = true;
+        private ICommand _searchCommand;
 
         public Action<bool>? CloseWindow
         {
@@ -125,12 +128,7 @@ namespace FreeAIr.UI.ViewModels
                     _addNewCommand = new RelayCommand(
                         a =>
                         {
-                            var newAgent = new McpServerWrapper(
-                                this,
-                                DateTime.Now.ToString()
-                                );
-                            ServerCollection.Add(newAgent);
-                            AvailableServers.Add(newAgent);
+                            AddServer();
                         });
                 }
 
@@ -278,6 +276,37 @@ namespace FreeAIr.UI.ViewModels
             }
         }
 
+        public ICommand SearchCommand
+        {
+            get
+            {
+                if (_searchCommand is null)
+                {
+                    _searchCommand = new AsyncRelayCommand(
+                        async a =>
+                        {
+                            var w = new SearchForDockerMcpServerWindow(
+                                );
+                            var viewModel = new SearchForDockerMcpServerViewModel(
+                                );
+                            w.DataContext = viewModel;
+                            if ((await w.ShowDialogAsync()).GetValueOrDefault())
+                            {
+                                if (viewModel.McpServerName != null && viewModel.McpServer != null)
+                                {
+                                    AddServer(
+                                        viewModel.McpServerName,
+                                        viewModel.McpServer
+                                        );
+                                }
+                            }
+                        });
+                }
+
+                return _searchCommand;
+            }
+        }
+
         public ICommand ApplyAndCloseCommand
         {
             get
@@ -287,7 +316,6 @@ namespace FreeAIr.UI.ViewModels
                     _applyAndCloseCommand = new AsyncRelayCommand(
                         async a =>
                         {
-
                             if (CloseWindow is not null)
                             {
                                 CloseWindow(true);
@@ -331,6 +359,10 @@ namespace FreeAIr.UI.ViewModels
                                         );
                                 }
                             }
+                            catch (Exception excp)
+                            {
+                                //todo log
+                            }
                             finally
                             {
                                 FormEnabled = true;
@@ -371,6 +403,36 @@ namespace FreeAIr.UI.ViewModels
                 .ToDictionary(w => w.Item1, w => w.Item2)
                 ;
             return result;
+        }
+
+        private void AddServer(
+            string name,
+            McpServer server
+            )
+        {
+            var newServer = new McpServerWrapper(
+                this,
+                name,
+                server
+                );
+            AddServerToCollections(newServer);
+        }
+
+        private void AddServer()
+        {
+            var newServer = new McpServerWrapper(
+                this,
+                DateTime.Now.ToString()
+                );
+            AddServerToCollections(newServer);
+        }
+
+        private void AddServerToCollections(
+            McpServerWrapper newServer
+            )
+        {
+            ServerCollection.Add(newServer);
+            AvailableServers.Add(newServer);
         }
 
         public sealed class McpServerWrapper : ICloneable

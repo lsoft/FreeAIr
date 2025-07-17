@@ -287,6 +287,7 @@
     <Compile Include="UI\ViewModels\NaturalLanguageOutlinesViewModel.cs" />
     <Compile Include="UI\ViewModels\NaturalLanguageResultsViewModel.cs" />
     <Compile Include="UI\ViewModels\OutlineEmbeddingOutputPanel.cs" />
+    <Compile Include="UI\ViewModels\SearchForDockerMcpServerViewModel.cs" />
     <Compile Include="UI\Windows\ActionConfigureWindow.xaml.cs">
       <DependentUpon>ActionConfigureWindow.xaml</DependentUpon>
     </Compile>
@@ -304,6 +305,9 @@
     <Compile Include="UI\ViewModels\AvailableToolsViewModel.cs" />
     <Compile Include="UI\Windows\ControlCenterWindow.xaml.cs">
       <DependentUpon>ControlCenterWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\Windows\SearchForDockerMcpServerWindow.xaml.cs">
+      <DependentUpon>SearchForDockerMcpServerWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\Windows\WaitForTaskWindow.xaml.cs">
       <DependentUpon>WaitForTaskWindow.xaml</DependentUpon>
@@ -561,6 +565,10 @@
     <Page Include="UI\Windows\ControlCenterWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI\Windows\SearchForDockerMcpServerWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UI\Windows\WaitForTaskWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
