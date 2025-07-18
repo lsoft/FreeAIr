@@ -19,28 +19,343 @@
       "Kind": 3,
       "FullPath": "DataObject\\BLogic\\TransferSearcher.cs",
       "Target": "DataObject\\BLogic\\TransferSearcher.cs",
-      "OutlineText": "The file TransferSearcher.cs in the DataObject.BLogic namespace of the project \u0022FreeAIr\u0022 is a class named TransferSearcher. This class is designed to search for voyages that match specific date and conditions, based on the Repository instance it is initialized with. \r\n\r\nThe TransferSearcher class has a private Repository field _repository to access and manipulate data. \r\n\r\nThe class has a constructor that takes a Repository instance as an argument, and it initializes the _repository field with the provided instance. If the provided instance is null, it throws an ArgumentNullException.\r\n\r\nThe SearchFor method is used to search for voyages that match the given date and conditions. It takes a Voyage instance and a DateTime as arguments. It retrieves all the voyages on the provided date from the repository, removes the first voyage from the list (to exclude the same voyage as the provided one), and then finds all voyages that have the first station of their route equal to the last station of the first voyage\u0027s route. Finally, it returns the list of these allowed voyages."
+      "OutlineText": ""
+    },
+    {
+      "Id": "c2d1aa43-664f-c55e-a540-55d7329759c8",
+      "Kind": 4,
+      "FullPath": "DataObject\\BLogic\\TransferSearcher.cs",
+      "Target": "TransferSearcher",
+      "OutlineText": "TransferSearcher"
+    },
+    {
+      "Id": "14212aad-b80e-8b4d-46bf-060c5d7b943c",
+      "Kind": 5,
+      "FullPath": "DataObject\\BLogic\\TransferSearcher.cs",
+      "Target": "TransferSearcher._repository",
+      "OutlineText": "TransferSearcher._repository"
+    },
+    {
+      "Id": "cc4c1f12-0d6b-ff1a-efe5-f7676e4fc17c",
+      "Kind": 5,
+      "FullPath": "DataObject\\BLogic\\TransferSearcher.cs",
+      "Target": "TransferSearcher.constructor",
+      "OutlineText": "Constructor initializes the repository."
+    },
+    {
+      "Id": "6c3a7201-16a8-9bba-f0f6-873645a64007",
+      "Kind": 5,
+      "FullPath": "DataObject\\BLogic\\TransferSearcher.cs",
+      "Target": "TransferSearcher.SearchFor",
+      "OutlineText": "Search for voyages that match the given date and conditions.\r\n\u0418\u0449\u0435\u0442 \u0440\u0435\u0439\u0441\u044B, \u0441\u043E\u043E\u0442\u0432\u0435\u0442\u0441\u0442\u0432\u0443\u044E\u0449\u0438\u0435 \u0437\u0430\u0434\u0430\u043D\u043D\u043E\u0439 \u0434\u0430\u0442\u0435 \u0438 \u0443\u0441\u043B\u043E\u0432\u0438\u044F\u043C."
     },
     {
       "Id": "b830cb74-d3f6-cea1-d10b-ff08885c3541",
       "Kind": 3,
       "FullPath": "DataObject\\Entity\\Station.cs",
       "Target": "DataObject\\Entity\\Station.cs",
-      "OutlineText": "This file, Station.cs, represents a railway station. It contains a class named Station that represents a station. This class has two properties: Id and Name. The Id property represents the unique identifier for the station, while the Name property represents the name of the station. The class includes constructor for creating a Station object, and overridden methods for Equals and GetHashCode. The Equals method checks if two Station objects are equal based on their Id and Name properties, while the GetHashCode method returns a hash code based on these properties."
+      "OutlineText": ""
+    },
+    {
+      "Id": "7fd2abd7-ff4a-7a6c-2065-cbf7d89cc44e",
+      "Kind": 4,
+      "FullPath": "DataObject\\Entity\\Station.cs",
+      "Target": "Voyage",
+      "OutlineText": "Voyage class represents a voyage with unique properties."
+    },
+    {
+      "Id": "63bfa841-2454-243a-e014-a6dc29fb9023",
+      "Kind": 5,
+      "FullPath": "DataObject\\Entity\\Station.cs",
+      "Target": "Voyage.Id",
+      "OutlineText": "Voyage.Id"
+    },
+    {
+      "Id": "3b549a5c-0cc0-fb16-29c2-ef2f1a2e7ea7",
+      "Kind": 5,
+      "FullPath": "DataObject\\Entity\\Station.cs",
+      "Target": "Voyage.TrainInfo",
+      "OutlineText": "Voyage.TrainInfo"
+    },
+    {
+      "Id": "3358cdaf-18df-7703-5947-7efd3e0e70df",
+      "Kind": 5,
+      "FullPath": "DataObject\\Entity\\Station.cs",
+      "Target": "Voyage.Route",
+      "OutlineText": "Voyage.Route"
+    },
+    {
+      "Id": "ad082f31-1b0e-7854-8ad3-2384e1839d02",
+      "Kind": 5,
+      "FullPath": "DataObject\\Entity\\Station.cs",
+      "Target": "Voyage.VoyageDate",
+      "OutlineText": "Voyage.VoyageDate"
+    },
+    {
+      "Id": "220bce54-0efc-770e-c369-d24a41a2d0aa",
+      "Kind": 5,
+      "FullPath": "DataObject\\Entity\\Station.cs",
+      "Target": "Voyage.constructor",
+      "OutlineText": "Voyage.constructor"
+    },
+    {
+      "Id": "c5c8e8c4-3207-0f70-3f03-d4e077ffa5cf",
+      "Kind": 5,
+      "FullPath": "DataObject\\Entity\\Station.cs",
+      "Target": "Voyage.Equals",
+      "OutlineText": "Voyage.Equals"
+    },
+    {
+      "Id": "cd8d5c11-ad56-cc2a-03cc-d8e654e8d338",
+      "Kind": 5,
+      "FullPath": "DataObject\\Entity\\Station.cs",
+      "Target": "Voyage.GetHashCode",
+      "OutlineText": "Voyage.GetHashCode"
+    },
+    {
+      "Id": "a724b42d-96c4-6ab6-835b-44241bb834eb",
+      "Kind": 4,
+      "FullPath": "DataObject\\Entity\\Station.cs",
+      "Target": "TrainInfo",
+      "OutlineText": "TrainInfo class represents train information."
+    },
+    {
+      "Id": "ffd0a464-5add-64cf-d126-e91ca04d3b53",
+      "Kind": 5,
+      "FullPath": "DataObject\\Entity\\Station.cs",
+      "Target": "TrainInfo.Id",
+      "OutlineText": "TrainInfo.Id"
+    },
+    {
+      "Id": "f306a13e-7117-1ea6-558e-786d28501034",
+      "Kind": 5,
+      "FullPath": "DataObject\\Entity\\Station.cs",
+      "Target": "TrainInfo.Name",
+      "OutlineText": "TrainInfo.Name"
+    },
+    {
+      "Id": "f0ae28b8-f23f-9b5d-35f5-f76c7295942c",
+      "Kind": 5,
+      "FullPath": "DataObject\\Entity\\Station.cs",
+      "Target": "TrainInfo.constructor",
+      "OutlineText": "TrainInfo.constructor"
+    },
+    {
+      "Id": "7981dfc3-4390-3a86-6cec-00c15f604cd6",
+      "Kind": 5,
+      "FullPath": "DataObject\\Entity\\Station.cs",
+      "Target": "TrainInfo.Equals",
+      "OutlineText": "TrainInfo.Equals"
+    },
+    {
+      "Id": "ae4f65b0-d834-b023-191d-61843821628d",
+      "Kind": 5,
+      "FullPath": "DataObject\\Entity\\Station.cs",
+      "Target": "TrainInfo.GetHashCode",
+      "OutlineText": "TrainInfo.GetHashCode"
+    },
+    {
+      "Id": "ab880cfa-fb70-f0a0-6fb9-1fe58de4702a",
+      "Kind": 4,
+      "FullPath": "DataObject\\Entity\\Station.cs",
+      "Target": "Route",
+      "OutlineText": "Route class represents a route with a list of stations."
+    },
+    {
+      "Id": "51ba394d-0e9d-0d89-2eab-6030d9681d30",
+      "Kind": 5,
+      "FullPath": "DataObject\\Entity\\Station.cs",
+      "Target": "Route._stationList",
+      "OutlineText": "Route._stationList"
+    },
+    {
+      "Id": "72be6958-0a7f-8652-5775-87262940ec61",
+      "Kind": 5,
+      "FullPath": "DataObject\\Entity\\Station.cs",
+      "Target": "Route.Id",
+      "OutlineText": "Route.Id"
+    },
+    {
+      "Id": "f9c0e0f6-4638-0ad9-5634-6849e9071727",
+      "Kind": 5,
+      "FullPath": "DataObject\\Entity\\Station.cs",
+      "Target": "Route.StationList",
+      "OutlineText": "Route.StationList"
+    },
+    {
+      "Id": "5d7abf36-8fe0-9f2f-37ea-dd15c36d6ab5",
+      "Kind": 5,
+      "FullPath": "DataObject\\Entity\\Station.cs",
+      "Target": "Route.constructor",
+      "OutlineText": "Route.constructor"
+    },
+    {
+      "Id": "e8309282-6860-78ae-c71c-4eb4e3066e51",
+      "Kind": 5,
+      "FullPath": "DataObject\\Entity\\Station.cs",
+      "Target": "Route.Equals",
+      "OutlineText": "Route.Equals"
+    },
+    {
+      "Id": "282a957b-d1f9-3309-013e-8f293871dd7b",
+      "Kind": 5,
+      "FullPath": "DataObject\\Entity\\Station.cs",
+      "Target": "Route.GetHashCode",
+      "OutlineText": "Route.GetHashCode"
+    },
+    {
+      "Id": "5b3004ac-74fa-efb8-0f29-7e1204a4df11",
+      "Kind": 4,
+      "FullPath": "DataObject\\Entity\\Station.cs",
+      "Target": "Edge",
+      "OutlineText": "Edge represents an graph edge (a road between two stations)."
+    },
+    {
+      "Id": "3a793999-f647-ad8a-58e3-8207886c88c2",
+      "Kind": 5,
+      "FullPath": "DataObject\\Entity\\Station.cs",
+      "Target": "Edge.First",
+      "OutlineText": "Edge.First"
+    },
+    {
+      "Id": "ba3b6e6b-4b6b-93df-e764-15c4af4c9764",
+      "Kind": 5,
+      "FullPath": "DataObject\\Entity\\Station.cs",
+      "Target": "Edge.Second",
+      "OutlineText": "Edge.Second"
+    },
+    {
+      "Id": "6cd3d3c5-7919-fe72-bcc1-a48bf6035090",
+      "Kind": 5,
+      "FullPath": "DataObject\\Entity\\Station.cs",
+      "Target": "Edge.constructor",
+      "OutlineText": "Edge.constructor"
+    },
+    {
+      "Id": "b41973ed-c248-b571-4407-48671f7c7e25",
+      "Kind": 5,
+      "FullPath": "DataObject\\Entity\\Station.cs",
+      "Target": "Edge.Equals",
+      "OutlineText": "Edge.Equals"
+    },
+    {
+      "Id": "9bd6acb6-f64e-3c1c-28cc-c0b4f4612ff0",
+      "Kind": 5,
+      "FullPath": "DataObject\\Entity\\Station.cs",
+      "Target": "Edge.GetHashCode",
+      "OutlineText": "Edge.GetHashCode"
+    },
+    {
+      "Id": "b1fdabf6-736e-adce-2706-9ca5425020f8",
+      "Kind": 4,
+      "FullPath": "DataObject\\Entity\\Station.cs",
+      "Target": "Station",
+      "OutlineText": "This is a route station."
+    },
+    {
+      "Id": "4b616b5f-a937-5617-e45b-599a87c4973a",
+      "Kind": 5,
+      "FullPath": "DataObject\\Entity\\Station.cs",
+      "Target": "Station.Id",
+      "OutlineText": "Station.Id"
+    },
+    {
+      "Id": "77415ed4-576e-1e98-6cbe-c4464bbb3dc2",
+      "Kind": 5,
+      "FullPath": "DataObject\\Entity\\Station.cs",
+      "Target": "Station.Name",
+      "OutlineText": "The name  of station."
+    },
+    {
+      "Id": "f9c6b249-5b2b-f1ec-6cad-02ac5985d364",
+      "Kind": 5,
+      "FullPath": "DataObject\\Entity\\Station.cs",
+      "Target": "Station.constructor",
+      "OutlineText": "Station.constructor"
+    },
+    {
+      "Id": "04b06bdf-5ea5-4bb1-6101-ec23e530f532",
+      "Kind": 5,
+      "FullPath": "DataObject\\Entity\\Station.cs",
+      "Target": "Station.Equals",
+      "OutlineText": "Station.Equals"
+    },
+    {
+      "Id": "10c49748-62d0-7bc4-5873-6d4ec3141be9",
+      "Kind": 5,
+      "FullPath": "DataObject\\Entity\\Station.cs",
+      "Target": "Station.GetHashCode",
+      "OutlineText": "Station.GetHashCode"
     },
     {
       "Id": "1b2483d4-0cdd-dc8c-ea01-b0d32682657e",
       "Kind": 3,
       "FullPath": "DataObject\\Helper\\CollectionHelper.cs",
       "Target": "DataObject\\Helper\\CollectionHelper.cs",
-      "OutlineText": "The file CollectionHelper.cs in the DataObject.Helper namespace is a C# class containing a static method for comparing two collections for equality. This class is primarily used for comparison of lists or arrays of objects for equality, based on the implementation of the IEquatable interface in the generic type T.\r\n\r\nIt provides a static method named IsCollectionEquals that accepts two parameters of type IReadOnlyList\u003CT\u003E. The method performs a series of checks to see if the two collections are the same instance, if either one of them is null, or if their element counts are not equal. If any of these conditions are met, it returns false. If the collections are not the same instance and have the same element counts, the method iterates over the collections, comparing each pair of elements. If all elements are equal, the method returns true. If any pair of elements are not equal, the method returns false.\r\n\r\nThe purpose of this helper class is to provide a more concise and readable way to compare collections for equality, especially useful in situations where you need to compare collections of complex types."
+      "OutlineText": ""
+    },
+    {
+      "Id": "2a0d5f98-74e8-b1f5-9fde-2ef81c8aabc6",
+      "Kind": 4,
+      "FullPath": "DataObject\\Helper\\CollectionHelper.cs",
+      "Target": "CollectionHelper",
+      "OutlineText": "CollectionHelper"
+    },
+    {
+      "Id": "ef89b2f9-281f-3e21-3610-21598661ef8d",
+      "Kind": 5,
+      "FullPath": "DataObject\\Helper\\CollectionHelper.cs",
+      "Target": "CollectionHelper.IsCollectionEquals",
+      "OutlineText": "\u041F\u0440\u043E\u0432\u0435\u0440\u044F\u0435\u0442 \u0440\u0430\u0432\u0435\u043D\u0441\u0442\u0432\u043E \u0434\u0432\u0443\u0445 \u043A\u043E\u043B\u043B\u0435\u043A\u0446\u0438\u0439.\r\n\u041E\u0431\u0440\u0430\u0431\u0430\u0442\u044B\u0432\u0430\u0435\u0442 \u0441\u043B\u0443\u0447\u0430\u0438, \u043A\u043E\u0433\u0434\u0430 \u043E\u0434\u043D\u0430 \u0438\u0437 \u043A\u043E\u043B\u043B\u0435\u043A\u0446\u0438\u0439 \u0440\u0430\u0432\u043D\u0430 null.\r\n\u0421\u0440\u0430\u0432\u043D\u0438\u0432\u0430\u0435\u0442 \u044D\u043B\u0435\u043C\u0435\u043D\u0442\u044B \u043A\u043E\u043B\u043B\u0435\u043A\u0446\u0438\u0439 \u043F\u043E\u043F\u0430\u0440\u043D\u043E."
     },
     {
       "Id": "59179160-4de6-78ab-db38-bbba2c6eee0a",
       "Kind": 3,
       "FullPath": "DataObject\\Repo\\Repository.cs",
       "Target": "DataObject\\Repo\\Repository.cs",
-      "OutlineText": "This file, Repository.cs, is a part of the DataObject.Repo namespace and is responsible for managing the data of various types. It provides methods for reading data in various forms such as stations, edges, routes, train information, and voyages. The methods return the read data as lists. The file is written in C#."
+      "OutlineText": ""
+    },
+    {
+      "Id": "e1d80681-b16a-b9df-1800-b98d5a1ae24a",
+      "Kind": 4,
+      "FullPath": "DataObject\\Repo\\Repository.cs",
+      "Target": "Repository",
+      "OutlineText": "Repository"
+    },
+    {
+      "Id": "f2fd3187-befd-bd32-ea2a-9a0b45b34825",
+      "Kind": 5,
+      "FullPath": "DataObject\\Repo\\Repository.cs",
+      "Target": "Repository.ReadAllStations",
+      "OutlineText": "Reads all stations and returns them as a list."
+    },
+    {
+      "Id": "8fa56c58-99b9-8d15-a77e-057051512bc5",
+      "Kind": 5,
+      "FullPath": "DataObject\\Repo\\Repository.cs",
+      "Target": "Repository.ReadAllEdges",
+      "OutlineText": "Reads all edges by referencing stations and returns them as a list."
+    },
+    {
+      "Id": "bb6d2c82-0434-31a2-329b-a6243b6d95d3",
+      "Kind": 5,
+      "FullPath": "DataObject\\Repo\\Repository.cs",
+      "Target": "Repository.ReadAllRoutes",
+      "OutlineText": "Reads all routes by referencing stations and returns them as a list."
+    },
+    {
+      "Id": "49689317-98f5-3c6f-d09b-ea9e8d2167f7",
+      "Kind": 5,
+      "FullPath": "DataObject\\Repo\\Repository.cs",
+      "Target": "Repository.ReadAllTrainInfos",
+      "OutlineText": "Reads all train information and returns it as a list."
+    },
+    {
+      "Id": "71ffbe70-a3af-42cf-4da1-54056fc3a725",
+      "Kind": 5,
+      "FullPath": "DataObject\\Repo\\Repository.cs",
+      "Target": "Repository.ReadAllVoyages",
+      "OutlineText": "Reads all voyages by referencing routes and train information and returns them as a list."
     },
     {
       "Id": "6b2736c6-9072-78f0-1c3b-2b018b08ea4b",
@@ -54,14 +369,28 @@
       "Kind": 3,
       "FullPath": "TestSubject\\Empty.cs",
       "Target": "TestSubject\\Empty.cs",
-      "OutlineText": "The file Empty.cs in the TestSubject namespace of the project is an empty C# file. It contains an empty namespace declaration, which likely exists solely to allow for the organization of related classes and interfaces. It currently does not contain any classes, interfaces, or other code elements. This file might be left over from an earlier project state and could be safely deleted if it\u0027s not being used in the current context."
+      "OutlineText": ""
     },
     {
       "Id": "d732bc2b-6f42-1e77-a20f-5b06470189f7",
       "Kind": 3,
       "FullPath": "TestSubject\\Program.cs",
       "Target": "TestSubject\\Program.cs",
-      "OutlineText": "This file, Program.cs, is the main entry point of the application. It demonstrates how to create an instance of a repository, initialize a transfer searcher with the repository, and use it to search for second voyages based on a specified date. The results are then printed to the console."
+      "OutlineText": ""
+    },
+    {
+      "Id": "be3d2b77-18f8-3c52-a8e7-8350e828cf89",
+      "Kind": 4,
+      "FullPath": "TestSubject\\Program.cs",
+      "Target": "Program",
+      "OutlineText": "Program"
+    },
+    {
+      "Id": "8b56cf4a-f70c-4abf-00ed-938a7627abdf",
+      "Kind": 5,
+      "FullPath": "TestSubject\\Program.cs",
+      "Target": "Program.Main",
+      "OutlineText": "Create a new repository instance.\r\nInitialize a transfer searcher with the repository.\r\nSearch for second voyages based on the first voyage and a specified date."
     }
   ]
 }

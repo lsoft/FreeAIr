@@ -339,7 +339,7 @@ namespace FreeAIr.NLOutline.Tree.Builder.File
             {
                 var typeName = typeDecl.Identifier.Text;
 
-                var commentText = GetOutlineText(typeDecl);
+                var commentText = GetOutlineText(typeDecl, true);
                 var outlineText = string.IsNullOrEmpty(commentText) ? typeName : commentText;
 
                 var typeNode = new OutlineNode(
@@ -357,7 +357,7 @@ namespace FreeAIr.NLOutline.Tree.Builder.File
                         continue;
 
                     var memberName = GetMemberName(member);
-                    var memberComment = GetOutlineText(member);
+                    var memberComment = GetOutlineText(member, false);
                     var typeMemberNames = $"{typeName}.{memberName}";
                     var memberOutlineText = string.IsNullOrEmpty(memberComment)
                         ? typeMemberNames
@@ -385,67 +385,97 @@ namespace FreeAIr.NLOutline.Tree.Builder.File
                 return typeNode;
             }
 
-            private string GetOutlineText(SyntaxNode node)
+            private string GetOutlineText(
+                SyntaxNode node,
+                bool onlyXmlComments
+                )
             {
-                var triviaList = node.GetLeadingTrivia();
                 var comments = new List<string>();
 
-                foreach (var trivia in triviaList)
+                if (onlyXmlComments)
                 {
-                    if (trivia.IsKind(SyntaxKind.SingleLineCommentTrivia))
-                    {
-                        var text = trivia.ToString().TrimStart();
-
-                        if (text.StartsWith("// * "))
-                        {
-                            comments.Add(text.Substring(5).Trim());
-                        }
-                        else
-                        {
-                            comments.Add(text.Substring(2).Trim());
-                        }
-                    }
-                    else if (trivia.IsKind(SyntaxKind.MultiLineCommentTrivia))
-                    {
-                        var text = trivia.ToString();
-                        var content = text.Substring(2, text.Length - 4).Trim();
-                        comments.Add(content);
-                    }
-                    else if (trivia.IsKind(SyntaxKind.SingleLineDocumentationCommentTrivia))
-                    {
-                        if (trivia.GetStructure() is DocumentationCommentTriviaSyntax docComment)
-                        {
-                            foreach (var child in docComment.Content)
-                            {
-                                if (child is XmlElementSyntax xmlElement &&
-                                    xmlElement.StartTag?.Name?.ToString() == "summary")
-                                {
-                                    var xmlChildren = xmlElement
-                                        .ChildNodes()
-                                        .OfType<XmlTextSyntax>()
-                                        .ToList();
-
-                                    var su = string.Join(
-                                        " ",
-                                        xmlChildren.SelectMany(
-                                            x => x
-                                                .GetText()
-                                                .ToString()
-                                                .Split('\r', '\n')
-                                                .Select(p => p.Trim('\r', '\n', ' ', '\t', '/'))
-                                            )
-                                        ).Trim();
-
-                                    comments.Add(su);
-                                }
-                            }
-                        }
-                    }
+                    ExtractComments(
+                        node.GetLeadingTrivia(),
+                        ref comments
+                        );
+                }
+                else
+                {
+                    ExtractComments(
+                        node.DescendantTrivia(),
+                        ref comments
+                        );
                 }
 
                 return string.Join(Environment.NewLine, comments);
             }
 
+            private static void ExtractComments(
+                IEnumerable<SyntaxTrivia> triviaList,
+                ref List<string> comments
+                )
+            {
+                foreach (var trivia in triviaList)
+                {
+                    if (trivia.IsKind(SyntaxKind.SingleLineCommentTrivia)
+                        || trivia.IsKind(SyntaxKind.MultiLineCommentTrivia)
+                        || trivia.GetStructure() is DocumentationCommentTriviaSyntax
+                        )
+                    {
+                        var cleanedText = CleanCommentText(
+                            trivia,
+                            trivia.Kind()
+                            );
+                        if (!string.IsNullOrEmpty(cleanedText))
+                        {
+                            comments.Add(cleanedText);
+                        }
+                    }
+                }
+            }
+
+            private static string CleanCommentText(
+                SyntaxTrivia trivia,
+                SyntaxKind kind
+                )
+            {
+                if (!trivia.IsKind(SyntaxKind.SingleLineDocumentationCommentTrivia))
+                {
+                    var triviaText = trivia.ToString();
+
+                    return triviaText.Trim('/', ' ', '*');
+                }
+
+                if (trivia.GetStructure() is DocumentationCommentTriviaSyntax docComment)
+                {
+                    foreach (var child in docComment.Content)
+                    {
+                        if (child is XmlElementSyntax xmlElement &&
+                            xmlElement.StartTag?.Name?.ToString() == "summary")
+                        {
+                            var xmlChildren = xmlElement
+                                .ChildNodes()
+                                .OfType<XmlTextSyntax>()
+                                .ToList();
+
+                            var su = string.Join(
+                                " ",
+                                xmlChildren.SelectMany(
+                                    x => x
+                                        .GetText()
+                                        .ToString()
+                                        .Split('\r', '\n')
+                                        .Select(p => p.Trim('\r', '\n', ' ', '\t', '/'))
+                                    )
+                                ).Trim();
+
+                            return su;
+                        }
+                    }
+                }
+
+                return string.Empty;
+            }
 
             private string GetMemberName(MemberDeclarationSyntax member)
             {
