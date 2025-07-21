@@ -31,7 +31,7 @@ namespace FreeAIr.BLogic.Context
             if (!string.IsNullOrEmpty(fullPath))
             {
                 context._items.Add(
-                    new CustomFileContextItem(
+                    new CustomFileChatContextItem(
                         fullPath,
                         true
                         )

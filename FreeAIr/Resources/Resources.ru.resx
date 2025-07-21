@@ -117,12 +117,6 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="SuggestWholeLine" xml:space="preserve">
-    <value>Предложи дополнение целой строки в том месте, где написано `{0}` в следующем коде. Дай в своем ответе только новый код без дополнительной информации и без того кода, что дал я.</value>
-  </data>
-  <data name="SuggestWholeLine_Anchor" xml:space="preserve">
-    <value>&lt;｜fim▁hole｜&gt;</value>
-  </data>
   <data name="Code_NoSelectedCode" xml:space="preserve">
     <value>Не могу получить выделенный блок кода.</value>
   </data>

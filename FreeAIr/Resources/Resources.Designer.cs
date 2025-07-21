@@ -88,24 +88,6 @@ namespace FreeAIr.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Suggest filling the whole line where `{0}` is written in the following code. Give in your reply only new piece of code without additional information and without the code I provide you..
-        /// </summary>
-        public static string SuggestWholeLine {
-            get {
-                return ResourceManager.GetString("SuggestWholeLine", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to &lt;｜fim▁hole｜&gt;.
-        /// </summary>
-        public static string SuggestWholeLine_Anchor {
-            get {
-                return ResourceManager.GetString("SuggestWholeLine_Anchor", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Answer.
         /// </summary>
         public static string UI_Answer {

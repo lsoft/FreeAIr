@@ -47,6 +47,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Antlr\Answer\IParsedAnswer.cs" />
+    <Compile Include="BLogic\Context\Item\SimpleTextChatContextItem.cs" />
     <Compile Include="Commands\ApplySupportCommand.cs" />
     <Compile Include="Commands\File\ApplyFileSupportCommand.cs" />
     <Compile Include="Commands\Other\OpenPropertiesCommand.cs" />
@@ -94,7 +95,7 @@
     <Compile Include="BLogic\Context\Composer\ContextSelectedIdentifier.cs" />
     <Compile Include="BLogic\Context\Composer\TypeReferenceWalker.cs" />
     <Compile Include="BLogic\Context\IChatContextItem.cs" />
-    <Compile Include="BLogic\Context\Item\CustomFileContextItem.cs" />
+    <Compile Include="BLogic\Context\Item\CustomFileChatContextItem.cs" />
     <Compile Include="BLogic\Context\Item\SolutionItemChatContextItem.cs" />
     <Compile Include="BuildErrors\BuildResultProvider.cs" />
     <Compile Include="Commands\BuildError\BuildErrorWindowFixErrorCommand.cs" />

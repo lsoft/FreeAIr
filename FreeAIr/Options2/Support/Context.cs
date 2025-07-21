@@ -1,4 +1,5 @@
-﻿using FreeAIr.BLogic.Context.Item;
+﻿using Community.VisualStudio.Toolkit;
+using FreeAIr.BLogic.Context.Item;
 using FreeAIr.BuildErrors;
 using System;
 using System.Collections.Generic;
@@ -17,7 +18,8 @@ namespace FreeAIr.Options2.Support
         BuildErrorColumn,
         UnitTestFramework,
         GitDiff,
-        NaturalLanguageSearchQuery
+        NaturalLanguageSearchQuery,
+        WholeLineCompletionAnchor
     }
 
     public static class SupportContextVariableHelper
@@ -29,6 +31,7 @@ namespace FreeAIr.Options2.Support
         private const string UnitTestFramework = "{UNIT_TEST_FRAMEWORK}";
         private const string GitDiff = "{GIT_DIFF}";
         private const string NaturalLanguageSearchQuery = "{NATURAL_LANGUAGE_SEARCH_QUERY}";
+        private const string WholeLineCompletionAnchor = "{WHOLE_LINE_COMPLETION_ANCHOR}";
 
         public static readonly string[] Anchors =
             [
@@ -38,7 +41,8 @@ namespace FreeAIr.Options2.Support
                 BuildErrorColumn,
                 UnitTestFramework,
                 GitDiff,
-                NaturalLanguageSearchQuery
+                NaturalLanguageSearchQuery,
+                WholeLineCompletionAnchor
             ];
 
         public static SupportContextVariableEnum GetVariableEnum(
@@ -61,6 +65,8 @@ namespace FreeAIr.Options2.Support
                     return SupportContextVariableEnum.GitDiff;
                 case NaturalLanguageSearchQuery:
                     return SupportContextVariableEnum.NaturalLanguageSearchQuery;
+                case WholeLineCompletionAnchor:
+                    return SupportContextVariableEnum.WholeLineCompletionAnchor;
             }
 
             return SupportContextVariableEnum.Unknown;
@@ -86,6 +92,8 @@ namespace FreeAIr.Options2.Support
                     return GitDiff;
                 case SupportContextVariableEnum.NaturalLanguageSearchQuery:
                     return NaturalLanguageSearchQuery;
+                case SupportContextVariableEnum.WholeLineCompletionAnchor:
+                    return WholeLineCompletionAnchor;
             }
 
             return string.Empty;
@@ -282,6 +290,35 @@ namespace FreeAIr.Options2.Support
             result.AddContextVariable(
                 SupportContextVariableEnum.BuildErrorColumn,
                 errorInformation.Column.ToString()
+                );
+            result.AddContextVariable(
+                SupportContextVariableEnum.UnitTestFramework,
+                unsorted.PreferredUnitTestFramework
+                );
+
+            return result;
+        }
+
+        public static async Task<SupportContext> WithWholeLineDataAsync(
+            string contextItemName
+            )
+        {
+            if (contextItemName is null)
+            {
+                throw new ArgumentNullException(nameof(contextItemName));
+            }
+
+            var unsorted = await FreeAIrOptions.DeserializeUnsortedAsync();
+
+            var result = new SupportContext();
+
+            result.AddContextVariable(
+                SupportContextVariableEnum.ContextItemName,
+                $"`{contextItemName}`"
+                );
+            result.AddContextVariable(
+                SupportContextVariableEnum.WholeLineCompletionAnchor,
+                unsorted.WholeLineCompletionAnchorName
                 );
             result.AddContextVariable(
                 SupportContextVariableEnum.UnitTestFramework,

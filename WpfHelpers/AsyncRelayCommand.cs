@@ -41,7 +41,15 @@ namespace WpfHelpers
             }
             catch (Exception excp)
             {
-                //togo log
+                //todo log
+                System.Windows.MessageBox.Show(
+                    excp.Message
+                    + Environment.NewLine
+                    + excp.StackTrace,
+                    "Error",
+                    System.Windows.MessageBoxButton.OK,
+                    System.Windows.MessageBoxImage.Error
+                    );
             }
 
             return false;
@@ -58,7 +66,15 @@ namespace WpfHelpers
             }
             catch (Exception excp)
             {
-                //togo log
+                //todo log
+                System.Windows.MessageBox.Show(
+                    excp.Message
+                    + Environment.NewLine
+                    + excp.StackTrace,
+                    "Error",
+                    System.Windows.MessageBoxButton.OK,
+                    System.Windows.MessageBoxImage.Error
+                    );
             }
             finally
             {
@@ -118,6 +134,18 @@ namespace WpfHelpers
             {
                 await _execute(parameter);
             }
+            catch (Exception excp)
+            {
+                //todo log
+                System.Windows.MessageBox.Show(
+                    excp.Message
+                    + Environment.NewLine
+                    + excp.StackTrace,
+                    "Error",
+                    System.Windows.MessageBoxButton.OK,
+                    System.Windows.MessageBoxImage.Error
+                    );
+            }
             finally
             {
                 Interlocked.Exchange(ref _isExecuting, 0);
@@ -172,6 +200,18 @@ namespace WpfHelpers
             try
             {
                 await _execute(parameter as TParameter);
+            }
+            catch (Exception excp)
+            {
+                //todo log
+                System.Windows.MessageBox.Show(
+                    excp.Message
+                    + Environment.NewLine
+                    + excp.StackTrace,
+                    "Error",
+                    System.Windows.MessageBoxButton.OK,
+                    System.Windows.MessageBoxImage.Error
+                    );
             }
             finally
             {

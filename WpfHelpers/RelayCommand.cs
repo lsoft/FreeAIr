@@ -68,12 +68,27 @@ namespace WpfHelpers
 
         public void Execute(object parameter)
         {
-            if ((parameter as T) == null)
+            try
             {
-                return;
-            }
+                if ((parameter as T) == null)
+                {
+                    return;
+                }
 
-            _execute(parameter as T);
+                _execute(parameter as T);
+            }
+            catch (Exception excp)
+            {
+                //todo log
+                System.Windows.MessageBox.Show(
+                    excp.Message
+                    + Environment.NewLine
+                    + excp.StackTrace,
+                    "Error",
+                    System.Windows.MessageBoxButton.OK,
+                    System.Windows.MessageBoxImage.Error
+                    );
+            }
         }
 
         #endregion // ICommand Members
@@ -138,7 +153,22 @@ namespace WpfHelpers
 
         public void Execute(object parameter)
         {
-            _execute(parameter);
+            try
+            {
+                _execute(parameter);
+            }
+            catch (Exception excp)
+            {
+                //todo log
+                System.Windows.MessageBox.Show(
+                    excp.Message
+                    + Environment.NewLine
+                    + excp.StackTrace,
+                    "Error",
+                    System.Windows.MessageBoxButton.OK,
+                    System.Windows.MessageBoxImage.Error
+                    );
+            }
         }
 
         #endregion // ICommand Members

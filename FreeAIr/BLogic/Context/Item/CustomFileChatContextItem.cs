@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace FreeAIr.BLogic.Context.Item
 {
-    public sealed class CustomFileContextItem : IChatContextItem
+    public sealed class CustomFileChatContextItem : IChatContextItem
     {
         private readonly string _filePath;
 
@@ -17,7 +17,7 @@ namespace FreeAIr.BLogic.Context.Item
             get;
         }
 
-        public CustomFileContextItem(
+        public CustomFileChatContextItem(
             string filePath,
             bool isAutoFound
             )
@@ -56,7 +56,7 @@ namespace FreeAIr.BLogic.Context.Item
 
         public bool IsSame(IChatContextItem other)
         {
-            if (other is not CustomFileContextItem other2)
+            if (other is not CustomFileChatContextItem other2)
             {
                 return false;
             }

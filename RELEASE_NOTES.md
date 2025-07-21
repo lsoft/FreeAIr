@@ -6,7 +6,17 @@ Please report any bugs to the [github repo](https://github.com/lsoft/FreeAIr).
 
 If you are enjoying FreeAIr to the enough level to donate, there are many [small cancer patients](https://advitausa.org/au/index.php/donate/) that need your help. Please provide your help them!
 
-## 3.1
+## 3.2.0
+
+- Added ability to set whole line completion prompts. The suggested prompt is:
+```
+- In the document {CONTEXT_ITEM_NAME} suggest whole local code completion at the place where {WHOLE_LINE_COMPLETION_ANCHOR} anchor is set.
+- Follow the style, the formatting and the actual indent of the provided code.
+- Do not post whole modified document. Do not post anything except the code snipped you suggest to add to that place. Skip any preamble, I need only suggested code part!
+- If you see that nothing can be suggested, return answer `//Nothing to suggest`.
+```
+
+## 3.1.0
 
 - Added ability to edit available MCP servers visually.
 - Added ability to install MCP servers from Docker registry.

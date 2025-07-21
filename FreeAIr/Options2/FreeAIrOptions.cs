@@ -406,7 +406,7 @@ namespace FreeAIr.Options2
         {
             if (!place.HasValue)
             {
-                return "Active servers";
+                return "Active options";
             }
 
             switch (place.Value)
@@ -414,7 +414,7 @@ namespace FreeAIr.Options2
                 case OptionsPlaceEnum.SolutionRelatedFilePath:
                     return "Solution-related json file";
                 case OptionsPlaceEnum.VisualStudioOption:
-                    return "Visual Studio servers";
+                    return "Visual Studio options";
             }
 
             throw new InvalidOperationException(place.Value.ToString());

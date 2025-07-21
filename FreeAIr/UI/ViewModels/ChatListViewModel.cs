@@ -836,7 +836,7 @@ namespace FreeAIr.UI.ViewModels
 
                             foreach (var fileName in ofd.FileNames)
                             {
-                                var contextItem = new CustomFileContextItem(
+                                var contextItem = new CustomFileChatContextItem(
                                     fileName,
                                     false
                                     );

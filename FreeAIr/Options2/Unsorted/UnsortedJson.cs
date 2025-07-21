@@ -55,6 +55,14 @@ namespace FreeAIr.Options2.Unsorted
             set;
         } = "{$MY_GITHUB_TOKEN}";
 
+
+        [Description("An anchor name for whole line completion logic. It may depend of your model.")]
+        public string WholeLineCompletionAnchorName
+        {
+            get;
+            set;
+        } = "<｜fim_hole｜>";
+
         public string GetGitHubToken()
         {
             if (GitHubToken.StartsWith("{$") && GitHubToken.EndsWith("}"))

@@ -68,40 +68,6 @@ namespace FreeAIr.BLogic
             new UserPrompt(
                 userPrompt
                 );
-
-        /// <summary>
-        /// Создает промпт для предложения целой строки кода в указанной позиции
-        /// </summary>
-        /// <param name="userCodeFileName">Имя файла с кодом</param>
-        /// <param name="documentText">Полный текст документа</param>
-        /// <param name="caretPosition">Позиция курсора для вставки якоря</param>
-        /// <returns>Новый объект UserPrompt</returns>
-        public static async Task<UserPrompt> CreateSuggestWholeLineAsync(string userCodeFileName, string documentText, int caretPosition)
-        {
-            var fi = new FileInfo(userCodeFileName);
-            var anchor = await "SuggestWholeLine_Anchor".GetLocalizedResourceByNameAsync();
-
-            documentText = documentText.Insert(caretPosition, anchor);
-
-            return new UserPrompt(
-                await GetSuggestWholeLinePromptAsync()
-                + Environment.NewLine
-                + Environment.NewLine
-                + "```"
-                + LanguageHelper.GetMarkdownLanguageCodeBlockNameBasedOnFileExtension(fi.Extension)
-                + Environment.NewLine
-                + documentText
-                + Environment.NewLine
-                + "```"
-            );
-        }
-
-        private static async Task<string> GetSuggestWholeLinePromptAsync()
-        {
-            var prompt = await "SuggestWholeLine".GetLocalizedResourceByNameAsync();
-            var anchor = await "SuggestWholeLine_Anchor".GetLocalizedResourceByNameAsync();
-            return string.Format(prompt, anchor);
-        }
     }
 
     public sealed class LLMAnswer

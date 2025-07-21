@@ -11,14 +11,6 @@ namespace FreeAIr.Options2.Agent
     [JsonConverter(typeof(JsonDescriptionCommentConverter<AgentCollectionJson>))]
     public sealed class AgentCollectionJson : ICloneable
     {
-        [Description("Agent name for a completion proposal feature.")]
-        public string CompletionProposalAgentName
-        {
-            get;
-            set;
-        } = string.Empty;
-
-
         public List<AgentJson> Agents
         {
             get;
@@ -58,11 +50,6 @@ namespace FreeAIr.Options2.Agent
 
             agents = null;
             return false;
-        }
-
-        public AgentJson? GetCompletionProposalAgent()
-        {
-            return Agents.FirstOrDefault(a => a.Name == CompletionProposalAgentName);
         }
 
         private static List<AgentJson> GetDefaultAgents() =>

@@ -1,5 +1,8 @@
-﻿using FreeAIr.Helper;
+﻿using FreeAIr.BLogic.Context.Item;
+using FreeAIr.Helper;
 using FreeAIr.Options2;
+using FreeAIr.Options2.Support;
+using FreeAIr.UI.Embedillo.Answer.Parser;
 using Microsoft.VisualStudio.ComponentModelHost;
 using Microsoft.VisualStudio.Language.Intellisense;
 using Microsoft.VisualStudio.Language.Intellisense.AsyncCompletion;
@@ -10,6 +13,8 @@ using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Utilities;
 using System.ComponentModel.Composition;
+using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
@@ -80,7 +85,31 @@ namespace FreeAIr.BLogic
             try
             {
                 var options = await FreeAIrOptions.DeserializeAsync();
-                var chosenAgent = options.AgentCollection.GetCompletionProposalAgent();
+
+                var support = await FreeAIrOptions.DeserializeSupportCollectionAsync();
+                var action = support.Actions.FirstOrDefault(
+                    a =>
+                        a.Scopes.Contains(SupportScopeEnum.WholeLineCompletion)
+                        && !string.IsNullOrEmpty(a.AgentName)
+                        );
+                if (action is null)
+                {
+                    if (!options.Unsorted.IsImplicitWholeLineCompletionEnabled)
+                    {
+                        await VS.MessageBox.ShowErrorAsync(
+                            $"No support action for {SupportScopeEnum.WholeLineCompletion} and with non empty agent name was defined."
+                            );
+                    }
+                    return null;
+                }
+                var chosenAgent = options.AgentCollection.Agents.FirstOrDefault(a => a.Name == action.AgentName);
+                if (chosenAgent is null)
+                {
+                    await VS.MessageBox.ShowErrorAsync(
+                        $"No agent with name {action.AgentName} was found. Check the whole line completion action."
+                        );
+                    return null;
+                }
 
                 var componentModel = (IComponentModel)await FreeAIrPackage.Instance.GetServiceAsync(typeof(SComponentModel));
 
@@ -90,12 +119,18 @@ namespace FreeAIr.BLogic
                 var snap = new SnapshotSpan(point.Position, 0);
 
                 var documentFilePath = _textView.TextBuffer.GetFileName();
+                var documentFileInfo = new System.IO.FileInfo(documentFilePath);
                 var documentText = _textView.TextSnapshot.GetText();
 
-                var userPrompt = await UserPrompt.CreateSuggestWholeLineAsync(
-                    documentFilePath,
-                    documentText,
-                    caretPosition
+                var supportContext = await SupportContext.WithWholeLineDataAsync(
+                    documentFilePath
+                    );
+
+                var promptText = supportContext.ApplyVariablesToPrompt(
+                    action.Prompt
+                    );
+                var userPrompt = UserPrompt.CreateTextBasedPrompt(
+                    promptText
                     );
 
                 var lineEnding = LineEndingHelper.Actual.GetOpenedDocumentLineEnding(documentFilePath);
@@ -113,6 +148,34 @@ namespace FreeAIr.BLogic
                 {
                     return null;
                 }
+
+                documentText = documentText.Insert(
+                    caretPosition,
+                    options.Unsorted.WholeLineCompletionAnchorName
+                    );
+
+                var promptBody =
+                    Environment.NewLine
+                    + $"Content of the file `{documentFilePath}`:"
+                    + Environment.NewLine
+                    + Environment.NewLine
+                    + "```"
+                    + LanguageHelper.GetMarkdownLanguageCodeBlockNameBasedOnFileExtension(documentFileInfo.Extension)
+                    + Environment.NewLine
+                    + documentText
+                    + Environment.NewLine
+                    + "```"
+                    ;
+
+                chat.ChatContext.AddItems(
+                    [
+                        new SimpleTextChatContextItem(
+                            documentFilePath,
+                            promptBody,
+                            false
+                            )
+                    ]
+                    );
 
                 var cleanAnswer = await chat.WaitForPromptCleanAnswerAsync(
                     lineEnding

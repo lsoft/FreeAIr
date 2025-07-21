@@ -130,6 +130,16 @@ namespace FreeAIr.Options2.Support
                     Prompt = $@"Identify the logical sections of the code inside the files: {SupportContextVariableEnum.ContextItemName.GetAnchor()} and summarize these sections by generating comments.",
                     KnownMoniker = nameof(KnownMonikers.SetLanguage)
                 },
+
+                new SupportActionJson
+                {
+                    Scopes = [ SupportScopeEnum.WholeLineCompletion ],
+                    Name = "Generate whole line completion",
+                    AgentName = "agent_name_must_be_set",
+                    Prompt = $@"In the document {SupportContextVariableEnum.ContextItemName.GetAnchor()} suggest whole local code completion where {SupportContextVariableEnum.WholeLineCompletionAnchor.GetAnchor()} anchor is set. Do not post whole modified document. Do not post anything except the code snipped you suggest to add to that place.",
+                    KnownMoniker = nameof(KnownMonikers.CompletionMode)
+                },
+
             ];
 
     }
@@ -200,6 +210,7 @@ namespace FreeAIr.Options2.Support
         CommitMessageBuilding,
         NaturalLanguageSearch,
         BuildNaturalLanguageOutlines,
-        GenerateNaturalLanguageOutlines
+        GenerateNaturalLanguageOutlines,
+        WholeLineCompletion
     }
 }
