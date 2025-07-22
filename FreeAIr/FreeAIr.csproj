@@ -202,6 +202,11 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="Resources\Resources1.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
     <Compile Include="Search\GoogleSearcher.cs" />
     <Compile Include="Search\SearchResult.cs" />
     <Compile Include="source.extension.cs">
@@ -222,9 +227,6 @@
     <Compile Include="UI\CodeLens\CodeLenseUserControlViewModel.cs" />
     <Compile Include="UI\CodeLens\ViewElementFactory.cs" />
     <Compile Include="UI\CombinedParameterConverter.cs" />
-    <Compile Include="UI\ContextMenuButton\MenuButton.xaml.cs">
-      <DependentUpon>MenuButton.xaml</DependentUpon>
-    </Compile>
     <Compile Include="UI\Converters.cs" />
     <Compile Include="UI\Dialog\DialogControl.xaml.cs">
       <DependentUpon>DialogControl.xaml</DependentUpon>
@@ -507,10 +509,6 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="UI\ContextMenuButton\MenuButton.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="UI\Dialog\DialogControl.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -579,8 +577,8 @@
   <ItemGroup>
     <EmbeddedResource Include="Resources\Resources.resx">
       <Generator>PublicResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
       <SubType>Designer</SubType>
+      <LastGenOutput>Resources1.Designer.cs</LastGenOutput>
     </EmbeddedResource>
     <EmbeddedResource Include="Resources\Resources.ru.resx" />
   </ItemGroup>

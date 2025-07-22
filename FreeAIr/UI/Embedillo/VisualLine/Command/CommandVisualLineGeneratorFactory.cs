@@ -179,7 +179,7 @@ namespace FreeAIr.UI.Embedillo.VisualLine.Command
             return
 $"""
 {action.Name}
-Its prompt template:
+{Resources.Resources.Its_prompt_template}:
 {action.Prompt}
 """;
 

@@ -73,15 +73,15 @@ namespace FreeAIr.UI.Informer
             switch (_status)
             {
                 case ChatsStatusEnum.Idle:
-                    sbs ="AI is getting colder, it nothing is asked about.";
+                    sbs = Resources.Resources.AI_is_getting_colder;
                     title = "⏸";
                     break;
                 case ChatsStatusEnum.Working:
-                    sbs = "Some tasks are in progress.";
+                    sbs = Resources.Resources.Some_tasks_are_in_progress;
                     title = "▶";
                     break;
                 default:
-                    sbs = "Status is unknown.";
+                    sbs = Resources.Resources.Status_is_unknown;
                     title = "�";
                     break;
             }
@@ -98,10 +98,6 @@ namespace FreeAIr.UI.Informer
                 return;
             }
             tb.SetText(sbs);
-            //pup.Child = new TextBlock
-            //{
-            //    Text = sbs
-            //};
             pup.IsOpen = true;
         }
 

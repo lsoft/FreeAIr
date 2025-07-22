@@ -13,7 +13,7 @@
     mc:Ignorable="d"
     d:DesignHeight="500"
     d:DesignWidth="800"
-    xmlns:nestedcheckbox="clr-namespace:FreeAIr.UI.NestedCheckBox"
+    xmlns:nestedcheckbox="clr-namespace:FreeAIr.UI.NestedCheckBox" xmlns:resources="clr-namespace:FreeAIr.Resources"
     Name="GenerateNaturalLanguageOutlineToolWindow"
     >
     <Grid
@@ -46,7 +46,7 @@
                 Grid.Column="0"
                 FontFamily="Cascadia Code"
                 VerticalAlignment="Center"
-                Text="Natural Language Outlines file path: "
+                Text="{x:Static resources:Resources.Natural_Language_Outlines_file_path}"
                 />
             <Button
                 Grid.Column="1"
@@ -64,7 +64,7 @@
                 HorizontalAlignment="Right"
                 VerticalAlignment="Center"
                 Cursor="Hand"
-                Content="Update page"
+                Content="{x:Static resources:Resources.UI_UpdatePage}"
                 Background="Transparent"
                 FontFamily="Cascadia Code"
                 Command="{Binding ReloadPageCommand}"
@@ -78,7 +78,7 @@
             Grid.ColumnSpan="2"
             Margin="2,2,2,10"
             VerticalContentAlignment="Center"
-            Content="Complete rebuild"
+            Content="{x:Static resources:Resources.UI_CompleteRebuild}"
             FontFamily="Cascadia Code"
             IsEnabled="{Binding GitRepoExists}"
             IsChecked="{Binding CompleteRebuild}"
@@ -116,7 +116,7 @@
                 VerticalAlignment="Center"
                 HorizontalAlignment="Right"
                 VerticalContentAlignment="Center"
-                Content="Force use chosen NLO agent"
+                Content="{x:Static resources:Resources.Force_use_chosen_NLO_agent}"
                 FontFamily="Cascadia Code"
                 IsChecked="{Binding ForceUseNLOAgent}"
                 />
@@ -126,7 +126,7 @@
                 Grid.Column="0"
                 FontFamily="Cascadia Code"
                 VerticalAlignment="Center"
-                Text="NLO extract action: "
+                Text="{x:Static resources:Resources.NLO_extract_action}"
                 />
             <ComboBox
                 Grid.Row="1"
@@ -143,7 +143,7 @@
                 Grid.Column="0"
                 FontFamily="Cascadia Code"
                 VerticalAlignment="Center"
-                Text="NLO extract agent: "
+                Text="{x:Static resources:Resources.NLO_extract_agent}"
                 />
             <ComboBox
                 Grid.Row="2"
@@ -181,7 +181,7 @@
                 Grid.Column="0"
                 FontFamily="Cascadia Code"
                 VerticalAlignment="Center"
-                Text="Embedding generate agent: "
+                Text="{x:Static resources:Resources.Embedding_generate_agent}"
                 />
             <ComboBox
                 Grid.Row="3"
@@ -224,7 +224,7 @@
                 Background="Transparent"
                 FontFamily="Cascadia Code"
                 Content="{Binding UpdateJsonFileCommandContent}"
-                ToolTip="Start process to actualize NLO Json file. Log of the process is in Visual Studio output pane."
+                ToolTip="{x:Static resources:Resources.Start_process_to_actualize_NLO_Json_file}"
                 Command="{Binding UpdateJsonFileCommand}"
                 Style="{DynamicResource TextBlockLikeButtonStyle}"
                 />
@@ -243,7 +243,7 @@
                     TextWrapping="Wrap"
                     Padding="0"
                     Margin="0"
-                    Text=" NLO embedding file(s) path depends on solution name. These files are useful for natural language search feature of FreeAIr. FreeAIr will use these embeddings to narrow down the search scope. It is recommended to actualize these files before every commit to keep embeddings in sync with your codebase."
+                    Text="{x:Static resources:Resources.NLOG_Tooltip10}"
                     />
 
                 <TextBlock
@@ -253,7 +253,7 @@
                     TextWrapping="Wrap"
                     Padding="0"
                     Margin="0"
-                    Text=" Checked tree items will be updated with a new embeddings, unchecked items will reuse the existing embeddings."
+                    Text="{x:Static resources:Resources.NLOG_Tooltip20}"
                     />
 
                 <TextBlock
@@ -263,7 +263,7 @@
                     TextWrapping="Wrap"
                     Padding="0"
                     Margin="0"
-                    Text=" FreeAIr process C# files with Roslyn, for any other file 'NLO extract agent' is used. This is an agent to extract natural language outlines from a source file if FreeAIr does not know its syntax tree and cannot extract NLOs from its body natively. If you choose 'Force use chosen NLO agent' then selected agent will be used for every processed file."
+                    Text="{x:Static resources:Resources.NLOG_Tooltip30}"
                     />
 
                 <TextBlock
@@ -273,7 +273,7 @@
                     TextWrapping="Wrap"
                     Padding="0"
                     Margin="0"
-                    Text=" 'Embedding generate agent' is an agent to generate the embeddings from gathered natural language outlines."
+                    Text="{x:Static resources:Resources.NLOG_Tooltip40}"
                     />
 
                 <TextBlock
@@ -283,7 +283,7 @@
                     TextWrapping="Wrap"
                     Padding="0"
                     Margin="0"
-                    Text=" Natural language outlines are used to apply RAG (retrieval augmented generation) for natural language search, and based on the paper https://arxiv.org/html/2408.04820v4"
+                    Text="{x:Static resources:Resources.NLOG_Tooltip50}"
                     />
 
             </StackPanel>

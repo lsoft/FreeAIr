@@ -12,7 +12,7 @@ namespace FreeAIr.UI
 {
     public class BuildNaturalLanguageOutlinesJsonFileToolWindow : BaseToolWindow<BuildNaturalLanguageOutlinesJsonFileToolWindow>
     {
-        public override string GetTitle(int toolWindowId) => "Build Natural Language Outlines Json File";
+        public override string GetTitle(int toolWindowId) => Resources.Resources.Build_Natural_Language_Outlines_Json_File;
 
         public override Type PaneType => typeof(Pane);
 

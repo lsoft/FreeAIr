@@ -11,7 +11,7 @@ namespace FreeAIr.UI.ToolWindows
 {
     public class ChatListToolWindow : BaseToolWindow<ChatListToolWindow>
     {
-        public override string GetTitle(int toolWindowId) => "AI chat list";
+        public override string GetTitle(int toolWindowId) => Resources.Resources.AI_chat_list;
 
         public override Type PaneType => typeof(Pane);
 

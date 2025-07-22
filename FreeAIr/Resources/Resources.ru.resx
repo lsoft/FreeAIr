@@ -153,4 +153,97 @@
   <data name="UI_StopWaiting" xml:space="preserve">
     <value>Остановить ожидание ответа</value>
   </data>
+  <data name="FreeAIr_available_support" xml:space="preserve">
+    <value>FreeAIr доступная поддержка:</value>
+  </data>
+  <data name="Start_discussion" xml:space="preserve">
+    <value>Начать дискуссию</value>
+  </data>
+  <data name="Its_prompt_template" xml:space="preserve">
+    <value>Шаблон промпта</value>
+  </data>
+  <data name="AI_is_getting_colder" xml:space="preserve">
+    <value>ИИ остывает, его ни о чем не спрашивают</value>
+  </data>
+  <data name="Some_tasks_are_in_progress" xml:space="preserve">
+    <value>Задача в работе</value>
+  </data>
+  <data name="Status_is_unknown" xml:space="preserve">
+    <value>Состояние неизвестно</value>
+  </data>
+  <data name="Build_Natural_Language_Outlines_Json_File" xml:space="preserve">
+    <value>Создание NLO Json файла</value>
+  </data>
+  <data name="Natural_Language_Outlines_file_path" xml:space="preserve">
+    <value>Путь к файлу NLO</value>
+  </data>
+  <data name="UI_CompleteRebuild" xml:space="preserve">
+    <value>Полностью перестроить</value>
+  </data>
+  <data name="Force_use_chosen_NLO_agent" xml:space="preserve">
+    <value>Принудительно использовать выбранного NLO агента</value>
+  </data>
+  <data name="NLO extract action" xml:space="preserve">
+    <value>Действия для извлечения NLO:</value>
+  </data>
+  <data name="NLO extract agent" xml:space="preserve">
+    <value>Агент извлечения NLO:</value>
+  </data>
+  <data name="Embedding generate agent" xml:space="preserve">
+    <value>Агент генерации эмбеддинга:</value>
+  </data>
+  <data name="Start process to actualize NLO Json file" xml:space="preserve">
+    <value>Начать процесс актуализации NLO Json файла. Логгирование процесса осуществляется в Visual Studio output панель.</value>
+  </data>
+  <data name="NLOG_Tooltip10" xml:space="preserve">
+    <value> Путь к файлам встраивания NLO зависит от имени солюшена. Эти файлы полезны для функции поиска на человеческом языке FreeAIr. FreeAIr будет использовать эти эмбеддинги для сужения области поиска. Рекомендуется актуализировать эти файлы перед каждым коммитом, чтобы эмбеддинги синхронизировались с вашей кодовой базой.</value>
+  </data>
+  <data name="NLOG_Tooltip20" xml:space="preserve">
+    <value> Отмеченные элементы дерева будут обновлены новыми эмбеддингами, неотмеченные элементы будут повторно использовать существующие.</value>
+  </data>
+  <data name="NLOG_Tooltip30" xml:space="preserve">
+    <value> FreeAIr обрабатывает файлы C# с помощью Roslyn, для всех остальных файлов используется «агент извлечения NLO». Этот агент извлекает структуры NLO из исходного файла, если FreeAIr не знает его синтаксическое дерево и не может извлечь NLO из его тела нативными средствами. Если выбрать «Принудительно использовать выбранный агент NLO», выбранный агент будет использоваться для каждого обрабатываемого файла.</value>
+  </data>
+  <data name="NLOG_Tooltip40" xml:space="preserve">
+    <value> «Агент генерации эмбеддингов» — это агент для генерации эмбеддингов из собранных NLO структур.</value>
+  </data>
+  <data name="NLOG_Tooltip50" xml:space="preserve">
+    <value> Собранные NLO используются для генерации эмбеддингов, которые используются для поиска на человеческом языке и основаны на статье https://arxiv.org/html/2408.04820v4</value>
+  </data>
+  <data name="AI chat list" xml:space="preserve">
+    <value>Список чатов с ИИ</value>
+  </data>
+  <data name="Open contol center" xml:space="preserve">
+    <value>Открыть центр управления...</value>
+  </data>
+  <data name="Edit_FreeAIr_options" xml:space="preserve">
+    <value>Редактирование настроек FreeAIr. Измененные настройки не влияют на уже открытые чаты.</value>
+  </data>
+  <data name="Show only user chats" xml:space="preserve">
+    <value>Показывать пользовательские чаты</value>
+  </data>
+  <data name="Chat context" xml:space="preserve">
+    <value>Контекст чата:</value>
+  </data>
+  <data name="Choose this chat agent" xml:space="preserve">
+    <value>Выберите агента для этого чата. Эти изменения не влияют на настройки других чатов.</value>
+  </data>
+  <data name="Edit the MCP tools for the selected chat" xml:space="preserve">
+    <value>Редактируйте MCP утилиты этого чата. Эти настройки не влияют на другие чаты.</value>
+  </data>
+  <data name="Edit chat tools" xml:space="preserve">
+    <value>Редактировать утилиты чата...</value>
+  </data>
+  <data name="Add custom file" xml:space="preserve">
+    <value>Добавить внешний файл...</value>
+  </data>
+  <data name="Remove all automatic found items" xml:space="preserve">
+    <value>Убрать все автоматические итемы</value>
+  </data>
+  <data name="Remove all automatic found items from chat context" xml:space="preserve">
+    <value>Убрать все автоматические итемы из контекста этого чата</value>
+  </data>
+  <data name="Delete from context" xml:space="preserve">
+    <value>Удалить из контекста</value>
+  </data>
 </root>

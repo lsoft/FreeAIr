@@ -61,6 +61,51 @@ namespace FreeAIr.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to AI chat list.
+        /// </summary>
+        public static string AI_chat_list {
+            get {
+                return ResourceManager.GetString("AI chat list", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to AI is getting colder, it nothing is asked about.
+        /// </summary>
+        public static string AI_is_getting_colder {
+            get {
+                return ResourceManager.GetString("AI_is_getting_colder", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Build Natural Language Outlines Json File.
+        /// </summary>
+        public static string Build_Natural_Language_Outlines_Json_File {
+            get {
+                return ResourceManager.GetString("Build_Natural_Language_Outlines_Json_File", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Chat context:.
+        /// </summary>
+        public static string Chat_context {
+            get {
+                return ResourceManager.GetString("Chat context", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Choose this chat agent. These changes are not shared across other chats..
+        /// </summary>
+        public static string Choose_this_chat_agent {
+            get {
+                return ResourceManager.GetString("Choose this chat agent", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Cannot obtain selected block of code..
         /// </summary>
         public static string Code_NoSelectedCode {
@@ -79,11 +124,200 @@ namespace FreeAIr.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Edit chat tools.
+        /// </summary>
+        public static string Edit_chat_tools {
+            get {
+                return ResourceManager.GetString("Edit chat tools", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Edit FreeAIr options. Changes that made do not affects your opened chats..
+        /// </summary>
+        public static string Edit_FreeAIr_options {
+            get {
+                return ResourceManager.GetString("Edit_FreeAIr_options", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Edit the MCP tools for the selected chat. These changes are not shared across other chats..
+        /// </summary>
+        public static string Edit_the_MCP_tools_for_the_selected_chat {
+            get {
+                return ResourceManager.GetString("Edit the MCP tools for the selected chat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Embedding generate agent:.
+        /// </summary>
+        public static string Embedding_generate_agent {
+            get {
+                return ResourceManager.GetString("Embedding generate agent", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Error.
         /// </summary>
         public static string Error {
             get {
                 return ResourceManager.GetString("Error", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Force use chosen NLO agent.
+        /// </summary>
+        public static string Force_use_chosen_NLO_agent {
+            get {
+                return ResourceManager.GetString("Force_use_chosen_NLO_agent", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to FreeAIr available support.
+        /// </summary>
+        public static string FreeAIr_available_support {
+            get {
+                return ResourceManager.GetString("FreeAIr_available_support", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Its prompt template.
+        /// </summary>
+        public static string Its_prompt_template {
+            get {
+                return ResourceManager.GetString("Its_prompt_template", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Natural Language Outlines file path.
+        /// </summary>
+        public static string Natural_Language_Outlines_file_path {
+            get {
+                return ResourceManager.GetString("Natural_Language_Outlines_file_path", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to NLO extract action:.
+        /// </summary>
+        public static string NLO_extract_action {
+            get {
+                return ResourceManager.GetString("NLO extract action", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to NLO extract agent:.
+        /// </summary>
+        public static string NLO_extract_agent {
+            get {
+                return ResourceManager.GetString("NLO extract agent", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to  NLO embedding file(s) path depends on solution name. These files are useful for natural language search feature of FreeAIr. FreeAIr will use these embeddings to narrow down the search scope. It is recommended to actualize these files before every commit to keep embeddings in sync with your codebase..
+        /// </summary>
+        public static string NLOG_Tooltip10 {
+            get {
+                return ResourceManager.GetString("NLOG_Tooltip10", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to  Checked tree items will be updated with a new embeddings, unchecked items will reuse the existing embeddings..
+        /// </summary>
+        public static string NLOG_Tooltip20 {
+            get {
+                return ResourceManager.GetString("NLOG_Tooltip20", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to  FreeAIr process C# files with Roslyn, for any other file &apos;NLO extract agent&apos; is used. This is an agent to extract natural language outlines from a source file if FreeAIr does not know its syntax tree and cannot extract NLOs from its body natively. If you choose &apos;Force use chosen NLO agent&apos; then selected agent will be used for every processed file..
+        /// </summary>
+        public static string NLOG_Tooltip30 {
+            get {
+                return ResourceManager.GetString("NLOG_Tooltip30", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to  &apos;Embedding generate agent&apos; is an agent to generate the embeddings from gathered natural language outlines..
+        /// </summary>
+        public static string NLOG_Tooltip40 {
+            get {
+                return ResourceManager.GetString("NLOG_Tooltip40", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to  Natural language outlines are used to apply RAG (retrieval augmented generation) for natural language search, and based on the paper https://arxiv.org/html/2408.04820v4.
+        /// </summary>
+        public static string NLOG_Tooltip50 {
+            get {
+                return ResourceManager.GetString("NLOG_Tooltip50", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Open contol center....
+        /// </summary>
+        public static string Open_contol_center {
+            get {
+                return ResourceManager.GetString("Open contol center", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Show only user chats.
+        /// </summary>
+        public static string Show_only_user_chats {
+            get {
+                return ResourceManager.GetString("Show only user chats", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Some tasks are in progress.
+        /// </summary>
+        public static string Some_tasks_are_in_progress {
+            get {
+                return ResourceManager.GetString("Some_tasks_are_in_progress", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Start discussion.
+        /// </summary>
+        public static string Start_discussion {
+            get {
+                return ResourceManager.GetString("Start_discussion", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Start process to actualize NLO Json file. Log of the process is in Visual Studio output pane.
+        /// </summary>
+        public static string Start_process_to_actualize_NLO_Json_file {
+            get {
+                return ResourceManager.GetString("Start process to actualize NLO Json file", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Status is unknown.
+        /// </summary>
+        public static string Status_is_unknown {
+            get {
+                return ResourceManager.GetString("Status_is_unknown", resourceCulture);
             }
         }
         
@@ -102,6 +336,15 @@ namespace FreeAIr.Resources {
         public static string UI_Choose {
             get {
                 return ResourceManager.GetString("UI_Choose", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Complete rebuild.
+        /// </summary>
+        public static string UI_CompleteRebuild {
+            get {
+                return ResourceManager.GetString("UI_CompleteRebuild", resourceCulture);
             }
         }
         

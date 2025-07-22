@@ -107,11 +107,11 @@
 
                 <Button
                     Margin="5,2,0,2"
-                    Content="Open contol center..."
+                    Content="{x:Static resources:Resources.Open_contol_center}"
                     HorizontalAlignment="Right"
                     VerticalAlignment="Center"
                     FontFamily="Cascadia Code"
-                    ToolTip="Edit FreeAIr options. Changes that made do not affects your opened chats."
+                    ToolTip="{x:Static resources:Resources.Edit_FreeAIr_options}"
                     Command="{Binding ElementName=ChatListToolWindow, Path=DataContext.OpenControlCenterCommand}"
                     Style="{DynamicResource TextBlockLikeButtonStyle}"
                     />
@@ -137,7 +137,7 @@
                 HorizontalAlignment="Right"
                 VerticalAlignment="Center"
                 VerticalContentAlignment="Center"
-                Content="Show only user chats"
+                Content="{x:Static resources:Resources.Show_only_user_chats}"
                 IsChecked="{Binding ShowOnlyUserChats}"
                 />
 
@@ -259,7 +259,7 @@
                         <Label
                             Grid.Column="0"
                             Margin="2"
-                            Content="Chat context:"
+                            Content="{x:Static resources:Resources.Chat_context}"
                             HorizontalAlignment="Left"
                             FontSize="12"
                             FontFamily="Cascadia Code"
@@ -278,24 +278,24 @@
                                 Content="{Binding ChosenChatAgentText}"
                                 FontFamily="Cascadia Code"
                                 VerticalAlignment="Center"
-                                ToolTip="Choose this chat agent. These changes are not shared across other chats."
+                                ToolTip="{x:Static resources:Resources.Choose_this_chat_agent}"
                                 Command="{Binding ElementName=ChatListToolWindow, Path=DataContext.ChooseChatAgentCommand}"
                                 Style="{DynamicResource TextBlockLikeButtonStyle}"
                                 />
 
                             <Button
                                 Margin="5,0,5,0"
-                                Content="Edit chat tools..."
+                                Content="{x:Static resources:Resources.Edit_chat_tools}"
                                 FontFamily="Cascadia Code"
                                 VerticalAlignment="Center"
-                                ToolTip="Edit the MCP tools for the selected chat. These changes are not shared across other chats."
+                                ToolTip="{x:Static resources:Resources.Edit_the_MCP_tools_for_the_selected_chat}"
                                 Command="{Binding ElementName=ChatListToolWindow, Path=DataContext.EditChatToolsCommand}"
                                 Style="{DynamicResource TextBlockLikeButtonStyle}"
                                 />
 
                             <Button
                                 Margin="5,0,5,0"
-                                Content="Add custom file..."
+                                Content="{x:Static resources:Resources.Add_custom_file}"
                                 FontFamily="Cascadia Code"
                                 VerticalAlignment="Center"
                                 ToolTip="Add custom file to chat context"
@@ -305,10 +305,10 @@
 
                             <Button
                                 Margin="5,0,5,0"
-                                Content="Remove all automatic found items"
+                                Content="{x:Static resources:Resources.Remove_all_automatic_found_items}"
                                 FontFamily="Cascadia Code"
                                 VerticalAlignment="Center"
-                                ToolTip="Remove all automatic found items from chat context"
+                                ToolTip="{x:Static resources:Resources.Remove_all_automatic_found_items_from_chat_context}"
                                 Command="{Binding ElementName=ChatListToolWindow, Path=DataContext.RemoveAllAutomaticItemsFromContextCommand}"
                                 Style="{DynamicResource TextBlockLikeButtonStyle}"
                                 />
@@ -342,7 +342,7 @@
                                         <imaging:CrispImage
                                             Grid.Column="0"
                                             Moniker="{x:Static catalog:KnownMonikers.Cancel}"
-                                            ToolTip="Delete from context"
+                                            ToolTip="{x:Static resources:Resources.Delete_from_context}"
                                             Cursor="Hand"
                                             >
                                             <imaging:CrispImage.InputBindings>

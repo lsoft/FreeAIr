@@ -34,7 +34,7 @@ namespace FreeAIr.UI.CodeLens
             CommandList.Add(
                 new EmbeddedCommandViewModel(
                     unitInfo,
-                    "Start discussion",
+                    Resources.Resources.Start_discussion,
                     new CommandID(
                         PackageGuids.FreeAIr,
                         PackageIds.StartDiscussionCommandId

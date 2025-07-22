@@ -153,4 +153,99 @@
   <data name="UI_StopWaiting" xml:space="preserve">
     <value>Stop</value>
   </data>
+  <data name="FreeAIr_available_support" xml:space="preserve">
+    <value>FreeAIr available support</value>
+    <comment>Used in codelens.</comment>
+  </data>
+  <data name="Start_discussion" xml:space="preserve">
+    <value>Start discussion</value>
+  </data>
+  <data name="Its_prompt_template" xml:space="preserve">
+    <value>Its prompt template</value>
+  </data>
+  <data name="AI_is_getting_colder" xml:space="preserve">
+    <value>AI is getting colder, it nothing is asked about</value>
+  </data>
+  <data name="Some_tasks_are_in_progress" xml:space="preserve">
+    <value>Some tasks are in progress</value>
+  </data>
+  <data name="Status_is_unknown" xml:space="preserve">
+    <value>Status is unknown</value>
+  </data>
+  <data name="Build_Natural_Language_Outlines_Json_File" xml:space="preserve">
+    <value>Build Natural Language Outlines Json File</value>
+    <comment>TITLE FOR Build Natural Language Outlines Json File</comment>
+  </data>
+  <data name="Natural_Language_Outlines_file_path" xml:space="preserve">
+    <value>Natural Language Outlines file path</value>
+  </data>
+  <data name="UI_CompleteRebuild" xml:space="preserve">
+    <value>Complete rebuild</value>
+  </data>
+  <data name="Force_use_chosen_NLO_agent" xml:space="preserve">
+    <value>Force use chosen NLO agent</value>
+  </data>
+  <data name="NLO extract action" xml:space="preserve">
+    <value>NLO extract action:</value>
+  </data>
+  <data name="NLO extract agent" xml:space="preserve">
+    <value>NLO extract agent:</value>
+  </data>
+  <data name="Embedding generate agent" xml:space="preserve">
+    <value>Embedding generate agent:</value>
+  </data>
+  <data name="Start process to actualize NLO Json file" xml:space="preserve">
+    <value>Start process to actualize NLO Json file. Log of the process is in Visual Studio output pane</value>
+  </data>
+  <data name="NLOG_Tooltip10" xml:space="preserve">
+    <value> NLO embedding file(s) path depends on solution name. These files are useful for natural language search feature of FreeAIr. FreeAIr will use these embeddings to narrow down the search scope. It is recommended to actualize these files before every commit to keep embeddings in sync with your codebase.</value>
+  </data>
+  <data name="NLOG_Tooltip20" xml:space="preserve">
+    <value> Checked tree items will be updated with a new embeddings, unchecked items will reuse the existing embeddings.</value>
+  </data>
+  <data name="NLOG_Tooltip30" xml:space="preserve">
+    <value> FreeAIr process C# files with Roslyn, for any other file 'NLO extract agent' is used. This is an agent to extract natural language outlines from a source file if FreeAIr does not know its syntax tree and cannot extract NLOs from its body natively. If you choose 'Force use chosen NLO agent' then selected agent will be used for every processed file.</value>
+  </data>
+  <data name="NLOG_Tooltip40" xml:space="preserve">
+    <value> 'Embedding generate agent' is an agent to generate the embeddings from gathered natural language outlines.</value>
+  </data>
+  <data name="NLOG_Tooltip50" xml:space="preserve">
+    <value> Natural language outlines are used to apply RAG (retrieval augmented generation) for natural language search, and based on the paper https://arxiv.org/html/2408.04820v4</value>
+  </data>
+  <data name="AI chat list" xml:space="preserve">
+    <value>AI chat list</value>
+  </data>
+  <data name="Open contol center" xml:space="preserve">
+    <value>Open contol center...</value>
+  </data>
+  <data name="Edit_FreeAIr_options" xml:space="preserve">
+    <value>Edit FreeAIr options. Changes that made do not affects your opened chats.</value>
+  </data>
+  <data name="Show only user chats" xml:space="preserve">
+    <value>Show only user chats</value>
+  </data>
+  <data name="Chat context" xml:space="preserve">
+    <value>Chat context:</value>
+  </data>
+  <data name="Choose this chat agent" xml:space="preserve">
+    <value>Choose this chat agent. These changes are not shared across other chats.</value>
+  </data>
+  <data name="Edit the MCP tools for the selected chat" xml:space="preserve">
+    <value>Edit the MCP tools for the selected chat. These changes are not shared across other chats.</value>
+  </data>
+  <data name="Edit chat tools" xml:space="preserve">
+    <value>Edit chat tools...</value>
+  </data>
+  <data name="Add custom file" xml:space="preserve">
+    <value>Add custom file...</value>
+  </data>
+  <data name="Remove all automatic found items" xml:space="preserve">
+    <value>Remove all automatic found items</value>
+  </data>
+  <data name="Remove all automatic found items from chat context" xml:space="preserve">
+    <value>Remove all automatic found items from chat context</value>
+  </data>
+  <data name="Delete from context" xml:space="preserve">
+    <value>Delete from context</value>
+  </data>
 </root>
