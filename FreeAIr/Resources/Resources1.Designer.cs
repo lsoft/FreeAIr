@@ -61,6 +61,15 @@ namespace FreeAIr.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Add custom file....
+        /// </summary>
+        public static string Add_custom_file {
+            get {
+                return ResourceManager.GetString("Add custom file", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to AI chat list.
         /// </summary>
         public static string AI_chat_list {
@@ -124,7 +133,16 @@ namespace FreeAIr.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Edit chat tools.
+        ///   Looks up a localized string similar to Delete from context.
+        /// </summary>
+        public static string Delete_from_context {
+            get {
+                return ResourceManager.GetString("Delete from context", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Edit chat tools....
         /// </summary>
         public static string Edit_chat_tools {
             get {
@@ -268,11 +286,38 @@ namespace FreeAIr.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Not started.
+        /// </summary>
+        public static string Not_started {
+            get {
+                return ResourceManager.GetString("Not_started", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Open contol center....
         /// </summary>
         public static string Open_contol_center {
             get {
                 return ResourceManager.GetString("Open contol center", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Remove all automatic found items.
+        /// </summary>
+        public static string Remove_all_automatic_found_items {
+            get {
+                return ResourceManager.GetString("Remove all automatic found items", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Remove all automatic found items from chat context.
+        /// </summary>
+        public static string Remove_all_automatic_found_items_from_chat_context {
+            get {
+                return ResourceManager.GetString("Remove all automatic found items from chat context", resourceCulture);
             }
         }
         
