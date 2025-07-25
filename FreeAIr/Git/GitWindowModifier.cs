@@ -111,7 +111,7 @@ namespace FreeAIr.BLogic
                                 HorizontalContentAlignment = HorizontalAlignment.Center,
                                 Margin = new System.Windows.Thickness(0),
                                 Style = dcButton.Style,
-                                ToolTip = "FreeAIr support: generate commit message"
+                                ToolTip = FreeAIr.Resources.Resources.FreeAIr_support__generate_commit
                             };
                             buildCommitMessageButton.Click += BuildCommitMessageButton_Click;
                             vsPanel.Children.Insert(0, buildCommitMessageButton);
@@ -127,7 +127,7 @@ namespace FreeAIr.BLogic
                                 HorizontalContentAlignment = HorizontalAlignment.Center,
                                 Margin = new System.Windows.Thickness(0),
                                 Style = dcButton.Style,
-                                ToolTip = "FreeAIr support: generate and add natural language outlines related to the diff below."
+                                ToolTip = FreeAIr.Resources.Resources.FreeAIr_support__generate_and_add
                             };
                             addNaturalLanguageOutlinesButton.Click += AddNaturalLanguageOutlinesButton_Click;
                             vsPanel.Children.Insert(0, addNaturalLanguageOutlinesButton);
@@ -143,7 +143,7 @@ namespace FreeAIr.BLogic
                                 HorizontalContentAlignment = HorizontalAlignment.Center,
                                 Margin = new System.Windows.Thickness(0),
                                 Style = dcButton.Style,
-                                ToolTip = "FreeAIr support: build natural language outlines json file related to the diff below."
+                                ToolTip = FreeAIr.Resources.Resources.FreeAIr_support__build_natural_language
                             };
                             buildNLOJsonFileButton.Click += BuildNLOJsonFileButton_Click;
                             vsPanel.Children.Insert(0, buildNLOJsonFileButton);

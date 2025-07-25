@@ -151,7 +151,7 @@
     <value>Начать чат...</value>
   </data>
   <data name="UI_StopWaiting" xml:space="preserve">
-    <value>Остановить ожидание ответа</value>
+    <value>Остановить</value>
   </data>
   <data name="FreeAIr_available_support" xml:space="preserve">
     <value>FreeAIr доступная поддержка:</value>
@@ -220,7 +220,7 @@
     <value>Редактирование настроек FreeAIr. Измененные настройки не влияют на уже открытые чаты.</value>
   </data>
   <data name="Show only user chats" xml:space="preserve">
-    <value>Показывать пользовательские чаты</value>
+    <value>Только чаты пользователя</value>
   </data>
   <data name="Chat context" xml:space="preserve">
     <value>Контекст чата:</value>
@@ -547,9 +547,162 @@
     <value>Системный промпт агента:</value>
   </data>
   <data name="Replace_with_general_system_prompt" xml:space="preserve">
-    <value>Заменить основным системным промптом...</value>
+    <value>Заменить стандартным системным промптом...</value>
   </data>
   <data name="Replace_this_system_prompt_with_default" xml:space="preserve">
-    <value>Заменить этот системный промпт основным системным промптом FreeAIr</value>
+    <value>Заменить этот системный промпт основным системным промптом из FreeAIr</value>
+  </data>
+  <data name="Replace_with_generate_NLO_system" xml:space="preserve">
+    <value>Заменить стандартным системным промтом генерации NLO</value>
+  </data>
+  <data name="Replace_this_system_prompt_with_default_NLO_g" xml:space="preserve">
+    <value>Заменить этот системный промпт стандартным системным промптом генерации NLO из FreeAIr</value>
+  </data>
+  <data name="Replace_with_extract_NLO_system_prompt" xml:space="preserve">
+    <value>Заменить стандартным системным промптом извлечения NLO...</value>
+  </data>
+  <data name="Replace_this_system_prompt_with_default_NLO_s" xml:space="preserve">
+    <value>Заменить этот системный промпт системным промптом извлечения NLO из документа из FreeAIr</value>
+  </data>
+  <data name="FreeAIr_Control_Center" xml:space="preserve">
+    <value>Центр управления FreeAIr</value>
+  </data>
+  <data name="Use_default" xml:space="preserve">
+    <value>Использовать по умолчанию...</value>
+  </data>
+  <data name="Reload" xml:space="preserve">
+    <value>Перезагрузить</value>
+  </data>
+  <data name="Save" xml:space="preserve">
+    <value>Сохранить</value>
+  </data>
+  <data name="Delete" xml:space="preserve">
+    <value>Удалить</value>
+  </data>
+  <data name="Edit_agents" xml:space="preserve">
+    <value>Редактировать агентов...</value>
+  </data>
+  <data name="Edit_actions" xml:space="preserve">
+    <value>Редактировать действия...</value>
+  </data>
+  <data name="Edit_MCP_servers" xml:space="preserve">
+    <value>Редактировать MCP сервера...</value>
+  </data>
+  <data name="Edit_global_MCP_tools" xml:space="preserve">
+    <value>Редактировать глобальные MCP tools...</value>
+  </data>
+  <data name="Github_MCP_Server_status" xml:space="preserve">
+    <value>Статус Github MCP сервера:</value>
+  </data>
+  <data name="Install_Github_MCP_server" xml:space="preserve">
+    <value>Установить Github MCP сервер...</value>
+  </data>
+  <data name="FreeAIr_options_can_be_saved_into" xml:space="preserve">
+    <value> Настройки FreeAIr могут быть сохранены в 2 разных места:</value>
+  </data>
+  <data name="Json_file__solution_related_approach" xml:space="preserve">
+    <value>1. Json файл за диске (solution-related подход).</value>
+  </data>
+  <data name="a_2__Inside_your_Visual_Studio__developer" xml:space="preserve">
+    <value>2. Внутри Вашей Visual Studio (developer-related подход).</value>
+  </data>
+  <data name="Json_file_is_placed_in_the_folder" xml:space="preserve">
+    <value> Json файл расположен в папке Вашего solution, внутри подпапки `.freeair` и имеет имя 'имя_вашего_солюшена&gt;_options.json'. Этот файл подлежит камиту в git, что полезно для командной работы, когда каждый член команды может использовать общие (общепроектные) настройки FreeAIr, например, корпоративного LLM агента.</value>
+  </data>
+  <data name="Visual_Studio_is_a_developer_related" xml:space="preserve">
+    <value> Сохранение настроек FreeAIr в Visual Studio это devloper-related подход, Ваш репозиторий не будет захламлен файла FreeAIr. Эти настройки будут применяться к каждому открываемому солюшену.</value>
+  </data>
+  <data name="If_you_have_both__json_file_and" xml:space="preserve">
+    <value> Если у Вас настройки FreeAIr сохранены в Visual Studio и Вы открыаете репозиторий с json файлом настроек FreeAIr, то выбраны будут настройки из файла. Если у Вас нет настроек FreeAIr нигде, то будут использоваться дефолтные настройки FreeAIr, которые в целом бесполезны.</value>
+  </data>
+  <data name="FreeAIr_MCP_Servers_Configuration" xml:space="preserve">
+    <value>Окно настройки MCP серверов FreeAIr</value>
+  </data>
+  <data name="Add_new" xml:space="preserve">
+    <value>Добавить</value>
+  </data>
+  <data name="Delete_selected" xml:space="preserve">
+    <value>Удалить</value>
+  </data>
+  <data name="Move_selected_up" xml:space="preserve">
+    <value>Поднять</value>
+  </data>
+  <data name="Move_selected_down" xml:space="preserve">
+    <value>Опустить</value>
+  </data>
+  <data name="Search_for_MCP_servers_in_Docker" xml:space="preserve">
+    <value>Искать MCP сервера в регистре докера...</value>
+  </data>
+  <data name="Check_for_connection" xml:space="preserve">
+    <value>Проверить подключение...</value>
+  </data>
+  <data name="Install_and_setup" xml:space="preserve">
+    <value>Установить и настроить...</value>
+  </data>
+  <data name="Open_in_browser" xml:space="preserve">
+    <value>Открыть в браузере...</value>
+  </data>
+  <data name="Cancel" xml:space="preserve">
+    <value>Отменить</value>
+  </data>
+  <data name="Show_release_notes" xml:space="preserve">
+    <value>Показать release notes</value>
+  </data>
+  <data name="Not_interested" xml:space="preserve">
+    <value>Скрыть</value>
+  </data>
+  <data name="Choose_searching_scope" xml:space="preserve">
+    <value>Выберите область поиска:</value>
+  </data>
+  <data name="Whole_solution" xml:space="preserve">
+    <value>Весь solution</value>
+  </data>
+  <data name="Current_project" xml:space="preserve">
+    <value>Текущий проект</value>
+  </data>
+  <data name="Choose_support_action" xml:space="preserve">
+    <value>Выберите действие:</value>
+  </data>
+  <data name="Choose_agent_for_natural_language" xml:space="preserve">
+    <value>Выберите агента для поиска на естесственном языке:</value>
+  </data>
+  <data name="Use_RAG" xml:space="preserve">
+    <value>Использовать RAG</value>
+  </data>
+  <data name="Find_using_natural_language" xml:space="preserve">
+    <value>Искать на естесственном языке</value>
+  </data>
+  <data name="Find_using_natural_language_in_current" xml:space="preserve">
+    <value>Искать на естесственном языке во всем солюшене или в текущем проекте</value>
+  </data>
+  <data name="Choose_agent_for_commit_message_generation" xml:space="preserve">
+    <value>Выберите агента для создания commit-сообщения:</value>
+  </data>
+  <data name="Cannot_collect_git_patch__Please" xml:space="preserve">
+    <value>Невозможно собрать git patch. Пожалуйста, введите commit-сообщение вручную.</value>
+  </data>
+  <data name="Cannot_receive_AI_answer__Please" xml:space="preserve">
+    <value>Невозможно получить ответ от LLM. Пожалуйста, введите сообщение вручную.</value>
+  </data>
+  <data name="Please_wait_for_git_patch_building" xml:space="preserve">
+    <value>Подождите, пока собирается git patch...</value>
+  </data>
+  <data name="Cannot_collect_git_patch" xml:space="preserve">
+    <value>Невозможно получить git patch.</value>
+  </data>
+  <data name="Cannot_determine_git_repository_path" xml:space="preserve">
+    <value>Невозможно получить путь к репозиторию git.</value>
+  </data>
+  <data name="Choose_agent_to_add_NL_outlines_to" xml:space="preserve">
+    <value>Выберите агента для добавления NLO в измененные файлы:</value>
+  </data>
+  <data name="FreeAIr_support__generate_commit" xml:space="preserve">
+    <value>FreeAIr: создать commit-сообщение по измененным файлам</value>
+  </data>
+  <data name="FreeAIr_support__generate_and_add" xml:space="preserve">
+    <value>FreeAIr: сформировать и добавить NLO в измененные файлы.</value>
+  </data>
+  <data name="FreeAIr_support__build_natural_language" xml:space="preserve">
+    <value>FreeAIr: извлечь NLO и сформировать NLO json файл для измененных файлов.</value>
   </data>
 </root>

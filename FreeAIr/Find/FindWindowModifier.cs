@@ -113,7 +113,7 @@ namespace FreeAIr.Find
                 VerticalAlignment = findAllButton.VerticalAlignment,
                 VerticalContentAlignment = findAllButton.VerticalContentAlignment,
                 Height = findAllButton.ActualHeight,
-                Content = "Use RAG",
+                Content = FreeAIr.Resources.Resources.Use_RAG,
                 //ToolTip = "Use NLO embedding JSON files to narrow down search scope, if the files exists for this solution",
                 ToolTip = "DOES NOT IMPLEMENTED YET",
                 Style = styleSourceCheckBox?.Style
@@ -137,8 +137,8 @@ namespace FreeAIr.Find
                 VerticalAlignment = findAllButton.VerticalAlignment,
                 VerticalContentAlignment = findAllButton.VerticalContentAlignment,
                 Height = findAllButton.ActualHeight,
-                Content = "Find using natural language",
-                ToolTip = "Find using natural language in current solution or the current project",
+                Content = FreeAIr.Resources.Resources.Find_using_natural_language,
+                ToolTip = FreeAIr.Resources.Resources.Find_using_natural_language_in_current,
                 Style = findAllButton.Style
             };
 

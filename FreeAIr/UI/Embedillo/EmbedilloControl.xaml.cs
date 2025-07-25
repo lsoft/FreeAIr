@@ -184,8 +184,8 @@ namespace FreeAIr.UI.Embedillo
 
         private void UpdateHintStatus()
         {
-            HintLabel.GetBindingExpression(System.Windows.Controls.Label.VisibilityProperty).UpdateTarget();
-            HintLabel.GetBindingExpression(System.Windows.Controls.Label.ContentProperty).UpdateTarget();
+            HintLabel.GetBindingExpression(System.Windows.Controls.TextBlock.VisibilityProperty).UpdateTarget();
+            HintLabel.GetBindingExpression(System.Windows.Controls.TextBlock.TextProperty).UpdateTarget();
         }
 
         public void Setup(

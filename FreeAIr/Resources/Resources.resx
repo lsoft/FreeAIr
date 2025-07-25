@@ -656,4 +656,208 @@
     <value>Replace this system prompt with default system prompt of general purpose</value>
     <comment>Used in FreeAIr\UI\Windows\AgentConfigureWindow.xaml document</comment>
   </data>
+  <data name="Replace_with_generate_NLO_system" xml:space="preserve">
+    <value>Replace with generate NLO system prompt...</value>
+    <comment>Used in FreeAIr\UI\Windows\AgentConfigureWindow.xaml document</comment>
+  </data>
+  <data name="Replace_this_system_prompt_with_default_NLO_g" xml:space="preserve">
+    <value>Replace this system prompt with default system prompt of generate new or update existing natural language outlines</value>
+    <comment>Used in FreeAIr\UI\Windows\AgentConfigureWindow.xaml document</comment>
+  </data>
+  <data name="Replace_with_extract_NLO_system_prompt" xml:space="preserve">
+    <value>Replace with extract NLO system prompt...</value>
+    <comment>Used in FreeAIr\UI\Windows\AgentConfigureWindow.xaml document</comment>
+  </data>
+  <data name="Replace_this_system_prompt_with_default_NLO_s" xml:space="preserve">
+    <value>Replace this system prompt with default system prompt of extract natural language outlines from documents.</value>
+    <comment>Used in FreeAIr\UI\Windows\AgentConfigureWindow.xaml document</comment>
+  </data>
+  <data name="FreeAIr_Control_Center" xml:space="preserve">
+    <value>FreeAIr Control Center</value>
+    <comment>Used in FreeAIr\UI\Windows\ControlCenterWindow.xaml document</comment>
+  </data>
+  <data name="Use_default" xml:space="preserve">
+    <value>Use default...</value>
+    <comment>Used in FreeAIr\UI\Windows\ControlCenterWindow.xaml document</comment>
+  </data>
+  <data name="Reload" xml:space="preserve">
+    <value>Reload</value>
+    <comment>Used in FreeAIr\UI\Windows\ControlCenterWindow.xaml document</comment>
+  </data>
+  <data name="Save" xml:space="preserve">
+    <value>Save</value>
+    <comment>Used in FreeAIr\UI\Windows\ControlCenterWindow.xaml document</comment>
+  </data>
+  <data name="Delete" xml:space="preserve">
+    <value>Delete</value>
+    <comment>Used in FreeAIr\UI\Windows\ControlCenterWindow.xaml document</comment>
+  </data>
+  <data name="Edit_agents" xml:space="preserve">
+    <value>Edit agents...</value>
+    <comment>Used in FreeAIr\UI\Windows\ControlCenterWindow.xaml document</comment>
+  </data>
+  <data name="Edit_actions" xml:space="preserve">
+    <value>Edit actions...</value>
+    <comment>Used in FreeAIr\UI\Windows\ControlCenterWindow.xaml document</comment>
+  </data>
+  <data name="Edit_MCP_servers" xml:space="preserve">
+    <value>Edit MCP servers...</value>
+    <comment>Used in FreeAIr\UI\Windows\ControlCenterWindow.xaml document</comment>
+  </data>
+  <data name="Edit_global_MCP_tools" xml:space="preserve">
+    <value>Edit global MCP tools...</value>
+    <comment>Used in FreeAIr\UI\Windows\ControlCenterWindow.xaml document</comment>
+  </data>
+  <data name="Github_MCP_Server_status" xml:space="preserve">
+    <value>Github MCP Server status:</value>
+    <comment>Used in FreeAIr\UI\Windows\ControlCenterWindow.xaml document</comment>
+  </data>
+  <data name="Install_Github_MCP_server" xml:space="preserve">
+    <value>Install Github MCP server...</value>
+    <comment>Used in FreeAIr\UI\Windows\ControlCenterWindow.xaml document</comment>
+  </data>
+  <data name="FreeAIr_options_can_be_saved_into" xml:space="preserve">
+    <value> FreeAIr options can be saved into 2 locations:</value>
+    <comment>Used in FreeAIr\UI\Windows\ControlCenterWindow.xaml document</comment>
+  </data>
+  <data name="Json_file__solution_related_approach" xml:space="preserve">
+    <value>1. Json file on the disk (solution-related approach).</value>
+    <comment>Used in FreeAIr\UI\Windows\ControlCenterWindow.xaml document</comment>
+  </data>
+  <data name="a_2__Inside_your_Visual_Studio__developer" xml:space="preserve">
+    <value>2. Inside your Visual Studio (developer-related approach).</value>
+    <comment>Used in FreeAIr\UI\Windows\ControlCenterWindow.xaml document</comment>
+  </data>
+  <data name="Json_file_is_placed_in_the_folder" xml:space="preserve">
+    <value> Json file is placed in the folder of your solution + '.freeair' folder + 'your_solution_name&gt;_options.json' filename. This file is a subject of committing to the git repo. This is useful for a command working, when every member of the team can use the same FreeAIr options, for example, connection to the company's LLM.</value>
+    <comment>Used in FreeAIr\UI\Windows\ControlCenterWindow.xaml document</comment>
+  </data>
+  <data name="Visual_Studio_is_a_developer_related" xml:space="preserve">
+    <value> Visual Studio is a developer-related way, no FreeAIr artifacts falls in your github repo. The same FreeAIr options will be applied for every solution you opened.</value>
+    <comment>Used in FreeAIr\UI\Windows\ControlCenterWindow.xaml document</comment>
+  </data>
+  <data name="If_you_have_both__json_file_and" xml:space="preserve">
+    <value> If you have both (json file and VS options) FreeAIr will use json file options. If you have nothing FreeAIr will use the default (embedded) options, which are useless for chat with LLM.</value>
+    <comment>Used in FreeAIr\UI\Windows\ControlCenterWindow.xaml document</comment>
+  </data>
+  <data name="FreeAIr_MCP_Servers_Configuration" xml:space="preserve">
+    <value>FreeAIr MCP Servers Configuration Window</value>
+    <comment>Used in FreeAIr\UI\Windows\McpServerConfigureWindow.xaml document</comment>
+  </data>
+  <data name="Add_new" xml:space="preserve">
+    <value>Add new</value>
+    <comment>Used in FreeAIr\UI\Windows\McpServerConfigureWindow.xaml document</comment>
+  </data>
+  <data name="Delete_selected" xml:space="preserve">
+    <value>Delete selected</value>
+    <comment>Used in FreeAIr\UI\Windows\McpServerConfigureWindow.xaml document</comment>
+  </data>
+  <data name="Move_selected_up" xml:space="preserve">
+    <value>Move selected up</value>
+    <comment>Used in FreeAIr\UI\Windows\McpServerConfigureWindow.xaml document</comment>
+  </data>
+  <data name="Move_selected_down" xml:space="preserve">
+    <value>Move selected down</value>
+    <comment>Used in FreeAIr\UI\Windows\McpServerConfigureWindow.xaml document</comment>
+  </data>
+  <data name="Search_for_MCP_servers_in_Docker" xml:space="preserve">
+    <value>Search for MCP servers in Docker registry...</value>
+    <comment>Used in FreeAIr\UI\Windows\McpServerConfigureWindow.xaml document</comment>
+  </data>
+  <data name="Check_for_connection" xml:space="preserve">
+    <value>Check for connection...</value>
+    <comment>Used in FreeAIr\UI\Windows\McpServerConfigureWindow.xaml document</comment>
+  </data>
+  <data name="Install_and_setup" xml:space="preserve">
+    <value>Install and setup...</value>
+    <comment>Used in FreeAIr\UI\Windows\SearchForDockerMcpServerWindow.xaml document</comment>
+  </data>
+  <data name="Open_in_browser" xml:space="preserve">
+    <value>Open in browser...</value>
+    <comment>Used in FreeAIr\UI\Windows\SearchForDockerMcpServerWindow.xaml document</comment>
+  </data>
+  <data name="Cancel" xml:space="preserve">
+    <value>Cancel</value>
+    <comment>Used in FreeAIr\UI\Windows\WaitForTaskWindow.xaml document</comment>
+  </data>
+  <data name="Show_release_notes" xml:space="preserve">
+    <value>Show release notes</value>
+    <comment>Used in FreeAIr\InfoBar\ReleaseNotesInfoBarService.cs document</comment>
+  </data>
+  <data name="Not_interested" xml:space="preserve">
+    <value>Not interested</value>
+    <comment>Used in FreeAIr\InfoBar\ReleaseNotesInfoBarService.cs document</comment>
+  </data>
+  <data name="Choose_searching_scope" xml:space="preserve">
+    <value>Choose searching scope:</value>
+    <comment>Used in FreeAIr\Find\DoSearch.cs document</comment>
+  </data>
+  <data name="Whole_solution" xml:space="preserve">
+    <value>Whole solution</value>
+    <comment>Used in FreeAIr\Find\DoSearch.cs document</comment>
+  </data>
+  <data name="Current_project" xml:space="preserve">
+    <value>Current project</value>
+    <comment>Used in FreeAIr\Find\DoSearch.cs document</comment>
+  </data>
+  <data name="Choose_support_action" xml:space="preserve">
+    <value>Choose support action:</value>
+    <comment>Used in FreeAIr\Find\DoSearch.cs document</comment>
+  </data>
+  <data name="Choose_agent_for_natural_language" xml:space="preserve">
+    <value>Choose agent for natural language search:</value>
+    <comment>Used in FreeAIr\Find\DoSearch.cs document</comment>
+  </data>
+  <data name="Use_RAG" xml:space="preserve">
+    <value>Use RAG</value>
+    <comment>Used in FreeAIr\Find\FindWindowModifier.cs document</comment>
+  </data>
+  <data name="Find_using_natural_language" xml:space="preserve">
+    <value>Find using natural language</value>
+    <comment>Used in FreeAIr\Find\FindWindowModifier.cs document</comment>
+  </data>
+  <data name="Find_using_natural_language_in_current" xml:space="preserve">
+    <value>Find using natural language in current solution or the current project</value>
+    <comment>Used in FreeAIr\Find\FindWindowModifier.cs document</comment>
+  </data>
+  <data name="Choose_agent_for_commit_message_generation" xml:space="preserve">
+    <value>Choose agent for commit message generation:</value>
+    <comment>Used in FreeAIr\Git\CommitMessageBuilder.cs document</comment>
+  </data>
+  <data name="Cannot_collect_git_patch__Please" xml:space="preserve">
+    <value>Cannot collect git patch. Please enter commit message manually.</value>
+    <comment>Used in FreeAIr\Git\CommitMessageBuilder.cs document</comment>
+  </data>
+  <data name="Cannot_receive_AI_answer__Please" xml:space="preserve">
+    <value>Cannot receive LLM answer. Please enter commit message manually.</value>
+    <comment>Used in FreeAIr\Git\CommitMessageBuilder.cs document</comment>
+  </data>
+  <data name="Please_wait_for_git_patch_building" xml:space="preserve">
+    <value>Please wait for git patch building...</value>
+    <comment>Used in FreeAIr\Git\GitCollectBackgroundTask.cs document</comment>
+  </data>
+  <data name="Cannot_collect_git_patch" xml:space="preserve">
+    <value>Cannot collect git patch.</value>
+    <comment>Used in FreeAIr\Git\GitDiffCreator.cs document</comment>
+  </data>
+  <data name="Cannot_determine_git_repository_path" xml:space="preserve">
+    <value>Cannot determine git repository path.</value>
+    <comment>Used in FreeAIr\Git\GitDiffCreator.cs document</comment>
+  </data>
+  <data name="Choose_agent_to_add_NL_outlines_to" xml:space="preserve">
+    <value>Choose agent to add NL outlines to changed files:</value>
+    <comment>Used in FreeAIr\Git\GitNaturalLanguageOutliner.cs document</comment>
+  </data>
+  <data name="FreeAIr_support__generate_commit" xml:space="preserve">
+    <value>FreeAIr support: generate commit message</value>
+    <comment>Used in FreeAIr\Git\GitWindowModifier.cs document</comment>
+  </data>
+  <data name="FreeAIr_support__generate_and_add" xml:space="preserve">
+    <value>FreeAIr support: generate and add natural language outlines related to the diff below.</value>
+    <comment>Used in FreeAIr\Git\GitWindowModifier.cs document</comment>
+  </data>
+  <data name="FreeAIr_support__build_natural_language" xml:space="preserve">
+    <value>FreeAIr support: build natural language outlines json file related to the diff below.</value>
+    <comment>Used in FreeAIr\Git\GitWindowModifier.cs document</comment>
+  </data>
 </root>

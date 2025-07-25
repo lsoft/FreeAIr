@@ -18,7 +18,7 @@ namespace FreeAIr.BLogic
                 await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
 
                 var chosenSupportAction = await SupportContextMenu.ChooseSupportAsync(
-                    "Choose support action:",
+                    Resources.Resources.Choose_support_action,
                     SupportScopeEnum.CommitMessageBuilding
                     );
                 if (chosenSupportAction is null)
@@ -27,7 +27,7 @@ namespace FreeAIr.BLogic
                 }
 
                 var chosenAgent = await AgentContextMenu.ChooseAgentWithTokenAsync(
-                    "Choose agent for commit message generation:",
+                    FreeAIr.Resources.Resources.Choose_agent_for_commit_message_generation,
                     chosenSupportAction.AgentName
                     );
                 if (chosenAgent is null)
@@ -67,7 +67,7 @@ namespace FreeAIr.BLogic
             var gitDiff = backgroundTask.Result;
             if (string.IsNullOrEmpty(gitDiff))
             {
-                await ShowErrorAsync("Cannot collect git patch. Please enter commit message manually.");
+                await ShowErrorAsync(FreeAIr.Resources.Resources.Cannot_collect_git_patch__Please);
                 return;
             }
 
@@ -101,7 +101,7 @@ namespace FreeAIr.BLogic
                 }
             }
 
-            ShowErrorAsync("Cannot receive AI answer. Please enter commit message manually.")
+            ShowErrorAsync(FreeAIr.Resources.Resources.Cannot_receive_AI_answer__Please)
                 .FileAndForget(nameof(ShowErrorAsync));
 
             await ChatListToolWindow.ShowIfEnabledAsync();

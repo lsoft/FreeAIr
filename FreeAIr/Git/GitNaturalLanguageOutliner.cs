@@ -26,7 +26,7 @@ namespace FreeAIr.Git
                 await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
 
                 var chosenSupportAction = await SupportContextMenu.ChooseSupportAsync(
-                    "Choose support action:",
+                    Resources.Resources.Choose_support_action,
                     SupportScopeEnum.GenerateNaturalLanguageOutlines
                     );
                 if (chosenSupportAction is null)
@@ -35,7 +35,7 @@ namespace FreeAIr.Git
                 }
 
                 var chosenAgent = await AgentContextMenu.ChooseAgentWithTokenAsync(
-                    "Choose agent to add NL outlines to changed files:",
+                    FreeAIr.Resources.Resources.Choose_agent_to_add_NL_outlines_to,
                     chosenSupportAction.AgentName
                     );
                 if (chosenAgent is null)
@@ -93,16 +93,6 @@ namespace FreeAIr.Git
             }
 
             return contextItems;
-        }
-
-        private static async Task ShowErrorAsync(
-            string error
-            )
-        {
-            await VS.MessageBox.ShowErrorAsync(
-                Resources.Resources.Error,
-                error
-                );
         }
     }
 

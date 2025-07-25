@@ -105,7 +105,7 @@
 
             <Button
                 Grid.Column="5"
-                Content="Apply changes"
+                Content="{x:Static resources:Resources.Apply_changes}"
                 Margin="5,0,5,0"
                 FontSize="12"
                 FontFamily="Cascadia Code"

@@ -11,7 +11,8 @@
     Height="700" Width="1000"
     ui:VsTheme.UseVsTheme="True"
     ShowInTaskbar="False"
-    Title="FreeAIr Control Center"
+    Title="{x:Static resources:Resources.FreeAIr_Control_Center}"
+    xmlns:resources="clr-namespace:FreeAIr.Resources"
     >
     <ScrollViewer
         HorizontalAlignment="Stretch"
@@ -99,7 +100,7 @@
                     FontSize="12"
                     Margin="10,0,10,0"
                     FontFamily="Cascadia Code"
-                    Content="Use default..."
+                    Content="{x:Static resources:Resources.Use_default}"
                     Command="{Binding SetDefaultOptionsCommand}"
                     Style="{DynamicResource TextBlockLikeButtonStyle}"
                     />
@@ -110,7 +111,7 @@
                     FontSize="12"
                     Margin="10,0,10,0"
                     FontFamily="Cascadia Code"
-                    Content="Reload"
+                    Content="{x:Static resources:Resources.Reload}"
                     Command="{Binding LoadOptionsCommand}"
                     Style="{DynamicResource TextBlockLikeButtonStyle}"
                     />
@@ -120,7 +121,7 @@
                     FontSize="12"
                     Margin="10,0,10,0"
                     FontFamily="Cascadia Code"
-                    Content="Save"
+                    Content="{x:Static resources:Resources.Save}"
                     Command="{Binding StoreOptionsCommand}"
                     Style="{DynamicResource TextBlockLikeButtonStyle}"
                     />
@@ -130,7 +131,7 @@
                     FontSize="12"
                     Margin="10,0,10,0"
                     FontFamily="Cascadia Code"
-                    Content="Delete"
+                    Content="{x:Static resources:Resources.Delete}"
                     Command="{Binding DeleteOptionsCommand}"
                     Style="{DynamicResource TextBlockLikeButtonStyle}"
                     />
@@ -146,7 +147,7 @@
                 VerticalAlignment="Center"
                 FontSize="12"
                 FontFamily="Cascadia Code"
-                Content="Edit agents..."
+                Content="{x:Static resources:Resources.Edit_agents}"
                 Command="{Binding EditAgentCommand}"
                 Style="{DynamicResource TextBlockLikeButtonStyle}"
                 />
@@ -160,7 +161,7 @@
                 VerticalAlignment="Center"
                 FontSize="12"
                 FontFamily="Cascadia Code"
-                Content="Edit actions..."
+                Content="{x:Static resources:Resources.Edit_actions}"
                 Command="{Binding EditActionCommand}"
                 Style="{DynamicResource TextBlockLikeButtonStyle}"
                 />
@@ -174,7 +175,7 @@
                 Margin="0,2,8,2"
                 FontSize="12"
                 FontFamily="Cascadia Code"
-                Content="Edit MCP servers..."
+                Content="{x:Static resources:Resources.Edit_MCP_servers}"
                 Command="{Binding EditMcpServersCommand}"
                 Style="{DynamicResource TextBlockLikeButtonStyle}"
                 />
@@ -188,7 +189,7 @@
                 Margin="0,2,8,2"
                 FontSize="12"
                 FontFamily="Cascadia Code"
-                Content="Edit global MCP tools..."
+                Content="{x:Static resources:Resources.Edit_global_MCP_tools}"
                 Command="{Binding EditGlobalToolsCommand}"
                 Style="{DynamicResource TextBlockLikeButtonStyle}"
                 />
@@ -202,7 +203,7 @@
                 FontFamily="Cascadia Code"
                 Margin="0,20,8,0"
                 Name="GithubStatusLabel"
-                Content="Github MCP Server status:"
+                Content="{x:Static resources:Resources.Github_MCP_Server_status}"
                 />
 
             <Label
@@ -225,7 +226,7 @@
                 Margin="0,20,8,0"
                 FontSize="12"
                 FontFamily="Cascadia Code"
-                Content="Install Github MCP server..."
+                Content="{x:Static resources:Resources.Install_Github_MCP_server}"
                 Command="{Binding InstallGithubMCPServerCommand}"
                 Style="{DynamicResource TextBlockLikeButtonStyle}"
                 />
@@ -245,7 +246,7 @@
                     Padding="0"
                     Margin="0"
                     Foreground="{Binding ElementName=GithubStatusLabel, Path=Foreground}"
-                    Text=" FreeAIr options can be saved into 2 locations:"
+                    Text="{x:Static resources:Resources.FreeAIr_options_can_be_saved_into}"
                     />
 
                 <TextBlock
@@ -256,7 +257,7 @@
                     Padding="0"
                     Margin="0"
                     Foreground="{Binding ElementName=GithubStatusLabel, Path=Foreground}"
-                    Text="1. Json file (solution-related approach)."
+                    Text="{x:Static resources:Resources.Json_file__solution_related_approach}"
                     />
 
                 <TextBlock
@@ -267,7 +268,7 @@
                     Padding="0"
                     Margin="0"
                     Foreground="{Binding ElementName=GithubStatusLabel, Path=Foreground}"
-                    Text="2. Inside your Visual Studio (developer-related approach)."
+                    Text="{x:Static resources:Resources.a_2__Inside_your_Visual_Studio__developer}"
                     />
 
                 <TextBlock
@@ -278,7 +279,7 @@
                     Padding="0"
                     Margin="0"
                     Foreground="{Binding ElementName=GithubStatusLabel, Path=Foreground}"
-                    Text=" Json file is placed in the folder of your solution + '.freeair' folder + 'your_solution_name>_options.json' filename. This file is a subject of committing to the git repo. This is useful for a command working, when every member of the team can use the same FreeAIr options, for example, connection to the company's LLM."
+                    Text="{x:Static resources:Resources.Json_file_is_placed_in_the_folder}"
                     />
 
                 <TextBlock
@@ -289,7 +290,7 @@
                     Padding="0"
                     Margin="0"
                     Foreground="{Binding ElementName=GithubStatusLabel, Path=Foreground}"
-                    Text=" Visual Studio is a developer-related way, no FreeAIr artifacts falls in your github repo. The same FreeAIr options will be applied for every solution you opened."
+                    Text="{x:Static resources:Resources.Visual_Studio_is_a_developer_related}"
                     />
                 
                 <TextBlock
@@ -300,7 +301,7 @@
                     Padding="0"
                     Margin="0"
                     Foreground="{Binding ElementName=GithubStatusLabel, Path=Foreground}"
-                    Text=" If you have both (json file and VS options) FreeAIr will use json file options. If you have nothing FreeAIr will use the default (embedded) options, which are useless for chat with LLM."
+                    Text="{x:Static resources:Resources.If_you_have_both__json_file_and}"
                     />
 
             </StackPanel>

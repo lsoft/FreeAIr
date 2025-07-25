@@ -104,7 +104,7 @@
 
             <Button
                 Grid.Column="5"
-                Content="Apply changes"
+                Content="{x:Static resources:Resources.Apply_changes}"
                 Margin="5,0,5,0"
                 FontSize="12"
                 FontFamily="Cascadia Code"
@@ -337,10 +337,10 @@
                     VerticalAlignment="Center"
                     Cursor="Hand"
                     Foreground="#569CD6"
-                    Content="Replace with generate NLO system prompt..."
+                    Content="{x:Static resources:Resources.Replace_with_generate_NLO_system}"
                     Command="{Binding ReplaceGenerateNLOSystemPromptCommand}"
                     Style="{DynamicResource TextBlockLikeButtonStyle}"
-                    ToolTip="Replace this system prompt with default system prompt of generate new or update existing natural language outlines"
+                    ToolTip="{x:Static resources:Resources.Replace_this_system_prompt_with_default_NLO_g}"
                     />
 
                 <Button
@@ -350,10 +350,10 @@
                     VerticalAlignment="Center"
                     Cursor="Hand"
                     Foreground="#569CD6"
-                    Content="Replace with extract NLO system prompt..."
+                    Content="{x:Static resources:Resources.Replace_with_extract_NLO_system_prompt}"
                     Command="{Binding ReplaceExtractNLOSystemPromptCommand}"
                     Style="{DynamicResource TextBlockLikeButtonStyle}"
-                    ToolTip="Replace this system prompt with default system prompt of extract natural language outlines from documents."
+                    ToolTip="{x:Static resources:Resources.Replace_this_system_prompt_with_default_NLO_s}"
                     />
             
             </WrapPanel>
