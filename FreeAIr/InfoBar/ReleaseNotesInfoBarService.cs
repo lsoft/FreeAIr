@@ -70,8 +70,8 @@ namespace FreeAIr.InfoBar
                 },
                 new InfoBarActionItem[]
                 {
-                        new InfoBarHyperlink("Show release notes", 1),
-                        new InfoBarHyperlink("Not interested", 2)
+                        new InfoBarHyperlink(FreeAIr.Resources.Resources.Show_release_notes, 1),
+                        new InfoBarHyperlink(FreeAIr.Resources.Resources.Not_interested, 2)
                 },
                 KnownMonikers.NeuralNetwork,
                 isCloseButtonVisible: false

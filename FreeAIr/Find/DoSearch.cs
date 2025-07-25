@@ -25,10 +25,10 @@ namespace FreeAIr.Find
                 await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
 
                 var chosenScope = await VisualStudioContextMenuCommandBridge.ShowAsync<NaturalSearchScope>(
-                    "Choose searching scope:",
+                    FreeAIr.Resources.Resources.Choose_searching_scope,
                     [
-                        ("Whole solution", new NaturalSearchScope(NaturalSearchScopeEnum.WholeSolution)),
-                        ("Current project", new NaturalSearchScope(NaturalSearchScopeEnum.CurrentProject)),
+                        (FreeAIr.Resources.Resources.Whole_solution, new NaturalSearchScope(NaturalSearchScopeEnum.WholeSolution)),
+                        (FreeAIr.Resources.Resources.Current_project, new NaturalSearchScope(NaturalSearchScopeEnum.CurrentProject)),
                     ]
                     );
                 if (chosenScope is null)
@@ -37,7 +37,7 @@ namespace FreeAIr.Find
                 }
 
                 var chosenSupportAction = await SupportContextMenu.ChooseSupportAsync(
-                    "Choose support action:",
+                    FreeAIr.Resources.Resources.Choose_support_action,
                     SupportScopeEnum.NaturalLanguageSearch
                     );
                 if (chosenSupportAction is null)
@@ -47,7 +47,7 @@ namespace FreeAIr.Find
 
 
                 var chosenAgent = await AgentContextMenu.ChooseAgentWithTokenAsync(
-                    "Choose agent for natural language search:",
+                    FreeAIr.Resources.Resources.Choose_agent_for_natural_language,
                     chosenSupportAction.AgentName
                     );
                 if (chosenAgent is null)

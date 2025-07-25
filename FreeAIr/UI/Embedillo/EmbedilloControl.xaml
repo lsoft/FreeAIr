@@ -43,7 +43,7 @@
             </Behaviors:Interaction.Behaviors>
 
         </avalonEdit:TextEditor>
-        <Label
+        <TextBlock
             x:Name="HintLabel"
             HorizontalAlignment="Center"
             VerticalAlignment="Center"
@@ -51,7 +51,9 @@
             FontSize="{Binding ElementName=EmbedilloInternalName, Path=FontSize}"
             Foreground="Gray"
             Background="Transparent"
-            Content="{Binding ElementName=EmbedilloInternalName, Path=HintText}"
+            Text="{Binding ElementName=EmbedilloInternalName, Path=HintText}"
+            TextWrapping="Wrap"
+            TextAlignment="Center"
             Margin="0"
             Padding="0"
             Focusable="False"

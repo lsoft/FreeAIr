@@ -14,8 +14,9 @@
     Height="700" Width="1000"
     ui:VsTheme.UseVsTheme="True"
     ShowInTaskbar="False"
-    Title="FreeAIr MCP Servers Configuration Window"
+    Title="{x:Static resources:Resources.FreeAIr_MCP_Servers_Configuration}"
     Loaded="Window_Loaded"
+    xmlns:resources="clr-namespace:FreeAIr.Resources" 
     >
     <Grid
         IsEnabled="{Binding FormEnabled}"
@@ -53,7 +54,7 @@
                 Foreground="Green"
                 FontFamily="Cascadia Code"
                 VerticalAlignment="Center"
-                ToolTip="Add new"
+                ToolTip="{x:Static resources:Resources.Add_new}"
                 Command="{Binding AddNewCommand}"
                 Style="{DynamicResource TextBlockLikeButtonStyle}"
                 />
@@ -65,7 +66,7 @@
                 Foreground="Red"
                 FontFamily="Cascadia Code"
                 VerticalAlignment="Center"
-                ToolTip="Delete selected"
+                ToolTip="{x:Static resources:Resources.Delete_selected}"
                 Command="{Binding DeleteCommand}"
                 Style="{DynamicResource TextBlockLikeButtonStyle}"
                 />
@@ -77,7 +78,7 @@
                 FontSize="12"
                 FontFamily="Cascadia Code"
                 VerticalAlignment="Center"
-                ToolTip="Move selected up"
+                ToolTip="{x:Static resources:Resources.Move_selected_up}"
                 Command="{Binding UpCommand}"
                 Style="{DynamicResource TextBlockLikeButtonStyle}"
                 />
@@ -88,7 +89,7 @@
                 FontSize="12"
                 FontFamily="Cascadia Code"
                 VerticalAlignment="Center"
-                ToolTip="Move selected down"
+                ToolTip="{x:Static resources:Resources.Move_selected_down}"
                 Command="{Binding DownCommand}"
                 Style="{DynamicResource TextBlockLikeButtonStyle}"
                 />
@@ -100,7 +101,7 @@
                 FontSize="12"
                 FontFamily="Cascadia Code"
                 VerticalAlignment="Center"
-                ToolTip="Clone"
+                ToolTip="{x:Static resources:Resources.Clone}"
                 Command="{Binding CloneCommand}"
                 Style="{DynamicResource TextBlockLikeButtonStyle}"
                 />
@@ -111,7 +112,7 @@
                 FontSize="12"
                 FontFamily="Cascadia Code"
                 VerticalAlignment="Center"
-                ToolTip="Search for MCP servers in Docker registry..."
+                ToolTip="{x:Static resources:Resources.Search_for_MCP_servers_in_Docker}"
                 Command="{Binding SearchCommand}"
                 Style="{DynamicResource TextBlockLikeButtonStyle}"
                 >
@@ -124,13 +125,13 @@
 
             <Button
                 Grid.Column="6"
-                Content="Apply changes"
+                Content="{x:Static resources:Resources.Apply_changes}"
                 Margin="5,0,5,0"
                 FontSize="12"
                 FontFamily="Cascadia Code"
                 HorizontalAlignment="Right"
                 VerticalAlignment="Center"
-                ToolTip="Apply changes"
+                ToolTip="{x:Static resources:Resources.Apply_changes}"
                 Command="{Binding ApplyAndCloseCommand}"
                 Style="{DynamicResource TextBlockLikeButtonStyle}"
                 />
@@ -220,7 +221,7 @@
                     VerticalAlignment="Center"
                     Cursor="Hand"
                     Foreground="#569CD6"
-                    Content="Check for connection..."
+                    Content="{x:Static resources:Resources.Check_for_connection}"
                     Command="{Binding CheckForConnectionCommand}"
                     Style="{DynamicResource TextBlockLikeButtonStyle}"
                     />

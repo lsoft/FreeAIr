@@ -5,7 +5,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
     xmlns:local="clr-namespace:FreeAIr"
-    xmlns:ui="clr-namespace:FreeAIr.UI"
+    xmlns:ui="clr-namespace:FreeAIr.UI" xmlns:resources="clr-namespace:FreeAIr.Resources"
     mc:Ignorable="d" 
     d:DesignHeight="150" d:DesignWidth="400"
     Height="200" Width="400"
@@ -51,7 +51,7 @@
             Margin="2"
             Padding="10,5,10,5"
             Width="100"
-            Content="Cancel"
+            Content="{x:Static resources:Resources.Cancel}"
             Name="CancelButton"
             Click="CancelButton_Click"
             />

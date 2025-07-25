@@ -11,7 +11,7 @@
     ShowInTaskbar="False"
     d:DesignHeight="450" d:DesignWidth="800"
     Name="SearchForDockerMcpServerName"
-    Loaded="Window_Loaded"
+    Loaded="Window_Loaded" xmlns:resources="clr-namespace:FreeAIr.Resources" 
     >
     <Grid>
         <Grid.RowDefinitions>
@@ -84,7 +84,7 @@
                             >
 
                             <Button
-                                Content="Install and setup..."
+                                Content="{x:Static resources:Resources.Install_and_setup}"
                                 Margin="15,0,5,0"
                                 FontSize="12"
                                 FontFamily="Cascadia Code"
@@ -96,7 +96,7 @@
                                 />
 
                             <Button
-                                Content="Open in browser..."
+                                Content="{x:Static resources:Resources.Open_in_browser}"
                                 Margin="15,0,5,0"
                                 FontSize="12"
                                 FontFamily="Cascadia Code"
@@ -115,6 +115,7 @@
                             Grid.ColumnSpan="2"
                             FontFamily="Cascadia Code"
                             FontWeight="Bold"
+                            TextWrapping="Wrap"
                             Text="{Binding ServerDescription}"
                             Foreground="{Binding ElementName=ForegroundButton, Path=Foreground}"
                             />

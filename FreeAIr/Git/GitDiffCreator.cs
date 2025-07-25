@@ -27,14 +27,14 @@ namespace FreeAIr.Git
             var gitDiffString = backgroundTask.Result;
             if (string.IsNullOrEmpty(gitDiffString))
             {
-                await ShowErrorAsync("Cannot collect git patch.");
+                await ShowErrorAsync(FreeAIr.Resources.Resources.Cannot_collect_git_patch);
                 return null;
             }
 
             var repositoryFolder = await GitRepositoryProvider.GetRepositoryFolderAsync();
             if (string.IsNullOrEmpty(repositoryFolder))
             {
-                await ShowErrorAsync("Cannot determine git repository path.");
+                await ShowErrorAsync(FreeAIr.Resources.Resources.Cannot_determine_git_repository_path);
                 return null;
             }
 

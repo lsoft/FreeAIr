@@ -5,7 +5,7 @@ namespace FreeAIr.BLogic
 {
     public sealed class GitCollectBackgroundTask : BackgroundTask
     {
-        public override string TaskDescription => "Please wait for git patch building...";
+        public override string TaskDescription => FreeAIr.Resources.Resources.Please_wait_for_git_patch_building;
 
         public string? Result
         {

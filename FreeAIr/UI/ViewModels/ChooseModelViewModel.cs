@@ -155,6 +155,7 @@ namespace FreeAIr.UI.ViewModels
             {
                 await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
 
+                AgentList.Clear();
                 AgentList.AddRange(
                     (await FreeAIrOptions.DeserializeAsync()).AgentCollection
                         .Agents

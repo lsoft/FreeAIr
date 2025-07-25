@@ -496,6 +496,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Resources\Resources.zh-Hans.resx" />
     <EmbeddedResource Include="UI\ClickableText\ClickableTextResource.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
