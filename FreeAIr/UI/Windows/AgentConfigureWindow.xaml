@@ -13,8 +13,9 @@
     Height="700" Width="1000"
     ui:VsTheme.UseVsTheme="True"
     ShowInTaskbar="False"
-    Title="FreeAIr Agent Configuration Window"
+    Title="{x:Static resources:Resources.FreeAIr_Agent_Configuration_Window}"
     Loaded="Window_Loaded"
+    xmlns:resources="clr-namespace:FreeAIr.Resources"
     >
     <Grid>
         <Grid.RowDefinitions>
@@ -49,7 +50,7 @@
                 Foreground="Green"
                 FontFamily="Cascadia Code"
                 VerticalAlignment="Center"
-                ToolTip="Add new agent"
+                ToolTip="{x:Static resources:Resources.Add_new_agent}"
                 Command="{Binding AddNewAgentCommand}"
                 Style="{DynamicResource TextBlockLikeButtonStyle}"
                 />
@@ -61,7 +62,7 @@
                 Foreground="Red"
                 FontFamily="Cascadia Code"
                 VerticalAlignment="Center"
-                ToolTip="Delete selected agent"
+                ToolTip="{x:Static resources:Resources.Delete_selected_agent}"
                 Command="{Binding DeleteAgentCommand}"
                 Style="{DynamicResource TextBlockLikeButtonStyle}"
                 />
@@ -73,7 +74,7 @@
                 FontSize="12"
                 FontFamily="Cascadia Code"
                 VerticalAlignment="Center"
-                ToolTip="Move selected agent up"
+                ToolTip="{x:Static resources:Resources.Move_selected_agent_up}"
                 Command="{Binding UpAgentCommand}"
                 Style="{DynamicResource TextBlockLikeButtonStyle}"
                 />
@@ -84,7 +85,7 @@
                 FontSize="12"
                 FontFamily="Cascadia Code"
                 VerticalAlignment="Center"
-                ToolTip="Move selected agent down"
+                ToolTip="{x:Static resources:Resources.Move_selected_agent_down}"
                 Command="{Binding DownAgentCommand}"
                 Style="{DynamicResource TextBlockLikeButtonStyle}"
                 />
@@ -96,7 +97,7 @@
                 FontSize="12"
                 FontFamily="Cascadia Code"
                 VerticalAlignment="Center"
-                ToolTip="Clone"
+                ToolTip="{x:Static resources:Resources.Clone}"
                 Command="{Binding CloneAgentCommand}"
                 Style="{DynamicResource TextBlockLikeButtonStyle}"
                 />
@@ -109,7 +110,7 @@
                 FontFamily="Cascadia Code"
                 HorizontalAlignment="Right"
                 VerticalAlignment="Center"
-                ToolTip="Apply changes"
+                ToolTip="{x:Static resources:Resources.Apply_changes}"
                 Command="{Binding ApplyAndCloseCommand}"
                 Style="{DynamicResource TextBlockLikeButtonStyle}"
                 />
@@ -174,7 +175,7 @@
                 Grid.Column="0"
                 HorizontalAlignment="Left"
                 VerticalAlignment="Center"
-                Content="Name:"
+                Content="{x:Static resources:Resources.Name}"
                 />
 
             <TextBox
@@ -191,7 +192,7 @@
                 Grid.Column="0"
                 HorizontalAlignment="Left"
                 VerticalAlignment="Center"
-                Content="Endpoint:"
+                Content="{x:Static resources:Resources.Endpoint}"
                 />
 
             <TextBox
@@ -208,7 +209,7 @@
                 Grid.Column="0"
                 HorizontalAlignment="Left"
                 VerticalAlignment="Center"
-                Content="Token:"
+                Content="{x:Static resources:Resources.Token}"
                 />
 
             <TextBox
@@ -225,7 +226,7 @@
                 Grid.Column="0"
                 HorizontalAlignment="Left"
                 VerticalAlignment="Center"
-                Content="Chosen model:"
+                Content="{x:Static resources:Resources.Chosen_model}"
                 />
 
             <Grid
@@ -269,7 +270,7 @@
                 Grid.Column="0"
                 HorizontalAlignment="Left"
                 VerticalAlignment="Center"
-                Content="Context size:"
+                Content="{x:Static resources:Resources.Context_size}"
                 x:Name="ContextSizeLabel"
                 />
 
@@ -290,7 +291,7 @@
                 Grid.Column="0"
                 HorizontalAlignment="Left"
                 VerticalAlignment="Center"
-                Content="Agent system prompt:"
+                Content="{x:Static resources:Resources.Agent_system_prompt}"
                 />
 
             <TextBox
@@ -323,10 +324,10 @@
                     VerticalAlignment="Center"
                     Cursor="Hand"
                     Foreground="#569CD6"
-                    Content="Replace with general system prompt..."
+                    Content="{x:Static resources:Resources.Replace_with_general_system_prompt}"
                     Command="{Binding ReplaceGeneralSystemPromptCommand}"
                     Style="{DynamicResource TextBlockLikeButtonStyle}"
-                    ToolTip="Replace this system prompt with default system prompt of general purpose"
+                    ToolTip="{x:Static resources:Resources.Replace_this_system_prompt_with_default}"
                     />
 
                 <Button

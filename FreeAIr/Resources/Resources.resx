@@ -248,4 +248,412 @@
   <data name="Delete from context" xml:space="preserve">
     <value>Delete from context</value>
   </data>
+  <data name="Not_started" xml:space="preserve">
+    <value>Not started</value>
+    <comment>Used in FreeAIr\Helper\EnumHelper.cs document</comment>
+  </data>
+  <data name="Waiting_for_answer" xml:space="preserve">
+    <value>Waiting for answer</value>
+    <comment>Used in FreeAIr\Helper\EnumHelper.cs document</comment>
+  </data>
+  <data name="Reading_answer" xml:space="preserve">
+    <value>Reading answer</value>
+    <comment>Used in FreeAIr\Helper\EnumHelper.cs document</comment>
+  </data>
+  <data name="Ready" xml:space="preserve">
+    <value>Ready</value>
+    <comment>Used in FreeAIr\Helper\EnumHelper.cs document</comment>
+  </data>
+  <data name="Failed" xml:space="preserve">
+    <value>Failed</value>
+    <comment>Used in FreeAIr\Helper\EnumHelper.cs document</comment>
+  </data>
+  <data name="Choose_chat_agent" xml:space="preserve">
+    <value>Choose chat agent{0}...</value>
+    <comment>Used in FreeAIr\UI\ViewModels\ChatListViewModel.cs document</comment>
+  </data>
+  <data name="No_dependencies_found__This_may_occurs" xml:space="preserve">
+    <value>No dependencies found. This may occurs because Intellisense is not loaded (yet), or the context item is not a .Net source code.</value>
+    <comment>Used in FreeAIr\UI\ViewModels\ChatListViewModel.cs document</comment>
+  </data>
+  <data name="Unknown_error_occurred_during_scanning" xml:space="preserve">
+    <value>Unknown error occurred during scanning for dependencies</value>
+    <comment>Used in FreeAIr\UI\ViewModels\ChatListViewModel.cs document</comment>
+  </data>
+  <data name="Error_occurred" xml:space="preserve">
+    <value>Error occurred</value>
+    <comment>Used in FreeAIr\UI\ViewModels\ChatListViewModel.cs document</comment>
+  </data>
+  <data name="Started" xml:space="preserve">
+    <value>Started</value>
+    <comment>Used in FreeAIr\UI\ViewModels\ChatListViewModel.cs document</comment>
+  </data>
+  <data name="Please_wait_for_the_code_dependencies" xml:space="preserve">
+    <value>Please wait for the code dependencies scanning...</value>
+    <comment>Used in FreeAIr\UI\ViewModels\ChatListViewModel.cs document</comment>
+  </data>
+  <data name="This_item_came_from_software_logic" xml:space="preserve">
+    <value>This item came from software logic</value>
+    <comment>Used in FreeAIr\UI\ViewModels\ChatListViewModel.cs document</comment>
+  </data>
+  <data name="This_item_came_from_user" xml:space="preserve">
+    <value>This item came from user</value>
+    <comment>Used in FreeAIr\UI\ViewModels\ChatListViewModel.cs document</comment>
+  </data>
+  <data name="Add_custom_file_to_chat_context" xml:space="preserve">
+    <value>Add custom file to chat context</value>
+    <comment>Used in FreeAIr\UI\ToolWindows\ChatListToolWindowControl.xaml document</comment>
+  </data>
+  <data name="Search_and_add_related_context_items" xml:space="preserve">
+    <value>Search and add related context items (.NET only)</value>
+    <comment>Used in FreeAIr\UI\ToolWindows\ChatListToolWindowControl.xaml document</comment>
+  </data>
+  <data name="Open_item_in_new_window" xml:space="preserve">
+    <value>Open item in new window</value>
+    <comment>Used in FreeAIr\UI\ToolWindows\ChatListToolWindowControl.xaml document</comment>
+  </data>
+  <data name="Add_new_items_to_context" xml:space="preserve">
+    <value>Add new items to context</value>
+    <comment>Used in FreeAIr\UI\ToolWindows\ChatListToolWindowControl.xaml document</comment>
+  </data>
+  <data name="Add_new_items_to_context1" xml:space="preserve">
+    <value>Add new items to context:</value>
+    <comment>Used in FreeAIr\UI\ToolWindows\ChatListToolWindowControl.xaml document</comment>
+  </data>
+  <data name="Press___to_enter_context_items_here" xml:space="preserve">
+    <value>Press # to enter context items here. Press Ctrl + Enter to add items to context.</value>
+    <comment>Used in FreeAIr\UI\ToolWindows\ChatListToolWindowControl.xaml document</comment>
+  </data>
+  <data name="Enter_your_prompt_here__Press___to" xml:space="preserve">
+    <value>Enter your prompt here. Press / to open commands. Press # to choose solution item. Press Ctrl + Enter to send your prompt.</value>
+    <comment>Used in FreeAIr\UI\ToolWindows\ChatListToolWindowControl.xaml document</comment>
+  </data>
+  <data name="Choose_OpenRouter_model" xml:space="preserve">
+    <value>Choose OpenRouter model</value>
+    <comment>Used in FreeAIr\UI\ToolWindows\ChooseModelToolWindow.cs document</comment>
+  </data>
+  <data name="FreeAIr_Natural_Language_Outlines" xml:space="preserve">
+    <value>FreeAIr Natural Language Outlines</value>
+    <comment>Used in FreeAIr\UI\ToolWindows\NaturalLanguageOutlinesToolWindow.cs document</comment>
+  </data>
+  <data name="Cancel_chat" xml:space="preserve">
+    <value>Cancel chat</value>
+    <comment>Used in FreeAIr\UI\ToolWindows\NaturalLanguageOutlinesToolWindowControl.xaml document</comment>
+  </data>
+  <data name="File_Name" xml:space="preserve">
+    <value>File Name</value>
+    <comment>Used in FreeAIr\UI\ToolWindows\NaturalLanguageOutlinesToolWindowControl.xaml document</comment>
+  </data>
+  <data name="Commented_Line" xml:space="preserve">
+    <value>Commented Line</value>
+    <comment>Used in FreeAIr\UI\ToolWindows\NaturalLanguageOutlinesToolWindowControl.xaml document</comment>
+  </data>
+  <data name="Comment" xml:space="preserve">
+    <value>Comment</value>
+    <comment>Used in FreeAIr\UI\ToolWindows\NaturalLanguageOutlinesToolWindowControl.xaml document</comment>
+  </data>
+  <data name="Line" xml:space="preserve">
+    <value>Line</value>
+    <comment>Used in FreeAIr\UI\ToolWindows\NaturalLanguageOutlinesToolWindowControl.xaml document</comment>
+  </data>
+  <data name="Natural_language_search_results" xml:space="preserve">
+    <value>Natural language search results</value>
+    <comment>Used in FreeAIr\UI\ToolWindows\NaturalLanguageResultsToolWindow.cs document</comment>
+  </data>
+  <data name="Found_text" xml:space="preserve">
+    <value>Found text</value>
+    <comment>Used in FreeAIr\UI\ToolWindows\NaturalLanguageResultsToolWindowControl.xaml document</comment>
+  </data>
+  <data name="Confidence" xml:space="preserve">
+    <value>Confidence</value>
+    <comment>Used in FreeAIr\UI\ToolWindows\NaturalLanguageResultsToolWindowControl.xaml document</comment>
+  </data>
+  <data name="cloned" xml:space="preserve">
+    <value> (cloned)</value>
+    <comment>Used in FreeAIr\UI\ViewModels\AgentConfigureViewModel.cs document</comment>
+  </data>
+  <data name="Choose_model_from_this_api_endpoint" xml:space="preserve">
+    <value>Choose model from this api endpoint</value>
+    <comment>Used in FreeAIr\UI\ViewModels\AgentConfigureViewModel.cs document</comment>
+  </data>
+  <data name="Choose_the_MCP_tools_you_want_to" xml:space="preserve">
+    <value>Choose the MCP tools you want to provide to LLM:</value>
+    <comment>Used in FreeAIr\UI\ViewModels\AvailableToolsViewModel.cs document</comment>
+  </data>
+  <data name="Folder_does_not_exists_yet__Save" xml:space="preserve">
+    <value>Folder does not exists yet. Save NLO Json file to create the folder.</value>
+    <comment>Used in FreeAIr\UI\ViewModels\BuildNaturalLanguageOutlinesJsonFileToolViewModel.cs document</comment>
+  </data>
+  <data name="Re_write_NLO_json_file_completely" xml:space="preserve">
+    <value>(Re)write NLO json file completely...</value>
+    <comment>Used in FreeAIr\UI\ViewModels\BuildNaturalLanguageOutlinesJsonFileToolViewModel.cs document</comment>
+  </data>
+  <data name="Update_NLO_json_file" xml:space="preserve">
+    <value>Update NLO json file...</value>
+    <comment>Used in FreeAIr\UI\ViewModels\BuildNaturalLanguageOutlinesJsonFileToolViewModel.cs document</comment>
+  </data>
+  <data name="Please_wait_for_generating_files" xml:space="preserve">
+    <value>Please wait for generating files...</value>
+    <comment>Used in FreeAIr\UI\ViewModels\BuildNaturalLanguageOutlinesJsonFileToolViewModel.cs document</comment>
+  </data>
+  <data name="Starting" xml:space="preserve">
+    <value>Starting...</value>
+    <comment>Used in FreeAIr\UI\ViewModels\BuildNaturalLanguageOutlinesJsonFileToolViewModel.cs document</comment>
+  </data>
+  <data name="Start_NLO_extraction" xml:space="preserve">
+    <value>Start NLO extraction...</value>
+    <comment>Used in FreeAIr\UI\ViewModels\BuildNaturalLanguageOutlinesJsonFileToolViewModel.cs document</comment>
+  </data>
+  <data name="Start_embedding_generation" xml:space="preserve">
+    <value>Start embedding generation</value>
+    <comment>Used in FreeAIr\UI\ViewModels\BuildNaturalLanguageOutlinesJsonFileToolViewModel.cs document</comment>
+  </data>
+  <data name="Process_SUCESSFULLY_completed" xml:space="preserve">
+    <value>Process SUCESSFULLY completed</value>
+    <comment>Used in FreeAIr\UI\ViewModels\BuildNaturalLanguageOutlinesJsonFileToolViewModel.cs document</comment>
+  </data>
+  <data name="Choose_agent__with_a_non_empty_token" xml:space="preserve">
+    <value>Choose agent (with a non-empty token) for a chat:</value>
+    <comment>Used in FreeAIr\UI\ViewModels\ChatListViewModel.cs document</comment>
+  </data>
+  <data name="Choose_the_available_agent" xml:space="preserve">
+    <value>Choose the available agent:</value>
+    <comment>Used in FreeAIr\UI\ViewModels\ChooseChatAgentViewModel.cs document</comment>
+  </data>
+  <data name="Available_agents" xml:space="preserve">
+    <value>Available agents:</value>
+    <comment>Used in FreeAIr\UI\ViewModels\ChooseChatAgentViewModel.cs document</comment>
+  </data>
+  <data name="Model_list_is_loading" xml:space="preserve">
+    <value>Model list is loading...</value>
+    <comment>Used in FreeAIr\UI\ViewModels\ChooseModelViewModel.cs document</comment>
+  </data>
+  <data name="Model_list_cannot_be_loaded" xml:space="preserve">
+    <value>Model list cannot be loaded</value>
+    <comment>Used in FreeAIr\UI\ViewModels\ChooseModelViewModel.cs document</comment>
+  </data>
+  <data name="chosen" xml:space="preserve">
+    <value>(chosen)</value>
+    <comment>Used in FreeAIr\UI\ViewModels\ChooseModelViewModel.cs document</comment>
+  </data>
+  <data name="Waiting_for_status" xml:space="preserve">
+    <value>Waiting for status</value>
+    <comment>Used in FreeAIr\UI\ViewModels\ControlCenterViewModel.cs document</comment>
+  </data>
+  <data name="Installed_and_Ready" xml:space="preserve">
+    <value>Installed and Ready</value>
+    <comment>Used in FreeAIr\UI\ViewModels\ControlCenterViewModel.cs document</comment>
+  </data>
+  <data name="Not_Installed" xml:space="preserve">
+    <value>Not Installed</value>
+    <comment>Used in FreeAIr\UI\ViewModels\ControlCenterViewModel.cs document</comment>
+  </data>
+  <data name="Current_json_is_different_from_the" xml:space="preserve">
+    <value>Current json is different from the saved one. Consider saving your changes.</value>
+    <comment>Used in FreeAIr\UI\ViewModels\ControlCenterViewModel.cs document</comment>
+  </data>
+  <data name="Json_cannot_be_deserialized_because" xml:space="preserve">
+    <value>Json cannot be deserialized because of:</value>
+    <comment>Used in FreeAIr\UI\ViewModels\ControlCenterViewModel.cs document</comment>
+  </data>
+  <data name="GitHub_MCP_server_installed_SUCCESSFULLY" xml:space="preserve">
+    <value>GitHub MCP server installed SUCCESSFULLY.</value>
+    <comment>Used in FreeAIr\UI\ViewModels\ControlCenterViewModel.cs document</comment>
+  </data>
+  <data name="Installation_GitHub_MCP_server_fails" xml:space="preserve">
+    <value>Installation GitHub MCP server fails. Please install it manually.</value>
+    <comment>Used in FreeAIr\UI\ViewModels\ControlCenterViewModel.cs document</comment>
+  </data>
+  <data name="Options_json_is_not_empty__Overwrite" xml:space="preserve">
+    <value>Options json is not empty. Overwrite?</value>
+    <comment>Used in FreeAIr\UI\ViewModels\ControlCenterViewModel.cs document</comment>
+  </data>
+  <data name="FreeAIr_options_file_does_not_found" xml:space="preserve">
+    <value>FreeAIr options file does not found</value>
+    <comment>Used in FreeAIr\UI\ViewModels\ControlCenterViewModel.cs document</comment>
+  </data>
+  <data name="Visual_studio_has_no_active_FreeAIr" xml:space="preserve">
+    <value>Visual studio has no active FreeAIr options.</value>
+    <comment>Used in FreeAIr\UI\ViewModels\ControlCenterViewModel.cs document</comment>
+  </data>
+  <data name="Invalid_json__Fix_json_and_try_again" xml:space="preserve">
+    <value>Invalid json. Fix json and try again.</value>
+    <comment>Used in FreeAIr\UI\ViewModels\ControlCenterViewModel.cs document</comment>
+  </data>
+  <data name="Every_MCP_server_is_found__and_pinged" xml:space="preserve">
+    <value>Every MCP server is found, and pinged successfully. Changes was saved successfully.</value>
+    <comment>Used in FreeAIr\UI\ViewModels\ControlCenterViewModel.cs document</comment>
+  </data>
+  <data name="You_are_going_to_delete_stored_options" xml:space="preserve">
+    <value>You are going to delete stored options. Please, confirm.</value>
+    <comment>Used in FreeAIr\UI\ViewModels\ControlCenterViewModel.cs document</comment>
+  </data>
+  <data name="Options_file__0__has_been_deleted" xml:space="preserve">
+    <value>Options file {0} has been deleted.</value>
+    <comment>Used in FreeAIr\UI\ViewModels\ControlCenterViewModel.cs document</comment>
+  </data>
+  <data name="Options_inside_Visual_Studio_has" xml:space="preserve">
+    <value>Options inside Visual Studio has been deleted.</value>
+    <comment>Used in FreeAIr\UI\ViewModels\ControlCenterViewModel.cs document</comment>
+  </data>
+  <data name="Click_to_copy_to_clipboard" xml:space="preserve">
+    <value>Click to copy to clipboard</value>
+    <comment>Used in FreeAIr\UI\ViewModels\DialogViewModel.cs document</comment>
+  </data>
+  <data name="Choose_context_item_to_replace_its" xml:space="preserve">
+    <value>Choose context item to replace its content with this code part</value>
+    <comment>Used in FreeAIr\UI\ViewModels\DialogViewModel.cs document</comment>
+  </data>
+  <data name="Cannot_replace_context_document_body" xml:space="preserve">
+    <value>Cannot replace context document body. Please replace manually.</value>
+    <comment>Used in FreeAIr\UI\ViewModels\DialogViewModel.cs document</comment>
+  </data>
+  <data name="Replace_the_selected_block_of_the" xml:space="preserve">
+    <value>Replace the selected block of the code in the VS document with this code part</value>
+    <comment>Used in FreeAIr\UI\ViewModels\DialogViewModel.cs document</comment>
+  </data>
+  <data name="Cannot_replace_selected_text__Please" xml:space="preserve">
+    <value>Cannot replace selected text. Please replace the selected text manually.</value>
+    <comment>Used in FreeAIr\UI\ViewModels\DialogViewModel.cs document</comment>
+  </data>
+  <data name="Create_new_file_with_this_code_part" xml:space="preserve">
+    <value>Create new file with this code part</value>
+    <comment>Used in FreeAIr\UI\ViewModels\DialogViewModel.cs document</comment>
+  </data>
+  <data name="Cannot_create_a_new_file__Please" xml:space="preserve">
+    <value>Cannot create a new file. Please create the file manually.</value>
+    <comment>Used in FreeAIr\UI\ViewModels\DialogViewModel.cs document</comment>
+  </data>
+  <data name="Choose_context_item_to_replace" xml:space="preserve">
+    <value>Choose context item to replace:</value>
+    <comment>Used in FreeAIr\UI\ViewModels\DialogViewModel.cs document</comment>
+  </data>
+  <data name="MCP_server_is_found__and_pinged_successfully" xml:space="preserve">
+    <value>MCP server is found, and pinged successfully.</value>
+    <comment>Used in FreeAIr\UI\ViewModels\McpServerConfigureViewModel.cs document</comment>
+  </data>
+  <data name="Idle" xml:space="preserve">
+    <value>Idle</value>
+    <comment>Used in FreeAIr\UI\ViewModels\NaturalLanguageOutlinesViewModel.cs document</comment>
+  </data>
+  <data name="No_comments_for_file__0__applied" xml:space="preserve">
+    <value>No comments for the file {0} applied</value>
+    <comment>Used in FreeAIr\UI\ViewModels\NaturalLanguageOutlinesViewModel.cs document</comment>
+  </data>
+  <data name="No_comments_applied" xml:space="preserve">
+    <value>No comments applied</value>
+    <comment>Used in FreeAIr\UI\ViewModels\NaturalLanguageOutlinesViewModel.cs document</comment>
+  </data>
+  <data name="In_progress___0___1" xml:space="preserve">
+    <value>In progress ({0}/{1})...</value>
+    <comment>Used in FreeAIr\UI\ViewModels\NaturalLanguageOutlinesViewModel.cs document</comment>
+  </data>
+  <data name="Generated__0__comments" xml:space="preserve">
+    <value>Generated {0} comments:</value>
+    <comment>Used in FreeAIr\UI\ViewModels\NaturalLanguageOutlinesViewModel.cs document</comment>
+  </data>
+  <data name="Cancelled" xml:space="preserve">
+    <value>Cancelled</value>
+    <comment>Used in FreeAIr\UI\ViewModels\NaturalLanguageOutlinesViewModel.cs document</comment>
+  </data>
+  <data name="Cannot_determine_the_position_of" xml:space="preserve">
+    <value>Cannot determine the position of found entry. The file will be open without selection.</value>
+    <comment>Used in FreeAIr\UI\ViewModels\NaturalLanguageResultsViewModel.cs document</comment>
+  </data>
+  <data name="FreeAIr_NLO_Json_file_generation" xml:space="preserve">
+    <value>FreeAIr NLO Json file generation</value>
+    <comment>Used in FreeAIr\UI\ViewModels\OutlineEmbeddingOutputPanel.cs document</comment>
+  </data>
+  <data name="Docker_image_for__0__MCP_server_installed" xml:space="preserve">
+    <value>Docker image for {0} MCP server installed. Please setup FreeAIr to work with the server.</value>
+    <comment>Used in FreeAIr\UI\ViewModels\SearchForDockerMcpServerViewModel.cs document</comment>
+  </data>
+  <data name="FreeAIr_Support_Action_Configuration" xml:space="preserve">
+    <value>FreeAIr Support Action Configuration Window</value>
+    <comment>Used in FreeAIr\UI\Windows\ActionConfigureWindow.xaml document</comment>
+  </data>
+  <data name="Add_new_action" xml:space="preserve">
+    <value>Add new action</value>
+    <comment>Used in FreeAIr\UI\Windows\ActionConfigureWindow.xaml document</comment>
+  </data>
+  <data name="Delete_selected_action" xml:space="preserve">
+    <value>Delete selected action</value>
+    <comment>Used in FreeAIr\UI\Windows\ActionConfigureWindow.xaml document</comment>
+  </data>
+  <data name="Move_selected_action_up" xml:space="preserve">
+    <value>Move selected action up</value>
+    <comment>Used in FreeAIr\UI\Windows\ActionConfigureWindow.xaml document</comment>
+  </data>
+  <data name="Move_selected_action_down" xml:space="preserve">
+    <value>Move selected action down</value>
+    <comment>Used in FreeAIr\UI\Windows\ActionConfigureWindow.xaml document</comment>
+  </data>
+  <data name="Clone" xml:space="preserve">
+    <value>Clone</value>
+    <comment>Used in FreeAIr\UI\Windows\ActionConfigureWindow.xaml document</comment>
+  </data>
+  <data name="Apply_changes" xml:space="preserve">
+    <value>Apply changes</value>
+    <comment>Used in FreeAIr\UI\Windows\ActionConfigureWindow.xaml document</comment>
+  </data>
+  <data name="Agent_name" xml:space="preserve">
+    <value>Agent name</value>
+    <comment>Used in FreeAIr\UI\Windows\ActionConfigureWindow.xaml document</comment>
+  </data>
+  <data name="Prompt" xml:space="preserve">
+    <value>Prompt:</value>
+    <comment>Used in FreeAIr\UI\Windows\ActionConfigureWindow.xaml document</comment>
+  </data>
+  <data name="FreeAIr_Agent_Configuration_Window" xml:space="preserve">
+    <value>FreeAIr Agent Configuration Window</value>
+    <comment>Used in FreeAIr\UI\Windows\AgentConfigureWindow.xaml document</comment>
+  </data>
+  <data name="Add_new_agent" xml:space="preserve">
+    <value>Add new agent</value>
+    <comment>Used in FreeAIr\UI\Windows\AgentConfigureWindow.xaml document</comment>
+  </data>
+  <data name="Delete_selected_agent" xml:space="preserve">
+    <value>Delete selected agent</value>
+    <comment>Used in FreeAIr\UI\Windows\AgentConfigureWindow.xaml document</comment>
+  </data>
+  <data name="Move_selected_agent_up" xml:space="preserve">
+    <value>Move selected agent up</value>
+    <comment>Used in FreeAIr\UI\Windows\AgentConfigureWindow.xaml document</comment>
+  </data>
+  <data name="Move_selected_agent_down" xml:space="preserve">
+    <value>Move selected agent down</value>
+    <comment>Used in FreeAIr\UI\Windows\AgentConfigureWindow.xaml document</comment>
+  </data>
+  <data name="Name" xml:space="preserve">
+    <value>Name:</value>
+    <comment>Used in FreeAIr\UI\Windows\AgentConfigureWindow.xaml document</comment>
+  </data>
+  <data name="Endpoint" xml:space="preserve">
+    <value>Endpoint:</value>
+    <comment>Used in FreeAIr\UI\Windows\AgentConfigureWindow.xaml document</comment>
+  </data>
+  <data name="Token" xml:space="preserve">
+    <value>Token:</value>
+    <comment>Used in FreeAIr\UI\Windows\AgentConfigureWindow.xaml document</comment>
+  </data>
+  <data name="Chosen_model" xml:space="preserve">
+    <value>Chosen model:</value>
+    <comment>Used in FreeAIr\UI\Windows\AgentConfigureWindow.xaml document</comment>
+  </data>
+  <data name="Context_size" xml:space="preserve">
+    <value>Context size:</value>
+    <comment>Used in FreeAIr\UI\Windows\AgentConfigureWindow.xaml document</comment>
+  </data>
+  <data name="Agent_system_prompt" xml:space="preserve">
+    <value>Agent system prompt:</value>
+    <comment>Used in FreeAIr\UI\Windows\AgentConfigureWindow.xaml document</comment>
+  </data>
+  <data name="Replace_with_general_system_prompt" xml:space="preserve">
+    <value>Replace with general system prompt...</value>
+    <comment>Used in FreeAIr\UI\Windows\AgentConfigureWindow.xaml document</comment>
+  </data>
+  <data name="Replace_this_system_prompt_with_default" xml:space="preserve">
+    <value>Replace this system prompt with default system prompt of general purpose</value>
+    <comment>Used in FreeAIr\UI\Windows\AgentConfigureWindow.xaml document</comment>
+  </data>
 </root>

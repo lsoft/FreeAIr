@@ -246,4 +246,310 @@
   <data name="Delete from context" xml:space="preserve">
     <value>Удалить из контекста</value>
   </data>
+  <data name="Not_started" xml:space="preserve">
+    <value>Не стартовал</value>
+  </data>
+  <data name="Waiting_for_answer" xml:space="preserve">
+    <value>Ожидает ответа</value>
+  </data>
+  <data name="Reading_answer" xml:space="preserve">
+    <value>Чтение ответа</value>
+  </data>
+  <data name="Ready" xml:space="preserve">
+    <value>Готов</value>
+  </data>
+  <data name="Failed" xml:space="preserve">
+    <value>Ошибка</value>
+  </data>
+  <data name="Choose_chat_agent" xml:space="preserve">
+    <value>Выбрать агента для чата{0}...</value>
+  </data>
+  <data name="No_dependencies_found__This_may_occurs" xml:space="preserve">
+    <value>Не найдено зависимостей. Это может произойти, если Intellisense еще не инициализирован, или этот контекстный итем не содержит кода .Net.</value>
+  </data>
+  <data name="Unknown_error_occurred_during_scanning" xml:space="preserve">
+    <value>Неизвестная ошибка сканирования зависимостей</value>
+  </data>
+  <data name="Error_occurred" xml:space="preserve">
+    <value>Произошла ошибка</value>
+  </data>
+  <data name="Started" xml:space="preserve">
+    <value>Стартовал</value>
+  </data>
+  <data name="Please_wait_for_the_code_dependencies" xml:space="preserve">
+    <value>Выполняется поиск зависимостей. Ожидайте...</value>
+  </data>
+  <data name="This_item_came_from_software_logic" xml:space="preserve">
+    <value>Этот итем получен через работу ПО</value>
+  </data>
+  <data name="This_item_came_from_user" xml:space="preserve">
+    <value>Этот итем добавлен пользователем</value>
+  </data>
+  <data name="Add_custom_file_to_chat_context" xml:space="preserve">
+    <value>Добавить внешний файл в контекст чата</value>
+  </data>
+  <data name="Search_and_add_related_context_items" xml:space="preserve">
+    <value>Найти и добавить зависимый код (только для .NET)</value>
+  </data>
+  <data name="Open_item_in_new_window" xml:space="preserve">
+    <value>Открыть итем в новой вкладке</value>
+  </data>
+  <data name="Add_new_items_to_context" xml:space="preserve">
+    <value>Добавить новые итемы в контекст</value>
+  </data>
+  <data name="Add_new_items_to_context1" xml:space="preserve">
+    <value>Добавить новые итемы в контекст:</value>
+  </data>
+  <data name="Press___to_enter_context_items_here" xml:space="preserve">
+    <value>Нажмите # чтобы ввести итемы в это поле. Нажмите Ctrl + Enter чтобы добавить итемы в контекст.</value>
+  </data>
+  <data name="Enter_your_prompt_here__Press___to" xml:space="preserve">
+    <value>Введите свой промпт сюда. Нажмите / чтобы открыть список команд. Нажмите # чтобы выбрать итемы текущего солюшена. Нажмите Ctrl + Enter чтобы отправить свой промпт.</value>
+  </data>
+  <data name="Choose_OpenRouter_model" xml:space="preserve">
+    <value>Выбеерите модель OpenRouter</value>
+  </data>
+  <data name="FreeAIr_Natural_Language_Outlines" xml:space="preserve">
+    <value>FreeAIr Natural Language Outlines</value>
+  </data>
+  <data name="Cancel_chat" xml:space="preserve">
+    <value>Остановить чат</value>
+  </data>
+  <data name="File_Name" xml:space="preserve">
+    <value>Имя файла</value>
+  </data>
+  <data name="Commented_Line" xml:space="preserve">
+    <value>Строка с комментарием</value>
+  </data>
+  <data name="Comment" xml:space="preserve">
+    <value>Комментарий</value>
+  </data>
+  <data name="Line" xml:space="preserve">
+    <value>Строка</value>
+  </data>
+  <data name="Natural_language_search_results" xml:space="preserve">
+    <value>Результаты поиска на естесственном языке</value>
+  </data>
+  <data name="Found_text" xml:space="preserve">
+    <value>Найденный текст</value>
+  </data>
+  <data name="Confidence" xml:space="preserve">
+    <value>Уверенность</value>
+  </data>
+  <data name="cloned" xml:space="preserve">
+    <value> (склонирован)</value>
+  </data>
+  <data name="Choose_model_from_this_api_endpoint" xml:space="preserve">
+    <value>Выберите модель для этого API endpoint</value>
+  </data>
+  <data name="Choose_the_MCP_tools_you_want_to" xml:space="preserve">
+    <value>Выберите MCP tools для использования c LLM:</value>
+  </data>
+  <data name="Folder_does_not_exists_yet__Save" xml:space="preserve">
+    <value>Папка еще не существует. Сохраните NLO Json файлы, чтобы создать папку.</value>
+  </data>
+  <data name="Re_write_NLO_json_file_completely" xml:space="preserve">
+    <value>(Пере)записать NLO json файл полностью...</value>
+  </data>
+  <data name="Update_NLO_json_file" xml:space="preserve">
+    <value>Обновить NLO json файл...</value>
+  </data>
+  <data name="Please_wait_for_generating_files" xml:space="preserve">
+    <value>Подождите, пока генерируются файлы...</value>
+  </data>
+  <data name="Starting" xml:space="preserve">
+    <value>Старт...</value>
+  </data>
+  <data name="Start_NLO_extraction" xml:space="preserve">
+    <value>Начато извлечение NLO...</value>
+  </data>
+  <data name="Start_embedding_generation" xml:space="preserve">
+    <value>Начата генерация эмбеддингов</value>
+  </data>
+  <data name="Process_SUCESSFULLY_completed" xml:space="preserve">
+    <value>Процесс УСПЕШНО завершен</value>
+  </data>
+  <data name="Choose_agent__with_a_non_empty_token" xml:space="preserve">
+    <value>Выберите агента (с заполненным токеном) для чата:</value>
+  </data>
+  <data name="Choose_the_available_agent" xml:space="preserve">
+    <value>Выберите доступного агента:</value>
+  </data>
+  <data name="Available_agents" xml:space="preserve">
+    <value>Доступные агенты:</value>
+  </data>
+  <data name="Model_list_is_loading" xml:space="preserve">
+    <value>Загружается список моделей...</value>
+  </data>
+  <data name="Model_list_cannot_be_loaded" xml:space="preserve">
+    <value>Список моделей не может быть загружен</value>
+  </data>
+  <data name="chosen" xml:space="preserve">
+    <value>(выбран)</value>
+  </data>
+  <data name="Waiting_for_status" xml:space="preserve">
+    <value>Ожидание статуса</value>
+  </data>
+  <data name="Installed_and_Ready" xml:space="preserve">
+    <value>Установлен и готов</value>
+  </data>
+  <data name="Not_Installed" xml:space="preserve">
+    <value>Не установлен</value>
+  </data>
+  <data name="Current_json_is_different_from_the" xml:space="preserve">
+    <value>Текущий json отличается от сохраненного. Рассмотрите необходимость сохранить Ваши правки.</value>
+  </data>
+  <data name="Json_cannot_be_deserialized_because" xml:space="preserve">
+    <value>Json не может быть десериализован из-за:</value>
+  </data>
+  <data name="GitHub_MCP_server_installed_SUCCESSFULLY" xml:space="preserve">
+    <value>GitHub MCP сервер установлен УСПЕШНО.</value>
+  </data>
+  <data name="Installation_GitHub_MCP_server_fails" xml:space="preserve">
+    <value>Установка GitHub MCP сервера завершилась с ошибкой. Установите его вручную.</value>
+  </data>
+  <data name="Options_json_is_not_empty__Overwrite" xml:space="preserve">
+    <value>Json настроек не пуст. Перезаписать?</value>
+  </data>
+  <data name="FreeAIr_options_file_does_not_found" xml:space="preserve">
+    <value>FreeAIr файл настроек не найден</value>
+  </data>
+  <data name="Visual_studio_has_no_active_FreeAIr" xml:space="preserve">
+    <value>Visual studio не содержит настроек FreeAIr.</value>
+  </data>
+  <data name="Invalid_json__Fix_json_and_try_again" xml:space="preserve">
+    <value>Некорректный json. Исправьте его и попробуйте снова.</value>
+  </data>
+  <data name="Every_MCP_server_is_found__and_pinged" xml:space="preserve">
+    <value>Каждый MCP сервер найден и успешно пропингован. Изменения были успешно сохранены.</value>
+  </data>
+  <data name="You_are_going_to_delete_stored_options" xml:space="preserve">
+    <value>Вы собираетесь удалить сохраненные настройки. Подтвердите.</value>
+  </data>
+  <data name="Options_file__0__has_been_deleted" xml:space="preserve">
+    <value>Файл настроек {0} был удален.</value>
+  </data>
+  <data name="Options_inside_Visual_Studio_has" xml:space="preserve">
+    <value>Настройки внутри Visual Studio были удалены.</value>
+  </data>
+  <data name="Click_to_copy_to_clipboard" xml:space="preserve">
+    <value>Скопировать в буфер обмена</value>
+  </data>
+  <data name="Choose_context_item_to_replace_its" xml:space="preserve">
+    <value>Выберите итем контекста для его замены этим кодом</value>
+  </data>
+  <data name="Cannot_replace_context_document_body" xml:space="preserve">
+    <value>Невозможно заменить контекстный документ. Сделайте это вручную.</value>
+  </data>
+  <data name="Replace_the_selected_block_of_the" xml:space="preserve">
+    <value>Заменить выбранный (selected) код внутри документа Visual Studio этим кодом</value>
+  </data>
+  <data name="Cannot_replace_selected_text__Please" xml:space="preserve">
+    <value>Невозможно заменить выбранный (selected) код. Сделайте это вручную.</value>
+  </data>
+  <data name="Create_new_file_with_this_code_part" xml:space="preserve">
+    <value>Создать новый файл с этим кодом</value>
+  </data>
+  <data name="Cannot_create_a_new_file__Please" xml:space="preserve">
+    <value>Невозможно создать новый файл. Сделайте это вручную.</value>
+  </data>
+  <data name="Choose_context_item_to_replace" xml:space="preserve">
+    <value>Выберите итем в контексте для его замены:</value>
+  </data>
+  <data name="MCP_server_is_found__and_pinged_successfully" xml:space="preserve">
+    <value>MCP сервер найден и пропингован успешно.</value>
+  </data>
+  <data name="Idle" xml:space="preserve">
+    <value>Ожидает</value>
+  </data>
+  <data name="No_comments_for_file__0__applied" xml:space="preserve">
+    <value>Ни одного комментария не применено к файлу {0}</value>
+  </data>
+  <data name="No_comments_applied" xml:space="preserve">
+    <value>Ни одного комментария не применено</value>
+  </data>
+  <data name="In_progress___0___1" xml:space="preserve">
+    <value>В процессе обработки ({0}/{1})...</value>
+  </data>
+  <data name="Generated__0__comments" xml:space="preserve">
+    <value>Сформировано {0} комментариев:</value>
+  </data>
+  <data name="Cancelled" xml:space="preserve">
+    <value>Отменено</value>
+  </data>
+  <data name="Cannot_determine_the_position_of" xml:space="preserve">
+    <value>Невозможно определить позицию найденной записи. Файл будет открыт без выделения указанного участка кода.</value>
+  </data>
+  <data name="FreeAIr_NLO_Json_file_generation" xml:space="preserve">
+    <value>Генерация файлов NLO Json в FreeAIr</value>
+  </data>
+  <data name="Docker_image_for__0__MCP_server_installed" xml:space="preserve">
+    <value>Докер образ для MCP сервера {0} успешно установлен. Пожалуйста, настройте FreeAIr для работы с этим сервером.</value>
+  </data>
+  <data name="FreeAIr_Support_Action_Configuration" xml:space="preserve">
+    <value>FreeAIr Окно выбора</value>
+  </data>
+  <data name="Add_new_action" xml:space="preserve">
+    <value>Добавить новое действие</value>
+  </data>
+  <data name="Delete_selected_action" xml:space="preserve">
+    <value>Удалить выбранное действие</value>
+  </data>
+  <data name="Move_selected_action_up" xml:space="preserve">
+    <value>Поднять выбранное действие выше</value>
+  </data>
+  <data name="Move_selected_action_down" xml:space="preserve">
+    <value>Опустить выбранное действие ниже</value>
+  </data>
+  <data name="Clone" xml:space="preserve">
+    <value>Клонировать</value>
+  </data>
+  <data name="Apply_changes" xml:space="preserve">
+    <value>Применить изменения</value>
+  </data>
+  <data name="Agent_name" xml:space="preserve">
+    <value>Имя агента</value>
+  </data>
+  <data name="Prompt" xml:space="preserve">
+    <value>Промпт:</value>
+  </data>
+  <data name="FreeAIr_Agent_Configuration_Window" xml:space="preserve">
+    <value>FreeAIr Окно конфигурации агентов</value>
+  </data>
+  <data name="Add_new_agent" xml:space="preserve">
+    <value>Добавить нового агента</value>
+  </data>
+  <data name="Delete_selected_agent" xml:space="preserve">
+    <value>Удалить выбранного агента</value>
+  </data>
+  <data name="Move_selected_agent_up" xml:space="preserve">
+    <value>Поднять выбранного агента наверх</value>
+  </data>
+  <data name="Move_selected_agent_down" xml:space="preserve">
+    <value>Опустить выбранного агента вниз</value>
+  </data>
+  <data name="Name" xml:space="preserve">
+    <value>Имя:</value>
+  </data>
+  <data name="Endpoint" xml:space="preserve">
+    <value>Endpoint:</value>
+  </data>
+  <data name="Token" xml:space="preserve">
+    <value>Токен:</value>
+  </data>
+  <data name="Chosen_model" xml:space="preserve">
+    <value>Выбранная модель:</value>
+  </data>
+  <data name="Context_size" xml:space="preserve">
+    <value>Размер контекста:</value>
+  </data>
+  <data name="Agent_system_prompt" xml:space="preserve">
+    <value>Системный промпт агента:</value>
+  </data>
+  <data name="Replace_with_general_system_prompt" xml:space="preserve">
+    <value>Заменить основным системным промптом...</value>
+  </data>
+  <data name="Replace_this_system_prompt_with_default" xml:space="preserve">
+    <value>Заменить этот системный промпт основным системным промптом FreeAIr</value>
+  </data>
 </root>

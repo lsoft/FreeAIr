@@ -10,7 +10,7 @@ namespace FreeAIr.UI.ToolWindows
 {
     public class NaturalLanguageOutlinesToolWindow : BaseToolWindow<NaturalLanguageOutlinesToolWindow>
     {
-        public override string GetTitle(int toolWindowId) => "FreeAIr Natural Language Outlines";
+        public override string GetTitle(int toolWindowId) => FreeAIr.Resources.Resources.FreeAIr_Natural_Language_Outlines;
 
         public override Type PaneType => typeof(Pane);
 

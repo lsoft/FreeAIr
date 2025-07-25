@@ -190,7 +190,7 @@ namespace FreeAIr.UI.ViewModels
                         async a =>
                         {
                             var chosenAgent = await AgentContextMenu.ChooseAgentWithTokenAsync(
-                                "Choose agent (with a non-empty token) for a chat:"
+                                FreeAIr.Resources.Resources.Choose_agent__with_a_non_empty_token
                                 );
                             if (chosenAgent is null)
                             {
@@ -572,11 +572,11 @@ namespace FreeAIr.UI.ViewModels
                     var agent = _selectedChat.Chat.Options.ChosenAgent;
                     if (agent is not null && !string.IsNullOrEmpty(agent.Name))
                     {
-                        return $"Change chat agent ({agent.Name})...";
+                        return string.Format(FreeAIr.Resources.Resources.Choose_chat_agent, $" ({agent.Name})");
                     }
                 }
 
-                return "Choose chat agent...";
+                return string.Format(FreeAIr.Resources.Resources.Choose_chat_agent, string.Empty);
             }
         }
 
@@ -725,7 +725,7 @@ namespace FreeAIr.UI.ViewModels
                                     else
                                     {
                                         await VS.MessageBox.ShowAsync(
-                                            "No dependencies found. This may occurs because Intellisense is not loaded (yet), or the context item is not a .Net source code.",
+                                            FreeAIr.Resources.Resources.No_dependencies_found__This_may_occurs,
                                             buttons: OLEMSGBUTTON.OLEMSGBUTTON_OK
                                             );
                                     }
@@ -733,7 +733,7 @@ namespace FreeAIr.UI.ViewModels
                                 else
                                 {
                                     await VS.MessageBox.ShowAsync(
-                                        "Unknown error occurred during scanning for dependencies",
+                                        FreeAIr.Resources.Resources.Unknown_error_occurred_during_scanning,
                                         buttons: OLEMSGBUTTON.OLEMSGBUTTON_OK
                                         );
                                 }
@@ -744,7 +744,7 @@ namespace FreeAIr.UI.ViewModels
 
                                 await VS.MessageBox.ShowErrorAsync(
                                     Resources.Resources.Error,
-                                    $"Error occurred: {excp.Message}{Environment.NewLine}{excp.StackTrace}"
+                                    $"{Resources.Resources.Error_occurred}: {excp.Message}{Environment.NewLine}{excp.StackTrace}"
                                     );
                             }
 
@@ -1086,8 +1086,8 @@ namespace FreeAIr.UI.ViewModels
                 get
                 {
                     return Chat.Started.HasValue
-                        ? "Started: " + Chat.Started.Value.ToString()
-                        : "Not started"
+                        ? FreeAIr.Resources.Resources.Started + ": " + Chat.Started.Value.ToString()
+                        : Resources.Resources.Not_started
                         ;
                 }
             }
@@ -1135,7 +1135,7 @@ namespace FreeAIr.UI.ViewModels
         {
             private readonly ChatContextItemViewModel _viewModel;
 
-            public override string TaskDescription => "Please wait for the code dependencies scanning...";
+            public override string TaskDescription => FreeAIr.Resources.Resources.Please_wait_for_the_code_dependencies;
 
             public IReadOnlyList<IChatContextItem>? Result
             {
@@ -1186,8 +1186,8 @@ namespace FreeAIr.UI.ViewModels
 
         public string Tooltip =>
             ContextItem.IsAutoFound
-                ? "This item came from software logic"
-                : "This item came from user"
+                ? FreeAIr.Resources.Resources.This_item_came_from_software_logic
+                : FreeAIr.Resources.Resources.This_item_came_from_user
                 ;
 
         public ChatContextItemViewModel(

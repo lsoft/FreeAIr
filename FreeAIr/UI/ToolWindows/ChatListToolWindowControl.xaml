@@ -298,7 +298,7 @@
                                 Content="{x:Static resources:Resources.Add_custom_file}"
                                 FontFamily="Cascadia Code"
                                 VerticalAlignment="Center"
-                                ToolTip="Add custom file to chat context"
+                                ToolTip="{x:Static resources:Resources.Add_custom_file_to_chat_context}"
                                 Command="{Binding ElementName=ChatListToolWindow, Path=DataContext.AddCustomFileToContextCommand}"
                                 Style="{DynamicResource TextBlockLikeButtonStyle}"
                                 />
@@ -357,7 +357,7 @@
                                             Grid.Column="1"
                                             Margin="5,0,0,0"
                                             Moniker="{x:Static catalog:KnownMonikers.ZoomIn}"
-                                            ToolTip="Search and add related context items (.NET only)"
+                                            ToolTip="{x:Static resources:Resources.Search_and_add_related_context_items}"
                                             Cursor="Hand"
                                             >
                                             <imaging:CrispImage.InputBindings>
@@ -381,7 +381,7 @@
                                             HorizontalAlignment="Left"
                                             HorizontalContentAlignment="Left"
                                             FontFamily="Cascadia Code"
-                                            ToolTip="Open item in new window"
+                                            ToolTip="{x:Static resources:Resources.Open_item_in_new_window}"
                                             Command="{Binding ElementName=ChatListToolWindow, Path=DataContext.OpenContextItemCommand}"
                                             CommandParameter="{Binding .}"
                                             Style="{DynamicResource TextBlockLikeButtonStyle}"
@@ -423,19 +423,19 @@
                             HorizontalContentAlignment="Left"
                             Foreground="Green"
                             FontFamily="Cascadia Code"
-                            ToolTip="Add new items to context"
+                            ToolTip="{x:Static resources:Resources.Add_new_items_to_context}"
                             />
 
                         <Label
                             Grid.Column="1"
                             Margin="20,5,2,5"
-                            Content="Add new items to context:"
+                            Content="{x:Static resources:Resources.Add_new_items_to_context1}"
                             VerticalAlignment="Center"
                             HorizontalAlignment="Left"
                             HorizontalContentAlignment="Left"
                             FontSize="12"
                             FontFamily="Cascadia Code"
-                            ToolTip="Add new items to context"
+                            ToolTip="{x:Static resources:Resources.Add_new_items_to_context}"
                             />
 
                         <embedillo:EmbedilloControl
@@ -450,7 +450,7 @@
                             FontSize="12"
                             FontFamily="Cascadia Code"
                             x:Name="AddToContextControl"
-                            HintText="Press # to enter context items here. Press Ctrl + Enter to add items to context."
+                            HintText="{x:Static resources:Resources.Press___to_enter_context_items_here}"
                             EnterCommand="{Binding AddItemToContextCommand}"
                             ControlEnabled="{Binding IsReadyToAcceptNewPrompt}"
                             MaxHeight="100"
@@ -498,7 +498,7 @@
                 FontSize="12"
                 x:Name="PromptControl"
                 EnterCommand="{Binding CreatePromptCommand}"
-                HintText="Enter your prompt here. Press / to open commands. Press # to choose solution item. Press Ctrl + Enter to send your prompt."
+                HintText="{x:Static resources:Resources.Enter_your_prompt_here__Press___to}"
                 ControlEnabled="{Binding IsReadyToAcceptNewPrompt}"
                 MaxHeight="100000"
                 />

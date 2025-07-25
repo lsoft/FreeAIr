@@ -211,7 +211,7 @@ namespace FreeAIr.UI.ViewModels
                         a =>
                         {
                             var clone = (AgentJson)_selectedAgent.Clone();
-                            clone.Name += " (cloned)";
+                            clone.Name += FreeAIr.Resources.Resources.cloned;
                             AgentCollection.Agents.Add(clone);
                             AvailableAgents.Add(clone);
 
@@ -265,7 +265,7 @@ namespace FreeAIr.UI.ViewModels
                             var chosenModelId = await ModelContextMenu.ChooseModelFromProviderAsync(
                                 token: SelectedAgent.Technical.GetToken(),
                                 endpoint: SelectedAgent.Technical.Endpoint,
-                                title: "Choose model from this api endpoint:",
+                                title: FreeAIr.Resources.Resources.Choose_model_from_this_api_endpoint,
                                 null
                                 );
                             if (string.IsNullOrEmpty(chosenModelId))

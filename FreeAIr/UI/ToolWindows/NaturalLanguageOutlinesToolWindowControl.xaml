@@ -14,7 +14,7 @@
     mc:Ignorable="d"
     d:DesignHeight="300"
     d:DesignWidth="300"
-    Name="NaturalLanguageCommentsName"
+    Name="NaturalLanguageCommentsName" xmlns:resources="clr-namespace:FreeAIr.Resources" 
     >
     <UserControl.Resources>
         <DoubleCollection x:Key="Proportions">2,5,10,14,2</DoubleCollection>
@@ -54,7 +54,7 @@
                     x:Name="StyleButtonName"
                     HorizontalAlignment="Right"
                     VerticalAlignment="Center"
-                    Content="Cancel chat"
+                    Content="{x:Static resources:Resources.Cancel_chat}"
                     toolkit:Themes.UseVsTheme="True"
                     />
 
@@ -69,7 +69,7 @@
 
                 <Button
                     Margin="5,0,5,0"
-                    Content="Cancel chat"
+                    Content="{x:Static resources:Resources.Cancel_chat}"
                     VerticalAlignment="Center"
                     Command="{Binding ElementName=NaturalLanguageCommentsName, Path=DataContext.CancelChatCommand}"
                     CommandParameter="{Binding}"
@@ -165,7 +165,7 @@
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
                         
-                    <GridViewColumn Header="File Name" Width="120">
+                    <GridViewColumn Header="{x:Static resources:Resources.File_Name}" Width="120">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
                                 <Label
@@ -188,7 +188,7 @@
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
 
-                    <GridViewColumn Header="Commented Line" Width="120">
+                    <GridViewColumn Header="{x:Static resources:Resources.Commented_Line}" Width="120">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
                                 <TextBlock
@@ -212,7 +212,7 @@
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
 
-                    <GridViewColumn Header="Comment" Width="120">
+                    <GridViewColumn Header="{x:Static resources:Resources.Comment}" Width="120">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
                                 <Label
@@ -225,7 +225,7 @@
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
 
-                    <GridViewColumn Header="Line" Width="60">
+                    <GridViewColumn Header="{x:Static resources:Resources.Line}" Width="60">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
                                 <Label

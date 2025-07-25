@@ -164,7 +164,7 @@ namespace FreeAIr.UI.ViewModels
 
                 ModelList.Clear();
 
-                Message = "Model list is loading...";
+                Message = FreeAIr.Resources.Resources.Model_list_is_loading;
 
                 var modelContainer = await _httpClient.GetFromJsonAsync<ModelResponse>(
                     "https://openrouter.ai/api/v1/models"
@@ -187,7 +187,7 @@ namespace FreeAIr.UI.ViewModels
             }
             catch (Exception excp)
             {
-                Message = $"Model list cannot be loaded: {excp.Message}";
+                Message = FreeAIr.Resources.Resources.Model_list_cannot_be_loaded + $": {excp.Message}";
 
                 //todo
             }
@@ -207,7 +207,7 @@ namespace FreeAIr.UI.ViewModels
                 get;
             }
 
-            public string SelectedMark => _isSelected ? "(chosen)" : string.Empty;
+            public string SelectedMark => _isSelected ? FreeAIr.Resources.Resources.chosen : string.Empty;
 
             public bool IsSelected
             {

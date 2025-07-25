@@ -27,7 +27,7 @@ namespace FreeAIr.UI.ViewModels
         private ICommand _gotoCommand;
         private ICommand _cancelChatCommand;
         
-        private string _status = "Idle";
+        private string _status = FreeAIr.Resources.Resources.Idle;
 
         private CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
         private Task? _processingTask;
@@ -73,7 +73,7 @@ namespace FreeAIr.UI.ViewModels
                                 if (appliedComments.Count == 0)
                                 {
                                     await VS.MessageBox.ShowAsync(
-                                        $"No comments for file {commentItem.FileName} applied",
+                                        string.Format(FreeAIr.Resources.Resources.No_comments_for_file__0__applied, commentItem.FileName),
                                         buttons: Microsoft.VisualStudio.Shell.Interop.OLEMSGBUTTON.OLEMSGBUTTON_OK
                                         );
                                     return;
@@ -128,7 +128,7 @@ namespace FreeAIr.UI.ViewModels
                                 if (groups.Count == 0)
                                 {
                                     await VS.MessageBox.ShowAsync(
-                                        $"No comments applied",
+                                        Resources.Resources.No_comments_applied,
                                         buttons: Microsoft.VisualStudio.Shell.Interop.OLEMSGBUTTON.OLEMSGBUTTON_OK
                                         );
                                     return;
@@ -318,7 +318,11 @@ namespace FreeAIr.UI.ViewModels
                 {
                     cancellationToken.ThrowIfCancellationRequested();
 
-                    Status = $"In progress ({processedItemCount}/{chosenSolutionItems.Count})...";
+                    Status = string.Format(
+                        FreeAIr.Resources.Resources.In_progress___0___1,
+                        processedItemCount,
+                        chosenSolutionItems.Count
+                        );
 
                     //add subject items (to use line numbers)
                     foreach (var portionSolutionItem in portionSolutionItems)
@@ -420,17 +424,20 @@ namespace FreeAIr.UI.ViewModels
                     processedItemCount += portionSolutionItems.Count;
                 }
 
-                Status = $"Generated {GeneratedComments.Count} comments:";
+                Status = string.Format(
+                    FreeAIr.Resources.Resources.Generated__0__comments,
+                    GeneratedComments.Count
+                    );
             }
             catch (OperationCanceledException)
             {
                 //this is ok
-                Status = $"Cancelled";
+                Status = Resources.Resources.Cancelled;
             }
             catch (Exception excp)
             {
                 //todo log
-                Status = $"Error: {excp.Message}";
+                Status = Resources.Resources.Error + $": {excp.Message}";
             }
 
             OnPropertyChanged();

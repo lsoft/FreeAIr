@@ -65,7 +65,7 @@ namespace FreeAIr.UI.ViewModels
                             var folderPath = fi.Directory.FullName;
                             if (!Directory.Exists(folderPath))
                             {
-                                VS.MessageBox.Show("Folder does not exists yet. Save NLO Json file to create the folder.");
+                                VS.MessageBox.Show(FreeAIr.Resources.Resources.Folder_does_not_exists_yet__Save);
                             }
 
                             Process.Start("explorer.exe", folderPath);
@@ -168,10 +168,10 @@ namespace FreeAIr.UI.ViewModels
             {
                 if (_completeRebuild)
                 {
-                    return "(Re)write NLO json file completely...";
+                    return FreeAIr.Resources.Resources.Re_write_NLO_json_file_completely;
                 }
 
-                return "Update NLO json file...";
+                return FreeAIr.Resources.Resources.Update_NLO_json_file;
             }
         }
 
@@ -203,7 +203,7 @@ namespace FreeAIr.UI.ViewModels
                             catch (Exception excp)
                             {
                                 await VS.MessageBox.ShowErrorAsync(
-                                    $"Error: {excp.Message}"
+                                    Resources.Resources.Error +  $": {excp.Message}"
                                     + Environment.NewLine
                                     + excp.StackTrace
                                     );
@@ -548,7 +548,7 @@ namespace FreeAIr.UI.ViewModels
         private readonly string _jsonFilePath;
         private readonly IReadOnlyList<CheckableItem> _tree;
 
-        public override string TaskDescription => "Please wait for generating files...";
+        public override string TaskDescription => FreeAIr.Resources.Resources.Please_wait_for_generating_files;
 
         public string? Result
         {
@@ -617,9 +617,9 @@ namespace FreeAIr.UI.ViewModels
 
                 try
                 {
-                    await ShowMessageAsync(outputPanel, "Starting...");
+                    await ShowMessageAsync(outputPanel, FreeAIr.Resources.Resources.Starting);
 
-                    await ShowMessageAsync(outputPanel, "Start NLO extraction...");
+                    await ShowMessageAsync(outputPanel, FreeAIr.Resources.Resources.Start_NLO_extraction);
 
                     HashSet<string>? checkedPaths = null;
                     OutlineNode? existingOutlineRoot = null;
@@ -643,7 +643,7 @@ namespace FreeAIr.UI.ViewModels
                         return;
                     }
 
-                    await ShowMessageAsync(outputPanel, "Start embedding generation...");
+                    await ShowMessageAsync(outputPanel, FreeAIr.Resources.Resources.Start_embedding_generation);
 
                     var eg = new EmbeddingGenerator(
                         _embeddingAgent
@@ -659,12 +659,12 @@ namespace FreeAIr.UI.ViewModels
                         CancellationToken.None //cannot be stopped in the middle!
                         );
 
-                    await ShowMessageAsync(outputPanel, "Process SUCESSFULLY completed.");
+                    await ShowMessageAsync(outputPanel, FreeAIr.Resources.Resources.Process_SUCESSFULLY_completed);
                     //await outputPane.HideAsync();
                 }
                 catch (Exception excp)
                 {
-                    await outputPanel.WriteLineAsync("Error:");
+                    await outputPanel.WriteLineAsync(Resources.Resources.Error + ":");
                     await outputPanel.WriteLineAsync(excp.Message);
                     await outputPanel.WriteLineAsync(excp.StackTrace);
                     throw;

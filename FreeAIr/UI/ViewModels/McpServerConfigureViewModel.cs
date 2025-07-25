@@ -255,7 +255,7 @@ namespace FreeAIr.UI.ViewModels
                         a =>
                         {
                             var clone = (McpServerWrapper)_selectedServer.Clone();
-                            clone.Name += " (cloned)";
+                            clone.Name += Resources.Resources.cloned;
                             ServerCollection.Add(clone);
                             AvailableServers.Add(clone);
 
@@ -354,7 +354,7 @@ namespace FreeAIr.UI.ViewModels
                                     await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
 
                                     await VS.MessageBox.ShowAsync(
-                                        $"MCP server is found, and pinged successfully.",
+                                        Resources.Resources.MCP_server_is_found__and_pinged_successfully,
                                         buttons: OLEMSGBUTTON.OLEMSGBUTTON_OK
                                         );
                                 }

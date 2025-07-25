@@ -10,7 +10,7 @@
     xmlns:catalog="clr-namespace:Microsoft.VisualStudio.Imaging;assembly=Microsoft.VisualStudio.ImageCatalog"
     xmlns:toolkit="clr-namespace:Community.VisualStudio.Toolkit;assembly=Community.VisualStudio.Toolkit"
     xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
-    xmlns:toolwindows="clr-namespace:FreeAIr.UI.ToolWindows"
+    xmlns:toolwindows="clr-namespace:FreeAIr.UI.ToolWindows" xmlns:resources="clr-namespace:FreeAIr.Resources"
     mc:Ignorable="d"
     d:DesignHeight="300"
     d:DesignWidth="300"
@@ -49,14 +49,14 @@
                 x:Name="StyleButtonName"
                 HorizontalAlignment="Right"
                 VerticalAlignment="Center"
-                Content="Cancel chat"
+                Content="{x:Static resources:Resources.Cancel_chat}"
                 toolkit:Themes.UseVsTheme="True"
                 />
             <Button
                 Grid.Column="1"
                 HorizontalAlignment="Right"
                 Margin="5,0,5,0"
-                Content="Cancel chat"
+                Content="{x:Static resources:Resources.Cancel_chat}"
                 VerticalAlignment="Center"
                 Command="{Binding ElementName=NaturaLanguageResultsName, Path=DataContext.CancelChatCommand}"
                 CommandParameter="{Binding}"
@@ -137,7 +137,7 @@
                             </Style>
                         </GridView.ColumnHeaderContainerStyle>
 
-                        <GridViewColumn Header="File Name" Width="120">
+                        <GridViewColumn Header="{x:Static resources:Resources.File_Name}" Width="120">
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
                                     <Label
@@ -160,7 +160,7 @@
                             </GridViewColumn.CellTemplate>
                         </GridViewColumn>
 
-                        <GridViewColumn Header="Found text" Width="120">
+                        <GridViewColumn Header="{x:Static resources:Resources.Found_text}" Width="120">
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
                                     <Grid
@@ -210,7 +210,7 @@
                             </GridViewColumn.CellTemplate>
                         </GridViewColumn>
 
-                        <GridViewColumn Header="Confidence" Width="70">
+                        <GridViewColumn Header="{x:Static resources:Resources.Confidence}" Width="70">
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
                                     <Label
@@ -223,7 +223,7 @@
                             </GridViewColumn.CellTemplate>
                         </GridViewColumn>
 
-                        <GridViewColumn Header="Line" Width="60">
+                        <GridViewColumn Header="{x:Static resources:Resources.Line}" Width="60">
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
                                     <Label

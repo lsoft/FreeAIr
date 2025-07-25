@@ -20,7 +20,9 @@ namespace FreeAIr.UI.ViewModels
 
                 if (_outlineEmbeddingOutputPanel is null)
                 {
-                    _outlineEmbeddingOutputPanel = await VS.Windows.CreateOutputWindowPaneAsync("FreeAIr NLO Json file generation");
+                    _outlineEmbeddingOutputPanel = await VS.Windows.CreateOutputWindowPaneAsync(
+                        FreeAIr.Resources.Resources.FreeAIr_NLO_Json_file_generation
+                        );
                 }
             }
             finally

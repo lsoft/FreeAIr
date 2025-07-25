@@ -10,7 +10,7 @@ namespace FreeAIr.UI.ToolWindows
 {
     public class NaturalLanguageResultsToolWindow : BaseToolWindow<NaturalLanguageResultsToolWindow>
     {
-        public override string GetTitle(int toolWindowId) => "Natural language search results";
+        public override string GetTitle(int toolWindowId) => FreeAIr.Resources.Resources.Natural_language_search_results;
 
         public override Type PaneType => typeof(Pane);
 

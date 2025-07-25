@@ -14,7 +14,7 @@ namespace FreeAIr.UI.ViewModels
 
         private ICommand _saveCommand;
 
-        public string Header => "Choose the MCP tools you want to provide to LLM:";
+        public string Header => FreeAIr.Resources.Resources.Choose_the_MCP_tools_you_want_to;
 
         public ObservableCollection2<CheckableItem> Groups
         {

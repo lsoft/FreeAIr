@@ -56,15 +56,15 @@ namespace FreeAIr.UI.ViewModels
             {
                 if (!_githubMcpServerStatus.HasValue)
                 {
-                    return "Waiting for status";
+                    return FreeAIr.Resources.Resources.Waiting_for_status;
                 }
 
                 if (_githubMcpServerStatus.Value)
                 {
-                    return "Installed and Ready";
+                    return FreeAIr.Resources.Resources.Installed_and_Ready;
                 }
 
-                return "Not Installed";
+                return FreeAIr.Resources.Resources.Not_Installed;
             }
         }
 
@@ -112,7 +112,7 @@ namespace FreeAIr.UI.ViewModels
 
                 if (_originalJson != _optionsJson)
                 {
-                    return "Current json is different from the saved one. Consider saving your changes.";
+                    return FreeAIr.Resources.Resources.Current_json_is_different_from_the;
                 }
 
                 return string.Empty;
@@ -251,7 +251,7 @@ namespace FreeAIr.UI.ViewModels
             catch (Exception excp)
             {
                 await VS.MessageBox.ShowErrorAsync(
-                    "Json cannot be deserialized because of:"
+                    FreeAIr.Resources.Resources.Json_cannot_be_deserialized_because
                     + Environment.NewLine
                     + excp.Message
                     );
@@ -301,7 +301,7 @@ namespace FreeAIr.UI.ViewModels
 
                         await VS.MessageBox.ShowAsync(
                             string.Empty,
-                            $"GitHub MCP server installed SUCCESSFULLY.",
+                            Resources.Resources.GitHub_MCP_server_installed_SUCCESSFULLY,
                             buttons: OLEMSGBUTTON.OLEMSGBUTTON_OK
                             );
                     }
@@ -312,7 +312,7 @@ namespace FreeAIr.UI.ViewModels
 
                     await VS.MessageBox.ShowErrorAsync(
                         Resources.Resources.Error,
-                        $"Installation GitHub MCP server fails. Please install it manually."
+                        FreeAIr.Resources.Resources.Installation_GitHub_MCP_server_fails
                         );
                 }
 
@@ -343,7 +343,7 @@ namespace FreeAIr.UI.ViewModels
                     if (!string.IsNullOrEmpty(_viewModel.OptionsJson))
                     {
                         if (!await VS.MessageBox.ShowConfirmAsync(
-                                $"Options json is not empty. Overwrite?"
+                                Resources.Resources.Options_json_is_not_empty__Overwrite
                                 )
                             )
                         {
@@ -392,7 +392,7 @@ namespace FreeAIr.UI.ViewModels
                     if (!string.IsNullOrEmpty(_viewModel.OptionsJson))
                     {
                         if (!await VS.MessageBox.ShowConfirmAsync(
-                            $"Options json is not empty. Overwrite?"
+                            Resources.Resources.Options_json_is_not_empty__Overwrite
                             )
                             )
                         {
@@ -408,7 +408,7 @@ namespace FreeAIr.UI.ViewModels
                         if (!File.Exists(filePath))
                         {
                             await VS.MessageBox.ShowErrorAsync(
-                                $"FreeAIr options file does not found: {filePath}"
+                                FreeAIr.Resources.Resources.FreeAIr_options_file_does_not_found + $": {filePath}"
                                 );
                             return;
                         }
@@ -418,7 +418,7 @@ namespace FreeAIr.UI.ViewModels
                         if (string.IsNullOrEmpty(InternalPage.Instance.Options))
                         {
                             await VS.MessageBox.ShowErrorAsync(
-                                $"Visual studio has no active FreeAIr options."
+                                FreeAIr.Resources.Resources.Visual_studio_has_no_active_FreeAIr
                                 );
                             return;
                         }
@@ -464,7 +464,7 @@ namespace FreeAIr.UI.ViewModels
                 {
                     await VS.MessageBox.ShowErrorAsync(
                         Resources.Resources.Error,
-                        $"Invalid json. Fix json and try again."
+                        Resources.Resources.Invalid_json__Fix_json_and_try_again
                         );
                     return;
                 }
@@ -485,7 +485,7 @@ namespace FreeAIr.UI.ViewModels
                     await _viewModel.AcceptOptionsAsync();
 
                     await VS.MessageBox.ShowAsync(
-                        $"Every MCP server is found, and pinged successfully. Changes was saved successfully.",
+                        FreeAIr.Resources.Resources.Every_MCP_server_is_found__and_pinged,
                         buttons: OLEMSGBUTTON.OLEMSGBUTTON_OK
                         );
                 }
@@ -536,7 +536,8 @@ namespace FreeAIr.UI.ViewModels
                 try
                 {
                     if (!await VS.MessageBox.ShowConfirmAsync(
-                        "You are going to delete stored options. Please, confirm.")
+                        FreeAIr.Resources.Resources.You_are_going_to_delete_stored_options
+                            )
                         )
                     {
                         return;
@@ -552,7 +553,10 @@ namespace FreeAIr.UI.ViewModels
                             System.IO.File.Delete(filePath);
 
                             await VS.MessageBox.ShowAsync(
-                                $"Options file {filePath} has been deleted.",
+                                string.Format(
+                                    FreeAIr.Resources.Resources.Options_file__0__has_been_deleted,
+                                    filePath
+                                    ),
                                 buttons: OLEMSGBUTTON.OLEMSGBUTTON_OK
                                 );
                             return;
@@ -569,7 +573,7 @@ namespace FreeAIr.UI.ViewModels
                         InternalPage.Instance.Options = string.Empty;
 
                         await VS.MessageBox.ShowAsync(
-                            $"Options inside Visual Studio has been deleted.",
+                            FreeAIr.Resources.Resources.Options_inside_Visual_Studio_has,
                             buttons: OLEMSGBUTTON.OLEMSGBUTTON_OK
                             );
                     }

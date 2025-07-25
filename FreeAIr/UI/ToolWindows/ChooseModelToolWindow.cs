@@ -10,7 +10,7 @@ namespace FreeAIr.UI.ToolWindows
 {
     public class ChooseModelToolWindow : BaseToolWindow<ChooseModelToolWindow>
     {
-        public override string GetTitle(int toolWindowId) => "Choose OpenRouter model";
+        public override string GetTitle(int toolWindowId) => FreeAIr.Resources.Resources.Choose_OpenRouter_model;
 
         public override Type PaneType => typeof(Pane);
 

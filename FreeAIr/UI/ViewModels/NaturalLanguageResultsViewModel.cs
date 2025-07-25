@@ -37,7 +37,7 @@ namespace FreeAIr.UI.ViewModels
         private ICommand _gotoCommand;
         private ICommand _cancelChatCommand;
         
-        private string _status = "Idle";
+        private string _status = Resources.Resources.Idle;
 
         private CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
         private Task? _processingTask;
@@ -112,7 +112,7 @@ namespace FreeAIr.UI.ViewModels
                                     {
                                         await VS.MessageBox.ShowErrorAsync(
                                             Resources.Resources.Error,
-                                            "Cannot determine the position of found entry. The file will be open without selection."
+                                            FreeAIr.Resources.Resources.Cannot_determine_the_position_of
                                             );
 
                                         startLineIndex = 0;
@@ -380,12 +380,12 @@ namespace FreeAIr.UI.ViewModels
             catch (OperationCanceledException)
             {
                 //this is ok
-                Status = $"Cancelled";
+                Status = Resources.Resources.Cancelled;
             }
             catch (Exception excp)
             {
                 //todo log
-                Status = $"Error: {excp.Message}";
+                Status = Resources.Resources.Error + $": {excp.Message}";
             }
 
             OnPropertyChanged();

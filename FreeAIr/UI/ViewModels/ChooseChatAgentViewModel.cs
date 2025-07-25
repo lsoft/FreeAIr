@@ -14,7 +14,7 @@ namespace FreeAIr.UI.ViewModels
     {
         private ICommand _saveCommand;
 
-        public string Header => "Choose the available agent:";
+        public string Header => FreeAIr.Resources.Resources.Choose_the_available_agent;
 
         public ObservableCollection2<CheckableItem> Groups
         {
@@ -71,7 +71,7 @@ namespace FreeAIr.UI.ViewModels
             ChosenAgent = chosenAgent;
             Groups.Add(
                 new SingleCheckedCheckableItem(
-                    "Available agents:",
+                    FreeAIr.Resources.Resources.Available_agents,
                     "",
                     CheckableItemStyle.Empty,
                     null,

@@ -13,9 +13,9 @@
     Height="700" Width="1000"
     ui:VsTheme.UseVsTheme="True"
     ShowInTaskbar="False"
-    Title="FreeAIr Support Action Configuration Window"
+    Title="{x:Static resources:Resources.FreeAIr_Support_Action_Configuration}"
     Name="ActionConfigurationWindowName"
-    Loaded="Window_Loaded"
+    Loaded="Window_Loaded" xmlns:resources="clr-namespace:FreeAIr.Resources"
     >
     <Grid>
         <Grid.RowDefinitions>
@@ -50,7 +50,7 @@
                 Foreground="Green"
                 FontFamily="Cascadia Code"
                 VerticalAlignment="Center"
-                ToolTip="Add new action"
+                ToolTip="{x:Static resources:Resources.Add_new_action}"
                 Command="{Binding AddNewActionCommand}"
                 Style="{DynamicResource TextBlockLikeButtonStyle}"
                 />
@@ -62,7 +62,7 @@
                 Foreground="Red"
                 FontFamily="Cascadia Code"
                 VerticalAlignment="Center"
-                ToolTip="Delete selected action"
+                ToolTip="{x:Static resources:Resources.Delete_selected_action}"
                 Command="{Binding DeleteActionCommand}"
                 Style="{DynamicResource TextBlockLikeButtonStyle}"
                 />
@@ -75,7 +75,7 @@
                 FontSize="12"
                 FontFamily="Cascadia Code"
                 VerticalAlignment="Center"
-                ToolTip="Move selected action up"
+                ToolTip="{x:Static resources:Resources.Move_selected_action_up}"
                 Command="{Binding UpActionCommand}"
                 Style="{DynamicResource TextBlockLikeButtonStyle}"
                 />
@@ -86,7 +86,7 @@
                 FontSize="12"
                 FontFamily="Cascadia Code"
                 VerticalAlignment="Center"
-                ToolTip="Move selected action down"
+                ToolTip="{x:Static resources:Resources.Move_selected_action_down}"
                 Command="{Binding DownActionCommand}"
                 Style="{DynamicResource TextBlockLikeButtonStyle}"
                 />
@@ -98,7 +98,7 @@
                 FontSize="12"
                 FontFamily="Cascadia Code"
                 VerticalAlignment="Center"
-                ToolTip="Clone"
+                ToolTip="{x:Static resources:Resources.Clone}"
                 Command="{Binding CloneActionCommand}"
                 Style="{DynamicResource TextBlockLikeButtonStyle}"
                 />
@@ -111,7 +111,7 @@
                 FontFamily="Cascadia Code"
                 HorizontalAlignment="Right"
                 VerticalAlignment="Center"
-                ToolTip="Apply changes"
+                ToolTip="{x:Static resources:Resources.Apply_changes}"
                 Command="{Binding ApplyAndCloseCommand}"
                 Style="{DynamicResource TextBlockLikeButtonStyle}"
                 />
@@ -199,7 +199,7 @@
                 Grid.Column="0"
                 HorizontalAlignment="Left"
                 VerticalAlignment="Center"
-                Content="Name:"
+                Content="{x:Static resources:Resources.Name}"
                 />
 
             <TextBox
@@ -215,7 +215,7 @@
                 Grid.Column="0"
                 HorizontalAlignment="Left"
                 VerticalAlignment="Center"
-                Content="Agent name:"
+                Content="{x:Static resources:Resources.Agent_name}"
                 />
 
             <TextBox
@@ -271,7 +271,7 @@
                 Grid.Column="0"
                 HorizontalAlignment="Left"
                 VerticalAlignment="Center"
-                Content="Prompt:"
+                Content="{x:Static resources:Resources.UI_Prompt}"
                 />
 
             <ScrollViewer
@@ -324,55 +324,6 @@
                     </ItemsPanelTemplate>
                 </ItemsControl.ItemsPanel>
             </ItemsControl>
-
-
-            <!--<WrapPanel
-                Grid.Row="7"
-                Grid.Column="0"
-                Grid.ColumnSpan="2"
-                HorizontalAlignment="Right"
-                >
-
-                <Button
-                    Margin="10,2,10,2"
-                    FontFamily="Cascadia Code"
-                    FontWeight="Bold"
-                    VerticalAlignment="Center"
-                    Cursor="Hand"
-                    Foreground="#569CD6"
-                    Content="Replace with general system prompt..."
-                    Command="{Binding ReplaceGeneralSystemPromptCommand}"
-                    Style="{DynamicResource TextBlockLikeButtonStyle}"
-                    ToolTip="Replace this system prompt with default system prompt of general purpose"
-                    />
-
-                <Button
-                    Margin="10,2,10,2"
-                    FontFamily="Cascadia Code"
-                    FontWeight="Bold"
-                    VerticalAlignment="Center"
-                    Cursor="Hand"
-                    Foreground="#569CD6"
-                    Content="Replace with generate NLO system prompt..."
-                    Command="{Binding ReplaceGenerateNLOSystemPromptCommand}"
-                    Style="{DynamicResource TextBlockLikeButtonStyle}"
-                    ToolTip="Replace this system prompt with default system prompt of generate new or update existing natural language outlines"
-                    />
-
-                <Button
-                    Margin="10,2,10,2"
-                    FontFamily="Cascadia Code"
-                    FontWeight="Bold"
-                    VerticalAlignment="Center"
-                    Cursor="Hand"
-                    Foreground="#569CD6"
-                    Content="Replace with extract NLO system prompt..."
-                    Command="{Binding ReplaceExtractNLOSystemPromptCommand}"
-                    Style="{DynamicResource TextBlockLikeButtonStyle}"
-                    ToolTip="Replace this system prompt with default system prompt of extract natural language outlines from documents."
-                    />
-            
-            </WrapPanel>-->
 
         </Grid>
 

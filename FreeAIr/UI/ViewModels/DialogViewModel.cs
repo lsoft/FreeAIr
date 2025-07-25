@@ -52,7 +52,7 @@ namespace FreeAIr.UI.ViewModels
                 new AdditionalCommand(
                     PartTypeEnum.CodeLine | PartTypeEnum.CodeBlock | PartTypeEnum.Xml | PartTypeEnum.Url,
                     "📋",
-                    "Click to copy to clipboard",
+                    FreeAIr.Resources.Resources.Click_to_copy_to_clipboard,
                     new RelayCommand(
                         a =>
                         {
@@ -70,7 +70,7 @@ namespace FreeAIr.UI.ViewModels
                     () => _selectedChat.Chat,
                     PartTypeEnum.CodeLine | PartTypeEnum.CodeBlock,
                     "♼",
-                    "Choose context item to replace its content with this code part",
+                    FreeAIr.Resources.Resources.Choose_context_item_to_replace_its,
                     new AsyncRelayCommand(
                         async a =>
                         {
@@ -86,7 +86,7 @@ namespace FreeAIr.UI.ViewModels
                             {
                                 await VS.MessageBox.ShowErrorAsync(
                                     FreeAIr.Resources.Resources.Error,
-                                    "Cannot replace context document body. Please replace manually."
+                                    FreeAIr.Resources.Resources.Cannot_replace_context_document_body
                                     );
                                 return;
                             }
@@ -105,7 +105,7 @@ namespace FreeAIr.UI.ViewModels
                 new AdditionalCommand(
                     PartTypeEnum.CodeLine | PartTypeEnum.CodeBlock,
                     "♽",
-                    "Replace the selected block of the code in the VS document with this code part",
+                    FreeAIr.Resources.Resources.Replace_the_selected_block_of_the,
                     new AsyncRelayCommand(
                         async a =>
                         {
@@ -114,7 +114,7 @@ namespace FreeAIr.UI.ViewModels
                             {
                                 await VS.MessageBox.ShowErrorAsync(
                                     FreeAIr.Resources.Resources.Error,
-                                    "Cannot replace selected text. Please replace the selected text manually."
+                                    FreeAIr.Resources.Resources.Cannot_replace_selected_text__Please
                                     );
                                 return;
                             }
@@ -124,7 +124,7 @@ namespace FreeAIr.UI.ViewModels
                             {
                                 await VS.MessageBox.ShowErrorAsync(
                                     FreeAIr.Resources.Resources.Error,
-                                    "Cannot replace selected text. Please replace the selected text manually."
+                                    FreeAIr.Resources.Resources.Cannot_replace_selected_text__Please
                                     );
                                 return;
                             }
@@ -134,7 +134,7 @@ namespace FreeAIr.UI.ViewModels
                             {
                                 await VS.MessageBox.ShowErrorAsync(
                                     FreeAIr.Resources.Resources.Error,
-                                    "Cannot replace selected text. Please replace the selected text manually."
+                                    FreeAIr.Resources.Resources.Cannot_replace_selected_text__Please
                                     );
                                 return;
                             }
@@ -143,7 +143,7 @@ namespace FreeAIr.UI.ViewModels
                             {
                                 await VS.MessageBox.ShowErrorAsync(
                                     FreeAIr.Resources.Resources.Error,
-                                    "Cannot replace selected text. Please replace the selected text manually."
+                                    FreeAIr.Resources.Resources.Cannot_replace_selected_text__Please
                                     );
                                 return;
                             }
@@ -187,7 +187,7 @@ namespace FreeAIr.UI.ViewModels
                 new AdditionalCommand(
                     PartTypeEnum.CodeLine | PartTypeEnum.CodeBlock,
                     "🗎",
-                    "Create new file with this code part",
+                    FreeAIr.Resources.Resources.Create_new_file_with_this_code_part,
                     new AsyncRelayCommand(
                         async a =>
                         {
@@ -196,7 +196,7 @@ namespace FreeAIr.UI.ViewModels
                             {
                                 await VS.MessageBox.ShowErrorAsync(
                                     FreeAIr.Resources.Resources.Error,
-                                    "Cannot create a new file. Please create the file manually."
+                                    FreeAIr.Resources.Resources.Cannot_create_a_new_file__Please
                                     );
                                 return;
                             }
@@ -206,7 +206,7 @@ namespace FreeAIr.UI.ViewModels
                             {
                                 await VS.MessageBox.ShowErrorAsync(
                                     FreeAIr.Resources.Resources.Error,
-                                    "Cannot create a new file. Please create the file manually."
+                                    FreeAIr.Resources.Resources.Cannot_create_a_new_file__Please
                                     );
                                 return;
                             }
@@ -239,7 +239,7 @@ namespace FreeAIr.UI.ViewModels
                 new AdditionalCommand(
                     PartTypeEnum.Image,
                     "📋",
-                    "Click to copy to clipboard",
+                    FreeAIr.Resources.Resources.Click_to_copy_to_clipboard,
                     new RelayCommand(
                         a =>
                         {
@@ -411,7 +411,7 @@ namespace FreeAIr.UI.ViewModels
             }
 
             var chosenContextItem = await VisualStudioContextMenuCommandBridge.ShowAsync<IChatContextItem>(
-                "Choose context item to replace:",
+                FreeAIr.Resources.Resources.Choose_context_item_to_replace,
                 chat.ChatContext.Items
                     .ConvertAll(i => (i.ContextUIDescription, (object)i))
                 );

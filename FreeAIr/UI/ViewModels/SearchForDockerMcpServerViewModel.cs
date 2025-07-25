@@ -129,7 +129,10 @@ namespace FreeAIr.UI.ViewModels
                 if (image is null)
                 {
                     await VS.MessageBox.ShowWarningAsync(
-                        $"Docker image for {serverName} MCP server installed. Please setup FreeAIr to work with the server."
+                        string.Format(
+                            FreeAIr.Resources.Resources.Docker_image_for__0__MCP_server_installed,
+                            serverName
+                            )
                         );
                     return (null, null);
                 }
@@ -140,7 +143,10 @@ namespace FreeAIr.UI.ViewModels
                 if (index < 0)
                 {
                     await VS.MessageBox.ShowWarningAsync(
-                        $"Docker image for {serverName} MCP server installed. Please setup FreeAIr to work with the server."
+                        string.Format(
+                            FreeAIr.Resources.Resources.Docker_image_for__0__MCP_server_installed,
+                            serverName
+                            )
                         );
                     return (null, null);
                 }
@@ -152,7 +158,10 @@ namespace FreeAIr.UI.ViewModels
                 if (si < 0)
                 {
                     await VS.MessageBox.ShowWarningAsync(
-                        $"Docker image for {serverName} MCP server installed. Please setup FreeAIr to work with the server."
+                        string.Format(
+                            FreeAIr.Resources.Resources.Docker_image_for__0__MCP_server_installed,
+                            serverName
+                            )
                         );
                     return (null, null);
                 }
@@ -161,7 +170,10 @@ namespace FreeAIr.UI.ViewModels
                 if (ei < 0)
                 {
                     await VS.MessageBox.ShowWarningAsync(
-                        $"Docker image for {serverName} MCP server installed. Please setup FreeAIr to work with the server."
+                        string.Format(
+                            FreeAIr.Resources.Resources.Docker_image_for__0__MCP_server_installed,
+                            serverName
+                            )
                         );
                     return (null, null);
                 }
@@ -174,7 +186,10 @@ namespace FreeAIr.UI.ViewModels
                 if (mcpServers.Servers.Count != 1)
                 {
                     await VS.MessageBox.ShowWarningAsync(
-                        $"Docker image for {serverName} MCP server installed. Please setup FreeAIr to work with the server."
+                        string.Format(
+                            FreeAIr.Resources.Resources.Docker_image_for__0__MCP_server_installed,
+                            serverName
+                            )
                         );
                     return (null, null);
                 }

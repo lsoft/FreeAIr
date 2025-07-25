@@ -13,15 +13,15 @@ namespace FreeAIr.Helper
             switch (status)
             {
                 case ChatStatusEnum.NotStarted:
-                    return "Not started";
+                    return FreeAIr.Resources.Resources.Not_started;
                 case ChatStatusEnum.WaitingForAnswer:
-                    return "Waiting for answer";
+                    return FreeAIr.Resources.Resources.Waiting_for_answer;
                 case ChatStatusEnum.ReadingAnswer:
-                    return "Reading answer";
+                    return FreeAIr.Resources.Resources.Reading_answer;
                 case ChatStatusEnum.Ready:
-                    return "Ready";
+                    return FreeAIr.Resources.Resources.Ready;
                 case ChatStatusEnum.Failed:
-                    return "Failed";
+                    return FreeAIr.Resources.Resources.Failed;
                 default:
                     return status.ToString();
             }
