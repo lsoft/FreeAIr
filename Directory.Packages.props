@@ -41,7 +41,7 @@
     <PackageVersion Include="Serilog.Sinks.Console" Version="6.0.0" />
     <PackageVersion Include="Serilog.Sinks.File" Version="7.0.0" />
     <PackageVersion Include="StreamJsonRpc" Version="2.22.11" />
-    <PackageVersion Include="System.ClientModel" Version="1.5.1" />
+    <PackageVersion Include="System.ClientModel" Version="1.2.1" />
     <PackageVersion Include="System.Management" Version="10.0.0-preview.4.25258.110" />
     <PackageVersion Include="System.Net.Http.Json" Version="9.0.7" />
     <PackageVersion Include="System.Net.ServerSentEvents" Version="9.0.7" />

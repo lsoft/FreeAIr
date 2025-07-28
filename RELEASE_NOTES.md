@@ -6,6 +6,10 @@ Please report any bugs to the [github repo](https://github.com/lsoft/FreeAIr).
 
 If you are enjoying FreeAIr to the enough level to donate, there are many [small cancer patients](https://advitausa.org/au/index.php/donate/) that need your help. Please provide your help them!
 
+## 3.3.0
+
+- Added Russian and simplified Chinese localization.
+
 ## 3.2.0
 
 - Added ability to set whole line completion prompts. The suggested prompt is:
