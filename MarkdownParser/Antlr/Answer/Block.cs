@@ -1,21 +1,18 @@
-﻿using FreeAIr.Antlr.Answer.Parts;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using MarkdownParser.Antlr.Answer.Parts;
 using System.Windows;
 using System.Windows.Documents;
 using System.Windows.Media;
 
-namespace FreeAIr.Antlr.Answer
+namespace MarkdownParser.Antlr.Answer
 {
     public sealed class Block
     {
         private static readonly System.Windows.Media.Brush _semiTransparentGray = new SolidColorBrush(Color.FromArgb(0x40, 0x80, 0x80, 0x80));
 
         private readonly List<IPart> _parts = new();
-
+        private readonly IFontSizeProvider _fontSizeProvider;
         private BlockUIContainer? _blockContainer;
-        
+
         public BlockTypeEnum Type
         {
             get;
@@ -24,8 +21,17 @@ namespace FreeAIr.Antlr.Answer
 
         public IReadOnlyList<IPart> Parts => _parts;
 
-        public Block()
+        public Block(
+            IFontSizeProvider fontSizeProvider
+            )
         {
+            if (fontSizeProvider is null)
+            {
+                throw new ArgumentNullException(nameof(fontSizeProvider));
+            }
+
+            _fontSizeProvider = fontSizeProvider;
+            
             Type = BlockTypeEnum.Paragraph;
         }
 
@@ -95,45 +101,45 @@ namespace FreeAIr.Antlr.Answer
         {
             if (_parts.Count > 0)
             {
-                var last = _parts.Last();
-                if (last is TextPart lastText)
+                var lastPart = _parts.Last();
+                if (lastPart is TextPart lastText)
                 {
                     lastText.Append(text);
                     return;
                 }
             }
 
-            _parts.Add(new TextPart(text));
+            _parts.Add(new TextPart(_fontSizeProvider, text));
         }
 
         public void AddXmlNode(string text, string nodeName, string body)
         {
-            _parts.Add(new XmlNodePart(text, nodeName, body));
+            _parts.Add(new XmlNodePart(_fontSizeProvider, text, nodeName, body));
         }
 
         public void AddUrl(string text, string description, string link, string title)
         {
-            _parts.Add(new UrlPart(text, description, link, title));
+            _parts.Add(new UrlPart(_fontSizeProvider, text, description, link, title));
         }
 
         public void AddHeader(int headerLevel, string text)
         {
-            _parts.Add(new HeaderPart(headerLevel, text));
+            _parts.Add(new HeaderPart(_fontSizeProvider, headerLevel, text));
         }
 
         public void AddCodeBlock(string text, string code)
         {
-            _parts.Add(new CodeBlockPart(text, code));
+            _parts.Add(new CodeBlockPart(_fontSizeProvider, text, code));
         }
 
         public void AddCodeLine(string text)
         {
-            _parts.Add(new CodeLinePart(text));
+            _parts.Add(new CodeLinePart(_fontSizeProvider, text));
         }
 
         public void AddImage(string text, string description, string link, string title)
         {
-            _parts.Add(new ImagePart(text, description, link, title));
+            _parts.Add(new ImagePart(_fontSizeProvider, text, description, link, title));
         }
     }
 }

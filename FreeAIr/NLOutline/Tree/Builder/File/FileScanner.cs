@@ -1,23 +1,17 @@
 ﻿using FreeAIr.BLogic;
 using FreeAIr.BLogic.Context.Item;
-using FreeAIr.Embedding;
-using FreeAIr.Git.Parser;
 using FreeAIr.Helper;
 using FreeAIr.Options2.Agent;
 using FreeAIr.Options2.Support;
-using FreeAIr.Shared.Helper;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.VisualStudio.ComponentModelHost;
 using Microsoft.VisualStudio.LanguageServices;
-using Microsoft.VisualStudio.Shell.Interop;
-using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace FreeAIr.NLOutline.Tree.Builder.File

@@ -1,7 +1,6 @@
-﻿using System.Collections.Generic;
-using System.Windows.Documents;
+﻿using System.Windows.Documents;
 
-namespace FreeAIr.Antlr.Answer
+namespace MarkdownParser.Antlr.Answer
 {
     public interface IParsedAnswer
     {

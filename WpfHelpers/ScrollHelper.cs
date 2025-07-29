@@ -1,6 +1,6 @@
 ﻿using System.Windows.Controls;
 
-namespace FreeAIr.Helper
+namespace WpfHelpers
 {
     public static class ScrollHelper
     {

@@ -1,5 +1,4 @@
 ﻿using FreeAIr.UI.ViewModels;
-using System.Windows;
 using System.Windows.Controls;
 
 namespace FreeAIr.UI.ToolWindows

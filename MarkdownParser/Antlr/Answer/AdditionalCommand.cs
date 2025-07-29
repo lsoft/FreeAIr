@@ -1,14 +1,11 @@
-﻿using FreeAIr.Antlr.Answer.Parts;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using MarkdownParser.Antlr.Answer.Parts;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 
-namespace FreeAIr.Antlr.Answer
+namespace MarkdownParser.Antlr.Answer
 {
     public sealed class AdditionalCommandContainer
     {
@@ -84,6 +81,8 @@ namespace FreeAIr.Antlr.Answer
 
     public /*sealed*/ class AdditionalCommand
     {
+        private readonly IFontSizeProvider _fontSizeProvider;
+
         public PartTypeEnum PartType
         {
             get;
@@ -110,6 +109,7 @@ namespace FreeAIr.Antlr.Answer
         }
 
         public AdditionalCommand(
+            IFontSizeProvider fontSizeProvider,
             PartTypeEnum partType,
             string title,
             string toolTip,
@@ -117,6 +117,11 @@ namespace FreeAIr.Antlr.Answer
             System.Windows.Media.Brush? foreground
             )
         {
+            if (fontSizeProvider is null)
+            {
+                throw new ArgumentNullException(nameof(fontSizeProvider));
+            }
+
             if (title is null)
             {
                 throw new ArgumentNullException(nameof(title));
@@ -127,6 +132,7 @@ namespace FreeAIr.Antlr.Answer
                 throw new ArgumentNullException(nameof(toolTip));
             }
 
+            _fontSizeProvider = fontSizeProvider;
             PartType = partType;
             Title = title;
             ToolTip = toolTip;
@@ -141,7 +147,7 @@ namespace FreeAIr.Antlr.Answer
             var control = new Button
             {
                 Margin = new Thickness(2, 0, 2, 0),
-                FontSize = FontSizePage.Instance.ContextButtonSize,
+                FontSize = _fontSizeProvider.ContextButtonSize,
                 FontFamily = new FontFamily("Cascadia Code"),
                 ToolTip = ToolTip,
                 FontWeight = FontWeights.Bold,

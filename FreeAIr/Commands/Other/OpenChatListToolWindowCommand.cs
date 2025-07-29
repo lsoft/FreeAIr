@@ -1,6 +1,4 @@
-﻿using FreeAIr.Options2;
-using FreeAIr.UI.ContextMenu;
-using FreeAIr.UI.ToolWindows;
+﻿using FreeAIr.UI.ToolWindows;
 
 namespace FreeAIr.Commands.Other
 {

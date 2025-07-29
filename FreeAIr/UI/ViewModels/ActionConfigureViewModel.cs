@@ -1,13 +1,7 @@
 ﻿using FreeAIr.Helper;
-using FreeAIr.Options2.Agent;
 using FreeAIr.Options2.Support;
 using Microsoft.VisualStudio.Imaging;
 using Microsoft.VisualStudio.Imaging.Interop;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using WpfHelpers;

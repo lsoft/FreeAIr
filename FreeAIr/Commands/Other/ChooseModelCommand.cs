@@ -1,6 +1,4 @@
-﻿using FreeAIr.Options2;
-using FreeAIr.UI.ToolWindows;
-using Xceed.Wpf.Toolkit;
+﻿using FreeAIr.UI.ToolWindows;
 
 namespace FreeAIr.Commands.Other
 {

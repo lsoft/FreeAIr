@@ -1,13 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
+﻿using System.IO;
 using System.Windows.Documents;
 using System.Windows.Media.Imaging;
 
-namespace FreeAIr.Antlr.Answer.Parts
+namespace MarkdownParser.Antlr.Answer.Parts
 {
     public sealed class ImagePart : IPart
     {
+        private readonly IFontSizeProvider _fontSizeProvider;
+
         public PartTypeEnum Type => PartTypeEnum.Image;
 
         public string Text
@@ -30,8 +30,20 @@ namespace FreeAIr.Antlr.Answer.Parts
             get;
         }
 
-        public ImagePart(string text, string description, string link, string title)
+        public ImagePart(
+            IFontSizeProvider fontSizeProvider,
+            string text,
+            string description,
+            string link,
+            string title
+            )
         {
+            if (fontSizeProvider is null)
+            {
+                throw new ArgumentNullException(nameof(fontSizeProvider));
+            }
+
+            _fontSizeProvider = fontSizeProvider;
             Text = text;
             Description = description;
             Link = link;
@@ -52,8 +64,9 @@ namespace FreeAIr.Antlr.Answer.Parts
             {
                 return [ new Run
                     {
-                        FontSize = FontSizePage.Instance.TextSize,
-                        Text = Text
+                        FontSize = _fontSizeProvider.TextSize,
+                        Text = Text,
+                        ToolTip = Title
                     }
                 ];
             }
@@ -83,6 +96,7 @@ namespace FreeAIr.Antlr.Answer.Parts
                 }
 
                 image.Source = bitmap;
+                image.ToolTip = Title;
 
                 return [ new InlineUIContainer(image) ];
             }

@@ -1,15 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Windows.Documents;
+﻿using System.Windows.Documents;
 using System.Windows.Media;
 
-namespace FreeAIr.Antlr.Answer.Parts
+namespace MarkdownParser.Antlr.Answer.Parts
 {
-    public sealed class CodeLinePart : IPart
+    public sealed class CodeBlockPart : IPart
     {
         private static readonly Brush _foregroundBrush = new SolidColorBrush(Color.FromRgb(0x56, 0x9C, 0xD6));
+        private readonly IFontSizeProvider _fontSizeProvider;
 
-        public PartTypeEnum Type => PartTypeEnum.CodeLine;
+        public PartTypeEnum Type => PartTypeEnum.CodeBlock;
 
         public string Text
         {
@@ -20,17 +19,30 @@ namespace FreeAIr.Antlr.Answer.Parts
             get;
         }
 
-        public CodeLinePart(
+        public CodeBlockPart(
+            IFontSizeProvider fontSizeProvider,
+            string text,
             string code
             )
         {
+            if (fontSizeProvider is null)
+            {
+                throw new ArgumentNullException(nameof(fontSizeProvider));
+            }
+
+            if (text is null)
+            {
+                throw new ArgumentNullException(nameof(text));
+            }
+
             if (code is null)
             {
                 throw new ArgumentNullException(nameof(code));
             }
 
-            Text = code;
-            Code = code.Trim('`');
+            _fontSizeProvider = fontSizeProvider;
+            Text = text;
+            Code = code;
         }
 
         public object GetContextForAdditionalCommand()
@@ -44,8 +56,8 @@ namespace FreeAIr.Antlr.Answer.Parts
             {
                 FontFamily = new FontFamily("Cascadia Code"),
                 Foreground = _foregroundBrush,
-                FontSize = FontSizePage.Instance.CodeLineSize,
-                Text = Text
+                FontSize = _fontSizeProvider.CodeBlockSize,
+                Text = Code
             };
         }
     }

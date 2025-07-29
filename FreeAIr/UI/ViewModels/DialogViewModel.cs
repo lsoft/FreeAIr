@@ -1,10 +1,10 @@
-﻿using FreeAIr.Antlr.Answer;
-using FreeAIr.Antlr.Answer.Parts;
-using FreeAIr.BLogic;
+﻿using FreeAIr.BLogic;
 using FreeAIr.BLogic.Context;
 using FreeAIr.Helper;
 using FreeAIr.Shared.Helper;
 using FreeAIr.UI.ContextMenu;
+using MarkdownParser.Antlr.Answer;
+using MarkdownParser.Antlr.Answer.Parts;
 using Microsoft.VisualStudio.ComponentModelHost;
 using System.IO;
 using System.Linq;
@@ -14,7 +14,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using WpfHelpers;
-using static FreeAIr.UI.Dialog.DialogControl;
+using static MarkdownParser.UI.Dialog.DialogControl;
 using static FreeAIr.UI.ViewModels.ChatListViewModel;
 
 namespace FreeAIr.UI.ViewModels
@@ -45,12 +45,55 @@ namespace FreeAIr.UI.ViewModels
             var componentModel = FreeAIrPackage.Instance.GetService<SComponentModel, IComponentModel>();
             _answerParser = componentModel.GetService<IAnswerParser>();
 
-
             #region AdditionalCommandContainer
 
             AdditionalCommandContainer.AddAdditionalCommand(
                 new AdditionalCommand(
-                    PartTypeEnum.CodeLine | PartTypeEnum.CodeBlock | PartTypeEnum.Xml | PartTypeEnum.Url,
+                    ConstantFontSizeProvider.Instance,
+                    PartTypeEnum.Xml,
+                    "⤢",
+                    "Expand-Collapse",
+                    new RelayCommand(
+                        a =>
+                        {
+                            var xmlNodePart = a as XmlNodePart;
+                            if (xmlNodePart is null)
+                            {
+                                return;
+                            }
+
+                            xmlNodePart.ExpandOrCollapse();
+                        }),
+                    null
+                    )
+                );
+            AdditionalCommandContainer.AddAdditionalCommand(
+                new AdditionalCommand(
+                    ConstantFontSizeProvider.Instance,
+                    PartTypeEnum.Xml,
+                    "📋",
+                    "Click to copy to clipboard",
+                    new RelayCommand(
+                        a =>
+                        {
+                            var xmlNodePart = a as XmlNodePart;
+                            if (xmlNodePart is null)
+                            {
+                                return;
+                            }
+
+                            if (!string.IsNullOrEmpty(xmlNodePart.Body))
+                            {
+                                Clipboard.SetText(xmlNodePart.Body);
+                            }
+                        }),
+                    null
+                    )
+                );
+            AdditionalCommandContainer.AddAdditionalCommand(
+                new AdditionalCommand(
+                    FontSizePage.Instance,
+                    PartTypeEnum.CodeLine | PartTypeEnum.CodeBlock | PartTypeEnum.Url,
                     "📋",
                     FreeAIr.Resources.Resources.Click_to_copy_to_clipboard,
                     new RelayCommand(
@@ -67,6 +110,7 @@ namespace FreeAIr.UI.ViewModels
                 );
             AdditionalCommandContainer.AddAdditionalCommand(
                 new ChatContextMenuAdditionalCommand(
+                    FontSizePage.Instance,
                     () => _selectedChat.Chat,
                     PartTypeEnum.CodeLine | PartTypeEnum.CodeBlock,
                     "♼",
@@ -103,6 +147,7 @@ namespace FreeAIr.UI.ViewModels
                 );
             AdditionalCommandContainer.AddAdditionalCommand(
                 new AdditionalCommand(
+                    FontSizePage.Instance,
                     PartTypeEnum.CodeLine | PartTypeEnum.CodeBlock,
                     "♽",
                     FreeAIr.Resources.Resources.Replace_the_selected_block_of_the,
@@ -185,6 +230,7 @@ namespace FreeAIr.UI.ViewModels
                 );
             AdditionalCommandContainer.AddAdditionalCommand(
                 new AdditionalCommand(
+                    FontSizePage.Instance,
                     PartTypeEnum.CodeLine | PartTypeEnum.CodeBlock,
                     "🗎",
                     FreeAIr.Resources.Resources.Create_new_file_with_this_code_part,
@@ -237,6 +283,7 @@ namespace FreeAIr.UI.ViewModels
                 );
             AdditionalCommandContainer.AddAdditionalCommand(
                 new AdditionalCommand(
+                    FontSizePage.Instance,
                     PartTypeEnum.Image,
                     "📋",
                     FreeAIr.Resources.Resources.Click_to_copy_to_clipboard,
@@ -312,7 +359,7 @@ namespace FreeAIr.UI.ViewModels
                     break;
                 case PromptChangeKindEnum.AnswerUpdated:
                     {
-                        var replic = Dialog.FirstOrDefault(d => ReferenceEquals(d.Prompt, prompt) && !d.IsPrompt);
+                        var replic = Dialog.FirstOrDefault(r => r.IsSameTag(prompt) && !r.IsPrompt);
                         if (replic is not null)
                         {
                             replic.Update(
@@ -359,13 +406,14 @@ namespace FreeAIr.UI.ViewModels
         private readonly ICommand? _actionCommand;
 
         public ChatContextMenuAdditionalCommand(
+            IFontSizeProvider fontSizeProvider,
             Func<Chat?> chatFunc,
             PartTypeEnum partType,
             string title,
             string toolTip,
             ICommand? actionCommand,
             Brush? foreground
-            ) : base(partType, title, toolTip, null, foreground)
+            ) : base(fontSizeProvider, partType, title, toolTip, null, foreground)
         {
             if (chatFunc is null)
             {

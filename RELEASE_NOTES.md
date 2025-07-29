@@ -6,6 +6,11 @@ Please report any bugs to the [github repo](https://github.com/lsoft/FreeAIr).
 
 If you are enjoying FreeAIr to the enough level to donate, there are many [small cancer patients](https://advitausa.org/au/index.php/donate/) that need your help. Please provide your help them!
 
+## 3.5.0
+
+- Improved markdown parser.
+- Added ability to collapse XML nodes in LLM answers.
+
 ## 3.4.0
 
 - Added NLOs into solution item metadata for GetAllSolutionItemsTool MCP tool. This is helpful if you are using LLM to make decisions about your solution structure (where to add new entity, etc.).

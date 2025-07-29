@@ -1,17 +1,14 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Windows.Controls;
+﻿using MarkdownParser.Antlr.Answer.Parts;
 using System.Windows.Documents;
-using System.Windows.Input;
 
-namespace FreeAIr.Antlr.Answer
+namespace MarkdownParser.Antlr.Answer
 {
     public sealed class ParsedAnswer : IParsedAnswer
     {
         private readonly object _locker = new();
 
         private readonly List<Block> _blocks = new();
-
+        private readonly IFontSizeProvider _fontSizeProvider;
         private FlowDocument? _flowDocument;
 
         private Block _lastBlock => _blocks.Last();
@@ -19,11 +16,23 @@ namespace FreeAIr.Antlr.Answer
         public IReadOnlyList<Block> Blocks => _blocks;
 
 
+        public ParsedAnswer(
+            IFontSizeProvider fontSizeProvider
+            )
+        {
+            if (fontSizeProvider is null)
+            {
+                throw new ArgumentNullException(nameof(fontSizeProvider));
+            }
+
+            _fontSizeProvider = fontSizeProvider;
+        }
+
         #region adding a block
 
         public void CreateBlock()
         {
-            _blocks.Add(new Block());
+            _blocks.Add(new Block(_fontSizeProvider));
         }
 
 

@@ -1,0 +1,26 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net48</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <LangVersion>Latest</LangVersion>
+    <UseWPF>true</UseWPF>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Antlr4.Runtime.Standard" />
+    <PackageReference Include="Antlr4BuildTasks" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Antlr4 Include="Antlr\Answer\AnswerMarkdown.g4">
+      <Generator>MSBuild:Compile</Generator>
+    </Antlr4>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\WpfHelpers\WpfHelpers.csproj" />
+  </ItemGroup>
+
+</Project>

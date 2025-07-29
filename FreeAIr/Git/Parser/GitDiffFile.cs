@@ -1,5 +1,4 @@
 ﻿using DiffPatch.Data;
-using FreeAIr.Shared.Helper;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;

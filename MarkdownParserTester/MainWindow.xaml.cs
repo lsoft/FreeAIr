@@ -1,0 +1,170 @@
+﻿using MarkdownParser.Antlr.Answer;
+using MarkdownParser.Antlr.Answer.Parts;
+using System.Windows;
+using WpfHelpers;
+using static MarkdownParser.UI.Dialog.DialogControl;
+
+namespace MarkdownParserTester
+{
+    /// <summary>
+    /// Interaction logic for MainWindow.xaml
+    /// </summary>
+    public partial class MainWindow : Window
+    {
+        public ObservableCollection2<Replic> Dialog
+        {
+            get;
+        } = new();
+
+        public AdditionalCommandContainer AdditionalCommandContainer
+        {
+            get;
+        } = new();
+
+        public MainWindow()
+        {
+            InitializeComponent();
+        }
+
+        private void MainWindowName_Loaded(object sender, RoutedEventArgs e)
+        {
+            AdditionalCommandContainer.AddAdditionalCommand(
+                new AdditionalCommand(
+                    ConstantFontSizeProvider.Instance,
+                    PartTypeEnum.Xml,
+                    "⤢",
+                    "Expand-Collapse",
+                    new RelayCommand(
+                        a =>
+                        {
+                            var xmlNodePart = a as XmlNodePart;
+                            if (xmlNodePart is null)
+                            {
+                                return;
+                            }
+
+                            xmlNodePart.ExpandOrCollapse();
+                        }),
+                    null
+                    )
+                );
+            AdditionalCommandContainer.AddAdditionalCommand(
+                new AdditionalCommand(
+                    ConstantFontSizeProvider.Instance,
+                    PartTypeEnum.Xml,
+                    "📋",
+                    "Click to copy to clipboard",
+                    new RelayCommand(
+                        a =>
+                        {
+                            var xmlNodePart = a as XmlNodePart;
+                            if (xmlNodePart is null)
+                            {
+                                return;
+                            }
+
+                            if (!string.IsNullOrEmpty(xmlNodePart.Body))
+                            {
+                                Clipboard.SetText(xmlNodePart.Body);
+                            }
+                        }),
+                    null
+                    )
+                );
+            AdditionalCommandContainer.AddAdditionalCommand(
+                new AdditionalCommand(
+                    ConstantFontSizeProvider.Instance,
+                    PartTypeEnum.CodeLine | PartTypeEnum.CodeBlock | PartTypeEnum.Url,
+                    "📋",
+                    "Click to copy to clipboard",
+                    new RelayCommand(
+                        a =>
+                        {
+                            var code = a as string;
+                            if (!string.IsNullOrEmpty(code))
+                            {
+                                Clipboard.SetText(code);
+                            }
+                        }),
+                    null
+                    )
+                );
+
+            var answerParser = new DirectAnswerParser(
+                ConstantFontSizeProvider.Instance
+                );
+
+
+            var parsedAnswer = answerParser.Parse(
+"""
+<mynode>One line xml node!</mynode>
+
+and the multiline:
+
+<think>
+Multi
+    line
+        thinking
+Wait, this is
+    a fake LLM
+                chat!
+</think>
+
+# Heading 1
+## Heading 2
+### Heading 3
+#### Heading 4
+##### Heading 5
+###### Heading 6
+
+Just a regular text with `codeblock with a space` and [link](https://github.com/lsoft) .
+
+![image](https://avatars.githubusercontent.com/u/5988558 "The author himself") .
+
+```
+        Unknown
+    multiline
+codeblock
+```
+
+and
+
+```csharp
+CSharp
+    multiline
+        codeblock
+```
+
+-------
+
+And here is:
+
+> quotation line 1
+> quotation line 2
+> quotation line 3
+
+heh!
+
+
+<think>
+s => s
+</think>
+
+This is all, folks!
+
+"""
+                );
+
+
+            Dialog.Add(
+                new Replic(
+                    parsedAnswer: parsedAnswer,
+                    tag: null,
+                    isPrompt: true,
+                    acc: AdditionalCommandContainer,
+                    inProgress: false
+                    )
+                );
+        }
+    }
+}

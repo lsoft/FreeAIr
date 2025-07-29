@@ -1,9 +1,9 @@
 ﻿using Antlr4.Runtime;
 using Antlr4.Runtime.Tree;
-using System;
+using MarkdownParser.Antlr.Answer.Parts;
 using System.ComponentModel.Composition;
 
-namespace FreeAIr.Antlr.Answer
+namespace MarkdownParser.Antlr.Answer
 {
     public interface IAnswerParser
     {
@@ -11,6 +11,7 @@ namespace FreeAIr.Antlr.Answer
     }
 
     [Export(typeof(IAnswerParser))]
+    [Export(typeof(CachedAnswerParser))]
     public sealed class CachedAnswerParser : IAnswerParser
     {
         private readonly object _locker = new();
@@ -51,6 +52,21 @@ namespace FreeAIr.Antlr.Answer
     [Export(typeof(DirectAnswerParser))]
     public sealed class DirectAnswerParser : IAnswerParser
     {
+        private readonly IFontSizeProvider _fontSizeProvider;
+
+        [ImportingConstructor]
+        public DirectAnswerParser(
+            IFontSizeProvider fontSizeProvider
+            )
+        {
+            if (fontSizeProvider is null)
+            {
+                throw new ArgumentNullException(nameof(fontSizeProvider));
+            }
+
+            _fontSizeProvider = fontSizeProvider;
+        }
+
         public IParsedAnswer Parse(string text)
         {
             if (text is null)
@@ -58,7 +74,9 @@ namespace FreeAIr.Antlr.Answer
                 throw new ArgumentNullException(nameof(text));
             }
 
-            var answer = new ParsedAnswer();
+            var answer = new ParsedAnswer(
+                _fontSizeProvider
+                );
 
             if (!GetMarkdownRepresentationSafely(answer, text))
             {

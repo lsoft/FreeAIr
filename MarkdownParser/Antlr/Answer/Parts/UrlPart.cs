@@ -1,12 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Windows.Documents;
+using System.Windows.Input;
 
-namespace FreeAIr.Antlr.Answer.Parts
+namespace MarkdownParser.Antlr.Answer.Parts
 {
     public sealed class UrlPart : IPart
     {
+        private readonly IFontSizeProvider _fontSizeProvider;
+
         public PartTypeEnum Type => PartTypeEnum.Url;
 
         public string Text
@@ -30,12 +31,18 @@ namespace FreeAIr.Antlr.Answer.Parts
         }
 
         public UrlPart(
+            IFontSizeProvider fontSizeProvider,
             string text,
             string description,
             string link,
             string title
             )
         {
+            if (fontSizeProvider is null)
+            {
+                throw new ArgumentNullException(nameof(fontSizeProvider));
+            }
+
             if (text is null)
             {
                 throw new ArgumentNullException(nameof(text));
@@ -56,6 +63,7 @@ namespace FreeAIr.Antlr.Answer.Parts
                 throw new ArgumentNullException(nameof(title));
             }
 
+            _fontSizeProvider = fontSizeProvider;
             Text = text;
             Description = description;
             Link = link;
@@ -75,12 +83,15 @@ namespace FreeAIr.Antlr.Answer.Parts
                 new Run(Description)
                 )
             {
-                FontSize = FontSizePage.Instance.TextSize,
+                FontSize = _fontSizeProvider.TextSize,
                 NavigateUri = uri,
                 ToolTip = Title
             };
-            hl.Click += (sender, e) =>
+            //PreviewMouseLeftButtonDown is to prevent FlowDocument scrolling when clicked
+            hl.PreviewMouseLeftButtonDown += (sender, e) =>
             {
+                e.Handled = true;
+
                 _ = Process.Start(
                     new ProcessStartInfo
                     {

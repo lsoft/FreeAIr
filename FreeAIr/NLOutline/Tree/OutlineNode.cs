@@ -1,16 +1,8 @@
-﻿using Community.VisualStudio.Toolkit;
-using FreeAIr.Embedding;
-using FreeAIr.Embedding.Json;
-using FreeAIr.Helper;
+﻿using FreeAIr.Embedding.Json;
 using FreeAIr.NLOutline.Json;
-using FreeAIr.Shared.Helper;
-using Microsoft.VisualStudio.PlatformUI;
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
-using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace FreeAIr.NLOutline.Tree

@@ -2,7 +2,6 @@
 using EnvDTE;
 using EnvDTE80;
 using FreeAIr.McpServerProxy;
-using FreeAIr.MCP.McpServerProxy.External;
 using System.IO;
 using System.IO.Compression;
 using System.Net.Http;

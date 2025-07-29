@@ -1,10 +1,7 @@
-﻿using Community.VisualStudio.Toolkit;
-using FreeAIr.BLogic.Context.Item;
+﻿using FreeAIr.BLogic.Context.Item;
 using FreeAIr.BuildErrors;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace FreeAIr.Options2.Support

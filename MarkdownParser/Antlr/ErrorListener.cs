@@ -1,7 +1,7 @@
 ﻿using Antlr4.Runtime;
 using System.IO;
 
-namespace FreeAIr.Antlr
+namespace MarkdownParser.Antlr
 {
     public class ErrorListener<S> : ConsoleErrorListener<S>
     {

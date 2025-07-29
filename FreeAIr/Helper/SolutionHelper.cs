@@ -1,5 +1,4 @@
-﻿using FreeAIr.BLogic.Context.Item;
-using FreeAIr.Shared.Helper;
+﻿using FreeAIr.Shared.Helper;
 using FreeAIr.UI.Embedillo.Answer.Parser;
 using Microsoft.Internal.VisualStudio.PlatformUI;
 using Microsoft.VisualStudio.Shell.Interop;

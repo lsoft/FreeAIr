@@ -1,11 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Windows.Documents;
+﻿using System.Windows.Documents;
 
-namespace FreeAIr.Antlr.Answer.Parts
+namespace MarkdownParser.Antlr.Answer.Parts
 {
     public sealed class HeaderPart : IPart
     {
+        private readonly IFontSizeProvider _fontSizeProvider;
+
         public PartTypeEnum Type => PartTypeEnum.Header;
 
         public int Level
@@ -23,15 +23,22 @@ namespace FreeAIr.Antlr.Answer.Parts
         }
 
         public HeaderPart(
+            IFontSizeProvider fontSizeProvider,
             int level,
             string header
             )
         {
+            if (fontSizeProvider is null)
+            {
+                throw new ArgumentNullException(nameof(fontSizeProvider));
+            }
+
             if (header is null)
             {
                 throw new ArgumentNullException(nameof(header));
             }
 
+            _fontSizeProvider = fontSizeProvider;
             Level = level;
             Text = header;
             Header = header.TrimStart('#');
@@ -52,7 +59,7 @@ namespace FreeAIr.Antlr.Answer.Parts
 
             yield return new Run
             {
-                FontSize = FontSizePage.Instance.GetHeaderFontSize(level),
+                FontSize = _fontSizeProvider.GetHeaderFontSize(level),
                 Text = Header
             };
         }

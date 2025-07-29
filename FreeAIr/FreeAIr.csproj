@@ -46,7 +46,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="Antlr\Answer\IParsedAnswer.cs" />
+    <Compile Include="Antlr\Prompt\PromptParser.cs" />
     <Compile Include="BLogic\Context\Item\SimpleTextChatContextItem.cs" />
     <Compile Include="Commands\ApplySupportCommand.cs" />
     <Compile Include="Commands\File\ApplyFileSupportCommand.cs" />
@@ -56,26 +56,9 @@
     <Compile Include="Helper\UriHelper.cs" />
     <Compile Include="Options2\Agent\AgentJson.cs" />
     <Compile Include="Options2\Agent\AgentCollectionJson.cs" />
-    <Compile Include="Antlr\Answer\AdditionalCommand.cs" />
-    <Compile Include="Antlr\Answer\AnswerMarkdownListener.cs" />
-    <Compile Include="Antlr\Answer\AnswerParser.cs" />
-    <Compile Include="Antlr\Answer\Block.cs" />
-    <Compile Include="Antlr\Answer\BlockTypeEnum.cs" />
-    <Compile Include="Antlr\Answer\ParsedAnswer.cs" />
-    <Compile Include="Antlr\Answer\Parts\CodeBlockPart.cs" />
-    <Compile Include="Antlr\Answer\Parts\CodeLinePart.cs" />
-    <Compile Include="Antlr\Answer\Parts\HeaderPart.cs" />
-    <Compile Include="Antlr\Answer\Parts\ImagePart.cs" />
-    <Compile Include="Antlr\Answer\Parts\IPart.cs" />
-    <Compile Include="Antlr\Answer\Parts\PartTypeEnum.cs" />
-    <Compile Include="Antlr\Answer\Parts\TextPart.cs" />
-    <Compile Include="Antlr\Answer\Parts\UrlPart.cs" />
-    <Compile Include="Antlr\Answer\Parts\XmlNodePart.cs" />
     <Compile Include="Antlr\Context\ContextParser.cs" />
-    <Compile Include="Antlr\ErrorListener.cs" />
     <Compile Include="Antlr\IParser.cs" />
     <Compile Include="Antlr\MarkdownListener.cs" />
-    <Compile Include="Antlr\Prompt\PromptParser.cs" />
     <Compile Include="BLogic\Chat.cs" />
     <Compile Include="BLogic\ChatContainer.cs" />
     <Compile Include="BLogic\ChatDescription.cs" />
@@ -142,7 +125,6 @@
     <Compile Include="Helper\RegExHelper.cs" />
     <Compile Include="Helper\ResourceHelper.cs" />
     <Compile Include="Helper\RoslynHelper.cs" />
-    <Compile Include="Helper\ScrollHelper.cs" />
     <Compile Include="Helper\SolutionHelper.cs" />
     <Compile Include="Helper\StringHelper.cs" />
     <Compile Include="Helper\TextDescriptorHelper.cs" />
@@ -223,9 +205,6 @@
     <Compile Include="UI\CodeLens\ViewElementFactory.cs" />
     <Compile Include="UI\CombinedParameterConverter.cs" />
     <Compile Include="UI\Converters.cs" />
-    <Compile Include="UI\Dialog\DialogControl.xaml.cs">
-      <DependentUpon>DialogControl.xaml</DependentUpon>
-    </Compile>
     <Compile Include="UI\Embedillo\Answer\Parser\CommandAnswerPart.cs" />
     <Compile Include="UI\Embedillo\Answer\Parser\IParsedPart.cs" />
     <Compile Include="UI\Embedillo\Answer\Parser\Parsed.cs" />
@@ -337,9 +316,6 @@
       <Link>RELEASE_NOTES.md</Link>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
-    <Antlr4 Include="Antlr\Answer\AnswerMarkdown.g4">
-      <Generator>MSBuild:Compile</Generator>
-    </Antlr4>
     <None Include="source.extension.vsixmanifest">
       <SubType>Designer</SubType>
       <Generator>VsixManifestGenerator</Generator>
@@ -422,6 +398,12 @@
       <Project>{12fb1b96-34e8-7f37-782d-4e07363c95d9}</Project>
       <Name>FreeAIr.CodeLens</Name>
     </ProjectReference>
+    <ProjectReference Include="..\MarkdownParser\MarkdownParser.csproj">
+      <Project>{4a1cbebc-86ac-43c4-9704-4f339b9ab910}</Project>
+      <Name>MarkdownParser</Name>
+      <IncludeOutputGroupsInVSIX>BuiltProjectOutputGroup%3bBuiltProjectOutputGroupDependencies%3bGetCopyToOutputDirectoryItems%3bSatelliteDllsProjectOutputGroup%3b</IncludeOutputGroupsInVSIX>
+      <IncludeOutputGroupsInVSIXLocalOnly>DebugSymbolsProjectOutputGroup%3b</IncludeOutputGroupsInVSIXLocalOnly>
+    </ProjectReference>
     <ProjectReference Include="..\MCP\Dto\Dto.csproj">
       <Project>{2F2E14EA-0DB3-1CC8-B8A2-D6C94D74026B}</Project>
       <Name>Dto</Name>
@@ -442,10 +424,6 @@
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <Page Include="UI\CodeLens\CodeLenseUserControl.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="UI\Dialog\DialogControl.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

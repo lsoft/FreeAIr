@@ -1,14 +1,7 @@
 ﻿using FreeAIr.Options2.Agent;
 using FreeAIr.Options2.Support;
-using FreeAIr.Shared.Helper;
 using FreeAIr.UI.ContextMenu;
-using FreeAIr.UI.ToolWindows;
 using FreeAIr.UI.ViewModels;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace FreeAIr.Find
 {

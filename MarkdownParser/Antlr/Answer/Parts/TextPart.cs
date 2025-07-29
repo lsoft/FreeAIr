@@ -1,27 +1,33 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Windows.Documents;
+﻿using System.Windows.Documents;
 
-namespace FreeAIr.Antlr.Answer.Parts
+namespace MarkdownParser.Antlr.Answer.Parts
 {
     public sealed class TextPart : IPart
     {
         private List<string> _text;
+        private readonly IFontSizeProvider _fontSizeProvider;
 
         public PartTypeEnum Type => PartTypeEnum.Text;
 
         public string Text => string.Join("", _text);
 
         public TextPart(
+            IFontSizeProvider fontSizeProvider,
             string text
             )
         {
+            if (fontSizeProvider is null)
+            {
+                throw new ArgumentNullException(nameof(fontSizeProvider));
+            }
+
             if (text is null)
             {
                 throw new ArgumentNullException(nameof(text));
             }
 
             _text = [text];
+            _fontSizeProvider = fontSizeProvider;
         }
 
         public void Append(string text)
@@ -43,7 +49,7 @@ namespace FreeAIr.Antlr.Answer.Parts
         {
             yield return new Run
             {
-                FontSize = FontSizePage.Instance.TextSize,
+                FontSize = _fontSizeProvider.TextSize,
                 Text = Text
             };
         }

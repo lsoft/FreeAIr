@@ -1,7 +1,6 @@
-﻿using System.Collections.Generic;
-using System.Windows.Documents;
+﻿using System.Windows.Documents;
 
-namespace FreeAIr.Antlr.Answer.Parts
+namespace MarkdownParser.Antlr.Answer.Parts
 {
     public interface IPart
     {

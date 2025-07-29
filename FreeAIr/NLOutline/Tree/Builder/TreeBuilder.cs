@@ -1,14 +1,9 @@
 ﻿using FreeAIr.Options2.Agent;
-using FreeAIr.BLogic;
-using FreeAIr.Embedding;
-using FreeAIr.Embedding.Json;
 using FreeAIr.Helper;
 using FreeAIr.NLOutline.Tree.Builder.File;
 using Microsoft.VisualStudio.ComponentModelHost;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using FreeAIr.Options2.Support;

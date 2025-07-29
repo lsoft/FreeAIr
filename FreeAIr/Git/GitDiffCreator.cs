@@ -1,11 +1,6 @@
 ﻿using FreeAIr.BLogic;
 using FreeAIr.Git.Parser;
 using FreeAIr.UI.Windows;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 
 namespace FreeAIr.Git

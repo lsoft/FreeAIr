@@ -1,13 +1,5 @@
-﻿using FreeAIr.Commands.Other;
-using FreeAIr.Options2;
-using FreeAIr.Options2.Agent;
+﻿using FreeAIr.Options2.Agent;
 using FreeAIr.UI.ContextMenu;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using WpfHelpers;

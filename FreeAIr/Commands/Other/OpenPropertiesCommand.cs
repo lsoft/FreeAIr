@@ -1,6 +1,4 @@
-﻿using FreeAIr.Helper;
-
-namespace FreeAIr.Commands.Other
+﻿namespace FreeAIr.Commands.Other
 {
     [Command(PackageIds.OpenPropertiesCommandId)]
     internal sealed class OpenPropertiesCommand : BaseCommand<OpenPropertiesCommand>

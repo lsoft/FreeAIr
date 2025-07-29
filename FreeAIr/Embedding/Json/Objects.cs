@@ -1,5 +1,4 @@
-﻿using FreeAIr.Git;
-using FreeAIr.Helper;
+﻿using FreeAIr.Helper;
 using FreeAIr.NLOutline.Json;
 using FreeAIr.NLOutline.Tree;
 using System.Collections.Generic;

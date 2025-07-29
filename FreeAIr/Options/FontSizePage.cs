@@ -1,9 +1,11 @@
-﻿using System.ComponentModel;
+﻿using MarkdownParser.Antlr.Answer.Parts;
+using System.ComponentModel;
+using System.ComponentModel.Composition;
 
 namespace FreeAIr
 {
     [Browsable(false)]
-    public class FontSizePage : BaseOptionModel<FontSizePage>
+    public class FontSizePage : BaseOptionModel<FontSizePage>, IFontSizeProvider
     {
 
         [Category("Context buttons font sizes")]
@@ -115,4 +117,20 @@ namespace FreeAIr
         #endregion
     }
 
+    [Export(typeof(IFontSizeProvider))]
+    public sealed class FontSizeProxy : IFontSizeProvider
+    {
+        public int ContextButtonSize => FontSizePage.Instance.ContextButtonSize;
+
+        public int CodeBlockSize => FontSizePage.Instance.CodeBlockSize;
+
+        public int CodeLineSize => FontSizePage.Instance.CodeLineSize;
+
+        public int TextSize => FontSizePage.Instance.TextSize;
+
+        public int GetHeaderFontSize(int level)
+        {
+            return FontSizePage.Instance.GetHeaderFontSize(level);
+        }
+    }
 }

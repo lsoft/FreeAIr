@@ -1,6 +1,4 @@
-﻿using EnvDTE;
-using FreeAIr.BLogic;
-using FreeAIr.Helper;
+﻿using FreeAIr.Helper;
 using FreeAIr.Options2;
 using FreeAIr.Options2.Support;
 using FreeAIr.UI.Embedillo.Answer.Parser;

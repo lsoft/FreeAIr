@@ -1,10 +1,7 @@
-﻿using FreeAIr.Antlr.Answer;
-using FreeAIr.BLogic;
-using FreeAIr.Helper;
+﻿using MarkdownParser.Antlr.Answer;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
-using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
@@ -12,7 +9,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using WpfHelpers;
 
-namespace FreeAIr.UI.Dialog
+namespace MarkdownParser.UI.Dialog
 {
     public partial class DialogControl : UserControl
     {
@@ -216,10 +213,12 @@ namespace FreeAIr.UI.Dialog
                 get;
                 private set;
             }
-            public UserPrompt Prompt
+
+            public object Tag
             {
                 get;
             }
+
             public bool IsPrompt
             {
                 get;
@@ -248,7 +247,7 @@ namespace FreeAIr.UI.Dialog
 
             public Replic(
                 IParsedAnswer parsedAnswer,
-                UserPrompt prompt,
+                object tag,
                 bool isPrompt,
                 AdditionalCommandContainer? acc,
                 bool inProgress
@@ -256,11 +255,32 @@ namespace FreeAIr.UI.Dialog
             {
                 _acc = acc;
                 ParsedAnswer = parsedAnswer;
-                Prompt = prompt;
+                Tag = tag;
                 IsPrompt = isPrompt;
                 HorizontalAlignment = isPrompt ? HorizontalAlignment.Right : HorizontalAlignment.Left;
                 BorderThickness = isPrompt ? new Thickness(1, 1, 10, 1) : new Thickness(10, 1, 1, 1);
                 Document = parsedAnswer.ConvertToFlowDocument(_acc, inProgress);
+            }
+
+            public bool IsSameTag(object tag)
+            {
+                if (Tag is null && tag is null)
+                {
+                    return true;
+                }
+                if (tag is null && Tag is not null)
+                {
+                    return false;
+                }
+                if (Tag is null && tag is not null)
+                {
+                    return false;
+                }
+
+                return
+                    ReferenceEquals(Tag, tag)
+                    && Tag.GetType() == tag.GetType()
+                    ;
             }
 
             public void Update(

@@ -2,7 +2,6 @@
 using FreeAIr.Options2;
 using FreeAIr.Options2.Agent;
 using FreeAIr.Shared.Helper;
-using Microsoft.VisualStudio.Debugger.Interop;
 using System.ComponentModel.Composition;
 using System.Linq;
 using System.Net.Http;

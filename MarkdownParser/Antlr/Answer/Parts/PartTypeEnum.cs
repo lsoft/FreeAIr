@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace FreeAIr.Antlr.Answer.Parts
+﻿namespace MarkdownParser.Antlr.Answer.Parts
 {
     [Flags]
     public enum PartTypeEnum

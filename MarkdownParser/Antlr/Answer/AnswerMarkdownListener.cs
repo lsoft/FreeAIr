@@ -1,14 +1,10 @@
 ﻿using Antlr4.Runtime.Misc;
-using System;
-using System.Drawing;
-using System.Linq;
 using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
-using static System.Net.Mime.MediaTypeNames;
 
-namespace FreeAIr.Antlr.Answer
+namespace MarkdownParser.Antlr.Answer
 {
     public class AnswerMarkdownListener : AnswerMarkdownBaseListener
     {
@@ -66,7 +62,6 @@ namespace FreeAIr.Antlr.Answer
             };
 
             var bc = new BlockUIContainer(border);
-            //bc.BaselineAlignment = BaselineAlignment.Center;
 
             _answer.SetBlockType(
                 BlockTypeEnum.HorizontalRule,

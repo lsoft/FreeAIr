@@ -1,9 +1,6 @@
 ﻿using FreeAIr.Options2.Agent;
-using FreeAIr.MCP.McpServerProxy;
-using FreeAIr.Shared.Helper;
 using FreeAIr.UI.NestedCheckBox;
 using FreeAIr.UI.Windows;
-using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Input;
 using WpfHelpers;

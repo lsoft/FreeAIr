@@ -2,7 +2,6 @@
 using FreeAIr.Helper;
 using FreeAIr.Options2;
 using FreeAIr.Options2.Support;
-using FreeAIr.UI.Embedillo.Answer.Parser;
 using Microsoft.VisualStudio.ComponentModelHost;
 using Microsoft.VisualStudio.Language.Intellisense;
 using Microsoft.VisualStudio.Language.Intellisense.AsyncCompletion;
@@ -13,7 +12,6 @@ using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Utilities;
 using System.ComponentModel.Composition;
-using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading;

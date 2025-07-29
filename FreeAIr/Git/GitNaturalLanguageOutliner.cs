@@ -1,18 +1,9 @@
-﻿using FreeAIr.BLogic;
-using FreeAIr.BLogic.Context.Item;
-using FreeAIr.Commands.File;
-using FreeAIr.Git.Parser;
+﻿using FreeAIr.BLogic.Context.Item;
 using FreeAIr.Helper;
-using FreeAIr.NLOutline;
-using FreeAIr.Options2;
-using FreeAIr.Options2.Agent;
 using FreeAIr.Options2.Support;
-using FreeAIr.Shared.Helper;
 using FreeAIr.UI.ContextMenu;
 using FreeAIr.UI.ViewModels;
-using FreeAIr.UI.Windows;
 using System.Collections.Generic;
-using System.Windows;
 
 namespace FreeAIr.Git
 {

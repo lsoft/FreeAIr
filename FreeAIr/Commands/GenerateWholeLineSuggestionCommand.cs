@@ -1,7 +1,6 @@
 ﻿using EnvDTE;
 using FreeAIr.BLogic;
 using FreeAIr.Helper;
-using FreeAIr.Options2;
 
 namespace FreeAIr.Commands
 {

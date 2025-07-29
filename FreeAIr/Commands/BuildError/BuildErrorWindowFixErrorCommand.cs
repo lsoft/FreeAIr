@@ -7,7 +7,6 @@ using FreeAIr.Options2.Support;
 using FreeAIr.UI.ContextMenu;
 using FreeAIr.UI.ToolWindows;
 using Microsoft.VisualStudio.ComponentModelHost;
-using System.IO;
 
 namespace FreeAIr.Commands.BuildError
 {

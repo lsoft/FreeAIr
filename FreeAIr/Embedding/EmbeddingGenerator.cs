@@ -1,16 +1,10 @@
 ﻿using FreeAIr.Options2.Agent;
-using FreeAIr.Embedding.Json;
 using FreeAIr.NLOutline.Tree;
-using FreeAIr.Shared.Helper;
 using OpenAI;
 using OpenAI.Embeddings;
-using System;
 using System.ClientModel;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace FreeAIr.Embedding
 {

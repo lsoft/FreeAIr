@@ -1,5 +1,4 @@
-﻿using FreeAIr.Options2;
-using FreeAIr.UI.ViewModels;
+﻿using FreeAIr.UI.ViewModels;
 using FreeAIr.UI.Windows;
 using System.Windows;
 

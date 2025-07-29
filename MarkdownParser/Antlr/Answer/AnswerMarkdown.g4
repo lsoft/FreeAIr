@@ -122,7 +122,7 @@ QUICK_LINK
   ;
 
 XML_BLOCK
-  : '<' XML_NODE_NAME '>' ~[<>]* '</' XML_NODE_NAME '>'
+  : '<' XML_NODE_NAME '>' .*? '</' XML_NODE_NAME '>'
   ;
 
 CODE_LINE
@@ -154,7 +154,7 @@ NOT_A_WHITESPACE_SYMBOL
   ;
 
 SYMBOL_FOR_XML_NODE
-  : ~[\\@/:.\t \r\n\u000C]
+  : ~[=<>\\@/:.\t \r\n\u000C]
   ;
 
 WHITESPACE

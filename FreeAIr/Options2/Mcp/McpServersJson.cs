@@ -1,9 +1,6 @@
 ﻿using FreeAIr.Shared.Helper;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace FreeAIr.Options2.Mcp
 {

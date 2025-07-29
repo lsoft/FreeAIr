@@ -1,7 +1,4 @@
-﻿using Dto;
-using System.Text.Json;
-
-namespace FreeAIr.MCP.McpServerProxy.External
+﻿namespace FreeAIr.MCP.McpServerProxy.External
 {
     //public static class ExternalMcpServersJsonParser
     //{

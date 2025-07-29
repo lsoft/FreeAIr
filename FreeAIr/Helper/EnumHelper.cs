@@ -1,6 +1,4 @@
 ﻿using FreeAIr.BLogic;
-using FreeAIr.Options2;
-using System.Threading.Tasks;
 
 namespace FreeAIr.Helper
 {

@@ -1,10 +1,7 @@
 ﻿using Dto;
 using FreeAIr.Options2;
 using FreeAIr.UI.Windows;
-using ICSharpCode.AvalonEdit.Search;
-using Microsoft.VisualStudio.PlatformUI;
 using Microsoft.VisualStudio.Shell.Interop;
-using Microsoft.VisualStudio.TextManager.Interop;
 using Microsoft.VisualStudio.Threading;
 using System.Collections.Generic;
 using System.Linq;
