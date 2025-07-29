@@ -751,13 +751,10 @@ namespace FreeAIr.UI.ViewModels
             }
 
             var jsonEmbeddingFilePath = await EmbeddingOutlineJsonObject.GenerateFilePathAsync();
-            var existingJson = await EmbeddingOutlineJsonObject.DeserializeAsync(
-                jsonEmbeddingFilePath
+            var existingOutlineRoot = await OutlineNode.CreateAsync(
+                jsonEmbeddingFilePath,
+                true
                 );
-            await existingJson.LoadEmbeddingsAsync();
-            await existingJson.LoadOutlinesAsync();
-            await existingJson.LoadOutlineTreeAsync();
-            var existingOutlineRoot = OutlineNode.Create(existingJson);
 
             return (checkedPaths, existingOutlineRoot);
         }

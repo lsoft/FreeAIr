@@ -157,6 +157,24 @@ namespace FreeAIr.NLOutline.Tree
             return result;
         }
 
+        public static async Task<OutlineNode?> CreateAsync(
+            string jsonEmbeddingFilePath,
+            bool full
+            )
+        {
+            if (jsonEmbeddingFilePath is null)
+            {
+                throw new ArgumentNullException(nameof(jsonEmbeddingFilePath));
+            }
+
+            var json = await EmbeddingOutlineJsonObject.DeserializeAsync(
+                jsonEmbeddingFilePath,
+                full
+                );
+            var outlineRoot = OutlineNode.Create(json);
+            return outlineRoot;
+        }
+
         public static OutlineNode? Create(
             EmbeddingOutlineJsonObject root
             )
@@ -180,6 +198,33 @@ namespace FreeAIr.NLOutline.Tree
             _children.Sort((a, b) => a.RelativePath.CompareTo(b.RelativePath));
         }
 
+        public T ApplyRecursive<T>(
+            Func<OutlineNode, T> action
+            ) where T : class
+        {
+            if (action is null)
+            {
+                throw new ArgumentNullException(nameof(action));
+            }
+
+            var r = action(this);
+            if (r is not null)
+            {
+                return r;
+            }
+
+            foreach (var child in Children)
+            {
+                r = child.ApplyRecursive(action);
+                if (r is not null)
+                {
+                    return r;
+                }
+            }
+
+            return null;
+        }
+
         public bool ApplyRecursive(
             Func<OutlineNode, bool> action
             )
@@ -197,10 +242,14 @@ namespace FreeAIr.NLOutline.Tree
 
             foreach (var child in Children)
             {
-                child.ApplyRecursive(action);
+                r = child.ApplyRecursive(action);
+                if (!r)
+                {
+                    return false;
+                }
             }
 
-            return true;
+            return false;
         }
 
         public void ApplyRecursive(

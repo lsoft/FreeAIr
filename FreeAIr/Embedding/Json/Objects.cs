@@ -115,6 +115,29 @@ namespace FreeAIr.Embedding.Json
                 );
         }
 
+        public static async Task<EmbeddingOutlineJsonObject> DeserializeAsync(
+            string filePath,
+            bool full
+            )
+        {
+            if (filePath is null)
+            {
+                throw new ArgumentNullException(nameof(filePath));
+            }
+
+            using var fs0 = new FileStream(filePath, FileMode.Open);
+            var result = await System.Text.Json.JsonSerializer.DeserializeAsync<EmbeddingOutlineJsonObject>(fs0);
+
+            if (full)
+            {
+                await result.LoadEmbeddingsAsync();
+                await result.LoadOutlinesAsync();
+                await result.LoadOutlineTreeAsync();
+            }
+
+            return result;
+        }
+
         public async Task LoadOutlinesAsync()
         {
             if (Outlines is not null)
@@ -148,54 +171,14 @@ namespace FreeAIr.Embedding.Json
             Embeddings = await EmbeddingsJsonObject.DeserializeAsync(eFilePath);
         }
 
-        public static async Task<EmbeddingOutlineJsonObject> DeserializeAsync(
-            string filePath
-            )
-        {
-            if (filePath is null)
-            {
-                throw new ArgumentNullException(nameof(filePath));
-            }
-
-            using var fs0 = new FileStream(filePath, FileMode.Open);
-            var result = await System.Text.Json.JsonSerializer.DeserializeAsync<EmbeddingOutlineJsonObject>(fs0);
-
-            return result;
-        }
-
-        public async Task DeserializeOutlineTreeAsync(
-            )
-        {
-            this.OutlineTree = await OutlineTreeJsonObject.DeserializeAsync(
-                GetOutlineTreeFileName()
-                );
-        }
-
         public void ClearOutlineTree()
         {
             this.OutlineTree = null;
         }
 
-        public async Task DeserializeOutlinesAsync(
-            )
-        {
-            this.Outlines = await OutlinesItselfJsonObject.DeserializeAsync(
-                GetOutlinesFileName()
-                );
-        }
-
         public void ClearOutlines()
         {
             this.Outlines = null;
-        }
-
-
-        public async Task DeserializeEmbeddingsAsync(
-            )
-        {
-            this.Embeddings = await EmbeddingsJsonObject.DeserializeAsync(
-                GetEmbeddingsFileName()
-                );
         }
 
         public void ClearEmbeddings()
