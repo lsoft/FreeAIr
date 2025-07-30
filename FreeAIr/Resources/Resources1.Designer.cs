@@ -1159,6 +1159,15 @@ namespace FreeAIr.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to New version of FreeAIr has been installed..
+        /// </summary>
+        public static string New_version_of_FreeAIr_has_been_installed {
+            get {
+                return ResourceManager.GetString("New_version_of_FreeAIr_has_been_installed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to NLO extract action:.
         /// </summary>
         public static string NLO_extract_action {

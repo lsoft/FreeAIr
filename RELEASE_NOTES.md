@@ -6,6 +6,11 @@ Please report any bugs to the [github repo](https://github.com/lsoft/FreeAIr).
 
 If you are enjoying FreeAIr to the enough level to donate, there are many [small cancer patients](https://advitausa.org/au/index.php/donate/) that need your help. Please provide your help them!
 
+## 3.6.0
+
+- Improved markdown parser (added bold text).
+- Fixed bugs in markdown parser.
+
 ## 3.5.0
 
 - Improved markdown parser.

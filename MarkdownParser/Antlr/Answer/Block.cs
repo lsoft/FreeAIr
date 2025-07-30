@@ -57,7 +57,7 @@ namespace MarkdownParser.Antlr.Answer
 
             var paragraph = new System.Windows.Documents.Paragraph
             {
-                Margin = new Thickness(10, 0, 0, 0),
+                Margin = new Thickness(10, 10, 0, 0),
             };
             ModifyParagraph(paragraph);
 
@@ -85,6 +85,12 @@ namespace MarkdownParser.Antlr.Answer
                 case BlockTypeEnum.Paragraph:
                     return;
                 case BlockTypeEnum.Blockquote:
+                    paragraph.Margin = new Thickness(
+                        paragraph.Margin.Left,
+                        0,
+                        paragraph.Margin.Right,
+                        paragraph.Margin.Bottom
+                        );
                     paragraph.Background = _semiTransparentGray;
                     paragraph.BorderBrush = Brushes.Green;
                     paragraph.BorderThickness = new Thickness(5, 0, 0, 0);

@@ -1,4 +1,6 @@
-﻿using Antlr4.Runtime.Misc;
+﻿using Antlr4.Runtime;
+using Antlr4.Runtime.Misc;
+using System.Diagnostics;
 using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
@@ -115,17 +117,36 @@ namespace MarkdownParser.Antlr.Answer
                 );
         }
 
+
+        //public override void EnterEveryRule([NotNull] ParserRuleContext context)
+        //{
+        //    Debug.WriteLine(context.GetText());
+        //}
+
+        public override void EnterPunctuation([NotNull] AnswerMarkdownParser.PunctuationContext context)
+        {
+            var text = context.GetText();
+
+            _answer.AddText(
+                text
+                );
+        }
+
         public override void EnterWord([NotNull] AnswerMarkdownParser.WordContext context)
         {
+            var text = context.GetText();
+
             _answer.AddText(
-                context.GetText()
+                text
                 );
         }
 
         public override void EnterWhitespace([NotNull] AnswerMarkdownParser.WhitespaceContext context)
         {
+            var text = context.GetText();
+
             _answer.AddText(
-                context.GetText()
+                text
                 );
         }
 
@@ -183,9 +204,11 @@ namespace MarkdownParser.Antlr.Answer
 
         public override void EnterH1([NotNull] AnswerMarkdownParser.H1Context context)
         {
+            var text = context.GetText();
+
             _answer.AddHeader(
                 1,
-                context.GetText()
+                text
                 );
         }
         public override void EnterH2([NotNull] AnswerMarkdownParser.H2Context context)

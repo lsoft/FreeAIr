@@ -860,4 +860,8 @@
     <value>FreeAIr support: build natural language outlines json file related to the diff below.</value>
     <comment>Used in FreeAIr\Git\GitWindowModifier.cs document</comment>
   </data>
+  <data name="New_version_of_FreeAIr_has_been_installed" xml:space="preserve">
+    <value>New version of FreeAIr has been installed.</value>
+    <comment>Used in FreeAIr\InfoBar\ReleaseNotesInfoBarService.cs document</comment>
+  </data>
 </root>

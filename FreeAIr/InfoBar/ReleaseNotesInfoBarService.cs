@@ -66,7 +66,7 @@ namespace FreeAIr.InfoBar
             return new InfoBarModel(
                 new InfoBarTextSpan[]
                 {
-                    new InfoBarTextSpan("New version of FreeAIr has been installed.")
+                    new InfoBarTextSpan(FreeAIr.Resources.Resources.New_version_of_FreeAIr_has_been_installed)
                 },
                 new InfoBarActionItem[]
                 {

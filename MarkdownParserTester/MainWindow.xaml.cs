@@ -89,7 +89,6 @@ namespace MarkdownParserTester
                     null
                     )
                 );
-
             var answerParser = new DirectAnswerParser(
                 ConstantFontSizeProvider.Instance
                 );
@@ -113,11 +112,14 @@ Wait, this is
 # Heading 1
 ## Heading 2
 ### Heading 3
+
+<https://ya.ru>
+
 #### Heading 4
 ##### Heading 5
 ###### Heading 6
 
-Just a regular text with `codeblock with a space` and [link](https://github.com/lsoft) .
+Just a **regular text** with `codeblock with a space` and [link to my profile](https://github.com/lsoft).
 
 ![image](https://avatars.githubusercontent.com/u/5988558 "The author himself") .
 
@@ -150,11 +152,59 @@ heh!
 s => s
 </think>
 
-This is all, folks!
+That's all, folks!
 
+""".Replace("\r\n", "\n")
+                );
+//*/
+
+            /*
+            var parsedAnswer = answerParser.Parse(
+"""
+aaa , b,
 """
                 );
+//*/
 
+/*
+            var parsedAnswer = answerParser.Parse(
+"""
+<think>
+dotnet run -r <path> -p <project> -- <args>
+</think>
+"""
+                );
+            //*/
+
+/*
+            var parsedAnswer = answerParser.Parse(
+"""
+not bolds at all
+
+fake **single bold
+
+**fake single bold
+
+fake single bold**
+
+**real** one bold
+
+real **one** bold
+
+real one **bold**
+
+**real one bold**
+
+**real** two bolds **yeah**
+
+**real** two **bolds** yeah
+
+real **two** bolds **yeah**
+
+fake **three** bolds **one** two **three and latest
+"""
+                );
+            //*/
 
             Dialog.Add(
                 new Replic(

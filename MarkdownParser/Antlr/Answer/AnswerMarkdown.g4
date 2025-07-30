@@ -1,7 +1,7 @@
 ﻿grammar AnswerMarkdown;
 
 markdownFile
-  : block+ EOF
+  : (block newline)+ EOF
   ;
 
 block
@@ -13,11 +13,10 @@ block
 paragraph
   : code_block
   | not_a_code_block
-  | newline
   ;
 
 blockquote
-  : BLOCKQUOTE_START sentence_without_newline* NEWLINE
+  : BLOCKQUOTE_START sentence*
   ;
   
 horizontal_rule
@@ -25,7 +24,7 @@ horizontal_rule
   ;
 
 newline
-  : NEWLINE
+  : NEWLINE_N
   ;
 
 code_block
@@ -47,30 +46,26 @@ heading
   ;
 
 h1
-  : '#' WHITESPACE+ WORD (WHITESPACE+ WORD)* NEWLINE?
+  : HEADER1_START WHITESPACE+ WORD (WHITESPACE+ WORD)* NEWLINE_N?
   ;
 h2
-  : '##' WHITESPACE+ WORD (WHITESPACE+ WORD)* NEWLINE?
+  : HEADER2_START WHITESPACE+ WORD (WHITESPACE+ WORD)* NEWLINE_N?
   ;
 h3
-  : '###' WHITESPACE+ WORD (WHITESPACE+ WORD)* NEWLINE?
+  : HEADER3_START WHITESPACE+ WORD (WHITESPACE+ WORD)* NEWLINE_N?
   ;
 h4
-  : '####' WHITESPACE+ WORD (WHITESPACE+ WORD)* NEWLINE?
+  : HEADER4_START WHITESPACE+ WORD (WHITESPACE+ WORD)* NEWLINE_N?
   ;
 h5
-  : '#####' WHITESPACE+ WORD (WHITESPACE+ WORD)* NEWLINE?
+  : HEADER5_START WHITESPACE+ WORD (WHITESPACE+ WORD)* NEWLINE_N?
   ;
 h6
-  : '######' WHITESPACE+ WORD (WHITESPACE+ WORD)* NEWLINE?
+  : HEADER6_START WHITESPACE+ WORD (WHITESPACE+ WORD)* NEWLINE_N?
   ;
 
 sentence
-  : sentence_without_newline NEWLINE?
-  ;
-
-sentence_without_newline
-  : (xml_block | code_line | quick_link | url | image | word | whitespace)+
+  : (xml_block | code_line | quick_link | url | image | word | punctuation | whitespace)+
   ;
 
 image
@@ -98,16 +93,28 @@ url
   ;
 
 word
-  : WORD
+  : WORD_SYMBOL+
+  ;
+
+punctuation
+  : PUNCTUATION
   ;
 
 
 // Lexer rules
 
+NEWLINE_N
+  : '\n'
+  ;
+
+NEWLINE_R
+  : '\r' -> skip
+  ;
+
 HORIZONTAL_RULE
-  : [ \t\r\n]* '-' ([ \t\r\n]* '-')+ ([ \t\r\n]* '-')+ [ \t\r\n]* NEWLINE
-  | [ \t\r\n]* '*' ([ \t\r\n]* '*')+ ([ \t\r\n]* '*')+ [ \t\r\n]* NEWLINE
-  | [ \t\r\n]* '_' ([ \t\r\n]* '_')+ ([ \t\r\n]* '_')+ [ \t\r\n]* NEWLINE
+  : [ \t\r\n]* '-' ([ \t\r\n]* '-')+ ([ \t\r\n]* '-')+ [ \t\r\n]* NEWLINE_N
+  | [ \t\r\n]* '*' ([ \t\r\n]* '*')+ ([ \t\r\n]* '*')+ [ \t\r\n]* NEWLINE_N
+  | [ \t\r\n]* '_' ([ \t\r\n]* '_')+ ([ \t\r\n]* '_')+ [ \t\r\n]* NEWLINE_N
   ;
 
 IMAGE
@@ -122,8 +129,9 @@ QUICK_LINK
   ;
 
 XML_BLOCK
-  : '<' XML_NODE_NAME '>' .*? '</' XML_NODE_NAME '>'
+  : '<' [\p{L}\p{N}_]+ '>' .*? '</' [\p{L}\p{N}_]+ '>'
   ;
+//интересный способ остановки { InputStream.LA(1) == '<' && InputStream.LA(2) == '/' }?
 
 CODE_LINE
   : '`' (~[\r\n`])+ '`'
@@ -137,30 +145,37 @@ URL
   : '[' ~[\]\r\n]+ ']'      '('      ~[)\r\n ]+        ([\t \u000C]+ '"' ~["]+ '"')?     ')'
   ;
 
+HEADER1_START
+  : {Column == 0}? '# '      // обязателен пробел после '#'
+  ;
+HEADER2_START
+  : {Column == 0}? '## '      // обязателен пробел после '#'
+  ;
+HEADER3_START
+  : {Column == 0}? '### '      // обязателен пробел после '#'
+  ;
+HEADER4_START
+  : {Column == 0}? '#### '      // обязателен пробел после '#'
+  ;
+HEADER5_START
+  : {Column == 0}? '##### '      // обязателен пробел после '#'
+  ;
+HEADER6_START
+  : {Column == 0}? '###### '      // обязателен пробел после '#'
+  ;
+
 BLOCKQUOTE_START
   : {Column == 0}? '> '      // обязателен пробел после '>'
   ;
 
-WORD
-  : NOT_A_WHITESPACE_SYMBOL+
+WORD_SYMBOL
+  : [\p{L}\p{N}_]
   ;
 
-XML_NODE_NAME
-  : SYMBOL_FOR_XML_NODE+
-  ;
-
-NOT_A_WHITESPACE_SYMBOL
-  : ~[\t \r\n\u000C]
-  ;
-
-SYMBOL_FOR_XML_NODE
-  : ~[=<>\\@/:.\t \r\n\u000C]
-  ;
+PUNCTUATION
+    : ~[\p{L}\p{N}_\t \u000C]
+    ;
 
 WHITESPACE
-  : [\t \u000C]
-  ;
-
-NEWLINE
-  : '\r'? '\n'
+  : [\p{Z}]
   ;

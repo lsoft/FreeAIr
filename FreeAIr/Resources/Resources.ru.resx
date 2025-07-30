@@ -705,4 +705,7 @@
   <data name="FreeAIr_support__build_natural_language" xml:space="preserve">
     <value>FreeAIr: извлечь NLO и сформировать NLO json файл для измененных файлов.</value>
   </data>
+  <data name="New_version_of_FreeAIr_has_been_installed" xml:space="preserve">
+    <value>Новая версия FreeAIr была установлена.</value>
+  </data>
 </root>
