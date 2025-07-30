@@ -8,7 +8,7 @@ If you are enjoying FreeAIr to the enough level to donate, there are many [small
 
 ## 3.6.0
 
-- Improved markdown parser (added bold text).
+- Improved markdown parser (added bold text, added support for markdown tables).
 - Fixed bugs in markdown parser.
 
 ## 3.5.0

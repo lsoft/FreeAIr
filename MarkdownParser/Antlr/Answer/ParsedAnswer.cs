@@ -1,20 +1,18 @@
-﻿using MarkdownParser.Antlr.Answer.Parts;
+﻿using MarkdownParser.Antlr.Answer.Blocks;
+using MarkdownParser.Antlr.Answer.Parts;
 using System.Windows.Documents;
 
 namespace MarkdownParser.Antlr.Answer
 {
-    public sealed class ParsedAnswer : IParsedAnswer
+    public sealed class ParsedAnswer
     {
         private readonly object _locker = new();
 
-        private readonly List<Block> _blocks = new();
+        private readonly List<IBlock> _blocks = new();
         private readonly IFontSizeProvider _fontSizeProvider;
         private FlowDocument? _flowDocument;
 
-        private Block _lastBlock => _blocks.Last();
-
-        public IReadOnlyList<Block> Blocks => _blocks;
-
+        public IReadOnlyList<IBlock> Blocks => _blocks;
 
         public ParsedAnswer(
             IFontSizeProvider fontSizeProvider
@@ -28,55 +26,183 @@ namespace MarkdownParser.Antlr.Answer
             _fontSizeProvider = fontSizeProvider;
         }
 
-        #region adding a block
+        #region adding a table
 
-        public void CreateBlock()
-        {
-            _blocks.Add(new Block(_fontSizeProvider));
-        }
-
-
-        public void SetBlockType(
-            BlockTypeEnum blockType,
-            BlockUIContainer? blockUIContainer
+        public void AddTableRow(
+            string row
             )
         {
-            _lastBlock.SetType(blockType, blockUIContainer);
+            var table = GetOrCreateTableBlock();
+            table.AddRow(row);
         }
+
+        private TableBlock GetOrCreateTableBlock(
+            )
+        {
+            TableBlock table;
+            if (_blocks.Count == 0)
+            {
+                table = new TableBlock(
+                    _fontSizeProvider
+                    );
+                _blocks.Add(table);
+            }
+            else
+            {
+                var lastBlock = _blocks[_blocks.Count - 1];
+                table = lastBlock as TableBlock;
+                if (table is null)
+                {
+                    table = new TableBlock(
+                        _fontSizeProvider
+                        );
+                    _blocks.Add(table);
+                }
+            }
+
+            return table;
+        }
+
+        #endregion
+
+        #region adding a horizontal rule
+
+        public void AddHorizontalRuleBlock(
+            BlockUIContainer blockUIContainer
+            )
+        {
+            _ = CreateHorizontalRuleBlock(blockUIContainer);
+        }
+
+        private HorizontalRuleBlock CreateHorizontalRuleBlock(
+            BlockUIContainer blockUIContainer
+            )
+        {
+            var block = new HorizontalRuleBlock(
+                blockUIContainer
+                );
+            _blocks.Add(block);
+
+            return block;
+        }
+
+        #endregion
+
+        #region adding a blockquote
+
+        public void AddBlockquoteBlock(
+            )
+        {
+            _ = CreateBlockquoteBlock();
+        }
+
+        private BlockquoteBlock CreateBlockquoteBlock()
+        {
+            var block = new BlockquoteBlock(
+                _fontSizeProvider
+                );
+            _blocks.Add(block);
+
+            return block;
+        }
+
+        #endregion
+
+        #region adding a paragraph
+
+        public void AddParagraphBlock(
+            )
+        {
+            _ = CreateParagraphBlock();
+        }
+
+        private ParagraphBlock CreateParagraphBlock()
+        {
+            var block = new ParagraphBlock(
+                _fontSizeProvider
+                );
+            _blocks.Add(block);
+
+            return block;
+        }
+
 
         public void AddText(string text)
         {
-            _lastBlock.AddText(text);
+            var lastBlock = GetTextualBlock();
+            if (lastBlock is null)
+            {
+                lastBlock = GetParagraphBlock();
+            }
+
+            lastBlock.AddText(text);
         }
 
         public void AddXmlNode(string text, string nodeName, string body)
         {
-            _lastBlock.AddXmlNode(text, nodeName, body);
+            var lastBlock = GetParagraphBlock();
+
+            lastBlock.AddXmlNode(text, nodeName, body);
         }
 
         public void AddUrl(string text, string description, string link, string title)
         {
-            _lastBlock.AddUrl(text, description, link, title);
+            var lastBlock = GetParagraphBlock();
+
+            lastBlock.AddUrl(text, description, link, title);
         }
 
         public void AddHeader(int headerLevel, string text)
         {
-            _lastBlock.AddHeader(headerLevel, text);
+            var lastBlock = GetParagraphBlock();
+
+            lastBlock.AddHeader(headerLevel, text);
         }
 
         public void AddCodeBlock(string text, string code)
         {
-            _lastBlock.AddCodeBlock(text, code);
+            var lastBlock = GetParagraphBlock();
+
+            lastBlock.AddCodeBlock(text, code);
         }
 
         public void AddCodeLine(string text)
         {
-            _lastBlock.AddCodeLine(text);
+            var lastBlock = GetParagraphBlock();
+
+            lastBlock.AddCodeLine(text);
         }
 
         public void AddImage(string text, string description, string link, string title)
         {
-            _lastBlock.AddImage(text, description, link, title);
+            var lastBlock = GetParagraphBlock();
+
+            lastBlock.AddImage(text, description, link, title);
+        }
+
+        private ITextualBlock? GetTextualBlock()
+        {
+            //if (_blocks.Count == 0)
+            //{
+            //    return null;
+            //}
+
+            var block = _blocks[_blocks.Count - 1] as ITextualBlock;
+            return block;
+        }
+
+        private ParagraphBlock GetParagraphBlock()
+        {
+            var block = _blocks[_blocks.Count - 1] as ParagraphBlock;
+            //if (block is null)
+            //{
+            //    block = new ParagraphBlock(
+            //        _fontSizeProvider
+            //        );
+            //    _blocks.Add(block);
+            //}
+
+            return block;
         }
 
         #endregion
@@ -103,15 +229,20 @@ namespace MarkdownParser.Antlr.Answer
 
             foreach (var block in Blocks)
             {
-                var paragraphBlock = block.CreateBlock(
+                var wpfBlock = block.CreateBlock(
                     acc,
                     isInProgress
                     );
+                if (wpfBlock is null)
+                {
+                    continue;
+                }
 
-                document.Blocks.Add(paragraphBlock);
+                document.Blocks.Add(wpfBlock);
             }
 
             return document;
         }
+
     }
 }

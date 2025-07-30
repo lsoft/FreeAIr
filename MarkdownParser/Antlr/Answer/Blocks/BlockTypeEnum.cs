@@ -1,9 +1,10 @@
-﻿namespace MarkdownParser.Antlr.Answer
+﻿namespace MarkdownParser.Antlr.Answer.Blocks
 {
     public enum BlockTypeEnum
     {
         Paragraph,
         Blockquote,
-        HorizontalRule
+        HorizontalRule,
+        Table
     }
 }

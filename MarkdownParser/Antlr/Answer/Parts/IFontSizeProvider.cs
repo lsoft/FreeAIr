@@ -22,6 +22,16 @@
             get;
         }
 
+        int TableHeaderSize
+        {
+            get;
+        }
+
+        int TableBodySize
+        {
+            get;
+        }
+
         int GetHeaderFontSize(int level);
     }
 
@@ -36,6 +46,10 @@
         public int CodeLineSize => 14;
 
         public int TextSize => 14;
+
+        public int TableHeaderSize => 18;
+
+        public int TableBodySize => 14;
 
         public int GetHeaderFontSize(int level)
         {

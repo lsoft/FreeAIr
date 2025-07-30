@@ -208,7 +208,7 @@ namespace MarkdownParser.UI.Dialog
             private readonly AdditionalCommandContainer? _acc;
             private FlowDocument _document;
 
-            public IParsedAnswer ParsedAnswer
+            public ParsedAnswer ParsedAnswer
             {
                 get;
                 private set;
@@ -246,7 +246,7 @@ namespace MarkdownParser.UI.Dialog
             }
 
             public Replic(
-                IParsedAnswer parsedAnswer,
+                ParsedAnswer parsedAnswer,
                 object tag,
                 bool isPrompt,
                 AdditionalCommandContainer? acc,
@@ -284,7 +284,7 @@ namespace MarkdownParser.UI.Dialog
             }
 
             public void Update(
-                IParsedAnswer parsedAnswer,
+                ParsedAnswer parsedAnswer,
                 bool inProgress
                 )
             {

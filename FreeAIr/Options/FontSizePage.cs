@@ -113,6 +113,23 @@ namespace FreeAIr
             }[level];
         }
 
+        [Category("Table sizes")]
+        [DisplayName("Table header size")]
+        [DefaultValue(14)]
+        public int TableHeaderSize
+        {
+            get;
+            set;
+        } = 14;
+
+        [Category("Table sizes")]
+        [DisplayName("Table body size")]
+        [DefaultValue(14)]
+        public int TableBodySize
+        {
+            get;
+            set;
+        } = 14;
 
         #endregion
     }
@@ -127,6 +144,10 @@ namespace FreeAIr
         public int CodeLineSize => FontSizePage.Instance.CodeLineSize;
 
         public int TextSize => FontSizePage.Instance.TextSize;
+
+        public int TableHeaderSize => FontSizePage.Instance.TableHeaderSize;
+
+        public int TableBodySize => FontSizePage.Instance.TableBodySize;
 
         public int GetHeaderFontSize(int level)
         {

@@ -1,5 +1,6 @@
 ﻿using Antlr4.Runtime;
 using Antlr4.Runtime.Misc;
+using MarkdownParser.Antlr.Answer.Blocks;
 using System.Diagnostics;
 using System.Text.RegularExpressions;
 using System.Windows;
@@ -37,19 +38,17 @@ namespace MarkdownParser.Antlr.Answer
             _answer = answer;
         }
 
-        public override void EnterBlock([NotNull] AnswerMarkdownParser.BlockContext context)
-        {
-            _answer.CreateBlock();
-        }
-
         public override void EnterBlockquote([NotNull] AnswerMarkdownParser.BlockquoteContext context)
         {
-            _answer.SetBlockType(
-                BlockTypeEnum.Blockquote,
-                null
-                );
+            _answer.AddBlockquoteBlock();
 
             base.EnterBlockquote(context);
+        }
+
+        public override void EnterTable_row([NotNull] AnswerMarkdownParser.Table_rowContext context)
+        {
+            var text = context.GetText();
+            _answer.AddTableRow(text);
         }
 
         public override void EnterHorizontal_rule([NotNull] AnswerMarkdownParser.Horizontal_ruleContext context)
@@ -65,10 +64,16 @@ namespace MarkdownParser.Antlr.Answer
 
             var bc = new BlockUIContainer(border);
 
-            _answer.SetBlockType(
-                BlockTypeEnum.HorizontalRule,
+            _answer.AddHorizontalRuleBlock(
                 bc
                 );
+        }
+
+        public override void EnterParagraph([NotNull] AnswerMarkdownParser.ParagraphContext context)
+        {
+            _answer.AddParagraphBlock();
+
+            base.EnterParagraph(context);
         }
 
         public override void EnterImage([NotNull] AnswerMarkdownParser.ImageContext context)
@@ -116,12 +121,6 @@ namespace MarkdownParser.Antlr.Answer
                 filtered
                 );
         }
-
-
-        //public override void EnterEveryRule([NotNull] ParserRuleContext context)
-        //{
-        //    Debug.WriteLine(context.GetText());
-        //}
 
         public override void EnterPunctuation([NotNull] AnswerMarkdownParser.PunctuationContext context)
         {

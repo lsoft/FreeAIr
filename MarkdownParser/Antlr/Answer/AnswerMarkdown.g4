@@ -8,11 +8,16 @@ block
   : paragraph
   | horizontal_rule
   | blockquote
+  | table_row
   ;
 
 paragraph
   : code_block
   | not_a_code_block
+  ;
+
+table_row
+  : TABLE_START (WORD_SYMBOL+ | PUNCTUATION+ | WHITESPACE+)+
   ;
 
 blockquote
@@ -143,6 +148,10 @@ CODE_BLOCK
 
 URL
   : '[' ~[\]\r\n]+ ']'      '('      ~[)\r\n ]+        ([\t \u000C]+ '"' ~["]+ '"')?     ')'
+  ;
+
+TABLE_START
+  : {Column == 0}? '|'
   ;
 
 HEADER1_START

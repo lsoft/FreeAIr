@@ -7,7 +7,7 @@ namespace MarkdownParser.Antlr.Answer
 {
     public interface IAnswerParser
     {
-        IParsedAnswer Parse(string text);
+        ParsedAnswer Parse(string text);
     }
 
     [Export(typeof(IAnswerParser))]
@@ -19,7 +19,7 @@ namespace MarkdownParser.Antlr.Answer
         private readonly DirectAnswerParser _answerParser;
 
         private string? _previousText;
-        private IParsedAnswer? _previousAnswer;
+        private ParsedAnswer? _previousAnswer;
 
         [ImportingConstructor]
         public CachedAnswerParser(
@@ -34,7 +34,7 @@ namespace MarkdownParser.Antlr.Answer
             _answerParser = answerParser;
         }
 
-        public IParsedAnswer Parse(string text)
+        public ParsedAnswer Parse(string text)
         {
             lock (_locker)
             {
@@ -67,7 +67,7 @@ namespace MarkdownParser.Antlr.Answer
             _fontSizeProvider = fontSizeProvider;
         }
 
-        public IParsedAnswer Parse(string text)
+        public ParsedAnswer Parse(string text)
         {
             if (text is null)
             {
@@ -101,7 +101,7 @@ namespace MarkdownParser.Antlr.Answer
                 throw new ArgumentNullException(nameof(text));
             }
 
-            answer.CreateBlock();
+            answer.AddParagraphBlock();
             answer.AddText(text);
         }
 

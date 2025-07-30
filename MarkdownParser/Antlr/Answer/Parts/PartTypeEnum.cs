@@ -9,6 +9,6 @@
         Header = 8,
         CodeBlock = 16,
         CodeLine = 32,
-        Image = 64,
+        Image = 64
     }
 }
