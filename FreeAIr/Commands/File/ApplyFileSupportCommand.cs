@@ -64,13 +64,31 @@ namespace FreeAIr.Commands.File
                 return;
             }
 
+            await AddFilesToContextAsync(
+                chat,
+                allSelectedFiles
+                );
+
+            var promptText = supportContext.ApplyVariablesToPrompt(
+                chosenSupportAction.Prompt
+                );
+
+            chat.AddPrompt(
+                UserPrompt.CreateTextBasedPrompt(
+                    promptText
+                    )
+                );
+
+            await ChatListToolWindow.ShowIfEnabledAsync();
+        }
+
+        public static async Task AddFilesToContextAsync(
+            Chat chat,
+            List<SolutionItem> allSelectedFiles
+            )
+        {
             foreach (var selectedFile in allSelectedFiles)
             {
-                if (selectedFile.Type != SolutionItemType.PhysicalFile)
-                {
-                    continue;
-                }
-
                 var contextItems = (await CSharpContextComposer.ComposeFromFilePathAsync(
                     selectedFile.FullPath
                     )).ConvertToChatContextItem();
@@ -90,21 +108,9 @@ namespace FreeAIr.Commands.File
                     contextItems
                     );
             }
-
-            var promptText = supportContext.ApplyVariablesToPrompt(
-                chosenSupportAction.Prompt
-                );
-
-            chat.AddPrompt(
-                UserPrompt.CreateTextBasedPrompt(
-                    promptText
-                    )
-                );
-
-            await ChatListToolWindow.ShowIfEnabledAsync();
         }
 
-        private static async System.Threading.Tasks.Task<List<SolutionItem>> GetSelectedFilesAsync()
+        public static async System.Threading.Tasks.Task<List<SolutionItem>> GetSelectedFilesAsync()
         {
             var sew = await VS.Windows.GetSolutionExplorerWindowAsync();
             var selections = await sew.GetSelectionAsync();
@@ -117,6 +123,7 @@ namespace FreeAIr.Commands.File
                         !item.IsNonVisibleItem
                         && item.Type == SolutionItemType.PhysicalFile
                         && item.FullPath.GetFileType() == FileTypeEnum.Text
+                        && item.Type == SolutionItemType.PhysicalFile
                         ,
                     false,
                     CancellationToken.None

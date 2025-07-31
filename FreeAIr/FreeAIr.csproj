@@ -49,6 +49,7 @@
     <Compile Include="Antlr\Prompt\PromptParser.cs" />
     <Compile Include="BLogic\Context\Item\SimpleTextChatContextItem.cs" />
     <Compile Include="Commands\ApplySupportCommand.cs" />
+    <Compile Include="Commands\File\AddFilesToContextCommand.cs" />
     <Compile Include="Commands\File\ApplyFileSupportCommand.cs" />
     <Compile Include="Commands\Other\OpenPropertiesCommand.cs" />
     <Compile Include="Helper\KnownMonikersHelper.cs" />

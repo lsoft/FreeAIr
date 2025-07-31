@@ -11,6 +11,12 @@ namespace FreeAIr.UI.ToolWindows
 {
     public class ChatListToolWindow : BaseToolWindow<ChatListToolWindow>
     {
+        public static ChatListViewModel? ChatListViewModel
+        {
+            get;
+            private set;
+        }
+
         public override string GetTitle(int toolWindowId) => Resources.Resources.AI_chat_list;
 
         public override Type PaneType => typeof(Pane);
@@ -20,6 +26,7 @@ namespace FreeAIr.UI.ToolWindows
             var componentModel = (IComponentModel)await FreeAIrPackage.Instance.GetServiceAsync(typeof(SComponentModel));
 
             var viewModel = componentModel.GetService<ChatListViewModel>();
+            ChatListToolWindow.ChatListViewModel = viewModel;
 
             var control = new ChatListToolWindowControl(viewModel);
 

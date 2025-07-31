@@ -193,6 +193,14 @@
           <ButtonText>Generate and add natural language outlines...</ButtonText>
         </Strings>
       </Button>
+      <Button guid="FreeAIr" id="AddFilesToContextCommandId" priority="0x0100" type="Button">
+        <Parent guid="FreeAIr" id="SolutionTreeContextGroup" />
+        <Icon guid="ImageCatalogGuid" id="AddTextFile" />
+        <CommandFlag>IconIsMoniker</CommandFlag>
+        <Strings>
+          <ButtonText>Add file(s) to current chat context...</ButtonText>
+        </Strings>
+      </Button>
 
       <Button guid="FreeAIr" id="CodeLens_AddXmlCommentCommandId" priority="0x0000" type="Button">
         <Strings>
@@ -277,6 +285,7 @@
       <IDSymbol name="OpenBuildingNaturalLanguageOutlinesWindowCommandId" value="0x1053"/>
 
       <IDSymbol name="OpenPropertiesCommandId" value="0x1054" />
+      <IDSymbol name="AddFilesToContextCommandId" value="0x1055" />
 
 
 
