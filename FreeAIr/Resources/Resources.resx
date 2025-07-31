@@ -864,4 +864,8 @@
     <value>New version of FreeAIr has been installed.</value>
     <comment>Used in FreeAIr\InfoBar\ReleaseNotesInfoBarService.cs document</comment>
   </data>
+  <data name="Cannot_edit_the_document__Please" xml:space="preserve">
+    <value>Cannot edit the document. Please copy-paste the text manually.</value>
+    <comment>Used in FreeAIr\BLogic\TextDescriptor.cs document</comment>
+  </data>
 </root>

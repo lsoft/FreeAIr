@@ -268,6 +268,15 @@ namespace FreeAIr.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Cannot edit the document. Please copy-paste the text manually..
+        /// </summary>
+        public static string Cannot_edit_the_document__Please {
+            get {
+                return ResourceManager.GetString("Cannot_edit_the_document__Please", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Cannot receive LLM answer. Please enter commit message manually..
         /// </summary>
         public static string Cannot_receive_AI_answer__Please {

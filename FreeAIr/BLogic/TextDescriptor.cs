@@ -178,7 +178,7 @@ namespace FreeAIr.BLogic
             {
                 await VS.MessageBox.ShowErrorAsync(
                     Resources.Resources.Error,
-                    "Cannot edit the document. Please copy-paste the text manually."
+                    FreeAIr.Resources.Resources.Cannot_edit_the_document__Please
                     );
                 return;
             }
@@ -187,7 +187,7 @@ namespace FreeAIr.BLogic
             {
                 await VS.MessageBox.ShowErrorAsync(
                     FreeAIr.Resources.Resources.Error,
-                    "Cannot edit the document. Please copy-paste the text manually."
+                    FreeAIr.Resources.Resources.Cannot_edit_the_document__Please
                     );
                 return;
             }

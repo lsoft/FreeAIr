@@ -133,19 +133,6 @@ namespace FreeAIr.Helper
         {
             lock (_locker)
             {
-                //if (_argsList.Count > 0)
-                //{
-                //    System.IO.File.AppendAllText(
-                //        $"C:\\projects\\LLM\\KoboldCpp\\1.txt",
-                //        DateTime.Now.ToString()
-                //            + "   waitTimeout: "
-                //            + timeout.ToString()
-                //            + "   argsList Count: "
-                //            + _argsList.Count
-                //            + Environment.NewLine
-                //        );
-                //}
-
                 if (_argsList.Count > 0)
                 {
                     for (var i = 0; i < _argsList.Count; i++)

@@ -708,4 +708,7 @@
   <data name="New_version_of_FreeAIr_has_been_installed" xml:space="preserve">
     <value>Новая версия FreeAIr была установлена.</value>
   </data>
+  <data name="Cannot_edit_the_document__Please" xml:space="preserve">
+    <value>Невозможно отредактировать документ. Пожалуйста, замените текст вручную.</value>
+  </data>
 </root>

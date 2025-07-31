@@ -863,4 +863,7 @@
   <data name="New_version_of_FreeAIr_has_been_installed" xml:space="preserve">
     <value>新版本的 FreeAIr 已安装。</value>
   </data>
+  <data name="Cannot_edit_the_document__Please" xml:space="preserve">
+    <value>无法编辑文档。请手动复制粘贴文本。</value>
+  </data>
 </root>
