@@ -9,6 +9,8 @@ If you are enjoying FreeAIr to the enough level to donate, there are many [small
 ## 3.7.0
 
 - Added a command to add selected files (in Solution Explorer window) to the current chat context.
+- Added ability to add items to chat context with drag-and-drop.
+- Improved VS theme support.
 
 ## 3.6.0
 

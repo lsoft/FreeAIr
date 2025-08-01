@@ -52,6 +52,7 @@
     <Compile Include="Commands\File\AddFilesToContextCommand.cs" />
     <Compile Include="Commands\File\ApplyFileSupportCommand.cs" />
     <Compile Include="Commands\Other\OpenPropertiesCommand.cs" />
+    <Compile Include="Helper\DisposeHelper.cs" />
     <Compile Include="Helper\KnownMonikersHelper.cs" />
     <Compile Include="Helper\TimeoutEventProxy.cs" />
     <Compile Include="Helper\UriHelper.cs" />
@@ -225,6 +226,7 @@
     <Compile Include="UI\Embedillo\VisualLine\SolutionItem\SolutionItemVisualLineGeneratorFactory.cs" />
     <Compile Include="UI\NullToUnsetValueConverter.cs" />
     <Compile Include="UI\OpenContextMenuOnLeftClickBehavior.cs" />
+    <Compile Include="UI\PseudoCrispImage.cs" />
     <Compile Include="UI\Theme.cs" />
     <Compile Include="UI\ToolWindows\ChooseModelToolWindow.cs" />
     <Compile Include="UI\ToolWindows\ChooseModelToolWindowControl.xaml.cs">

@@ -8,6 +8,7 @@
     xmlns:ui="clr-namespace:FreeAIr.UI"
     xmlns:et="clr-namespace:Xceed.Wpf.Toolkit;assembly=Xceed.Wpf.Toolkit"
     xmlns:imaging="clr-namespace:Microsoft.VisualStudio.Imaging;assembly=Microsoft.VisualStudio.Imaging"
+    xmlns:theming="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Imaging"
     mc:Ignorable="d" 
     d:DesignHeight="700" d:DesignWidth="1000"
     Height="700" Width="1000"
@@ -258,7 +259,7 @@
                 BorderThickness="1"
                 Background="#11FFFFFF"
                 >
-                <imaging:CrispImage
+                <ui:PseudoCrispImage
                     Width="90"
                     Height="90"
                     Margin="0"

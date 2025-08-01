@@ -23,6 +23,7 @@
     d:DesignWidth="300"
     Name="ChatListToolWindow"
     IsVisibleChanged="ChatListToolWindow_IsVisibleChanged"
+    DragDrop.Drop="ChatListToolWindow_Drop"
     >
     <UserControl.Resources>
         <ui:InvertBooleanToVisibilityConverter  x:Key="StopCommandVisibilityConverter" />
@@ -179,7 +180,7 @@
                                     <ColumnDefinition />
                                 </Grid.ColumnDefinitions>
 
-                                <imaging:CrispImage
+                                <ui:PseudoCrispImage
                                     Grid.Column="0"
                                     Margin="0"
                                     Moniker="{Binding StatusMoniker}"
@@ -340,36 +341,36 @@
                                             <ColumnDefinition />
                                         </Grid.ColumnDefinitions>
 
-                                        <imaging:CrispImage
+                                        <ui:PseudoCrispImage
                                             Grid.Column="0"
                                             Moniker="{x:Static catalog:KnownMonikers.Cancel}"
                                             ToolTip="{x:Static resources:Resources.Delete_from_context}"
                                             Cursor="Hand"
                                             >
-                                            <imaging:CrispImage.InputBindings>
+                                            <ui:PseudoCrispImage.InputBindings>
                                                 <MouseBinding
                                                     Command="{Binding ElementName=ChatListToolWindow, Path=DataContext.DeleteItemFromContextCommand}"
                                                     CommandParameter="{Binding .}"
                                                     MouseAction="LeftClick"
                                                     />
-                                            </imaging:CrispImage.InputBindings>
-                                        </imaging:CrispImage>
-                                        <imaging:CrispImage
+                                            </ui:PseudoCrispImage.InputBindings>
+                                        </ui:PseudoCrispImage>
+                                        <ui:PseudoCrispImage
                                             Grid.Column="1"
                                             Margin="5,0,0,0"
                                             Moniker="{x:Static catalog:KnownMonikers.ZoomIn}"
                                             ToolTip="{x:Static resources:Resources.Search_and_add_related_context_items}"
                                             Cursor="Hand"
                                             >
-                                            <imaging:CrispImage.InputBindings>
+                                            <ui:PseudoCrispImage.InputBindings>
                                                 <MouseBinding
                                                     Command="{Binding ElementName=ChatListToolWindow, Path=DataContext.AddRelatedItemsToContextCommand}"
                                                     CommandParameter="{Binding .}"
                                                     MouseAction="LeftClick"
                                                     />
-                                            </imaging:CrispImage.InputBindings>
-                                        </imaging:CrispImage>
-                                        <imaging:CrispImage
+                                            </ui:PseudoCrispImage.InputBindings>
+                                        </ui:PseudoCrispImage>
+                                        <ui:PseudoCrispImage
                                             Grid.Column="2"
                                             Margin="20,0,0,0"
                                             Moniker="{Binding Moniker}"
@@ -480,11 +481,13 @@
                 HorizontalAlignment="Stretch"
                 />
 
-            <imaging:CrispImage
+            <ui:PseudoCrispImage
                 Grid.Row="3"
                 Margin="2,5,2,2"
                 HorizontalAlignment="Right"
                 VerticalAlignment="Top"
+                Width="16"
+                Height="16"
                 IsHitTestVisible="False"
                 Moniker="{Binding StatusMoniker}"
                 />
@@ -497,6 +500,7 @@
                 Foreground="{Binding ElementName=ForegroundButton, Path=Foreground}"
                 Background="Transparent"
                 FontSize="12"
+                FontFamily="Cascadia Code"
                 x:Name="PromptControl"
                 EnterCommand="{Binding CreatePromptCommand}"
                 HintText="{x:Static resources:Resources.Enter_your_prompt_here__Press___to}"

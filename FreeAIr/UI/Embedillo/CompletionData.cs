@@ -3,6 +3,8 @@ using ICSharpCode.AvalonEdit.Document;
 using ICSharpCode.AvalonEdit.Editing;
 using Microsoft.VisualStudio.Imaging;
 using Microsoft.VisualStudio.Imaging.Interop;
+using Microsoft.VisualStudio.OLE.Interop;
+using Microsoft.VisualStudio.PlatformUI;
 using Microsoft.VisualStudio.Shell.Interop;
 using System.Runtime.InteropServices;
 using System.Windows.Media;
@@ -51,7 +53,11 @@ namespace FreeAIr.UI.Embedillo
 
         #endregion
 
-        private ImageSource? ConvertMonikerToImageSource(ImageMoniker imageMoniker)
+        public static ImageSource? ConvertMonikerToImageSource(
+            ImageMoniker imageMoniker,
+            int? width = null,
+            int? height = null
+            )
         {
             var imageService = ServiceProvider.GlobalProvider.GetService(typeof(SVsImageService)) as IVsImageService2;
             if (imageService == null || imageMoniker.IsNullImage())
@@ -59,14 +65,27 @@ namespace FreeAIr.UI.Embedillo
                 return null;
             }
 
+            var backgroundColor = VSColorTheme.GetThemedColor(EnvironmentColors.ToolWindowBackgroundColorKey);
+            uint ColorToColorRef(System.Drawing.Color color)
+            {
+                return (uint)(
+                    (color.A << 24) |
+                    (color.B << 16) |
+                    (color.G << 8) |
+                    (color.R)
+                );
+            }
+
             var imageAttributes = new ImageAttributes
             {
-                Flags = (uint)_ImageAttributesFlags.IAF_RequiredFlags,
+                Flags = (uint)_ImageAttributesFlags.IAF_RequiredFlags | 0x8000_0000/*this is _ImageAttributesFlags.IAF_Background*/,
                 Format = (uint)_UIDataFormat.DF_WPF,
                 ImageType = (uint)_UIImageType.IT_Bitmap,
-                LogicalWidth = 16,
-                LogicalHeight = 16,
-                StructSize = Marshal.SizeOf<ImageAttributes>()
+                LogicalWidth = Math.Max(width.GetValueOrDefault(16), 16),
+                LogicalHeight = Math.Max(height.GetValueOrDefault(16), 16),
+                Dpi = 96,
+                StructSize = Marshal.SizeOf<ImageAttributes>(),
+                Background = ColorToColorRef(backgroundColor)
             };
 
             var bitmapFrame = imageService.GetImage(imageMoniker, imageAttributes);
@@ -83,8 +102,11 @@ namespace FreeAIr.UI.Embedillo
                 return null;
             }
 
-            return bitmapSource as BitmapSource;
+            var result = bitmapSource as BitmapSource;
+
+            return result;
         }
+
 
 
     }

@@ -127,17 +127,14 @@ namespace FreeAIr.UI.Embedillo.VisualLine.SolutionItem
                 };
                 sp.Children.Add(tb1);
                 Grid.SetColumn(tb1, 0);
-                
-                var tb2 = new TextBlock
+
+                var img0 = new PseudoCrispImage
                 {
-                    Padding = new Thickness(0),
-                    Text = " ✓ ",
-                    Foreground = Brushes.Green,
-                    VerticalAlignment = VerticalAlignment.Bottom,
-                    ToolTip = filePath
+                    Moniker = KnownMonikers.AddTextFile,
+                    Margin = new Thickness(5, 0, 0, 0)
                 };
-                sp.Children.Add(tb2);
-                Grid.SetColumn(tb2, 1);
+                sp.Children.Add(img0);
+                Grid.SetColumn(img0, 1);
 
                 child = sp;
             }
@@ -161,16 +158,13 @@ namespace FreeAIr.UI.Embedillo.VisualLine.SolutionItem
                 sp.Children.Add(tb1);
                 Grid.SetColumn(tb1, 0);
 
-                var tb2 = new TextBlock
+                var img0 = new PseudoCrispImage
                 {
-                    Padding = new Thickness(0),
-                    Text = "<!>",
-                    Foreground = Brushes.Red,
-                    VerticalAlignment = VerticalAlignment.Bottom,
-                    ToolTip = filePath
+                    Moniker = KnownMonikers.ExclamationPoint,
+                    Margin = new Thickness(5, 0, 0, 0)
                 };
-                sp.Children.Add(tb2);
-                Grid.SetColumn(tb2, 1);
+                sp.Children.Add(img0);
+                Grid.SetColumn(img0, 1);
 
                 child = sp;
             }

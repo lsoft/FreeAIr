@@ -1,17 +1,25 @@
 ﻿using FreeAIr.Antlr.Context;
 using FreeAIr.Antlr.Prompt;
+using FreeAIr.Commands.File;
+using FreeAIr.Helper;
 using FreeAIr.UI.Embedillo.VisualLine.Command;
 using FreeAIr.UI.Embedillo.VisualLine.SolutionItem;
 using FreeAIr.UI.ViewModels;
+using Microsoft.VisualStudio.VCProjectEngine;
 using System.Globalization;
+using System.Linq;
+using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
+using System.Windows.Input;
 
 namespace FreeAIr.UI.ToolWindows
 {
     public partial class ChatListToolWindowControl : UserControl
     {
+        private readonly ChatListViewModel _viewModel;
+
         public ChatListToolWindowControl(
             ChatListViewModel viewModel
             )
@@ -21,6 +29,8 @@ namespace FreeAIr.UI.ToolWindows
                 throw new ArgumentNullException(nameof(viewModel));
             }
 
+            _viewModel = viewModel;
+            
             DataContext = viewModel;
 
             InitializeComponent();
@@ -103,6 +113,50 @@ namespace FreeAIr.UI.ToolWindows
                 );
         }
 
+        private void ChatListToolWindow_Drop(object sender, DragEventArgs e)
+        {
+            var solutionItemsPaths = e.Data.GetData(DataFormats.FileDrop) as string[];
+            if (solutionItemsPaths is null || solutionItemsPaths.Length == 0)
+            {
+                return;
+            }
+
+            e.Handled = true;
+
+            ThreadHelper.JoinableTaskFactory.RunAsync(
+                async () =>
+                {
+                    await AddMovedFilesAndTheirDescendantsToChatContextAsync(
+                        solutionItemsPaths
+                        );
+                }).FileAndForget(nameof(AddMovedFilesAndTheirDescendantsToChatContextAsync));
+        }
+
+        private async System.Threading.Tasks.Task AddMovedFilesAndTheirDescendantsToChatContextAsync(
+            string[] solutionItemsPaths
+            )
+        {
+            await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+
+            var solution = await VS.Solutions.GetCurrentSolutionAsync();
+
+            var solutionItems = await solution.ProcessDownRecursivelyForAsync(
+                item =>
+                    solutionItemsPaths.Contains(item.FullPath)
+                    ,
+                false,
+                CancellationToken.None
+                );
+
+            var children = await ApplyFileSupportCommand.GetChildrenOfFilesAsync(
+                solutionItems.Select(s => s.SolutionItem)
+                );
+
+            await ApplyFileSupportCommand.AddFilesToContextAsync(
+                _viewModel.SelectedChat.Chat,
+                children
+                );
+        }
     }
 
     public class RelativeMaxHeightConverter : IValueConverter

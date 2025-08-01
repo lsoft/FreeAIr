@@ -115,6 +115,15 @@ namespace FreeAIr.Commands.File
             var sew = await VS.Windows.GetSolutionExplorerWindowAsync();
             var selections = await sew.GetSelectionAsync();
 
+            return await GetChildrenOfFilesAsync(
+                selections
+                );
+        }
+
+        public static async System.Threading.Tasks.Task<List<SolutionItem>> GetChildrenOfFilesAsync(
+            IEnumerable<SolutionItem> selections
+            )
+        {
             var allChildren = new List<SolutionItem>();
             foreach (var selection in selections)
             {
@@ -123,7 +132,6 @@ namespace FreeAIr.Commands.File
                         !item.IsNonVisibleItem
                         && item.Type == SolutionItemType.PhysicalFile
                         && item.FullPath.GetFileType() == FileTypeEnum.Text
-                        && item.Type == SolutionItemType.PhysicalFile
                         ,
                     false,
                     CancellationToken.None

@@ -75,13 +75,14 @@ namespace FreeAIr.UI.Embedillo.VisualLine.Command
                 sp.ColumnDefinitions.Add(new ColumnDefinition());
                 sp.ColumnDefinitions.Add(new ColumnDefinition());
 
-                var img0 = new CrispImage
+                var img0 = new PseudoCrispImage
                 {
                     Moniker = new Microsoft.VisualStudio.Imaging.Interop.ImageMoniker
                     {
                         Guid = new Guid("ae27a6b0-e345-4288-96df-5eaf394ee369"),
                         Id = 2646
-                    }
+                    },
+                    Margin = new Thickness(0, 0, 5, 0),
                 };
                 sp.Children.Add(img0);
                 Grid.SetColumn(img0, 0);
@@ -107,13 +108,14 @@ namespace FreeAIr.UI.Embedillo.VisualLine.Command
                 sp.ColumnDefinitions.Add(new ColumnDefinition());
                 sp.ColumnDefinitions.Add(new ColumnDefinition());
 
-                var img0 = new CrispImage
+                var img0 = new PseudoCrispImage
                 {
                     Moniker = new Microsoft.VisualStudio.Imaging.Interop.ImageMoniker
                     {
                         Guid = new Guid("ae27a6b0-e345-4288-96df-5eaf394ee369"),
                         Id = 2926
-                    }
+                    },
+                    Margin = new Thickness(0, 0, 5, 0),
                 };
                 sp.Children.Add(img0);
                 Grid.SetColumn(img0, 0);

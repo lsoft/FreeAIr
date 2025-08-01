@@ -3,6 +3,7 @@ using EnvDTE80;
 using FreeAIr.Git;
 using FreeAIr.UI;
 using Microsoft.VisualStudio.Imaging;
+using Microsoft.VisualStudio.PlatformUI;
 using System.ComponentModel.Composition;
 using System.Threading;
 using System.Windows;
@@ -102,7 +103,7 @@ namespace FreeAIr.BLogic
 
                             var buildCommitMessageButton = new Button
                             {
-                                Content = new CrispImage
+                                Content = new PseudoCrispImage
                                 {
                                     Moniker = KnownMonikers.GitRepository
                                 },
@@ -118,7 +119,7 @@ namespace FreeAIr.BLogic
 
                             var addNaturalLanguageOutlinesButton = new Button
                             {
-                                Content = new CrispImage
+                                Content = new PseudoCrispImage
                                 {
                                     Moniker = KnownMonikers.DocumentOutline
                                 },
@@ -134,7 +135,7 @@ namespace FreeAIr.BLogic
 
                             var buildNLOJsonFileButton = new Button
                             {
-                                Content = new CrispImage
+                                Content = new PseudoCrispImage
                                 {
                                     Moniker = KnownMonikers.ValidationSummary
                                 },

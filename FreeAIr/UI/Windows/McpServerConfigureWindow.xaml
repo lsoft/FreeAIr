@@ -9,6 +9,7 @@
     xmlns:et="clr-namespace:Xceed.Wpf.Toolkit;assembly=Xceed.Wpf.Toolkit"
     xmlns:imaging="clr-namespace:Microsoft.VisualStudio.Imaging;assembly=Microsoft.VisualStudio.Imaging"
     xmlns:imaging1="clr-namespace:Microsoft.VisualStudio.Imaging;assembly=Microsoft.VisualStudio.ImageCatalog"
+    xmlns:theming="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Imaging"
     mc:Ignorable="d" 
     d:DesignHeight="700" d:DesignWidth="1000"
     Height="700" Width="1000"
@@ -117,7 +118,7 @@
                 Style="{DynamicResource TextBlockLikeButtonStyle}"
                 >
                 <Button.Content>
-                    <imaging:CrispImage
+                    <ui:PseudoCrispImage
                         Moniker="{x:Static imaging1:KnownMonikers.Docker}"
                         />
                 </Button.Content>
