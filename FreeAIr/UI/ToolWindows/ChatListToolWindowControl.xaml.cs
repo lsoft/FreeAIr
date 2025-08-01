@@ -138,6 +138,66 @@ namespace FreeAIr.UI.ToolWindows
         {
             await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
 
+            var children = await GetSolutionItemsWithChildrenAsync(solutionItemsPaths);
+
+            await ApplyFileSupportCommand.AddFilesToContextAsync(
+                _viewModel.SelectedChat.Chat,
+                children
+                );
+        }
+
+        private void EmbedilloControl_Drop(object sender, DragEventArgs e)
+        {
+            var solutionItemsPaths = e.Data.GetData(DataFormats.FileDrop) as string[];
+            if (solutionItemsPaths is null || solutionItemsPaths.Length == 0)
+            {
+                return;
+            }
+
+            var embedillo = sender as Embedillo.EmbedilloControl;
+            if (embedillo is null)
+            {
+                return;
+            }
+
+            e.Handled = true;
+
+            AddMovedFilesAndTheirDescendantsToChatPromptAsync(
+                embedillo,
+                solutionItemsPaths
+                ).FileAndForget(nameof(AddMovedFilesAndTheirDescendantsToChatPromptAsync));
+        }
+
+        private async System.Threading.Tasks.Task AddMovedFilesAndTheirDescendantsToChatPromptAsync(
+            Embedillo.EmbedilloControl embedillo,
+            string[] solutionItemsPaths
+            )
+        {
+            await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+
+            var children = await GetSolutionItemsWithChildrenAsync(solutionItemsPaths);
+
+            foreach (var child in children)
+            {
+                if (
+                    !string.IsNullOrEmpty(embedillo.AvalonTextEditor.Text)
+                    && !char.IsWhiteSpace(embedillo.AvalonTextEditor.Text[embedillo.AvalonTextEditor.Text.Length - 1]))
+                {
+                    embedillo.AvalonTextEditor.Text += " ";
+                }
+
+                embedillo.AvalonTextEditor.Text += SolutionItemVisualLineGenerator.Anchor + child.FullPath;
+            }
+
+            embedillo.AvalonTextEditor.CaretOffset = embedillo.AvalonTextEditor.Text.Length;
+
+            embedillo.UpdateHintStatus();
+        }
+
+        private static async System.Threading.Tasks.Task<System.Collections.Generic.List<SolutionItem>> GetSolutionItemsWithChildrenAsync(
+            string[] solutionItemsPaths
+            )
+        {
             var solution = await VS.Solutions.GetCurrentSolutionAsync();
 
             var solutionItems = await solution.ProcessDownRecursivelyForAsync(
@@ -151,12 +211,9 @@ namespace FreeAIr.UI.ToolWindows
             var children = await ApplyFileSupportCommand.GetChildrenOfFilesAsync(
                 solutionItems.Select(s => s.SolutionItem)
                 );
-
-            await ApplyFileSupportCommand.AddFilesToContextAsync(
-                _viewModel.SelectedChat.Chat,
-                children
-                );
+            return children;
         }
+
     }
 
     public class RelativeMaxHeightConverter : IValueConverter

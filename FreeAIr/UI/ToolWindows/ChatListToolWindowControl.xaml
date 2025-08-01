@@ -456,6 +456,7 @@
                             EnterCommand="{Binding AddItemToContextCommand}"
                             ControlEnabled="{Binding IsReadyToAcceptNewPrompt}"
                             MaxHeight="100"
+                            DragDrop.Drop="EmbedilloControl_Drop"
                             />
 
                     </Grid>
@@ -506,6 +507,7 @@
                 HintText="{x:Static resources:Resources.Enter_your_prompt_here__Press___to}"
                 ControlEnabled="{Binding IsReadyToAcceptNewPrompt}"
                 MaxHeight="100000"
+                DragDrop.Drop="EmbedilloControl_Drop"
                 />
 
 

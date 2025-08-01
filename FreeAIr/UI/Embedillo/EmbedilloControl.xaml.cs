@@ -50,12 +50,6 @@ namespace FreeAIr.UI.Embedillo
             set => SetValue(ControlEnabledProperty, value);
         }
 
-        private static void OnControlEnabledChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            var control = d as EmbedilloControl;
-            control.UpdateHintStatus();
-        }
-
         public string HintText
         {
             get;
@@ -89,6 +83,8 @@ namespace FreeAIr.UI.Embedillo
             InitializeComponent();
 
             ControlEnabled = true;
+
+            #region setup AvalonTextEditor
 
             AvalonTextEditor.TextArea.TextEntered += (object sender, TextCompositionEventArgs e) =>
             {
@@ -180,12 +176,8 @@ namespace FreeAIr.UI.Embedillo
                     e.Handled = true; //блокируем стандартную обработку
                 }
             };
-        }
 
-        private void UpdateHintStatus()
-        {
-            HintLabel.GetBindingExpression(System.Windows.Controls.TextBlock.VisibilityProperty).UpdateTarget();
-            HintLabel.GetBindingExpression(System.Windows.Controls.TextBlock.TextProperty).UpdateTarget();
+            #endregion
         }
 
         public void Setup(
@@ -210,6 +202,24 @@ namespace FreeAIr.UI.Embedillo
         public void MakeFocused()
         {
             AvalonTextEditor.Focus();
+        }
+
+        public Parsed Parse()
+        {
+            if (_parser is null)
+            {
+                throw new InvalidOperationException("Setup this control before.");
+            }
+            var parsed = _parser.Parse(
+                AvalonTextEditor.Text
+                );
+            return parsed;
+        }
+
+        public void UpdateHintStatus()
+        {
+            HintLabel.GetBindingExpression(System.Windows.Controls.TextBlock.VisibilityProperty).UpdateTarget();
+            HintLabel.GetBindingExpression(System.Windows.Controls.TextBlock.TextProperty).UpdateTarget();
         }
 
         private async Task ShowCompletionWindowAsync(
@@ -489,21 +499,15 @@ namespace FreeAIr.UI.Embedillo
             }
         }
 
-        public Parsed Parse()
-        {
-            if (_parser is null)
-            {
-                throw new InvalidOperationException("Setup this control before.");
-            }
-            var parsed = _parser.Parse(
-                AvalonTextEditor.Text
-                );
-            return parsed;
-        }
-
         private void EmbedilloInternalName_Loaded(object sender, RoutedEventArgs e)
         {
             UpdateHintStatus();
+        }
+
+        private static void OnControlEnabledChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            var control = d as EmbedilloControl;
+            control.UpdateHintStatus();
         }
     }
 }
