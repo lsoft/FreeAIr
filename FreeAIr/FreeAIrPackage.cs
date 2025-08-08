@@ -15,13 +15,10 @@ using FreeAIr.UI.Informer;
 using FreeAIr.UI.ToolWindows;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.ComponentModelHost;
+using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Threading;
-
-//[assembly: ProvideCodeBase(AssemblyName = "Xceed.Wpf.Toolkit")]
-//[assembly: ProvideCodeBase(AssemblyName = "System.ClientModel")]
-//[assembly: ProvideCodeBase(AssemblyName = "JsonPath.Net")]
 
 namespace FreeAIr
 {
@@ -70,7 +67,6 @@ namespace FreeAIr
                     [
                         "Xceed.Wpf.Toolkit.dll",
                         "System.ClientModel.dll",
-                        "JsonPath.Net.dll"
                     ]);
 
                 AddService(

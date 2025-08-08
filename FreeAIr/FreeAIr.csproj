@@ -365,7 +365,6 @@
     <PackageReference Include="Extended.Wpf.Toolkit" />
     <PackageReference Include="FuzzySharp" />
     <PackageReference Include="HtmlAgilityPack" />
-    <PackageReference Include="JsonPath.Net" />
     <PackageReference Include="MessagePack" />
     <PackageReference Include="Microsoft.AspNetCore.WebUtilities" />
     <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" PrivateAssets="all" />

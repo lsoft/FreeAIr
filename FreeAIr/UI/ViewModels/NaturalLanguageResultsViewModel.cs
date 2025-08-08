@@ -8,7 +8,6 @@ using FreeAIr.Shared.Helper;
 using FreeAIr.UI.ToolWindows;
 using FuzzySharp;
 using FuzzySharp.PreProcess;
-using Json.Path;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.ComponentModelHost;
 using Microsoft.VisualStudio.TextManager.Interop;
@@ -28,8 +27,6 @@ namespace FreeAIr.UI.ViewModels
     [Export(typeof(NaturalLanguageResultsViewModel))]
     public sealed class NaturalLanguageResultsViewModel : BaseViewModel
     {
-        private static readonly JsonPath _jsonPath = JsonPath.Parse("$..matches.*");
-
         private Chat? _chat;
         private ICommand _gotoCommand;
         private ICommand _cancelChatCommand;
@@ -431,22 +428,26 @@ $"""
                         return null;
                     });
 
-                var parsedJson = JsonNode.Parse(jsonBody);
-                var evaluatedJson = _jsonPath.Evaluate(parsedJson);
-                foreach (var evaluated in evaluatedJson.Matches)
+                using var document = JsonDocument.Parse(jsonBody);
+                var root = document.RootElement;
+                var matchesElement = FindMatchesElement(root);
+                if (matchesElement != null && matchesElement.Value.ValueKind == JsonValueKind.Array)
                 {
-                    if (evaluated.Value.TryGetSingleValue(out var jsonMatch))
+                    foreach (var item in matchesElement.Value.EnumerateArray())
                     {
-                        var match = JsonSerializer.Deserialize<Match>(jsonMatch);
-                        foundItems.Add(
-                            new FoundResultItem(
-                                filePath: match.fullpath,
-                                foundText: match.found_text,
-                                reason: match.reason,
-                                confidenceLevel: match.confidence_level,
-                                lineIndex: match.line
-                                )
-                            );
+                        if (HasRequiredProperties(item))
+                        {
+                            var match = JsonSerializer.Deserialize<Match>(item);
+                            foundItems.Add(
+                                new FoundResultItem(
+                                    filePath: match.fullpath,
+                                    foundText: match.found_text,
+                                    reason: match.reason,
+                                    confidenceLevel: match.confidence_level,
+                                    lineIndex: match.line
+                                    )
+                                );
+                        }
                     }
                 }
             }
@@ -454,6 +455,64 @@ $"""
             {
                 excp.ActivityLogException();
             }
+        }
+
+
+        private static JsonElement? FindMatchesElement(JsonElement element)
+        {
+            // Если текущий элемент содержит "matches" - возвращаем его
+            if (element.ValueKind == JsonValueKind.Object &&
+                element.TryGetProperty("matches", out var matchesElement))
+            {
+                return matchesElement;
+            }
+
+            // Рекурсивно ищем в дочерних элементах
+            switch (element.ValueKind)
+            {
+                case JsonValueKind.Object:
+                    foreach (var property in element.EnumerateObject())
+                    {
+                        var result = FindMatchesElement(property.Value);
+                        if (result.HasValue)
+                            return result;
+                    }
+                    break;
+
+                case JsonValueKind.Array:
+                    foreach (var item in element.EnumerateArray())
+                    {
+                        var result = FindMatchesElement(item);
+                        if (result.HasValue)
+                            return result;
+                    }
+                    break;
+            }
+
+            return null;
+        }
+
+        private static readonly string[] _requiredProperties = new[]
+        {
+            "fullpath", "found_text", "confidence_level", "line", "reason"
+        };
+
+        private static bool HasRequiredProperties(JsonElement element)
+        {
+            if (element.ValueKind != JsonValueKind.Object)
+            {
+                return false;
+            }
+
+            foreach (var prop in _requiredProperties)
+            {
+                if (!element.TryGetProperty(prop, out _))
+                {
+                    return false;
+                }
+            }
+
+            return true;
         }
 
         private static bool FindSelectionFromDocumentBody(
