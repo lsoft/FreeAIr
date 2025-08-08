@@ -1,4 +1,5 @@
 ﻿using FreeAIr.Git;
+using FreeAIr.Helper;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -58,7 +59,7 @@ namespace FreeAIr.MCP.McpServerProxy.VS.Tools
             }
             catch (Exception excp)
             {
-                //todo log
+                excp.ActivityLogException();
 
                 return new McpServerProxyToolCallResult("Failed commit.");
             }

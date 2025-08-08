@@ -80,6 +80,7 @@ namespace FreeAIr.MCP.McpServerProxy.VS.Tools
             if (dte == null)
             {
                 //todo log
+
                 return new McpServerProxyToolCallResult("Visual Studio internal error.");
             }
 

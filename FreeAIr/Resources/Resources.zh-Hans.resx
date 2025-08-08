@@ -866,4 +866,10 @@
   <data name="Cannot_edit_the_document__Please" xml:space="preserve">
     <value>无法编辑文档。请手动复制粘贴文本。</value>
   </data>
+  <data name="Question" xml:space="preserve">
+    <value>问题</value>
+  </data>
+  <data name="MCP_servers_did_not_respond__Save" xml:space="preserve">
+    <value>MCP 服务器没有响应。是否要保存选项？</value>
+  </data>
 </root>

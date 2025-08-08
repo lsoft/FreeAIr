@@ -1,4 +1,5 @@
-﻿using RunProcessAsTask;
+﻿using FreeAIr.Helper;
+using RunProcessAsTask;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading;
@@ -97,7 +98,7 @@ namespace FreeAIr.Git
             }
             catch (Exception excp)
             {
-                //todo log
+                excp.ActivityLogException();
             }
 
             return null;

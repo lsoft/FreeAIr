@@ -106,7 +106,7 @@ namespace FreeAIr.CodeLens
 
                 return response123;
             }
-            catch (Exception ex)
+            catch (Exception excp)
             {
                 //todo log
                 throw;

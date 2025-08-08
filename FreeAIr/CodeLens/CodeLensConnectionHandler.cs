@@ -1,9 +1,10 @@
-﻿using System.Collections.Concurrent;
+﻿using FreeAIr.Helper;
+using FreeAIr.Shared;
+using StreamJsonRpc;
+using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.IO.Pipes;
 using System.Linq;
-using FreeAIr.Shared;
-using StreamJsonRpc;
 
 namespace FreeAIr.Extension.CodeLens
 {
@@ -30,9 +31,9 @@ namespace FreeAIr.Extension.CodeLens
                     _ = HandleConnectionAsync(stream);
                 }
             }
-            catch (Exception ex)
+            catch (Exception excp)
             {
-                //todo log
+                excp.ActivityLogException();
                 throw;
             }
 
@@ -47,9 +48,9 @@ namespace FreeAIr.Extension.CodeLens
                         await rpc.Completion;
                     }
                 }
-                catch (Exception ex)
+                catch (Exception excp)
                 {
-                    //todo log
+                    excp.ActivityLogException();
                 }
                 finally
                 {
@@ -66,7 +67,7 @@ namespace FreeAIr.Extension.CodeLens
             }
             catch (Exception excp)
             {
-                //todo log
+                excp.ActivityLogException();
             }
 
             return Task.CompletedTask;

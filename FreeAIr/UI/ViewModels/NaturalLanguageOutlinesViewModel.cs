@@ -98,7 +98,7 @@ namespace FreeAIr.UI.ViewModels
                             }
                             catch (Exception excp)
                             {
-                                //todo log
+                                excp.ActivityLogException();
                             }
                         }
                         );
@@ -149,7 +149,7 @@ namespace FreeAIr.UI.ViewModels
                             }
                             catch (Exception excp)
                             {
-                                //todo log
+                                excp.ActivityLogException();
                             }
                         },
                         a =>
@@ -436,7 +436,8 @@ namespace FreeAIr.UI.ViewModels
             }
             catch (Exception excp)
             {
-                //todo log
+                excp.ActivityLogException();
+
                 Status = Resources.Resources.Error + $": {excp.Message}";
             }
 

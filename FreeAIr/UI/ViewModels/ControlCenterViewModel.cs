@@ -1,8 +1,10 @@
-﻿using FreeAIr.MCP.McpServerProxy;
+﻿using FreeAIr.Helper;
+using FreeAIr.MCP.McpServerProxy;
 using FreeAIr.MCP.McpServerProxy.Github;
 using FreeAIr.Options2;
 using FreeAIr.UI.Windows;
 using Microsoft.VisualStudio.Shell.Interop;
+using Microsoft.VisualStudio.VSHelp80;
 using System.IO;
 using System.Linq;
 using System.Windows;
@@ -237,6 +239,8 @@ namespace FreeAIr.UI.ViewModels
         {
             try
             {
+                PageEnabled = false;
+
                 _optionsJson = FreeAIrOptions.SerializeToString(
                     await FreeAIrOptions.DeserializeAsync(
                         SelectedPlace.Place
@@ -356,7 +360,8 @@ namespace FreeAIr.UI.ViewModels
                 }
                 catch (Exception excp)
                 {
-                    //todo log
+                    excp.ActivityLogException();
+
                     await VS.MessageBox.ShowErrorAsync(
                         Resources.Resources.Error,
                         excp.Message + Environment.NewLine + excp.StackTrace
@@ -425,7 +430,8 @@ namespace FreeAIr.UI.ViewModels
                 }
                 catch (Exception excp)
                 {
-                    //todo log
+                    excp.ActivityLogException();
+
                     await VS.MessageBox.ShowErrorAsync(
                         Resources.Resources.Error,
                         excp.Message + Environment.NewLine + excp.StackTrace
@@ -468,11 +474,20 @@ namespace FreeAIr.UI.ViewModels
 
                 try
                 {
+                    _viewModel.PageEnabled = false;
+
                     if (!await FreeAIrOptions.ApplyMcpServerNodeAsync(
                         options.AvailableMcpServers
                         ))
                     {
-                        return;
+                        var confirm = await VS.MessageBox.ShowConfirmAsync(
+                            FreeAIr.Resources.Resources.Question,
+                            FreeAIr.Resources.Resources.MCP_servers_did_not_respond__Save
+                            );
+                        if (!confirm)
+                        {
+                            return;
+                        }
                     }
 
                     var place = _viewModel.SelectedPlace.Place;
@@ -488,7 +503,8 @@ namespace FreeAIr.UI.ViewModels
                 }
                 catch (Exception excp)
                 {
-                    //todo log
+                    excp.ActivityLogException();
+
                     await VS.MessageBox.ShowErrorAsync(
                         Resources.Resources.Error,
                         excp.Message + Environment.NewLine + excp.StackTrace
@@ -578,7 +594,8 @@ namespace FreeAIr.UI.ViewModels
                 }
                 catch (Exception excp)
                 {
-                    //todo log
+                    excp.ActivityLogException();
+
                     await VS.MessageBox.ShowErrorAsync(
                         Resources.Resources.Error,
                         excp.Message + Environment.NewLine + excp.StackTrace

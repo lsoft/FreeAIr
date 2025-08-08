@@ -1,4 +1,5 @@
-﻿using FreeAIr.Options2.Agent;
+﻿using FreeAIr.Helper;
+using FreeAIr.Options2.Agent;
 using FreeAIr.Options2.Support;
 using FreeAIr.UI.ContextMenu;
 using FreeAIr.UI.ViewModels;
@@ -64,7 +65,7 @@ namespace FreeAIr.Find
             }
             catch (Exception excp)
             {
-                //todo log
+                excp.ActivityLogException();
             }
         }
 

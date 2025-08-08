@@ -1,4 +1,5 @@
-﻿using FreeAIr.Seaarch;
+﻿using FreeAIr.Helper;
+using FreeAIr.Seaarch;
 using System.Collections.Generic;
 using System.Text.Json;
 using System.Threading;
@@ -78,7 +79,7 @@ namespace FreeAIr.MCP.McpServerProxy.VS.Tools
             }
             catch (Exception excp)
             {
-                //todo log
+                excp.ActivityLogException();
 
                 return new McpServerProxyToolCallResult("Search failed.");
             }

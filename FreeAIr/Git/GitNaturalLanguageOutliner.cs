@@ -44,7 +44,7 @@ namespace FreeAIr.Git
             }
             catch (Exception excp)
             {
-                //todo log
+                excp.ActivityLogException();
             }
         }
 

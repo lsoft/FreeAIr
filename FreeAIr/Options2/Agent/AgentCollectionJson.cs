@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using FreeAIr.Helper;
+using System.Collections.Generic;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -38,10 +39,10 @@ namespace FreeAIr.Options2.Agent
                 agents = JsonSerializer.Deserialize<AgentCollectionJson>(optionAgentsJson);
                 return true;
             }
-            catch
+            catch(Exception excp)
             {
                 //error in json
-                //todo log
+                excp.ActivityLogException();
             }
 
             agents = null;

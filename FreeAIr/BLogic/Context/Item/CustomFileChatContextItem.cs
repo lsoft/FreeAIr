@@ -87,7 +87,7 @@ namespace FreeAIr.BLogic.Context.Item
                     + excp.StackTrace
                     );
 
-                //todo log
+                excp.ActivityLogException();
             }
         }
 

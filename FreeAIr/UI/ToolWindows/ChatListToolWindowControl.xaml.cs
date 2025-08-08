@@ -68,7 +68,7 @@ namespace FreeAIr.UI.ToolWindows
             }
             catch (Exception excp)
             {
-                //todo log
+                excp.ActivityLogException();
             }
         }
 

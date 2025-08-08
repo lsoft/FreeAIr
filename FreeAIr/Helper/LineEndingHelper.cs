@@ -58,7 +58,7 @@ namespace FreeAIr.Helper
                 }
                 catch (Exception excp)
                 {
-                    //todo log
+                    excp.ActivityLogException();
                 }
 
                 return Environment.NewLine;
@@ -93,7 +93,7 @@ namespace FreeAIr.Helper
                 }
                 catch (Exception excp)
                 {
-                    //todo log
+                    excp.ActivityLogException();
                 }
 
                 return Environment.NewLine;
@@ -122,7 +122,7 @@ namespace FreeAIr.Helper
                 }
                 catch (Exception excp)
                 {
-                    //todo log
+                    excp.ActivityLogException();
                 }
 
                 return Environment.NewLine;

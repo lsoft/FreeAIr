@@ -52,6 +52,8 @@
     <Compile Include="Commands\File\AddFilesToContextCommand.cs" />
     <Compile Include="Commands\File\ApplyFileSupportCommand.cs" />
     <Compile Include="Commands\Other\OpenPropertiesCommand.cs" />
+    <Compile Include="Commands\Other\OpenActivityLogCommand.cs" />
+    <Compile Include="Helper\ActivityLogHelper.cs" />
     <Compile Include="Helper\DisposeHelper.cs" />
     <Compile Include="Helper\KnownMonikersHelper.cs" />
     <Compile Include="Helper\TimeoutEventProxy.cs" />
@@ -142,7 +144,6 @@
     <Compile Include="InfoBar\ReleaseNotesInfoBarService.cs" />
     <Compile Include="MCP\ServerProxy\McpServerProxyCollection.cs" />
     <Compile Include="MCP\ServerProxy\McpServerProxyApplication.cs" />
-    <Compile Include="MCP\ServerProxy\External\ExternalMcpServersJsonParser.cs" />
     <Compile Include="MCP\ServerProxy\External\ExternalMcpServerProxy.cs" />
     <Compile Include="MCP\Tools.cs" />
     <Compile Include="MCP\ServerProxy\Github\GithubMcpServerProxy.cs" />

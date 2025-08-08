@@ -191,8 +191,7 @@ namespace FreeAIr.BLogic
             }
             catch (Exception excp)
             {
-                //todo log
-                int g = 0;
+                excp.ActivityLogException();
             }
 
             return ProposalFactory.CreateEmptyCollection();

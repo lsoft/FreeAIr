@@ -1,6 +1,7 @@
 using EnvDTE;
 using EnvDTE80;
 using FreeAIr.Git;
+using FreeAIr.Helper;
 using FreeAIr.UI;
 using Microsoft.VisualStudio.Imaging;
 using Microsoft.VisualStudio.PlatformUI;
@@ -183,7 +184,7 @@ namespace FreeAIr.BLogic
             }
             catch (Exception excp)
             {
-                //todo log
+                excp.ActivityLogException();
             }
         }
 
@@ -196,7 +197,7 @@ namespace FreeAIr.BLogic
             }
             catch (Exception excp)
             {
-                //todo log
+                excp.ActivityLogException();
             }
         }
 

@@ -1,4 +1,5 @@
-﻿using Microsoft.VisualStudio.Shell.Interop;
+﻿using FreeAIr.Helper;
+using Microsoft.VisualStudio.Shell.Interop;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Windows;
@@ -114,7 +115,7 @@ namespace FreeAIr.UI.ContextMenu
             }
             catch (Exception excp)
             {
-                //todo log
+                excp.ActivityLogException();
             }
 
             return null;

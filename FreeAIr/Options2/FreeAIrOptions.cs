@@ -192,7 +192,7 @@ namespace FreeAIr.Options2
             }
             catch (Exception excp)
             {
-                //todo log
+                excp.ActivityLogException();
             }
 
             //VS options is not set
@@ -345,7 +345,8 @@ namespace FreeAIr.Options2
             }
             catch (Exception excp)
             {
-                //todo log
+                excp.ActivityLogException();
+
                 await VS.MessageBox.ShowErrorAsync(
                     Resources.Resources.Error,
                     excp.Message

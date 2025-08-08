@@ -1,14 +1,15 @@
 ﻿using Dto;
 using EnvDTE;
 using EnvDTE80;
+using FreeAIr.Helper;
 using FreeAIr.McpServerProxy;
+using FreeAIr.Options2;
 using System.IO;
 using System.IO.Compression;
 using System.Net.Http;
 using System.Net.Http.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using FreeAIr.Options2;
 
 namespace FreeAIr.MCP.McpServerProxy
 {
@@ -77,7 +78,8 @@ namespace FreeAIr.MCP.McpServerProxy
                 }
                 catch (Exception excp)
                 {
-                    //todo log
+                    excp.ActivityLogException();
+
                     return null;
                 }
             }

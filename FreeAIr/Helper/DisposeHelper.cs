@@ -18,7 +18,7 @@ namespace FreeAIr.Helper
             }
             catch (Exception excp)
             {
-                //todo log
+                excp.ActivityLogException();
             }
         }
     }

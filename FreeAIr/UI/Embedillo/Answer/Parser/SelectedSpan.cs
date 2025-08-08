@@ -73,7 +73,7 @@ namespace FreeAIr.UI.Embedillo.Answer.Parser
                     + excp.StackTrace
                     );
 
-                //todo log
+                excp.ActivityLogException();
             }
         }
 

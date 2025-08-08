@@ -711,4 +711,10 @@
   <data name="Cannot_edit_the_document__Please" xml:space="preserve">
     <value>Невозможно отредактировать документ. Пожалуйста, замените текст вручную.</value>
   </data>
+  <data name="Question" xml:space="preserve">
+    <value>Вопрос</value>
+  </data>
+  <data name="MCP_servers_did_not_respond__Save" xml:space="preserve">
+    <value>MCP сервера не ответили. Сохранить настройки все равно?</value>
+  </data>
 </root>

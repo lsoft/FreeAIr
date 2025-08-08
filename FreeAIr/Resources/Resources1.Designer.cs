@@ -1069,6 +1069,15 @@ namespace FreeAIr.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to MCP servers did not respond. Save options anyway?.
+        /// </summary>
+        public static string MCP_servers_did_not_respond__Save {
+            get {
+                return ResourceManager.GetString("MCP_servers_did_not_respond__Save", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Model list cannot be loaded.
         /// </summary>
         public static string Model_list_cannot_be_loaded {
@@ -1398,6 +1407,15 @@ namespace FreeAIr.Resources {
         public static string Prompt {
             get {
                 return ResourceManager.GetString("Prompt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Question.
+        /// </summary>
+        public static string Question {
+            get {
+                return ResourceManager.GetString("Question", resourceCulture);
             }
         }
         

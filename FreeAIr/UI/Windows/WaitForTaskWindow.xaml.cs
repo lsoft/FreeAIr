@@ -1,4 +1,5 @@
-﻿using System.Threading;
+﻿using FreeAIr.Helper;
+using System.Threading;
 using System.Windows;
 using System.Windows.Input;
 
@@ -37,7 +38,7 @@ namespace FreeAIr.UI.Windows
             }
             catch (Exception excp)
             {
-                //todo log
+                excp.ActivityLogException();
             }
         }
 
@@ -125,7 +126,7 @@ namespace FreeAIr.UI.Windows
                 }
                 catch (Exception excp)
                 {
-                    //todo log
+                    excp.ActivityLogException();
                 }
             }
         }

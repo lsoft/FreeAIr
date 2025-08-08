@@ -1,10 +1,10 @@
-﻿using Microsoft.VisualStudio.Threading;
+﻿using FreeAIr.Helper;
+using Microsoft.VisualStudio.Threading;
 using System.Diagnostics;
 using System.Threading;
 
 namespace FreeAIr.McpServerProxy
 {
-    //todo log here across all class body
     public sealed class ProcessMonitor
     {
         private readonly string _folderPath;
@@ -44,37 +44,39 @@ namespace FreeAIr.McpServerProxy
                         process.StartInfo.CreateNoWindow = true;
 
                         //todo replace Console.WriteLine with logging in the whole class
-                        Console.WriteLine($"Запускаем процесс: {_fileName} {_arguments}");
+                        ActivityLogHelper.ActivityLogInformation($"Запускаем процесс: {_fileName} {_arguments}");
                         process.Start();
 
                         _ = await process.WaitForExitAsync(cancellationToken);
 
                         cancellationToken.ThrowIfCancellationRequested();
 
-                        Console.WriteLine("Процесс завершён нештатно. Перезапуск...");
+                        ActivityLogHelper.ActivityLogWarning("Процесс завершён нештатно. Перезапуск...");
 
                         //чтобы не сразу перезапускать процесс и не ДДОСить ОС
-                        await Task.Delay(1000);
+                        await Task.Delay(1_000, cancellationToken);
+
+                        cancellationToken.ThrowIfCancellationRequested();
                     }
                     catch (OperationCanceledException)
                     {
                         //that's ok
                         //kill the app
-                        process.Kill();
+                        process.SafelyKill();
                         break;
                     }
-                    catch (Exception ex)
+                    catch (Exception excp)
                     {
-                        Console.WriteLine($"Ошибка при выполнении процесса: {ex.Message}");
+                        excp.ActivityLogException();
 
-                        process.Kill();
+                        process.SafelyKill();
                         break;
                     }
 
                 }
             }
 
-            Console.WriteLine("Мониторинг завершён.");
+            ActivityLogHelper.ActivityLogInformation("Мониторинг завершён.");
         }
     }
 }

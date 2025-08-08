@@ -1,4 +1,5 @@
 ﻿using Dto;
+using FreeAIr.Helper;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http.Json;
@@ -126,7 +127,8 @@ namespace FreeAIr.MCP.McpServerProxy.External
             }
             catch (Exception excp)
             {
-                //todo log
+                excp.ActivityLogException();
+
                 return new McpServerProxyToolCallResult([excp.Message + Environment.NewLine + excp.StackTrace]);
             }
 

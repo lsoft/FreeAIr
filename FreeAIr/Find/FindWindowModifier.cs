@@ -95,7 +95,7 @@ namespace FreeAIr.Find
             }
             catch (Exception excp)
             {
-                //todo logging
+                excp.ActivityLogException();
             }
         }
 

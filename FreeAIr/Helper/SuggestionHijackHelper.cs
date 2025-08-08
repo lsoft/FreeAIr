@@ -112,9 +112,9 @@ namespace FreeAIr.Helper
                     await suggestionSessionBase.DisplayProposalAsync(proposalCollection.Proposals.First(), new CancellationToken());
                 }
             }
-            catch (Exception ex)
+            catch (Exception excp)
             {
-                //todo log
+                excp.ActivityLogException();
             }
         }
 

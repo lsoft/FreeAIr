@@ -277,7 +277,8 @@ namespace FreeAIr.UI.Embedillo
                 }
                 catch (Exception excp)
                 {
-                    //todo log
+                    excp.ActivityLogException();
+
                     AvalonTextEditor.KeyUp -= KeyUpMethod;
                     completionWindow.Close();
                 }

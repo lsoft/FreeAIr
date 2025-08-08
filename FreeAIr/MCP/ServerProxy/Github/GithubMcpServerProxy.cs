@@ -1,7 +1,9 @@
 ﻿using Dto;
+using FreeAIr.Helper;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http.Json;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -27,10 +29,12 @@ namespace FreeAIr.MCP.McpServerProxy.Github
                 return false;
             }
 
+            var payload = await GithubRequestFactory.IsInstalledRequestAsync(
+                );
+
             var response = await McpServerProxyApplication.HttpClient.PostAsJsonAsync<IsInstalledRequest>(
                 "/is_installed",
-                await GithubRequestFactory.IsInstalledRequestAsync(
-                    )
+                payload
                 );
             response.EnsureSuccessStatusCode();
 
@@ -126,7 +130,8 @@ namespace FreeAIr.MCP.McpServerProxy.Github
             }
             catch (Exception excp)
             {
-                //todo log
+                excp.ActivityLogException();
+
                 return new McpServerProxyToolCallResult([excp.Message + Environment.NewLine + excp.StackTrace]);
             }
 

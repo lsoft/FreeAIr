@@ -868,4 +868,12 @@
     <value>Cannot edit the document. Please copy-paste the text manually.</value>
     <comment>Used in FreeAIr\BLogic\TextDescriptor.cs document</comment>
   </data>
+  <data name="Question" xml:space="preserve">
+    <value>Question</value>
+    <comment>Used in FreeAIr\UI\ViewModels\ControlCenterViewModel.cs document</comment>
+  </data>
+  <data name="MCP_servers_did_not_respond__Save" xml:space="preserve">
+    <value>MCP servers did not respond. Save options anyway?</value>
+    <comment>Used in FreeAIr\UI\ViewModels\ControlCenterViewModel.cs document</comment>
+  </data>
 </root>

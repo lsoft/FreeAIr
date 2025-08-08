@@ -8,6 +8,21 @@ namespace FreeAIr.Helper
 {
     public static class ProcessHelper
     {
+        public static void SafelyKill(
+            this System.Diagnostics.Process process
+            )
+        {
+            try
+            {
+                process.Kill();
+            }
+            catch (Exception excp)
+            {
+                //nothing to do
+            }
+        }
+
+
         public static Task<ProcessResults> RunSilentlyAsync(
             string workingDirectory,
             string exeName,

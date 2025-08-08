@@ -265,7 +265,7 @@ namespace FreeAIr.UI.ViewModels
             }
             catch (Exception excp)
             {
-                //todo log
+                excp.ActivityLogException();
             }
         }
 
@@ -280,7 +280,7 @@ namespace FreeAIr.UI.ViewModels
             }
             catch (Exception excp)
             {
-                //todo log
+                excp.ActivityLogException();
             }
         }
 

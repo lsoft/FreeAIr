@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using FreeAIr.Helper;
+using System.Collections.Generic;
 
 namespace FreeAIr.UI.ContextMenu
 {
@@ -33,7 +34,7 @@ namespace FreeAIr.UI.ContextMenu
             }
             catch (Exception excp)
             {
-                //todo log
+                excp.ActivityLogException();
             }
         }
     }

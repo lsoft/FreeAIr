@@ -151,6 +151,14 @@
           <ButtonText>Open FreeAIr properties...</ButtonText>
         </Strings>
       </Button>
+      <Button guid="FreeAIr" id="OpenActivityLogCommandId" priority="0x0105" type="Button">
+        <Parent guid="FreeAIr" id="SubExtensionMenuGroup2" />
+        <Icon guid="ImageCatalogGuid" id="Log" />
+        <CommandFlag>IconIsMoniker</CommandFlag>
+        <Strings>
+          <ButtonText>Open Visual Studio log...</ButtonText>
+        </Strings>
+      </Button>
 
       <Button guid="FreeAIr" id="ApplySupportCommandId" priority="0x0000" type="Button">
         <Parent guid="VSMainMenu" id="CodeWindow.LanguageGroupGroup" />
@@ -287,6 +295,7 @@
       <IDSymbol name="OpenPropertiesCommandId" value="0x1054" />
       <IDSymbol name="AddFilesToContextCommandId" value="0x1055" />
 
+      <IDSymbol name="OpenActivityLogCommandId" value="0x1056" />
 
 
       <!-- context menu -->

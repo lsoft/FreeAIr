@@ -738,7 +738,7 @@ namespace FreeAIr.UI.ViewModels
                             }
                             catch (Exception excp)
                             {
-                                //todo log
+                                excp.ActivityLogException();
 
                                 await VS.MessageBox.ShowErrorAsync(
                                     Resources.Resources.Error,

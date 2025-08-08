@@ -96,7 +96,7 @@ namespace FreeAIr.BLogic.Context.Composer
             }
             catch (Exception excp)
             {
-                //todo log
+                excp.ActivityLogException();
             }
 
             return context;
@@ -250,7 +250,7 @@ namespace FreeAIr.BLogic.Context.Composer
             }
             catch (Exception excp)
             {
-                //todo log
+                excp.ActivityLogException();
             }
 
             return context;

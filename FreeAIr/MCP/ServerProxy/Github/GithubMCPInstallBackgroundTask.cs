@@ -1,4 +1,5 @@
-﻿using FreeAIr.UI.Windows;
+﻿using FreeAIr.Helper;
+using FreeAIr.UI.Windows;
 
 namespace FreeAIr.MCP.McpServerProxy.Github
 {
@@ -30,7 +31,7 @@ namespace FreeAIr.MCP.McpServerProxy.Github
             }
             catch (Exception excp)
             {
-                //todo log
+                excp.ActivityLogException();
                 throw;
             }
 

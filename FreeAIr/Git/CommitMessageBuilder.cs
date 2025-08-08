@@ -1,3 +1,4 @@
+using FreeAIr.Helper;
 using FreeAIr.Options2.Agent;
 using FreeAIr.Options2.Support;
 using FreeAIr.UI.ContextMenu;
@@ -42,7 +43,7 @@ namespace FreeAIr.BLogic
             }
             catch (Exception excp)
             {
-                //todo log
+                excp.ActivityLogException();
             }
         }
 

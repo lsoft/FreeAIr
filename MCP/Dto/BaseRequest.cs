@@ -5,13 +5,17 @@ namespace Dto
     public abstract class BaseRequest : IParameterProvider
     {
         [JsonInclude]
-        private Dictionary<string, string> _pool = new();
+        public Dictionary<string, string> Pool
+        {
+            get;
+            set;
+        } = new();
 
         public string this[string key]
         {
             get
             {
-                var r = _pool[key.ToLower()];
+                var r = Pool[key.ToLower()];
                 if (r is null)
                 {
                     throw new InvalidOperationException($"Parameter {key} has NULL value");
@@ -21,7 +25,7 @@ namespace Dto
             }
             protected set
             {
-                _pool[key.ToLower()] = value;
+                Pool[key.ToLower()] = value;
             }
         }
 
@@ -33,7 +37,7 @@ namespace Dto
 
         public bool TryGetValue(string key, out string? value)
         {
-            return _pool.TryGetValue(key.ToLower(), out value);
+            return Pool.TryGetValue(key.ToLower(), out value);
         }
 
         protected BaseRequest()

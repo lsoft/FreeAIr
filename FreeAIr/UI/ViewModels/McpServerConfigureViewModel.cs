@@ -1,4 +1,5 @@
 ﻿using Dto;
+using FreeAIr.Helper;
 using FreeAIr.Options2;
 using FreeAIr.UI.Windows;
 using Microsoft.VisualStudio.Shell.Interop;
@@ -358,7 +359,7 @@ namespace FreeAIr.UI.ViewModels
                             }
                             catch (Exception excp)
                             {
-                                //todo log
+                                excp.ActivityLogException();
                             }
                             finally
                             {
