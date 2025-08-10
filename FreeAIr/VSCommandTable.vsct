@@ -176,12 +176,20 @@
           <ButtonText>FreeAIr start discussion with...</ButtonText>
         </Strings>
       </Button>
-      <Button guid="FreeAIr" id="GenerateWholeLineSuggestionCommand" priority="0x0002" type="Button">
+      <Button guid="FreeAIr" id="GenerateWholeLineSuggestionCommandId" priority="0x0002" type="Button">
         <Parent guid="VSMainMenu" id="CodeWindow.LanguageGroupGroup" />
         <Icon guid="ImageCatalogGuid" id="ApplyCodeChanges" />
         <CommandFlag>IconIsMoniker</CommandFlag>
         <Strings>
           <ButtonText>FreeAIr generate whole line suggestion...</ButtonText>
+        </Strings>
+      </Button>
+      <Button guid="FreeAIr" id="ShowInSituChatCommandId" priority="0x0002" type="Button">
+        <Parent guid="VSMainMenu" id="CodeWindow.LanguageGroupGroup" />
+        <Icon guid="ImageCatalogGuid" id="NeuralNetwork" />
+        <CommandFlag>IconIsMoniker</CommandFlag>
+        <Strings>
+          <ButtonText>FreeAIr start chat here...</ButtonText>
         </Strings>
       </Button>
 
@@ -251,7 +259,8 @@
   <KeyBindings>
     <KeyBinding guid="FreeAIr" id="ApplySupportCommandId" key1="L" mod1="ALT" editor="guidVSStd97" />
     <KeyBinding guid="FreeAIr" id="StartDiscussionCommandId" key1="C" mod1="ALT" editor="guidVSStd97" />
-    <KeyBinding guid="FreeAIr" id="GenerateWholeLineSuggestionCommand" key1="A" mod1="ALT" editor="guidVSStd97" />
+    <KeyBinding guid="FreeAIr" id="GenerateWholeLineSuggestionCommandId" key1="A" mod1="ALT" editor="guidVSStd97" />
+    <KeyBinding guid="FreeAIr" id="ShowInSituChatCommandId" key1="Z" mod1="ALT" editor="guidVSStd97" />
   </KeyBindings>
 
   <Symbols>
@@ -268,7 +277,7 @@
 
       <IDSymbol name="ApplySupportCommandId" value="0x1011" />
       <IDSymbol name="StartDiscussionCommandId" value="0x1012" />
-      <IDSymbol name="GenerateWholeLineSuggestionCommand" value="0x1013" />
+      <IDSymbol name="GenerateWholeLineSuggestionCommandId" value="0x1013" />
 
       <IDSymbol name="ChooseModelCommandId" value="0x1014" />
       <IDSymbol name="OpenChatListToolWindowCommandId" value="0x1015" />
@@ -297,6 +306,7 @@
 
       <IDSymbol name="OpenActivityLogCommandId" value="0x1056" />
 
+      <IDSymbol name="ShowInSituChatCommandId" value="0x1057" />
 
       <!-- context menu -->
       <IDSymbol name="VisualStudioContextMenu" value="0x8000"/>

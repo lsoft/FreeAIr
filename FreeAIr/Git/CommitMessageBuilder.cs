@@ -101,11 +101,10 @@ namespace FreeAIr.BLogic
                     return;
                 }
             }
-
             ShowErrorAsync(FreeAIr.Resources.Resources.Cannot_receive_AI_answer__Please)
                 .FileAndForget(nameof(ShowErrorAsync));
 
-            await ChatListToolWindow.ShowIfEnabledAsync();
+            await ChatWindowShower.ShowChatWindowAsync(chat);
         }
 
         private static async Task ShowErrorAsync(

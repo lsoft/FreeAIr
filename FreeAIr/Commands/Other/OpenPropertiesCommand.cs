@@ -7,7 +7,7 @@
         {
             await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
 
-            FreeAIrPackage.Instance.ShowOptionPage(typeof(OptionsProvider.FontSizePageOptions));
+            FreeAIrPackage.Instance.ShowOptionPage(typeof(OptionsProvider.UIPageOptions));
         }
 
     }

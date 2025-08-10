@@ -23,7 +23,7 @@ namespace FreeAIr.UI.ViewModels
     {
         private readonly IAnswerParser _answerParser;
 
-        private ChatWrapper? _selectedChat;
+        private BLogic.Chat? _selectedChat;
 
         public ObservableCollection2<Replic> Dialog
         {
@@ -35,13 +35,9 @@ namespace FreeAIr.UI.ViewModels
             get;
         } = new();
 
-        public DialogViewModel(ChatContainer chatContainer)
+        public DialogViewModel(
+            )
         {
-            if (chatContainer is null)
-            {
-                throw new ArgumentNullException(nameof(chatContainer));
-            }
-
             var componentModel = FreeAIrPackage.Instance.GetService<SComponentModel, IComponentModel>();
             _answerParser = componentModel.GetService<IAnswerParser>();
 
@@ -111,7 +107,7 @@ namespace FreeAIr.UI.ViewModels
             AdditionalCommandContainer.AddAdditionalCommand(
                 new ChatContextMenuAdditionalCommand(
                     FontSizePage.Instance,
-                    () => _selectedChat.Chat,
+                    () => _selectedChat,
                     PartTypeEnum.CodeLine | PartTypeEnum.CodeBlock,
                     "♼",
                     FreeAIr.Resources.Resources.Choose_context_item_to_replace_its,
@@ -164,7 +160,7 @@ namespace FreeAIr.UI.ViewModels
                                 return;
                             }
 
-                            var chat = _selectedChat?.Chat;
+                            var chat = _selectedChat;
                             if (chat is null)
                             {
                                 await VS.MessageBox.ShowErrorAsync(
@@ -205,7 +201,7 @@ namespace FreeAIr.UI.ViewModels
                                 return false;
                             }
 
-                            var chat = _selectedChat?.Chat;
+                            var chat = _selectedChat;
                             if (chat is null)
                             {
                                 return false;
@@ -301,30 +297,31 @@ namespace FreeAIr.UI.ViewModels
                 );
 
             #endregion
-
-            chatContainer.PromptStateChangedEvent += PromptStateChanged;
         }
 
         public void UpdateDialog(
-            ChatWrapper? selectedChat
+            BLogic.Chat? selectedChat
             )
         {
             Dialog.Clear();
+
+            if (_selectedChat is not null)
+            {
+                _selectedChat.PromptStateChangedEvent.Event -= PromptStateChanged;
+            }
 
             _selectedChat = selectedChat;
 
             if (selectedChat is not null)
             {
-                var chat = selectedChat.Chat;
-                if (chat is not null)
+                selectedChat.PromptStateChangedEvent.Event += PromptStateChanged;
+
+                foreach (var prompt in selectedChat.Prompts)
                 {
-                    foreach (var prompt in chat.Prompts)
-                    {
-                        UpdateDialogPrompt(
-                            prompt,
-                            PromptChangeKindEnum.PromptAdded
-                            );
-                    }
+                    UpdateDialogPrompt(
+                        prompt,
+                        PromptChangeKindEnum.PromptAdded
+                        );
                 }
             }
         }
@@ -345,7 +342,15 @@ namespace FreeAIr.UI.ViewModels
                             AdditionalCommandContainer,
                             false
                             );
-                        Dialog.Add(promptReplic);
+                        var existingPromptReplicIndex = Dialog.FindIndex(r => r.IsSameTag(prompt) && r.IsPrompt);
+                        if (existingPromptReplicIndex >= 0)
+                        {
+                            Dialog[existingPromptReplicIndex] = promptReplic;
+                        }
+                        else
+                        {
+                            Dialog.Add(promptReplic);
+                        }
 
                         var answerReplic = new Replic(
                             _answerParser.Parse(prompt.Answer.GetUserVisibleAnswer()),
@@ -354,7 +359,15 @@ namespace FreeAIr.UI.ViewModels
                             AdditionalCommandContainer,
                             false
                             );
-                        Dialog.Add(answerReplic);
+                        var existingAnswerReplicIndex = Dialog.FindIndex(r => r.IsSameTag(prompt) && !r.IsPrompt);
+                        if (existingAnswerReplicIndex >= 0)
+                        {
+                            Dialog[existingAnswerReplicIndex] = answerReplic;
+                        }
+                        else
+                        {
+                            Dialog.Add(answerReplic);
+                        }
                     }
                     break;
                 case PromptChangeKindEnum.AnswerUpdated:
@@ -384,7 +397,7 @@ namespace FreeAIr.UI.ViewModels
             {
                 await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
 
-                if (_selectedChat is not null && ReferenceEquals(_selectedChat.Chat, e.Chat))
+                if (_selectedChat is not null && ReferenceEquals(_selectedChat, e.Chat))
                 {
                     UpdateDialogPrompt(
                         e.Prompt,
@@ -402,12 +415,12 @@ namespace FreeAIr.UI.ViewModels
 
     public sealed class ChatContextMenuAdditionalCommand : AdditionalCommand
     {
-        private readonly Func<Chat?> _chatFunc;
+        private readonly Func<BLogic.Chat?> _chatFunc;
         private readonly ICommand? _actionCommand;
 
         public ChatContextMenuAdditionalCommand(
             IFontSizeProvider fontSizeProvider,
-            Func<Chat?> chatFunc,
+            Func<BLogic.Chat?> chatFunc,
             PartTypeEnum partType,
             string title,
             string toolTip,

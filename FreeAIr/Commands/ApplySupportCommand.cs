@@ -112,7 +112,7 @@ namespace FreeAIr.Commands
                     )
                 );
 
-            await ChatListToolWindow.ShowIfEnabledAsync();
+            await ChatWindowShower.ShowChatWindowAsync(chat);
         }
 
         protected abstract System.Threading.Tasks.Task<SupportActionJson> ChooseSupportAsync(

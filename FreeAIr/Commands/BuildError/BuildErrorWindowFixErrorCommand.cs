@@ -98,7 +98,7 @@ namespace FreeAIr.Commands.BuildError
                     )
                 );
 
-            await ChatListToolWindow.ShowIfEnabledAsync();
+            await ChatWindowShower.ShowChatWindowAsync(chat);
         }
     }
 }

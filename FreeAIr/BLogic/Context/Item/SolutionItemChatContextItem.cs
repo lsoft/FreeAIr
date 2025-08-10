@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace FreeAIr.BLogic.Context.Item
 {
-    [DebuggerDisplay("{SelectedIdentifier.Key}")]
+    [DebuggerDisplay("{SelectedIdentifier.FilePath}")]
     public sealed class SolutionItemChatContextItem : IChatContextItem
     {
         private readonly AddLineNumbersMode _addLineNumberMode;

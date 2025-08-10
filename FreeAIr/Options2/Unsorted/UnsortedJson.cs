@@ -14,13 +14,6 @@ namespace FreeAIr.Options2.Unsorted
             set;
         } = 8192;
 
-        [Description("Should FreeAIr switch to its window after dev asked a prompt.")]
-        public bool SwitchToTaskWindow
-        {
-            get;
-            set;
-        } = true;
-
         [Description("If your preferred AI answers culture is differ of your VS UI culture, then use this option to override AI answer culture. For example set ru-RU to get answers in Russian.")]
         public string OverriddenCulture
         {
@@ -86,7 +79,6 @@ namespace FreeAIr.Options2.Unsorted
             return new UnsortedJson
             {
                 MaxOutputTokenCount = MaxOutputTokenCount,
-                SwitchToTaskWindow = SwitchToTaskWindow,
                 OverriddenCulture = OverriddenCulture,
                 PreferredUnitTestFramework = PreferredUnitTestFramework,
                 AutomaticSearchForContextItemsTimeoutMsec = AutomaticSearchForContextItemsTimeoutMsec,

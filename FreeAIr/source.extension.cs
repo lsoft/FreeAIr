@@ -12,7 +12,7 @@ namespace FreeAIr
         public const string Name = "FreeAIr";
         public const string Description = @"Access to AI for free for anyone.";
         public const string Language = "en-US";
-        public const string Version = "3.7.3";
+        public const string Version = "4.0.0";
         public const string Author = "lsoft";
         public const string Tags = "AI, Autocomplete, C#, Code Generation, Code Prediction, Code Snippets, Coding Accelerator, Coding Assistant, Developer Tools, IntelliCode, IntelliSense, LLM, Machine Learning, ML, Productivity, Suggestions";
         public const bool IsPreview = false;

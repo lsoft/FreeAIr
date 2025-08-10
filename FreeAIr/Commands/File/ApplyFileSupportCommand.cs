@@ -79,7 +79,7 @@ namespace FreeAIr.Commands.File
                     )
                 );
 
-            await ChatListToolWindow.ShowIfEnabledAsync();
+            await ChatWindowShower.ShowChatWindowAsync(chat);
         }
 
         public static async Task AddFilesToContextAsync(

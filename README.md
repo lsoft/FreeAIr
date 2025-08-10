@@ -111,6 +111,10 @@ Main functions:
     <img src="https://raw.githubusercontent.com/lsoft/FreeAIr/main/controlpanel.png" style="height: 150px; width: auto; object-fit: contain; border: 1px solid #ccc;" alt="FreeAIr control panel" />
   </a>
 
+  <a href="https://raw.githubusercontent.com/lsoft/FreeAIr/main/in_situ_chat.gif" target="_blank">
+    <img src="https://raw.githubusercontent.com/lsoft/FreeAIr/main/in_situ_chat.gif" style="height: 150px; width: auto; object-fit: contain; border: 1px solid #ccc;" alt="FreeAIr in situ chat" />
+  </a>
+
 </div>
 
 # Getting started

@@ -53,6 +53,7 @@
     <Compile Include="Commands\File\ApplyFileSupportCommand.cs" />
     <Compile Include="Commands\Other\OpenPropertiesCommand.cs" />
     <Compile Include="Commands\Other\OpenActivityLogCommand.cs" />
+    <Compile Include="Commands\ShowInSituChatCommand.cs" />
     <Compile Include="Helper\ActivityLogHelper.cs" />
     <Compile Include="Helper\DisposeHelper.cs" />
     <Compile Include="Helper\KnownMonikersHelper.cs" />
@@ -177,9 +178,11 @@
     <Compile Include="Options2\Support\SupportCollectionJson.cs" />
     <Compile Include="Options2\Unsorted\UnsortedJson.cs" />
     <Compile Include="Options\FontSizePage.cs" />
+    <Compile Include="Options\FontSizeProxy.cs" />
     <Compile Include="Options\InternalPage.cs" />
     <Compile Include="Options2\JsonDescriptionCommentConverter.cs" />
     <Compile Include="Options\OptionsProvider.cs" />
+    <Compile Include="Options\UIPage.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="FreeAIrPackage.cs" />
     <Compile Include="Resources\Resources1.Designer.cs">
@@ -195,6 +198,9 @@
       <DependentUpon>source.extension.vsixmanifest</DependentUpon>
     </Compile>
     <Compile Include="UI\BindingProxy.cs" />
+    <Compile Include="UI\Chat\ChatControl.xaml.cs">
+      <DependentUpon>ChatControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI\ContextMenu\AgentContextMenu.cs" />
     <Compile Include="UI\ContextMenu\ModelContextMenu.cs" />
     <Compile Include="UI\ContextMenu\SupportContextMenu.cs" />
@@ -225,10 +231,13 @@
     <Compile Include="UI\Embedillo\VisualLine\Command\CommandVisualLineGeneratorFactory.cs" />
     <Compile Include="UI\Embedillo\VisualLine\SolutionItem\SolutionItemSuggestion.cs" />
     <Compile Include="UI\Embedillo\VisualLine\SolutionItem\SolutionItemVisualLineGeneratorFactory.cs" />
+    <Compile Include="UI\InSitu\InSituChatInputCommandFilter.cs" />
+    <Compile Include="UI\InSitu\InSituChatInputFilterProvider.cs" />
     <Compile Include="UI\NullToUnsetValueConverter.cs" />
     <Compile Include="UI\OpenContextMenuOnLeftClickBehavior.cs" />
     <Compile Include="UI\PseudoCrispImage.cs" />
     <Compile Include="UI\Theme.cs" />
+    <Compile Include="UI\ToolWindows\ChatWindowShower.cs" />
     <Compile Include="UI\ToolWindows\ChooseModelToolWindow.cs" />
     <Compile Include="UI\ToolWindows\ChooseModelToolWindowControl.xaml.cs">
       <DependentUpon>ChooseModelToolWindowControl.xaml</DependentUpon>
@@ -258,7 +267,11 @@
     <Compile Include="UI\ToolWindows\NaturalLanguageResultsToolWindowControl.xaml.cs">
       <DependentUpon>NaturalLanguageResultsToolWindowControl.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UI\ToolWindows\RelativeMaxHeightConverter.cs" />
     <Compile Include="UI\ViewModels\ActionConfigureViewModel.cs" />
+    <Compile Include="UI\ViewModels\AddRelatedItemsToContextBackgroundTask.cs" />
+    <Compile Include="UI\ViewModels\ChatContextItemViewModel.cs" />
+    <Compile Include="UI\ViewModels\InSituChatViewModel.cs" />
     <Compile Include="UI\ViewModels\McpServerConfigureViewModel.cs" />
     <Compile Include="UI\ViewModels\AgentConfigureViewModel.cs" />
     <Compile Include="UI\ViewModels\ChooseChatAgentViewModel.cs" />
@@ -269,6 +282,9 @@
     <Compile Include="UI\ViewModels\NaturalLanguageResultsViewModel.cs" />
     <Compile Include="UI\ViewModels\OutlineEmbeddingOutputPanel.cs" />
     <Compile Include="UI\ViewModels\SearchForDockerMcpServerViewModel.cs" />
+    <Compile Include="UI\Windows\InSituChatWindow.xaml.cs">
+      <DependentUpon>InSituChatWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI\Windows\ActionConfigureWindow.xaml.cs">
       <DependentUpon>ActionConfigureWindow.xaml</DependentUpon>
     </Compile>
@@ -426,6 +442,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </EmbeddedResource>
+    <Page Include="UI\Chat\ChatControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="UI\CodeLens\CodeLenseUserControl.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -461,6 +481,10 @@
     <Page Include="UI\ToolWindows\NaturalLanguageResultsToolWindowControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\Windows\InSituChatWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="UI\Windows\ActionConfigureWindow.xaml">
       <Generator>MSBuild:Compile</Generator>

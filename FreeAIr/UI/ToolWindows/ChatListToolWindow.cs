@@ -33,17 +33,6 @@ namespace FreeAIr.UI.ToolWindows
             return control;
         }
 
-
-        public static async Task ShowIfEnabledAsync()
-        {
-            var unsorted = await FreeAIrOptions.DeserializeUnsortedAsync();
-            if (unsorted.SwitchToTaskWindow)
-            {
-                _ = await ChatListToolWindow.ShowAsync();
-            }
-        }
-
-
         [Guid("ff949254-e51d-40a2-afa6-ad4482f5e54d")]
         internal class Pane : ToolkitToolWindowPane
         {

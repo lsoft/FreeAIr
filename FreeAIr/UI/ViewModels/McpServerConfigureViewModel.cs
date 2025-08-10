@@ -288,7 +288,8 @@ namespace FreeAIr.UI.ViewModels
                             var viewModel = new SearchForDockerMcpServerViewModel(
                                 );
                             w.DataContext = viewModel;
-                            if ((await w.ShowDialogAsync()).GetValueOrDefault())
+                            var dialogResult = await w.ShowDialogAsync();
+                            if (dialogResult.GetValueOrDefault())
                             {
                                 if (viewModel.McpServerName != null && viewModel.McpServer != null)
                                 {

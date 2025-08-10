@@ -61,8 +61,7 @@ namespace FreeAIr.Commands
                     )
                 );
 
-            _ = await ChatListToolWindow.ShowAsync();
+            await ChatWindowShower.ShowChatWindowAsync(chat);
         }
-
     }
 }

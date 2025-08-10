@@ -4,8 +4,9 @@ using FreeAIr.Helper;
 
 namespace FreeAIr.Commands
 {
-    [Command(PackageIds.GenerateWholeLineSuggestionCommand)]
-    internal sealed class GenerateWholeLineSuggestionCommand : BaseCommand<GenerateWholeLineSuggestionCommand>
+
+    [Command(PackageIds.GenerateWholeLineSuggestionCommandId)]
+    public sealed class GenerateWholeLineSuggestionCommand : BaseCommand<GenerateWholeLineSuggestionCommand>
     {
         public GenerateWholeLineSuggestionCommand(
             )

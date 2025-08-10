@@ -36,7 +36,7 @@ namespace FreeAIr.Commands.File
                 selectedFiles
                 );
 
-            await ChatListToolWindow.ShowIfEnabledAsync();
+            await ChatWindowShower.ShowChatWindowAsync(selectedChat);
         }
 
         protected override void BeforeQueryStatus(EventArgs e)

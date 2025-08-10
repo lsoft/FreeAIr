@@ -1,0 +1,336 @@
+﻿<UserControl
+    x:Class="FreeAIr.UI.Chat.ChatControl"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+    xmlns:local="clr-namespace:FreeAIr.UI.Chat"
+    xmlns:imaging="clr-namespace:Microsoft.VisualStudio.Imaging;assembly=Microsoft.VisualStudio.Imaging"
+    xmlns:theming="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Imaging"
+    xmlns:util="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Utilities"
+    xmlns:catalog="clr-namespace:Microsoft.VisualStudio.Imaging;assembly=Microsoft.VisualStudio.ImageCatalog"
+    xmlns:toolkit="clr-namespace:Community.VisualStudio.Toolkit;assembly=Community.VisualStudio.Toolkit"
+    xmlns:resources="clr-namespace:FreeAIr.Resources"
+    xmlns:mdxaml="https://github.com/whistyun/MdXaml"
+    xmlns:embedillo="clr-namespace:FreeAIr.UI.Embedillo"
+    xmlns:viewmodels="clr-namespace:FreeAIr.UI.ViewModels"
+    xmlns:toolwindows="clr-namespace:FreeAIr.UI.ToolWindows"
+    xmlns:ui="clr-namespace:FreeAIr.UI"
+    xmlns:dialog="clr-namespace:MarkdownParser.UI.Dialog;assembly=MarkdownParser"
+    mc:Ignorable="d" 
+    d:DesignHeight="450" d:DesignWidth="800"
+    x:Name="ChatControlName"
+    >
+    <UserControl.Resources>
+        <ui:InvertBooleanToVisibilityConverter  x:Key="StopCommandVisibilityConverter" />
+
+        <!-- Прокси для передачи контекста в ContextMenu -->
+        <!--<ui:BindingProxy x:Key="DataContextProxy" Data="{Binding}" />
+        <ui:BindingProxy x:Key="ForegroundButtonProxy" Data="{Binding ElementName=ForegroundButton}" />-->
+
+        <!--<ui:CombinedParameterConverter x:Key="CombinedParameterConverter" />-->
+
+        <toolwindows:RelativeMaxHeightConverter x:Key="RelativeMaxHeightConverter" Ratio="0.2" />
+    </UserControl.Resources>
+    
+    <Grid
+        >
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="10*" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="3*" />
+        </Grid.RowDefinitions>
+
+        <!-- chat context section -->
+        <Border
+            Grid.Row="0"
+            BorderThickness="1"
+            CornerRadius="0"
+            BorderBrush="#569CD6"
+            >
+            <Grid
+                >
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition Height="auto" MinHeight="50" />
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition Height="auto"/>
+                </Grid.RowDefinitions>
+
+                <Grid
+                    Grid.Row="0"
+                    HorizontalAlignment="Stretch"
+                    >
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="auto"/>
+                        <ColumnDefinition />
+                    </Grid.ColumnDefinitions>
+
+                    <Label
+                        Grid.Column="0"
+                        Margin="2"
+                        Content="{x:Static resources:Resources.Chat_context}"
+                        HorizontalAlignment="Left"
+                        FontSize="12"
+                        FontFamily="Cascadia Code"
+                        />
+
+                    <WrapPanel
+                        Grid.Column="1"
+                        Orientation="Horizontal"
+                        HorizontalAlignment="Right"
+                        VerticalAlignment="Stretch"
+                        Margin="0,5,0,5"
+                        >
+
+                        <Button
+                            Margin="5,0,5,0"
+                            Content="{Binding ElementName=ChatControlName, Path=ChatAgentText}"
+                            FontFamily="Cascadia Code"
+                            VerticalAlignment="Center"
+                            ToolTip="{x:Static resources:Resources.Choose_this_chat_agent}"
+                            Command="{Binding ElementName=ChatControlName, Path=ChooseChatAgentCommand}"
+                            Style="{DynamicResource TextBlockLikeButtonStyle}"
+                            />
+
+                        <Button
+                            Margin="5,0,5,0"
+                            Content="{x:Static resources:Resources.Edit_chat_tools}"
+                            FontFamily="Cascadia Code"
+                            VerticalAlignment="Center"
+                            ToolTip="{x:Static resources:Resources.Edit_the_MCP_tools_for_the_selected_chat}"
+                            Command="{Binding ElementName=ChatControlName, Path=EditChatToolsCommand}"
+                            Style="{DynamicResource TextBlockLikeButtonStyle}"
+                            />
+
+                        <Button
+                            Margin="5,0,5,0"
+                            Content="{x:Static resources:Resources.Add_custom_file}"
+                            FontFamily="Cascadia Code"
+                            VerticalAlignment="Center"
+                            ToolTip="{x:Static resources:Resources.Add_custom_file_to_chat_context}"
+                            Command="{Binding ElementName=ChatControlName, Path=AddCustomFileToContextCommand}"
+                            Style="{DynamicResource TextBlockLikeButtonStyle}"
+                            />
+
+                        <Button
+                            Margin="5,0,5,0"
+                            Content="{x:Static resources:Resources.Remove_all_automatic_found_items}"
+                            FontFamily="Cascadia Code"
+                            VerticalAlignment="Center"
+                            ToolTip="{x:Static resources:Resources.Remove_all_automatic_found_items_from_chat_context}"
+                            Command="{Binding ElementName=ChatControlName, Path=RemoveAllAutomaticItemsFromContextCommand}"
+                            Style="{DynamicResource TextBlockLikeButtonStyle}"
+                            />
+
+                    </WrapPanel>
+                </Grid>
+
+                <ScrollViewer
+                    Grid.Row="1"
+                    Margin="2"
+                    MaxHeight="{Binding Path=ActualHeight, ElementName=ChatControlName, Converter={StaticResource RelativeMaxHeightConverter}}"
+                    VerticalScrollBarVisibility="Auto"
+                    >
+
+                    <!-- chat context item list -->
+                    <ItemsControl
+                        ItemsSource="{Binding ElementName=ChatControlName, Path=ChatContextItems}"
+                        >
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Grid
+                                    Margin="0"
+                                    >
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="auto" />
+                                        <ColumnDefinition Width="auto" />
+                                        <ColumnDefinition Width="auto" />
+                                        <ColumnDefinition />
+                                    </Grid.ColumnDefinitions>
+
+                                    <ui:PseudoCrispImage
+                                        Grid.Column="0"
+                                        Moniker="{x:Static catalog:KnownMonikers.Cancel}"
+                                        ToolTip="{x:Static resources:Resources.Delete_from_context}"
+                                        Cursor="Hand"
+                                        >
+                                        <ui:PseudoCrispImage.InputBindings>
+                                            <MouseBinding
+                                                Command="{Binding ElementName=ChatControlName, Path=DeleteItemFromContextCommand}"
+                                                CommandParameter="{Binding .}"
+                                                MouseAction="LeftClick"
+                                                />
+                                        </ui:PseudoCrispImage.InputBindings>
+                                    </ui:PseudoCrispImage>
+                                    <ui:PseudoCrispImage
+                                        Grid.Column="1"
+                                        Margin="5,0,0,0"
+                                        Moniker="{x:Static catalog:KnownMonikers.ZoomIn}"
+                                        ToolTip="{x:Static resources:Resources.Search_and_add_related_context_items}"
+                                        Cursor="Hand"
+                                        >
+                                        <ui:PseudoCrispImage.InputBindings>
+                                            <MouseBinding
+                                                Command="{Binding ElementName=ChatControlName, Path=AddRelatedItemsToContextCommand}"
+                                                CommandParameter="{Binding .}"
+                                                MouseAction="LeftClick"
+                                                />
+                                        </ui:PseudoCrispImage.InputBindings>
+                                    </ui:PseudoCrispImage>
+                                    <ui:PseudoCrispImage
+                                        Grid.Column="2"
+                                        Margin="20,0,0,0"
+                                        Moniker="{Binding Moniker}"
+                                        ToolTip="{Binding Tooltip}"
+                                        />
+                                    <Button
+                                        Grid.Column="3"
+                                        Margin="5,0,0,0"
+                                        Content="{Binding ChatContextDescription}"
+                                        HorizontalAlignment="Left"
+                                        HorizontalContentAlignment="Left"
+                                        FontFamily="Cascadia Code"
+                                        ToolTip="{x:Static resources:Resources.Open_item_in_new_window}"
+                                        Command="{Binding ElementName=ChatControlName, Path=OpenContextItemCommand}"
+                                        CommandParameter="{Binding .}"
+                                        Style="{DynamicResource TextBlockLikeButtonStyle}"
+                                        />
+
+                                </Grid>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+
+                </ScrollViewer>
+
+
+                <Border
+                    Grid.Row="2"
+                    CornerRadius="0"
+                    BorderBrush="#569CD6"
+                    BorderThickness="0,1,0,0"
+                    Margin="50,0,50,0"
+                    />
+
+                <!-- add item to context section -->
+
+                <Grid
+                    Grid.Row="3"
+                    >
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="auto"/>
+                        <ColumnDefinition Width="auto"/>
+                        <ColumnDefinition />
+                    </Grid.ColumnDefinitions>
+
+                    <Label
+                        Grid.Column="0"
+                        Margin="2"
+                        Content="➕"
+                        VerticalAlignment="Center"
+                        HorizontalAlignment="Left"
+                        HorizontalContentAlignment="Left"
+                        Foreground="Green"
+                        FontFamily="Cascadia Code"
+                        ToolTip="{x:Static resources:Resources.Add_new_items_to_context}"
+                        />
+
+                    <Label
+                        Grid.Column="1"
+                        Margin="20,5,2,5"
+                        Content="{x:Static resources:Resources.Add_new_items_to_context1}"
+                        VerticalAlignment="Center"
+                        HorizontalAlignment="Left"
+                        HorizontalContentAlignment="Left"
+                        FontSize="12"
+                        FontFamily="Cascadia Code"
+                        ToolTip="{x:Static resources:Resources.Add_new_items_to_context}"
+                        />
+
+                    <embedillo:EmbedilloControl
+                        Grid.Column="2"
+                        Margin="2"
+                        VerticalAlignment="Center"
+                        VerticalContentAlignment="Center"
+                        HorizontalAlignment="Stretch"
+                        HorizontalContentAlignment="Stretch"
+                        Foreground="{Binding ElementName=ChatControlName, Path=Foreground}"
+                        Background="Transparent"
+                        FontSize="12"
+                        FontFamily="Cascadia Code"
+                        x:Name="AddToContextControl"
+                        HintText="{x:Static resources:Resources.Press___to_enter_context_items_here}"
+                        EnterCommand="{Binding ElementName=ChatControlName, Path=AddItemToContextCommand}"
+                        ControlEnabled="{Binding ElementName=ChatControlName, Path=IsReadyToAcceptNewPrompt}"
+                        MaxHeight="100"
+                        DragDrop.Drop="EmbedilloControl_Drop"
+                        />
+
+                </Grid>
+
+            </Grid>
+
+        </Border>
+
+        <dialog:DialogControl
+            Grid.Row="1"
+            Margin="2"
+            HorizontalAlignment="Stretch"
+            VerticalAlignment="Stretch"
+            x:Name="DialogControlName"
+            Dialog="{Binding ElementName=ChatControlName, Path=DialogViewModel.Dialog}"
+            />
+
+        <GridSplitter
+            Grid.Row="2"
+            ResizeDirection="Rows"
+            Height="2"
+            VerticalAlignment="Center"
+            HorizontalAlignment="Stretch"
+            />
+
+        <ui:PseudoCrispImage
+            Grid.Row="3"
+            Margin="2,5,2,2"
+            HorizontalAlignment="Right"
+            VerticalAlignment="Top"
+            Width="16"
+            Height="16"
+            IsHitTestVisible="False"
+            Moniker="{Binding ElementName=ChatControlName, Path=StatusMoniker}"
+            />
+
+        <embedillo:EmbedilloControl
+            Grid.Row="3"
+            Margin="2,2,2,2"
+            VerticalAlignment="Stretch"
+            VerticalContentAlignment="Stretch"
+            Foreground="{Binding ElementName=ChatControlName, Path=Foreground}"
+            Background="Transparent"
+            FontSize="12"
+            FontFamily="Cascadia Code"
+            x:Name="PromptControl"
+            EnterCommand="{Binding ElementName=ChatControlName, Path=CreatePromptCommand}"
+            HintText="{x:Static resources:Resources.Enter_your_prompt_here__Press___to}"
+            ControlEnabled="{Binding ElementName=ChatControlName, Path=IsReadyToAcceptNewPrompt}"
+            MaxHeight="100000"
+            DragDrop.Drop="EmbedilloControl_Drop"
+            />
+
+
+        <Button
+            Grid.Row="3"
+            Margin="5,2,5,2"
+            Content="{x:Static resources:Resources.UI_StopWaiting}"
+            HorizontalAlignment="Right"
+            VerticalAlignment="Bottom"
+            FontFamily="Cascadia Code"
+            Visibility="{Binding ElementName=ChatControlName, Path=IsReadyToAcceptNewPrompt, Converter={StaticResource StopCommandVisibilityConverter}}"
+            Command="{Binding ElementName=ChatControlName, Path=StopCommand}"
+            Style="{DynamicResource TextBlockLikeButtonStyle}"
+            />
+
+    </Grid>
+</UserControl>

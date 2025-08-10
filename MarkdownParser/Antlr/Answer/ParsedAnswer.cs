@@ -6,11 +6,8 @@ namespace MarkdownParser.Antlr.Answer
 {
     public sealed class ParsedAnswer
     {
-        private readonly object _locker = new();
-
         private readonly List<IBlock> _blocks = new();
         private readonly IFontSizeProvider _fontSizeProvider;
-        private FlowDocument? _flowDocument;
 
         public IReadOnlyList<IBlock> Blocks => _blocks;
 
@@ -182,11 +179,6 @@ namespace MarkdownParser.Antlr.Answer
 
         private ITextualBlock? GetTextualBlock()
         {
-            //if (_blocks.Count == 0)
-            //{
-            //    return null;
-            //}
-
             var block = _blocks[_blocks.Count - 1] as ITextualBlock;
             return block;
         }
@@ -194,13 +186,6 @@ namespace MarkdownParser.Antlr.Answer
         private ParagraphBlock GetParagraphBlock()
         {
             var block = _blocks[_blocks.Count - 1] as ParagraphBlock;
-            //if (block is null)
-            //{
-            //    block = new ParagraphBlock(
-            //        _fontSizeProvider
-            //        );
-            //    _blocks.Add(block);
-            //}
 
             return block;
         }
@@ -212,15 +197,9 @@ namespace MarkdownParser.Antlr.Answer
             bool isInProgress
             )
         {
-            lock (_locker)
-            {
-                if (_flowDocument is null)
-                {
-                    _flowDocument = CreateFlowDocument(acc, isInProgress);
-                }
+            var flowDocument = CreateFlowDocument(acc, isInProgress);
 
-                return _flowDocument;
-            }
+            return flowDocument;
         }
 
         private FlowDocument CreateFlowDocument(AdditionalCommandContainer acc, bool isInProgress)
