@@ -5,22 +5,22 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:local="clr-namespace:MarkdownParserTester"
-    xmlns:dialog="clr-namespace:MarkdownParser.UI.Dialog;assembly=MarkdownParser"
     mc:Ignorable="d"
     x:Name="MainWindowName"
     Title="MainWindow"
     Height="450" Width="800"
-    Loaded="MainWindowName_Loaded"
     WindowState="Maximized"
     >
     <Grid>
-        <dialog:DialogControl
-            Margin="2"
-            HorizontalAlignment="Stretch"
-            VerticalAlignment="Stretch"
-            x:Name="DialogControlName"
-            Dialog="{Binding ElementName=MainWindowName, Path=Dialog}"
-            Focusable="False"
-            />
+        <Border BorderBrush="Red" BorderThickness="1">
+            
+            <FlowDocumentScrollViewer
+                HorizontalContentAlignment="Stretch"
+                VerticalAlignment="Stretch"
+                VerticalContentAlignment="Stretch"
+                Document="{Binding ElementName=MainWindowName, Path=Document}"
+                />
+
+        </Border>
     </Grid>
 </Window>

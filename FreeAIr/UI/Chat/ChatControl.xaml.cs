@@ -25,7 +25,6 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using WpfHelpers;
 using static FreeAIr.UI.ViewModels.ChatListViewModel;
-using static MarkdownParser.UI.Dialog.DialogControl;
 
 namespace FreeAIr.UI.Chat
 {
@@ -644,10 +643,10 @@ namespace FreeAIr.UI.Chat
 
         public BLogic.Chat? Chat
         {
-            get => (BLogic.Chat)GetValue(DialogProperty);
+            get => (BLogic.Chat)GetValue(ChatProperty);
             set
             {
-                SetValue(DialogProperty, value);
+                SetValue(ChatProperty, value);
             }
         }
 

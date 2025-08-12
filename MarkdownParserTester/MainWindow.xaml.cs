@@ -1,8 +1,8 @@
 ﻿using MarkdownParser.Antlr.Answer;
 using MarkdownParser.Antlr.Answer.Parts;
 using System.Windows;
+using System.Windows.Documents;
 using WpfHelpers;
-using static MarkdownParser.UI.Dialog.DialogControl;
 
 namespace MarkdownParserTester
 {
@@ -11,23 +11,29 @@ namespace MarkdownParserTester
     /// </summary>
     public partial class MainWindow : Window
     {
-        public ObservableCollection2<Replic> Dialog
+        public FlowDocument Document
         {
             get;
-        } = new();
+            private set;
+        }
 
         public AdditionalCommandContainer AdditionalCommandContainer
         {
             get;
-        } = new();
+            private set;
+        }
 
         public MainWindow()
         {
+            CreateDocument();
+
             InitializeComponent();
         }
 
-        private void MainWindowName_Loaded(object sender, RoutedEventArgs e)
+        private void CreateDocument()
         {
+            AdditionalCommandContainer = new();
+
             AdditionalCommandContainer.AddAdditionalCommand(
                 new AdditionalCommand(
                     ConstantFontSizeProvider.Instance,
@@ -89,10 +95,10 @@ namespace MarkdownParserTester
                     null
                     )
                 );
+
             var answerParser = new DirectAnswerParser(
                 ConstantFontSizeProvider.Instance
                 );
-
 
             var parsedAnswer = answerParser.Parse(
 """
@@ -214,14 +220,9 @@ fake **three** bolds **one** two **three and latest
                 );
             //*/
 
-            Dialog.Add(
-                new Replic(
-                    parsedAnswer: parsedAnswer,
-                    tag: null,
-                    isPrompt: true,
-                    acc: AdditionalCommandContainer,
-                    inProgress: false
-                    )
+            Document = parsedAnswer.ConvertToFlowDocument(
+                AdditionalCommandContainer,
+                false
                 );
         }
     }

@@ -14,8 +14,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using WpfHelpers;
-using static MarkdownParser.UI.Dialog.DialogControl;
-using static FreeAIr.UI.ViewModels.ChatListViewModel;
+using static FreeAIr.UI.Dialog.DialogControl;
 
 namespace FreeAIr.UI.ViewModels
 {

@@ -2,6 +2,7 @@
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
+using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
@@ -9,7 +10,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using WpfHelpers;
 
-namespace MarkdownParser.UI.Dialog
+namespace FreeAIr.UI.Dialog
 {
     public partial class DialogControl : UserControl
     {

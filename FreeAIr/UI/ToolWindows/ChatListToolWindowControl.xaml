@@ -16,7 +16,6 @@
     xmlns:toolwindows="clr-namespace:FreeAIr.UI.ToolWindows"
     xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
     xmlns:ui="clr-namespace:FreeAIr.UI"
-    xmlns:dialog="clr-namespace:MarkdownParser.UI.Dialog;assembly=MarkdownParser"
     xmlns:chat="clr-namespace:FreeAIr.UI.Chat"
     toolkit:Themes.UseVsTheme="True"
     mc:Ignorable="d"

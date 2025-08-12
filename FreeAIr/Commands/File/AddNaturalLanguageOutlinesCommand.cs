@@ -1,4 +1,5 @@
 ﻿using EnvDTE;
+using FreeAIr.BLogic;
 using FreeAIr.BLogic.Context.Item;
 using FreeAIr.Helper;
 using FreeAIr.Options2.Support;

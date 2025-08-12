@@ -47,6 +47,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Antlr\Prompt\PromptParser.cs" />
+    <Compile Include="BLogic\AddLineNumbersMode.cs" />
     <Compile Include="BLogic\Context\Item\SimpleTextChatContextItem.cs" />
     <Compile Include="Commands\ApplySupportCommand.cs" />
     <Compile Include="Commands\File\AddFilesToContextCommand.cs" />
@@ -215,6 +216,9 @@
     <Compile Include="UI\CodeLens\ViewElementFactory.cs" />
     <Compile Include="UI\CombinedParameterConverter.cs" />
     <Compile Include="UI\Converters.cs" />
+    <Compile Include="UI\Dialog\DialogControl.xaml.cs">
+      <DependentUpon>DialogControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI\Embedillo\Answer\Parser\CommandAnswerPart.cs" />
     <Compile Include="UI\Embedillo\Answer\Parser\IParsedPart.cs" />
     <Compile Include="UI\Embedillo\Answer\Parser\Parsed.cs" />
@@ -448,6 +452,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UI\CodeLens\CodeLenseUserControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI\Dialog\DialogControl.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
