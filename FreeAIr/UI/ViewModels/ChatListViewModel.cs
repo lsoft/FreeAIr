@@ -68,6 +68,54 @@ namespace FreeAIr.UI.ViewModels
             }
         }
 
+        public bool ShowChatListPanel
+        {
+            get => UIPage.Instance.ShowChatListPanel;
+            set
+            {
+                UIPage.Instance.ShowChatListPanel = value;
+                UIPage.Instance.Save();
+
+                OnPropertyChanged();
+            }
+        }
+
+        public int ChatPanelColumn
+        {
+            get
+            {
+                if (ShowChatListPanel)
+                {
+                    return 2;
+                }
+
+                return 0;
+            }
+        }
+
+        public int ChatPanelColumnSpan
+        {
+            get
+            {
+                if (ShowChatListPanel)
+                {
+                    return 0;
+                }
+                return 3;
+            }
+        }
+
+        public Visibility ChatListVisibility
+        {
+            get
+            {
+                return ShowChatListPanel
+                    ? Visibility.Visible
+                    : Visibility.Collapsed
+                    ;
+            }
+        }
+
         public Visibility ChatPanelVisibility
         {
             get

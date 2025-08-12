@@ -295,10 +295,10 @@
     <value>Открыть итем в новой вкладке</value>
   </data>
   <data name="Add_new_items_to_context" xml:space="preserve">
-    <value>Добавить новые итемы в контекст</value>
+    <value>Добавить в контекст</value>
   </data>
   <data name="Add_new_items_to_context1" xml:space="preserve">
-    <value>Добавить новые итемы в контекст:</value>
+    <value>Добавить в контекст:</value>
   </data>
   <data name="Press___to_enter_context_items_here" xml:space="preserve">
     <value>Нажмите # чтобы ввести итемы в это поле. Нажмите Ctrl + Enter чтобы добавить итемы в контекст.</value>

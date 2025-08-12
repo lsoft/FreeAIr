@@ -21,7 +21,7 @@ namespace FreeAIr.BLogic.Context.Item
             get;
         }
 
-        public string ContextUIDescription => SelectedIdentifier.FilePath + SelectedIdentifier.Selection?.ToString();
+        public string ContextUIDescription => SelectedIdentifier.ContextUIDescription;
 
         public bool IsAutoFound
         {

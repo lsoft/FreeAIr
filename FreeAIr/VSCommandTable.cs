@@ -52,7 +52,8 @@ namespace FreeAIr
         public const int OpenPropertiesCommandId = 0x1054;
         public const int AddFilesToContextCommandId = 0x1055;
         public const int OpenActivityLogCommandId = 0x1056;
-        public const int ShowInSituChatCommandId = 0x1057;
+        public const int OpenProxyLogCommandId = 0x1057;
+        public const int ShowInSituChatCommandId = 0x1058;
         public const int VisualStudioContextMenu = 0x8000;
         public const int VisualStudioContextMenuGroup = 0x8001;
         public const int VisualStudioContextMenuDynamicCommandId = 0x8002;

@@ -115,7 +115,7 @@ namespace FreeAIr.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Add new items to context.
+        ///   Looks up a localized string similar to Add to context.
         /// </summary>
         public static string Add_new_items_to_context {
             get {
@@ -124,7 +124,7 @@ namespace FreeAIr.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Add new items to context:.
+        ///   Looks up a localized string similar to Add to context:.
         /// </summary>
         public static string Add_new_items_to_context1 {
             get {

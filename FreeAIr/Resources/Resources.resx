@@ -313,11 +313,11 @@
     <comment>Used in FreeAIr\UI\ToolWindows\ChatListToolWindowControl.xaml document</comment>
   </data>
   <data name="Add_new_items_to_context" xml:space="preserve">
-    <value>Add new items to context</value>
+    <value>Add to context</value>
     <comment>Used in FreeAIr\UI\ToolWindows\ChatListToolWindowControl.xaml document</comment>
   </data>
   <data name="Add_new_items_to_context1" xml:space="preserve">
-    <value>Add new items to context:</value>
+    <value>Add to context:</value>
     <comment>Used in FreeAIr\UI\ToolWindows\ChatListToolWindowControl.xaml document</comment>
   </data>
   <data name="Press___to_enter_context_items_here" xml:space="preserve">

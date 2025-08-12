@@ -1,6 +1,7 @@
 ﻿using FreeAIr.Helper;
 using Microsoft.VisualStudio.Threading;
 using System.Diagnostics;
+using System.Text;
 using System.Threading;
 
 namespace FreeAIr.McpServerProxy
@@ -37,21 +38,41 @@ namespace FreeAIr.McpServerProxy
                 {
                     try
                     {
+                        var error = new StringBuilder();
+
                         process.StartInfo.WorkingDirectory = _folderPath;
-                        process.StartInfo.FileName = _fileName;
+                        process.StartInfo.FileName = System.IO.Path.Combine(_folderPath, _fileName);
                         process.StartInfo.Arguments = _arguments;
                         process.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
                         process.StartInfo.CreateNoWindow = true;
 
-                        //todo replace Console.WriteLine with logging in the whole class
+                        process.StartInfo.UseShellExecute = false;
+                        process.StartInfo.RedirectStandardOutput = true;
+                        process.StartInfo.RedirectStandardError = true;
+                        process.ErrorDataReceived += new DataReceivedEventHandler((sender, e) =>
+                        {
+                            error.Append(e.Data);
+                        });
+
                         ActivityLogHelper.ActivityLogInformation($"Запускаем процесс: {_fileName} {_arguments}");
-                        process.Start();
+                        var startResult = process.Start();
+
+                        process.BeginErrorReadLine();
+                        var output = await process.StandardOutput.ReadToEndAsync();
 
                         _ = await process.WaitForExitAsync(cancellationToken);
 
                         cancellationToken.ThrowIfCancellationRequested();
 
-                        ActivityLogHelper.ActivityLogWarning("Процесс завершён нештатно. Перезапуск...");
+                        var msg = new StringBuilder();
+                        msg.AppendLine("Процесс завершён нештатно. Перезапуск...");
+                        msg.AppendLine(new string('-', 80));
+                        msg.AppendLine("Output:");
+                        msg.AppendLine(output);
+                        msg.AppendLine(new string('-', 80));
+                        msg.AppendLine("Error:");
+                        msg.AppendLine(error.ToString());
+                        ActivityLogHelper.ActivityLogWarning(msg.ToString());
 
                         //чтобы не сразу перезапускать процесс и не ДДОСить ОС
                         await Task.Delay(1_000, cancellationToken);

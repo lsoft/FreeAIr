@@ -24,12 +24,6 @@
     <UserControl.Resources>
         <ui:InvertBooleanToVisibilityConverter  x:Key="StopCommandVisibilityConverter" />
 
-        <!-- Прокси для передачи контекста в ContextMenu -->
-        <!--<ui:BindingProxy x:Key="DataContextProxy" Data="{Binding}" />
-        <ui:BindingProxy x:Key="ForegroundButtonProxy" Data="{Binding ElementName=ForegroundButton}" />-->
-
-        <!--<ui:CombinedParameterConverter x:Key="CombinedParameterConverter" />-->
-
         <toolwindows:RelativeMaxHeightConverter x:Key="RelativeMaxHeightConverter" Ratio="0.2" />
     </UserControl.Resources>
     
@@ -58,17 +52,15 @@
                     <RowDefinition Height="auto"/>
                 </Grid.RowDefinitions>
 
-                <Grid
+                <WrapPanel
                     Grid.Row="0"
+                    Orientation="Horizontal"
                     HorizontalAlignment="Stretch"
+                    VerticalAlignment="Stretch"
+                    Margin="0,5,0,5"
                     >
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="auto"/>
-                        <ColumnDefinition />
-                    </Grid.ColumnDefinitions>
 
                     <Label
-                        Grid.Column="0"
                         Margin="2"
                         Content="{x:Static resources:Resources.Chat_context}"
                         HorizontalAlignment="Left"
@@ -76,56 +68,47 @@
                         FontFamily="Cascadia Code"
                         />
 
-                    <WrapPanel
-                        Grid.Column="1"
-                        Orientation="Horizontal"
-                        HorizontalAlignment="Right"
-                        VerticalAlignment="Stretch"
-                        Margin="0,5,0,5"
-                        >
+                    <Button
+                        Margin="5,0,5,0"
+                        Content="{Binding ElementName=ChatControlName, Path=ChatAgentText}"
+                        FontFamily="Cascadia Code"
+                        VerticalAlignment="Center"
+                        ToolTip="{x:Static resources:Resources.Choose_this_chat_agent}"
+                        Command="{Binding ElementName=ChatControlName, Path=ChooseChatAgentCommand}"
+                        Style="{DynamicResource TextBlockLikeButtonStyle}"
+                        />
 
-                        <Button
-                            Margin="5,0,5,0"
-                            Content="{Binding ElementName=ChatControlName, Path=ChatAgentText}"
-                            FontFamily="Cascadia Code"
-                            VerticalAlignment="Center"
-                            ToolTip="{x:Static resources:Resources.Choose_this_chat_agent}"
-                            Command="{Binding ElementName=ChatControlName, Path=ChooseChatAgentCommand}"
-                            Style="{DynamicResource TextBlockLikeButtonStyle}"
-                            />
+                    <Button
+                        Margin="5,0,5,0"
+                        Content="{x:Static resources:Resources.Edit_chat_tools}"
+                        FontFamily="Cascadia Code"
+                        VerticalAlignment="Center"
+                        ToolTip="{x:Static resources:Resources.Edit_the_MCP_tools_for_the_selected_chat}"
+                        Command="{Binding ElementName=ChatControlName, Path=EditChatToolsCommand}"
+                        Style="{DynamicResource TextBlockLikeButtonStyle}"
+                        />
 
-                        <Button
-                            Margin="5,0,5,0"
-                            Content="{x:Static resources:Resources.Edit_chat_tools}"
-                            FontFamily="Cascadia Code"
-                            VerticalAlignment="Center"
-                            ToolTip="{x:Static resources:Resources.Edit_the_MCP_tools_for_the_selected_chat}"
-                            Command="{Binding ElementName=ChatControlName, Path=EditChatToolsCommand}"
-                            Style="{DynamicResource TextBlockLikeButtonStyle}"
-                            />
+                    <Button
+                        Margin="5,0,5,0"
+                        Content="{x:Static resources:Resources.Add_custom_file}"
+                        FontFamily="Cascadia Code"
+                        VerticalAlignment="Center"
+                        ToolTip="{x:Static resources:Resources.Add_custom_file_to_chat_context}"
+                        Command="{Binding ElementName=ChatControlName, Path=AddCustomFileToContextCommand}"
+                        Style="{DynamicResource TextBlockLikeButtonStyle}"
+                        />
 
-                        <Button
-                            Margin="5,0,5,0"
-                            Content="{x:Static resources:Resources.Add_custom_file}"
-                            FontFamily="Cascadia Code"
-                            VerticalAlignment="Center"
-                            ToolTip="{x:Static resources:Resources.Add_custom_file_to_chat_context}"
-                            Command="{Binding ElementName=ChatControlName, Path=AddCustomFileToContextCommand}"
-                            Style="{DynamicResource TextBlockLikeButtonStyle}"
-                            />
+                    <Button
+                        Margin="5,0,5,0"
+                        Content="{x:Static resources:Resources.Remove_all_automatic_found_items}"
+                        FontFamily="Cascadia Code"
+                        VerticalAlignment="Center"
+                        ToolTip="{x:Static resources:Resources.Remove_all_automatic_found_items_from_chat_context}"
+                        Command="{Binding ElementName=ChatControlName, Path=RemoveAllAutomaticItemsFromContextCommand}"
+                        Style="{DynamicResource TextBlockLikeButtonStyle}"
+                        />
 
-                        <Button
-                            Margin="5,0,5,0"
-                            Content="{x:Static resources:Resources.Remove_all_automatic_found_items}"
-                            FontFamily="Cascadia Code"
-                            VerticalAlignment="Center"
-                            ToolTip="{x:Static resources:Resources.Remove_all_automatic_found_items_from_chat_context}"
-                            Command="{Binding ElementName=ChatControlName, Path=RemoveAllAutomaticItemsFromContextCommand}"
-                            Style="{DynamicResource TextBlockLikeButtonStyle}"
-                            />
-
-                    </WrapPanel>
-                </Grid>
+                </WrapPanel>
 
                 <ScrollViewer
                     Grid.Row="1"
@@ -216,59 +199,25 @@
 
                 <!-- add item to context section -->
 
-                <Grid
+                <embedillo:EmbedilloControl
                     Grid.Row="3"
-                    >
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="auto"/>
-                        <ColumnDefinition Width="auto"/>
-                        <ColumnDefinition />
-                    </Grid.ColumnDefinitions>
-
-                    <Label
-                        Grid.Column="0"
-                        Margin="2"
-                        Content="➕"
-                        VerticalAlignment="Center"
-                        HorizontalAlignment="Left"
-                        HorizontalContentAlignment="Left"
-                        Foreground="Green"
-                        FontFamily="Cascadia Code"
-                        ToolTip="{x:Static resources:Resources.Add_new_items_to_context}"
-                        />
-
-                    <Label
-                        Grid.Column="1"
-                        Margin="20,5,2,5"
-                        Content="{x:Static resources:Resources.Add_new_items_to_context1}"
-                        VerticalAlignment="Center"
-                        HorizontalAlignment="Left"
-                        HorizontalContentAlignment="Left"
-                        FontSize="12"
-                        FontFamily="Cascadia Code"
-                        ToolTip="{x:Static resources:Resources.Add_new_items_to_context}"
-                        />
-
-                    <embedillo:EmbedilloControl
-                        Grid.Column="2"
-                        Margin="2"
-                        VerticalAlignment="Center"
-                        VerticalContentAlignment="Center"
-                        HorizontalAlignment="Stretch"
-                        HorizontalContentAlignment="Stretch"
-                        Foreground="{Binding ElementName=ChatControlName, Path=Foreground}"
-                        Background="Transparent"
-                        FontSize="12"
-                        FontFamily="Cascadia Code"
-                        x:Name="AddToContextControl"
-                        HintText="{x:Static resources:Resources.Press___to_enter_context_items_here}"
-                        EnterCommand="{Binding ElementName=ChatControlName, Path=AddItemToContextCommand}"
-                        ControlEnabled="{Binding ElementName=ChatControlName, Path=IsReadyToAcceptNewPrompt}"
-                        MaxHeight="100"
-                        DragDrop.Drop="EmbedilloControl_Drop"
-                        />
-
-                </Grid>
+                    VerticalAlignment="Center"
+                    VerticalContentAlignment="Center"
+                    HorizontalAlignment="Stretch"
+                    HorizontalContentAlignment="Stretch"
+                    Foreground="{Binding ElementName=ChatControlName, Path=Foreground}"
+                    Background="Transparent"
+                    FontSize="12"
+                    MinHeight="30"
+                    Margin="10,0,10,0"
+                    FontFamily="Cascadia Code"
+                    x:Name="AddToContextControl"
+                    HintText="{x:Static resources:Resources.Press___to_enter_context_items_here}"
+                    EnterCommand="{Binding ElementName=ChatControlName, Path=AddItemToContextCommand}"
+                    ControlEnabled="{Binding ElementName=ChatControlName, Path=IsReadyToAcceptNewPrompt}"
+                    MaxHeight="100"
+                    DragDrop.Drop="EmbedilloControl_Drop"
+                    />
 
             </Grid>
 

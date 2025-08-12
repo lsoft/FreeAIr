@@ -5,6 +5,7 @@ using FreeAIr.BLogic.Context.Item;
 using FreeAIr.Helper;
 using FreeAIr.Options2.Support;
 using FreeAIr.UI.ContextMenu;
+using FreeAIr.UI.Embedillo.Answer.Parser;
 using FreeAIr.UI.ToolWindows;
 using Microsoft.VisualStudio.ComponentModelHost;
 using System.Collections.Generic;
@@ -95,7 +96,7 @@ namespace FreeAIr.Commands.File
 
                 chat.ChatContext.AddItem(
                     new SolutionItemChatContextItem(
-                        new UI.Embedillo.Answer.Parser.SelectedIdentifier(
+                        SelectedIdentifier.Create(
                             selectedFile.FullPath,
                             null
                             ),

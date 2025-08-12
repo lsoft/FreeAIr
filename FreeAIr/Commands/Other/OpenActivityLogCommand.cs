@@ -1,10 +1,9 @@
-﻿using FreeAIr.Helper;
-using Microsoft.VisualStudio.Shell.Interop;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.IO;
 
 namespace FreeAIr.Commands.Other
 {
+
     [Command(PackageIds.OpenActivityLogCommandId)]
     internal sealed class OpenActivityLogCommand : BaseCommand<OpenActivityLogCommand>
     {

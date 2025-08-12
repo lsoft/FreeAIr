@@ -53,6 +53,7 @@
     <Compile Include="Commands\File\ApplyFileSupportCommand.cs" />
     <Compile Include="Commands\Other\OpenPropertiesCommand.cs" />
     <Compile Include="Commands\Other\OpenActivityLogCommand.cs" />
+    <Compile Include="Commands\Other\OpenProxyLogCommand.cs" />
     <Compile Include="Commands\ShowInSituChatCommand.cs" />
     <Compile Include="Helper\ActivityLogHelper.cs" />
     <Compile Include="Helper\DisposeHelper.cs" />

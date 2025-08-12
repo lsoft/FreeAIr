@@ -18,7 +18,7 @@ namespace FreeAIr.MCP.McpServerProxy
         public const string ProxyApplicationZipFileName = "Proxy.zip";
         public const string ProxyApplicationExeFileName = "Proxy.exe";
 
-        private static readonly string _proxyUnpackedFolderPath;
+        public static readonly string ProxyUnpackedFolderPath;
         private static readonly string _proxyZipFolderPath;
 
         private static readonly CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
@@ -38,7 +38,7 @@ namespace FreeAIr.MCP.McpServerProxy
 
         static McpServerProxyApplication()
         {
-            _proxyUnpackedFolderPath = Path.Combine(FreeAIrPackage.WorkingFolder, @"MCP\Proxy\Unpacked");
+            ProxyUnpackedFolderPath = Path.Combine(FreeAIrPackage.WorkingFolder, @"MCP\Proxy\Unpacked");
             _proxyZipFolderPath = Path.Combine(FreeAIrPackage.WorkingFolder, @"MCP\Proxy\Archive");
 
             UnpackProxy();
@@ -50,7 +50,7 @@ namespace FreeAIr.MCP.McpServerProxy
             _httpClient.BaseAddress = new Uri($"http://localhost:{proxyProcessId}");
 
             _processMonitor = new ProcessMonitor(
-                _proxyUnpackedFolderPath,
+                ProxyUnpackedFolderPath,
                 ProxyApplicationExeFileName,
                 $"{proxyProcessId} {visualStudioProcessId}"
                 );
@@ -135,9 +135,9 @@ namespace FreeAIr.MCP.McpServerProxy
 
         private static void UnpackProxy()
         {
-            if (!Directory.Exists(_proxyUnpackedFolderPath))
+            if (!Directory.Exists(ProxyUnpackedFolderPath))
             {
-                Directory.CreateDirectory(_proxyUnpackedFolderPath);
+                Directory.CreateDirectory(ProxyUnpackedFolderPath);
 
                 var zipFilePath = Path.Combine(
                     FreeAIrPackage.WorkingFolder,
@@ -145,7 +145,7 @@ namespace FreeAIr.MCP.McpServerProxy
                     ProxyApplicationZipFileName
                     );
                 using var zip = ZipFile.OpenRead(zipFilePath);
-                zip.ExtractToDirectory(_proxyUnpackedFolderPath);
+                zip.ExtractToDirectory(ProxyUnpackedFolderPath);
             }
         }
 

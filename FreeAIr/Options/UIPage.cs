@@ -57,6 +57,15 @@ namespace FreeAIr
         } = 350;
 
 
+        [Category("UI")]
+        [DisplayName("Show chat list panel")]
+        [DefaultValue(true)]
+        public bool ShowChatListPanel
+        {
+            get;
+            set;
+        } = true;
+
         public void SetInSituSize(
             double width,
             double height

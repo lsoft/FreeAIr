@@ -5,6 +5,7 @@ using FreeAIr.Find;
 using FreeAIr.Helper;
 using FreeAIr.Options2.Support;
 using FreeAIr.Shared.Helper;
+using FreeAIr.UI.Embedillo.Answer.Parser;
 using FreeAIr.UI.ToolWindows;
 using FuzzySharp;
 using FuzzySharp.PreProcess;
@@ -320,7 +321,7 @@ namespace FreeAIr.UI.ViewModels
                         cancellationToken.ThrowIfCancellationRequested();
 
                         var contextItem = new SolutionItemChatContextItem(
-                            new UI.Embedillo.Answer.Parser.SelectedIdentifier(
+                            SelectedIdentifier.Create(
                                 solutionItem.SolutionItem.FullPath,
                                 null
                                 ),

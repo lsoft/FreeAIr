@@ -1,10 +1,14 @@
 ﻿using EnvDTE;
+using EnvDTE80;
 using FreeAIr.BLogic;
 using FreeAIr.BLogic.Context.Item;
 using FreeAIr.Helper;
 using FreeAIr.UI.ContextMenu;
 using FreeAIr.UI.ToolWindows;
+using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.ComponentModelHost;
+using Microsoft.VisualStudio.OLE.Interop;
+using Microsoft.VisualStudio.Shell.Interop;
 
 namespace FreeAIr.Commands
 {
@@ -33,6 +37,46 @@ namespace FreeAIr.Commands
                 return;
             }
 
+
+            //try
+            //{
+            //    var dte = AsyncPackage.GetGlobalService(typeof(EnvDTE.DTE)) as DTE2;
+            //    dte.ExecuteCommand("OtherContextMenus.inlinediffsettings.Diff.InlineView");
+
+            //    var differenceService = (IVsDifferenceService)await FreeAIrPackage.Instance.GetServiceAsync(typeof(SVsDifferenceService));
+
+            //    var leftPath = @"C:\temp\file1.txt";
+            //    var rightPath = @"C:\temp\file2.txt";
+            //    var caption = "My Diff";
+            //    var tooltip = "Inline diff between two files";
+
+            //    IVsWindowFrame frame = differenceService.OpenComparisonWindow2(
+            //        leftFileMoniker: leftPath,
+            //        rightFileMoniker: rightPath,
+            //        caption: caption,
+            //        Tooltip: tooltip,
+            //        leftLabel: "left file", // не используется
+            //        rightLabel: "right file", // не используется
+            //        inlineLabel: "inline label", // не используется
+            //        roles: "roles roles", // не используется
+            //        grfDiffOptions: (uint)__VSDIFFSERVICEOPTIONS.VSDIFFOPT_DoNotShow
+            //    );
+
+            //    frame.Show();
+
+            //    //OtherContextMenus.inlinediffsettings.Diff.InlineView
+
+
+            //}
+            //catch (Exception excp)
+            //{
+            //    int g = 0;
+            //}
+            //return;
+
+
+
+
             var chosenAgent = await AgentContextMenu.ChooseAgentWithTokenAsync(
                 "Choose agent:"
                 );
@@ -40,6 +84,7 @@ namespace FreeAIr.Commands
             {
                 return;
             }
+
 
             var chat = await chatContainer.StartChatAsync(
                 new ChatDescription(
@@ -63,5 +108,6 @@ namespace FreeAIr.Commands
 
             await ChatWindowShower.ShowChatWindowAsync(chat);
         }
+
     }
 }

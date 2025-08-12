@@ -177,7 +177,7 @@ namespace FreeAIr.BLogic.Context.Composer
 
                 var vsDocumentFilePath = vsDocument.FilePath;
                 context.AddUserProvidedIdentifier(
-                    new SelectedIdentifier(
+                    SelectedIdentifier.Create(
                         vsDocumentFilePath,
                         new SelectedSpan(
                             snapshotSpan.Start,

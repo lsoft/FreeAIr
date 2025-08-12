@@ -2,6 +2,7 @@
 using FreeAIr.Helper;
 using FreeAIr.Options2.Support;
 using FreeAIr.UI.ContextMenu;
+using FreeAIr.UI.Embedillo.Answer.Parser;
 using FreeAIr.UI.ViewModels;
 using System.Collections.Generic;
 
@@ -71,7 +72,7 @@ namespace FreeAIr.Git
                 }
 
                 var contextItem = new SolutionItemChatContextItem(
-                    new UI.Embedillo.Answer.Parser.SelectedIdentifier(
+                    SelectedIdentifier.Create(
                         diffFile.NewFullPath,
                         null
                         ),

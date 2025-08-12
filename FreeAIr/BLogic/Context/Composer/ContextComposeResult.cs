@@ -49,7 +49,7 @@ namespace FreeAIr.BLogic.Context.Composer
 
             foreach (var filePath in filePaths)
             {
-                _foundIdentifiers.Add(new( new(filePath, null), isAutoFound));
+                _foundIdentifiers.Add(new(SelectedIdentifier.Create(filePath, null), isAutoFound));
             }
         }
 

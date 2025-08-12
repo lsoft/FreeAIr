@@ -16,6 +16,8 @@ namespace FreeAIr.UI.Embedillo.Answer.Parser
             RegexOptions.Compiled
             );
 
+        private readonly string? _solutionFilePath;
+
         public string FilePath
         {
             get;
@@ -26,16 +28,51 @@ namespace FreeAIr.UI.Embedillo.Answer.Parser
             get;
         }
 
-        public SelectedIdentifier(
+        public string ContextUIDescription
+        {
+            get
+            {
+                var relative =
+                    _solutionFilePath is not null
+                    ? FilePath.MakeRelativeAgainst(_solutionFilePath)
+                    : FilePath
+                    ;
+
+                return relative + Selection?.ToString();
+            }
+        }
+
+        public static SelectedIdentifier Create(
             string filePath,
             SelectedSpan? selection
             )
         {
+            var solution = VS.Solutions.GetCurrentSolution();
+            var solutionFilePath = solution?.FullPath;
+            return new SelectedIdentifier(
+                solutionFilePath,
+                filePath,
+                selection
+                );
+        }
+
+        private SelectedIdentifier(
+            string? solutionFilePath,
+            string filePath,
+            SelectedSpan? selection
+            )
+        {
+            if (solutionFilePath is null)
+            {
+                throw new ArgumentNullException(nameof(solutionFilePath));
+            }
+
             if (filePath is null)
             {
                 throw new ArgumentNullException(nameof(filePath));
             }
 
+            _solutionFilePath = solutionFilePath;
             FilePath = filePath.Trim();
             Selection = selection;
         }
@@ -128,13 +165,13 @@ namespace FreeAIr.UI.Embedillo.Answer.Parser
                             var start = int.Parse(positionMatch.Groups[1].Value);
                             var end = int.Parse(positionMatch.Groups[2].Value);
 
-                            return new(filePath, new SelectedSpan(start, end - start));
+                            return SelectedIdentifier.Create(filePath, new SelectedSpan(start, end - start));
                         }
                     }
                 }
             }
 
-            return new(solutionItemText, null);
+            return SelectedIdentifier.Create(solutionItemText, null);
         }
     }
 

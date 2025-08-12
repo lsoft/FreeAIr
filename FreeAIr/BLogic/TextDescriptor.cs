@@ -94,7 +94,7 @@ namespace FreeAIr.BLogic
 
         public SelectedIdentifier CreateSelectedIdentifier()
         {
-            return new(FilePath, null);
+            return SelectedIdentifier.Create(FilePath, null);
         }
     }
 
@@ -207,7 +207,7 @@ namespace FreeAIr.BLogic
 
         public SelectedIdentifier CreateSelectedIdentifier()
         {
-            return new(FilePath, SelectedSpan);
+            return SelectedIdentifier.Create(FilePath, SelectedSpan);
         }
 
         private void TextView_Closed(object sender, EventArgs e)

@@ -3,6 +3,7 @@ using FreeAIr.BLogic.Context.Item;
 using FreeAIr.Helper;
 using FreeAIr.Options2.Agent;
 using FreeAIr.Options2.Support;
+using FreeAIr.UI.Embedillo.Answer.Parser;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -135,7 +136,7 @@ namespace FreeAIr.NLOutline.Tree.Builder.File
             foreach (var item in items)
             {
                 var contextItem = new SolutionItemChatContextItem(
-                    new UI.Embedillo.Answer.Parser.SelectedIdentifier(
+                    SelectedIdentifier.Create(
                         item.FullPath,
                         null
                         ),
