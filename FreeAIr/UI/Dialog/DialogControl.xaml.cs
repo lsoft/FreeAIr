@@ -1,11 +1,9 @@
-﻿using MarkdownParser.Antlr.Answer;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using WpfHelpers;
@@ -22,17 +20,17 @@ namespace FreeAIr.UI.Dialog
         public static readonly DependencyProperty DialogProperty =
             DependencyProperty.Register(
                 nameof(Dialog),
-                typeof(ObservableCollection<Replic>),
+                typeof(ObservableCollection<DialogContent>),
                 typeof(DialogControl),
                 new PropertyMetadata(OnDialogPropertyChanged));
 
-        public ObservableCollection<Replic> Dialog
+        public ObservableCollection<DialogContent> Dialog
         {
-            get => (ObservableCollection<Replic>)GetValue(DialogProperty);
+            get => (ObservableCollection<DialogContent>)GetValue(DialogProperty);
             set
             {
                 SetValue(DialogProperty, value);
-                OnLastReplicChangedRaised();
+                OnLastContentChangedRaised();
             }
         }
 
@@ -44,35 +42,35 @@ namespace FreeAIr.UI.Dialog
         private static void OnDialogPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             var control = d as DialogControl;
-            if (e.OldValue is ObservableCollection<Replic> oldCollection)
+            if (e.OldValue is ObservableCollection<DialogContent> oldCollection)
             {
                 oldCollection.CollectionChanged -= control.OnDialogCollectionChanged;
 
                 // Отписываемся от старых элементов
-                foreach (var replic in oldCollection)
+                foreach (var content in oldCollection)
                 {
-                    if (replic is INotifyPropertyChanged npc)
+                    if (content is INotifyPropertyChanged npc)
                     {
-                        npc.PropertyChanged -= control.OnReplicPropertyChanged;
+                        npc.PropertyChanged -= control.OnContentPropertyChanged;
                     }
                 }
             }
 
-            if (e.NewValue is ObservableCollection<Replic> newCollection)
+            if (e.NewValue is ObservableCollection<DialogContent> newCollection)
             {
                 newCollection.CollectionChanged += control.OnDialogCollectionChanged;
 
                 // Подписываемся на новые элементы
-                foreach (var replic in newCollection)
+                foreach (var content in newCollection)
                 {
-                    if (replic is INotifyPropertyChanged npc)
+                    if (content is INotifyPropertyChanged npc)
                     {
-                        npc.PropertyChanged += control.OnReplicPropertyChanged;
+                        npc.PropertyChanged += control.OnContentPropertyChanged;
                     }
                 }
             }
 
-            control.OnLastReplicChangedRaised();
+            control.OnLastContentChangedRaised();
         }
 
         /// <summary>
@@ -82,22 +80,22 @@ namespace FreeAIr.UI.Dialog
         {
             if (e.NewItems != null)
             {
-                foreach (Replic replic in e.NewItems)
+                foreach (DialogContent content in e.NewItems)
                 {
-                    if (replic is INotifyPropertyChanged npc)
+                    if (content is INotifyPropertyChanged npc)
                     {
-                        npc.PropertyChanged += OnReplicPropertyChanged;
+                        npc.PropertyChanged += OnContentPropertyChanged;
                     }
                 }
             }
 
             if (e.OldItems != null)
             {
-                foreach (Replic replic in e.OldItems)
+                foreach (DialogContent content in e.OldItems)
                 {
-                    if (replic is INotifyPropertyChanged npc)
+                    if (content is INotifyPropertyChanged npc)
                     {
-                        npc.PropertyChanged -= OnReplicPropertyChanged;
+                        npc.PropertyChanged -= OnContentPropertyChanged;
                     }
                 }
             }
@@ -106,13 +104,13 @@ namespace FreeAIr.UI.Dialog
         }
 
         /// <summary>
-        /// Обработчик изменений конкретного Replic
+        /// Обработчик изменений конкретного контента (например, промпта, или ответа LLM)
         /// </summary>
-        private void OnReplicPropertyChanged(object sender, PropertyChangedEventArgs e)
+        private void OnContentPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            if (sender is Replic replic)
+            if (sender is DialogContent content)
             {
-                OnReplicChanged(replic);
+                OnContentChanged(content);
             }
         }
 
@@ -121,15 +119,15 @@ namespace FreeAIr.UI.Dialog
         /// </summary>
         private void OnDialogUpdated()
         {
-            OnLastReplicChangedRaised();
+            OnLastContentChangedRaised();
         }
 
         /// <summary>
         /// Callback при изменении реплики
         /// </summary>
-        private void OnReplicChanged(Replic replic)
+        private void OnContentChanged(DialogContent content)
         {
-            OnLastReplicChangedRaised();
+            OnLastContentChangedRaised();
         }
 
         #endregion
@@ -141,7 +139,7 @@ namespace FreeAIr.UI.Dialog
             InitializeComponent();
         }
 
-        private void OnLastReplicChangedRaised()
+        private void OnLastContentChangedRaised()
         {
             var locked = false;
             try
@@ -202,96 +200,6 @@ namespace FreeAIr.UI.Dialog
             while (current != null);
 
             return null;
-        }
-
-        public sealed class Replic : BaseViewModel
-        {
-            private readonly AdditionalCommandContainer? _acc;
-            private FlowDocument _document;
-
-            public ParsedAnswer ParsedAnswer
-            {
-                get;
-                private set;
-            }
-
-            public object Tag
-            {
-                get;
-            }
-
-            public bool IsPrompt
-            {
-                get;
-            }
-
-            public HorizontalAlignment HorizontalAlignment
-            {
-                get;
-            }
-
-            public Thickness BorderThickness
-            {
-                get;
-            }
-
-            public FlowDocument Document
-            {
-                get => _document;
-                private set
-                {
-                    _document = value;
-
-                    OnPropertyChanged();
-                }
-            }
-
-            public Replic(
-                ParsedAnswer parsedAnswer,
-                object tag,
-                bool isPrompt,
-                AdditionalCommandContainer? acc,
-                bool inProgress
-                )
-            {
-                _acc = acc;
-                ParsedAnswer = parsedAnswer;
-                Tag = tag;
-                IsPrompt = isPrompt;
-                HorizontalAlignment = isPrompt ? HorizontalAlignment.Right : HorizontalAlignment.Left;
-                BorderThickness = isPrompt ? new Thickness(1, 1, 10, 1) : new Thickness(10, 1, 1, 1);
-                Document = parsedAnswer.ConvertToFlowDocument(_acc, inProgress);
-            }
-
-            public bool IsSameTag(object tag)
-            {
-                if (Tag is null && tag is null)
-                {
-                    return true;
-                }
-                if (tag is null && Tag is not null)
-                {
-                    return false;
-                }
-                if (Tag is null && tag is not null)
-                {
-                    return false;
-                }
-
-                return
-                    ReferenceEquals(Tag, tag)
-                    && Tag.GetType() == tag.GetType()
-                    ;
-            }
-
-            public void Update(
-                ParsedAnswer parsedAnswer,
-                bool inProgress
-                )
-            {
-                ParsedAnswer = parsedAnswer;
-                Document = parsedAnswer.ConvertToFlowDocument(_acc, inProgress);
-            }
         }
     }
 }

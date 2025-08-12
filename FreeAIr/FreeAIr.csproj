@@ -216,9 +216,14 @@
     <Compile Include="UI\CodeLens\ViewElementFactory.cs" />
     <Compile Include="UI\CombinedParameterConverter.cs" />
     <Compile Include="UI\Converters.cs" />
+    <Compile Include="UI\Dialog\DialogContent.cs" />
+    <Compile Include="UI\Dialog\DialogContentTypeEnum.cs" />
     <Compile Include="UI\Dialog\DialogControl.xaml.cs">
       <DependentUpon>DialogControl.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UI\Dialog\DialogTemplateSelector.cs" />
+    <Compile Include="UI\Dialog\ReplicContent.cs" />
+    <Compile Include="UI\Dialog\ToolCallContent.cs" />
     <Compile Include="UI\Embedillo\Answer\Parser\CommandAnswerPart.cs" />
     <Compile Include="UI\Embedillo\Answer\Parser\IParsedPart.cs" />
     <Compile Include="UI\Embedillo\Answer\Parser\Parsed.cs" />

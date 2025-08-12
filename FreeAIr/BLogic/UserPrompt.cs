@@ -76,12 +76,25 @@ namespace FreeAIr.BLogic
 
         public IReadOnlyList<OpenAI.Chat.ChatMessage> Reactions => _reactions;
 
+        #region permanent reaction
+
         public void AddPermanentReaction(
             ToolChatMessage toolChatMessage
             )
         {
             _reactions.Add(toolChatMessage);
         }
+
+        public void AddPermanentReaction(
+            AssistantChatMessage assistantChatMessage
+            )
+        {
+            _reactions.Add(assistantChatMessage);
+        }
+
+        #endregion
+
+        #region user visible answer
 
         public void UpdateUserVisibleAnswer(
             string suffix
@@ -90,17 +103,12 @@ namespace FreeAIr.BLogic
             _userVisibleAnswer.Append(suffix);
         }
 
-        public void AddPermanentReaction(
-            AssistantChatMessage assistantChatMessage
-            )
-         {
-            _reactions.Add(assistantChatMessage);
-        }
-
         public string GetUserVisibleAnswer()
         {
             return _userVisibleAnswer.ToString();
         }
+
+        #endregion
     }
 
 }

@@ -230,38 +230,8 @@ namespace FreeAIr.BLogic
             {
                 Status = ChatStatusEnum.WaitingForAnswer;
 
-                var chosenAgent = this.Options.ChosenAgent;
-                var chatClient = new ChatClient(
-                    model: chosenAgent.Technical.ChosenModel,
-                    new ApiKeyCredential(
-                        chosenAgent.Technical.GetToken()
-                        ),
-                    new OpenAIClientOptions
-                    {
-                        NetworkTimeout = TimeSpan.FromHours(1),
-                        Endpoint = chosenAgent.Technical.TryBuildEndpointUri(),
-                    }
-                    );
-
-                var toolCollection = McpServerProxyCollection.GetTools(ChatTools);
-                var activeTools = toolCollection.GetActiveToolList();
-
-                var cco = new ChatCompletionOptions
-                {
-                    ToolChoice =
-                        activeTools.Count > 0
-                        ? Options.ToolChoice
-                        : ChatToolChoice.CreateNoneChoice(),
-                    ResponseFormat = Options.ResponseFormat,
-                    MaxOutputTokenCount = (await FreeAIrOptions.DeserializeUnsortedAsync()).MaxOutputTokenCount,
-                };
-
-                foreach (var tool in activeTools)
-                {
-                    cco.Tools.Add(
-                        tool.CreateChatTool()
-                        );
-                }
+                var chatClient = CreateChatClient();
+                var chatCompletionOptions = await CreateChatCompletionOptionsAsync();
 
                 var continueTalk = false;
                 do
@@ -270,7 +240,7 @@ namespace FreeAIr.BLogic
 
                     var completionUpdates = chatClient.CompleteChatStreaming(
                         messages: await dialog.GetMessageListAsync(),
-                        options: cco,
+                        options: chatCompletionOptions,
                         cancellationToken: cancellationToken
                         );
 
@@ -349,7 +319,7 @@ namespace FreeAIr.BLogic
                                     toolCall
                                     );
 
-                                throw new InvalidOperationException($"Tool named {toolCall.FunctionName} does not exists.");
+                                throw new InvalidOperationException($"Tool named {toolCall.FunctionName} failed to run.");
                             }
 
                             dialog.AppendToolCallResult(
@@ -386,8 +356,50 @@ namespace FreeAIr.BLogic
 
                 Status = ChatStatusEnum.Failed;
 
-                //todo
+                excp.ActivityLogException();
             }
+        }
+
+        private async Task<ChatCompletionOptions> CreateChatCompletionOptionsAsync()
+        {
+            var toolCollection = McpServerProxyCollection.GetTools(ChatTools);
+            var activeTools = toolCollection.GetActiveToolList();
+
+            var cco = new ChatCompletionOptions
+            {
+                ToolChoice =
+                    activeTools.Count > 0
+                    ? Options.ToolChoice
+                    : ChatToolChoice.CreateNoneChoice(),
+                ResponseFormat = Options.ResponseFormat,
+                MaxOutputTokenCount = (await FreeAIrOptions.DeserializeUnsortedAsync()).MaxOutputTokenCount,
+            };
+
+            foreach (var tool in activeTools)
+            {
+                cco.Tools.Add(
+                    tool.CreateChatTool()
+                    );
+            }
+
+            return cco;
+        }
+
+        private ChatClient CreateChatClient()
+        {
+            var chosenAgent = this.Options.ChosenAgent;
+            var chatClient = new ChatClient(
+                model: chosenAgent.Technical.ChosenModel,
+                new ApiKeyCredential(
+                    chosenAgent.Technical.GetToken()
+                    ),
+                new OpenAIClientOptions
+                {
+                    NetworkTimeout = TimeSpan.FromHours(1),
+                    Endpoint = chosenAgent.Technical.TryBuildEndpointUri(),
+                }
+                );
+            return chatClient;
         }
 
         private void PromptStateChanged(

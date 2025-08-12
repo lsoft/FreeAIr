@@ -3,6 +3,7 @@ using FreeAIr.BLogic.Context;
 using FreeAIr.Helper;
 using FreeAIr.Shared.Helper;
 using FreeAIr.UI.ContextMenu;
+using FreeAIr.UI.Dialog;
 using MarkdownParser.Antlr.Answer;
 using MarkdownParser.Antlr.Answer.Parts;
 using Microsoft.VisualStudio.ComponentModelHost;
@@ -14,7 +15,6 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using WpfHelpers;
-using static FreeAIr.UI.Dialog.DialogControl;
 
 namespace FreeAIr.UI.ViewModels
 {
@@ -24,7 +24,7 @@ namespace FreeAIr.UI.ViewModels
 
         private BLogic.Chat? _selectedChat;
 
-        public ObservableCollection2<Replic> Dialog
+        public ObservableCollection2<DialogContent> Dialog
         {
             get;
         } = new();
@@ -334,14 +334,14 @@ namespace FreeAIr.UI.ViewModels
             {
                 case PromptChangeKindEnum.PromptAdded:
                     {
-                        var promptReplic = new Replic(
+                        var promptReplic = new ReplicContent(
                             _answerParser.Parse(prompt.PromptBody),
                             prompt,
                             true,
                             AdditionalCommandContainer,
                             false
                             );
-                        var existingPromptReplicIndex = Dialog.FindIndex(r => r.IsSameTag(prompt) && r.IsPrompt);
+                        var existingPromptReplicIndex = Dialog.FindIndex(r => r.IsSameTag(prompt) && r.Type == DialogContentTypeEnum.Prompt);
                         if (existingPromptReplicIndex >= 0)
                         {
                             Dialog[existingPromptReplicIndex] = promptReplic;
@@ -351,14 +351,14 @@ namespace FreeAIr.UI.ViewModels
                             Dialog.Add(promptReplic);
                         }
 
-                        var answerReplic = new Replic(
+                        var answerReplic = new ReplicContent(
                             _answerParser.Parse(prompt.Answer.GetUserVisibleAnswer()),
                             prompt,
                             false,
                             AdditionalCommandContainer,
                             false
                             );
-                        var existingAnswerReplicIndex = Dialog.FindIndex(r => r.IsSameTag(prompt) && !r.IsPrompt);
+                        var existingAnswerReplicIndex = Dialog.FindIndex(r => r.IsSameTag(prompt) && r.Type == DialogContentTypeEnum.LLMAnswer);
                         if (existingAnswerReplicIndex >= 0)
                         {
                             Dialog[existingAnswerReplicIndex] = answerReplic;
@@ -367,11 +367,13 @@ namespace FreeAIr.UI.ViewModels
                         {
                             Dialog.Add(answerReplic);
                         }
+
+                        Dialog.Add(new ToolCallContent("qwerty"));
                     }
                     break;
                 case PromptChangeKindEnum.AnswerUpdated:
                     {
-                        var replic = Dialog.FirstOrDefault(r => r.IsSameTag(prompt) && !r.IsPrompt);
+                        var replic = (ReplicContent?)Dialog.FirstOrDefault(r => r.IsSameTag(prompt) && r.Type == DialogContentTypeEnum.LLMAnswer);
                         if (replic is not null)
                         {
                             replic.Update(
@@ -407,7 +409,7 @@ namespace FreeAIr.UI.ViewModels
             }
             catch (Exception excp)
             {
-                //todo
+                excp.ActivityLogException();
             }
         }
     }
