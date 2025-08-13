@@ -49,13 +49,12 @@ namespace FreeAIr.UI.Dialog.Content
             _additionalCommandContainer = additionalCommandContainer;
 
             UpdateDocument(isInProgress);
-            answer.AnswerChangedEvent.Event += AnswerChangedEvent_Event;
+            answer.AnswerChangedEvent.Event += AnswerChangedRaisedAsync;
         }
 
-        private void AnswerChangedEvent_Event(object sender, AnswerChangedEventArgs args)
+        private async Task AnswerChangedRaisedAsync(object sender, AnswerChangedEventArgs args)
         {
-            UpdateDocumentAsync(true)
-                .FileAndForget(nameof(UpdateDocumentAsync));
+            await UpdateDocumentAsync(true);
         }
 
         private async Task UpdateDocumentAsync(bool isInProgress)

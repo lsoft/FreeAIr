@@ -39,9 +39,6 @@ namespace FreeAIr.UI.ViewModels
         public DialogViewModel(
             )
         {
-            //var componentModel = FreeAIrPackage.Instance.GetService<SComponentModel, IComponentModel>();
-            //_answerParser = componentModel.GetService<IAnswerParser>();
-
             #region AdditionalCommandContainer
 
             AdditionalCommandContainer.AddAdditionalCommand(
@@ -308,86 +305,100 @@ namespace FreeAIr.UI.ViewModels
 
             if (_selectedChat is not null)
             {
-                _selectedChat.PromptAddedEvent -= PromptAddedRaised;
+                _selectedChat.ContentAddedEvent -= ContentAddedRaised;
             }
 
             _selectedChat = selectedChat;
 
             if (selectedChat is not null)
             {
-                selectedChat.PromptAddedEvent += PromptAddedRaised;
+                selectedChat.ContentAddedEvent += ContentAddedRaised;
 
                 RewriteDialog();
             }
-        }
-
-        public void AddContent(DialogContent content)
-        {
-            if (content is null)
-            {
-                throw new ArgumentNullException(nameof(content));
-            }
-
-            Dialog.Add(content);
         }
 
         private void RewriteDialog()
         {
             foreach (var content in _selectedChat.Contents)
             {
-                switch (content.Type)
-                {
-                    case ChatContentTypeEnum.Prompt:
-                        var p = PromptDialogContent.Create(
-                            (UserPrompt)content,
-                            AdditionalCommandContainer
-                            );
-                        Dialog.Add(p);
-                        break;
-                    case ChatContentTypeEnum.LLMAnswer:
-                        var a = AnswerDialogContent.Create(
-                            (AnswerChatContent)content,
-                            AdditionalCommandContainer,
-                            false
-                            );
-                        Dialog.Add(a);
-                        break;
-                    case ChatContentTypeEnum.ToolCall:
-                        var tc = new ToolCallDialogContent(
-                            (ToolCallChatContent)content
-                            );
-                        Dialog.Add(tc);
-                        break;
-                }
+                AddDialogContent(content);
             }
         }
 
-        private async void PromptAddedRaised(object sender, PromptAddedEventArgs e)
+        private void ContentAddedRaised(object sender, ChatContentAddedEventArgs e)
+        {
+            if (_selectedChat is null || !ReferenceEquals(_selectedChat, e.Chat))
+            {
+                return;
+            }
+
+            AddDialogContentSafelyAsync(e)
+                .FileAndForget(nameof(AddDialogContentSafelyAsync));
+        }
+
+        private async Task AddDialogContentSafelyAsync(
+            ChatContentAddedEventArgs e
+            )
         {
             try
             {
                 await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
 
-                if (_selectedChat is not null && ReferenceEquals(_selectedChat, e.Chat))
-                {
-                    var p = PromptDialogContent.Create(
-                        e.Prompt,
-                        AdditionalCommandContainer
-                        );
-                    Dialog.Add(p);
-
-                    LLMReaderPool.AddAndStartReader(
-                        _selectedChat,
-                        this,
-                        AdditionalCommandContainer
-                        );
-                }
+                AddDialogContent(e.ChatContent);
             }
             catch (Exception excp)
             {
                 excp.ActivityLogException();
             }
         }
+
+        #region add dialog content
+
+        private void AddDialogContent(IChatContent content)
+        {
+            switch (content.Type)
+            {
+                case ChatContentTypeEnum.Prompt:
+                    AddDialogPrompt(content);
+                    break;
+                case ChatContentTypeEnum.LLMAnswer:
+                    AddDialogAnswer(content, false);
+                    break;
+                case ChatContentTypeEnum.ToolCall:
+                    AddDialogToolCall(content);
+                    break;
+            }
+        }
+
+        private void AddDialogPrompt(IChatContent content)
+        {
+            var p = PromptDialogContent.Create(
+                (UserPrompt)content,
+                AdditionalCommandContainer
+                );
+            Dialog.Add(p);
+        }
+
+        private void AddDialogAnswer(IChatContent content, bool isInProgress)
+        {
+            var a = AnswerDialogContent.Create(
+                (AnswerChatContent)content,
+                AdditionalCommandContainer,
+                isInProgress
+                );
+            Dialog.Add(a);
+        }
+
+        private void AddDialogToolCall(IChatContent content)
+        {
+            var tc = new ToolCallDialogContent(
+                (ToolCallChatContent)content
+                );
+            Dialog.Add(tc);
+        }
+
+        #endregion
     }
 
     public sealed class ChatContextMenuAdditionalCommand : AdditionalCommand

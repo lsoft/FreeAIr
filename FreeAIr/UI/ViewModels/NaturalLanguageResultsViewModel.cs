@@ -210,6 +210,7 @@ namespace FreeAIr.UI.ViewModels
             if (oldChat is not null)
             {
                 await oldChat.StopAsync();
+                await oldChat.DisposeAsync();
             }
             _cancellationTokenSource?.Dispose();
 

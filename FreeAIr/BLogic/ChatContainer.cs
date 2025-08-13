@@ -108,7 +108,7 @@ namespace FreeAIr.BLogic
                 FireChatCollectionChanged();
             }
 
-            chat.Dispose();
+            await chat.DisposeAsync();
         }
 
 

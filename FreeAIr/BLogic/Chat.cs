@@ -18,7 +18,7 @@ using System.Threading.Tasks;
 
 namespace FreeAIr.BLogic
 {
-    public sealed class Chat : IDisposable
+    public sealed class Chat : IAsyncDisposable
     {
         private readonly List<IChatContent> _contents = new();
 
@@ -48,11 +48,7 @@ namespace FreeAIr.BLogic
 
         public event ChatStatusChangedDelegate ChatStatusChangedEvent;
 
-        public event PromptAddedDelegate PromptAddedEvent;
-        //public TimeoutEventProxy<PromptEventArgs> PromptStateChangedEvent
-        //{
-        //    get;
-        //}
+        public event ChatContentAddedDelegate ContentAddedEvent;
 
         public ChatDescription Description
         {
@@ -107,33 +103,6 @@ namespace FreeAIr.BLogic
             ChatTools = chatTools;
             _status = ChatStatusEnum.NotStarted;
 
-            //PromptStateChangedEvent = new TimeoutEventProxy<PromptEventArgs>(
-            //    250,
-            //    this,
-            //    (pa0, pa1) =>
-            //    {
-            //        if (pa0 is null && pa1 is null)
-            //        {
-            //            return ArgsActionKindEnum.ReplaceLastArgs;
-            //        }
-            //        if (pa0 is null)
-            //        {
-            //            return ArgsActionKindEnum.AddToQueue;
-            //        }
-            //        if (pa1 is null)
-            //        {
-            //            return ArgsActionKindEnum.ReplaceLastArgs;
-            //        }
-
-            //        if (pa0.Kind == pa1.Kind)
-            //        {
-            //            return ArgsActionKindEnum.ReplaceLastArgs;
-            //        }
-
-            //        return ArgsActionKindEnum.AddToQueue;
-            //    }
-            //    );
-
             Started = DateTime.Now;
 
             ChatContext.ChatContextChangedEvent += ChatContextChangedRaised;
@@ -168,15 +137,18 @@ namespace FreeAIr.BLogic
 
             _contents.Add(userPrompt);
 
-            //_task = Task.Run(async () => await AskPromptAndReceiveAnswerAsync());
+            LLMReaderPool.AddAndStartReader(this);
 
-            RaisePromptAdded(userPrompt);
+            RaiseContentAdded(userPrompt);
         }
 
         public AnswerChatContent CreateAnswer()
         {
             var answer = new AnswerChatContent();
             _contents.Add(answer);
+
+            RaiseContentAdded(answer);
+
             return answer;
         }
 
@@ -190,185 +162,30 @@ namespace FreeAIr.BLogic
             return WaitForTaskAsync();
         }
 
-        //public async Task StopAsync()
-        //{
-        //    _cancellationTokenSource?.Cancel();
-
-        //    await WaitForTaskAsync();
-
-        //    _cancellationTokenSource?.Dispose();
-
-        //    _cancellationTokenSource = new CancellationTokenSource();
-        //}
-
         public void ArchiveAllPrompts()
         {
             _contents.ForEach(p =>
             {
                 p.Archive();
-
-                //PromptStateChanged(p, PromptChangeKindEnum.PromptArchived);
             });
         }
 
-        public void Dispose()
+        public async ValueTask DisposeAsync()
         {
             Description.Dispose();
 
-            //PromptStateChangedEvent.Dispose();
+            foreach (var content in Contents)
+            {
+                if (content is IAsyncDisposable ad)
+                {
+                    await ad.DisposeAsync();
+                }
+                else if (content is IDisposable d)
+                {
+                    d.Dispose();
+                }
+            }
         }
-
-        private async Task WaitForTaskAsync()
-        {
-            await LLMReaderPool.WaitForTaskAsync(this);
-        }
-
-        private void ChatContextChangedRaised(object sender, ChatContextEventArgs e)
-        {
-            StatusChanged();
-        }
-
-        //private async Task AskPromptAndReceiveAnswerAsync()
-        //{
-        //    var cancellationToken = _cancellationTokenSource.Token;
-
-        //    var dialog = await Dialog.CreateAsync(
-        //        this
-        //        );
-
-        //    try
-        //    {
-        //        Status = ChatStatusEnum.WaitingForAnswer;
-
-        //        var chatClient = CreateChatClient();
-        //        var chatCompletionOptions = await CreateChatCompletionOptionsAsync();
-
-        //        var continueTalk = false;
-        //        do
-        //        {
-        //            continueTalk = false;
-
-        //            var completionUpdates = chatClient.CompleteChatStreaming(
-        //                messages: await dialog.GetMessageListAsync(),
-        //                options: chatCompletionOptions,
-        //                cancellationToken: cancellationToken
-        //                );
-
-        //            OpenAI.Chat.ChatFinishReason? chatFinishReason = null;
-        //            var toolCalls = new List<StreamingChatToolCallUpdate>();
-        //            var contentParts = new List<ChatMessageContentPart>();
-
-        //            Status = ChatStatusEnum.ReadingAnswer;
-
-        //            foreach (StreamingChatCompletionUpdate completionUpdate in completionUpdates)
-        //            {
-        //                //completionUpdate.Usage.OutputTokenDetails.
-
-        //                if (completionUpdate.CompletionId is null)
-        //                {
-        //                    dialog.UpdateUserVisibleAnswer("Server returns error.");
-        //                    Status = ChatStatusEnum.Failed;
-        //                    return;
-        //                }
-
-        //                chatFinishReason ??= completionUpdate.FinishReason;
-        //                toolCalls.AddRange(completionUpdate.ToolCallUpdates);
-
-        //                if (completionUpdate.FinishReason == ChatFinishReason.ToolCalls
-        //                    && completionUpdate.ToolCallUpdates.Count > 0
-        //                    )
-        //                {
-        //                    dialog.AppendAssistantReply(
-        //                        completionUpdate.ToolCallUpdates.ConvertToChatTools()
-        //                        );
-        //                }
-        //                else
-        //                {
-        //                    if (completionUpdate.ContentUpdate.Count > 0)
-        //                    {
-        //                        contentParts.AddRange(completionUpdate.ContentUpdate);
-        //                    }
-        //                }
-
-        //                foreach (ChatMessageContentPart contentPart in completionUpdate.ContentUpdate)
-        //                {
-        //                    if (contentPart.Kind != ChatMessageContentPartKind.Text)
-        //                    {
-        //                        continue;
-        //                    }
-        //                    if (string.IsNullOrEmpty(contentPart.Text))
-        //                    {
-        //                        continue;
-        //                    }
-
-        //                    //for updating UI in real time
-        //                    dialog.UpdateUserVisibleAnswer(contentPart.Text);
-
-        //                    if (cancellationToken.IsCancellationRequested)
-        //                    {
-        //                        Status = ChatStatusEnum.Ready;
-        //                        return;
-        //                    }
-        //                }
-        //            }
-
-        //            if (chatFinishReason == ChatFinishReason.ToolCalls && toolCalls.Count > 0)
-        //            {
-        //                foreach (var toolCall in toolCalls)
-        //                {
-        //                    var toolArguments = ParseToolInvocationArguments(toolCall);
-
-        //                    var toolResult = await McpServerProxyCollection.CallToolAsync(
-        //                        toolCall.FunctionName,
-        //                        toolArguments,
-        //                        cancellationToken: CancellationToken.None
-        //                        );
-        //                    if (toolResult is null)
-        //                    {
-        //                        dialog.AppendUnsuccessfulToolCall(
-        //                            toolCall
-        //                            );
-
-        //                        throw new InvalidOperationException($"Tool named {toolCall.FunctionName} failed to run.");
-        //                    }
-
-        //                    dialog.AppendToolCallResult(
-        //                        toolCall,
-        //                        toolResult
-        //                        );
-        //                }
-
-        //                continueTalk = true;
-        //            }
-        //            else
-        //            {
-        //                dialog.AppendAssistantReply(
-        //                    contentParts
-        //                    );
-        //            }
-
-
-
-
-        //        }
-        //        while (continueTalk);
-
-        //        Status = ChatStatusEnum.Ready;
-        //    }
-        //    catch (OperationCanceledException)
-        //    {
-        //        //this is OK
-        //        Status = ChatStatusEnum.Ready;
-        //    }
-        //    catch (Exception excp)
-        //    {
-        //        dialog.AppendException(excp);
-
-        //        Status = ChatStatusEnum.Failed;
-
-        //        excp.ActivityLogException();
-        //    }
-        //}
 
         public async Task<ChatCompletionOptions> CreateChatCompletionOptionsAsync()
         {
@@ -412,13 +229,23 @@ namespace FreeAIr.BLogic
             return chatClient;
         }
 
-        private void RaisePromptAdded(
-            UserPrompt prompt
+        private async Task WaitForTaskAsync()
+        {
+            await LLMReaderPool.WaitForTaskAsync(this);
+        }
+
+        private void ChatContextChangedRaised(object sender, ChatContextEventArgs e)
+        {
+            StatusChanged();
+        }
+
+        private void RaiseContentAdded(
+            IChatContent content
             )
         {
-            PromptAddedEvent?.Invoke(
+            ContentAddedEvent?.Invoke(
                 this,
-                new PromptAddedEventArgs(this, prompt)
+                new ChatContentAddedEventArgs(this, content)
                 );
         }
 
@@ -430,26 +257,6 @@ namespace FreeAIr.BLogic
                 e(this, new ChatEventArgs(this));
             }
         }
-
-        //private static Dictionary<string, object?> ParseToolInvocationArguments(
-        //    StreamingChatToolCallUpdate toolCall
-        //    )
-        //{
-        //    var toolArguments = new Dictionary<string, object?>();
-        //    if (toolCall.FunctionArgumentsUpdate.ToMemory().Length > 0)
-        //    {
-        //        using JsonDocument toolArgumentJson = JsonDocument.Parse(
-        //            toolCall.FunctionArgumentsUpdate
-        //            );
-
-        //        foreach (var pair in toolArgumentJson.RootElement.EnumerateObject())
-        //        {
-        //            toolArguments.Add(pair.Name, pair.Value.DeserializeToObject());
-        //        }
-        //    }
-
-        //    return toolArguments;
-        //}
 
         public async Task<IReadOnlyList<OpenAI.Chat.ChatMessage>> GetMessageListAsync()
         {
@@ -491,249 +298,27 @@ namespace FreeAIr.BLogic
         }
     }
 
-    #region Dialog
-
-    //public sealed class Dialog
-    //{
-    //    private readonly Chat _chat;
-    //    private readonly SystemChatMessage _systemChatMessage;
-
-    //    private UserPrompt _lastPrompt => _chat.Contents.Last();
-
-    //    private Dialog(
-    //        Chat chat,
-    //        string formattedSystemPrompt
-    //        )
-    //    {
-    //        if (chat is null)
-    //        {
-    //            throw new ArgumentNullException(nameof(chat));
-    //        }
-
-    //        if (formattedSystemPrompt is null)
-    //        {
-    //            throw new ArgumentNullException(nameof(formattedSystemPrompt));
-    //        }
-
-    //        _chat = chat;
-    //        _systemChatMessage = new SystemChatMessage(
-    //            formattedSystemPrompt
-    //            );
-    //    }
-
-    //    public void AppendAssistantReply(
-    //        IReadOnlyList<ChatMessageContentPart> contents
-    //        )
-    //    {
-    //        if (contents is null)
-    //        {
-    //            throw new ArgumentNullException(nameof(contents));
-    //        }
-
-    //        if (contents.Count == 0)
-    //        {
-    //            return;
-    //        }
-
-
-    //        var content = string.Join(
-    //            "",
-    //            contents
-    //                .Where(c => c.Kind == ChatMessageContentPartKind.Text)
-    //                .Select(c => c.Text)
-    //            );
-
-    //        var assistantReply = new AssistantChatMessage(
-    //            content
-    //            );
-
-    //        _lastPrompt.Answer.AddPermanentReaction(assistantReply);
-
-    //        _chat.PromptStateChanged(_lastPrompt, PromptChangeKindEnum.AnswerUpdated);
-    //    }
-
-
-    //    public void AppendAssistantReply(
-    //        IReadOnlyList<ChatToolCall> chatToolCalls
-    //        )
-    //    {
-    //        if (chatToolCalls is null)
-    //        {
-    //            throw new ArgumentNullException(nameof(chatToolCalls));
-    //        }
-
-    //        if (chatToolCalls.Count == 0)
-    //        {
-    //            return;
-    //        }
-
-    //        _lastPrompt.Answer.AddPermanentReaction(
-    //            new AssistantChatMessage(
-    //                chatToolCalls
-    //                )
-    //            );
-
-    //        _chat.PromptStateChanged(_lastPrompt, PromptChangeKindEnum.AnswerUpdated);
-    //    }
-
-    //    public void UpdateUserVisibleAnswer(string helperText)
-    //    {
-    //        if (string.IsNullOrEmpty(helperText))
-    //        {
-    //            return;
-    //        }
-
-    //        _lastPrompt.Answer.UpdateUserVisibleAnswer(
-    //            helperText
-    //            );
-
-    //        _chat.PromptStateChanged(_lastPrompt, PromptChangeKindEnum.AnswerUpdated);
-    //    }
-
-    //    public void AppendException(Exception excp)
-    //    {
-    //        _lastPrompt.Answer.UpdateUserVisibleAnswer(
-    //            $"Error: {excp.Message}"
-    //            );
-
-    //        _chat.PromptStateChanged(_lastPrompt, PromptChangeKindEnum.AnswerUpdated);
-    //    }
-
-
-    //    public void AppendUnsuccessfulToolCall(
-    //        StreamingChatToolCallUpdate toolCall
-    //        )
-    //    {
-    //        _lastPrompt.Answer.UpdateUserVisibleAnswer(
-    //             Environment.NewLine + $"> Tool {toolCall.FunctionName} has been called and the tool is FAILED." + Environment.NewLine + Environment.NewLine
-    //            );
-
-    //        _lastPrompt.Answer.AddPermanentReaction(
-    //            new ToolChatMessage(
-    //                toolCall.ToolCallId,
-    //                $"Tool {toolCall.FunctionName} FAILED to produce results."
-    //                )
-    //            );
-
-    //        _chat.PromptStateChanged(_lastPrompt, PromptChangeKindEnum.AnswerUpdated);
-    //    }
-
-    //    public void AppendToolCallResult(
-    //        StreamingChatToolCallUpdate toolCall,
-    //        string[] toolResult
-    //        )
-    //    {
-    //        _lastPrompt.Answer.UpdateUserVisibleAnswer(
-    //             Environment.NewLine + $"> Tool {toolCall.FunctionName} has been called SUCESSFULLY." + Environment.NewLine + Environment.NewLine
-    //            );
-
-    //        _lastPrompt.Answer.AddPermanentReaction(
-    //            new ToolChatMessage(
-    //                toolCall.ToolCallId,
-    //                string.Join(
-    //                    Environment.NewLine,
-    //                    toolResult
-    //                    )
-    //                )
-    //            );
-
-    //        _chat.PromptStateChanged(_lastPrompt, PromptChangeKindEnum.AnswerUpdated);
-    //    }
-
-    //    public void ArchiveAllPrompts()
-    //    {
-    //        _chat.ArchiveAllPrompts();
-    //    }
-
-    //    public async Task<IReadOnlyList<OpenAI.Chat.ChatMessage>> GetMessageListAsync()
-    //    {
-    //        var result = new List<OpenAI.Chat.ChatMessage>();
-
-    //        result.Add(_systemChatMessage);
-
-    //        var nonArchivedPrompts = _chat.Contents.FindAll(p => !p.IsArchived);
-
-    //        foreach (var prompt in nonArchivedPrompts.Take(nonArchivedPrompts.Count - 1))
-    //        {
-    //            FillMessageList(prompt, result);
-    //        }
-
-    //        foreach (var contextItem in _chat.ChatContext.Items)
-    //        {
-    //            result.Add(await contextItem.CreateChatMessageAsync());
-    //        }
-
-    //        FillMessageList(nonArchivedPrompts.Last(), result);
-
-    //        return result;
-    //    }
-
-
-    //    public static async Task<Dialog> CreateAsync(
-    //        Chat chat
-    //        )
-    //    {
-    //        var formattedSystemPrompt = await chat.Options.ChosenAgent.GetFormattedSystemPromptAsync();
-    //        var dialog = new Dialog(
-    //            chat,
-    //            formattedSystemPrompt
-    //            );
-    //        return dialog;
-    //    }
-
-    //    private static void FillMessageList(
-    //        UserPrompt prompt,
-    //        List<OpenAI.Chat.ChatMessage> result
-    //        )
-    //    {
-    //        if (result is null)
-    //        {
-    //            throw new ArgumentNullException(nameof(result));
-    //        }
-
-    //        //put prompt
-    //        var chatMessage = prompt.CreateChatMessage();
-    //        result.Add(chatMessage);
-
-    //        //put answers (assistant + tool)
-    //        foreach (var reaction in prompt.Answer.Reactions)
-    //        {
-    //            result.Add(reaction);
-    //        }
-    //    }
-
-    //}
-
-    #endregion
-
     public delegate void ChatStatusChangedDelegate(object sender, ChatEventArgs e);
-    public delegate void PromptAddedDelegate(object sender, PromptAddedEventArgs e);
+    public delegate void ChatContentAddedDelegate(object sender, ChatContentAddedEventArgs e);
 
-    public sealed class PromptAddedEventArgs : EventArgs
+    public sealed class ChatContentAddedEventArgs : EventArgs
     {
         public Chat Chat
         {
             get;
         }
 
-        public UserPrompt Prompt
+        public IChatContent ChatContent
         {
             get;
         }
 
-        public PromptAddedEventArgs(Chat chat, UserPrompt prompt)
+        public ChatContentAddedEventArgs(Chat chat, IChatContent chatContent)
         {
             Chat = chat;
-            Prompt = prompt;
+            ChatContent = chatContent;
         }
     }
-
-    //public enum PromptChangeKindEnum
-    //{
-    //    PromptAdded,
-    //    AnswerUpdated,
-    //    PromptArchived
-    //}
 
     public sealed class ChatEventArgs : EventArgs
     {

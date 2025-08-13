@@ -2,17 +2,9 @@
 using FreeAIr.BLogic.Content;
 using FreeAIr.Helper;
 using FreeAIr.MCP.McpServerProxy;
-using FreeAIr.UI.Dialog;
-using FreeAIr.UI.Dialog.Content;
-using FreeAIr.UI.ViewModels;
-using MarkdownParser.Antlr.Answer;
 using Microsoft.VisualStudio.Threading;
 using OpenAI.Chat;
-using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
@@ -23,21 +15,14 @@ namespace FreeAIr.UI.BLogic.Reader
     {
         private readonly object _taskLocker = new();
 
-        private readonly SemaphoreSlim _semaphore = new (1);
-
         private readonly FreeAIr.BLogic.Chat _chat;
-        private readonly DialogViewModel _dialog;
-        private readonly AdditionalCommandContainer _additionalCommandContainer;
 
         private CancellationTokenSource _cancellationTokenSource = new();
 
-        private AnswerDialogContent? _dialogAnswer;
         private Task? _task;
 
         public LLMReader(
-            FreeAIr.BLogic.Chat chat,
-            DialogViewModel dialog,
-            AdditionalCommandContainer? additionalCommandContainer
+            FreeAIr.BLogic.Chat chat
             )
         {
             if (chat is null)
@@ -45,14 +30,7 @@ namespace FreeAIr.UI.BLogic.Reader
                 throw new ArgumentNullException(nameof(chat));
             }
 
-            if (dialog is null)
-            {
-                throw new ArgumentNullException(nameof(dialog));
-            }
-
             _chat = chat;
-            _dialog = dialog;
-            _additionalCommandContainer = additionalCommandContainer;
         }
 
         public void AsyncStartRead(
@@ -117,8 +95,7 @@ namespace FreeAIr.UI.BLogic.Reader
 
         public void Dispose()
         {
-            _cancellationTokenSource.Dispose();
-            _semaphore.Dispose();
+            _cancellationTokenSource?.Dispose();
         }
 
         private async Task ReadSafelyAsync(
@@ -141,6 +118,8 @@ namespace FreeAIr.UI.BLogic.Reader
             )
         {
             await TaskScheduler.Default;
+
+            AnswerChatContent? chatAnswer = null;
 
             try
             {
@@ -172,7 +151,7 @@ namespace FreeAIr.UI.BLogic.Reader
 
                     if (completionUpdate.CompletionId is null)
                     {
-                        await AddOrAppendAnswerAsync("Server returns error.");
+                        chatAnswer = await CreateOrAppendAnswerPartAsync(chatAnswer, "Server returns error.");
                         _chat.Status = ChatStatusEnum.Failed;
                         return;
                     }
@@ -202,7 +181,7 @@ namespace FreeAIr.UI.BLogic.Reader
                         }
 
                         //for updating UI in real time
-                        await AddOrAppendAnswerAsync(contentPart.Text);
+                        chatAnswer = await CreateOrAppendAnswerPartAsync(chatAnswer, contentPart.Text);
 
                         if (cancellationToken.IsCancellationRequested)
                         {
@@ -253,7 +232,7 @@ namespace FreeAIr.UI.BLogic.Reader
             }
             catch (Exception excp)
             {
-                await AddOrAppendAnswerAsync(excp);
+                chatAnswer = await CreateOrAppendAnswerPartAsync(chatAnswer, excp);
 
                 _chat.Status = ChatStatusEnum.Failed;
 
@@ -261,7 +240,10 @@ namespace FreeAIr.UI.BLogic.Reader
             }
         }
 
-        private async Task AddOrAppendAnswerAsync(Exception excp)
+        private async Task<AnswerChatContent> CreateOrAppendAnswerPartAsync(
+            AnswerChatContent? chatAnswer,
+            Exception excp
+            )
         {
             if (excp is null)
             {
@@ -274,55 +256,23 @@ namespace FreeAIr.UI.BLogic.Reader
                 + excp.StackTrace
                 ;
 
-            await AddOrAppendAnswerAsync(answerPart);
+            return await CreateOrAppendAnswerPartAsync(chatAnswer, answerPart);
         }
 
-        //private async Task AddOrAppendAnswerAsync(
-        //    List<ChatMessageContentPart> contentParts
-        //    )
-        //{
-        //    if (contentParts is null)
-        //    {
-        //        throw new ArgumentNullException(nameof(contentParts));
-        //    }
 
-        //    if (contentParts.Count == 0)
-        //    {
-        //        return;
-        //    }
-
-        //    var answerPart = string.Join("", contentParts.Select(c => c.Text));
-        //    await AddOrAppendAnswerAsync(answerPart);
-        //}
-
-        private async Task AddOrAppendAnswerAsync(
+        private async Task<AnswerChatContent> CreateOrAppendAnswerPartAsync(
+            AnswerChatContent? chatAnswer,
             string answerPart
             )
         {
-            await _semaphore.WaitAsync();
-            try
+            if (chatAnswer is null)
             {
-                await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
-
-                if (_dialogAnswer is null)
-                {
-                    var chatAnswer = _chat.CreateAnswer();
-
-                    _dialogAnswer = AnswerDialogContent.Create(
-                        chatAnswer,
-                        _additionalCommandContainer,
-                        true
-                        );
-
-                    _dialog.AddContent(_dialogAnswer);
-                }
-
-                _dialogAnswer.TypedContent.Append(answerPart);
+                chatAnswer = _chat.CreateAnswer();
             }
-            finally
-            {
-                _semaphore.Release();
-            }
+
+            await chatAnswer.AppendAsync(answerPart);
+
+            return chatAnswer;
         }
 
         private static Dictionary<string, object?> ParseToolInvocationArguments(

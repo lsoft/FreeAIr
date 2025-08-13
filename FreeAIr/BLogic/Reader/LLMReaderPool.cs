@@ -10,9 +10,7 @@ namespace FreeAIr.UI.BLogic.Reader
         private static readonly Dictionary<FreeAIr.BLogic.Chat, LLMReader> _readers = new();
 
         public static void AddAndStartReader(
-            FreeAIr.BLogic.Chat chat,
-            DialogViewModel dialog,
-            AdditionalCommandContainer? additionalCommandContainer
+            FreeAIr.BLogic.Chat chat
             )
         {
             lock (_locker)
@@ -20,9 +18,7 @@ namespace FreeAIr.UI.BLogic.Reader
                 if (!_readers.TryGetValue(chat, out var reader))
                 {
                     reader = new LLMReader(
-                        chat,
-                        dialog,
-                        additionalCommandContainer
+                        chat
                         );
                     _readers[chat] = reader;
                 }

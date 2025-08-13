@@ -1,6 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using Microsoft.VisualStudio.Shell.Interop;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace FreeAIr.Helper
 {
@@ -10,12 +12,12 @@ namespace FreeAIr.Helper
         AddToQueue
     }
 
-    public sealed class TimeoutEventProxy<TArgs> : IDisposable
+    public sealed class TimeoutEventProxy<TArgs> : IAsyncDisposable
         where TArgs : EventArgs
     {
-        public delegate void TimeoutEventProxyDelegate(object sender, TArgs args);
+        public delegate Task TimeoutEventProxyDelegate(object sender, TArgs args);
 
-        private readonly object _locker = new();
+        private readonly SemaphoreSlim _semaphore = new(1);
 
         private readonly ManualResetEvent _stopSignal = new(false);
         private readonly AutoResetEvent _immediatelySendSignal = new(false);
@@ -24,7 +26,7 @@ namespace FreeAIr.Helper
         private readonly Func<TArgs?, TArgs?, ArgsActionKindEnum> _determineActionPredicate;
 
         private int _firstCall = 1;
-        private Thread? _workingThread;
+        private Task? _workingTask;
 
         private List<TArgs> _argsList = new();
 
@@ -51,14 +53,16 @@ namespace FreeAIr.Helper
             _determineActionPredicate = determineActionPredicate;
         }
 
-        public void Fire(
+        public async Task FireAsync(
             TArgs args
             )
         {
             StartWorkingThread();
 
-            lock (_locker)
+            try
             {
+                await _semaphore.WaitAsync();
+
                 var action = _determineActionPredicate(_argsList.LastOrDefault(), args);
                 switch (action)
                 {
@@ -83,18 +87,21 @@ namespace FreeAIr.Helper
                         break;
                 }
             }
+            finally
+            {
+                _semaphore.Release();
+            }
         }
 
         private void StartWorkingThread()
         {
             if (Interlocked.Exchange(ref _firstCall, 0) == 1)
             {
-                _workingThread = new Thread(WorkThread);
-                _workingThread.Start();
+                _workingTask = Task.Run(DoWorkAsync);
             }
         }
 
-        private void WorkThread()
+        private async Task DoWorkAsync()
         {
             while (true)
             {
@@ -108,15 +115,13 @@ namespace FreeAIr.Helper
                 if (index == WaitHandle.WaitTimeout)
                 {
                     //timeout! send all args
-                    SendAllItems(
-                        //true
+                    await SendAllItemsAsync(
                         );
                 }
                 else if (index == 0)
                 {
                     //send signal fired; send all args
-                    SendAllItems(
-                        //false
+                    await SendAllItemsAsync(
                         );
                 }
                 else if (index == 1)
@@ -127,41 +132,49 @@ namespace FreeAIr.Helper
             }
         }
 
-        private void SendAllItems(
-            //bool timeout
+        private async Task SendAllItemsAsync(
             )
         {
-            lock (_locker)
+            try
             {
+                await _semaphore.WaitAsync();
+
                 if (_argsList.Count > 0)
                 {
                     for (var i = 0; i < _argsList.Count; i++)
                     {
-                        FireEvent(_argsList[i]);
+                        await FireEventAsync(_argsList[i]);
                     }
 
                     _argsList.Clear();
                 }
             }
+            finally
+            {
+                _semaphore.Release();
+            }
         }
 
-        public void Dispose()
+        public async ValueTask DisposeAsync()
         {
             _stopSignal.Set();
-            _workingThread?.Join();
+            if (_workingTask is not null)
+            {
+                await _workingTask;
+            }
 
             _stopSignal.Dispose();
-            _immediatelySendSignal.Dispose();
+            _semaphore.Dispose();
         }
 
-        private void FireEvent(
+        private async Task FireEventAsync(
             TArgs args
             )
         {
             var e = Event;
             if (e is not null)
             {
-                e(_sender, args);
+                await e(_sender, args);
             }
         }
     }
