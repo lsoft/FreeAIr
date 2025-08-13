@@ -23,7 +23,7 @@ namespace FreeAIr.BLogic
 
         public event ChatCollectionChangedDelegate ChatCollectionChangedEvent;
         public event ChatStatusChangedDelegate ChatStatusChangedEvent;
-        public event PromptStateChangedDelegate PromptStateChangedEvent;
+        //public event PromptAddedDelegate PromptStateChangedEvent;
 
         [ImportingConstructor]
         public ChatContainer(
@@ -68,7 +68,7 @@ namespace FreeAIr.BLogic
                 options
                 );
             chat.ChatStatusChangedEvent += ChatStatusChanged;
-            chat.PromptStateChangedEvent.Event += PromptStateChanged;
+            //chat.PromptStateChangedEvent.Event += PromptStateChanged;
 
             lock (_locker)
             {
@@ -154,14 +154,14 @@ namespace FreeAIr.BLogic
             return false;
         }
 
-        private void PromptStateChanged(object sender, PromptEventArgs pea)
-        {
-            var e = PromptStateChangedEvent;
-            if (e is not null)
-            {
-                e(this, pea);
-            }
-        }
+        //private void PromptStateChanged(object sender, PromptAddedEventArgs pea)
+        //{
+        //    var e = PromptStateChangedEvent;
+        //    if (e is not null)
+        //    {
+        //        e(this, pea);
+        //    }
+        //}
 
 
         private void ChatStatusChanged(object sender, ChatEventArgs ea)

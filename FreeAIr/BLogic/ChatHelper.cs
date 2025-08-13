@@ -1,4 +1,5 @@
-﻿using FreeAIr.Helper;
+﻿using FreeAIr.BLogic.Content;
+using FreeAIr.Helper;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -23,26 +24,32 @@ namespace FreeAIr.BLogic
 
             await chat.WaitForPromptResultAsync();
 
-            if (chat.Status == ChatStatusEnum.Ready)
+            if (chat.Status != ChatStatusEnum.Ready)
             {
-                var lastPrompt = chat.Prompts.Last();
-                if (!lastPrompt.Answer.IsEmpty)
-                {
-                    var textAnswer = lastPrompt.Answer.GetUserVisibleAnswer();
-                    if (!string.IsNullOrEmpty(textAnswer))
-                    {
-                        var cleanAnswer = textAnswer.CleanupFromQuotesAndThinks(
-                            lineEnding
-                            );
-                        if (!string.IsNullOrEmpty(cleanAnswer))
-                        {
-                            return cleanAnswer;
-                        }
-                    }
-                }
+                return null;
             }
 
-            return null;
+            var lastAnswer = (AnswerChatContent)chat.Contents.LastOrDefault(c => c.Type == Content.ChatContentTypeEnum.LLMAnswer);
+            if (lastAnswer is null)
+            {
+                return null;
+            }
+
+            var textAnswer = lastAnswer.AnswerBody;
+            if (string.IsNullOrEmpty(textAnswer))
+            {
+                return null;
+            }
+
+            var cleanAnswer = textAnswer.CleanupFromQuotesAndThinks(
+                lineEnding
+                );
+            if (string.IsNullOrEmpty(cleanAnswer))
+            {
+                return null;
+            }
+
+            return cleanAnswer;
         }
     }
 }

@@ -34,7 +34,7 @@ namespace FreeAIr.UI.Chat
         public static readonly DependencyProperty ChatProperty =
             DependencyProperty.Register(
                 nameof(Chat),
-                typeof(BLogic.Chat),
+                typeof(FreeAIr.BLogic.Chat),
                 typeof(ChatControl),
                 new PropertyMetadata(OnChatPropertyChanged)
                 );
@@ -48,17 +48,19 @@ namespace FreeAIr.UI.Chat
         {
             var control = d as ChatControl;
 
-            if (e.OldValue is BLogic.Chat ochat)
+            if (e.OldValue is FreeAIr.BLogic.Chat ochat)
             {
-                ochat.PromptStateChangedEvent.Event -= control.PromptStateChangedEvent_Event;
+                ochat.ChatStatusChangedEvent -= control.ChatStatusChangedEvent;
+                //ochat.PromptStateChangedEvent.Event -= control.PromptStateChangedEvent_Event;
                 control._chat = null;
 
                 control.DialogViewModel.UpdateDialog(null);
             }
 
-            if (e.NewValue is BLogic.Chat nchat)
+            if (e.NewValue is FreeAIr.BLogic.Chat nchat)
             {
-                nchat.PromptStateChangedEvent.Event += control.PromptStateChangedEvent_Event;
+                nchat.ChatStatusChangedEvent += control.ChatStatusChangedEvent;
+                //nchat.PromptStateChangedEvent.Event += control.PromptStateChangedEvent_Event;
 
                 control._chat = nchat;
                 control.DialogViewModel.UpdateDialog(nchat);
@@ -82,7 +84,7 @@ namespace FreeAIr.UI.Chat
         private ICommand _createPromptCommand;
         private ICommand _stopCommand;
 
-        private BLogic.Chat? _chat;
+        private FreeAIr.BLogic.Chat? _chat;
 
         /// <summary>
         /// Событие изменения свойства
@@ -641,9 +643,9 @@ namespace FreeAIr.UI.Chat
         #endregion
 
 
-        public BLogic.Chat? Chat
+        public FreeAIr.BLogic.Chat? Chat
         {
-            get => (BLogic.Chat)GetValue(ChatProperty);
+            get => (FreeAIr.BLogic.Chat)GetValue(ChatProperty);
             set
             {
                 SetValue(ChatProperty, value);
@@ -733,16 +735,13 @@ namespace FreeAIr.UI.Chat
             SetupAddToContextControl();
         }
 
-        private void PromptStateChangedEvent_Event(
-            object sender,
-            PromptEventArgs args
-            )
+        private void ChatStatusChangedEvent(object sender, ChatEventArgs e)
         {
             OnPropertyChanged();
         }
 
         private void AddContextItemsFromPrompt(
-            BLogic.Chat chat,
+            FreeAIr.BLogic.Chat chat,
             Parsed parsed
             )
         {

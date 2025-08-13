@@ -23,7 +23,7 @@ namespace FreeAIr.UI.ViewModels
     [Export(typeof(NaturalLanguageOutlinesViewModel))]
     public sealed class NaturalLanguageOutlinesViewModel : BaseViewModel
     {
-        private BLogic.Chat? _chat;
+        private FreeAIr.BLogic.Chat? _chat;
         private ICommand _gotoCommand;
         private ICommand _cancelChatCommand;
         
@@ -273,7 +273,7 @@ namespace FreeAIr.UI.ViewModels
                 () =>
                 {
                     _chat.StopAsync()
-                        .FileAndForget(nameof(BLogic.Chat.StopAsync));
+                        .FileAndForget(nameof(FreeAIr.BLogic.Chat.StopAsync));
                 });
 
             _processingTask = ProcessSolutionDocumentsAsync(

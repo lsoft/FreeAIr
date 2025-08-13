@@ -13,7 +13,7 @@ namespace FreeAIr.Helper
     public sealed class TimeoutEventProxy<TArgs> : IDisposable
         where TArgs : EventArgs
     {
-        public delegate void Delegate(object sender, TArgs args);
+        public delegate void TimeoutEventProxyDelegate(object sender, TArgs args);
 
         private readonly object _locker = new();
 
@@ -28,7 +28,7 @@ namespace FreeAIr.Helper
 
         private List<TArgs> _argsList = new();
 
-        public event Delegate Event;
+        public event TimeoutEventProxyDelegate Event;
 
         public TimeoutEventProxy(
             int timeoutMsec,
@@ -101,7 +101,7 @@ namespace FreeAIr.Helper
                 var index = WaitHandle.WaitAny(
                     [
                         _immediatelySendSignal,
-                            _stopSignal
+                        _stopSignal
                     ],
                     _timeoutMsec
                     );

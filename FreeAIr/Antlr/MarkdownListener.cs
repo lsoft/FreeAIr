@@ -55,6 +55,11 @@ namespace FreeAIr.Antlr
             {
                 var partPayload = word.Substring(1);
                 var part = generator.CreatePart(partPayload);
+                if (part is null)
+                {
+                    part = new StringAnswerPart(word);
+                }
+
                 parsed.AppendPart(part);
             }
         }

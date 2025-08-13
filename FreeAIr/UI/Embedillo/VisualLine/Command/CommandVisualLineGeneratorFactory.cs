@@ -38,9 +38,13 @@ namespace FreeAIr.UI.Embedillo.VisualLine.Command
         {
         }
 
-        public override IParsedPart CreatePart(string partPayload)
+        public override IParsedPart? CreatePart(string partPayload)
         {
-            var suggestion = _suggestions?.First(s => StringComparer.CurrentCultureIgnoreCase.Compare(s.PublicData, partPayload) == 0);
+            var suggestion = _suggestions?.FirstOrDefault(s => StringComparer.CurrentCultureIgnoreCase.Compare(s.PublicData, partPayload) == 0);
+            if (suggestion is null)
+            {
+                return null;
+            }
 
             var supportContext = SupportContext.WithPrompt(
                 );

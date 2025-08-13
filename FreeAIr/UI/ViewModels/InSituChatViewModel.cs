@@ -14,7 +14,7 @@ namespace FreeAIr.UI.ViewModels
     {
         private ICommand _closeCommand;
 
-        public BLogic.Chat CurrentChat
+        public FreeAIr.BLogic.Chat CurrentChat
         {
             get;
         }
@@ -58,7 +58,7 @@ namespace FreeAIr.UI.ViewModels
 
         [ImportingConstructor]
         public InSituChatViewModel(
-            BLogic.Chat currentChat
+            FreeAIr.BLogic.Chat currentChat
             )
         {
             if (currentChat is null)

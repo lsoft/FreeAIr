@@ -1,10 +1,33 @@
-﻿using WpfHelpers;
+﻿using FreeAIr.BLogic.Content;
+using WpfHelpers;
 
 namespace FreeAIr.UI.Dialog
 {
+    public abstract class DialogContent<T> : DialogContent
+        where T : IChatContent
+    {
+        public T TypedContent
+        {
+            get;
+        }
+
+        protected DialogContent(
+            T content,
+            object tag
+            ) : base(content, tag)
+        {
+            if (content is null)
+            {
+                throw new ArgumentNullException(nameof(content));
+            }
+
+            TypedContent = content;
+        }
+    }
+
     public abstract class DialogContent : BaseViewModel
     {
-        public DialogContentTypeEnum Type
+        public IChatContent Content
         {
             get;
         }
@@ -15,11 +38,16 @@ namespace FreeAIr.UI.Dialog
         }
 
         protected DialogContent(
-            DialogContentTypeEnum type,
+            IChatContent content,
             object tag
             )
         {
-            Type = type;
+            if (content is null)
+            {
+                throw new ArgumentNullException(nameof(content));
+            }
+
+            Content = content;
             Tag = tag;
         }
 

@@ -322,14 +322,14 @@ namespace FreeAIr.UI.ViewModels
 
         public sealed class ChatWrapper : BaseViewModel
         {
-            public BLogic.Chat Chat
+            public FreeAIr.BLogic.Chat Chat
             {
                 get;
             }
 
             public ImageMoniker StatusMoniker => GetStatusMoniker(Chat);
 
-            public static ImageMoniker GetStatusMoniker(BLogic.Chat chat)
+            public static ImageMoniker GetStatusMoniker(FreeAIr.BLogic.Chat chat)
             {
                 if (chat.Status.In(ChatStatusEnum.NotStarted, ChatStatusEnum.Ready))
                 {
@@ -407,7 +407,7 @@ namespace FreeAIr.UI.ViewModels
             }
 
             public ChatWrapper(
-                BLogic.Chat chat
+                FreeAIr.BLogic.Chat chat
                 )
             {
                 if (chat is null)

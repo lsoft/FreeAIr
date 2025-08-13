@@ -14,7 +14,7 @@ namespace FreeAIr.UI.Windows
     public partial class InSituChatWindow : Window
     {
         public InSituChatWindow(
-            BLogic.Chat chat
+            FreeAIr.BLogic.Chat chat
             )
         {
             var viewModel = new InSituChatViewModel(
@@ -52,7 +52,7 @@ namespace FreeAIr.UI.Windows
         }
 
         public static async Task ShowAsync(
-            BLogic.Chat chat,
+            FreeAIr.BLogic.Chat chat,
             Point position
             )
         {

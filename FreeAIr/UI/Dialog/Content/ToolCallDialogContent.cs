@@ -1,9 +1,10 @@
-﻿using System.Windows.Input;
+﻿using FreeAIr.BLogic.Content;
+using System.Windows.Input;
 using WpfHelpers;
 
-namespace FreeAIr.UI.Dialog
+namespace FreeAIr.UI.Dialog.Content
 {
-    public sealed class ToolCallContent : DialogContent
+    public sealed class ToolCallDialogContent : DialogContent<ToolCallChatContent>
     {
         private ICommand _clickCommand;
         private ICommand _allowThisToolAllTimeCommand;
@@ -128,12 +129,12 @@ namespace FreeAIr.UI.Dialog
             }
         }
 
-        public ToolCallContent(
-            string name
-            ) : base(DialogContentTypeEnum.ToolCall, null)
+        public ToolCallDialogContent(
+            ToolCallChatContent content
+            ) : base(content, content)
         {
             Status = ToolCallStatusEnum.Asking;
-            Name = name;
+            Name = "qwerty";
         }
 
         private void AllowThisToolAllTime()

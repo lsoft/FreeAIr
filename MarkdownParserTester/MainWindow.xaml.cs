@@ -14,8 +14,7 @@ namespace MarkdownParserTester
         public FlowDocument Document
         {
             get;
-            private set;
-        }
+        } = new();
 
         public AdditionalCommandContainer AdditionalCommandContainer
         {
@@ -220,7 +219,8 @@ fake **three** bolds **one** two **three and latest
                 );
             //*/
 
-            Document = parsedAnswer.ConvertToFlowDocument(
+            parsedAnswer.UpdateFlowDocument(
+                Document,
                 AdditionalCommandContainer,
                 false
                 );

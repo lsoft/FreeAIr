@@ -192,19 +192,13 @@ namespace MarkdownParser.Antlr.Answer
 
         #endregion
 
-        public FlowDocument ConvertToFlowDocument(
+        public void UpdateFlowDocument(
+            FlowDocument document,
             AdditionalCommandContainer? acc,
             bool isInProgress
             )
         {
-            var flowDocument = CreateFlowDocument(acc, isInProgress);
-
-            return flowDocument;
-        }
-
-        private FlowDocument CreateFlowDocument(AdditionalCommandContainer acc, bool isInProgress)
-        {
-            var document = new FlowDocument();
+            document.Blocks.Clear();
 
             foreach (var block in Blocks)
             {
@@ -219,8 +213,6 @@ namespace MarkdownParser.Antlr.Answer
 
                 document.Blocks.Add(wpfBlock);
             }
-
-            return document;
         }
 
     }

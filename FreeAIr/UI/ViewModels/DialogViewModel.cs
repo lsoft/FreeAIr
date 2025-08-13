@@ -1,14 +1,18 @@
 ﻿using FreeAIr.BLogic;
+using FreeAIr.BLogic.Content;
 using FreeAIr.BLogic.Context;
 using FreeAIr.Helper;
 using FreeAIr.Shared.Helper;
+using FreeAIr.UI.BLogic.Reader;
 using FreeAIr.UI.ContextMenu;
 using FreeAIr.UI.Dialog;
+using FreeAIr.UI.Dialog.Content;
 using MarkdownParser.Antlr.Answer;
 using MarkdownParser.Antlr.Answer.Parts;
 using Microsoft.VisualStudio.ComponentModelHost;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -20,9 +24,7 @@ namespace FreeAIr.UI.ViewModels
 {
     public class DialogViewModel : BaseViewModel
     {
-        private readonly IAnswerParser _answerParser;
-
-        private BLogic.Chat? _selectedChat;
+        private FreeAIr.BLogic.Chat? _selectedChat;
 
         public ObservableCollection2<DialogContent> Dialog
         {
@@ -37,8 +39,8 @@ namespace FreeAIr.UI.ViewModels
         public DialogViewModel(
             )
         {
-            var componentModel = FreeAIrPackage.Instance.GetService<SComponentModel, IComponentModel>();
-            _answerParser = componentModel.GetService<IAnswerParser>();
+            //var componentModel = FreeAIrPackage.Instance.GetService<SComponentModel, IComponentModel>();
+            //_answerParser = componentModel.GetService<IAnswerParser>();
 
             #region AdditionalCommandContainer
 
@@ -299,100 +301,68 @@ namespace FreeAIr.UI.ViewModels
         }
 
         public void UpdateDialog(
-            BLogic.Chat? selectedChat
+            FreeAIr.BLogic.Chat? selectedChat
             )
         {
             Dialog.Clear();
 
             if (_selectedChat is not null)
             {
-                _selectedChat.PromptStateChangedEvent.Event -= PromptStateChanged;
+                _selectedChat.PromptAddedEvent -= PromptAddedRaised;
             }
 
             _selectedChat = selectedChat;
 
             if (selectedChat is not null)
             {
-                selectedChat.PromptStateChangedEvent.Event += PromptStateChanged;
+                selectedChat.PromptAddedEvent += PromptAddedRaised;
 
-                foreach (var prompt in selectedChat.Prompts)
+                RewriteDialog();
+            }
+        }
+
+        public void AddContent(DialogContent content)
+        {
+            if (content is null)
+            {
+                throw new ArgumentNullException(nameof(content));
+            }
+
+            Dialog.Add(content);
+        }
+
+        private void RewriteDialog()
+        {
+            foreach (var content in _selectedChat.Contents)
+            {
+                switch (content.Type)
                 {
-                    UpdateDialogPrompt(
-                        prompt,
-                        PromptChangeKindEnum.PromptAdded
-                        );
+                    case ChatContentTypeEnum.Prompt:
+                        var p = PromptDialogContent.Create(
+                            (UserPrompt)content,
+                            AdditionalCommandContainer
+                            );
+                        Dialog.Add(p);
+                        break;
+                    case ChatContentTypeEnum.LLMAnswer:
+                        var a = AnswerDialogContent.Create(
+                            (AnswerChatContent)content,
+                            AdditionalCommandContainer,
+                            false
+                            );
+                        Dialog.Add(a);
+                        break;
+                    case ChatContentTypeEnum.ToolCall:
+                        var tc = new ToolCallDialogContent(
+                            (ToolCallChatContent)content
+                            );
+                        Dialog.Add(tc);
+                        break;
                 }
             }
         }
 
-        private void UpdateDialogPrompt(
-            UserPrompt prompt,
-            PromptChangeKindEnum kind
-            )
-        {
-            switch (kind)
-            {
-                case PromptChangeKindEnum.PromptAdded:
-                    {
-                        var promptReplic = new ReplicContent(
-                            _answerParser.Parse(prompt.PromptBody),
-                            prompt,
-                            true,
-                            AdditionalCommandContainer,
-                            false
-                            );
-                        var existingPromptReplicIndex = Dialog.FindIndex(r => r.IsSameTag(prompt) && r.Type == DialogContentTypeEnum.Prompt);
-                        if (existingPromptReplicIndex >= 0)
-                        {
-                            Dialog[existingPromptReplicIndex] = promptReplic;
-                        }
-                        else
-                        {
-                            Dialog.Add(promptReplic);
-                        }
-
-                        var answerReplic = new ReplicContent(
-                            _answerParser.Parse(prompt.Answer.GetUserVisibleAnswer()),
-                            prompt,
-                            false,
-                            AdditionalCommandContainer,
-                            false
-                            );
-                        var existingAnswerReplicIndex = Dialog.FindIndex(r => r.IsSameTag(prompt) && r.Type == DialogContentTypeEnum.LLMAnswer);
-                        if (existingAnswerReplicIndex >= 0)
-                        {
-                            Dialog[existingAnswerReplicIndex] = answerReplic;
-                        }
-                        else
-                        {
-                            Dialog.Add(answerReplic);
-                        }
-
-                        Dialog.Add(new ToolCallContent("qwerty"));
-                    }
-                    break;
-                case PromptChangeKindEnum.AnswerUpdated:
-                    {
-                        var replic = (ReplicContent?)Dialog.FirstOrDefault(r => r.IsSameTag(prompt) && r.Type == DialogContentTypeEnum.LLMAnswer);
-                        if (replic is not null)
-                        {
-                            replic.Update(
-                                _answerParser.Parse(
-                                    prompt.Answer.GetUserVisibleAnswer()
-                                    ),
-                                true
-                                );
-                        }
-                    }
-                    break;
-                case PromptChangeKindEnum.PromptArchived:
-                    break;
-                default:
-                    break;
-            }
-        }
-
-        private async void PromptStateChanged(object sender, PromptEventArgs e)
+        private async void PromptAddedRaised(object sender, PromptAddedEventArgs e)
         {
             try
             {
@@ -400,12 +370,18 @@ namespace FreeAIr.UI.ViewModels
 
                 if (_selectedChat is not null && ReferenceEquals(_selectedChat, e.Chat))
                 {
-                    UpdateDialogPrompt(
+                    var p = PromptDialogContent.Create(
                         e.Prompt,
-                        e.Kind
+                        AdditionalCommandContainer
+                        );
+                    Dialog.Add(p);
+
+                    LLMReaderPool.AddAndStartReader(
+                        _selectedChat,
+                        this,
+                        AdditionalCommandContainer
                         );
                 }
-
             }
             catch (Exception excp)
             {
@@ -416,12 +392,12 @@ namespace FreeAIr.UI.ViewModels
 
     public sealed class ChatContextMenuAdditionalCommand : AdditionalCommand
     {
-        private readonly Func<BLogic.Chat?> _chatFunc;
+        private readonly Func<FreeAIr.BLogic.Chat?> _chatFunc;
         private readonly ICommand? _actionCommand;
 
         public ChatContextMenuAdditionalCommand(
             IFontSizeProvider fontSizeProvider,
-            Func<BLogic.Chat?> chatFunc,
+            Func<FreeAIr.BLogic.Chat?> chatFunc,
             PartTypeEnum partType,
             string title,
             string toolTip,

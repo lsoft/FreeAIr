@@ -6,12 +6,33 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:dialog="clr-namespace:FreeAIr.UI.Dialog"
     xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+    xmlns:content="clr-namespace:FreeAIr.UI.Dialog.Content"
     mc:Ignorable="d" 
     d:DesignHeight="450" d:DesignWidth="800"
     x:Name="DialogControlName"
     >
     <UserControl.Resources>
-        <DataTemplate x:Key="ReplicContentTemplate">
+        <DataTemplate x:Key="PromptContentTemplate">
+            <Border
+                BorderBrush="#569CD6"
+                Margin="0,2,0,2"
+                BorderThickness="{Binding BorderThickness}"
+                HorizontalAlignment="{Binding HorizontalAlignment}"
+                >
+
+                <FlowDocumentScrollViewer
+                    HorizontalContentAlignment="Stretch"
+                    VerticalAlignment="Stretch"
+                    VerticalContentAlignment="Stretch"
+                    ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                    ScrollViewer.VerticalScrollBarVisibility="Disabled"
+                    SizeChanged="FlowDocumentScrollViewer_SizeChanged"
+                    Document="{Binding Document}"
+                    >
+                </FlowDocumentScrollViewer>
+            </Border>
+        </DataTemplate>
+        <DataTemplate x:Key="AnswerContentTemplate">
             <Border
                 BorderBrush="#569CD6"
                 Margin="0,2,0,2"
@@ -69,9 +90,10 @@
             </xctk:SplitButton>
         </DataTemplate>
 
-        <dialog:DialogTemplateSelector
+        <content:DialogTemplateSelector
             x:Key="DialogTemplateSelector"
-            ReplicContentTemplate="{StaticResource ReplicContentTemplate}"
+            PromptContentTemplate="{StaticResource PromptContentTemplate}"
+            AnswerContentTemplate="{StaticResource AnswerContentTemplate}"
             ToolCallContentTemplate="{StaticResource ToolCallContentTemplate}"
             />
         
@@ -111,6 +133,7 @@
                 Background="{Binding ElementName=DialogControlName, Path=Background}"
                 ItemsSource="{Binding ElementName=DialogControlName, Path=Dialog}"
                 ItemTemplateSelector="{StaticResource DialogTemplateSelector}"
+                VirtualizingPanel.IsVirtualizing="False"
                 Focusable="False"
                 >
                 <ListView.ItemContainerStyle>

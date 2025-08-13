@@ -1,4 +1,5 @@
-﻿using OpenAI.Chat;
+﻿using FreeAIr.BLogic.Content;
+using OpenAI.Chat;
 using System.Collections.Generic;
 using System.Text;
 
@@ -7,24 +8,16 @@ namespace FreeAIr.BLogic
     /// <summary>
     /// Контракт для пользовательских запросов к ИИ-ассистенту
     /// </summary>
-    public sealed class UserPrompt
+    public sealed class UserPrompt : IChatContent
     {
+        public ChatContentTypeEnum Type => ChatContentTypeEnum.Prompt;
+
         /// <inheritdoc />
         public string PromptBody
         {
             get;
         }
 
-        /// <inheritdoc />
-        public LLMAnswer Answer
-        {
-            get;
-        }
-
-        /// <summary>
-        /// This prompt may be archived.
-        /// If so, this means it is not a subject to send into LLM.
-        /// </summary>
         public bool IsArchived
         {
             get;
@@ -41,10 +34,9 @@ namespace FreeAIr.BLogic
                 throw new ArgumentNullException(nameof(promptBody));
 
             PromptBody = promptBody;
-            Answer = new LLMAnswer();
         }
 
-        public UserChatMessage CreateChatMessage()
+        public ChatMessage CreateChatMessage()
         {
             return new UserChatMessage(
                 ChatMessageContentPart.CreateTextPart(PromptBody)
@@ -67,48 +59,48 @@ namespace FreeAIr.BLogic
                 );
     }
 
-    public sealed class LLMAnswer
-    {
-        private readonly List<OpenAI.Chat.ChatMessage> _reactions = new();
-        private readonly StringBuilder _userVisibleAnswer = new();
+    //public sealed class LLMAnswer
+    //{
+    //    private readonly List<OpenAI.Chat.ChatMessage> _reactions = new();
+    //    private readonly StringBuilder _userVisibleAnswer = new();
 
-        public bool IsEmpty => _reactions.Count == 0;
+    //    public bool IsEmpty => _reactions.Count == 0;
 
-        public IReadOnlyList<OpenAI.Chat.ChatMessage> Reactions => _reactions;
+    //    public IReadOnlyList<OpenAI.Chat.ChatMessage> Reactions => _reactions;
 
-        #region permanent reaction
+    //    #region permanent reaction
 
-        public void AddPermanentReaction(
-            ToolChatMessage toolChatMessage
-            )
-        {
-            _reactions.Add(toolChatMessage);
-        }
+    //    public void AddPermanentReaction(
+    //        ToolChatMessage toolChatMessage
+    //        )
+    //    {
+    //        _reactions.Add(toolChatMessage);
+    //    }
 
-        public void AddPermanentReaction(
-            AssistantChatMessage assistantChatMessage
-            )
-        {
-            _reactions.Add(assistantChatMessage);
-        }
+    //    public void AddPermanentReaction(
+    //        AssistantChatMessage assistantChatMessage
+    //        )
+    //    {
+    //        _reactions.Add(assistantChatMessage);
+    //    }
 
-        #endregion
+    //    #endregion
 
-        #region user visible answer
+    //    #region user visible answer
 
-        public void UpdateUserVisibleAnswer(
-            string suffix
-            )
-        {
-            _userVisibleAnswer.Append(suffix);
-        }
+    //    public void UpdateUserVisibleAnswer(
+    //        string suffix
+    //        )
+    //    {
+    //        _userVisibleAnswer.Append(suffix);
+    //    }
 
-        public string GetUserVisibleAnswer()
-        {
-            return _userVisibleAnswer.ToString();
-        }
+    //    public string GetUserVisibleAnswer()
+    //    {
+    //        return _userVisibleAnswer.ToString();
+    //    }
 
-        #endregion
-    }
+    //    #endregion
+    //}
 
 }
