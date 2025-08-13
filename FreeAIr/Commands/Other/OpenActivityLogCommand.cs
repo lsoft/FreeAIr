@@ -5,7 +5,7 @@ namespace FreeAIr.Commands.Other
 {
 
     [Command(PackageIds.OpenActivityLogCommandId)]
-    internal sealed class OpenActivityLogCommand : BaseCommand<OpenActivityLogCommand>
+    public sealed class OpenActivityLogCommand : BaseCommand<OpenActivityLogCommand>
     {
         protected override async Task ExecuteAsync(OleMenuCmdEventArgs e)
         {

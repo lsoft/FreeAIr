@@ -79,6 +79,9 @@
       <Group guid="FreeAIr" id="SubExtensionMenuGroup2" priority="0x0001">
         <Parent guid="FreeAIr" id="SubExtensionMenu" />
       </Group>
+      <Group guid="FreeAIr" id="SubExtensionMenuGroup3" priority="0x0002">
+        <Parent guid="FreeAIr" id="SubExtensionMenu" />
+      </Group>
 
       <Group guid="FreeAIr" id="SolutionTreeContextGroup" priority="0x0600">
         <Parent guid="FreeAIr" id="SolutionTreeContextMenu" />
@@ -136,7 +139,7 @@
         </Strings>
       </Button>
       <Button guid="FreeAIr" id="OpenControlCenterCommandId" priority="0x0104" type="Button">
-        <Parent guid="FreeAIr" id="SubExtensionMenuGroup2" />
+        <Parent guid="FreeAIr" id="SubExtensionMenuGroup3" />
         <Icon guid="ImageCatalogGuid" id="Settings" />
         <CommandFlag>IconIsMoniker</CommandFlag>
         <Strings>
@@ -144,7 +147,7 @@
         </Strings>
       </Button>
       <Button guid="FreeAIr" id="OpenPropertiesCommandId" priority="0x0105" type="Button">
-        <Parent guid="FreeAIr" id="SubExtensionMenuGroup2" />
+        <Parent guid="FreeAIr" id="SubExtensionMenuGroup3" />
         <Icon guid="ImageCatalogGuid" id="Property" />
         <CommandFlag>IconIsMoniker</CommandFlag>
         <Strings>
@@ -152,7 +155,7 @@
         </Strings>
       </Button>
       <Button guid="FreeAIr" id="OpenActivityLogCommandId" priority="0x0105" type="Button">
-        <Parent guid="FreeAIr" id="SubExtensionMenuGroup2" />
+        <Parent guid="FreeAIr" id="SubExtensionMenuGroup3" />
         <Icon guid="ImageCatalogGuid" id="Log" />
         <CommandFlag>IconIsMoniker</CommandFlag>
         <Strings>
@@ -160,11 +163,19 @@
         </Strings>
       </Button>
       <Button guid="FreeAIr" id="OpenProxyLogCommandId" priority="0x0105" type="Button">
-        <Parent guid="FreeAIr" id="SubExtensionMenuGroup2" />
+        <Parent guid="FreeAIr" id="SubExtensionMenuGroup3" />
         <Icon guid="ImageCatalogGuid" id="LogPopulation" />
         <CommandFlag>IconIsMoniker</CommandFlag>
         <Strings>
           <ButtonText>Open FreeAIr MCP proxy log...</ButtonText>
+        </Strings>
+      </Button>
+      <Button guid="FreeAIr" id="ResetMCPToolsCommandId" priority="0x0105" type="Button">
+        <Parent guid="FreeAIr" id="SubExtensionMenuGroup3" />
+        <Icon guid="ImageCatalogGuid" id="WPFToolBox" />
+        <CommandFlag>IconIsMoniker</CommandFlag>
+        <Strings>
+          <ButtonText>Reset MCP tools auto execution status</ButtonText>
         </Strings>
       </Button>
 
@@ -280,8 +291,9 @@
       <IDSymbol name="ExtensionMenuGroup" value="0x1003" />
       <IDSymbol name="SubExtensionMenuGroup1" value="0x1004" />
       <IDSymbol name="SubExtensionMenuGroup2" value="0x1005" />
+      <IDSymbol name="SubExtensionMenuGroup3" value="0x1006" />
 
-      <IDSymbol name="SubExtensionMenu" value="0x1006" />
+      <IDSymbol name="SubExtensionMenu" value="0x1007" />
 
       <IDSymbol name="ApplySupportCommandId" value="0x1011" />
       <IDSymbol name="StartDiscussionCommandId" value="0x1012" />
@@ -316,6 +328,8 @@
       <IDSymbol name="OpenProxyLogCommandId" value="0x1057" />
 
       <IDSymbol name="ShowInSituChatCommandId" value="0x1058" />
+
+      <IDSymbol name="ResetMCPToolsCommandId" value="0x1059" />
 
       <!-- context menu -->
       <IDSymbol name="VisualStudioContextMenu" value="0x8000"/>

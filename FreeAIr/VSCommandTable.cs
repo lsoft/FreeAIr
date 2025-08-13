@@ -31,7 +31,8 @@ namespace FreeAIr
         public const int ExtensionMenuGroup = 0x1003;
         public const int SubExtensionMenuGroup1 = 0x1004;
         public const int SubExtensionMenuGroup2 = 0x1005;
-        public const int SubExtensionMenu = 0x1006;
+        public const int SubExtensionMenuGroup3 = 0x1006;
+        public const int SubExtensionMenu = 0x1007;
         public const int ApplySupportCommandId = 0x1011;
         public const int StartDiscussionCommandId = 0x1012;
         public const int GenerateWholeLineSuggestionCommandId = 0x1013;
@@ -54,6 +55,7 @@ namespace FreeAIr
         public const int OpenActivityLogCommandId = 0x1056;
         public const int OpenProxyLogCommandId = 0x1057;
         public const int ShowInSituChatCommandId = 0x1058;
+        public const int ResetMCPToolsCommandId = 0x1059;
         public const int VisualStudioContextMenu = 0x8000;
         public const int VisualStudioContextMenuGroup = 0x8001;
         public const int VisualStudioContextMenuDynamicCommandId = 0x8002;

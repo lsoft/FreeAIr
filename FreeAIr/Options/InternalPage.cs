@@ -37,6 +37,34 @@ namespace FreeAIr
             set;
         }
 
-    }
+        [Category("Logic")]
+        [DisplayName("MCPToolsExecutionStatus")]
+        [DefaultValue("")]
+        [Browsable(false)]
+        public string MCPToolsExecutionStatus
+        {
+            get;
+            set;
+        }
 
+        public void ResetMCPToolsExecutionStatus()
+        {
+            MCPToolsExecutionStatus = string.Empty;
+            Save();
+        }
+
+        public MCPToolsExecutionStatus ReadMCPToolsExecutionStatus()
+        {
+            try
+            {
+                return System.Text.Json.JsonSerializer.Deserialize<MCPToolsExecutionStatus>(MCPToolsExecutionStatus);
+            }
+            catch
+            {
+                //suppress
+            }
+
+            return new MCPToolsExecutionStatus();
+        }
+    }
 }

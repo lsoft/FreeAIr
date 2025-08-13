@@ -55,18 +55,7 @@ namespace FreeAIr.UI.Dialog.Content
                     _clickCommand = new AsyncRelayCommand(
                         async a =>
                         {
-                            try
-                            {
-                                SetStatus(ToolCallStatusEnum.Executing);
-
-                                await ExecuteToolAsync();
-                            }
-                            catch (Exception excp)
-                            {
-                                excp.ActivityLogException();
-
-                                SetFailed(excp);
-                            }
+                            await ExecuteToolAsync();
 
                             OnPropertyChanged();
                         },
@@ -206,39 +195,62 @@ namespace FreeAIr.UI.Dialog.Content
             ToolCallChatContent content
             ) : base(content, content)
         {
+            var ts = InternalPage.Instance.ReadMCPToolsExecutionStatus();
+            if (ts.IsToolEnabled(content.ToolCall.FunctionName))
+            {
+                ExecuteToolAsync()
+                    .FileAndForget(nameof(ExecuteToolAsync));
+            }
         }
 
         private async Task AllowThisToolAllTimeAsync()
         {
+            var ts = InternalPage.Instance.ReadMCPToolsExecutionStatus();
+            ts.EnableTool(TypedContent.ToolCall.FunctionName);
+
             await ExecuteToolAsync();
         }
 
         private async Task AllowAnyToolAllTimeAsync()
         {
+            var ts = InternalPage.Instance.ReadMCPToolsExecutionStatus();
+            ts.EnableAllTools();
+
             await ExecuteToolAsync();
         }
 
 
         private async Task ExecuteToolAsync()
         {
-            var toolCall = TypedContent.ToolCall;
-
-            var toolArguments = ParseToolInvocationArguments(toolCall);
-
-            var toolResult = await McpServerProxyCollection.CallToolAsync(
-                toolCall.FunctionName,
-                toolArguments,
-                cancellationToken: CancellationToken.None
-                );
-            if (toolResult is null)
+            try
             {
-                SetFailed($"Failed to execute the tools named {toolCall.FunctionName}");
-            }
-            else
-            {
-                SetSuccess(
-                    string.Join("", toolResult)
+                SetStatus(ToolCallStatusEnum.Executing);
+
+                var toolCall = TypedContent.ToolCall;
+
+                var toolArguments = ParseToolInvocationArguments(toolCall);
+
+                var toolResult = await McpServerProxyCollection.CallToolAsync(
+                    toolCall.FunctionName,
+                    toolArguments,
+                    cancellationToken: CancellationToken.None
                     );
+                if (toolResult is null)
+                {
+                    SetFailed($"Failed to execute the tools named {toolCall.FunctionName}");
+                }
+                else
+                {
+                    SetSuccess(
+                        string.Join("", toolResult)
+                        );
+                }
+            }
+            catch (Exception excp)
+            {
+                excp.ActivityLogException();
+
+                SetFailed(excp);
             }
         }
 
