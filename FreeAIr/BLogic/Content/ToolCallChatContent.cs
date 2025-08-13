@@ -1,9 +1,13 @@
-﻿using OpenAI.Chat;
+﻿using FreeAIr.Helper;
+using OpenAI.Chat;
+using System.Collections.Generic;
 
 namespace FreeAIr.BLogic.Content
 {
     public sealed class ToolCallChatContent : IChatContent
     {
+        private readonly Action _activeChatAction;
+
         public ChatContentTypeEnum Type => ChatContentTypeEnum.ToolCall;
 
         public bool IsArchived
@@ -12,14 +16,97 @@ namespace FreeAIr.BLogic.Content
             private set;
         }
 
+        public ToolCallStatusEnum Status
+        {
+            get;
+            private set;
+        }
+
+        public StreamingChatToolCallUpdate ToolCall
+        {
+            get;
+        }
+
+        public string Name => ToolCall.FunctionName;
+
+        public string? Result
+        {
+            get;
+            private set;
+        }
+
+        public ToolCallChatContent(
+            StreamingChatToolCallUpdate toolCall,
+            Action activeChatAction
+            )
+        {
+            if (toolCall is null)
+            {
+                throw new ArgumentNullException(nameof(toolCall));
+            }
+
+            if (activeChatAction is null)
+            {
+                throw new ArgumentNullException(nameof(activeChatAction));
+            }
+
+            ToolCall = toolCall;
+            Status = ToolCallStatusEnum.Asking;
+            _activeChatAction = activeChatAction;
+        }
+
         public void Archive()
         {
             IsArchived = true;
         }
 
-        public ChatMessage CreateChatMessage()
+        public void SetStatus(
+            ToolCallStatusEnum status
+            )
         {
-            throw new NotImplementedException();
+            Status = status;
+        }
+
+        public void SetResult(
+            ToolCallStatusEnum status,
+            string? result
+            )
+        {
+            Status = status;
+            Result = result;
+
+            _activeChatAction();
+        }
+
+        public IReadOnlyList<ChatMessage> CreateChatMessages()
+        {
+            var result = new List<ChatMessage>();
+
+            var m1 = new AssistantChatMessage(
+                [ ToolCall.ConvertToChatTool() ]
+                );
+            result.Add(m1);
+
+            if (!string.IsNullOrEmpty(Result))
+            {
+                var m2 = new ToolChatMessage(
+                    ToolCall.ToolCallId,
+                    Result
+                    );
+                result.Add(m2);
+            }
+
+            return result;
         }
     }
+
+    public enum ToolCallStatusEnum
+    {
+        Asking,
+        Executing,
+        Succeeded,
+        Failed,
+        Blocked
+    }
+
 }

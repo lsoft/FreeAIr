@@ -108,7 +108,7 @@ and the multiline:
 <think>
 Multi
     line
-        thinking
+        "thinking"
 Wait, this is
     a fake LLM
                 chat!

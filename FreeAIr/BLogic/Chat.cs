@@ -137,24 +137,39 @@ namespace FreeAIr.BLogic
 
             _contents.Add(userPrompt);
 
-            LLMReaderPool.AddAndStartReader(this);
+            LLMReaderPool.StartReaderFor(this);
 
             RaiseContentAdded(userPrompt);
         }
 
         public AnswerChatContent CreateAnswer()
         {
-            var answer = new AnswerChatContent();
-            _contents.Add(answer);
+            var content = new AnswerChatContent();
+            _contents.Add(content);
 
-            RaiseContentAdded(answer);
+            RaiseContentAdded(content);
 
-            return answer;
+            return content;
+        }
+
+        public ToolCallChatContent CreateToolCall(
+            StreamingChatToolCallUpdate toolCall
+            )
+        {
+            var content = new ToolCallChatContent(
+                toolCall,
+                () => LLMReaderPool.StartReaderFor(this)
+                );
+            _contents.Add(content);
+
+            RaiseContentAdded(content);
+
+            return content;
         }
 
         public async Task StopAsync()
         {
-            await LLMReaderPool.StopAndDeleteReaderAsync(this);
+            await LLMReaderPool.StopAndDeleteReaderForAsync(this);
         }
 
         public Task WaitForPromptResultAsync()
@@ -293,9 +308,10 @@ namespace FreeAIr.BLogic
             }
 
             //put prompt
-            var chatMessage = content.CreateChatMessage();
-            result.Add(chatMessage);
+            var chatMessages = content.CreateChatMessages();
+            result.AddRange(chatMessages);
         }
+
     }
 
     public delegate void ChatStatusChangedDelegate(object sender, ChatEventArgs e);

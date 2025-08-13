@@ -54,40 +54,58 @@
         </DataTemplate>
 
         <DataTemplate x:Key="ToolCallContentTemplate">
-            <!--  x:Name is a workaround for https://stackoverflow.com/questions/22108712/could-not-load-file-or-assembly-xceed-wpf-toolkit  -->
-            <xctk:SplitButton
-                Margin="0,0,5,0"
-                Padding="5,1,5,1"
-                MinWidth="200"
-                HorizontalAlignment="Right"
-                VerticalAlignment="Stretch"
-                HorizontalContentAlignment="Right"
-                Foreground="{Binding ElementName=ForegroundButton, Path=Foreground}"
-                Background="{Binding ElementName=ForegroundButton, Path=Background}"
-                DropDownContentBackground="{Binding ElementName=ForegroundButton, Path=Background}"
-                Content="{Binding UIDescription}"
-                Command="{Binding ClickCommand}"
+            <StackPanel
+                Orientation="Horizontal"
+                HorizontalAlignment="Center"
                 >
-                <xctk:SplitButton.DropDownContent>
-                    <StackPanel
-                        >
-                        <Button
-                            Margin="20,2,10,2"
-                            Foreground="Red"
-                            Content="Allow THIS tool all the time"
-                            Style="{DynamicResource TextBlockLikeButtonStyle}"
-                            Command="{Binding AllowThisToolAllTimeCommand}"
-                            />
-                        <Button
-                            Margin="20,2,10,2"
-                            Foreground="Red"
-                            Content="Allow ANY tool all the time"
-                            Style="{DynamicResource TextBlockLikeButtonStyle}"
-                            Command="{Binding AllowAnyToolAllTimeCommand}"
-                            />
-                    </StackPanel>
-                </xctk:SplitButton.DropDownContent>
-            </xctk:SplitButton>
+                <!--  x:Name is a workaround for https://stackoverflow.com/questions/22108712/could-not-load-file-or-assembly-xceed-wpf-toolkit  -->
+                <xctk:SplitButton
+                    Margin="0,0,5,0"
+                    Padding="5,1,5,1"
+                    MinWidth="200"
+                    VerticalAlignment="Stretch"
+                    HorizontalContentAlignment="Right"
+                    Foreground="{Binding ElementName=ForegroundButton, Path=Foreground}"
+                    Background="{Binding ElementName=ForegroundButton, Path=Background}"
+                    DropDownContentBackground="{Binding ElementName=ForegroundButton, Path=Background}"
+                    Content="{Binding UIDescription}"
+                    Command="{Binding ClickCommand}"
+                    >
+                    <xctk:SplitButton.DropDownContent>
+                        <StackPanel
+                            >
+                            <Button
+                                Margin="20,2,10,2"
+                                Content="BLOCK at this time"
+                                Style="{DynamicResource TextBlockLikeButtonStyle}"
+                                Command="{Binding BlockAtThisTimeCommand}"
+                                />
+                            <Button
+                                Margin="20,20,10,2"
+                                Foreground="Red"
+                                Content="Allow THIS tool all the time"
+                                Style="{DynamicResource TextBlockLikeButtonStyle}"
+                                Command="{Binding AllowThisToolAllTimeCommand}"
+                                />
+                            <Button
+                                Margin="20,2,10,2"
+                                Foreground="Red"
+                                Content="Allow ANY tool all the time"
+                                Style="{DynamicResource TextBlockLikeButtonStyle}"
+                                Command="{Binding AllowAnyToolAllTimeCommand}"
+                                />
+                        </StackPanel>
+                    </xctk:SplitButton.DropDownContent>
+                </xctk:SplitButton>
+
+                <Button
+                    Content="👁"
+                    Margin="0"
+                    Padding="0"
+                    VerticalAlignment="Stretch"
+                    Command="{Binding ShowResultCommand}"
+                    />
+            </StackPanel>
         </DataTemplate>
 
         <content:DialogTemplateSelector

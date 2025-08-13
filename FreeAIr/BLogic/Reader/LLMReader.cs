@@ -195,26 +195,31 @@ namespace FreeAIr.UI.BLogic.Reader
                 {
                     foreach (var toolCall in toolCalls)
                     {
-                        var toolArguments = ParseToolInvocationArguments(toolCall);
-
-                        var toolResult = await McpServerProxyCollection.CallToolAsync(
-                            toolCall.FunctionName,
-                            toolArguments,
-                            cancellationToken: CancellationToken.None
+                        var toolCallContent = _chat.CreateToolCall(
+                            toolCall
                             );
-                        if (toolResult is null)
-                        {
-                            //dialog.AppendUnsuccessfulToolCall(
-                            //    toolCall
-                            //    );
 
-                            throw new InvalidOperationException($"Tool named {toolCall.FunctionName} failed to run.");
-                        }
 
-                        //dialog.AppendToolCallResult(
-                        //    toolCall,
-                        //    toolResult
+                        //var toolArguments = ParseToolInvocationArguments(toolCall);
+
+                        //var toolResult = await McpServerProxyCollection.CallToolAsync(
+                        //    toolCall.FunctionName,
+                        //    toolArguments,
+                        //    cancellationToken: CancellationToken.None
                         //    );
+                        //if (toolResult is null)
+                        //{
+                        //    //dialog.AppendUnsuccessfulToolCall(
+                        //    //    toolCall
+                        //    //    );
+
+                        //    throw new InvalidOperationException($"Tool named {toolCall.FunctionName} failed to run.");
+                        //}
+
+                        ////dialog.AppendToolCallResult(
+                        ////    toolCall,
+                        ////    toolResult
+                        ////    );
                     }
 
                 }
@@ -251,7 +256,8 @@ namespace FreeAIr.UI.BLogic.Reader
             }
 
             var answerPart =
-                excp.Message
+                Environment.NewLine
+                + excp.Message
                 + Environment.NewLine
                 + excp.StackTrace
                 ;
@@ -273,26 +279,6 @@ namespace FreeAIr.UI.BLogic.Reader
             await chatAnswer.AppendAsync(answerPart);
 
             return chatAnswer;
-        }
-
-        private static Dictionary<string, object?> ParseToolInvocationArguments(
-            StreamingChatToolCallUpdate toolCall
-            )
-        {
-            var toolArguments = new Dictionary<string, object?>();
-            if (toolCall.FunctionArgumentsUpdate.ToMemory().Length > 0)
-            {
-                using JsonDocument toolArgumentJson = JsonDocument.Parse(
-                    toolCall.FunctionArgumentsUpdate
-                    );
-
-                foreach (var pair in toolArgumentJson.RootElement.EnumerateObject())
-                {
-                    toolArguments.Add(pair.Name, pair.Value.DeserializeToObject());
-                }
-            }
-
-            return toolArguments;
         }
 
     }

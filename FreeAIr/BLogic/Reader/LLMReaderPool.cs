@@ -9,7 +9,7 @@ namespace FreeAIr.UI.BLogic.Reader
         private static readonly object _locker = new();
         private static readonly Dictionary<FreeAIr.BLogic.Chat, LLMReader> _readers = new();
 
-        public static void AddAndStartReader(
+        public static void StartReaderFor(
             FreeAIr.BLogic.Chat chat
             )
         {
@@ -27,7 +27,7 @@ namespace FreeAIr.UI.BLogic.Reader
             }
         }
 
-        public static async Task StopAndDeleteReaderAsync(
+        public static async Task StopAndDeleteReaderForAsync(
             FreeAIr.BLogic.Chat chat
             )
         {

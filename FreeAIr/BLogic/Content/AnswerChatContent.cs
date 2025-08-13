@@ -1,5 +1,6 @@
 ﻿using FreeAIr.Helper;
 using OpenAI.Chat;
+using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -60,9 +61,12 @@ namespace FreeAIr.BLogic.Content
             await AnswerChangedEvent.FireAsync(AnswerChangedEventArgs.Instance);
         }
 
-        public ChatMessage CreateChatMessage()
+        public IReadOnlyList<ChatMessage> CreateChatMessages()
         {
-            return new AssistantChatMessage(AnswerBody);
+            return
+                [
+                    new AssistantChatMessage(AnswerBody)
+                ];
         }
 
         public async ValueTask DisposeAsync()

@@ -1,4 +1,5 @@
 ﻿using OpenAI.Chat;
+using System.Collections.Generic;
 
 namespace FreeAIr.BLogic.Content
 {
@@ -20,6 +21,6 @@ namespace FreeAIr.BLogic.Content
 
         void Archive();
 
-        ChatMessage CreateChatMessage();
+        IReadOnlyList<ChatMessage> CreateChatMessages();
     }
 }

@@ -36,11 +36,14 @@ namespace FreeAIr.BLogic
             PromptBody = promptBody;
         }
 
-        public ChatMessage CreateChatMessage()
+        public IReadOnlyList<ChatMessage> CreateChatMessages()
         {
-            return new UserChatMessage(
-                ChatMessageContentPart.CreateTextPart(PromptBody)
-                );
+            return
+                [
+                    new UserChatMessage(
+                        ChatMessageContentPart.CreateTextPart(PromptBody)
+                        )
+                ];
         }
 
         public void Archive()
