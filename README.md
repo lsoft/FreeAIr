@@ -119,6 +119,7 @@ Main functions:
 
 # Getting started
 
+- Install .NET 9 runtime.
 - Install the extension through the [Visual Studio Marketplace](https://marketplace.visualstudio.com/items?itemName=lsoft.FreeAIr).
 - If you want to use local inference, run your model and get its `endpoint`, `token` and model name.
 - Run `Visual Studio` and open your solution.

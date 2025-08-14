@@ -1,5 +1,6 @@
 ﻿using Dto;
 using ModelContextProtocol.Client;
+using ModelContextProtocol.Protocol;
 using Serilog;
 
 namespace Proxy.Server
@@ -52,11 +53,12 @@ namespace Proxy.Server
 
             var texts = innerResult.Content
                 .Where(t => t.Type == "text")
+                .Cast<TextContentBlock>()
                 .Select(t => t.Text)
                 .ToArray()
                 ;
 
-            if (innerResult.IsError)
+            if (innerResult.IsError.GetValueOrDefault())
             {
                 var msg = "Error call tool: " + string.Join(string.Empty, texts);
                 _log.Error(msg);

@@ -33,7 +33,7 @@
     <PackageVersion Include="Microsoft.VisualStudio.Text.Logic" Version="17.14.249" />
     <PackageVersion Include="Microsoft.VSSDK.BuildTools" Version="17.14.2094" />
     <PackageVersion Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.135" />
-    <PackageVersion Include="ModelContextProtocol" Version="0.2.0-preview.1" />
+    <PackageVersion Include="ModelContextProtocol" Version="0.3.0-preview.3" />
     <PackageVersion Include="NuGet.VisualStudio" Version="17.14.0" />
     <PackageVersion Include="PuppeteerSharp" Version="20.2.2" />
     <PackageVersion Include="RunProcessAsTask" Version="1.2.4" />
