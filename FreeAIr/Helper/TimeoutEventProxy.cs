@@ -17,7 +17,7 @@ namespace FreeAIr.Helper
     {
         public delegate Task TimeoutEventProxyDelegate(object sender, TArgs args);
 
-        private readonly SemaphoreSlim _semaphore = new(1);
+        private readonly NonDisposableSemaphoreSlim _semaphore = new(1);
 
         private readonly ManualResetEvent _stopSignal = new(false);
         private readonly AutoResetEvent _immediatelySendSignal = new(false);
@@ -164,7 +164,6 @@ namespace FreeAIr.Helper
             }
 
             _stopSignal.Dispose();
-            _semaphore.Dispose();
         }
 
         private async Task FireEventAsync(

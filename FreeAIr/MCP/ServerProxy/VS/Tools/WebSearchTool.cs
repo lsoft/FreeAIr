@@ -47,12 +47,12 @@ namespace FreeAIr.MCP.McpServerProxy.VS.Tools
 
                 if (!arguments.TryGetValue(SearchTermParameterName, out var searchTermParameterName))
                 {
-                    return new McpServerProxyToolCallResult($"Parameter {SearchTermParameterName} does not found.");
+                    return McpServerProxyToolCallResult.CreateFailed($"Parameter {SearchTermParameterName} does not found.");
                 }
                 var searchTerm = searchTermParameterName as string;
 
                 var searcher = new GoogleSearcher(
-                    pageImagesFolder: null //@"c:\temp"
+                    pageImagesFolder: null
                     );
                 var results = await searcher.SearchAsync(
                     searchTerm,
@@ -60,7 +60,7 @@ namespace FreeAIr.MCP.McpServerProxy.VS.Tools
                     );
                 if (results is null || results.Count == 0)
                 {
-                    return new McpServerProxyToolCallResult("Search failed.");
+                    return McpServerProxyToolCallResult.CreateFailed("Search failed.");
                 }
 
                 var searchResults = new SearchResults
@@ -75,13 +75,13 @@ namespace FreeAIr.MCP.McpServerProxy.VS.Tools
 
                 var result = JsonSerializer.Serialize(searchResults);
 
-                return new McpServerProxyToolCallResult(result);
+                return McpServerProxyToolCallResult.CreateSuccess(result);
             }
             catch (Exception excp)
             {
                 excp.ActivityLogException();
 
-                return new McpServerProxyToolCallResult("Search failed.");
+                return McpServerProxyToolCallResult.CreateFailed("Search failed.");
             }
         }
 

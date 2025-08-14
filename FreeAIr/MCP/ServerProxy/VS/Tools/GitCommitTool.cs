@@ -46,7 +46,7 @@ namespace FreeAIr.MCP.McpServerProxy.VS.Tools
 
                 if (!arguments.TryGetValue(CommitMessageParameterName, out var commitMessageParameterName))
                 {
-                    return new McpServerProxyToolCallResult($"Parameter {CommitMessageParameterName} does not found.");
+                    return McpServerProxyToolCallResult.CreateFailed($"Parameter {CommitMessageParameterName} does not found.");
                 }
                 var commitMessage = commitMessageParameterName as string;
 
@@ -55,13 +55,13 @@ namespace FreeAIr.MCP.McpServerProxy.VS.Tools
                     cancellationToken
                     );
 
-                return new McpServerProxyToolCallResult("Successfully committed.");
+                return McpServerProxyToolCallResult.CreateSuccess("Successfully committed.");
             }
             catch (Exception excp)
             {
                 excp.ActivityLogException();
 
-                return new McpServerProxyToolCallResult("Failed commit.");
+                return McpServerProxyToolCallResult.CreateFailed("Failed to commit.");
             }
         }
     }

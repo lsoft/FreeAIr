@@ -101,36 +101,74 @@ namespace FreeAIr.MCP.McpServerProxy
 
     public sealed class McpServerProxyToolCallResult
     {
+        public McpServerProxyToolCallResultEnum Result
+        {
+            get;
+        }
+
         public string[] Content
         {
             get;
         }
 
         public McpServerProxyToolCallResult(
-            string content
+            McpServerProxyToolCallResultEnum result,
+            string[] content
             )
-        {
-            Content = [content];
-        }
-
-        public McpServerProxyToolCallResult(string[] content)
         {
             if (content is null)
             {
                 throw new ArgumentNullException(nameof(content));
             }
 
+            Result = result;
             Content = content;
         }
 
-        public McpServerProxyToolCallResult(IEnumerable<string> content)
+        public static McpServerProxyToolCallResult CreateSuccess(
+            IEnumerable<string> content
+            )
         {
-            if (content is null)
-            {
-                throw new ArgumentNullException(nameof(content));
-            }
-
-            Content = content.ToArray();
+            return new McpServerProxyToolCallResult(
+                McpServerProxyToolCallResultEnum.Success,
+                content.ToArray()
+                );
         }
+
+        public static McpServerProxyToolCallResult CreateSuccess(
+            string content
+            )
+        {
+            return new McpServerProxyToolCallResult(
+                McpServerProxyToolCallResultEnum.Success,
+                [ content ]
+                );
+        }
+
+        public static McpServerProxyToolCallResult CreateFailed(
+            string errorMessage
+            )
+        {
+            return new McpServerProxyToolCallResult(
+                McpServerProxyToolCallResultEnum.Fail,
+                [ errorMessage ]
+                );
+        }
+
+        public static McpServerProxyToolCallResult CreatePostponed(
+            )
+        {
+            return new McpServerProxyToolCallResult(
+                McpServerProxyToolCallResultEnum.Postpone,
+                [string.Empty]
+                );
+        }
+    }
+
+    public enum McpServerProxyToolCallResultEnum
+    {
+        Success,
+        Fail,
+        Postpone
     }
 }

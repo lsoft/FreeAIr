@@ -207,29 +207,25 @@ namespace FreeAIr.MCP.McpServerProxy
             return result;
         }
 
-        public static async Task<string[]?> CallToolAsync(
+        public static async Task<McpServerProxyToolCallResult?> CallToolAsync(
             string toolName,
             Dictionary<string, object?> arguments,
             CancellationToken cancellationToken
             )
         {
-            foreach (var mcpServerProxy in _mcpServerProxyWrappers)
+            foreach (var mcpServerProxyWrapper in _mcpServerProxyWrappers)
             {
-                foreach (var tool in mcpServerProxy.Tools.Tools)
+                foreach (var tool in mcpServerProxyWrapper.Tools.Tools)
                 {
                     if (StringComparer.InvariantCultureIgnoreCase.Compare(tool.FullName, toolName) == 0)
                     {
-                        var toolResult = await mcpServerProxy.McpServerProxy.CallToolAsync(
+                        var toolResult = await mcpServerProxyWrapper.McpServerProxy.CallToolAsync(
                             tool.ToolName,
                             arguments,
                             cancellationToken
                             );
-                        if (toolResult is null)
-                        {
-                            return [];
-                        }
 
-                        return toolResult.Content;
+                        return toolResult;
                     }
                 }
             }

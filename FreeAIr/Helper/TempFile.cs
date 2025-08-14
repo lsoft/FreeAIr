@@ -23,8 +23,8 @@ namespace FreeAIr.Helper
 
         public static TempFile Create()
         {
-            var filePath = System.IO.Path.Combine(
-                System.IO.Path.GetTempPath(),
+            var filePath = Path.Combine(
+                Path.GetTempPath(),
                 Guid.NewGuid().ToString()
                 );
             return new TempFile(filePath);
@@ -35,12 +35,19 @@ namespace FreeAIr.Helper
             string suffix
             )
         {
-            var filePath = Path.GetFileNameWithoutExtension(fileName)
+            var tempFileName = Path.GetFileNameWithoutExtension(fileName)
                 + "."
                 + suffix
                 + "."
+                + Guid.NewGuid().ToString().Substring(0, 8)
                 + Path.GetExtension(fileName)
                 ;
+
+            var filePath = Path.Combine(
+                Path.GetTempPath(),
+                tempFileName
+                );
+
             return new TempFile(filePath);
         }
 

@@ -1,4 +1,6 @@
-﻿using FreeAIr.Helper;
+﻿using EnvDTE80;
+using FreeAIr.Helper;
+using FreeAIr.UI.Difference;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
@@ -51,60 +53,96 @@ namespace FreeAIr.MCP.McpServerProxy.VS.Tools
 
             if (!arguments.TryGetValue(ItemNamePathParameterName, out var itemNamePathObj))
             {
-                return new McpServerProxyToolCallResult($"Parameter {ItemNamePathParameterName} does not found.");
+                return McpServerProxyToolCallResult.CreateFailed($"Parameter {ItemNamePathParameterName} does not found.");
             }
-            var itemNamePath = itemNamePathObj as string;
-            if (!System.IO.File.Exists(itemNamePath))
-            {
-                return new McpServerProxyToolCallResult($"File {itemNamePath} does not found at the disk.");
-            }
+            var nameOrPathOfItem = itemNamePathObj as string;
 
-            if (!arguments.TryGetValue(NewItemBodyParameterName, out var newItemBodyObj))
-            {
-                return new McpServerProxyToolCallResult($"Parameter {NewItemBodyParameterName} does not found.");
-            }
-            var newItemBody = newItemBodyObj as string;
-
-
-            var solution = await Community.VisualStudio.Toolkit.VS.Solutions.GetCurrentSolutionAsync();
-            if (solution is null)
-            {
-                return null;
-            }
-
-            var items = await solution.ProcessDownRecursivelyForAsync(
-                item => !item.IsNonVisibleItem && (StringComparer.InvariantCultureIgnoreCase.Compare(item.Text, itemNamePath) == 0 || StringComparer.InvariantCultureIgnoreCase.Compare(item.FullPath, itemNamePath) == 0),
-                false,
+            var item = await SolutionHelper.FindItemByNameOrFilePathAsync(
+                nameOrPathOfItem,
                 cancellationToken
                 );
-            items = items.FindAll(i => !i.SolutionItem.IsNonVisibleItem);
-            if (items.Count == 0)
+            if (item is null)
             {
-                return new McpServerProxyToolCallResult($"File {itemNamePath} does not found in current solution.");
-            }
-            if (items.Count > 1)
-            {
-                return new McpServerProxyToolCallResult($"Found more than 1 file with name(path) {itemNamePath} in current solution.");
+                return McpServerProxyToolCallResult.CreateFailed($"File {nameOrPathOfItem} does not found in current solution.");
             }
 
-            var item = items[0];
+            if (!arguments.TryGetValue(NewItemBodyParameterName, out var draftBodyOfNewItemObj))
+            {
+                return McpServerProxyToolCallResult.CreateFailed($"Parameter {NewItemBodyParameterName} does not found.");
+            }
+            var draftBodyOfNewItem = draftBodyOfNewItemObj as string;
+
+            var newBody = ComposeItemNewBody(item, draftBodyOfNewItem);
+
+            var solution = await Community.VisualStudio.Toolkit.VS.Solutions.GetCurrentSolutionAsync();
+
+            var itemFullPath = item.SolutionItem.FullPath;
+            var itemRelativePath = itemFullPath.MakeRelativeAgainst(solution.FullPath);
+
+            var dte = AsyncPackage.GetGlobalService(typeof(EnvDTE.DTE)) as DTE2;
+            dte.ExecuteCommand("OtherContextMenus.inlinediffsettings.Diff.InlineView");
+
+            var origFileBody = await SolutionHelper.GetActualItemBodyAsync(
+                itemFullPath
+                );
+
+            var itemFileInfo = new System.IO.FileInfo(itemFullPath);
+            var itemFileName = itemFileInfo.Name;
+
+            var caption = $"Changes for the file {itemRelativePath}";
+            var tooltip = "Inline diff between the source file and the modified file";
+            var leftLabel = itemRelativePath;
+            var rightLabel = itemRelativePath + " (modified)";
+
+            var parameters = new DifferenceShowerParameters(
+                fileName: itemFileName,
+                originalFileBody: origFileBody,
+                modifiedFileBody: newBody,
+                caption: caption,
+                tooltip: tooltip,
+                leftLabel: leftLabel,
+                rightLabel: rightLabel
+                );
+
+            var twiceChangedBody = await DifferenceShower.ShowAsync(
+                parameters
+                );
+            if (!string.IsNullOrEmpty(twiceChangedBody))
+            {
+                if (twiceChangedBody != origFileBody)
+                {
+                    await UpdateItemBodyAsync(
+                        itemFullPath,
+                        twiceChangedBody
+                        );
+
+                    var result = JsonSerializer.Serialize(
+                        new UpdateBodyResultJson
+                        {
+                            ResultMessage = "The document successfully updated"
+                        }
+                        );
+
+                    return McpServerProxyToolCallResult.CreateSuccess([result]);
+                }
+            }
+
+            return McpServerProxyToolCallResult.CreatePostponed();
+        }
+
+        private static string ComposeItemNewBody(
+            SolutionHelper.FoundSolutionItem item,
+            string draftBodyOfNewItem
+            )
+        {
             var lineEndings = LineEndingHelper.Actual.GetDocumentLineEnding(item.SolutionItem.FullPath);
-            var lines = newItemBody.Split(
+            var lines = draftBodyOfNewItem.Split(
                 new[] { "\r\n", "\r", "\n" },
                 StringSplitOptions.None
                 );
 
             var newBody = string.Join(lineEndings, lines);
-            await UpdateItemBodyAsync(itemNamePath, newBody);
-
-            var result = JsonSerializer.Serialize(
-                new UpdateBodyResultJson
-                {
-                    ResultMessage = "The document successfully updated"
-                }
-                );
-
-            return new McpServerProxyToolCallResult([result]);
+            return newBody;
         }
 
         public static async Task UpdateItemBodyAsync(

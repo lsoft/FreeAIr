@@ -1,4 +1,5 @@
 ﻿using FreeAIr.Helper;
+using MessagePack.Resolvers;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
@@ -44,31 +45,23 @@ namespace FreeAIr.MCP.McpServerProxy.VS.Tools
         {
             await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
 
-            if (!arguments.TryGetValue(ItemNamePathParameterName, out var itemNamePathObj))
+            if (!arguments.TryGetValue(ItemNamePathParameterName, out var nameOrPathOfItemObj))
             {
-                return new McpServerProxyToolCallResult($"Parameter {ItemNamePathParameterName} does not found.");
+                return McpServerProxyToolCallResult.CreateFailed($"Parameter {ItemNamePathParameterName} does not found.");
             }
 
-            var itemNamePath = itemNamePathObj as string;
+            var nameOrPathOfItem = nameOrPathOfItemObj as string;
 
-            var solution = await Community.VisualStudio.Toolkit.VS.Solutions.GetCurrentSolutionAsync();
-            if (solution is null)
-            {
-                return null;
-            }
-
-            var items = await solution.ProcessDownRecursivelyForAsync(
-                item => !item.IsNonVisibleItem && (StringComparer.InvariantCultureIgnoreCase.Compare(item.Text, itemNamePath) == 0 || StringComparer.InvariantCultureIgnoreCase.Compare(item.FullPath, itemNamePath) == 0),
-                false,
+            var item = await SolutionHelper.FindItemByNameOrFilePathAsync(
+                nameOrPathOfItem,
                 cancellationToken
                 );
-            var item = items.FirstOrDefault(i => !i.SolutionItem.IsNonVisibleItem);
             if (item is null)
             {
-                return new McpServerProxyToolCallResult($"File {itemNamePath} does not found in current solution.");
+                return McpServerProxyToolCallResult.CreateFailed($"File {nameOrPathOfItem} does not found in current solution.");
             }
 
-            var itemBody = await GetItemBodyAsync(item.SolutionItem.FullPath);
+            var itemBody = await SolutionHelper.GetActualItemBodyAsync(item.SolutionItem.FullPath);
 
             var packed = new SolutionItemBodiesJson
             {
@@ -86,23 +79,9 @@ namespace FreeAIr.MCP.McpServerProxy.VS.Tools
 
             var result = JsonSerializer.Serialize(packed);
 
-            return new McpServerProxyToolCallResult([result]);
+            return McpServerProxyToolCallResult.CreateSuccess(result);
         }
 
-        public static async Task<string> GetItemBodyAsync(
-            string fullPath
-            )
-        {
-            var openedDocument = await Community.VisualStudio.Toolkit.VS.Documents.GetDocumentViewAsync(
-                fullPath
-                );
-            if (openedDocument is not null)
-            {
-                return openedDocument.Document.TextBuffer.CurrentSnapshot.GetText();
-            }
-
-            return System.IO.File.ReadAllText(fullPath);
-        }
 
         private sealed class SolutionItemBodiesJson
         {

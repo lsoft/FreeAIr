@@ -2,7 +2,6 @@
 using FreeAIr.Helper;
 using FreeAIr.MCP.McpServerProxy;
 using FreeAIr.Shared.Helper;
-using FreeAIr.UI.Dialog.Content.Tools;
 using MarkdownParser.Antlr.Answer;
 using OpenAI.Chat;
 using System.Collections.Generic;
@@ -207,23 +206,12 @@ namespace FreeAIr.UI.Dialog.Content
             get;
         }
 
-        public object? ToolControl
-        {
-            get;
-        }
-
-        public Visibility ToolControlVisibility => ToolControl is null ? Visibility.Collapsed : Visibility.Visible;
-
         public ToolCallDialogContent(
             ToolCallChatContent content
             ) : base(content, content)
         {
             ToolArgumentsFlowDocument = new();
             DocumentVisibility = UpdateFlowDocument(content);
-
-            ToolControl = ToolControlFactory.CreateToolControl(
-                content.ToolCall
-                );
 
             var ts = InternalPage.Instance.ReadMCPToolsExecutionStatus();
             if (ts.IsToolEnabled(content.ToolCall.FunctionName))
@@ -291,15 +279,21 @@ namespace FreeAIr.UI.Dialog.Content
                     toolArguments,
                     cancellationToken: CancellationToken.None
                     );
-                if (toolResult is null)
+
+                if (toolResult is null || toolResult.Result == McpServerProxyToolCallResultEnum.Fail)
                 {
                     SetFailed($"Failed to execute the tools named {toolCall.FunctionName}");
                 }
-                else
+                else if (toolResult.Result == McpServerProxyToolCallResultEnum.Success)
                 {
                     SetSuccess(
-                        string.Join("", toolResult)
+                        string.Join("", toolResult.Content)
                         );
+                }
+                else
+                {
+                    //postponed
+                    SetStatus(ToolCallStatusEnum.Asking);
                 }
             }
             catch (Exception excp)

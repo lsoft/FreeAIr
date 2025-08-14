@@ -1,11 +1,12 @@
-﻿using System.Threading;
+﻿using FreeAIr.Helper;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace FreeAIr.UI.ViewModels
 {
     public static class OutlineEmbeddingOutputPanel
     {
-        private static readonly SemaphoreSlim _semaphore = new SemaphoreSlim(1, 1);
+        private static readonly NonDisposableSemaphoreSlim _semaphore = new (1, 1);
         private static OutputWindowPane _outlineEmbeddingOutputPanel;
 
         public static async Task<OutputWindowPane> CreateOrGetAsync()

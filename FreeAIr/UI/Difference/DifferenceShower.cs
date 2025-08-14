@@ -1,15 +1,12 @@
 ﻿using Community.VisualStudio.Toolkit;
 using FreeAIr.Helper;
-using MessagePack.Resolvers;
 using Microsoft.VisualStudio.Shell.Interop;
-using Microsoft.VisualStudio.TextManager.Interop;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.Tab;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.Window;
 
 namespace FreeAIr.UI.Difference
 {
@@ -24,7 +21,7 @@ namespace FreeAIr.UI.Difference
             VS.Events.WindowEvents.Destroyed += WindowEvents_Destroyed;
         }
 
-        public static async Task ShowAsync(
+        public static async Task<string?> ShowAsync(
             DifferenceShowerParameters parameters
             )
         {
@@ -37,28 +34,60 @@ namespace FreeAIr.UI.Difference
                 if (_descriptors.TryGetValue(parameters.Caption, out var d))
                 {
                     d.Frame.Show();
-                    return;
+                    return null;
                 }
             }
 
-            var frame = differenceService.OpenComparisonWindow2(
-                leftFileMoniker: parameters.LeftFile.FilePath,
-                rightFileMoniker: parameters.RightFile.FilePath,
-                caption: parameters.Caption,
-                Tooltip: parameters.Tooltip,
-                leftLabel: parameters.LeftLabel,
-                rightLabel: parameters.RightLabel,
-                inlineLabel: parameters.Caption,
-                roles: null,
-                grfDiffOptions: (uint)__VSDIFFSERVICEOPTIONS.VSDIFFOPT_DoNotShow
-                );
-
-            lock (_locker)
+            DiffFrameDescriptor? descriptor = null;
+            try
             {
-                _descriptors.Add(parameters.Caption, new DiffFrameDescriptor(parameters, frame));
-            }
+                var leftFile = TempFile.CreateBasedOfExistingName(
+                    parameters.FileName,
+                    "current"
+                    );
+                leftFile.WriteAllText(parameters.OriginalFileBody);
 
-            frame.Show();
+                var rightFile = TempFile.CreateBasedOfExistingName(
+                    parameters.FileName,
+                    "modified"
+                    );
+                rightFile.WriteAllText(parameters.OriginalFileBody);
+
+                var frame = differenceService.OpenComparisonWindow2(
+                    leftFileMoniker: leftFile.FilePath,
+                    rightFileMoniker: rightFile.FilePath,
+                    caption: parameters.Caption,
+                    Tooltip: parameters.Tooltip,
+                    leftLabel: parameters.LeftLabel,
+                    rightLabel: parameters.RightLabel,
+                    inlineLabel: parameters.Caption,
+                    roles: null,
+                    grfDiffOptions: (uint)__VSDIFFSERVICEOPTIONS.VSDIFFOPT_DoNotShow
+                    );
+
+                descriptor = new DiffFrameDescriptor(
+                    parameters,
+                    leftFile,
+                    rightFile,
+                    frame
+                    );
+                lock (_locker)
+                {
+                    _descriptors.Add(parameters.Caption, descriptor);
+                }
+
+                frame.Show();
+
+                await descriptor.CloseSignal.WaitAsync();
+
+                var result = descriptor.TwiceModifiedItemBody;
+
+                return result;
+            }
+            finally
+            {
+                descriptor?.Dispose();
+            }
         }
 
 
@@ -76,48 +105,16 @@ namespace FreeAIr.UI.Difference
                     return;
                 }
 
-                if (d.Parameters.ChangedTextAdded)
+                if (d.ChangedTextAdded)
                 {
                     return;
                 }
 
-                d.Parameters.ChangedTextAdded = true;
+                d.ChangedTextAdded = true;
             }
 
             ApplyModifiedBodyAsync(windowFrame, d)
                 .FileAndForget(nameof(ApplyModifiedBodyAsync));
-        }
-
-        private static async Task ApplyModifiedBodyAsync(
-            WindowFrame windowFrame,
-            DiffFrameDescriptor descriptor
-            )
-        {
-            try
-            {
-                var documentView = await windowFrame.GetDocumentViewAsync();
-                if (documentView is null)
-                {
-                    return;
-                }
-
-                var currentText = documentView.TextBuffer.CurrentSnapshot.GetText();
-
-                using var edit = documentView.TextBuffer.CreateEdit();
-                edit.Replace(
-                    0,
-                    currentText.Length,
-                    descriptor.Parameters.ModifiedFileBody
-                    //"q" + Environment.NewLine + d.Parameters.RightFile.ReadAllText()
-                    );
-
-                edit.Apply();
-
-            }
-            catch (Exception excp)
-            {
-                excp.ActivityLogException();
-            }
         }
 
         private static void WindowEvents_Destroyed(WindowFrame windowFrame)
@@ -135,10 +132,42 @@ namespace FreeAIr.UI.Difference
                 _descriptors.Remove(caption);
             }
 
-            d.FrameClosedAsync()
-                .FileAndForget(nameof(DiffFrameDescriptor.FrameClosedAsync));
+            d.FrameClosed();
         }
 
+
+        private static async Task ApplyModifiedBodyAsync(
+            WindowFrame windowFrame,
+            DiffFrameDescriptor descriptor
+            )
+        {
+            try
+            {
+                await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+
+                var documentView = await windowFrame.GetDocumentViewAsync();
+                if (documentView is null)
+                {
+                    return;
+                }
+
+                var currentText = documentView.TextBuffer.CurrentSnapshot.GetText();
+
+                using var edit = documentView.TextBuffer.CreateEdit();
+                edit.Replace(
+                    0,
+                    currentText.Length,
+                    descriptor.Parameters.ModifiedFileBody
+                    );
+
+                edit.Apply();
+
+            }
+            catch (Exception excp)
+            {
+                excp.ActivityLogException();
+            }
+        }
 
         private sealed class DiffFrameDescriptor : IDisposable
         {
@@ -152,46 +181,93 @@ namespace FreeAIr.UI.Difference
                 get;
             }
 
+            public bool ChangedTextAdded
+            {
+                get;
+                set;
+            }
+
+            public TempFile LeftFile
+            {
+                get;
+            }
+
+            public TempFile RightFile
+            {
+                get;
+            }
+
+            public NonDisposableSemaphoreSlim CloseSignal
+            {
+                get;
+            }
+
+            public string TwiceModifiedItemBody
+            {
+                get;
+                private set;
+            }
+
             public DiffFrameDescriptor(
                 DifferenceShowerParameters parameters,
+                TempFile leftFile,
+                TempFile rightFile,
                 IVsWindowFrame frame
                 )
             {
+                if (leftFile is null)
+                {
+                    throw new ArgumentNullException(nameof(leftFile));
+                }
+
+                if (rightFile is null)
+                {
+                    throw new ArgumentNullException(nameof(rightFile));
+                }
+
                 if (frame is null)
                 {
                     throw new ArgumentNullException(nameof(frame));
                 }
 
                 Parameters = parameters;
+                LeftFile = leftFile;
+                RightFile = rightFile;
                 Frame = frame;
+
+                TwiceModifiedItemBody = parameters.OriginalFileBody;
+
+                CloseSignal = new(0, 1);
             }
 
-            public async Task FrameClosedAsync()
+            public void FrameClosed()
             {
-                try
-                {
-                    await Parameters.FrameClosedAction?.Invoke(Parameters);
-                }
-                catch (Exception excp)
-                {
-                    excp.ActivityLogException();
-                }
-                finally
-                {
-                    Dispose();
-                }
+                TwiceModifiedItemBody = RightFile.ReadAllText();
+
+                CloseSignal.Release();
             }
 
             public void Dispose()
             {
-                Parameters.Dispose();
+                LeftFile.Dispose();
+                RightFile.Dispose();
             }
         }
 
     }
 
-    public sealed class DifferenceShowerParameters : IDisposable
+    public sealed class DifferenceShowerParameters
     {
+        public string FileName
+        {
+            get;
+        }
+
+        public string OriginalFileBody
+        {
+            get;
+        }
+
         public string ModifiedFileBody
         {
             get;
@@ -216,28 +292,6 @@ namespace FreeAIr.UI.Difference
         {
             get;
         }
-        
-        public Func<DifferenceShowerParameters, Task>? FrameClosedAction
-        {
-            get;
-        }
-
-        public TempFile LeftFile
-        {
-            get;
-        }
-
-        public TempFile RightFile
-        {
-            get;
-        }
-
-        public bool ChangedTextAdded
-        {
-            get;
-            set;
-        }
-
 
         public DifferenceShowerParameters(
             string fileName,
@@ -246,8 +300,7 @@ namespace FreeAIr.UI.Difference
             string caption,
             string tooltip,
             string leftLabel,
-            string rightLabel,
-            Func<DifferenceShowerParameters, Task>? frameClosedAction
+            string rightLabel
             )
         {
             if (fileName is null)
@@ -285,32 +338,13 @@ namespace FreeAIr.UI.Difference
                 throw new ArgumentException($"'{nameof(rightLabel)}' cannot be null or empty.", nameof(rightLabel));
             }
 
+            FileName = fileName;
+            OriginalFileBody = originalFileBody;
             ModifiedFileBody = modifiedFileBody;
             Caption = caption;
             Tooltip = tooltip;
             LeftLabel = leftLabel;
             RightLabel = rightLabel;
-            FrameClosedAction = frameClosedAction;
-
-            LeftFile = TempFile.CreateBasedOfExistingName(
-                fileName,
-                "current"
-                );
-            LeftFile.WriteAllText(originalFileBody);
-
-            RightFile = TempFile.CreateBasedOfExistingName(
-                fileName,
-                "modified"
-                );
-            RightFile.WriteAllText(originalFileBody);
-
-            ChangedTextAdded = false;
-        }
-
-        public void Dispose()
-        {
-            LeftFile.Dispose();
-            RightFile.Dispose();
         }
     }
 }

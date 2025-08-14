@@ -114,7 +114,7 @@ namespace FreeAIr.MCP.McpServerProxy.External
                     throw new InvalidOperationException("Error during tool call");
                 }
 
-                return new McpServerProxyToolCallResult(
+                return McpServerProxyToolCallResult.CreateSuccess(
                     reply.Content
                     );
             }
@@ -122,7 +122,9 @@ namespace FreeAIr.MCP.McpServerProxy.External
             {
                 excp.ActivityLogException();
 
-                return new McpServerProxyToolCallResult([excp.Message + Environment.NewLine + excp.StackTrace]);
+                return McpServerProxyToolCallResult.CreateFailed(
+                    excp.Message + Environment.NewLine + excp.StackTrace
+                    );
             }
 
         }

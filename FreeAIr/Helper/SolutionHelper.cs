@@ -12,6 +12,54 @@ namespace FreeAIr.Helper
 {
     public static class SolutionHelper
     {
+        /// <summary>
+        /// Search first solution item by its name or full path.
+        /// </summary>
+        public static async Task<FoundSolutionItem> FindItemByNameOrFilePathAsync(
+            string nameOrPathOfItem,
+            CancellationToken cancellationToken
+            )
+        {
+            var solution = await VS.Solutions.GetCurrentSolutionAsync();
+            if (solution is null)
+            {
+                return null;
+            }
+
+            var items = await solution.ProcessDownRecursivelyForAsync(
+                item => !item.IsNonVisibleItem && (StringComparer.InvariantCultureIgnoreCase.Compare(item.Text, nameOrPathOfItem) == 0 || StringComparer.InvariantCultureIgnoreCase.Compare(item.FullPath, nameOrPathOfItem) == 0),
+                false,
+                cancellationToken
+                );
+            var item = items.FirstOrDefault(i => !i.SolutionItem.IsNonVisibleItem);
+            if (item is null)
+            {
+                return null;
+            }
+
+            return item;
+        }
+
+        /// <summary>
+        /// If file is opened inside VS, then return text of the document vuew, even the text is not saved.
+        /// Otherwise, read the document body from the disk.
+        /// </summary>
+        public static async Task<string> GetActualItemBodyAsync(
+            string fullPath
+            )
+        {
+            var openedDocument = await VS.Documents.GetDocumentViewAsync(
+                fullPath
+                );
+            if (openedDocument is not null)
+            {
+                return openedDocument.Document.TextBuffer.CurrentSnapshot.GetText();
+            }
+
+            return System.IO.File.ReadAllText(fullPath);
+        }
+
+
         public static bool TryGetSolution(out Solution solution)
         {
             solution = VS.Solutions.GetCurrentSolution();

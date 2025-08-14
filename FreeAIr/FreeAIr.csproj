@@ -69,6 +69,7 @@
     <Compile Include="Helper\Frame\DifferenceWindowFrameWrapper.cs" />
     <Compile Include="Helper\Frame\WindowFrameWrapper.cs" />
     <Compile Include="Helper\KnownMonikersHelper.cs" />
+    <Compile Include="Helper\NonDisposableSemaphoreSlim.cs" />
     <Compile Include="Helper\TempFile.cs" />
     <Compile Include="Helper\TimeoutEventProxy.cs" />
     <Compile Include="Helper\UriHelper.cs" />
@@ -229,10 +230,6 @@
     <Compile Include="UI\CombinedParameterConverter.cs" />
     <Compile Include="UI\Converters.cs" />
     <Compile Include="UI\Dialog\Content\PromptDialogContent.cs" />
-    <Compile Include="UI\Dialog\Content\Tools\ToolControlFactory.cs" />
-    <Compile Include="UI\Dialog\Content\Tools\VisualStudio_ReplaceDocumentBody_UserControl.xaml.cs">
-      <DependentUpon>VisualStudio_ReplaceDocumentBody_UserControl.xaml</DependentUpon>
-    </Compile>
     <Compile Include="UI\Dialog\DialogContent.cs" />
     <Compile Include="UI\Dialog\DialogControl.xaml.cs">
       <DependentUpon>DialogControl.xaml</DependentUpon>
@@ -477,10 +474,6 @@
     <Page Include="UI\CodeLens\CodeLenseUserControl.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
-    </Page>
-    <Page Include="UI\Dialog\Content\Tools\VisualStudio_ReplaceDocumentBody_UserControl.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UI\Dialog\DialogControl.xaml">
       <Generator>MSBuild:Compile</Generator>

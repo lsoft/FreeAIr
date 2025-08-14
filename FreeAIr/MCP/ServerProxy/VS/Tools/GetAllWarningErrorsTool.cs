@@ -50,7 +50,7 @@ namespace FreeAIr.MCP.McpServerProxy.VS.Tools
 
             var result = JsonSerializer.Serialize(packed);
 
-            return new McpServerProxyToolCallResult([result]);
+            return McpServerProxyToolCallResult.CreateSuccess(result);
         }
 
         private sealed class BuildInformationsJson

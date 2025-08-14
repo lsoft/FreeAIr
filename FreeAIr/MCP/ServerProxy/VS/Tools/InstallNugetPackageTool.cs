@@ -58,7 +58,7 @@ namespace FreeAIr.MCP.McpServerProxy.VS.Tools
 
             if (!arguments.TryGetValue(NugetPackageNameParameterName, out var nugetPackageNameItem))
             {
-                return new McpServerProxyToolCallResult($"Parameter {NugetPackageNameParameterName} does not found.");
+                return McpServerProxyToolCallResult.CreateFailed($"Parameter {NugetPackageNameParameterName} does not found.");
             }
             var nugetPackageName = nugetPackageNameItem as string;
 
@@ -70,7 +70,7 @@ namespace FreeAIr.MCP.McpServerProxy.VS.Tools
 
             if (!arguments.TryGetValue(TargetProjectNameParameterName, out var targetProjectNameItem))
             {
-                return new McpServerProxyToolCallResult($"Parameter {TargetProjectNameParameterName} does not found.");
+                return McpServerProxyToolCallResult.CreateFailed($"Parameter {TargetProjectNameParameterName} does not found.");
             }
             var targetProjectName = targetProjectNameItem as string;
 
@@ -81,13 +81,13 @@ namespace FreeAIr.MCP.McpServerProxy.VS.Tools
             {
                 //todo log
 
-                return new McpServerProxyToolCallResult("Visual Studio internal error.");
+                return McpServerProxyToolCallResult.CreateFailed("Visual Studio internal error.");
             }
 
             var targetProject = dte.TryFindProject(targetProjectName);
             if (targetProject is null)
             {
-                return new McpServerProxyToolCallResult($"Cannot find project `{targetProjectName}` in current solution.");
+                return McpServerProxyToolCallResult.CreateFailed($"Cannot find project `{targetProjectName}` in current solution.");
             }
 
             var componentModel = await FreeAIrPackage.Instance.GetServiceAsync(typeof(SComponentModel)) as IComponentModel;
@@ -116,7 +116,7 @@ namespace FreeAIr.MCP.McpServerProxy.VS.Tools
             }
 
 
-            return new McpServerProxyToolCallResult($"Nuget package `{nugetPackageName}` version {nugetPackageVersion} installed into project `{targetProjectName}` SUCCESSFULLY.");
+            return McpServerProxyToolCallResult.CreateSuccess($"Nuget package `{nugetPackageName}` version {nugetPackageVersion} installed into project `{targetProjectName}` SUCCESSFULLY.");
         }
     }
 

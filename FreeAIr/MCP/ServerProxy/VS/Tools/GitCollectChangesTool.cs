@@ -34,10 +34,10 @@ namespace FreeAIr.MCP.McpServerProxy.VS.Tools
                 );
             if (diffs is null || diffs.Count == 0)
             {
-                return new McpServerProxyToolCallResult($"Collecting changes fail.");
+                return McpServerProxyToolCallResult.CreateFailed($"Collecting changes fail.");
             }
 
-            return new McpServerProxyToolCallResult(diffs);
+            return McpServerProxyToolCallResult.CreateSuccess(diffs);
         }
     }
 
