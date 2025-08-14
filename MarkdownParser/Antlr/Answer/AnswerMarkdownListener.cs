@@ -24,10 +24,10 @@ namespace MarkdownParser.Antlr.Answer
             RegexOptions.Compiled
             );
 
-        private readonly ParsedAnswer _answer;
+        private readonly ParsedMarkdown _answer;
 
         public AnswerMarkdownListener(
-            ParsedAnswer answer
+            ParsedMarkdown answer
             )
         {
             if (answer is null)

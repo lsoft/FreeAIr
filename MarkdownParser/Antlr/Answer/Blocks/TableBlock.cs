@@ -164,9 +164,11 @@ namespace MarkdownParser.Antlr.Answer.Blocks
         {
             var cell = new TableCell(
                 new Paragraph(
-                    new Run(
-                        cellText
-                        )
+                    new Run
+                    {
+                        FontSize = fontSize,
+                        Text = cellText
+                    }
                     )
                 )
             {

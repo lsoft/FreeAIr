@@ -95,7 +95,7 @@ namespace MarkdownParserTester
                     )
                 );
 
-            var answerParser = new DirectAnswerParser(
+            var answerParser = new DirectMarkdownParser(
                 ConstantFontSizeProvider.Instance
                 );
 

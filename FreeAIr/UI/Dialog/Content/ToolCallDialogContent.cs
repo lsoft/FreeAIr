@@ -2,11 +2,14 @@
 using FreeAIr.Helper;
 using FreeAIr.MCP.McpServerProxy;
 using FreeAIr.Shared.Helper;
+using MarkdownParser.Antlr.Answer;
 using OpenAI.Chat;
 using System.Collections.Generic;
 using System.Net.Mail;
 using System.Text.Json;
 using System.Threading;
+using System.Windows;
+using System.Windows.Documents;
 using System.Windows.Input;
 using WpfHelpers;
 
@@ -191,16 +194,60 @@ namespace FreeAIr.UI.Dialog.Content
             }
         }
 
+        public FlowDocument ToolArgumentsFlowDocument
+        {
+            get;
+        }
+
+
+        public Visibility DocumentVisibility
+        {
+            get;
+        }
+
         public ToolCallDialogContent(
             ToolCallChatContent content
             ) : base(content, content)
         {
+            var json = content.ToolCall.FunctionArgumentsUpdate.ToString();
+            var dict = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, object>>(json);
+            ToolArgumentsFlowDocument = new();
+
+            if (dict.Count > 0)
+            {
+                UpdateFlowDocument(dict);
+
+                DocumentVisibility = Visibility.Visible;
+            }
+            else
+            {
+                DocumentVisibility = Visibility.Collapsed;
+            }
+
+
             var ts = InternalPage.Instance.ReadMCPToolsExecutionStatus();
             if (ts.IsToolEnabled(content.ToolCall.FunctionName))
             {
                 ExecuteToolAsync()
                     .FileAndForget(nameof(ExecuteToolAsync));
             }
+        }
+
+        private void UpdateFlowDocument(
+            Dictionary<string, object> nameValueDict
+            )
+        {
+            var md = new ParsedMarkdown(
+                FontSizePage.Instance
+                );
+
+            md.AddTableRow($"|Argument name|Argument value|");
+            md.AddTableRow($"|---|---|");
+            foreach (var pair in nameValueDict)
+            {
+                md.AddTableRow($"|{pair.Key}|{pair.Value}|");
+            }
+            md.UpdateFlowDocument(ToolArgumentsFlowDocument, null, false);
         }
 
         private async Task AllowThisToolAllTimeAsync()

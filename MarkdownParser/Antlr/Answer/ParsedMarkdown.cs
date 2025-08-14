@@ -4,14 +4,14 @@ using System.Windows.Documents;
 
 namespace MarkdownParser.Antlr.Answer
 {
-    public sealed class ParsedAnswer
+    public sealed class ParsedMarkdown
     {
         private readonly List<IBlock> _blocks = new();
         private readonly IFontSizeProvider _fontSizeProvider;
 
         public IReadOnlyList<IBlock> Blocks => _blocks;
 
-        public ParsedAnswer(
+        public ParsedMarkdown(
             IFontSizeProvider fontSizeProvider
             )
         {

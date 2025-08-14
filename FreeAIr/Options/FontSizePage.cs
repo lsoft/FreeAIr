@@ -114,21 +114,21 @@ namespace FreeAIr
 
         [Category("Table sizes")]
         [DisplayName("Table header size")]
-        [DefaultValue(14)]
+        [DefaultValue(12)]
         public int TableHeaderSize
         {
             get;
             set;
-        } = 14;
+        } = 12;
 
         [Category("Table sizes")]
         [DisplayName("Table body size")]
-        [DefaultValue(14)]
+        [DefaultValue(12)]
         public int TableBodySize
         {
             get;
             set;
-        } = 14;
+        } = 12;
 
         #endregion
     }

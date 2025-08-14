@@ -5,57 +5,57 @@ using System.ComponentModel.Composition;
 
 namespace MarkdownParser.Antlr.Answer
 {
-    public interface IAnswerParser
+    public interface IMarkdownParser
     {
-        ParsedAnswer Parse(string text);
+        ParsedMarkdown Parse(string text);
     }
 
-    [Export(typeof(IAnswerParser))]
-    [Export(typeof(CachedAnswerParser))]
-    public sealed class CachedAnswerParser : IAnswerParser
+    [Export(typeof(IMarkdownParser))]
+    [Export(typeof(CachedMarkdownParser))]
+    public sealed class CachedMarkdownParser : IMarkdownParser
     {
         private readonly object _locker = new();
 
-        private readonly DirectAnswerParser _answerParser;
+        private readonly DirectMarkdownParser _parser;
 
         private string? _previousText;
-        private ParsedAnswer? _previousAnswer;
+        private ParsedMarkdown? _previousMarkdown;
 
         [ImportingConstructor]
-        public CachedAnswerParser(
-            DirectAnswerParser answerParser
+        public CachedMarkdownParser(
+            DirectMarkdownParser parser
             )
         {
-            if (answerParser is null)
+            if (parser is null)
             {
-                throw new ArgumentNullException(nameof(answerParser));
+                throw new ArgumentNullException(nameof(parser));
             }
 
-            _answerParser = answerParser;
+            _parser = parser;
         }
 
-        public ParsedAnswer Parse(string text)
+        public ParsedMarkdown Parse(string text)
         {
             lock (_locker)
             {
                 if (_previousText is null || _previousText != text)
                 {
-                    _previousAnswer = _answerParser.Parse(text);
+                    _previousMarkdown = _parser.Parse(text);
                     _previousText = text;
                 }
 
-                return _previousAnswer;
+                return _previousMarkdown;
             }
         }
     }
 
-    [Export(typeof(DirectAnswerParser))]
-    public sealed class DirectAnswerParser : IAnswerParser
+    [Export(typeof(DirectMarkdownParser))]
+    public sealed class DirectMarkdownParser : IMarkdownParser
     {
         private readonly IFontSizeProvider _fontSizeProvider;
 
         [ImportingConstructor]
-        public DirectAnswerParser(
+        public DirectMarkdownParser(
             IFontSizeProvider fontSizeProvider
             )
         {
@@ -67,33 +67,33 @@ namespace MarkdownParser.Antlr.Answer
             _fontSizeProvider = fontSizeProvider;
         }
 
-        public ParsedAnswer Parse(string text)
+        public ParsedMarkdown Parse(string text)
         {
             if (text is null)
             {
                 throw new ArgumentNullException(nameof(text));
             }
 
-            var answer = new ParsedAnswer(
+            var md = new ParsedMarkdown(
                 _fontSizeProvider
                 );
 
-            if (!GetMarkdownRepresentationSafely(answer, text))
+            if (!GetMarkdownRepresentationSafely(md, text))
             {
-                GetFallbackRepresentation(answer, text);
+                GetFallbackRepresentation(md, text);
             }
 
-            return answer;
+            return md;
         }
 
         private static void GetFallbackRepresentation(
-            ParsedAnswer answer,
+            ParsedMarkdown md,
             string text
             )
         {
-            if (answer is null)
+            if (md is null)
             {
-                throw new ArgumentNullException(nameof(answer));
+                throw new ArgumentNullException(nameof(md));
             }
 
             if (text is null)
@@ -101,18 +101,18 @@ namespace MarkdownParser.Antlr.Answer
                 throw new ArgumentNullException(nameof(text));
             }
 
-            answer.AddParagraphBlock();
-            answer.AddText(text);
+            md.AddParagraphBlock();
+            md.AddText(text);
         }
 
         private static bool GetMarkdownRepresentationSafely(
-            ParsedAnswer answer,
+            ParsedMarkdown md,
             string text
             )
         {
-            if (answer is null)
+            if (md is null)
             {
-                throw new ArgumentNullException(nameof(answer));
+                throw new ArgumentNullException(nameof(md));
             }
 
             if (text is null)
@@ -136,7 +136,7 @@ namespace MarkdownParser.Antlr.Answer
 
                 var walker = new ParseTreeWalker();
                 var listener = new AnswerMarkdownListener(
-                    answer
+                    md
                     );
                 walker.Walk(listener, tree);
                 return true;

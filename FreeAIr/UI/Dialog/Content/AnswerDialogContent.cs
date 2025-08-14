@@ -18,7 +18,7 @@ namespace FreeAIr.UI.Dialog.Content
 {
     public sealed class AnswerDialogContent : DialogContent<AnswerChatContent>
     {
-        private readonly IAnswerParser _answerParser;
+        private readonly IMarkdownParser _answerParser;
         private readonly AdditionalCommandContainer _additionalCommandContainer;
 
         public HorizontalAlignment HorizontalAlignment => HorizontalAlignment.Left;
@@ -34,7 +34,7 @@ namespace FreeAIr.UI.Dialog.Content
         } = new FlowDocument();
 
         private AnswerDialogContent(
-            IAnswerParser answerParser,
+            IMarkdownParser answerParser,
             AdditionalCommandContainer? additionalCommandContainer,
             AnswerChatContent answer,
             bool isInProgress
@@ -84,7 +84,7 @@ namespace FreeAIr.UI.Dialog.Content
             )
         {
             var componentModel = FreeAIrPackage.Instance.GetService<SComponentModel, IComponentModel>();
-            var answerParser = componentModel.GetService<IAnswerParser>();
+            var answerParser = componentModel.GetService<IMarkdownParser>();
 
             return new AnswerDialogContent(
                 answerParser,
