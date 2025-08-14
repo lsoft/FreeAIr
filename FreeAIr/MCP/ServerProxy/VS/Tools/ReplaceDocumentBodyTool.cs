@@ -13,8 +13,8 @@ namespace FreeAIr.MCP.McpServerProxy.VS.Tools
 
         public const string VisualStudioToolName = "ReplaceDocumentBody";
 
-        private const string ItemNamePathParameterName = "item_name_or_full_path";
-        private const string NewItemBodyParameterName = "new_item_body";
+        public const string ItemNamePathParameterName = "item_name_or_full_path";
+        public const string NewItemBodyParameterName = "new_item_body";
 
         public ReplaceDocumentBodyTool(
             ) : base(
@@ -77,21 +77,25 @@ namespace FreeAIr.MCP.McpServerProxy.VS.Tools
                 false,
                 cancellationToken
                 );
-            var item = items.FirstOrDefault(i => !i.SolutionItem.IsNonVisibleItem);
-            if (item is null)
+            items = items.FindAll(i => !i.SolutionItem.IsNonVisibleItem);
+            if (items.Count == 0)
             {
                 return new McpServerProxyToolCallResult($"File {itemNamePath} does not found in current solution.");
             }
+            if (items.Count > 1)
+            {
+                return new McpServerProxyToolCallResult($"Found more than 1 file with name(path) {itemNamePath} in current solution.");
+            }
 
+            var item = items[0];
             var lineEndings = LineEndingHelper.Actual.GetDocumentLineEnding(item.SolutionItem.FullPath);
-
             var lines = newItemBody.Split(
                 new[] { "\r\n", "\r", "\n" },
                 StringSplitOptions.None
                 );
 
             var newBody = string.Join(lineEndings, lines);
-            System.IO.File.WriteAllText(itemNamePath, newBody);
+            await UpdateItemBodyAsync(itemNamePath, newBody);
 
             var result = JsonSerializer.Serialize(
                 new UpdateBodyResultJson
@@ -101,6 +105,28 @@ namespace FreeAIr.MCP.McpServerProxy.VS.Tools
                 );
 
             return new McpServerProxyToolCallResult([result]);
+        }
+
+        public static async Task UpdateItemBodyAsync(
+            string fullPath,
+            string body
+            )
+        {
+            var openedDocument = await Community.VisualStudio.Toolkit.VS.Documents.GetDocumentViewAsync(
+                fullPath
+                );
+            if (openedDocument is not null)
+            {
+                var currentText = openedDocument.Document.TextBuffer.CurrentSnapshot.GetText();
+
+                using var edit = openedDocument.Document.TextBuffer.CreateEdit();
+                edit.Replace(0, currentText.Length, body);
+                edit.Apply();
+
+                return;
+            }
+
+            System.IO.File.WriteAllText(fullPath, body);
         }
 
         private sealed class UpdateBodyResultJson

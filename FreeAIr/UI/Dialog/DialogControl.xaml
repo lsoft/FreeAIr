@@ -52,7 +52,7 @@
                 </FlowDocumentScrollViewer>
             </Border>
         </DataTemplate>
-        <DataTemplate x:Key="DefaultToolCallContentTemplate">
+        <DataTemplate x:Key="ToolCallContentTemplate">
             <Border
                 HorizontalAlignment="Center"
                 BorderBrush="#569CD6"
@@ -62,6 +62,7 @@
                     Margin="2"
                     >
                     <Grid.RowDefinitions>
+                        <RowDefinition  Height="auto" />
                         <RowDefinition  Height="auto" />
                         <RowDefinition />
                     </Grid.RowDefinitions>
@@ -75,8 +76,16 @@
                         Visibility="{Binding DocumentVisibility}"
                         />
 
-                    <StackPanel
+                    <ContentControl
                         Grid.Row="1"
+                        Margin="2"
+                        HorizontalAlignment="Stretch"
+                        Content="{Binding ToolControl}"
+                        Visibility="{Binding ToolControlVisibility}"
+                        />
+
+                    <StackPanel
+                        Grid.Row="2"
                         Orientation="Horizontal"
                         HorizontalAlignment="Center"
                         >
@@ -137,7 +146,7 @@
             x:Key="DialogTemplateSelector"
             PromptContentTemplate="{StaticResource PromptContentTemplate}"
             AnswerContentTemplate="{StaticResource AnswerContentTemplate}"
-            DefaultToolCallContentTemplate="{StaticResource DefaultToolCallContentTemplate}"
+            ToolCallContentTemplate="{StaticResource ToolCallContentTemplate}"
             />
         
     </UserControl.Resources>

@@ -137,15 +137,6 @@ namespace FreeAIr.Options2.Mcp
             Name = string.Empty;
         }
 
-        public object Clone()
-        {
-            return new AvailableMcpServerToolJson
-            {
-                Enabled = Enabled,
-                Name = Name
-            };
-        }
-
         public AvailableMcpServerToolJson(string name)
         {
             if (name is null)
@@ -166,6 +157,15 @@ namespace FreeAIr.Options2.Mcp
 
             Name = name;
             Enabled = enabled;
+        }
+
+        public object Clone()
+        {
+            return new AvailableMcpServerToolJson
+            {
+                Enabled = Enabled,
+                Name = Name
+            };
         }
     }
 }

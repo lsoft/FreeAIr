@@ -7,7 +7,6 @@ namespace FreeAIr.MCP.McpServerProxy
 {
     /// <summary>
     /// Тулзы, доступные согласно настройкам.
-    /// По существу, парсер настроек Visual Studio.
     /// </summary>
     public sealed class AvailableToolContainer
     {

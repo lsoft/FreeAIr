@@ -189,11 +189,9 @@ namespace FreeAIr.MCP.McpServerProxy
             foreach (var mcpServerProxyWrapper in _mcpServerProxyWrappers)
             {
                 var mcpServerProxyName = mcpServerProxyWrapper.McpServerProxy.Name;
+
                 var toolsStatus = new McpServerToolsStatus(mcpServerProxyName);
-
-                var tools = mcpServerProxyWrapper.Tools;
-
-                foreach (var tool in tools.Tools)
+                foreach (var tool in mcpServerProxyWrapper.Tools.Tools)
                 {
                     toolsStatus.AddTool(
                         new McpServerToolStatus(

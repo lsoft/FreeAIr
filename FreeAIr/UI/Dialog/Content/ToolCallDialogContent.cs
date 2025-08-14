@@ -2,6 +2,7 @@
 using FreeAIr.Helper;
 using FreeAIr.MCP.McpServerProxy;
 using FreeAIr.Shared.Helper;
+using FreeAIr.UI.Dialog.Content.Tools;
 using MarkdownParser.Antlr.Answer;
 using OpenAI.Chat;
 using System.Collections.Generic;
@@ -9,6 +10,7 @@ using System.Net.Mail;
 using System.Text.Json;
 using System.Threading;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Input;
 using WpfHelpers;
@@ -22,8 +24,6 @@ namespace FreeAIr.UI.Dialog.Content
         private ICommand? _allowAnyToolAllTimeCommand;
         private ICommand? _blockAtThisTimeCommand;
         private ICommand? _showResultCommand;
-
-        public override string TemplatePropertyName => nameof(DialogTemplateSelector.DefaultToolCallContentTemplate);
 
         public ToolCallStatusEnum Status => TypedContent.Status;
 
@@ -207,25 +207,23 @@ namespace FreeAIr.UI.Dialog.Content
             get;
         }
 
+        public object? ToolControl
+        {
+            get;
+        }
+
+        public Visibility ToolControlVisibility => ToolControl is null ? Visibility.Collapsed : Visibility.Visible;
+
         public ToolCallDialogContent(
             ToolCallChatContent content
             ) : base(content, content)
         {
-            var json = content.ToolCall.FunctionArgumentsUpdate.ToString();
-            var dict = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, object>>(json);
             ToolArgumentsFlowDocument = new();
+            DocumentVisibility = UpdateFlowDocument(content);
 
-            if (dict.Count > 0)
-            {
-                UpdateFlowDocument(dict);
-
-                DocumentVisibility = Visibility.Visible;
-            }
-            else
-            {
-                DocumentVisibility = Visibility.Collapsed;
-            }
-
+            ToolControl = ToolControlFactory.CreateToolControl(
+                content.ToolCall
+                );
 
             var ts = InternalPage.Instance.ReadMCPToolsExecutionStatus();
             if (ts.IsToolEnabled(content.ToolCall.FunctionName))
@@ -235,10 +233,17 @@ namespace FreeAIr.UI.Dialog.Content
             }
         }
 
-        private void UpdateFlowDocument(
-            Dictionary<string, object> nameValueDict
+        private Visibility UpdateFlowDocument(
+            ToolCallChatContent content
             )
         {
+            var json = content.ToolCall.FunctionArgumentsUpdate.ToString();
+            var nameValueDict = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, object>>(json);
+            if (nameValueDict.Count <= 0)
+            {
+                return Visibility.Collapsed;
+            }
+
             var md = new ParsedMarkdown(
                 FontSizePage.Instance
                 );
@@ -250,6 +255,8 @@ namespace FreeAIr.UI.Dialog.Content
                 md.AddTableRow($"|{pair.Key}|{pair.Value}|");
             }
             md.UpdateFlowDocument(ToolArgumentsFlowDocument, null, false);
+
+            return Visibility.Visible;
         }
 
         private async Task AllowThisToolAllTimeAsync()
@@ -277,7 +284,7 @@ namespace FreeAIr.UI.Dialog.Content
 
                 var toolCall = TypedContent.ToolCall;
 
-                var toolArguments = ParseToolInvocationArguments(toolCall);
+                var toolArguments = toolCall.ParseToolInvocationArguments();
 
                 var toolResult = await McpServerProxyCollection.CallToolAsync(
                     toolCall.FunctionName,
@@ -350,27 +357,6 @@ namespace FreeAIr.UI.Dialog.Content
         }
 
         #endregion
-
-        private static Dictionary<string, object?> ParseToolInvocationArguments(
-            StreamingChatToolCallUpdate toolCall
-            )
-        {
-            var toolArguments = new Dictionary<string, object?>();
-            if (toolCall.FunctionArgumentsUpdate.Length > 0)
-            {
-                using JsonDocument toolArgumentJson = JsonDocument.Parse(
-                    toolCall.FunctionArgumentsUpdate
-                    );
-
-                foreach (var pair in toolArgumentJson.RootElement.EnumerateObject())
-                {
-                    toolArguments.Add(pair.Name, pair.Value.DeserializeToObject());
-                }
-            }
-
-            return toolArguments;
-        }
-
 
     }
 }

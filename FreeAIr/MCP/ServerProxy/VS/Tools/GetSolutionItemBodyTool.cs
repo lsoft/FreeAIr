@@ -50,7 +50,7 @@ namespace FreeAIr.MCP.McpServerProxy.VS.Tools
             }
 
             var itemNamePath = itemNamePathObj as string;
-             
+
             var solution = await Community.VisualStudio.Toolkit.VS.Solutions.GetCurrentSolutionAsync();
             if (solution is null)
             {
@@ -68,23 +68,40 @@ namespace FreeAIr.MCP.McpServerProxy.VS.Tools
                 return new McpServerProxyToolCallResult($"File {itemNamePath} does not found in current solution.");
             }
 
+            var itemBody = await GetItemBodyAsync(item.SolutionItem.FullPath);
+
             var packed = new SolutionItemBodiesJson
             {
                 SolutionItemBodies =
                 [
                     new SolutionItemBodyJson
-                    {
-                        ItemName = item.SolutionItem.Name,
-                        ItemFullPath = item.SolutionItem.FullPath,
-                        ItemType = item.SolutionItem.Type.ToString(),
-                        ItemBody = System.IO.File.ReadAllText(item.SolutionItem.FullPath)
-                    }
+                {
+                    ItemName = item.SolutionItem.Name,
+                    ItemFullPath = item.SolutionItem.FullPath,
+                    ItemType = item.SolutionItem.Type.ToString(),
+                    ItemBody = itemBody
+                }
                 ]
             };
 
             var result = JsonSerializer.Serialize(packed);
 
             return new McpServerProxyToolCallResult([result]);
+        }
+
+        public static async Task<string> GetItemBodyAsync(
+            string fullPath
+            )
+        {
+            var openedDocument = await Community.VisualStudio.Toolkit.VS.Documents.GetDocumentViewAsync(
+                fullPath
+                );
+            if (openedDocument is not null)
+            {
+                return openedDocument.Document.TextBuffer.CurrentSnapshot.GetText();
+            }
+
+            return System.IO.File.ReadAllText(fullPath);
         }
 
         private sealed class SolutionItemBodiesJson

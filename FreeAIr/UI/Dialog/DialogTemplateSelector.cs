@@ -17,7 +17,7 @@ namespace FreeAIr.UI.Dialog.Content
             set;
         }
 
-        public DataTemplate DefaultToolCallContentTemplate
+        public DataTemplate ToolCallContentTemplate
         {
             get;
             set;
@@ -25,13 +25,14 @@ namespace FreeAIr.UI.Dialog.Content
 
         public override DataTemplate SelectTemplate(object item, DependencyObject container)
         {
-            if (item is not DialogContent dc)
-            {
-                return base.SelectTemplate(item, container);
-            }
+            if (item is PromptDialogContent)
+                return PromptContentTemplate;
+            if (item is AnswerDialogContent)
+                return AnswerContentTemplate;
+            else if (item is ToolCallDialogContent)
+                return ToolCallContentTemplate;
 
-            var propertyName = dc.TemplatePropertyName;
-            return (DataTemplate)typeof(DialogTemplateSelector).GetProperty(propertyName).GetValue(this);
+            return base.SelectTemplate(item, container);
         }
     }
 }
