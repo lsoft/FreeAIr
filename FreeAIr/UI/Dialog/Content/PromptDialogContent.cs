@@ -10,6 +10,8 @@ namespace FreeAIr.UI.Dialog.Content
     {
         private FlowDocument _document;
 
+        public override string TemplatePropertyName => nameof(DialogTemplateSelector.PromptContentTemplate);
+
         public FlowDocument Document
         {
             get => _document;

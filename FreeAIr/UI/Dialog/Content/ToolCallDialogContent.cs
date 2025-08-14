@@ -23,6 +23,8 @@ namespace FreeAIr.UI.Dialog.Content
         private ICommand? _blockAtThisTimeCommand;
         private ICommand? _showResultCommand;
 
+        public override string TemplatePropertyName => nameof(DialogTemplateSelector.DefaultToolCallContentTemplate);
+
         public ToolCallStatusEnum Status => TypedContent.Status;
 
         public string Name => TypedContent.Name;
@@ -354,7 +356,7 @@ namespace FreeAIr.UI.Dialog.Content
             )
         {
             var toolArguments = new Dictionary<string, object?>();
-            if (toolCall.FunctionArgumentsUpdate.ToMemory().Length > 0)
+            if (toolCall.FunctionArgumentsUpdate.Length > 0)
             {
                 using JsonDocument toolArgumentJson = JsonDocument.Parse(
                     toolCall.FunctionArgumentsUpdate

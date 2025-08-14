@@ -26,7 +26,7 @@ namespace FreeAIr.Shared.Helper
             return c.Skip(1).FirstOrDefault();
         }
 
-        public static IReadOnlyList<T> FindAll<T>(
+        public static List<T> FindAll<T>(
             this IReadOnlyList<T> list,
             Func<T, bool> predicate
             )

@@ -27,6 +27,11 @@ namespace FreeAIr.UI.Dialog
 
     public abstract class DialogContent : BaseViewModel
     {
+        public abstract string TemplatePropertyName
+        {
+            get;
+        }
+
         public IChatContent Content
         {
             get;

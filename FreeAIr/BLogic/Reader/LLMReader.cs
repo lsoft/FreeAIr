@@ -132,9 +132,10 @@ namespace FreeAIr.UI.BLogic.Reader
 
 
 
+                var messages = await _chat.GetMessageListAsync();
 
                 var completionUpdates = chatClient.CompleteChatStreaming(
-                    messages: await _chat.GetMessageListAsync(),
+                    messages: messages,
                     options: chatCompletionOptions,
                     cancellationToken: cancellationToken
                     );

@@ -21,6 +21,8 @@ namespace FreeAIr.UI.Dialog.Content
         private readonly IMarkdownParser _answerParser;
         private readonly AdditionalCommandContainer _additionalCommandContainer;
 
+        public override string TemplatePropertyName => nameof(DialogTemplateSelector.AnswerContentTemplate);
+
         public HorizontalAlignment HorizontalAlignment => HorizontalAlignment.Left;
 
         public Thickness BorderThickness

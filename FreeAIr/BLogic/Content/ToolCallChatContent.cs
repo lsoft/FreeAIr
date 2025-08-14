@@ -6,7 +6,7 @@ namespace FreeAIr.BLogic.Content
 {
     public sealed class ToolCallChatContent : IChatContent
     {
-        private readonly Action _activeChatAction;
+        private readonly Action _checkForRequestAnswer;
 
         public ChatContentTypeEnum Type => ChatContentTypeEnum.ToolCall;
 
@@ -37,7 +37,7 @@ namespace FreeAIr.BLogic.Content
 
         public ToolCallChatContent(
             StreamingChatToolCallUpdate toolCall,
-            Action activeChatAction
+            Action checkForRequestAnswer
             )
         {
             if (toolCall is null)
@@ -45,14 +45,14 @@ namespace FreeAIr.BLogic.Content
                 throw new ArgumentNullException(nameof(toolCall));
             }
 
-            if (activeChatAction is null)
+            if (checkForRequestAnswer is null)
             {
-                throw new ArgumentNullException(nameof(activeChatAction));
+                throw new ArgumentNullException(nameof(checkForRequestAnswer));
             }
 
             ToolCall = toolCall;
             Status = ToolCallStatusEnum.Asking;
-            _activeChatAction = activeChatAction;
+            _checkForRequestAnswer = checkForRequestAnswer;
         }
 
         public void Archive()
@@ -75,7 +75,7 @@ namespace FreeAIr.BLogic.Content
             Status = status;
             Result = result;
 
-            _activeChatAction();
+            _checkForRequestAnswer();
         }
 
         public IReadOnlyList<ChatMessage> CreateChatMessages()

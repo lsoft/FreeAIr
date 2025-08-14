@@ -7,29 +7,31 @@ namespace FreeAIr.UI.Dialog.Content
     {
         public DataTemplate PromptContentTemplate
         {
-            get; set;
+            get;
+            set;
         }
 
         public DataTemplate AnswerContentTemplate
         {
-            get; set;
+            get;
+            set;
         }
 
-        public DataTemplate ToolCallContentTemplate
+        public DataTemplate DefaultToolCallContentTemplate
         {
-            get; set;
+            get;
+            set;
         }
 
         public override DataTemplate SelectTemplate(object item, DependencyObject container)
         {
-            if (item is PromptDialogContent)
-                return PromptContentTemplate;
-            if (item is AnswerDialogContent)
-                return AnswerContentTemplate;
-            else if (item is ToolCallDialogContent)
-                return ToolCallContentTemplate;
+            if (item is not DialogContent dc)
+            {
+                return base.SelectTemplate(item, container);
+            }
 
-            return base.SelectTemplate(item, container);
+            var propertyName = dc.TemplatePropertyName;
+            return (DataTemplate)typeof(DialogTemplateSelector).GetProperty(propertyName).GetValue(this);
         }
     }
 }

@@ -158,7 +158,26 @@ namespace FreeAIr.BLogic
         {
             var content = new ToolCallChatContent(
                 toolCall,
-                () => LLMReaderPool.StartReaderFor(this)
+                () =>
+                {
+                    var lastPromptIndex = _contents.FindLastIndex(c => c.Type == ChatContentTypeEnum.Prompt);
+                    if (lastPromptIndex == -1)
+                    {
+                        return;
+                    }
+
+                    var lastTools = _contents
+                        .Skip(lastPromptIndex)
+                        .Where(c => c.Type == ChatContentTypeEnum.ToolCall)
+                        .Cast<ToolCallChatContent>()
+                        .ToList()
+                        ;
+                    var allToolsHaveResult = lastTools.All(t => t.Status.In(ToolCallStatusEnum.Succeeded, ToolCallStatusEnum.Failed, ToolCallStatusEnum.Blocked));
+                    if (allToolsHaveResult)
+                    {
+                        LLMReaderPool.StartReaderFor(this);
+                    }
+                }
                 );
             _contents.Add(content);
 
@@ -282,7 +301,9 @@ namespace FreeAIr.BLogic
 
             var nonArchivedContents = Contents.FindAll(p => !p.IsArchived);
 
-            foreach (var content in nonArchivedContents.Take(nonArchivedContents.Count - 1))
+            var lastPromptIndex = nonArchivedContents.FindLastIndex(c => c.Type == ChatContentTypeEnum.Prompt);
+
+            foreach (var content in nonArchivedContents.Take(lastPromptIndex))
             {
                 FillMessageList(content, result);
             }
@@ -292,7 +313,10 @@ namespace FreeAIr.BLogic
                 result.Add(await contextItem.CreateChatMessageAsync());
             }
 
-            FillMessageList(nonArchivedContents.Last(), result);
+            foreach (var content in nonArchivedContents.Skip(lastPromptIndex))
+            {
+                FillMessageList(content, result);
+            }
 
             return result;
         }
