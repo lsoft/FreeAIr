@@ -166,6 +166,9 @@
             Visibility="{Binding ShowServerPanel}"
             >
             <Grid.RowDefinitions>
+                <!-- type -->
+                <RowDefinition Height="auto"/>
+
                 <!-- name -->
                 <RowDefinition Height="auto"/>
                 
@@ -181,8 +184,26 @@
                 <ColumnDefinition />
             </Grid.ColumnDefinitions>
 
-            <TextBox
+            <Label
                 Grid.Row="0"
+                Grid.Column="0"
+                HorizontalAlignment="Left"
+                VerticalAlignment="Center"
+                FontFamily="Cascadia Code"
+                Content="Type:"
+                />
+
+            <Label
+                Grid.Row="0"
+                Grid.Column="1"
+                HorizontalAlignment="Left"
+                VerticalAlignment="Center"
+                FontFamily="Cascadia Code"
+                Content="{Binding SelectedServer.Type}"
+                />
+
+            <TextBox
+                Grid.Row="1"
                 Grid.Column="0"
                 Grid.ColumnSpan="2"
                 HorizontalAlignment="Stretch"
@@ -193,7 +214,7 @@
                 />
 
             <TextBox
-                Grid.Row="1"
+                Grid.Row="2"
                 Grid.Column="0"
                 Grid.ColumnSpan="2"
                 HorizontalAlignment="Stretch"
@@ -210,7 +231,7 @@
                 />
 
             <StackPanel
-                Grid.Row="2"
+                Grid.Row="3"
                 Grid.Column="0"
                 Grid.ColumnSpan="2"
                 >

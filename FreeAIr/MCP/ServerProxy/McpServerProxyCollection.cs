@@ -116,8 +116,8 @@ namespace FreeAIr.MCP.McpServerProxy
                     var mcpServer = mcpServers.Servers.First(s => s.Key == addedOrUpdated);
 
                     var mcpServerProxy = new ExternalMcpServerProxy(
-                        mcpServer.Key,
-                        mcpServer.Value
+                        mcpServer.Key
+                        //mcpServer.Value
                         );
                     if (await ProcessMcpServerProxyAsync(toolContainer, mcpServerProxy))
                     {

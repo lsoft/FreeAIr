@@ -36,6 +36,85 @@ namespace Dto
 
     public class McpServer : ICloneable
     {
+        [JsonPropertyName("Type")]
+        public McpServerType Type
+        {
+            get;
+            set;
+        }
+
+        [JsonPropertyName("JsonConfiguration")]
+        public string JsonConfiguration
+        {
+            get;
+            set;
+        }
+
+        public McpServer()
+        {
+            JsonConfiguration = string.Empty;
+        }
+
+        public McpServer(
+            McpServerType type,
+            string jsonConfiguration
+            )
+        {
+            Type = type;
+            JsonConfiguration = jsonConfiguration;
+        }
+
+        public bool IsHttpAndHasEndpoint(string endpoint)
+        {
+            if (Type != McpServerType.Http)
+            {
+                return false;
+            }
+
+            var mcpServerParameters = HttpMcpServerParameters.DeserializeStdio(this);
+            return mcpServerParameters.Endpoint == endpoint;
+        }
+
+        public object Clone()
+        {
+            return new McpServer
+            {
+                Type = Type,
+                JsonConfiguration = JsonConfiguration
+            };
+        }
+    }
+
+    public sealed class HttpMcpServerParameters
+    {
+        [JsonPropertyName("url")]
+        public string Endpoint
+        {
+            get; set;
+        }
+
+        public HttpMcpServerParameters()
+        {
+            Endpoint = string.Empty;
+        }
+
+        public static HttpMcpServerParameters DeserializeStdio(
+            McpServer server
+            )
+        {
+            if (server.Type != McpServerType.Http)
+            {
+                throw new InvalidOperationException($"Unsupported type: {server.Type}");
+            }
+
+            return System.Text.Json.JsonSerializer.Deserialize<HttpMcpServerParameters>(
+                server.JsonConfiguration
+                )!;
+        }
+    }
+
+    public sealed class StdioMcpServerParameters
+    {
         [JsonPropertyName("command")]
         public string Command
         {
@@ -54,31 +133,11 @@ namespace Dto
             get; set;
         }
 
-        public McpServer()
+        public StdioMcpServerParameters()
         {
             Command = string.Empty;
             Args = [];
             Env = [];
-        }
-
-        public object Clone()
-        {
-            Dictionary<string, string>? env = null;
-            if (Env is not null)
-            {
-                env = new Dictionary<string, string>();
-                foreach (var pair in Env)
-                {
-                    env[pair.Key] = pair.Value;
-                }
-            }
-
-            return new McpServer
-            {
-                Command = Command,
-                Args = Args,
-                Env = env
-            };
         }
 
         public string GetArgStringRepresentation()
@@ -90,5 +149,25 @@ namespace Dto
         {
             return JsonSerializer.Serialize(Env ?? new Dictionary<string, string>());
         }
+
+        public static StdioMcpServerParameters DeserializeStdio(
+            McpServer server
+            )
+        {
+            if (server.Type != McpServerType.Stdio)
+            {
+                throw new InvalidOperationException($"Unsupported type: {server.Type}");
+            }
+
+            return System.Text.Json.JsonSerializer.Deserialize<StdioMcpServerParameters>(
+                server.JsonConfiguration
+                )!;
+        }
+    }
+
+    public enum McpServerType
+    {
+        Stdio = 0,
+        Http = 1
     }
 }

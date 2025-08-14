@@ -18,22 +18,15 @@ namespace FreeAIr.MCP.McpServerProxy.External
         }
 
         public ExternalMcpServerProxy(
-            string name,
-            McpServer server
+            string name
             )
         {
-            if (server is null)
-            {
-                throw new ArgumentNullException(nameof(server));
-            }
-
             if (name is null)
             {
                 throw new ArgumentNullException(nameof(name));
             }
 
             Name = name;
-            _server = server;
         }
 
         public async Task<bool> IsInstalledAsync()
@@ -138,10 +131,7 @@ namespace FreeAIr.MCP.McpServerProxy.External
         {
             return new Dictionary<string, string>
             {
-                ["MCPServerFolderPath"] = FreeAIrPackage.WorkingFolder,
-                ["MCPServerFileName"] = _server.Command,
-                ["MCPServerArguments"] = _server.GetArgStringRepresentation(),
-                ["MCPServerEnvironment"] = _server.GetEnvStringRepresentation()
+                ["MCPServerFolderPath"] = FreeAIrPackage.WorkingFolder
             };
         }
 

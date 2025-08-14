@@ -1,6 +1,9 @@
-﻿using Proxy.Server.Github;
-using Dto;
+﻿using Dto;
+using Microsoft.AspNetCore.Routing;
 using ModelContextProtocol.Client;
+using Proxy.Server.Github;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace Proxy.Server.External
 {
@@ -29,23 +32,53 @@ namespace Proxy.Server.External
             IParameterProvider parameterProvider
             )
         {
-            var mcpServerFolderPath = Environment.CurrentDirectory;
-            var mcpServerFileName = _server.Command;
+            IClientTransport mcpClientTransport;
+            switch (_server.Type)
+            {
+                case McpServerType.Stdio:
+                    {
+                        var parameters = StdioMcpServerParameters.DeserializeStdio(
+                            _server
+                            );
 
-            var arguments = _server.Args;
-            var env = _server.Env;
+                        var mcpServerFolderPath = Environment.CurrentDirectory;
+                        var mcpServerFileName = parameters.Command;
+                        var arguments = parameters.Args;
+                        var env = parameters.Env;
 
-            var mcpClientTransport = new StdioClientTransport(
-                new StdioClientTransportOptions
-                {
-                    Name = this.Name,
-                    WorkingDirectory = mcpServerFolderPath,
-                    Command = mcpServerFileName,
-                    ShutdownTimeout = TimeSpan.FromMinutes(1),
-                    Arguments = arguments,
-                    EnvironmentVariables = env
-                }
-                );
+                        mcpClientTransport = new StdioClientTransport(
+                            new StdioClientTransportOptions
+                            {
+                                Name = this.Name,
+                                WorkingDirectory = mcpServerFolderPath,
+                                Command = mcpServerFileName,
+                                ShutdownTimeout = TimeSpan.FromMinutes(1),
+                                Arguments = arguments,
+                                EnvironmentVariables = env
+                            }
+                            );
+                    }
+                    break;
+                case McpServerType.Http:
+                    {
+                        var parameters = HttpMcpServerParameters.DeserializeStdio(
+                            _server
+                            );
+
+                        mcpClientTransport = new SseClientTransport(
+                            new SseClientTransportOptions
+                            {
+                                TransportMode = HttpTransportMode.AutoDetect,
+                                Name = this.Name,
+                                Endpoint = new Uri(parameters.Endpoint)
+                            }
+                            );
+                    }
+                    break;
+                default:
+                    throw new InvalidOperationException($"Unknown type: {_server.Type}");
+            }
+
             return await McpClientFactory.CreateAsync(mcpClientTransport);
         }
     }

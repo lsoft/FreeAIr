@@ -1,4 +1,5 @@
-﻿using FreeAIr.Helper;
+﻿using Dto;
+using FreeAIr.Helper;
 using FreeAIr.MCP.McpServerProxy;
 using FreeAIr.MCP.McpServerProxy.Github;
 using FreeAIr.Options2;
@@ -68,6 +69,11 @@ namespace FreeAIr.UI.ViewModels
         }
 
         public InstallGithubMCPServerCmd InstallGithubMCPServerCommand
+        {
+            get;
+        }
+
+        public InstallMicrosoftMsdnMCPServerCmd InstallMicrosoftMsdnMCPServerCommand
         {
             get;
         }
@@ -191,6 +197,7 @@ namespace FreeAIr.UI.ViewModels
             _originalJson = string.Empty;
 
             InstallGithubMCPServerCommand = new(this);
+            InstallMicrosoftMsdnMCPServerCommand = new(this);
 
             SetDefaultOptionsCommand = new SetDefaultOptionsCmd(this);
 
@@ -318,6 +325,62 @@ namespace FreeAIr.UI.ViewModels
                 }
 
                 _viewModel.OnGithubPropertyChanged();
+            }
+        }
+
+        public sealed class InstallMicrosoftMsdnMCPServerCmd : AsyncBaseRelayCommand
+        {
+            const string MsdnEndpoint = "https://learn.microsoft.com/api/mcp";
+
+            private readonly ControlCenterViewModel _viewModel;
+
+            public InstallMicrosoftMsdnMCPServerCmd(
+                ControlCenterViewModel viewModel
+                )
+            {
+                if (viewModel is null)
+                {
+                    throw new ArgumentNullException(nameof(viewModel));
+                }
+
+                _viewModel = viewModel;
+            }
+
+            protected override async Task ExecuteInternalAsync(object parameter)
+            {
+                var options = FreeAIrOptions.DeserializeFromString(
+                    _viewModel.OptionsJson
+                    );
+
+                options.AvailableMcpServers.Servers.Add(
+                    "microsoft.docs.mcp",
+                    new McpServer(
+                        McpServerType.Http,
+$$$"""
+{
+  "type": "http",
+  "url": "{{{MsdnEndpoint}}}"
+}
+"""
+                    )
+                );
+
+                _viewModel.OptionsJson = FreeAIrOptions.SerializeToString(options);
+                _viewModel.OnGithubPropertyChanged();
+            }
+
+            protected override bool CanExecuteInternal(object parameter)
+            {
+                var options = FreeAIrOptions.DeserializeFromString(
+                    _viewModel.OptionsJson
+                    );
+
+                if (options.AvailableMcpServers.Servers.Any(s => s.Value.IsHttpAndHasEndpoint(MsdnEndpoint)))
+                {
+                    return false;
+                }
+
+                return true;
             }
         }
 

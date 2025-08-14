@@ -1,6 +1,8 @@
 ﻿using Dto;
 using FreeAIr.Helper;
 using FreeAIr.Options2;
+using FreeAIr.Options2.Agent;
+using FreeAIr.UI.ContextMenu;
 using FreeAIr.UI.Windows;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.Threading;
@@ -123,10 +125,10 @@ namespace FreeAIr.UI.ViewModels
             {
                 if (_addNewCommand is null)
                 {
-                    _addNewCommand = new RelayCommand(
-                        a =>
+                    _addNewCommand = new AsyncRelayCommand(
+                        async a =>
                         {
-                            AddServer();
+                            await CreateServerAsync();
                         });
                 }
 
@@ -417,11 +419,30 @@ namespace FreeAIr.UI.ViewModels
             AddServerToCollections(newServer);
         }
 
-        private void AddServer()
+        private async Task CreateServerAsync()
         {
+            var types = new List<(string, object)>();
+            foreach (McpServerType v in Enum.GetValues(typeof(McpServerType)))
+            {
+                var w = new McpServerTypeWrapper(v);
+                types.Add((w.ToString(), w));
+            }
+
+            var chosenWrapper = await VisualStudioContextMenuCommandBridge.ShowAsync<McpServerTypeWrapper>(
+                "Choose MCP server type:",
+                types
+                );
+            if (chosenWrapper is null)
+            {
+                return;
+            }
+
+            var chosenType = chosenWrapper.Type;
+
             var newServer = new McpServerWrapper(
                 this,
-                DateTime.Now.ToString()
+                DateTime.Now.ToString(),
+                chosenType
                 );
             AddServerToCollections(newServer);
         }
@@ -432,6 +453,24 @@ namespace FreeAIr.UI.ViewModels
         {
             ServerCollection.Add(newServer);
             AvailableServers.Add(newServer);
+        }
+
+        private sealed class McpServerTypeWrapper
+        {
+            public McpServerType Type
+            {
+                get;
+            }
+
+            public McpServerTypeWrapper(McpServerType type)
+            {
+                Type = type;
+            }
+
+            public override string ToString()
+            {
+                return Type.ToString();
+            }
         }
 
         public sealed class McpServerWrapper : ICloneable
@@ -453,6 +492,11 @@ namespace FreeAIr.UI.ViewModels
                 }
             }
 
+            public McpServerType Type
+            {
+                get;
+            }
+
             public string Json
             {
                 get => _json;
@@ -471,10 +515,8 @@ namespace FreeAIr.UI.ViewModels
             {
                 _viewModel = viewModel;
                 Name = name;
-                Json = System.Text.Json.JsonSerializer.Serialize(
-                    mcpServer,
-                    new JsonSerializerOptions { WriteIndented = true }
-                    );
+                Type = mcpServer.Type;
+                Json = mcpServer.JsonConfiguration;
             }
 
             public McpServerWrapper(
@@ -490,12 +532,18 @@ namespace FreeAIr.UI.ViewModels
 
             public McpServerWrapper(
                 McpServerConfigureViewModel viewModel,
-                string name
+                string name,
+                McpServerType type
                 )
             {
                 _viewModel = viewModel;
                 Name = name;
-                Json =
+                Type = type;
+
+                switch (type)
+                {
+                    case McpServerType.Stdio:
+                        Json =
 """
 {
   "command": "my_command",
@@ -509,6 +557,17 @@ namespace FreeAIr.UI.ViewModels
     }
 }
 """;
+                        break;
+                    case McpServerType.Http:
+                        Json =
+"""
+{
+    "type": "http",
+    "url": "https://example.com"
+}
+""";
+                        break;
+                }
             }
 
             public McpServer? TryDeserialize()
@@ -517,7 +576,7 @@ namespace FreeAIr.UI.ViewModels
                 {
                     if (_lastDeserializedJson != Json)
                     {
-                        _lastDeserializedServer = System.Text.Json.JsonSerializer.Deserialize<McpServer>(Json);
+                        _lastDeserializedServer = new McpServer(Type, Json);
                     }
                 }
                 catch

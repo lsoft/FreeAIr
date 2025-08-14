@@ -6,6 +6,8 @@ using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Json;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading;
 using System.Windows.Input;
 using WpfHelpers;
@@ -181,7 +183,7 @@ namespace FreeAIr.UI.ViewModels
                     .Substring(si + jsonStart.Length, ei - si - jsonStart.Length - jsonEnd.Length + 2)
                     ;
 
-                var mcpServers = System.Text.Json.JsonSerializer.Deserialize<McpServers>(json);
+                var mcpServers = System.Text.Json.JsonSerializer.Deserialize<DockerMcpServers>(json);
                 if (mcpServers.Servers.Count != 1)
                 {
                     await VS.MessageBox.ShowWarningAsync(
@@ -193,8 +195,8 @@ namespace FreeAIr.UI.ViewModels
                     return (null, null);
                 }
 
-                var pair = mcpServers.Servers.First();
-                return (pair.Key, pair.Value);
+                var pair = mcpServers.Convert().First();
+                return pair;
             }
             catch (Exception excp)
             {
@@ -265,6 +267,65 @@ namespace FreeAIr.UI.ViewModels
 
             OnPropertyChanged();
         }
+
+
+        private sealed class DictionaryToStringConverter : JsonConverter<Dictionary<string, string>>
+        {
+            public override Dictionary<string, string> Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+            {
+                using var doc = JsonDocument.ParseValue(ref reader);
+                var root = doc.RootElement;
+
+                var result = new Dictionary<string, string>();
+
+                foreach (var property in root.EnumerateObject())
+                {
+                    // Сериализуем значение свойства в строку
+                    result[property.Name] = property.Value.GetRawText();
+                }
+
+                return result;
+            }
+
+            public override void Write(Utf8JsonWriter writer, Dictionary<string, string> value, JsonSerializerOptions options)
+            {
+                writer.WriteStartObject();
+
+                foreach (var kvp in value)
+                {
+                    // Десериализуем строку обратно в JSON
+                    using var doc = JsonDocument.Parse(kvp.Value);
+                    writer.WritePropertyName(kvp.Key);
+                    doc.WriteTo(writer);
+                }
+
+                writer.WriteEndObject();
+            }
+        }
+
+        private sealed class DockerMcpServers
+        {
+            [JsonPropertyName("mcpServers")]
+            [JsonConverter(typeof(DictionaryToStringConverter))]
+            public Dictionary<string, string> Servers
+            {
+                get; set;
+            }
+
+            public IEnumerable<(string, McpServer)> Convert()
+            {
+                foreach (var pair in Servers)
+                {
+                    //var heuristicType = pair.Value.Contains("\"command\"")
+                    //    ? McpServerType.Stdio
+                    //    : McpServerType.Http
+                    //    ;
+
+                    yield return (pair.Key, new McpServer(McpServerType.Stdio, pair.Value));
+                }
+            }
+        }
+
 
         public sealed class DockerMcpServerInfo : BaseViewModel
         {

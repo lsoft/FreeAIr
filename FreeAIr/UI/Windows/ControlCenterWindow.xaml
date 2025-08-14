@@ -25,16 +25,17 @@
         >
         <Grid>
             <Grid.RowDefinitions>
-                <RowDefinition Height="auto"/> <!-- 0 -->
-                <RowDefinition Height="auto"/> <!-- 1 -->
-                <RowDefinition Height="auto"/> <!-- 2 -->
-                <RowDefinition Height="auto"/> <!-- 3 -->
-                <RowDefinition Height="auto"/> <!-- 4 -->
-                <RowDefinition Height="auto"/> <!-- 5 -->
-                <RowDefinition Height="auto"/> <!-- 6 -->
-                <RowDefinition Height="auto"/> <!-- 7 -->
-                <RowDefinition Height="auto"/> <!-- 8 -->
-                <RowDefinition Height="auto"/> <!-- 9 -->
+                <RowDefinition Height="auto"/> <!--  0 -->
+                <RowDefinition Height="auto"/> <!--  1 -->
+                <RowDefinition Height="auto"/> <!--  2 -->
+                <RowDefinition Height="auto"/> <!--  3 -->
+                <RowDefinition Height="auto"/> <!--  4 -->
+                <RowDefinition Height="auto"/> <!--  5 -->
+                <RowDefinition Height="auto"/> <!--  6 -->
+                <RowDefinition Height="auto"/> <!--  7 -->
+                <RowDefinition Height="auto"/> <!--  8 -->
+                <RowDefinition Height="auto"/> <!--  9 -->
+                <RowDefinition Height="auto"/> <!-- 10 -->
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="auto"/>
@@ -231,8 +232,21 @@
                 Style="{DynamicResource TextBlockLikeButtonStyle}"
                 />
 
-            <StackPanel
+            <Button
                 Grid.Row="9"
+                Grid.Column="2"
+                HorizontalAlignment="Right"
+                VerticalAlignment="Center"
+                Margin="0,0,8,0"
+                FontSize="12"
+                FontFamily="Cascadia Code"
+                Content="Install Microsoft MSDN MCP server"
+                Command="{Binding InstallMicrosoftMsdnMCPServerCommand}"
+                Style="{DynamicResource TextBlockLikeButtonStyle}"
+                />
+
+            <StackPanel
+                Grid.Row="10"
                 Grid.Column="0"
                 Grid.ColumnSpan="3"
                 Margin="2,20,2,2"
