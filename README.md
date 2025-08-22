@@ -49,6 +49,7 @@ Main functions:
 - Fix build errors
 - Support for MCP servers and their tools.
 - A Visual Studio MCP server is built into FreeAIr.
+- Support for MSDN MCP server.
 
 # FreeAIr images (click to open)
 

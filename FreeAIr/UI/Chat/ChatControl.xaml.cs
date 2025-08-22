@@ -10,6 +10,7 @@ using FreeAIr.UI.Embedillo.VisualLine.SolutionItem;
 using FreeAIr.UI.ToolWindows;
 using FreeAIr.UI.ViewModels;
 using FreeAIr.UI.Windows;
+using Microsoft.Build.Utilities;
 using Microsoft.VisualStudio.ComponentModelHost;
 using Microsoft.VisualStudio.Imaging;
 using Microsoft.VisualStudio.Imaging.Interop;
@@ -91,6 +92,16 @@ namespace FreeAIr.UI.Chat
         /// </summary>
         public event PropertyChangedEventHandler PropertyChanged;
 
+
+        /// <summary>
+        /// Called when any child window is opened or closed.
+        /// </summary>
+        public Action<bool>? ChildWindowAction
+        {
+            get;
+            set;
+        }
+
         #region commands
 
         public ICommand ChooseChatAgentCommand
@@ -108,7 +119,7 @@ namespace FreeAIr.UI.Chat
                                 _chat.Options.ChosenAgent
                                 );
                             w.DataContext = vm;
-                            _ = await w.ShowDialogAsync();
+                            await ShowDialogAsync(w);
 
                             _chat.Options.ChangeChosenAgent(
                                 vm.ChosenAgent
@@ -150,7 +161,7 @@ namespace FreeAIr.UI.Chat
                             w.DataContext = new AvailableToolsViewModel(
                                 _chat.ChatTools
                                 );
-                            _ = await w.ShowDialogAsync();
+                            await ShowDialogAsync(w);
 
                             OnPropertyChanged();
                         },
@@ -214,7 +225,7 @@ namespace FreeAIr.UI.Chat
                                 ofd.InitialDirectory = sfi.Directory.FullName;
                             }
 
-                            var sw = ofd.ShowDialog();
+                            var sw = ShowDialog(ofd);
                             if (!sw.GetValueOrDefault(false))
                             {
                                 return;
@@ -387,7 +398,7 @@ namespace FreeAIr.UI.Chat
                                 var w = new WaitForTaskWindow(
                                     backgroundTask
                                     );
-                                await w.ShowDialogAsync();
+                                await ShowDialogAsync(w);
 
                                 if (backgroundTask.Result is not null)
                                 {
@@ -768,6 +779,38 @@ namespace FreeAIr.UI.Chat
                     );
             }
         }
+
+        #region show child windows
+
+        private bool? ShowDialog(CommonDialog d)
+        {
+            try
+            {
+                ChildWindowAction?.Invoke(true);
+
+                return d.ShowDialog();
+            }
+            finally
+            {
+                ChildWindowAction?.Invoke(false);
+            }
+        }
+
+        private async Task ShowDialogAsync(Window w)
+        {
+            try
+            {
+                ChildWindowAction?.Invoke(true);
+
+                _ = await w.ShowDialogAsync();
+            }
+            finally
+            {
+                ChildWindowAction?.Invoke(false);
+            }
+        }
+
+        #endregion
 
         #region setup
 

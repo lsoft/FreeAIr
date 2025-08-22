@@ -7,11 +7,15 @@ namespace FreeAIr.Commands.Other
     {
         protected override async Task ExecuteAsync(OleMenuCmdEventArgs e)
         {
+            await ExecuteCommandAsync();
+        }
+
+        public static async Task ExecuteCommandAsync()
+        {
             await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
 
             _ = await ChatListToolWindow.ShowAsync();
         }
-
     }
 
 }

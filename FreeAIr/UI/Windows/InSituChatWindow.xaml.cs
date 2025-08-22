@@ -24,8 +24,18 @@ namespace FreeAIr.UI.Windows
             
             InitializeComponent();
 
+            ChatControlName.ChildWindowAction +=
+                (opened) =>
+                {
+                    this.Topmost = !opened;
+                };
+
+            AllowsTransparency = true;
+
             Activated += (sender, e) =>
             {
+                this.Opacity = 1f;
+
                 InSituChatInputCommandFilter.SetSuppressMode(true);
             };
             Deactivated += (sender, e) =>
@@ -35,7 +45,10 @@ namespace FreeAIr.UI.Windows
                 if (UIPage.Instance.CloseIfUserSwitchedAwayFromInSituWindow)
                 {
                     this.Close();
+                    return;
                 }
+
+                this.Opacity = 0.5f;
             };
             Loaded += (sender, e) =>
             {

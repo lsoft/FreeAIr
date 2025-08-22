@@ -23,48 +23,82 @@
     PreviewKeyUp="Window_PreviewKeyUp"
     MouseLeftButtonDown="Window_MouseLeftButtonDown"
     >
-    <Grid
+    <Border
+        BorderBrush="#569CD6"
+        BorderThickness="1"
+        Margin="0"
+        Padding="1"
         >
-        <Grid.RowDefinitions>
-            <RowDefinition MinHeight="20" Height="auto" />
-            <RowDefinition />
-        </Grid.RowDefinitions>
 
-        <Button
-            Margin="0"
-            Width="0"
-            Height="0"
-            IsEnabled="True"
-            Visibility="Collapsed"
-            x:Name="ForegroundButton"
-            />
+        <Grid
+            >
+            <Grid.RowDefinitions>
+                <RowDefinition MinHeight="20" Height="auto" />
+                <RowDefinition />
+            </Grid.RowDefinitions>
 
-        <CheckBox
-            Grid.Row="0"
-            Margin="5,0,5,0"
-            HorizontalAlignment="Left"
-            VerticalAlignment="Center"
-            Content="Close if switch away"
-            IsChecked="{Binding CloseIfSwitchAway}"
-            />
+            <Grid
+                Grid.Row="0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="auto" />
+                    <ColumnDefinition Width="auto" />
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
 
-        <Button
-            Margin="5,2,5,2"
-            Content="Close"
-            HorizontalAlignment="Right"
-            VerticalAlignment="Center"
-            Background="Transparent"
-            FontFamily="Cascadia Code"
-            Command="{Binding Path=CloseCommand}"
-            Style="{DynamicResource TextBlockLikeButtonStyle}"
-            />
+                <Button
+                    Grid.Column="0"
+                    Margin="0"
+                    Width="0"
+                    Height="0"
+                    IsEnabled="True"
+                    Visibility="Collapsed"
+                    x:Name="ForegroundButton"
+                    />
 
-        <chat:ChatControl
-            Grid.Row="1"
-            Foreground="{Binding ElementName=ForegroundButton, Path=Foreground}"
-            Chat="{Binding CurrentChat}"
-            />
+                <CheckBox
+                    Grid.Column="0"
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Center"
+                    Margin="0,0,5,0"
+                    Content="Close if switch away"
+                    IsChecked="{Binding CloseIfSwitchAway}"
+                    />
 
-    </Grid>
-    
+                <Button
+                    Grid.Column="1"
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Center"
+                    Margin="10,2,5,2"
+                    Content="Open full window"
+                    Background="Transparent"
+                    FontFamily="Cascadia Code"
+                    Command="{Binding Path=OpenFullWindowCommand}"
+                    Style="{DynamicResource TextBlockLikeButtonStyle}"
+                    />
+
+                <Button
+                    Grid.Column="2"
+                    HorizontalAlignment="Right"
+                    VerticalAlignment="Center"
+                    Margin="5,2,5,2"
+                    Content="Close"
+                    Background="Transparent"
+                    FontFamily="Cascadia Code"
+                    Command="{Binding Path=CloseCommand}"
+                    Style="{DynamicResource TextBlockLikeButtonStyle}"
+                    />
+
+            </Grid>
+
+            <chat:ChatControl
+                Grid.Row="1"
+                x:Name="ChatControlName"
+                Foreground="{Binding ElementName=ForegroundButton, Path=Foreground}"
+                Chat="{Binding CurrentChat}"
+                />
+
+        </Grid>
+        
+    </Border>
+
 </Window>

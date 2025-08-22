@@ -1,4 +1,5 @@
 ﻿using FreeAIr.BLogic;
+using FreeAIr.Commands.Other;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
@@ -13,13 +14,14 @@ namespace FreeAIr.UI.ViewModels
     public sealed class InSituChatViewModel : BaseViewModel
     {
         private ICommand _closeCommand;
+        private ICommand _openFullWindowCommand;
 
         public FreeAIr.BLogic.Chat CurrentChat
         {
             get;
         }
 
-        public Action CloseWindow
+        public Action? CloseWindow
         {
             get;
             set;
@@ -39,6 +41,25 @@ namespace FreeAIr.UI.ViewModels
             }
         }
 
+        public ICommand OpenFullWindowCommand
+        {
+            get
+            {
+                if (_openFullWindowCommand is null)
+                {
+                    _openFullWindowCommand = new AsyncRelayCommand(
+                        async a =>
+                        {
+                            await OpenChatListToolWindowCommand.ExecuteCommandAsync();
+
+                            CloseWindow?.Invoke();
+                        });
+                }
+
+                return _openFullWindowCommand;
+            }
+        }
+
         public ICommand CloseCommand
         {
             get
@@ -48,7 +69,7 @@ namespace FreeAIr.UI.ViewModels
                     _closeCommand = new RelayCommand(
                         a =>
                         {
-                            CloseWindow();
+                            CloseWindow?.Invoke();
                         });
                 }
 
