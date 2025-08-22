@@ -1,4 +1,5 @@
-﻿using DataObject.Entity;
+//copyright (c) lsoft 2025
+using DataObject.Entity;
 using System;
 using System.Collections.Generic;
 using System.Linq;

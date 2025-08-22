@@ -132,7 +132,7 @@ namespace FreeAIr.Options2
             {
                 if (!place.HasValue || place.Value == OptionsPlaceEnum.SolutionRelatedFilePath)
                 {
-                    var filePath = await ComposeFilePathAsync();
+                    var filePath = await ComposeOptionsFilePathAsync();
                     if (!string.IsNullOrEmpty(filePath))
                     {
                         var fileResult = await DataPieceCache.GetValueAsync<FreeAIrOptions>(
@@ -170,18 +170,18 @@ namespace FreeAIr.Options2
                 {
                     //trying to load options from Visual Studio
                     var vsResult = await DataPieceCache.GetValueAsync<FreeAIrOptions>(
-                    "::VSOptions", //just a key which cannot be a file path
-                    (o) => !string.IsNullOrEmpty(InternalPage.Instance.Options),
-                    (o) =>
-                    {
-                        return InternalPage.Instance.Options;
-                    },
-                    (o) =>
-                    {
-                        var result = DeserializeFromString(InternalPage.Instance.Options);
-                        return Task.FromResult((ICloneable)result.Clone());
-                    }
-                    );
+                        "::VSOptions", //just a key which cannot be a file path
+                        (o) => !string.IsNullOrEmpty(InternalPage.Instance.Options),
+                        (o) =>
+                        {
+                            return InternalPage.Instance.Options;
+                        },
+                        (o) =>
+                        {
+                            var result = DeserializeFromString(InternalPage.Instance.Options);
+                            return Task.FromResult((ICloneable)result.Clone());
+                        }
+                        );
                     if (vsResult is not null
                         || (place.HasValue && place.Value == OptionsPlaceEnum.VisualStudioOption)
                         )
@@ -242,9 +242,16 @@ namespace FreeAIr.Options2
             )
         {
             //serialize to file
-            var filePath = await ComposeFilePathAsync();
+            var filePath = await ComposeOptionsFilePathAsync();
             if ((!place.HasValue && File.Exists(filePath)) || place == OptionsPlaceEnum.SolutionRelatedFilePath)
             {
+                var fileInfo = new FileInfo(filePath);
+                var directoryPath = fileInfo.Directory.FullName;
+                if (!Directory.Exists(directoryPath))
+                {
+                    Directory.CreateDirectory(directoryPath);
+                }
+
                 using var fs = new FileStream(filePath, FileMode.Create);
                 await JsonSerializer.SerializeAsync(fs, this, _writeOptions);
                 return OptionsPlaceEnum.SolutionRelatedFilePath;
@@ -358,7 +365,21 @@ namespace FreeAIr.Options2
             return false;
         }
 
-        public static async Task<string> ComposeFilePathAsync()
+        public static Task<string?> ComposeOptionsFilePathAsync(
+            )
+        {
+            return ComposeFilePathAsync("options");
+        }
+
+        public static Task<string?> ComposeEmbeddingsFilePathAsync(
+            )
+        {
+            return ComposeFilePathAsync("embeddings");
+        }
+
+        public static async Task<string?> ComposeFilePathAsync(
+            string suffix
+            )
         {
             var solution = await VS.Solutions.GetCurrentSolutionAsync();
             if (solution is null)
@@ -378,14 +399,14 @@ namespace FreeAIr.Options2
                 solutionFileInfo.Directory.FullName,
                 ".freeair"
                 );
-            if (!System.IO.Directory.Exists(folderPath))
-            {
-                System.IO.Directory.CreateDirectory(folderPath);
-            }
+            //if (!System.IO.Directory.Exists(folderPath))
+            //{
+            //    System.IO.Directory.CreateDirectory(folderPath);
+            //}
 
             var filePath = System.IO.Path.Combine(
                 folderPath,
-                $"{solutionName}_options.json"
+                $"{solutionName}_{suffix}.json"
                 );
             return filePath;
         }

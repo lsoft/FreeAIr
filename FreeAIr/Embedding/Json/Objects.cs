@@ -186,38 +186,6 @@ namespace FreeAIr.Embedding.Json
         }
 
 
-        public static async System.Threading.Tasks.Task<string?> GenerateFilePathAsync()
-        {
-            var solution = await VS.Solutions.GetCurrentSolutionAsync();
-            if (solution is null)
-            {
-                return null;
-            }
-
-            var solutionFileInfo = new FileInfo(solution.Name);
-
-            var solutionName = solution.Name;
-            if (solutionFileInfo.Extension.Length > 0)
-            {
-                solutionName = solutionName.Substring(0, solutionName.Length - solutionFileInfo.Extension.Length);
-            }
-
-            var folderPath = System.IO.Path.Combine(
-                solutionFileInfo.Directory.FullName,
-                ".freeair"
-                );
-            if (!System.IO.Directory.Exists(folderPath))
-            {
-                System.IO.Directory.CreateDirectory(folderPath);
-            }
-
-            var filePath = System.IO.Path.Combine(
-                folderPath,
-                $"{solutionName}_embeddings.json"
-                );
-            return filePath;
-        }
-
         public IReadOnlyDictionary<Guid, Triple> CreateTripleDictionary(
             )
         {

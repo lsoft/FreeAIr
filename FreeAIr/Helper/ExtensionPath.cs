@@ -16,7 +16,7 @@ namespace FreeAIr.Helper
 
             if (Path.IsPathRooted(folderPath))
             {
-                throw new InvalidOperationException("Relative path sound not be rooted!");
+                throw new InvalidOperationException("Relative path should not be rooted!");
             }
 
 

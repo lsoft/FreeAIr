@@ -1,6 +1,7 @@
 ﻿using FreeAIr.Embedding.Json;
 using FreeAIr.Helper;
 using FreeAIr.NLOutline.Tree;
+using FreeAIr.Options2;
 using FreeAIr.Shared.Helper;
 using System.Collections.Generic;
 using System.Linq;
@@ -48,7 +49,7 @@ namespace FreeAIr.MCP.McpServerProxy.VS.Tools
                     cancellationToken
                     );
 
-                var jsonEmbeddingFilePath = await EmbeddingOutlineJsonObject.GenerateFilePathAsync();
+                var jsonEmbeddingFilePath = await FreeAIrOptions.ComposeEmbeddingsFilePathAsync();
                 var existingOutlineRoot = await OutlineNode.CreateAsync(
                     jsonEmbeddingFilePath,
                     true

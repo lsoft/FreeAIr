@@ -469,7 +469,7 @@ $$$"""
 
                     if (place.HasValue && place.Value == OptionsPlaceEnum.SolutionRelatedFilePath)
                     {
-                        var filePath = await FreeAIrOptions.ComposeFilePathAsync();
+                        var filePath = await FreeAIrOptions.ComposeOptionsFilePathAsync();
                         if (!File.Exists(filePath))
                         {
                             await VS.MessageBox.ShowErrorAsync(
@@ -623,7 +623,7 @@ $$$"""
 
                     if (!place.HasValue || place.Value == OptionsPlaceEnum.SolutionRelatedFilePath)
                     {
-                        var filePath = await FreeAIrOptions.ComposeFilePathAsync();
+                        var filePath = await FreeAIrOptions.ComposeOptionsFilePathAsync();
                         if (System.IO.File.Exists(filePath))
                         {
                             System.IO.File.Delete(filePath);

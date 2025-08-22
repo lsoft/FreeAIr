@@ -307,7 +307,7 @@ namespace FreeAIr.UI.ViewModels
                 GitRepoExists = true;
             }
 
-            JsonFilePath = await EmbeddingOutlineJsonObject.GenerateFilePathAsync();
+            JsonFilePath = await FreeAIrOptions.ComposeEmbeddingsFilePathAsync();
 
             if (reloadFromOptions)
             {
@@ -750,7 +750,7 @@ namespace FreeAIr.UI.ViewModels
                 ProcessItem(checkedPaths, root);
             }
 
-            var jsonEmbeddingFilePath = await EmbeddingOutlineJsonObject.GenerateFilePathAsync();
+            var jsonEmbeddingFilePath = await FreeAIrOptions.ComposeEmbeddingsFilePathAsync();
             var existingOutlineRoot = await OutlineNode.CreateAsync(
                 jsonEmbeddingFilePath,
                 true

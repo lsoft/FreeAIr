@@ -34,11 +34,11 @@ namespace FreeAIr.MCP.McpServerProxy.VS.Tools
                             },
                         "{{{NugetPackageVersionParameterName}}}": {
                             "type": "string",
-                            "description": "A version of nuget package you want ot install. Leave this empty if you want to install latest version of nuget package."
+                            "description": "A version of nuget package you want to install. Leave this empty if you want to install latest version of nuget package."
                             },
                         "{{{TargetProjectNameParameterName}}}": {
                             "type": "string",
-                            "description": "A solution project name in which you want ot install a nuget package"
+                            "description": "A solution project name in which you want to install a nuget package"
                             }
                         },
                     "required": ["{{{NugetPackageNameParameterName}}}", "{{{TargetProjectNameParameterName}}}"]
