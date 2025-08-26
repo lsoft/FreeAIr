@@ -21,6 +21,27 @@ namespace FreeAIr.Helper
             FilePath = filePath;
         }
 
+        public FileStream OpenWrite()
+        {
+            return File.OpenWrite(FilePath);
+        }
+
+        public FileStream OpenRead()
+        {
+            return File.OpenRead(FilePath);
+        }
+
+        public static TempFile CreateWithExtension(string extension)
+        {
+            var filePath = Path.Combine(
+                Path.GetTempPath(),
+                Guid.NewGuid().ToString()
+                    + (extension.StartsWith(".") ? string.Empty : ".")
+                    + extension
+                );
+            return new TempFile(filePath);
+        }
+
         public static TempFile Create()
         {
             var filePath = Path.Combine(

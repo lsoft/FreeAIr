@@ -3,6 +3,7 @@ using FreeAIr.Options2;
 using FreeAIr.Options2.Support;
 using FreeAIr.UI.Embedillo.Answer.Parser;
 using Microsoft.VisualStudio.Imaging;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -155,14 +156,11 @@ namespace FreeAIr.UI.Embedillo.VisualLine.Command
         {
             var suggestions = new List<CommandSuggestion>();
 
-            var support = await FreeAIrOptions.DeserializeSupportCollectionAsync();
-            foreach (var action in support.Actions)
+            var actions = await FreeAIrOptions.DeserializeSupportActionsAsync(
+                a => a.Scopes.Contains(SupportScopeEnum.EnterPromptControl)
+                );
+            foreach (var action in actions)
             {
-                if (!action.Scopes.Contains(SupportScopeEnum.EnterPromptControl))
-                {
-                    continue;
-                }
-
                 var transformedName = TransformSupportActionName(action.Name);
 
                 suggestions.Add(

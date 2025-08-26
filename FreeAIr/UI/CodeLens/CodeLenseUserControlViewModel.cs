@@ -3,6 +3,7 @@ using FreeAIr.Options2;
 using FreeAIr.Options2.Support;
 using FreeAIr.Shared.Dto;
 using Microsoft.VisualStudio.Text;
+using System;
 using System.ComponentModel.Design;
 using System.Threading.Tasks;
 using System.Windows.Input;
@@ -42,14 +43,11 @@ namespace FreeAIr.UI.CodeLens
                     )
                 );
 
-            var supportCollection = await FreeAIrOptions.DeserializeSupportCollectionAsync();
-            foreach (var action in supportCollection.Actions)
+            var actions = await FreeAIrOptions.DeserializeSupportActionsAsync(
+                a => a.Scopes.Contains(SupportScopeEnum.CodelensInDocument)
+                );
+            foreach (var action in actions)
             {
-                if (!action.Scopes.Contains(SupportScopeEnum.CodelensInDocument))
-                {
-                    continue;
-                }
-
                 var cvm = new CommandViewModel(
                     unitInfo,
                     action

@@ -18,6 +18,7 @@
     WindowStartupLocation="Manual"
     ShowInTaskbar="True"
     Topmost="True"
+    AllowsTransparency="True"
     WindowStyle="None"
     SizeChanged="Window_SizeChanged"
     PreviewKeyUp="Window_PreviewKeyUp"

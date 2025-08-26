@@ -16,7 +16,8 @@ namespace FreeAIr.Options2.Support
         UnitTestFramework,
         GitDiff,
         NaturalLanguageSearchQuery,
-        WholeLineCompletionAnchor
+        WholeLineCompletionAnchor,
+        RecordedText
     }
 
     public static class SupportContextVariableHelper
@@ -29,6 +30,7 @@ namespace FreeAIr.Options2.Support
         private const string GitDiff = "{GIT_DIFF}";
         private const string NaturalLanguageSearchQuery = "{NATURAL_LANGUAGE_SEARCH_QUERY}";
         private const string WholeLineCompletionAnchor = "{WHOLE_LINE_COMPLETION_ANCHOR}";
+        private const string RecordedText = "{RECORDED_TEXT}";
 
         public static readonly string[] Anchors =
             [
@@ -39,7 +41,8 @@ namespace FreeAIr.Options2.Support
                 UnitTestFramework,
                 GitDiff,
                 NaturalLanguageSearchQuery,
-                WholeLineCompletionAnchor
+                WholeLineCompletionAnchor,
+                RecordedText
             ];
 
         public static SupportContextVariableEnum GetVariableEnum(
@@ -64,6 +67,8 @@ namespace FreeAIr.Options2.Support
                     return SupportContextVariableEnum.NaturalLanguageSearchQuery;
                 case WholeLineCompletionAnchor:
                     return SupportContextVariableEnum.WholeLineCompletionAnchor;
+                case RecordedText:
+                    return SupportContextVariableEnum.RecordedText;
             }
 
             return SupportContextVariableEnum.Unknown;
@@ -91,6 +96,8 @@ namespace FreeAIr.Options2.Support
                     return NaturalLanguageSearchQuery;
                 case SupportContextVariableEnum.WholeLineCompletionAnchor:
                     return WholeLineCompletionAnchor;
+                case SupportContextVariableEnum.RecordedText:
+                    return RecordedText;
             }
 
             return string.Empty;
@@ -130,6 +137,31 @@ namespace FreeAIr.Options2.Support
         public static SupportContext WithPrompt()
         {
             var result = new SupportContext();
+
+            return result;
+        }
+
+        public static async Task<SupportContext> WithRecordedTextAsync(
+            string recordedText
+            )
+        {
+            if (recordedText is null)
+            {
+                throw new ArgumentNullException(nameof(recordedText));
+            }
+
+            var unsorted = await FreeAIrOptions.DeserializeUnsortedAsync();
+
+            var result = new SupportContext();
+
+            result.AddContextVariable(
+                SupportContextVariableEnum.RecordedText,
+                recordedText
+                );
+            result.AddContextVariable(
+                SupportContextVariableEnum.UnitTestFramework,
+                unsorted.PreferredUnitTestFramework
+                );
 
             return result;
         }

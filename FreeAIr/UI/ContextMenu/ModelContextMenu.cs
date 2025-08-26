@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace FreeAIr.UI.ContextMenu
 {
-    public sealed class ModelContextMenu
+    public static class ModelContextMenu
     {
         public static async Task<string?> ChooseModelFromProviderAsync(
             string token,

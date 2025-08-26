@@ -22,7 +22,7 @@ namespace FreeAIr.UI.ContextMenu
         protected override void BeforeQueryStatus(OleMenuCommand menuItem, EventArgs e, VisualStudioContextMenuItem item)
         {
             menuItem.Text = item.Title;
-            menuItem.Checked = false;
+            menuItem.Checked = item.IsChecked;
             menuItem.Enabled = item.IsEnabled;
         }
 

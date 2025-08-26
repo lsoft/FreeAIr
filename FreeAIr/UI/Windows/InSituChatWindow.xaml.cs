@@ -1,11 +1,6 @@
-﻿using FreeAIr.BLogic;
-using FreeAIr.Commands;
-using FreeAIr.UI.ContextMenu;
+﻿using FreeAIr.Helper;
 using FreeAIr.UI.InSitu;
 using FreeAIr.UI.ViewModels;
-using Microsoft.VisualStudio;
-using Microsoft.VisualStudio.ComponentModelHost;
-using Microsoft.VisualStudio.Shell.Interop;
 using System.Windows;
 using System.Windows.Media;
 
@@ -24,13 +19,13 @@ namespace FreeAIr.UI.Windows
             
             InitializeComponent();
 
-            ChatControlName.ChildWindowAction +=
-                (opened) =>
-                {
-                    this.Topmost = !opened;
-                };
-
-            AllowsTransparency = true;
+            FreeAIrPackage.WindowOpened += OtherWindowOpened;
+            FreeAIrPackage.WindowClosed += OtherWindowClosed;
+            //ChatControlName.ChildWindowAction +=
+            //    (opened) =>
+            //    {
+            //        this.Topmost = !opened;
+            //    };
 
             Activated += (sender, e) =>
             {
@@ -60,8 +55,36 @@ namespace FreeAIr.UI.Windows
             };
             Closed += (sender, e) =>
             {
-                InSituChatInputCommandFilter.SetSuppressMode(false);
+                try
+                {
+                    InSituChatInputCommandFilter.SetSuppressMode(false);
+                }
+                finally
+                {
+                    FreeAIrPackage.WindowOpened -= OtherWindowOpened;
+                    FreeAIrPackage.WindowClosed -= OtherWindowClosed;
+                }
             };
+        }
+
+        private void OtherWindowClosed(Window window)
+        {
+            if (ReferenceEquals(this, window))
+            {
+                return;
+            }
+
+            this.Topmost = true;
+        }
+
+        private void OtherWindowOpened(Window window)
+        {
+            if (ReferenceEquals(this, window))
+            {
+                return;
+            }
+
+            this.Topmost = false;
         }
 
         public static async Task ShowAsync(
@@ -98,37 +121,7 @@ namespace FreeAIr.UI.Windows
             window.Width = Math.Max(100.0, UIPage.Instance.InSituWidth);
             window.Height = Math.Max(100.0, UIPage.Instance.InSituHeight);
 
-            // Корректируем позицию, если окно выходит за границы экрана с учетом custom DPI
-            _ = window.Dispatcher.BeginInvoke(new Action(() =>
-            {
-                // Получаем информацию о первичном экране (наиболее надежный способ в чистом WPF)
-                double workAreaWidth = SystemParameters.WorkArea.Width;
-                double workAreaHeight = SystemParameters.WorkArea.Height;
-                double workAreaLeft = SystemParameters.WorkArea.Left;
-                double workAreaTop = SystemParameters.WorkArea.Top;
-
-                // Корректируем левую позицию
-                if (window.Left + window.ActualWidth > workAreaLeft + workAreaWidth)
-                {
-                    window.Left = workAreaLeft + workAreaWidth - window.ActualWidth;
-                }
-
-                if (window.Left < workAreaLeft)
-                {
-                    window.Left = workAreaLeft;
-                }
-
-                // Корректируем верхнюю позицию
-                if (window.Top + window.ActualHeight > workAreaTop + workAreaHeight)
-                {
-                    window.Top = workAreaTop + workAreaHeight - window.ActualHeight;
-                }
-
-                if (window.Top < workAreaTop)
-                {
-                    window.Top = workAreaTop;
-                }
-            }), System.Windows.Threading.DispatcherPriority.Render);
+            window.CorrectWindowPosition();
         }
 
         private void Window_PreviewKeyUp(object sender, System.Windows.Input.KeyEventArgs e)

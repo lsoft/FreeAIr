@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json.Bson;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -26,7 +27,13 @@ namespace FreeAIr.Helper
             _semaphoreSlim = new SemaphoreSlim(initialCount, maxCount);
         }
 
+        public void Wait() => _semaphoreSlim.Wait();
+
+        public bool Wait(TimeSpan timeout) => _semaphoreSlim.Wait(timeout);
+
         public Task WaitAsync() => _semaphoreSlim.WaitAsync();
+
+        public Task<bool> WaitAsync(TimeSpan timeout) => _semaphoreSlim.WaitAsync(timeout);
 
         public void Release() => _semaphoreSlim.Release();
     }

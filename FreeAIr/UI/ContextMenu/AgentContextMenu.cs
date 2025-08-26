@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 namespace FreeAIr.UI.ContextMenu
 {
 
-    public sealed class AgentContextMenu
+    public static class AgentContextMenu
     {
         public static async Task<AgentJson?> ChooseAgentWithTokenAsync(
             string title,

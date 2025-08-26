@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace FreeAIr.UI.ContextMenu
 {
-    public sealed class SupportContextMenu
+    public static class SupportContextMenu
     {
         public static async Task<SupportActionJson?> ChooseSupportAsync(
             string title,
@@ -16,9 +16,9 @@ namespace FreeAIr.UI.ContextMenu
                 throw new ArgumentNullException(nameof(title));
             }
 
-            var supportCollection = await FreeAIrOptions.DeserializeSupportCollectionAsync();
-            var entities = supportCollection.Actions;
-            var filteredEntities = entities.FindAll(e => e.Scopes.Contains(scope));
+            var filteredEntities = await FreeAIrOptions.DeserializeSupportActionsAsync(
+                e => e.Scopes.Contains(scope)
+                );
             if (filteredEntities.Count == 0)
             {
                 return null;

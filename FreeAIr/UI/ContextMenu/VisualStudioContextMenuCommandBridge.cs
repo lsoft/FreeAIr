@@ -74,19 +74,112 @@ namespace FreeAIr.UI.ContextMenu
             return ChosenItem;
         }
 
-        public static async Task<TResult?> ShowAsync<TResult>(
+        public static Task<TResult?> ShowAsync<TResult>(
             string title,
             List<(string, object)> items,
             System.Windows.Media.Visual? control = null
             )
             where TResult : class
         {
+            return ShowAsync<TResult>(
+                title,
+                items.ConvertAll(t => (t.Item1, false, t.Item2)),
+                control
+                );
+        }
+        
+        public static async Task<TResult?> ShowAsync<TResult>(
+            string title,
+            List<(string, bool, object)> items,
+            System.Windows.Media.Visual? control = null
+            ) where TResult : class
+        {
             await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
 
             try
             {
-                var menuItems = BuildMenuItems(title, items);
+                var value = await BuildMenuItems()
+                    .AddTitle(title)
+                    .AddItems(items)
+                    .ShowAsync<TResult>()
+                    ;
 
+                //var menuItems = BuildMenuItems(title, items);
+
+                //var value = await ShowMenuItemsAsync<TResult>(
+                //    menuItems,
+                //    control
+                //    );
+
+                return value;
+            }
+            catch (Exception excp)
+            {
+                excp.ActivityLogException();
+            }
+
+            return null;
+        }
+
+        public static MenuItemsBuilder BuildMenuItems()
+        {
+            return new MenuItemsBuilder();
+        }
+
+        public sealed class MenuItemsBuilder
+        {
+            private readonly List<VisualStudioContextMenuItem> _menuItems = new();
+
+            public MenuItemsBuilder AddTitle(string title)
+            {
+                _menuItems.Add(new VisualStudioContextMenuItem(title));
+                return this;
+            }
+
+            public MenuItemsBuilder AddItems(
+                List<(string, bool, object)> items
+                )
+            {
+                _menuItems.AddRange(
+                    items.ConvertAll(a =>
+                        new VisualStudioContextMenuItem(
+                            a.Item1,
+                            a.Item2,
+                            a.Item3
+                            )
+                        )
+                    );
+                return this;
+            }
+
+            public async Task<TResult?> ShowAsync<TResult>(
+                System.Windows.Media.Visual? control = null
+                ) where TResult : class
+            {
+                await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+
+                try
+                {
+                    var value = await ShowMenuItemsAsync<TResult>(
+                        _menuItems,
+                        control
+                        );
+
+                    return value;
+                }
+                catch (Exception excp)
+                {
+                    excp.ActivityLogException();
+                }
+
+                return null;
+            }
+
+            private static async Task<TResult?> ShowMenuItemsAsync<TResult>(
+                List<VisualStudioContextMenuItem> menuItems,
+                System.Windows.Media.Visual? control = null
+                ) where TResult : class
+            {
                 var bridge = await VS.GetRequiredServiceAsync<VisualStudioContextMenuCommandBridge, VisualStudioContextMenuCommandBridge>();
 
                 Point point;
@@ -112,40 +205,11 @@ namespace FreeAIr.UI.ContextMenu
                 {
                     return menuItem.Tag as TResult;
                 }
-            }
-            catch (Exception excp)
-            {
-                excp.ActivityLogException();
+
+                return null;
             }
 
-            return null;
-        }
-
-        private static List<VisualStudioContextMenuItem> BuildMenuItems(
-            string title,
-            List<(string, object)> items
-            )
-        {
-            List<VisualStudioContextMenuItem> menuItems = new();
-
-            menuItems.Add(
-                new VisualStudioContextMenuItem(
-                    title
-                    )
-                );
-
-            menuItems.AddRange(
-                items.ConvertAll(a =>
-                    new VisualStudioContextMenuItem(
-                        a.Item1,
-                        a.Item2
-                        )
-                    )
-                );
-
-            return menuItems;
         }
     }
-
 
 }

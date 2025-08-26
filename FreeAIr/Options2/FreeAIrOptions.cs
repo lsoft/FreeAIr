@@ -123,7 +123,15 @@ namespace FreeAIr.Options2
             var options = await DeserializeAsync(null);
             return options.Supports;
         }
-        
+
+        public static async Task<List<SupportActionJson>> DeserializeSupportActionsAsync(
+            Func<SupportActionJson, bool> filter
+            )
+        {
+            var options = await DeserializeAsync(null);
+            return options.Supports.Actions.FindAll(a => filter(a));
+        }
+
         public static async Task<FreeAIrOptions> DeserializeAsync(
             OptionsPlaceEnum? place = null
             )

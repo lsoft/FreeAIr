@@ -88,15 +88,7 @@ namespace FreeAIr.Options2.Agent
 
         public string GetToken()
         {
-            if (Token.StartsWith("{$") && Token.EndsWith("}"))
-            {
-                //it's a env var!
-                var varName = Token.Substring(2, Token.Length - 3);
-                var result = Environment.GetEnvironmentVariable(varName);
-                return result;
-            }
-
-            return Token;
+            return DirectOrEnvStringHelper.GetValue(Token);
         }
 
         /// <summary>

@@ -7,6 +7,11 @@
             get;
         }
 
+        public bool IsChecked
+        {
+            get;
+        }
+
         public bool IsEnabled
         {
             get;
@@ -22,16 +27,19 @@
             )
         {
             Title = title;
+            IsChecked = false;
             IsEnabled = false;
             Tag = null;
         }
 
         public VisualStudioContextMenuItem(
             string title,
+            bool isChecked,
             object tag
             )
         {
             Title = title;
+            IsChecked = isChecked;
             IsEnabled = true;
             Tag = tag;
         }

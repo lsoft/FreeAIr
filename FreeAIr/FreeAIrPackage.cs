@@ -19,6 +19,7 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Threading;
+using System.Windows;
 
 namespace FreeAIr
 {
@@ -31,6 +32,7 @@ namespace FreeAIr
     [ProvideOptionPage(typeof(OptionsProvider.UIPageOptions), "FreeAIr", "UI", 0, 0, true, SupportsProfiles = true)]
     [ProvideOptionPage(typeof(OptionsProvider.InternalPageOptions), "FreeAIr", "Internal", 0, 0, true, SupportsProfiles = true)]
     [ProvideOptionPage(typeof(OptionsProvider.FontSizePageOptions), "FreeAIr", "Font sizes", 0, 0, true, SupportsProfiles = true)]
+    [ProvideOptionPage(typeof(OptionsProvider.RecordingPage), "FreeAIr", "Recording audio", 0, 0, true, SupportsProfiles = true)]
     [ProvideToolWindow(typeof(ChatListToolWindow.Pane), Style = VsDockStyle.Tabbed, Window = WindowGuids.DocumentWell)]
     [ProvideToolWindow(typeof(ChooseModelToolWindow.Pane), Style = VsDockStyle.Tabbed, Window = WindowGuids.DocumentWell)]
     [ProvideToolWindow(typeof(NaturalLanguageResultsToolWindow.Pane), Style = VsDockStyle.Tabbed, Window = WindowGuids.DocumentWell)]
@@ -42,6 +44,9 @@ namespace FreeAIr
         public static FreeAIrPackage Instance = null;
 
         public static readonly string WorkingFolder;
+
+        public static event Action<Window>? WindowOpened;
+        public static event Action<Window>? WindowClosed;
 
         static FreeAIrPackage()
         {
@@ -69,6 +74,13 @@ namespace FreeAIr
                         "Xceed.Wpf.Toolkit.dll",
                         "System.ClientModel.dll",
                     ]);
+
+                // Handle Loaded for every Window in the app
+                EventManager.RegisterClassHandler(
+                    typeof(Window),
+                    FrameworkElement.LoadedEvent,
+                    new RoutedEventHandler(OnAnyWindowLoaded)
+                    );
 
                 AddService(
                     typeof(VisualStudioContextMenuCommandBridge),
@@ -111,6 +123,44 @@ namespace FreeAIr
                 throw;
             }
         }
+
+        #region window actions
+
+        private void OnAnyWindowLoaded(object sender, RoutedEventArgs e)
+        {
+            if (sender is not Window w)
+            {
+                return;
+            }
+
+            // If you want the moment it’s actually rendered:
+            //w.ContentRendered += (_, __) => WindowOpened?.Invoke(w);
+
+            // Or, if "Loaded" is good enough:
+            WindowOpened?.Invoke(w);
+
+            // track close
+            w.Closed += AnyWindowClosed;
+        }
+
+        private void AnyWindowClosed(object sender, EventArgs e)
+        {
+            if (sender is not Window w)
+            {
+                return;
+            }
+
+            try
+            {
+                WindowClosed?.Invoke(w);
+            }
+            finally
+            {
+                w.Closed -= AnyWindowClosed;
+            }
+        }
+
+        #endregion
 
         private static void LoadDlls(
             string[] dllNames

@@ -331,13 +331,13 @@ namespace FreeAIr.UI.ViewModels
         {
             ClearSupportActions();
 
-            var supportActionsCollection = await FreeAIrOptions.DeserializeSupportCollectionAsync();
+            var actions = await FreeAIrOptions.DeserializeSupportActionsAsync(
+                a => a.Scopes.Contains(SupportScopeEnum.BuildNaturalLanguageOutlines)
+                );
 
             SupportActionList.AddRange(
-                supportActionsCollection.Actions
-                    .FindAll(a => a.Scopes.Contains(SupportScopeEnum.BuildNaturalLanguageOutlines))
-                    .ConvertAll(a => new SupportActionWrapper(a))
-                    );
+                actions.ConvertAll(a => new SupportActionWrapper(a))
+                );
             SelectedSupportAction = SupportActionList.FirstOrDefault();
         }
 

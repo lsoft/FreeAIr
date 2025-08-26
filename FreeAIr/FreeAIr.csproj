@@ -27,6 +27,7 @@
     <StartProgram Condition="'$(DevEnvDir)' != ''">$(DevEnvDir)devenv.exe</StartProgram>
     <StartArguments>/rootsuffix Exp</StartArguments>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -65,14 +66,14 @@
     <Compile Include="Commands\ShowInSituChatCommand.cs" />
     <Compile Include="Helper\ActivityLogHelper.cs" />
     <Compile Include="Helper\ChatToolHelper.cs" />
+    <Compile Include="Helper\DirectOrEnvStringHelper.cs" />
     <Compile Include="Helper\DisposeHelper.cs" />
-    <Compile Include="Helper\Frame\DifferenceWindowFrameWrapper.cs" />
-    <Compile Include="Helper\Frame\WindowFrameWrapper.cs" />
     <Compile Include="Helper\KnownMonikersHelper.cs" />
     <Compile Include="Helper\NonDisposableSemaphoreSlim.cs" />
     <Compile Include="Helper\TempFile.cs" />
     <Compile Include="Helper\TimeoutEventProxy.cs" />
     <Compile Include="Helper\UriHelper.cs" />
+    <Compile Include="Helper\WindowHelper.cs" />
     <Compile Include="Options2\Agent\AgentJson.cs" />
     <Compile Include="Options2\Agent\AgentCollectionJson.cs" />
     <Compile Include="Antlr\Context\ContextParser.cs" />
@@ -190,6 +191,7 @@
     <Compile Include="Options2\Support\Context.cs" />
     <Compile Include="Options2\Support\StringEnumConverter.cs" />
     <Compile Include="Options2\Support\SupportCollectionJson.cs" />
+    <Compile Include="Options2\Support\SupportScopeEnum.cs" />
     <Compile Include="Options2\Unsorted\UnsortedJson.cs" />
     <Compile Include="Options\FontSizePage.cs" />
     <Compile Include="Options\FontSizeProxy.cs" />
@@ -197,9 +199,26 @@
     <Compile Include="Options2\JsonDescriptionCommentConverter.cs" />
     <Compile Include="Options\MCPToolsExecutionStatus.cs" />
     <Compile Include="Options\OptionsProvider.cs" />
+    <Compile Include="Options\RecordingPage.cs" />
     <Compile Include="Options\UIPage.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="FreeAIrPackage.cs" />
+    <Compile Include="Record\ChosenRecorder.cs" />
+    <Compile Include="Record\Fake\FakeRecorder.cs" />
+    <Compile Include="Record\IRecorder.cs" />
+    <Compile Include="Record\IRecorderFactory.cs" />
+    <Compile Include="Record\MicrophoneRecorder.cs" />
+    <Compile Include="Record\RecordTranscribeResult.cs" />
+    <Compile Include="Record\WhisperNet\WhisperNetRecorder.cs" />
+    <Compile Include="Record\WhisperNet\WhisperNetRecorderFactory.cs" />
+    <Compile Include="Record\WhisperNet\WhisperNetUserControl.xaml.cs">
+      <DependentUpon>WhisperNetUserControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Record\WhisperOpenAI\WhisperOAIUserControl.xaml.cs">
+      <DependentUpon>WhisperOAIUserControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Record\WhisperOpenAI\WhisperOAIRecorderFactory.cs" />
+    <Compile Include="Record\WhisperOpenAI\WhisperOAIRecorder.cs" />
     <Compile Include="Resources\Resources1.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -216,6 +235,7 @@
     <Compile Include="UI\Chat\ChatControl.xaml.cs">
       <DependentUpon>ChatControl.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UI\ContextMenu\RecorderContextMenu.cs" />
     <Compile Include="UI\ContextMenu\AgentContextMenu.cs" />
     <Compile Include="UI\ContextMenu\ModelContextMenu.cs" />
     <Compile Include="UI\ContextMenu\SupportContextMenu.cs" />
@@ -307,6 +327,9 @@
     <Compile Include="UI\ViewModels\NaturalLanguageResultsViewModel.cs" />
     <Compile Include="UI\ViewModels\OutlineEmbeddingOutputPanel.cs" />
     <Compile Include="UI\ViewModels\SearchForDockerMcpServerViewModel.cs" />
+    <Compile Include="UI\Windows\RecorderSetupWindow.xaml.cs">
+      <DependentUpon>RecorderSetupWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI\Windows\InSituChatWindow.xaml.cs">
       <DependentUpon>InSituChatWindow.xaml</DependentUpon>
     </Compile>
@@ -426,16 +449,14 @@
     </PackageReference>
     <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" />
     <PackageReference Include="NuGet.VisualStudio" />
+    <PackageReference Include="NAudio" />
     <PackageReference Include="PuppeteerSharp" />
     <PackageReference Include="RunProcessAsTask" />
     <PackageReference Include="System.ClientModel" />
     <PackageReference Include="System.Net.Http.Json" />
     <PackageReference Include="System.Net.ServerSentEvents" />
-    <!--
-    <PackageReference Include="System.Text.Json">
-      <Version>9.0.5</Version>
-    </PackageReference>
--->
+    <PackageReference Include="Whisper.net" />
+    <PackageReference Include="Whisper.net.Runtime" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\CodeLens\FreeAIr.CodeLens.csproj">
@@ -467,6 +488,14 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </EmbeddedResource>
+    <Page Include="Record\WhisperNet\WhisperNetUserControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Record\WhisperOpenAI\WhisperOAIUserControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="UI\Chat\ChatControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -510,6 +539,10 @@
     <Page Include="UI\ToolWindows\NaturalLanguageResultsToolWindowControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\Windows\RecorderSetupWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="UI\Windows\InSituChatWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -557,9 +590,14 @@
   <Target Name="IncludeNuGetPackageReferences" AfterTargets="GetVsixSourceItems">
     <ItemGroup>
       <VSIXSourceItem Include="$(SolutionDir).art\Proxy.zip" TargetPath="MCP\Proxy\Archive\Proxy.zip" />
+      <VSIXSourceItem Include="$(SolutionDir).art\WhisperNet.Runtime.zip" TargetPath="runtimes\win-x64\WhisperNet.Runtime.zip" />
       <VSIXSourceItem Include="@(ReferenceCopyLocalPaths)" Condition="'%(ReferenceCopyLocalPaths.NuGetPackageId)' == 'System.IO.Pipelines'" />
       <VSIXSourceItem Include="@(ReferenceCopyLocalPaths)" Condition="'%(ReferenceCopyLocalPaths.NuGetPackageId)' == 'System.Text.Json'" />
       <VSIXSourceItem Include="@(ReferenceCopyLocalPaths)" Condition="'%(ReferenceCopyLocalPaths.NuGetPackageId)' == 'Microsoft.Bcl.AsyncInterfaces'" />
     </ItemGroup>
   </Target>
+  <PropertyGroup>
+    <PostBuildEvent>if exist $(SolutionDir).art\WhisperNet.Runtime.zip del /F /Q $(SolutionDir).art\WhisperNet.Runtime.zip
+PowerShell.exe -Command "Add-Type -A 'System.IO.Compression.FileSystem'; [IO.Compression.ZipFile]::CreateFromDirectory('$(TargetDir)runtimes\win-x64', '$(SolutionDir).art\WhisperNet.Runtime.zip')"</PostBuildEvent>
+  </PropertyGroup>
 </Project>
