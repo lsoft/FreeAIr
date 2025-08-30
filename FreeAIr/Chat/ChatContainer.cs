@@ -7,7 +7,7 @@ using System.ComponentModel.Composition;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace FreeAIr.BLogic
+namespace FreeAIr.Chat
 {
     [Export(typeof(ChatContainer))]
     public sealed class ChatContainer
@@ -45,7 +45,7 @@ namespace FreeAIr.BLogic
         public async Task<Chat?> StartChatAsync(
             ChatDescription kind,
             UserPrompt? prompt,
-            FreeAIr.BLogic.ChatOptions options
+            FreeAIr.Chat.ChatOptions options
             )
         {
             if (kind is null)

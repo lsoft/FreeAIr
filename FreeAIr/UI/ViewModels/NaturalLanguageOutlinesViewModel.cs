@@ -1,7 +1,4 @@
 ﻿using EnvDTE80;
-using FreeAIr.BLogic;
-using FreeAIr.BLogic.Context;
-using FreeAIr.BLogic.Context.Item;
 using FreeAIr.Helper;
 using FreeAIr.NLOutline;
 using FreeAIr.Options2.Agent;
@@ -17,13 +14,16 @@ using System.Text;
 using System.Threading;
 using System.Windows.Input;
 using WpfHelpers;
+using FreeAIr.Chat;
+using FreeAIr.Chat.Context;
+using FreeAIr.Chat.Context.Item;
 
 namespace FreeAIr.UI.ViewModels
 {
     [Export(typeof(NaturalLanguageOutlinesViewModel))]
     public sealed class NaturalLanguageOutlinesViewModel : BaseViewModel
     {
-        private FreeAIr.BLogic.Chat? _chat;
+        private FreeAIr.Chat.Chat? _chat;
         private ICommand _gotoCommand;
         private ICommand _cancelChatCommand;
         
@@ -261,7 +261,7 @@ namespace FreeAIr.UI.ViewModels
                     null
                     ),
                 null,
-                await FreeAIr.BLogic.ChatOptions.NoToolAutoProcessedJsonResponseAsync(defaultAgent)
+                await FreeAIr.Chat.ChatOptions.NoToolAutoProcessedJsonResponseAsync(defaultAgent)
                 );
             if (_chat is null)
             {
@@ -273,7 +273,7 @@ namespace FreeAIr.UI.ViewModels
                 () =>
                 {
                     _chat.StopAsync()
-                        .FileAndForget(nameof(FreeAIr.BLogic.Chat.StopAsync));
+                        .FileAndForget(nameof(FreeAIr.Chat.Chat.StopAsync));
                 });
 
             _processingTask = ProcessSolutionDocumentsAsync(

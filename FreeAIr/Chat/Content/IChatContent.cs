@@ -1,7 +1,7 @@
 ﻿using OpenAI.Chat;
 using System.Collections.Generic;
 
-namespace FreeAIr.BLogic.Content
+namespace FreeAIr.Chat.Content
 {
     public interface IChatContent
     {

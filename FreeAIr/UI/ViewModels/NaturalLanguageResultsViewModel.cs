@@ -1,7 +1,4 @@
-﻿using FreeAIr.BLogic;
-using FreeAIr.BLogic.Context;
-using FreeAIr.BLogic.Context.Item;
-using FreeAIr.Find;
+﻿using FreeAIr.Find;
 using FreeAIr.Helper;
 using FreeAIr.Options2.Support;
 using FreeAIr.Shared.Helper;
@@ -21,13 +18,16 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using WpfHelpers;
+using FreeAIr.Chat;
+using FreeAIr.Chat.Context;
+using FreeAIr.Chat.Context.Item;
 
 namespace FreeAIr.UI.ViewModels
 {
     [Export(typeof(NaturalLanguageResultsViewModel))]
     public sealed class NaturalLanguageResultsViewModel : BaseViewModel
     {
-        private FreeAIr.BLogic.Chat? _chat;
+        private FreeAIr.Chat.Chat? _chat;
         private ICommand _gotoCommand;
         private ICommand _cancelChatCommand;
         
@@ -239,7 +239,7 @@ namespace FreeAIr.UI.ViewModels
                 () =>
                 {
                     _chat.StopAsync()
-                        .FileAndForget(nameof(FreeAIr.BLogic.Chat.StopAsync));
+                        .FileAndForget(nameof(FreeAIr.Chat.Chat.StopAsync));
                 });
 
             _processingTask = ProcessSolutionDocumentsAsync(

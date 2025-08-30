@@ -10,7 +10,7 @@ namespace FreeAIr.UI.ViewModels
         private ICommand _closeCommand;
         private ICommand _openFullWindowCommand;
 
-        public FreeAIr.BLogic.Chat CurrentChat
+        public FreeAIr.Chat.Chat CurrentChat
         {
             get;
         }
@@ -73,7 +73,7 @@ namespace FreeAIr.UI.ViewModels
 
         [ImportingConstructor]
         public InSituChatViewModel(
-            FreeAIr.BLogic.Chat currentChat
+            FreeAIr.Chat.Chat currentChat
             )
         {
             if (currentChat is null)

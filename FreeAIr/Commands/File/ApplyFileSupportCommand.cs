@@ -1,7 +1,4 @@
 ﻿using EnvDTE;
-using FreeAIr.BLogic;
-using FreeAIr.BLogic.Context.Composer;
-using FreeAIr.BLogic.Context.Item;
 using FreeAIr.Helper;
 using FreeAIr.Options2.Support;
 using FreeAIr.UI.ContextMenu;
@@ -11,6 +8,9 @@ using Microsoft.VisualStudio.ComponentModelHost;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using FreeAIr.Chat;
+using FreeAIr.Chat.Context.Composer;
+using FreeAIr.Chat.Context.Item;
 
 namespace FreeAIr.Commands.File
 {
@@ -58,7 +58,7 @@ namespace FreeAIr.Commands.File
                     null
                     ),
                 null,
-                await FreeAIr.BLogic.ChatOptions.GetDefaultAsync(chosenAgent)
+                await FreeAIr.Chat.ChatOptions.GetDefaultAsync(chosenAgent)
                 );
             if (chat is null)
             {
@@ -84,7 +84,7 @@ namespace FreeAIr.Commands.File
         }
 
         public static async Task AddFilesToContextAsync(
-            Chat chat,
+            FreeAIr.Chat.Chat chat,
             List<SolutionItem> allSelectedFiles
             )
         {

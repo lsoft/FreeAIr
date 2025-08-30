@@ -1,4 +1,4 @@
-﻿namespace FreeAIr.BLogic.Content
+﻿namespace FreeAIr.Chat.Content
 {
     public enum ChatContentTypeEnum
     {

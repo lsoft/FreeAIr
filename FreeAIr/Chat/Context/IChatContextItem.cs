@@ -1,9 +1,9 @@
-﻿using FreeAIr.BLogic.Context.Item;
-using OpenAI.Chat;
+﻿using OpenAI.Chat;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using FreeAIr.Chat.Context.Item;
 
-namespace FreeAIr.BLogic.Context
+namespace FreeAIr.Chat.Context
 {
     public interface IChatContextItem
     {

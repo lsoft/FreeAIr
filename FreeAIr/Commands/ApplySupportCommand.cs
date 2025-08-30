@@ -1,11 +1,11 @@
 ﻿using EnvDTE;
-using FreeAIr.BLogic;
-using FreeAIr.BLogic.Context.Composer;
 using FreeAIr.Helper;
 using FreeAIr.Options2.Support;
 using FreeAIr.UI.ContextMenu;
 using FreeAIr.UI.ToolWindows;
 using Microsoft.VisualStudio.ComponentModelHost;
+using FreeAIr.Chat;
+using FreeAIr.Chat.Context.Composer;
 
 namespace FreeAIr.Commands
 {
@@ -91,7 +91,7 @@ namespace FreeAIr.Commands
                     std
                     ),
                 null,
-                await FreeAIr.BLogic.ChatOptions.GetDefaultAsync(chosenAgent)
+                await FreeAIr.Chat.ChatOptions.GetDefaultAsync(chosenAgent)
                 );
             if (chat is null)
             {

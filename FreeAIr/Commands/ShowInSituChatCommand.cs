@@ -1,8 +1,8 @@
 ﻿using EnvDTE;
-using FreeAIr.BLogic;
 using FreeAIr.UI.ContextMenu;
 using FreeAIr.UI.ToolWindows;
 using Microsoft.VisualStudio.ComponentModelHost;
+using FreeAIr.Chat;
 
 namespace FreeAIr.Commands
 {
@@ -30,7 +30,7 @@ namespace FreeAIr.Commands
             var chat = await chatContainer.StartChatAsync(
                 new ChatDescription(null),
                 null,
-                await FreeAIr.BLogic.ChatOptions.GetDefaultAsync(chosenAgent)
+                await FreeAIr.Chat.ChatOptions.GetDefaultAsync(chosenAgent)
                 );
 
             await ChatWindowShower.ShowChatWindowAsync(

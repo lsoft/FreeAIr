@@ -1,9 +1,9 @@
-﻿using FreeAIr.BLogic.Content;
-using FreeAIr.Helper;
+﻿using FreeAIr.Helper;
 using System.Linq;
 using System.Threading.Tasks;
+using FreeAIr.Chat.Content;
 
-namespace FreeAIr.BLogic
+namespace FreeAIr.Chat
 {
     public static class ChatHelper
     {

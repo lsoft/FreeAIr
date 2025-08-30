@@ -6,6 +6,7 @@ using FreeAIr.UI.ToolWindows;
 using FreeAIr.UI.Windows;
 using Microsoft.VisualStudio.ComponentModelHost;
 using System.Windows;
+using FreeAIr.Chat;
 
 namespace FreeAIr.BLogic
 {

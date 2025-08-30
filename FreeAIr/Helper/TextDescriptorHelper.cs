@@ -1,5 +1,5 @@
-﻿using FreeAIr.BLogic;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
+using FreeAIr.Chat;
 
 namespace FreeAIr.Helper
 {

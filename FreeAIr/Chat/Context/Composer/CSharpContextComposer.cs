@@ -9,7 +9,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace FreeAIr.BLogic.Context.Composer
+namespace FreeAIr.Chat.Context.Composer
 {
     /// <summary>
     /// Ищет C# типы, связанные с данным, чтобы LLM было понятнее.

@@ -1,5 +1,5 @@
-﻿using FreeAIr.BLogic.Content;
-using WpfHelpers;
+﻿using WpfHelpers;
+using FreeAIr.Chat.Content;
 
 namespace FreeAIr.UI.Dialog
 {

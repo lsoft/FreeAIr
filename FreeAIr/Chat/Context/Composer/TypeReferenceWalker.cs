@@ -5,7 +5,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System.Collections.Generic;
 using System.Threading;
 
-namespace FreeAIr.BLogic.Context.Composer
+namespace FreeAIr.Chat.Context.Composer
 {
     public sealed class TypeReferenceWalker : CSharpSyntaxWalker
     {

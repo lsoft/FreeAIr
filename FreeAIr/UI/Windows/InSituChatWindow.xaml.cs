@@ -9,7 +9,7 @@ namespace FreeAIr.UI.Windows
     public partial class InSituChatWindow : Window
     {
         public InSituChatWindow(
-            FreeAIr.BLogic.Chat chat
+            FreeAIr.Chat.Chat chat
             )
         {
             var viewModel = new InSituChatViewModel(
@@ -88,7 +88,7 @@ namespace FreeAIr.UI.Windows
         }
 
         public static async Task ShowAsync(
-            FreeAIr.BLogic.Chat chat,
+            FreeAIr.Chat.Chat chat,
             Point position
             )
         {

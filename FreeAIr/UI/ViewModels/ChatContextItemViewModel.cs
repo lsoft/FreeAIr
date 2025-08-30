@@ -1,7 +1,7 @@
-﻿using FreeAIr.BLogic.Context;
-using Microsoft.VisualStudio.Imaging;
+﻿using Microsoft.VisualStudio.Imaging;
 using Microsoft.VisualStudio.Imaging.Interop;
 using WpfHelpers;
+using FreeAIr.Chat.Context;
 
 namespace FreeAIr.UI.ViewModels
 {

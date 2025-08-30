@@ -1,4 +1,4 @@
-﻿namespace FreeAIr.BLogic.Context
+﻿namespace FreeAIr.Chat.Context
 {
     public sealed class ChatContextEventArgs : EventArgs
     {

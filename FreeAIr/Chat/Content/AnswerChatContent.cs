@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FreeAIr.BLogic.Content
+namespace FreeAIr.Chat.Content
 {
     public sealed class AnswerChatContent : IChatContent, IAsyncDisposable
     {
@@ -12,8 +12,6 @@ namespace FreeAIr.BLogic.Content
 
         public ChatContentTypeEnum Type => ChatContentTypeEnum.LLMAnswer;
 
-        
-        //public event Action AnswerChangedEvent;
         public TimeoutEventProxy<AnswerChangedEventArgs> AnswerChangedEvent;
 
         public bool IsArchived

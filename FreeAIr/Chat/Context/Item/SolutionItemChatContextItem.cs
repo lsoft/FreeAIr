@@ -1,13 +1,13 @@
-﻿using FreeAIr.BLogic.Context.Composer;
-using FreeAIr.Helper;
+﻿using FreeAIr.Helper;
 using FreeAIr.UI.Embedillo.Answer.Parser;
 using OpenAI.Chat;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
+using FreeAIr.Chat.Context.Composer;
 
-namespace FreeAIr.BLogic.Context.Item
+namespace FreeAIr.Chat.Context.Item
 {
     [DebuggerDisplay("{SelectedIdentifier.FilePath}")]
     public sealed class SolutionItemChatContextItem : IChatContextItem

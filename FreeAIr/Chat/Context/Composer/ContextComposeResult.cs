@@ -1,10 +1,10 @@
-﻿using FreeAIr.BLogic.Context.Item;
-using FreeAIr.UI.Embedillo.Answer.Parser;
+﻿using FreeAIr.UI.Embedillo.Answer.Parser;
 using Microsoft.CodeAnalysis;
 using System.Collections.Generic;
 using System.Linq;
+using FreeAIr.Chat.Context.Item;
 
-namespace FreeAIr.BLogic.Context.Composer
+namespace FreeAIr.Chat.Context.Composer
 {
     public sealed class ContextComposeResult
     {

@@ -1,7 +1,4 @@
-﻿using FreeAIr.BLogic;
-using FreeAIr.BLogic.Content;
-using FreeAIr.BLogic.Context;
-using FreeAIr.Helper;
+﻿using FreeAIr.Helper;
 using FreeAIr.Shared.Helper;
 using FreeAIr.UI.ContextMenu;
 using FreeAIr.UI.Dialog;
@@ -15,12 +12,15 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using WpfHelpers;
+using FreeAIr.Chat;
+using FreeAIr.Chat.Content;
+using FreeAIr.Chat.Context;
 
 namespace FreeAIr.UI.ViewModels
 {
     public class DialogViewModel : BaseViewModel
     {
-        private FreeAIr.BLogic.Chat? _selectedChat;
+        private FreeAIr.Chat.Chat? _selectedChat;
 
         public ObservableCollection2<DialogContent> Dialog
         {
@@ -294,7 +294,7 @@ namespace FreeAIr.UI.ViewModels
         }
 
         public void UpdateDialog(
-            FreeAIr.BLogic.Chat? selectedChat
+            FreeAIr.Chat.Chat? selectedChat
             )
         {
             Dialog.Clear();
@@ -399,12 +399,12 @@ namespace FreeAIr.UI.ViewModels
 
     public sealed class ChatContextMenuAdditionalCommand : AdditionalCommand
     {
-        private readonly Func<FreeAIr.BLogic.Chat?> _chatFunc;
+        private readonly Func<FreeAIr.Chat.Chat?> _chatFunc;
         private readonly ICommand? _actionCommand;
 
         public ChatContextMenuAdditionalCommand(
             IFontSizeProvider fontSizeProvider,
-            Func<FreeAIr.BLogic.Chat?> chatFunc,
+            Func<FreeAIr.Chat.Chat?> chatFunc,
             PartTypeEnum partType,
             string title,
             string toolTip,

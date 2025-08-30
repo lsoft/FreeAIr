@@ -1,8 +1,8 @@
-﻿using FreeAIr.BLogic.Context.Item;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using static FreeAIr.Helper.SolutionHelper;
+using FreeAIr.Chat.Context.Item;
 
-namespace FreeAIr.BLogic.Context
+namespace FreeAIr.Chat.Context
 {
     public static class ChatContextItemHelper
     {

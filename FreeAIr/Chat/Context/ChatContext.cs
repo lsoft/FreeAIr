@@ -1,10 +1,10 @@
-﻿using FreeAIr.BLogic.Context.Item;
-using FreeAIr.Git;
+﻿using FreeAIr.Git;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using FreeAIr.Chat.Context.Item;
 
-namespace FreeAIr.BLogic.Context
+namespace FreeAIr.Chat.Context
 {
     public sealed class ChatContext
     {

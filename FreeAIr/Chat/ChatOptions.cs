@@ -3,7 +3,7 @@ using FreeAIr.Options2.Agent;
 using OpenAI.Chat;
 using System.Threading.Tasks;
 
-namespace FreeAIr.BLogic
+namespace FreeAIr.Chat
 {
     public sealed class ChatOptions
     {

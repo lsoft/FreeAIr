@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Text;
 
-namespace FreeAIr.BLogic
+namespace FreeAIr.Chat
 {
     public sealed class AddLineNumbersMode
     {

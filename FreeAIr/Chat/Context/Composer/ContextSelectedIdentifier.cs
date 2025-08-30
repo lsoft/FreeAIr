@@ -1,6 +1,6 @@
 ﻿using FreeAIr.UI.Embedillo.Answer.Parser;
 
-namespace FreeAIr.BLogic.Context.Composer
+namespace FreeAIr.Chat.Context.Composer
 {
     public sealed class ContextSelectedIdentifier
     {

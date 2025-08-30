@@ -1,7 +1,7 @@
-﻿using FreeAIr.BLogic;
-using MarkdownParser.Antlr.Answer;
+﻿using MarkdownParser.Antlr.Answer;
 using Microsoft.VisualStudio.ComponentModelHost;
 using System.Windows.Documents;
+using FreeAIr.Chat;
 
 namespace FreeAIr.UI.Dialog.Content
 {

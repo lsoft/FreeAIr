@@ -1,11 +1,11 @@
-﻿using FreeAIr.BLogic;
-using FreeAIr.BLogic.Content;
-using FreeAIr.Helper;
+﻿using FreeAIr.Helper;
 using Microsoft.VisualStudio.Threading;
 using OpenAI.Chat;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using FreeAIr.Chat;
+using FreeAIr.Chat.Content;
 
 namespace FreeAIr.UI.BLogic.Reader
 {
@@ -13,14 +13,14 @@ namespace FreeAIr.UI.BLogic.Reader
     {
         private readonly object _taskLocker = new();
 
-        private readonly FreeAIr.BLogic.Chat _chat;
+        private readonly FreeAIr.Chat.Chat _chat;
 
         private CancellationTokenSource _cancellationTokenSource = new();
 
         private Task? _task;
 
         public LLMReader(
-            FreeAIr.BLogic.Chat chat
+            FreeAIr.Chat.Chat chat
             )
         {
             if (chat is null)

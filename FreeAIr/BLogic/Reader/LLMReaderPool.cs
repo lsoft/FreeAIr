@@ -5,10 +5,10 @@ namespace FreeAIr.UI.BLogic.Reader
     public static class LLMReaderPool
     {
         private static readonly object _locker = new();
-        private static readonly Dictionary<FreeAIr.BLogic.Chat, LLMReader> _readers = new();
+        private static readonly Dictionary<FreeAIr.Chat.Chat, LLMReader> _readers = new();
 
         public static void StartReaderFor(
-            FreeAIr.BLogic.Chat chat
+            FreeAIr.Chat.Chat chat
             )
         {
             lock (_locker)
@@ -26,7 +26,7 @@ namespace FreeAIr.UI.BLogic.Reader
         }
 
         public static async Task StopAndDeleteReaderForAsync(
-            FreeAIr.BLogic.Chat chat
+            FreeAIr.Chat.Chat chat
             )
         {
             LLMReader? reader = null;
@@ -51,7 +51,7 @@ namespace FreeAIr.UI.BLogic.Reader
 
 
         public static async Task WaitForTaskAsync(
-            FreeAIr.BLogic.Chat chat
+            FreeAIr.Chat.Chat chat
             )
         {
             LLMReader? reader = null;

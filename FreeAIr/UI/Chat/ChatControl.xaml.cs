@@ -1,7 +1,6 @@
 ﻿using FreeAIr.Antlr.Context;
 using FreeAIr.Antlr.Prompt;
 using FreeAIr.BLogic;
-using FreeAIr.BLogic.Context.Item;
 using FreeAIr.Helper;
 using FreeAIr.Options2.Agent;
 using FreeAIr.Record;
@@ -27,6 +26,8 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using WpfHelpers;
 using static FreeAIr.UI.ViewModels.ChatListViewModel;
+using FreeAIr.Chat;
+using FreeAIr.Chat.Context.Item;
 
 namespace FreeAIr.UI.Chat
 {
@@ -36,7 +37,7 @@ namespace FreeAIr.UI.Chat
         public static readonly DependencyProperty ChatProperty =
             DependencyProperty.Register(
                 nameof(Chat),
-                typeof(FreeAIr.BLogic.Chat),
+                typeof(FreeAIr.Chat.Chat),
                 typeof(ChatControl),
                 new PropertyMetadata(OnChatPropertyChanged)
                 );
@@ -50,7 +51,7 @@ namespace FreeAIr.UI.Chat
         {
             var control = d as ChatControl;
 
-            if (e.OldValue is FreeAIr.BLogic.Chat ochat)
+            if (e.OldValue is FreeAIr.Chat.Chat ochat)
             {
                 ochat.ChatStatusChangedEvent -= control.ChatStatusChangedEvent;
                 //ochat.PromptStateChangedEvent.Event -= control.PromptStateChangedEvent_Event;
@@ -59,7 +60,7 @@ namespace FreeAIr.UI.Chat
                 control.DialogViewModel.UpdateDialog(null);
             }
 
-            if (e.NewValue is FreeAIr.BLogic.Chat nchat)
+            if (e.NewValue is FreeAIr.Chat.Chat nchat)
             {
                 nchat.ChatStatusChangedEvent += control.ChatStatusChangedEvent;
                 //nchat.PromptStateChangedEvent.Event += control.PromptStateChangedEvent_Event;
@@ -86,7 +87,7 @@ namespace FreeAIr.UI.Chat
         private ICommand _createPromptCommand;
         private ICommand _stopCommand;
 
-        private FreeAIr.BLogic.Chat? _chat;
+        private FreeAIr.Chat.Chat? _chat;
         private ICommand _chooseRecorderCommand;
 
         /// <summary>
@@ -658,9 +659,9 @@ namespace FreeAIr.UI.Chat
 
         #endregion
 
-        public FreeAIr.BLogic.Chat? Chat
+        public FreeAIr.Chat.Chat? Chat
         {
-            get => (FreeAIr.BLogic.Chat)GetValue(ChatProperty);
+            get => (FreeAIr.Chat.Chat)GetValue(ChatProperty);
             set
             {
                 SetValue(ChatProperty, value);
@@ -758,7 +759,7 @@ namespace FreeAIr.UI.Chat
         }
 
         private void AddContextItemsFromPrompt(
-            FreeAIr.BLogic.Chat chat,
+            FreeAIr.Chat.Chat chat,
             Parsed parsed
             )
         {

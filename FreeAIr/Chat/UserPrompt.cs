@@ -1,8 +1,8 @@
-﻿using FreeAIr.BLogic.Content;
-using OpenAI.Chat;
+﻿using OpenAI.Chat;
 using System.Collections.Generic;
+using FreeAIr.Chat.Content;
 
-namespace FreeAIr.BLogic
+namespace FreeAIr.Chat
 {
     /// <summary>
     /// Контракт для пользовательских запросов к ИИ-ассистенту

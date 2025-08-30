@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 
-namespace FreeAIr.BLogic.Context.Item
+namespace FreeAIr.Chat.Context.Item
 {
     public sealed class CustomFileChatContextItem : IChatContextItem
     {

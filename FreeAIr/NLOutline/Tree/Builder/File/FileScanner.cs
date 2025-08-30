@@ -1,6 +1,4 @@
-﻿using FreeAIr.BLogic;
-using FreeAIr.BLogic.Context.Item;
-using FreeAIr.Helper;
+﻿using FreeAIr.Helper;
 using FreeAIr.Options2.Agent;
 using FreeAIr.Options2.Support;
 using FreeAIr.UI.Embedillo.Answer.Parser;
@@ -14,6 +12,8 @@ using System.ComponentModel.Composition;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using FreeAIr.Chat;
+using FreeAIr.Chat.Context.Item;
 
 namespace FreeAIr.NLOutline.Tree.Builder.File
 {
@@ -165,7 +165,7 @@ namespace FreeAIr.NLOutline.Tree.Builder.File
 
         private static async Task<string> ProcessOutlinePromptAsync(
             SupportActionJson action,
-            Chat chat,
+            FreeAIr.Chat.Chat chat,
             SolutionItem item
             )
         {

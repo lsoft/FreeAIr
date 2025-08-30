@@ -1,8 +1,8 @@
-﻿using FreeAIr.BLogic;
-using FreeAIr.BLogic.Context;
-using FreeAIr.BLogic.Context.Item;
-using System.IO;
+﻿using System.IO;
 using System.Threading.Tasks;
+using FreeAIr.Chat;
+using FreeAIr.Chat.Context;
+using FreeAIr.Chat.Context.Item;
 
 namespace FreeAIr.UI.Embedillo.Answer.Parser
 {

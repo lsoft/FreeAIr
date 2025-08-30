@@ -1,6 +1,4 @@
-﻿using FreeAIr.BLogic.Content;
-using FreeAIr.BLogic.Context;
-using FreeAIr.MCP.McpServerProxy;
+﻿using FreeAIr.MCP.McpServerProxy;
 using FreeAIr.Options2;
 using FreeAIr.Shared.Helper;
 using FreeAIr.UI.BLogic.Reader;
@@ -10,8 +8,10 @@ using System.ClientModel;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using FreeAIr.Chat.Content;
+using FreeAIr.Chat.Context;
 
-namespace FreeAIr.BLogic
+namespace FreeAIr.Chat
 {
     public sealed class Chat : IAsyncDisposable
     {
@@ -105,7 +105,7 @@ namespace FreeAIr.BLogic
 
         public static async System.Threading.Tasks.Task<Chat> CreateChatAsync(
             ChatDescription description,
-            FreeAIr.BLogic.ChatOptions options
+            FreeAIr.Chat.ChatOptions options
             )
         {
             var chatContext = await ChatContext.CreateChatContextAsync();

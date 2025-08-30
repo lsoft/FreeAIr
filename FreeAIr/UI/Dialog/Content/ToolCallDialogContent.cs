@@ -1,5 +1,4 @@
-﻿using FreeAIr.BLogic.Content;
-using FreeAIr.Helper;
+﻿using FreeAIr.Helper;
 using FreeAIr.MCP.McpServerProxy;
 using FreeAIr.Shared.Helper;
 using MarkdownParser.Antlr.Answer;
@@ -9,6 +8,7 @@ using System.Windows;
 using System.Windows.Documents;
 using System.Windows.Input;
 using WpfHelpers;
+using FreeAIr.Chat.Content;
 
 namespace FreeAIr.UI.Dialog.Content
 {

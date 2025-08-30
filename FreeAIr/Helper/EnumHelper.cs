@@ -1,4 +1,4 @@
-﻿using FreeAIr.BLogic;
+﻿using FreeAIr.Chat;
 
 namespace FreeAIr.Helper
 {

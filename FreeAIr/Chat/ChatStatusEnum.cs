@@ -1,4 +1,4 @@
-﻿namespace FreeAIr.BLogic
+﻿namespace FreeAIr.Chat
 {
     public enum ChatStatusEnum
     {

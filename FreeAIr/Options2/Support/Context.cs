@@ -1,8 +1,8 @@
-﻿using FreeAIr.BLogic.Context.Item;
-using FreeAIr.BuildErrors;
+﻿using FreeAIr.BuildErrors;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using FreeAIr.Chat.Context.Item;
 
 namespace FreeAIr.Options2.Support
 {

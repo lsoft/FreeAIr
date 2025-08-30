@@ -4,7 +4,7 @@ using Microsoft.VisualStudio.Text;
 using System.IO;
 using System.Threading;
 
-namespace FreeAIr.BLogic
+namespace FreeAIr.Chat
 {
     public interface IOriginalTextDescriptor : IDisposable
     {

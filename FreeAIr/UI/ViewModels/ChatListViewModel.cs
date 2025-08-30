@@ -1,5 +1,4 @@
-﻿using FreeAIr.BLogic;
-using FreeAIr.Helper;
+﻿using FreeAIr.Helper;
 using FreeAIr.Shared.Helper;
 using FreeAIr.UI.ContextMenu;
 using Microsoft.VisualStudio.Imaging;
@@ -9,6 +8,7 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Input;
 using WpfHelpers;
+using FreeAIr.Chat;
 
 namespace FreeAIr.UI.ViewModels
 {
@@ -202,7 +202,7 @@ namespace FreeAIr.UI.ViewModels
                             _ = await _chatContainer.StartChatAsync(
                                 new ChatDescription(null),
                                 null,
-                                await FreeAIr.BLogic.ChatOptions.GetDefaultAsync(chosenAgent)
+                                await FreeAIr.Chat.ChatOptions.GetDefaultAsync(chosenAgent)
                                 );
 
                             OnPropertyChanged();
@@ -322,14 +322,14 @@ namespace FreeAIr.UI.ViewModels
 
         public sealed class ChatWrapper : BaseViewModel
         {
-            public FreeAIr.BLogic.Chat Chat
+            public FreeAIr.Chat.Chat Chat
             {
                 get;
             }
 
             public ImageMoniker StatusMoniker => GetStatusMoniker(Chat);
 
-            public static ImageMoniker GetStatusMoniker(FreeAIr.BLogic.Chat chat)
+            public static ImageMoniker GetStatusMoniker(FreeAIr.Chat.Chat chat)
             {
                 if (chat.Status.In(ChatStatusEnum.NotStarted, ChatStatusEnum.Ready))
                 {
@@ -407,7 +407,7 @@ namespace FreeAIr.UI.ViewModels
             }
 
             public ChatWrapper(
-                FreeAIr.BLogic.Chat chat
+                FreeAIr.Chat.Chat chat
                 )
             {
                 if (chat is null)

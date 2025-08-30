@@ -1,13 +1,13 @@
 ﻿using EnvDTE;
-using FreeAIr.BLogic;
-using FreeAIr.BLogic.Context.Composer;
-using FreeAIr.BLogic.Context.Item;
 using FreeAIr.Helper;
 using FreeAIr.Options2.Support;
 using FreeAIr.UI.ContextMenu;
 using FreeAIr.UI.Embedillo.Answer.Parser;
 using FreeAIr.UI.ToolWindows;
 using Microsoft.VisualStudio.ComponentModelHost;
+using FreeAIr.Chat;
+using FreeAIr.Chat.Context.Composer;
+using FreeAIr.Chat.Context.Item;
 
 namespace FreeAIr.Commands.BuildError
 {
@@ -67,7 +67,7 @@ namespace FreeAIr.Commands.BuildError
                     wfd
                     ),
                 null,
-                await FreeAIr.BLogic.ChatOptions.GetDefaultAsync(chosenAgent)
+                await FreeAIr.Chat.ChatOptions.GetDefaultAsync(chosenAgent)
                 );
             if (chat is null)
             {

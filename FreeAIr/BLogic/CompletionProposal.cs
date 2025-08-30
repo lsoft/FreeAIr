@@ -1,5 +1,4 @@
-﻿using FreeAIr.BLogic.Context.Item;
-using FreeAIr.Helper;
+﻿using FreeAIr.Helper;
 using FreeAIr.Options2;
 using FreeAIr.Options2.Support;
 using Microsoft.VisualStudio.ComponentModelHost;
@@ -17,6 +16,8 @@ using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using static FreeAIr.Helper.SuggestionHijackHelper;
+using FreeAIr.Chat;
+using FreeAIr.Chat.Context.Item;
 
 #nullable enable
 namespace FreeAIr.BLogic

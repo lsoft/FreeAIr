@@ -6,7 +6,7 @@ namespace FreeAIr.UI.ToolWindows
     public static class ChatWindowShower
     {
         public static async Task ShowChatWindowAsync(
-            FreeAIr.BLogic.Chat chat,
+            FreeAIr.Chat.Chat chat,
             bool inSituForce = false,
             bool toolForce = false
             )

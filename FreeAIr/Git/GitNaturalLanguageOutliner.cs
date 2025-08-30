@@ -1,11 +1,11 @@
-﻿using FreeAIr.BLogic;
-using FreeAIr.BLogic.Context.Item;
-using FreeAIr.Helper;
+﻿using FreeAIr.Helper;
 using FreeAIr.Options2.Support;
 using FreeAIr.UI.ContextMenu;
 using FreeAIr.UI.Embedillo.Answer.Parser;
 using FreeAIr.UI.ViewModels;
 using System.Collections.Generic;
+using FreeAIr.Chat;
+using FreeAIr.Chat.Context.Item;
 
 namespace FreeAIr.Git
 {

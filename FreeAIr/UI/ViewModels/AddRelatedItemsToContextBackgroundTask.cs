@@ -1,6 +1,6 @@
-﻿using FreeAIr.BLogic.Context;
-using FreeAIr.UI.Windows;
+﻿using FreeAIr.UI.Windows;
 using System.Collections.Generic;
+using FreeAIr.Chat.Context;
 
 namespace FreeAIr.UI.ViewModels
 {

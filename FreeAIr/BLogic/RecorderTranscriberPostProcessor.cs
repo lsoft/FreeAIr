@@ -7,6 +7,7 @@ using Microsoft.VisualStudio.ComponentModelHost;
 using Microsoft.VisualStudio.Threading;
 using System.Threading;
 using System.Threading.Tasks;
+using FreeAIr.Chat;
 
 namespace FreeAIr.BLogic
 {
@@ -185,7 +186,7 @@ namespace FreeAIr.BLogic
                     null
                     ),
                 null,
-                await FreeAIr.BLogic.ChatOptions.NoToolAutoProcessedTextResponseAsync(chosenAgent)
+                await FreeAIr.Chat.ChatOptions.NoToolAutoProcessedTextResponseAsync(chosenAgent)
                 );
             if (chat is null)
             {
