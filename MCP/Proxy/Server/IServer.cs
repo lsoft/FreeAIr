@@ -23,7 +23,8 @@ namespace Proxy.Server
         Task<CallToolReply> CallToolAsync(
             IParameterProvider parameterProvider,
             string toolName,
-            IReadOnlyDictionary<string, object?>? arguments
+            IReadOnlyDictionary<string, object?>? arguments,
+            CancellationToken cancellationToken
             );
     }
 }

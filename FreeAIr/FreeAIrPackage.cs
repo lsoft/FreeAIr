@@ -16,7 +16,6 @@ using FreeAIr.UI.Informer;
 using FreeAIr.UI.ToolWindows;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.ComponentModelHost;
-using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Threading;

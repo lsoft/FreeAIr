@@ -1,9 +1,6 @@
-﻿using FreeAIr.Find;
-using FreeAIr.Options2;
-using FreeAIr.Options2.Agent;
+﻿using FreeAIr.Options2;
 using FreeAIr.Options2.Support;
 using FreeAIr.Record;
-using FreeAIr.UI.ViewModels;
 using Microsoft.VisualStudio.ComponentModelHost;
 using System.Collections.Generic;
 using System.Linq;

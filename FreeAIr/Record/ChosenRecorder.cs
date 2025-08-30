@@ -3,10 +3,7 @@ using FreeAIr.Options2.Support;
 using FreeAIr.Record.Fake;
 using FreeAIr.UI.ContextMenu;
 using FreeAIr.UI.Windows;
-using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 

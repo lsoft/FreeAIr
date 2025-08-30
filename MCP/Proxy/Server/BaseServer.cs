@@ -43,12 +43,14 @@ namespace Proxy.Server
         protected override async Task<CallToolReply> CallToolInternalAsync(
             IMcpClient mcpClient,
             string toolName,
-            IReadOnlyDictionary<string, object?>? arguments
+            IReadOnlyDictionary<string, object?>? arguments,
+            CancellationToken cancellationToken
             )
         {
             var innerResult = await mcpClient.CallToolAsync(
                 toolName,
-                arguments?.ToDictionary(d => d.Key, d => d.Value)
+                arguments?.ToDictionary(d => d.Key, d => d.Value),
+                cancellationToken: cancellationToken
                 );
 
             var texts = innerResult.Content
@@ -101,7 +103,8 @@ namespace Proxy.Server
         public async Task<CallToolReply> CallToolAsync(
             IParameterProvider parameterProvider,
             string toolName,
-            IReadOnlyDictionary<string, object?>? arguments
+            IReadOnlyDictionary<string, object?>? arguments,
+            CancellationToken cancellationToken
             )
         {
             await using var mcpClient = await CreateMcpClientAsync(
@@ -116,7 +119,8 @@ namespace Proxy.Server
             return await CallToolInternalAsync(
                 mcpClient,
                 toolName,
-                arguments
+                arguments,
+                cancellationToken
                 );
         }
 
@@ -178,7 +182,8 @@ namespace Proxy.Server
         protected abstract Task<CallToolReply> CallToolInternalAsync(
             IMcpClient mcpClient,
             string toolName,
-            IReadOnlyDictionary<string, object?>? arguments
+            IReadOnlyDictionary<string, object?>? arguments,
+            CancellationToken cancellationToken
             );
 
     }

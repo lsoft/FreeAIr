@@ -1,16 +1,5 @@
 ﻿using EnvDTE;
-using FreeAIr.BLogic;
-using FreeAIr.BLogic.Context.Composer;
-using FreeAIr.BLogic.Context.Item;
-using FreeAIr.Helper;
-using FreeAIr.Options2.Support;
-using FreeAIr.UI.ContextMenu;
 using FreeAIr.UI.ToolWindows;
-using Microsoft.VisualStudio.ComponentModelHost;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
 
 namespace FreeAIr.Commands.File
 {

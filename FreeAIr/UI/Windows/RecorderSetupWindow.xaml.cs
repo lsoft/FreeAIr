@@ -1,5 +1,4 @@
 ﻿using FreeAIr.Helper;
-using FreeAIr.UI.ViewModels;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;

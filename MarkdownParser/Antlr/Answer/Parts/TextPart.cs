@@ -1,7 +1,6 @@
 ﻿using MarkdownParser.Helper;
 using System.Windows;
 using System.Windows.Documents;
-using System.Windows.Media.Animation;
 
 namespace MarkdownParser.Antlr.Answer.Parts
 {

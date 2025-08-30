@@ -7,16 +7,12 @@
     <LangVersion>Latest</LangVersion>
   </PropertyGroup>
   <ItemGroup>
-    <FrameworkReference Include="Microsoft.AspNetCore.App" />
-  </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="JsonPath.Net" />
     <PackageReference Include="ModelContextProtocol" />
     <PackageReference Include="Serilog" />
     <PackageReference Include="Serilog.Sinks.Console" />
     <PackageReference Include="Serilog.Sinks.File" />
+    <PackageReference Include="StreamJsonRpc" />
     <PackageReference Include="System.Management" />
-    <PackageReference Include="System.Net.Http.Json" />
     <PackageReference Include="System.Net.ServerSentEvents" VersionOverride="10.0.0-preview.3.25171.5" />
   </ItemGroup>
   <ItemGroup>

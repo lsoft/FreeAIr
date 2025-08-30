@@ -1,11 +1,9 @@
 ﻿using FreeAIr.BLogic;
 using FreeAIr.BLogic.Content;
 using FreeAIr.Helper;
-using FreeAIr.MCP.McpServerProxy;
 using Microsoft.VisualStudio.Threading;
 using OpenAI.Chat;
 using System.Collections.Generic;
-using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 

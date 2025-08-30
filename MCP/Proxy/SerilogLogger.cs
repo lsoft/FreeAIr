@@ -34,7 +34,7 @@ namespace Proxy
                 );
 
             Logger = new LoggerConfiguration()
-                .WriteTo.Console()
+                //.WriteTo.Console()
                 .WriteTo.File(
                     logFilePath,
                     rollingInterval: RollingInterval.Day,

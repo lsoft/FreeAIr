@@ -4,7 +4,6 @@ using FreeAIr.Git;
 using FreeAIr.Helper;
 using FreeAIr.UI;
 using Microsoft.VisualStudio.Imaging;
-using Microsoft.VisualStudio.PlatformUI;
 using System.ComponentModel.Composition;
 using System.Threading;
 using System.Windows;

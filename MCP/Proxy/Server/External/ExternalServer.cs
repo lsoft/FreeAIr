@@ -1,9 +1,6 @@
 ﻿using Dto;
-using Microsoft.AspNetCore.Routing;
 using ModelContextProtocol.Client;
 using Proxy.Server.Github;
-using System.Text.Json;
-using System.Text.Json.Serialization;
 
 namespace Proxy.Server.External
 {

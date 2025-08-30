@@ -1,19 +1,14 @@
 ﻿using FreeAIr.BLogic.Content;
 using FreeAIr.BLogic.Context;
-using FreeAIr.Helper;
 using FreeAIr.MCP.McpServerProxy;
 using FreeAIr.Options2;
 using FreeAIr.Shared.Helper;
-using FreeAIr.UI.BLogic;
 using FreeAIr.UI.BLogic.Reader;
 using OpenAI;
 using OpenAI.Chat;
-using System;
 using System.ClientModel;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.Json;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace FreeAIr.BLogic

@@ -12,6 +12,12 @@ namespace FreeAIr.McpServerProxy
         private readonly string _fileName;
         private readonly string? _arguments;
 
+        public Process Process
+        {
+            get;
+            private set;
+        }
+
         public ProcessMonitor(
             string folderPath,
             string fileName,
@@ -34,41 +40,43 @@ namespace FreeAIr.McpServerProxy
         {
             while (true)
             {
-                using (var process = new Process())
+                Process = new Process();
+                using (Process)
                 {
                     try
                     {
                         var error = new StringBuilder();
 
-                        process.StartInfo.WorkingDirectory = _folderPath;
-                        process.StartInfo.FileName = System.IO.Path.Combine(_folderPath, _fileName);
-                        process.StartInfo.Arguments = _arguments;
-                        process.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
-                        process.StartInfo.CreateNoWindow = true;
+                        Process.StartInfo.WorkingDirectory = _folderPath;
+                        Process.StartInfo.FileName = System.IO.Path.Combine(_folderPath, _fileName);
+                        Process.StartInfo.Arguments = _arguments;
+                        Process.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
+                        Process.StartInfo.CreateNoWindow = true;
 
-                        process.StartInfo.UseShellExecute = false;
-                        process.StartInfo.RedirectStandardOutput = true;
-                        process.StartInfo.RedirectStandardError = true;
-                        process.ErrorDataReceived += new DataReceivedEventHandler((sender, e) =>
+                        Process.StartInfo.UseShellExecute = false;
+                        Process.StartInfo.RedirectStandardInput = true;
+                        Process.StartInfo.RedirectStandardOutput = true;
+                        Process.StartInfo.RedirectStandardError = true;
+                        Process.ErrorDataReceived += new DataReceivedEventHandler((sender, e) =>
                         {
                             error.Append(e.Data);
                         });
 
                         ActivityLogHelper.ActivityLogInformation($"Запускаем процесс: {_fileName} {_arguments}");
-                        var startResult = process.Start();
+                        var startResult = Process.Start();
 
-                        process.BeginErrorReadLine();
-                        var output = await process.StandardOutput.ReadToEndAsync();
+                        Process.BeginErrorReadLine();
+                        //var output = await Process.StandardOutput.ReadToEndAsync();
 
-                        _ = await process.WaitForExitAsync(cancellationToken);
+                        _ = await Process.WaitForExitAsync(cancellationToken);
 
                         cancellationToken.ThrowIfCancellationRequested();
 
                         var msg = new StringBuilder();
                         msg.AppendLine("Процесс завершён нештатно. Перезапуск...");
                         msg.AppendLine(new string('-', 80));
-                        msg.AppendLine("Output:");
-                        msg.AppendLine(output);
+                        //msg.AppendLine("Output:");
+                        //msg.AppendLine(output);
                         msg.AppendLine(new string('-', 80));
                         msg.AppendLine("Error:");
                         msg.AppendLine(error.ToString());
@@ -83,14 +91,14 @@ namespace FreeAIr.McpServerProxy
                     {
                         //that's ok
                         //kill the app
-                        process.SafelyKill();
+                        Process.SafelyKill();
                         break;
                     }
                     catch (Exception excp)
                     {
                         excp.ActivityLogException();
 
-                        process.SafelyKill();
+                        Process.SafelyKill();
                         break;
                     }
 

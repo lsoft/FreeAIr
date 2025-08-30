@@ -3,7 +3,6 @@ using FreeAIr.Options2;
 using FreeAIr.Options2.Support;
 using FreeAIr.Shared.Dto;
 using Microsoft.VisualStudio.Text;
-using System;
 using System.ComponentModel.Design;
 using System.Threading.Tasks;
 using System.Windows.Input;

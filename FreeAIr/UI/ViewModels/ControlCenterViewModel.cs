@@ -5,7 +5,6 @@ using FreeAIr.MCP.McpServerProxy.Github;
 using FreeAIr.Options2;
 using FreeAIr.UI.Windows;
 using Microsoft.VisualStudio.Shell.Interop;
-using Microsoft.VisualStudio.VSHelp80;
 using System.IO;
 using System.Linq;
 using System.Windows;

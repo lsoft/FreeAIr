@@ -2,7 +2,6 @@
 using FreeAIr.Helper;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Http.Json;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -56,17 +55,12 @@ namespace FreeAIr.MCP.McpServerProxy.External
                 throw new InvalidOperationException("Proxy application is not started");
             }
 
-            var response = await McpServerProxyApplication.HttpClient.PostAsJsonAsync<GetToolsRequest>(
-                "/get_tools",
+            var reply = await McpServerProxyApplication.ProxyInterface.GetToolsAsync(
                 new GetToolsRequest(
                     Name,
                     GetMcpServerSpecificArguments()
                     )
                 );
-            response.EnsureSuccessStatusCode();
-
-            var reply = await response.Content.ReadFromJsonAsync<GetToolsReply>();
-
             if (!string.IsNullOrEmpty(reply.ErrorMessage))
             {
                 throw new InvalidOperationException(reply.ErrorMessage);
@@ -90,8 +84,7 @@ namespace FreeAIr.MCP.McpServerProxy.External
 
             try
             {
-                var response = await McpServerProxyApplication.HttpClient.PostAsJsonAsync<CallToolRequest>(
-                    "/call_tool",
+                var reply = await McpServerProxyApplication.ProxyInterface.CallToolAsync(
                     new CallToolRequest(
                         Name,
                         toolName,
@@ -100,11 +93,7 @@ namespace FreeAIr.MCP.McpServerProxy.External
                         ),
                     cancellationToken
                     );
-                response.EnsureSuccessStatusCode();
 
-                var reply = await response.Content.ReadFromJsonAsync<CallToolReply>(
-                    cancellationToken
-                    );
                 if (!string.IsNullOrEmpty(reply.ErrorMessage))
                 {
                     throw new InvalidOperationException(reply.ErrorMessage);

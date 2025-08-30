@@ -1,14 +1,12 @@
 ﻿using Dto;
 using FreeAIr.Helper;
 using FreeAIr.Options2;
-using FreeAIr.Options2.Agent;
 using FreeAIr.UI.ContextMenu;
 using FreeAIr.UI.Windows;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.Threading;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.Json;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;

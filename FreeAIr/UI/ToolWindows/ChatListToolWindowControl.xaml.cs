@@ -1,6 +1,5 @@
 ﻿using FreeAIr.Commands.File;
 using FreeAIr.Helper;
-using FreeAIr.UI.Embedillo.VisualLine.SolutionItem;
 using FreeAIr.UI.ViewModels;
 using System.Linq;
 using System.Threading;

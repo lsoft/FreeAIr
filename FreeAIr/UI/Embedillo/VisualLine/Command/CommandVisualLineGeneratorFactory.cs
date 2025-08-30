@@ -2,8 +2,6 @@
 using FreeAIr.Options2;
 using FreeAIr.Options2.Support;
 using FreeAIr.UI.Embedillo.Answer.Parser;
-using Microsoft.VisualStudio.Imaging;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;

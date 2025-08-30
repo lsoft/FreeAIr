@@ -1,7 +1,6 @@
 ﻿using FreeAIr.BLogic.Content;
 using OpenAI.Chat;
 using System.Collections.Generic;
-using System.Text;
 
 namespace FreeAIr.BLogic
 {

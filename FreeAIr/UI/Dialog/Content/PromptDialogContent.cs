@@ -1,7 +1,6 @@
 ﻿using FreeAIr.BLogic;
 using MarkdownParser.Antlr.Answer;
 using Microsoft.VisualStudio.ComponentModelHost;
-using System.Windows;
 using System.Windows.Documents;
 
 namespace FreeAIr.UI.Dialog.Content

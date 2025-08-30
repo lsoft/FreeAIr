@@ -1,6 +1,4 @@
-﻿using FreeAIr.UI.ViewModels;
-using MarkdownParser.Antlr.Answer;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace FreeAIr.UI.BLogic.Reader
 {

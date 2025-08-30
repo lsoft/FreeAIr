@@ -1,7 +1,4 @@
-﻿using Antlr4.Runtime;
-using Antlr4.Runtime.Misc;
-using MarkdownParser.Antlr.Answer.Blocks;
-using System.Diagnostics;
+﻿using Antlr4.Runtime.Misc;
 using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;

@@ -2,14 +2,9 @@
 using Microsoft.VisualStudio.Threading;
 using OpenAI;
 using OpenAI.Audio;
-using System;
 using System.ClientModel;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Whisper.net;
 
 namespace FreeAIr.Record.WhisperOpenAI
 {

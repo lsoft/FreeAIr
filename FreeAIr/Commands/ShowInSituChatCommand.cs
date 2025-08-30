@@ -1,11 +1,8 @@
 ﻿using EnvDTE;
 using FreeAIr.BLogic;
-using FreeAIr.Helper;
 using FreeAIr.UI.ContextMenu;
 using FreeAIr.UI.ToolWindows;
-using FreeAIr.UI.Windows;
 using Microsoft.VisualStudio.ComponentModelHost;
-using Microsoft.VisualStudio.Text;
 
 namespace FreeAIr.Commands
 {

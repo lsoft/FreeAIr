@@ -1,16 +1,6 @@
 ﻿using FreeAIr.BLogic.Content;
-using FreeAIr.Helper;
-using FreeAIr.MCP.McpServerProxy;
-using FreeAIr.Options2;
 using MarkdownParser.Antlr.Answer;
 using Microsoft.VisualStudio.ComponentModelHost;
-using Microsoft.VisualStudio.OLE.Interop;
-using OpenAI;
-using OpenAI.Chat;
-using System.ClientModel;
-using System.Management.Instrumentation;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Documents;
 

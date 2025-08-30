@@ -1,11 +1,6 @@
-﻿using Community.VisualStudio.Toolkit;
-using FreeAIr.Helper;
+﻿using FreeAIr.Helper;
 using Microsoft.VisualStudio.Shell.Interop;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace FreeAIr.UI.Difference

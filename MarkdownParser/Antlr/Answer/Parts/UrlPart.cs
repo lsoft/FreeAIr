@@ -1,6 +1,5 @@
 ﻿using System.Diagnostics;
 using System.Windows.Documents;
-using System.Windows.Input;
 
 namespace MarkdownParser.Antlr.Answer.Parts
 {

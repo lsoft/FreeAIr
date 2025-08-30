@@ -4,10 +4,9 @@ using EnvDTE80;
 using FreeAIr.Helper;
 using FreeAIr.McpServerProxy;
 using FreeAIr.Options2;
+using StreamJsonRpc;
 using System.IO;
 using System.IO.Compression;
-using System.Net.Http;
-using System.Net.Http.Json;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -27,14 +26,17 @@ namespace FreeAIr.MCP.McpServerProxy
 
         private static readonly DTEEvents _dteEvents;
 
-        private static readonly HttpClient _httpClient;
+        //private static readonly HttpClient _httpClient;
 
         public static readonly bool Started;
+        private static IMcpProxyInterface _proxyInterface;
 
-        public static HttpClient HttpClient =>
-            Started
-                ? _httpClient
-                : throw new InvalidOperationException("Proxy not started");
+        public static IMcpProxyInterface ProxyInterface => _proxyInterface;
+
+        //public static HttpClient HttpClient =>
+        //    Started
+        //        ? _httpClient
+        //        : throw new InvalidOperationException("Proxy not started");
 
         static McpServerProxyApplication()
         {
@@ -46,8 +48,8 @@ namespace FreeAIr.MCP.McpServerProxy
             var visualStudioProcessId = System.Diagnostics.Process.GetCurrentProcess().Id;
             var proxyProcessId = 30000 + (visualStudioProcessId % 10000);
 
-            _httpClient = new();
-            _httpClient.BaseAddress = new Uri($"http://localhost:{proxyProcessId}");
+            //_httpClient = new();
+            //_httpClient.BaseAddress = new Uri($"http://localhost:{proxyProcessId}");
 
             _processMonitor = new ProcessMonitor(
                 ProxyUnpackedFolderPath,
@@ -58,6 +60,12 @@ namespace FreeAIr.MCP.McpServerProxy
             _processTask = _processMonitor.StartMonitoringAsync(
                 _cancellationTokenSource.Token
                 );
+
+            var rpc = JsonRpc.Attach(
+                _processMonitor.Process.StandardInput.BaseStream,
+                _processMonitor.Process.StandardOutput.BaseStream
+                );
+            _proxyInterface = rpc.Attach<IMcpProxyInterface>();
 
             var dte = AsyncPackage.GetGlobalService(typeof(EnvDTE.DTE)) as DTE2;
             _dteEvents = ((Events2)dte.Events).DTEEvents;
@@ -84,15 +92,11 @@ namespace FreeAIr.MCP.McpServerProxy
                 }
             }
 
-            var response = await McpServerProxyApplication.HttpClient.PostAsJsonAsync<UpdateExternalServersRequest>(
-                "/update_external_servers",
+            var reply = await _proxyInterface.UpdateExternalServersAsync(
                 new UpdateExternalServersRequest(
                     mcpServers
                     )
                 );
-            response.EnsureSuccessStatusCode();
-
-            var reply = await response.Content.ReadFromJsonAsync<UpdateExternalServersReply>();
             if (!string.IsNullOrEmpty(reply.ErrorMessage))
             {
                 throw new InvalidOperationException(reply.ErrorMessage);
