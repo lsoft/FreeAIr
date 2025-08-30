@@ -1,7 +1,6 @@
 ﻿using FreeAIr.MCP.McpServerProxy;
 using FreeAIr.Options2;
 using FreeAIr.Shared.Helper;
-using FreeAIr.UI.BLogic.Reader;
 using OpenAI;
 using OpenAI.Chat;
 using System.ClientModel;
@@ -10,6 +9,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using FreeAIr.Chat.Content;
 using FreeAIr.Chat.Context;
+using FreeAIr.BLogic.Reader;
 
 namespace FreeAIr.Chat
 {

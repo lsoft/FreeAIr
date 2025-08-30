@@ -1,8 +1,8 @@
-﻿using FreeAIr.Helper;
-using Microsoft.VisualStudio.Threading;
+﻿using Microsoft.VisualStudio.Threading;
 using System.Speech.Recognition;
 using System.Threading;
 using System.Threading.Tasks;
+using FreeAIr.BLogic;
 
 namespace FreeAIr.Record.Speech
 {

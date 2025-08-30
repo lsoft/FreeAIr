@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 
-namespace FreeAIr.Helper
+namespace FreeAIr.BLogic
 {
     public sealed class AsyncAwaitProductionCycle<T>
     {

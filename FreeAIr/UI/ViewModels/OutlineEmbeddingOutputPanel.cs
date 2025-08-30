@@ -1,5 +1,5 @@
-﻿using FreeAIr.Helper;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
+using FreeAIr.BLogic;
 
 namespace FreeAIr.UI.ViewModels
 {

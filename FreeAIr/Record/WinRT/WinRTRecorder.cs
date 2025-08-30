@@ -3,6 +3,7 @@ using Microsoft.VisualStudio.Threading;
 using System.Threading;
 using System.Threading.Tasks;
 using Windows.Media.SpeechRecognition;
+using FreeAIr.BLogic;
 
 namespace FreeAIr.Record.WinRT
 {

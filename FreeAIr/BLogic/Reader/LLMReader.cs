@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using FreeAIr.Chat;
 using FreeAIr.Chat.Content;
 
-namespace FreeAIr.UI.BLogic.Reader
+namespace FreeAIr.BLogic.Reader
 {
     public sealed class LLMReader : IDisposable
     {

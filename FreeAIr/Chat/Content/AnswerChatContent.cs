@@ -1,8 +1,8 @@
-﻿using FreeAIr.Helper;
-using OpenAI.Chat;
+﻿using OpenAI.Chat;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
+using FreeAIr.BLogic;
 
 namespace FreeAIr.Chat.Content
 {

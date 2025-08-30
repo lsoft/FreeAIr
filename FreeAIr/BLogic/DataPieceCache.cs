@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace FreeAIr.Helper
+namespace FreeAIr.BLogic
 {
     /// <summary>
     /// Класс для кэширования значений с возможностью асинхронного получения данных.

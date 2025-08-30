@@ -1,5 +1,4 @@
-﻿using FreeAIr.Helper;
-using FreeAIr.Options2;
+﻿using FreeAIr.Options2;
 using FreeAIr.Options2.Support;
 using FreeAIr.Record;
 using FreeAIr.Shared.Helper;

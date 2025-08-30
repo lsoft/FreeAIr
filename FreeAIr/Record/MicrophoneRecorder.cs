@@ -1,7 +1,7 @@
-﻿using FreeAIr.Helper;
-using NAudio.Wave;
+﻿using NAudio.Wave;
 using System.Threading;
 using System.Threading.Tasks;
+using FreeAIr.BLogic;
 
 namespace FreeAIr.Record
 {

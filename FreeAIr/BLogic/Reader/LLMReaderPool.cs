@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace FreeAIr.UI.BLogic.Reader
+namespace FreeAIr.BLogic.Reader
 {
     public static class LLMReaderPool
     {

@@ -11,6 +11,7 @@ using System.Linq;
 using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Threading.Tasks;
+using FreeAIr.BLogic;
 
 namespace FreeAIr.Options2
 {

@@ -1,6 +1,6 @@
 ﻿using System.IO;
 
-namespace FreeAIr.Helper
+namespace FreeAIr.BLogic
 {
     public sealed class TempFile : IDisposable
     {

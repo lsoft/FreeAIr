@@ -2,6 +2,7 @@
 using Microsoft.VisualStudio.Shell.Interop;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using FreeAIr.BLogic;
 
 namespace FreeAIr.UI.Difference
 {
