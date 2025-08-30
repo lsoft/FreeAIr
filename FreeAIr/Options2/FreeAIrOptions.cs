@@ -118,6 +118,24 @@ namespace FreeAIr.Options2
             return options.AgentCollection;
         }
 
+        public static async Task<AgentJson?> DeserializeAgentByNameAsync(
+            string agentName
+            )
+        {
+            var options = await DeserializeAsync(null);
+            var agents = options.AgentCollection.Agents;
+            var filteredAgents = agents.FindAll(a => !string.IsNullOrEmpty(a.Technical.GetToken()));
+            if (filteredAgents.Count == 0)
+            {
+                return null;
+            }
+
+            var result = filteredAgents.FirstOrDefault(
+                a => a.Name == agentName
+                );
+            return result;
+        }
+
         public static async Task<SupportCollectionJson> DeserializeSupportCollectionAsync()
         {
             var options = await DeserializeAsync(null);

@@ -1,10 +1,31 @@
-# FreeAIr Release Notes
-
-If you like this project, please [gift a ★★★★★ rating](https://marketplace.visualstudio.com/items?itemName=lsoft.FreeAIr).
+# Overview
 
 Please report any bugs to the [github repo](https://github.com/lsoft/FreeAIr).
 
-If you are enjoying FreeAIr to the enough level to donate, there are many [small cancer patients](https://advitausa.org/au/index.php/donate/) that need your help. Please provide your help them!
+## Feedback
+
+Visual Studio extension authors suffers of lack of feedback. Please share your feelings and gratitude. Choose one or few available options:
+
+1. Please [gift a ★★★★★ rating](https://marketplace.visualstudio.com/items?itemName=lsoft.FreeAIr) for this VSIX in the VS Marketplace.
+2. Gift a ★ to the [github repo](https://github.com/lsoft/FreeAIr).
+3. If you are enjoying FreeAIr to the enough level to donate, there are many [small cancer patients](https://advitausa.org/au/index.php/donate/) that need your help. Please provide your help them!
+
+## Other my VSIXes may interest you
+
+- [Fix incorrect namespaces](https://marketplace.visualstudio.com/items?itemName=lsoft.AdjustNamespaceVisualStudioExtension2022) for a single file, folder, project or a whole solution and rules the resulting regressions in the code (including XAML), e.g. fixes the broken references. This extension works like Resharper `Adjust namespaces` function.
+- [Visual Studio extension](https://marketplace.visualstudio.com/items?itemName=lsoft.MultiLineDebugExpressionEvaluatorInternalName) for quick watch window which allows to debug and edit multilines expressions.
+- If you are using plain SQL inside you code base you may want to validate these queries against your DB schema right inside Visual Studio. [ReSequel](https://marketplace.visualstudio.com/items?itemName=lsoft.ReSequel64) does exactly that.
+- [This extension](https://marketplace.visualstudio.com/items?itemName=lsoft.RelationalRoslynVisualStudioExtension) puts Roslyn metadata of your project into the in-memory sqlite database and allows to you to execute queries to the database.
+- [The faster way](https://marketplace.visualstudio.com/items?itemName=lsoft.StringLocalizer) to add strings to your multilanguage resx files. Just install the extension, select the text and press Alt+J.
+- A [Visual Studio extension](https://marketplace.visualstudio.com/items?itemName=lsoft.SyncToAsyncExtension) which creates codelenses allows you to go to sync sibling method for async methods and vice-versa even if sibling method is in different file or code generated.
+
+My others extensions lives [here](https://marketplace.visualstudio.com/publishers/lsoft).
+
+# FreeAIr Release Notes
+
+## 4.1.0
+
+- Added voice prompting with 4 voice providers and LLM-based post-processor.
 
 ## 4.0.2
 

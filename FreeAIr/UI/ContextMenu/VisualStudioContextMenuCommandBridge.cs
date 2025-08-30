@@ -104,13 +104,6 @@ namespace FreeAIr.UI.ContextMenu
                     .ShowAsync<TResult>()
                     ;
 
-                //var menuItems = BuildMenuItems(title, items);
-
-                //var value = await ShowMenuItemsAsync<TResult>(
-                //    menuItems,
-                //    control
-                //    );
-
                 return value;
             }
             catch (Exception excp)

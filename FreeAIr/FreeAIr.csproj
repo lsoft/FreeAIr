@@ -56,6 +56,7 @@
     <Compile Include="BLogic\Context\Item\SimpleTextChatContextItem.cs" />
     <Compile Include="BLogic\Content\IChatContent.cs" />
     <Compile Include="BLogic\Reader\LLMReaderPool.cs" />
+    <Compile Include="BLogic\RecorderTranscriberPostProcessor.cs" />
     <Compile Include="Commands\ApplySupportCommand.cs" />
     <Compile Include="Commands\File\AddFilesToContextCommand.cs" />
     <Compile Include="Commands\File\ApplyFileSupportCommand.cs" />
@@ -65,6 +66,9 @@
     <Compile Include="Commands\Other\ResetMCPToolsCommand.cs" />
     <Compile Include="Commands\ShowInSituChatCommand.cs" />
     <Compile Include="Helper\ActivityLogHelper.cs" />
+    <Compile Include="Helper\AsyncAwaitProduct.cs" />
+    <Compile Include="Helper\AsyncAwaitProductionCycle.cs" />
+    <Compile Include="Helper\CallAwaiter.cs" />
     <Compile Include="Helper\ChatToolHelper.cs" />
     <Compile Include="Helper\DirectOrEnvStringHelper.cs" />
     <Compile Include="Helper\DisposeHelper.cs" />
@@ -219,6 +223,10 @@
     </Compile>
     <Compile Include="Record\WhisperOpenAI\WhisperOAIRecorderFactory.cs" />
     <Compile Include="Record\WhisperOpenAI\WhisperOAIRecorder.cs" />
+    <Compile Include="Record\Speech\SpeechRecorder.cs" />
+    <Compile Include="Record\Speech\SpeechRecorderFactory.cs" />
+    <Compile Include="Record\WinRT\WinRTRecorderFactory.cs" />
+    <Compile Include="Record\WinRT\WinRTRecorder.cs" />
     <Compile Include="Resources\Resources1.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -319,7 +327,6 @@
     <Compile Include="UI\ViewModels\InSituChatViewModel.cs" />
     <Compile Include="UI\ViewModels\McpServerConfigureViewModel.cs" />
     <Compile Include="UI\ViewModels\AgentConfigureViewModel.cs" />
-    <Compile Include="UI\ViewModels\ChooseChatAgentViewModel.cs" />
     <Compile Include="UI\ViewModels\ControlCenterViewModel.cs" />
     <Compile Include="UI\ViewModels\DialogViewModel.cs" />
     <Compile Include="UI\ViewModels\BuildNaturalLanguageOutlinesJsonFileToolViewModel.cs" />
@@ -447,6 +454,7 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
+    <PackageReference Include="Microsoft.Windows.SDK.Contracts" />
     <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" />
     <PackageReference Include="NuGet.VisualStudio" />
     <PackageReference Include="NAudio" />
@@ -455,6 +463,7 @@
     <PackageReference Include="System.ClientModel" />
     <PackageReference Include="System.Net.Http.Json" />
     <PackageReference Include="System.Net.ServerSentEvents" />
+    <PackageReference Include="System.Speech" />
     <PackageReference Include="Whisper.net" />
     <PackageReference Include="Whisper.net.Runtime" />
   </ItemGroup>

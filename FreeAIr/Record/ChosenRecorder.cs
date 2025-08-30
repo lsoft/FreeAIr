@@ -3,7 +3,6 @@ using FreeAIr.Options2.Support;
 using FreeAIr.Record.Fake;
 using FreeAIr.UI.ContextMenu;
 using FreeAIr.UI.Windows;
-using Microsoft.VisualStudio.ComponentModelHost;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,64 +14,29 @@ namespace FreeAIr.Record
 {
     public static class ChosenRecorder
     {
-        private static readonly NonDisposableSemaphoreSlim _semaphore = new (1);
         private static IRecorder? _currentRecorder;
 
         public static event RecorderStatusChangedDelegate RecorderStatusChangedSignal;
 
-        static ChosenRecorder()
+        public static async Task InitAsync()
         {
-            GetRecorderAsync()
-                .FileAndForget(nameof(GetRecorderAsync));
+            await SetNewRecorderAsync();
         }
 
-        //public static RecorderStatusEnum? GetRecorderStatus()
-        //{
-        //    var taken = false;
-        //    try
-        //    {
-        //        taken = _semaphore.Wait(TimeSpan.FromMilliseconds(10));
-
-        //        return _currentRecorder?.Status;
-        //    }
-        //    finally
-        //    {
-        //        if (taken)
-        //        {
-        //            _semaphore.Release();
-        //        }
-        //    }
-        //}
+        public static bool IsReady() => _currentRecorder is not null;
 
         public static string? GetRecorderName()
         {
-            var taken = false;
-            try
-            {
-                taken = _semaphore.Wait(TimeSpan.FromMilliseconds(10));
-
-                return _currentRecorder?.Name;
-            }
-            finally
-            {
-                if (taken)
-                {
-                    _semaphore.Release();
-                }
-            }
+            return _currentRecorder?.Name;
         }
 
         public static async Task<IRecorder> GetRecorderAsync()
         {
             try
             {
-                await _semaphore.WaitAsync();
-
                 if (_currentRecorder is null)
                 {
-                    var recorderFactories = await RecorderContextMenu.ObtainRecorderFactoriesAsync();
-                    var recorderFactory = recorderFactories[0];
-                    _currentRecorder = await recorderFactory.CreateRecorderAsync();
+                    await SetNewRecorderAsync();
                 }
 
                 return _currentRecorder;
@@ -80,10 +44,6 @@ namespace FreeAIr.Record
             catch (Exception excp)
             {
                 excp.ActivityLogException();
-            }
-            finally
-            {
-                _semaphore.Release();
             }
 
             return FakeRecorder.Instance;
@@ -117,19 +77,32 @@ namespace FreeAIr.Record
             }
         }
 
+        private static async Task SetNewRecorderAsync()
+        {
+            var recorderFactories = await RecorderContextMenu.ObtainRecorderFactoriesAsync();
+            var recorderFactory = recorderFactories.FirstOrDefault(
+                r => r.Name == RecordingPage.Instance.ChosenRecorderName
+                ) ?? recorderFactories[0];
+
+            var defaultRecorder = await recorderFactory.CreateRecorderAsync();
+            await ReplaceRecorderWithAsync(defaultRecorder);
+        }
+
         private static async Task ProcessNewRecorderAsync(
             IRecorderFactory chosenRecorderFactory
             )
         {
             var recorderConfigurationControl = chosenRecorderFactory.CreateConfigurationControl();
-
-            await RecorderSetupWindow.ShowAsync(
-                recorderConfigurationControl,
-                new System.Windows.Point(
-                    System.Windows.Forms.Cursor.Position.X,
-                    System.Windows.Forms.Cursor.Position.Y
-                    )
-                );
+            if (recorderConfigurationControl is not null)
+            {
+                await RecorderSetupWindow.ShowAsync(
+                    recorderConfigurationControl,
+                    new System.Windows.Point(
+                        System.Windows.Forms.Cursor.Position.X,
+                        System.Windows.Forms.Cursor.Position.Y
+                        )
+                    );
+            }
 
             var recorder = await chosenRecorderFactory.CreateRecorderAsync();
 
@@ -137,25 +110,16 @@ namespace FreeAIr.Record
         }
 
         private static async Task ReplaceRecorderWithAsync(
-            IRecorder recorder
+            IRecorder newRecorder
             )
         {
-            try
-            {
-                await _semaphore.WaitAsync();
+            newRecorder.RecorderStatusChangedSignal += FireRecorderStatusChangedSignal;
 
-                if (_currentRecorder is not null)
-                {
-                    _currentRecorder.RecorderStatusChangedSignal -= FireRecorderStatusChangedSignal;
-                    await _currentRecorder.DisposeAsync();
-                }
-
-                _currentRecorder = recorder;
-                _currentRecorder.RecorderStatusChangedSignal += FireRecorderStatusChangedSignal;
-            }
-            finally
+            var oldRecorder = Interlocked.Exchange(ref _currentRecorder, newRecorder);
+            if (oldRecorder is not null)
             {
-                _semaphore.Release();
+                oldRecorder.RecorderStatusChangedSignal -= FireRecorderStatusChangedSignal;
+                await oldRecorder.DisposeAsync();
             }
         }
 
@@ -166,6 +130,6 @@ namespace FreeAIr.Record
         {
             RecorderStatusChangedSignal?.Invoke(recorder, status);
         }
-
     }
+
 }

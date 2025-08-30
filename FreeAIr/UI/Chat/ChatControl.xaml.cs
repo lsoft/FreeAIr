@@ -3,6 +3,9 @@ using FreeAIr.Antlr.Prompt;
 using FreeAIr.BLogic;
 using FreeAIr.BLogic.Context.Item;
 using FreeAIr.Helper;
+using FreeAIr.Options2;
+using FreeAIr.Options2.Agent;
+using FreeAIr.Options2.Support;
 using FreeAIr.Record;
 using FreeAIr.Shared.Helper;
 using FreeAIr.UI.ContextMenu;
@@ -120,16 +123,19 @@ namespace FreeAIr.UI.Chat
                     _chooseChatAgentCommand = new AsyncRelayCommand(
                         async a =>
                         {
-                            var w = new NestedCheckBoxWindow();
-                            var vm = new ChooseChatAgentViewModel(
-                                _chat.Options.ChatAgents,
-                                _chat.Options.ChosenAgent
+                            var chosenAgent = await VisualStudioContextMenuCommandBridge.ShowAsync<AgentJson>(
+                                FreeAIr.Resources.Resources.Choose_the_available_agent,
+                                _chat.Options.ChatAgents.Agents
+                                    .FindAll(a => a.Technical.HasToken())
+                                    .ConvertAll(a => (a.Name, a.Name == _chat.Options.ChosenAgent.Name, a as object))
                                 );
-                            w.DataContext = vm;
-                            await ShowDialogAsync(w);
+                            if (chosenAgent is null)
+                            {
+                                return;
+                            }
 
                             _chat.Options.ChangeChosenAgent(
-                                vm.ChosenAgent
+                                chosenAgent
                                 );
 
                             OnPropertyChanged();
@@ -658,41 +664,6 @@ namespace FreeAIr.UI.Chat
             }
         }
 
-        public ICommand ChooseRecorderCommand
-        {
-            get
-            {
-                if (_chooseRecorderCommand == null)
-                {
-                    _chooseRecorderCommand = new AsyncRelayCommand(
-                        async a =>
-                        {
-                            await ChosenRecorder.ChooseRecorderAsync();
-
-                            OnPropertyChanged();
-                        },
-                        a =>
-                        {
-                            if (_chat is null)
-                            {
-                                return false;
-                            }
-
-                            if (_chat.Status.NotIn(ChatStatusEnum.NotStarted, ChatStatusEnum.Ready))
-                            {
-                                return false;
-                            }
-
-                            return true;
-                        }
-                        );
-                }
-
-                return _chooseRecorderCommand;
-            }
-        }
-
-
         #endregion
 
         public FreeAIr.BLogic.Chat? Chat
@@ -785,6 +756,8 @@ namespace FreeAIr.UI.Chat
             SetupPromptControl();
 
             SetupAddToContextControl();
+
+            _rtpProcessor.RecordingStatusChangedSignal += RecordingStatusChangedSignal;
         }
 
         private void ChatStatusChangedEvent(object sender, ChatEventArgs e)
@@ -823,25 +796,67 @@ namespace FreeAIr.UI.Chat
 
         #region recording
 
-        private readonly NonDisposableSemaphoreSlim _stopRecordingSignal = new(1);
+        private readonly RecorderTranscriberPostProcessor _rtpProcessor = new RecorderTranscriberPostProcessor(
+            );
 
-        private CancellationTokenSource? _recordingCancellation;
-        private Task<RecordTranscribeResult>? _recordingTask;
-        private RecorderStatusEnum _recorderStatus = RecorderStatusEnum.Idle;
+        public ICommand ChooseRecorderCommand
+        {
+            get
+            {
+                if (_chooseRecorderCommand == null)
+                {
+                    _chooseRecorderCommand = new AsyncRelayCommand(
+                        async a =>
+                        {
+                            await ChosenRecorder.ChooseRecorderAsync();
 
+                            OnPropertyChanged();
+                        },
+                        a =>
+                        {
+                            if (_chat is null)
+                            {
+                                return false;
+                            }
+
+                            if (_chat.Status.NotIn(ChatStatusEnum.NotStarted, ChatStatusEnum.Ready))
+                            {
+                                return false;
+                            }
+
+                            if (!ChosenRecorder.IsReady())
+                            {
+                                return false;
+                            }
+
+                            if (_rtpProcessor.IsWorking)
+                            {
+                                return false;
+                            }
+
+                            return true;
+                        }
+                        );
+                }
+
+                return _chooseRecorderCommand;
+            }
+        }
 
         public ImageMoniker RecordingMoniker
         {
             get
             {
-                switch (_recorderStatus)
+                switch (_rtpProcessor.RecordingProcessStatus)
                 {
-                    case RecorderStatusEnum.Idle:
+                    case RecordingProcessStatusEnum.Idle:
                         return KnownMonikers.RecordingNotStarted;
-                    case RecorderStatusEnum.Recording:
+                    case RecordingProcessStatusEnum.Recording:
                         return KnownMonikers.Record;
-                    case RecorderStatusEnum.Transcribing:
+                    case RecordingProcessStatusEnum.Transcribing:
                         return KnownMonikers.FluidLayout;
+                    case RecordingProcessStatusEnum.PostProcessing:
+                        return KnownMonikers.Process;
                     default:
                         return KnownMonikers.QuestionMark;
                 }
@@ -857,8 +872,12 @@ namespace FreeAIr.UI.Chat
                 sb.AppendLine(
                     "Chosen model: " + (ChosenRecorder.GetRecorderName() ?? "Not chosen")
                     );
+                var ppn = RecordingPage.Instance.ChosenPostProcessActionName;
                 sb.AppendLine(
-                    "Status: " + _recorderStatus.ToString()
+                    "Chosen post process: " + (string.IsNullOrEmpty(ppn) ? "No post process" : ppn)
+                    );
+                sb.AppendLine(
+                    "Status: " + _rtpProcessor.RecordingProcessStatus.ToString()
                     );
                 sb.Append(
                     "Left click to choose recorder. Press and hold right Ctrl to record prompt by voice."
@@ -868,100 +887,50 @@ namespace FreeAIr.UI.Chat
             }
         }
 
-        private bool IsRecording()
+        private void RecordingStatusChangedSignal(
+            RecorderTranscriberPostProcessor sender,
+            RecordingProcessStatusEnum newStatus
+            )
         {
-            return
-                _recordingTask is not null
-                && _recordingTask.Status.In(
-                    TaskStatus.Running,
-                    TaskStatus.WaitingForActivation,
-                    TaskStatus.WaitingToRun,
-                    TaskStatus.WaitingForChildrenToComplete
-                    )
-                ;
+            OnPropertyChanged();
         }
 
         private async Task StartRecordingAsync()
         {
-            if (IsRecording())
-            {
-                return;
-            }
 
-            if (_recordingCancellation is not null)
-            {
-                _recordingCancellation.Dispose();
-            }
-
-            _recordingCancellation = new();
-
-            _recorderStatus = RecorderStatusEnum.Idle;
-            ChosenRecorder.RecorderStatusChangedSignal += RecorderStatusChangedSignal;
-
-            var recorder = await ChosenRecorder.GetRecorderAsync();
-
-            _recordingTask = recorder.RecordAndTranscribeAsync(
-                _recordingCancellation.Token
-                );
-            //_recordingTask = Task.Run(
-            //    async () =>
-            //        await recorder.RecordAndTranscribeAsync(
-            //            _recordingCancellation.Token
-            //            )
-            //    );
-
-            OnPropertyChanged();
-        }
-
-        private void RecorderStatusChangedSignal(
-            IRecorder sender,
-            RecorderStatusEnum newStatus
-            )
-        {
-            _recorderStatus = newStatus;
-
-            OnPropertyChanged();
-        }
-
-        private async Task StopRecordingAsync()
-        {
             try
             {
-                if (_recordingTask is null || _recordingCancellation is null)
+                var transcribeResult = await _rtpProcessor.RecordTranscribeAndPostProcessAsync();
+                if (transcribeResult is null)
                 {
                     return;
                 }
 
-                if (!await _stopRecordingSignal.WaitAsync(TimeSpan.Zero))
+                if (transcribeResult.TryGetText(out var text) && !string.IsNullOrEmpty(text))
                 {
-                    return;
+                    await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+
+                    PromptControl.AvalonTextEditor.Text += text;
+                    PromptControl.AvalonTextEditor.CaretOffset = PromptControl.AvalonTextEditor.Text.Length;
                 }
-
-                try
+                else if (transcribeResult.TryGetError(out var error))
                 {
-                    _recordingCancellation.Cancel();
-
-                    var transcribeResult = await _recordingTask;
-                    if (transcribeResult.TryGetText(out var text))
-                    {
-                        await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
-
-                        PromptControl.AvalonTextEditor.Text += text;
-                    }
-                }
-                finally
-                {
-                    _stopRecordingSignal.Release();
+                    await VS.MessageBox.ShowErrorAsync(
+                        "Error during recording",
+                        error
+                        );
                 }
             }
             finally
             {
-                ChosenRecorder.RecorderStatusChangedSignal -= RecorderStatusChangedSignal;
-
-                _recorderStatus = RecorderStatusEnum.Idle;
-
                 OnPropertyChanged();
             }
+
+        }
+
+        private async Task StopRecordingAsync()
+        {
+            await _rtpProcessor.StopRecordingAsync();
         }
 
         #endregion
@@ -970,27 +939,34 @@ namespace FreeAIr.UI.Chat
 
         private void ChatControlName_PreviewKeyDown(object sender, KeyEventArgs e)
         {
-            if (e.Key == Key.RightCtrl)
+            if (!e.IsRepeat)
             {
-                //start recording
-                StartRecordingAsync()
-                    .FileAndForget(nameof(StartRecordingAsync));
-            }
-            else
-            {
-                if (IsRecording())
+                if (e.Key == Key.RightCtrl)
+                {
+                    if (!_rtpProcessor.IsWorking)
+                    {
+                        //start recording
+                        StartRecordingAsync()
+                            .FileAndForget(nameof(StartRecordingAsync));
+                    }
+                }
+                else
                 {
                     //any other key pressed
-                    //stop recording
-                    StopRecordingAsync()
-                        .FileAndForget(nameof(StopRecordingAsync));
+
+                    if (_rtpProcessor.IsWorking)
+                    {
+                        //stop recording
+                        StopRecordingAsync()
+                            .FileAndForget(nameof(StopRecordingAsync));
+                    }
                 }
             }
         }
 
         private void ChatControlName_PreviewKeyUp(object sender, KeyEventArgs e)
         {
-            if (IsRecording())
+            if (_rtpProcessor.IsWorking)
             {
                 //any key up
                 //stop recording regardless of the key

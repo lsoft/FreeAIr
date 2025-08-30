@@ -9,6 +9,7 @@ using FreeAIr.Find;
 using FreeAIr.Helper;
 using FreeAIr.InfoBar;
 using FreeAIr.MCP.McpServerProxy;
+using FreeAIr.Record;
 using FreeAIr.UI;
 using FreeAIr.UI.ContextMenu;
 using FreeAIr.UI.Informer;
@@ -106,6 +107,8 @@ namespace FreeAIr
 
                 var componentModel = (IComponentModel)await this.GetServiceAsync(typeof(SComponentModel));
                 StartServices(componentModel);
+
+                await ChosenRecorder.InitAsync();
 
                 ShowReleaseNotesInfoBarIfNeeded();
 

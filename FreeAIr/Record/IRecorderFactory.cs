@@ -10,7 +10,7 @@ namespace FreeAIr.Record
             get;
         }
 
-        UserControl CreateConfigurationControl();
+        UserControl? CreateConfigurationControl();
 
         Task<IRecorder> CreateRecorderAsync();
     }
