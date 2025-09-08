@@ -13,13 +13,13 @@ namespace FreeAIr.Record.WhisperNet
 
         private static readonly string _runtimeFolderPath;
 
-        public const string RecorderName = "Whisper local (using Whisper.Net; processing on CPU)";
+        public const string RecorderName = "Whisper local (using Whisper.Net; processing on Vulkan or CPU)";
 
         public string Name => RecorderName;
 
         static WhisperNetRecorderFactory()
         {
-            _runtimeFolderPath = Path.Combine(FreeAIrPackage.WorkingFolder, @"runtimes\win-x64");
+            _runtimeFolderPath = Path.Combine(FreeAIrPackage.WorkingFolder, @"runtimes");
 
             Unpack();
         }

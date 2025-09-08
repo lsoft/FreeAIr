@@ -51,5 +51,6 @@
     <PackageVersion Include="System.Text.Json" Version="9.0.0" />
     <PackageVersion Include="Whisper.net" Version="1.7.4" />
     <PackageVersion Include="Whisper.net.Runtime" Version="1.7.4" />
+    <PackageVersion Include="Whisper.net.Runtime.Vulkan" Version="1.7.4" />
   </ItemGroup>
 </Project>

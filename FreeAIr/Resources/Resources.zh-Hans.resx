@@ -872,4 +872,17 @@
   <data name="MCP_servers_did_not_respond__Save" xml:space="preserve">
     <value>MCP 服务器没有响应。是否要保存选项？</value>
   </data>
+  <data name="Вы_можете_диктовать_промпты" xml:space="preserve">
+    <value>您可以使用语音口述提示。选择您首选的识别器，然后进行后处理。将光标置于提示文本框中，按住右 Ctrl 键。松开右 Ctrl 键后，提示识别开始，然后进行后处理（如果已启用）。
+
+识别器：
+- WinRT 和 Microsoft Speech API - 内置 Windows 识别器。运行良好且速度快，但并非支持所有语言。
+- Whisper Local - 是 FreeAIr 内置的基于 Whisper.net 的识别器。如果支持 Vulkan，则运行良好且速度快；如果不支持 Vulkan，则需要占用 CPU 资源。由 OpenAI Whisper LLM 提供支持。
+- Whisper OpenAI API - 是通过 OpenAI API 使用 Whisper LLM 的识别器。您可以使用远程 LLM 或本地 LLM，例如通过 KoboldCpp。
+
+选择识别器时，可能会显示一个包含其设置的窗口，必须先设置设置，然后该识别器才能运行。
+
+什么是后处理？
+后处理是通过 LLM 调用对已识别的提示进行处理。例如，您输入了一个提示，并且“create a class my class”被识别。当然，提供者无法知道最后两个单词是类“MyClass”的名称。后处理旨在纠正此类错误。您可以在 FreeAIr 控制中心添加后处理代理。</value>
+  </data>
 </root>

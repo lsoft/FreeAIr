@@ -15,17 +15,18 @@ namespace FreeAIr.UI.ContextMenu
             string? chosenPostProcessActionName
             )
         {
-            var recorderFactories = await ObtainRecorderFactoriesAsync();
-
-            var filteredActions = await FreeAIrOptions.DeserializeSupportActionsAsync(
-                e => e.Scopes.Contains(SupportScopeEnum.RecordPostProcess) && !string.IsNullOrEmpty(e.AgentName)
-                );
 
             var builder = VisualStudioContextMenuCommandBridge.BuildMenuItems();
+
             builder.AddTitle("Choose recorder:");
+            var recorderFactories = await ObtainRecorderFactoriesAsync();
             builder.AddItems(
                 recorderFactories
                     .ConvertAll(a => (a.Name, a.Name == chosenRecorderName, a as object))
+                );
+
+            var filteredActions = await FreeAIrOptions.DeserializeSupportActionsAsync(
+                e => e.Scopes.Contains(SupportScopeEnum.RecordPostProcess) && !string.IsNullOrEmpty(e.AgentName)
                 );
             if (filteredActions.Count == 0)
             {
@@ -52,6 +53,20 @@ namespace FreeAIr.UI.ContextMenu
                     );
             }
 
+
+            builder.AddTitle("Other:");
+            builder.AddItems(
+                [
+                    ("Recording enabled", RecordingPage.Instance.Enabled, RecordingOtherActionEnum.EnableDisable as object)
+                ]
+                );
+            builder.AddItems(
+                [
+                    ("Show help", false, RecordingOtherActionEnum.ShowHelp as object)
+                ]
+                );
+
+
             var chosenMenuItem = await builder.ShowAsync<object>();
 
             return chosenMenuItem;
@@ -67,5 +82,11 @@ namespace FreeAIr.UI.ContextMenu
             return recorderFactories;
         }
 
+    }
+
+    public enum RecordingOtherActionEnum
+    {
+        EnableDisable,
+        ShowHelp
     }
 }

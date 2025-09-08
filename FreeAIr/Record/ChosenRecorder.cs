@@ -3,6 +3,7 @@ using FreeAIr.Options2.Support;
 using FreeAIr.Record.Fake;
 using FreeAIr.UI.ContextMenu;
 using FreeAIr.UI.Windows;
+using Microsoft.VisualStudio.Shell.Interop;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -71,6 +72,22 @@ namespace FreeAIr.Record
             {
                 RecordingPage.Instance.ChosenPostProcessActionName = chosenAction.Name;
                 await RecordingPage.Instance.SaveAsync();
+            }
+            else if (chosenMenuItem is RecordingOtherActionEnum otherAction)
+            {
+                switch (otherAction)
+                {
+                    case RecordingOtherActionEnum.EnableDisable:
+                        RecordingPage.Instance.Enabled = !RecordingPage.Instance.Enabled;
+                        await RecordingPage.Instance.SaveAsync();
+                        break;
+                    case RecordingOtherActionEnum.ShowHelp:
+                        await VS.MessageBox.ShowAsync(
+                            FreeAIr.Resources.Resources.Вы_можете_диктовать_промпты,
+                            buttons: OLEMSGBUTTON.OLEMSGBUTTON_OK
+                            );
+                        break;
+                }
             }
         }
 

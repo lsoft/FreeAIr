@@ -1859,5 +1859,18 @@ namespace FreeAIr.Resources {
                 return ResourceManager.GetString("You_are_going_to_delete_stored_options", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to You can dictate prompts using your voice. Select your preferred provider, postprocessing, place the cursor in the prompt TextBox, press and hold Right-Ctrl. After releasing Right-Ctrl, prompt recognition starts, and then postprocessing, if enabled.
+        ///
+        ///Recognition providers:
+        ///- WinRT and Microsoft speech API - built-in Windows recognizers. Work well and fast, however, do not support all languages.
+        ///- Whisper local - is a built-in recognizer in FreeAIr based on Whisper.net. Works well and fast if Vulkan is su [rest of string was truncated]&quot;;.
+        /// </summary>
+        public static string Вы_можете_диктовать_промпты {
+            get {
+                return ResourceManager.GetString("Вы_можете_диктовать_промпты", resourceCulture);
+            }
+        }
     }
 }

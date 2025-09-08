@@ -876,4 +876,18 @@
     <value>MCP servers did not respond. Save options anyway?</value>
     <comment>Used in FreeAIr\UI\ViewModels\ControlCenterViewModel.cs document</comment>
   </data>
+  <data name="Вы_можете_диктовать_промпты" xml:space="preserve">
+    <value>You can dictate prompts using your voice. Select your preferred provider, postprocessing, place the cursor in the prompt TextBox, press and hold Right-Ctrl. After releasing Right-Ctrl, prompt recognition starts, and then postprocessing, if enabled.
+
+Recognition providers:
+- WinRT and Microsoft speech API - built-in Windows recognizers. Work well and fast, however, do not support all languages.
+- Whisper local - is a built-in recognizer in FreeAIr based on Whisper.net. Works well and fast if Vulkan is supported, uses CPU if Vulkan is not. Powered by OpenAI Whisper LLM.
+- Whisper OpenAI API - is a recognizer using Whisper LLM via OpenAI API. You can use either remote LLM or local LLM, for example, via KoboldCpp.
+
+When selecting a provider, a window may be displayed with its settings, which must be set up before the provider will work.
+
+What is post-processing?
+Post-processing is the processing of a recognized prompt via an LLM call. For example, you said a prompt and `create a class my class` was recognized. Of course, the provider cannot know that the last two words are the name of the class `MyClass`. Post-processing is designed to correct such errors. You can add a post-processing agent in the FreeAIr control center.</value>
+    <comment>Used in FreeAIr\Record\ChosenRecorder.cs document</comment>
+  </data>
 </root>

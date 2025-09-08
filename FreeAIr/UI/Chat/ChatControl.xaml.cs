@@ -932,27 +932,39 @@ namespace FreeAIr.UI.Chat
 
         private void ChatControlName_PreviewKeyDown(object sender, KeyEventArgs e)
         {
-            if (!e.IsRepeat)
-            {
-                if (e.Key == Key.RightCtrl)
-                {
-                    if (!_rtpProcessor.IsWorking)
-                    {
-                        //start recording
-                        StartRecordingAsync()
-                            .FileAndForget(nameof(StartRecordingAsync));
-                    }
-                }
-                else
-                {
-                    //any other key pressed
+            ProcessRecording(e);
+        }
 
-                    if (_rtpProcessor.IsWorking)
-                    {
-                        //stop recording
-                        StopRecordingAsync()
-                            .FileAndForget(nameof(StopRecordingAsync));
-                    }
+        private void ProcessRecording(KeyEventArgs e)
+        {
+            if (!RecordingPage.Instance.Enabled)
+            {
+                return;
+            }
+
+            if (e.IsRepeat)
+            {
+                return;
+            }
+
+            if (e.Key == Key.RightCtrl)
+            {
+                if (!_rtpProcessor.IsWorking)
+                {
+                    //start recording
+                    StartRecordingAsync()
+                        .FileAndForget(nameof(StartRecordingAsync));
+                }
+            }
+            else
+            {
+                //any other key pressed
+
+                if (_rtpProcessor.IsWorking)
+                {
+                    //stop recording
+                    StopRecordingAsync()
+                        .FileAndForget(nameof(StopRecordingAsync));
                 }
             }
         }

@@ -3,6 +3,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Whisper.net;
+using Whisper.net.LibraryLoader;
 
 namespace FreeAIr.Record.WhisperNet
 {
@@ -79,6 +80,12 @@ namespace FreeAIr.Record.WhisperNet
 
                 //switch to background thread (the thread will be blocked)
                 await TaskScheduler.Default;
+
+                RuntimeOptions.RuntimeLibraryOrder =
+                [
+                    RuntimeLibrary.Vulkan,
+                    RuntimeLibrary.Cpu
+                ];
 
                 using var recognizeFile = await MicrophoneRecorder.RecordAsync(
                     recordingCancellationToken

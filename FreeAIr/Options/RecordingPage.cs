@@ -6,6 +6,16 @@ namespace FreeAIr
     public class RecordingPage : BaseOptionModel<RecordingPage>
     {
         [Category("Recording")]
+        [DisplayName("Enabled")]
+        [Description("Recording enabled")]
+        [DefaultValue(true)]
+        public bool Enabled
+        {
+            get;
+            set;
+        } = true;
+
+        [Category("Recording")]
         [DisplayName("Chosen recorder name")]
         [Description("Chosen recorder name")]
         [DefaultValue("")]

@@ -466,6 +466,7 @@
     <PackageReference Include="System.Speech" />
     <PackageReference Include="Whisper.net" />
     <PackageReference Include="Whisper.net.Runtime" />
+    <PackageReference Include="Whisper.net.Runtime.Vulkan" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\CodeLens\FreeAIr.CodeLens.csproj">
@@ -599,14 +600,16 @@
   <Target Name="IncludeNuGetPackageReferences" AfterTargets="GetVsixSourceItems">
     <ItemGroup>
       <VSIXSourceItem Include="$(SolutionDir).art\Proxy.zip" TargetPath="MCP\Proxy\Archive\Proxy.zip" />
-      <VSIXSourceItem Include="$(SolutionDir).art\WhisperNet.Runtime.zip" TargetPath="runtimes\win-x64\WhisperNet.Runtime.zip" />
+      <VSIXSourceItem Include="$(SolutionDir).art\WhisperNet.Runtime.zip" TargetPath="runtimes\WhisperNet.Runtime.zip" />
       <VSIXSourceItem Include="@(ReferenceCopyLocalPaths)" Condition="'%(ReferenceCopyLocalPaths.NuGetPackageId)' == 'System.IO.Pipelines'" />
       <VSIXSourceItem Include="@(ReferenceCopyLocalPaths)" Condition="'%(ReferenceCopyLocalPaths.NuGetPackageId)' == 'System.Text.Json'" />
       <VSIXSourceItem Include="@(ReferenceCopyLocalPaths)" Condition="'%(ReferenceCopyLocalPaths.NuGetPackageId)' == 'Microsoft.Bcl.AsyncInterfaces'" />
     </ItemGroup>
   </Target>
   <PropertyGroup>
-    <PostBuildEvent>if exist $(SolutionDir).art\WhisperNet.Runtime.zip del /F /Q $(SolutionDir).art\WhisperNet.Runtime.zip
-PowerShell.exe -Command "Add-Type -A 'System.IO.Compression.FileSystem'; [IO.Compression.ZipFile]::CreateFromDirectory('$(TargetDir)runtimes\win-x64', '$(SolutionDir).art\WhisperNet.Runtime.zip')"</PostBuildEvent>
+    <PostBuildEvent>set "DIRS_TO_ZIP=win-x64 vulkan\win-x64"
+set "ZIP_NAME=$(SolutionDir).art\WhisperNet.Runtime.zip"
+PowerShell.exe -ExecutionPolicy Bypass -File "$(SolutionDir).CreateZipArchive.ps1" -DirsToZip "%25DIRS_TO_ZIP%25" -ZipName "%25ZIP_NAME%25" -RootDir "$(TargetDir)runtimes"
+</PostBuildEvent>
   </PropertyGroup>
 </Project>
