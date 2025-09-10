@@ -3,14 +3,21 @@
     <Metadata>
         <Identity Id="FreeAIr.47ca033e-85ab-44c6-a9ff-5a56c7317ea7" Version="4.2.0" Language="en-US" Publisher="lsoft" />
         <DisplayName>FreeAIr</DisplayName>
-        <Description xml:space="preserve">Access to AI for free for anyone.</Description>
+        <Description xml:space="preserve">Access to AI for free for anyone who is using VS 2022, VS 2026.</Description>
         <MoreInfo>https://github.com/lsoft/FreeAIr</MoreInfo>
+        <License>LICENSE.txt</License>
         <Icon>Resources\Icon.png</Icon>
         <PreviewImage>Resources\Icon.png</PreviewImage>
         <Tags>AI, Autocomplete, C#, Code Generation, Code Prediction, Code Snippets, Coding Accelerator, Coding Assistant, Developer Tools, IntelliCode, IntelliSense, LLM, Machine Learning, ML, Productivity, Suggestions</Tags>
     </Metadata>
     <Installation>
-        <InstallationTarget Id="Microsoft.VisualStudio.Community" Version="[17.14, 18.0)">
+        <InstallationTarget Id="Microsoft.VisualStudio.Community" Version="[17.14, 19.0)">
+            <ProductArchitecture>amd64</ProductArchitecture>
+        </InstallationTarget>
+        <InstallationTarget Version="[17.14,19.0)" Id="Microsoft.VisualStudio.Pro">
+            <ProductArchitecture>amd64</ProductArchitecture>
+        </InstallationTarget>
+        <InstallationTarget Version="[17.14,19.0)" Id="Microsoft.VisualStudio.Enterprise">
             <ProductArchitecture>amd64</ProductArchitecture>
         </InstallationTarget>
     </Installation>

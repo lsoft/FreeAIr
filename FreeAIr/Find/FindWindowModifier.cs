@@ -1,11 +1,14 @@
 ﻿using EnvDTE80;
+using EnvDTE90;
 using FreeAIr.Helper;
 using System.Collections.Generic;
+using System.Drawing.Printing;
 using System.Linq;
 using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+using System.Windows.Media.Media3D;
 using WpfHelpers;
 
 namespace FreeAIr.Find
@@ -44,7 +47,6 @@ namespace FreeAIr.Find
 
                         var sortedTextBoxes = (
                             from textBox in textBoxes
-                            where textBox.GetType() == typeof(TextBox)
                             where textBox.Visibility == Visibility.Visible && textBox.ActualHeight >= double.Epsilon
                             let crd = textBox.PointToScreen(new Point(0, 0))
                             orderby crd.Y
@@ -106,17 +108,28 @@ namespace FreeAIr.Find
             TextBox fileTypesFilterTextBox
             )
         {
-            var useRAGCheckBox = new CheckBox
+            CheckBox useRAGCheckBox;
+            if (styleSourceCheckBox is not null)
             {
-                Margin = findAllButton.Margin,
-                VerticalAlignment = findAllButton.VerticalAlignment,
-                VerticalContentAlignment = findAllButton.VerticalContentAlignment,
-                Height = findAllButton.ActualHeight,
-                Content = FreeAIr.Resources.Resources.Use_RAG,
-                //ToolTip = "Use NLO embedding JSON files to narrow down search scope, if the files exists for this solution",
-                ToolTip = "DOES NOT IMPLEMENTED YET",
-                Style = styleSourceCheckBox?.Style
-            };
+                useRAGCheckBox = styleSourceCheckBox.GetType().GetConstructors()[0].Invoke(null) as CheckBox;
+                useRAGCheckBox.Style = styleSourceCheckBox?.Style;
+                useRAGCheckBox.Template = styleSourceCheckBox?.Template;
+            }
+            else
+            {
+                useRAGCheckBox = new CheckBox
+                {
+                    Style = styleSourceCheckBox?.Style
+                };
+            }
+
+            useRAGCheckBox.Margin = findAllButton.Margin;
+            useRAGCheckBox.VerticalAlignment = findAllButton.VerticalAlignment;
+            useRAGCheckBox.VerticalContentAlignment = findAllButton.VerticalContentAlignment;
+            useRAGCheckBox.Height = findAllButton.ActualHeight;
+            useRAGCheckBox.Content = FreeAIr.Resources.Resources.Use_RAG;
+            //userRAGCheckBox.ToolTip = "Use NLO embedding JSON files to narrow down search scope, if the files exists for this solution";
+            useRAGCheckBox.ToolTip = "DOES NOT IMPLEMENTED YET";
 
             useRAGCheckBox.IsEnabled = false;
 
@@ -130,16 +143,14 @@ namespace FreeAIr.Find
             TextBox fileTypesFilterTextBox
             )
         {
-            var naturalSearchButton = new Button
-            {
-                Margin = findAllButton.Margin,
-                VerticalAlignment = findAllButton.VerticalAlignment,
-                VerticalContentAlignment = findAllButton.VerticalContentAlignment,
-                Height = findAllButton.ActualHeight,
-                Content = FreeAIr.Resources.Resources.Find_using_natural_language,
-                ToolTip = FreeAIr.Resources.Resources.Find_using_natural_language_in_current,
-                Style = findAllButton.Style
-            };
+            var naturalSearchButton = findAllButton.GetType().GetConstructors()[0].Invoke(null) as Button;
+            naturalSearchButton.Margin = findAllButton.Margin;
+            naturalSearchButton.VerticalAlignment = findAllButton.VerticalAlignment;
+            naturalSearchButton.VerticalContentAlignment = findAllButton.VerticalContentAlignment;
+            naturalSearchButton.Height = findAllButton.ActualHeight;
+            naturalSearchButton.Content = FreeAIr.Resources.Resources.Find_using_natural_language;
+            naturalSearchButton.ToolTip = FreeAIr.Resources.Resources.Find_using_natural_language_in_current;
+            naturalSearchButton.Style = findAllButton.Style;
 
             naturalSearchButton.Click += (sender, e) =>
             {

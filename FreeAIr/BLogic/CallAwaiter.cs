@@ -27,10 +27,7 @@ namespace FreeAIr.BLogic
             {
                 await PrepareAsync();
 
-                if (!await _semaphore.WaitAsync(_callTimeout))
-                {
-                    int g = 0;
-                }
+                _ = await _semaphore.WaitAsync(_callTimeout);
 
                 return await GetResultAsync();
             }

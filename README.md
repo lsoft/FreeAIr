@@ -4,7 +4,7 @@
 
 [این صفحه به زبان فارسی](https://translate.google.com/translate?sl=en&tl=fa&hl=en&u=https://github.com/lsoft/FreeAIr&client=webapp)
 
-Access to AI for free for everyone who is using Visual Studio.
+Access to AI for free for anyone who is using Visual Studio 2022\2026.
 
 ![logo](https://raw.githubusercontent.com/lsoft/FreeAIr/main/logo.png)
 

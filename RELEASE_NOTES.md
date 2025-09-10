@@ -25,6 +25,7 @@ My others extensions lives [here](https://marketplace.visualstudio.com/publisher
 
 ## 4.2.0
 
+- Added initial support for Visual Studio 2026.
 - Added voice prompting with 4 voice providers and LLM-based post-processor.
 - Simplified IPC data flow with FreeAIr child process Proxy.exe.
 

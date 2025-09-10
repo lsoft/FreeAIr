@@ -32,7 +32,7 @@ namespace FreeAIr
     [ProvideOptionPage(typeof(OptionsProvider.UIPageOptions), "FreeAIr", "UI", 0, 0, true, SupportsProfiles = true)]
     [ProvideOptionPage(typeof(OptionsProvider.InternalPageOptions), "FreeAIr", "Internal", 0, 0, true, SupportsProfiles = true)]
     [ProvideOptionPage(typeof(OptionsProvider.FontSizePageOptions), "FreeAIr", "Font sizes", 0, 0, true, SupportsProfiles = true)]
-    [ProvideOptionPage(typeof(OptionsProvider.RecordingPage), "FreeAIr", "Recording audio", 0, 0, true, SupportsProfiles = true)]
+    [ProvideOptionPage(typeof(OptionsProvider.RecordingPageOptions), "FreeAIr", "Recording audio", 0, 0, true, SupportsProfiles = true)]
     [ProvideToolWindow(typeof(ChatListToolWindow.Pane), Style = VsDockStyle.Tabbed, Window = WindowGuids.DocumentWell)]
     [ProvideToolWindow(typeof(ChooseModelToolWindow.Pane), Style = VsDockStyle.Tabbed, Window = WindowGuids.DocumentWell)]
     [ProvideToolWindow(typeof(NaturalLanguageResultsToolWindow.Pane), Style = VsDockStyle.Tabbed, Window = WindowGuids.DocumentWell)]

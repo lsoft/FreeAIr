@@ -97,6 +97,11 @@ namespace FreeAIr.UI.Embedillo
                 }
             };
 
+            AvalonTextEditor.TextChanged += (object sender, EventArgs e) =>
+            {
+                UpdateHintStatus();
+            };
+
             AvalonTextEditor.KeyUp += (object sender, KeyEventArgs e) =>
             {
                 UpdateHintStatus();

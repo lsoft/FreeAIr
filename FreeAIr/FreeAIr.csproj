@@ -374,6 +374,11 @@
   <ItemGroup>
     <Resource Include="Resources\Icon16.png" />
     <Resource Include="Resources\Icon32.png" />
+    <Content Include="..\LICENSE.txt">
+      <Link>LICENSE.txt</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
     <Content Include="Monikers.imagemanifest">
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>

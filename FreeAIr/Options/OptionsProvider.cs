@@ -5,7 +5,7 @@ namespace FreeAIr
     internal partial class OptionsProvider
     {
         [ComVisible(true)]
-        public class RecordingPage : BaseOptionPage<UIPage>
+        public class RecordingPageOptions : BaseOptionPage<RecordingPage>
         {
         }
 
