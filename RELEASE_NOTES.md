@@ -23,6 +23,10 @@ My others extensions lives [here](https://marketplace.visualstudio.com/publisher
 
 # FreeAIr Release Notes
 
+## 4.2.1
+
+- Fixed stupid bug.
+
 ## 4.2.0
 
 - Added initial support for Visual Studio 2026.

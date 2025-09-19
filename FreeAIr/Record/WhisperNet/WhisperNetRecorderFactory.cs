@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.Composition;
+﻿using FreeAIr.Helper;
+using System.ComponentModel.Composition;
 using System.IO;
 using System.IO.Compression;
 using System.Threading.Tasks;
@@ -46,18 +47,30 @@ namespace FreeAIr.Record.WhisperNet
 
         private static void Unpack()
         {
-            if (!Directory.Exists(_runtimeFolderPath))
+            try
             {
-                return;
-            }
+                if (!Directory.Exists(_runtimeFolderPath))
+                {
+                    return;
+                }
 
-            var zipFilePath = Path.Combine(
-                FreeAIrPackage.WorkingFolder,
-                _runtimeFolderPath,
-                RuntimeZipFileName
-                );
-            using var zip = ZipFile.OpenRead(zipFilePath);
-            zip.ExtractToDirectory(_runtimeFolderPath);
+                if (Directory.GetFileSystemEntries(_runtimeFolderPath).Length > 1)
+                {
+                    return;
+                }
+
+                var zipFilePath = Path.Combine(
+                    FreeAIrPackage.WorkingFolder,
+                    _runtimeFolderPath,
+                    RuntimeZipFileName
+                    );
+                using var zip = ZipFile.OpenRead(zipFilePath);
+                zip.ExtractToDirectory(_runtimeFolderPath);
+            }
+            catch (Exception excp)
+            {
+                excp.ActivityLogException();
+            }
         }
     }
 }

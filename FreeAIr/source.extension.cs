@@ -10,9 +10,9 @@ namespace FreeAIr
     {
         public const string Id = "FreeAIr.47ca033e-85ab-44c6-a9ff-5a56c7317ea7";
         public const string Name = "FreeAIr";
-        public const string Description = @"Access to AI for free for anyone.";
+        public const string Description = @"Access to AI for free for anyone who is using VS 2022, VS 2026.";
         public const string Language = "en-US";
-        public const string Version = "4.2.0";
+        public const string Version = "4.2.1";
         public const string Author = "lsoft";
         public const string Tags = "AI, Autocomplete, C#, Code Generation, Code Prediction, Code Snippets, Coding Accelerator, Coding Assistant, Developer Tools, IntelliCode, IntelliSense, LLM, Machine Learning, ML, Productivity, Suggestions";
         public const bool IsPreview = false;
