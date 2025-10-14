@@ -7,6 +7,11 @@ namespace FreeAIr.UI.InSitu
     {
         private static bool _suppress;
 
+        public static bool GetSuppressMode()
+        {
+            return _suppress;
+        }
+
         public static void SetSuppressMode(bool suppress)
         {
             _suppress = suppress;

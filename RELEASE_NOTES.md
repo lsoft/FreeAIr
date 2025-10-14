@@ -23,6 +23,10 @@ My others extensions lives [here](https://marketplace.visualstudio.com/publisher
 
 # FreeAIr Release Notes
 
+## 4.2.2
+
+- Fixed few bugs.
+
 ## 4.2.1
 
 - Fixed stupid bug.

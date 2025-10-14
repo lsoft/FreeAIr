@@ -156,11 +156,29 @@ namespace FreeAIr.Chat.Context.Item
                 SelectedIdentifier.FilePath
                 );
 
-
-            File.WriteAllText(
-                SelectedIdentifier.FilePath,
-                body.WithLineEnding(lineEnding)
-                );
+            if (SelectedIdentifier.Selection is null)
+            {
+                File.WriteAllText(
+                    SelectedIdentifier.FilePath,
+                    body.WithLineEnding(lineEnding)
+                    );
+            }
+            else
+            {
+                var text = File.ReadAllText(SelectedIdentifier.FilePath);
+                var mtext = text.Substring(
+                    0,
+                    SelectedIdentifier.Selection.StartPosition
+                    )
+                    + body.WithLineEnding(lineEnding)
+                    + text.Substring(
+                        SelectedIdentifier.Selection.StartPosition + SelectedIdentifier.Selection.Length
+                        );
+                File.WriteAllText(
+                    SelectedIdentifier.FilePath,
+                    mtext
+                    );
+            }
         }
 
         public async Task<IReadOnlyList<SolutionItemChatContextItem>> SearchRelatedContextItemsAsync()

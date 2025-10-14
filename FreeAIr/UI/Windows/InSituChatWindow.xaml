@@ -20,6 +20,7 @@
     Topmost="True"
     AllowsTransparency="True"
     WindowStyle="None"
+    ResizeMode="CanResize"
     SizeChanged="Window_SizeChanged"
     PreviewKeyUp="Window_PreviewKeyUp"
     MouseLeftButtonDown="Window_MouseLeftButtonDown"

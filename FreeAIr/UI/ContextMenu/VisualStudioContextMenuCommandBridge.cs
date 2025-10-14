@@ -1,4 +1,5 @@
 ﻿using FreeAIr.Helper;
+using FreeAIr.UI.InSitu;
 using Microsoft.VisualStudio.Shell.Interop;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -188,18 +189,28 @@ namespace FreeAIr.UI.ContextMenu
                     point = control.PointToScreen(new Point(0, 0));
                 }
 
-                var menuItem = await bridge.ShowAsync(
-                    menuItems,
-                    (int)point.X,
-                    (int)point.Y
-                    );
-
-                if (menuItem is not null)
+                var state = InSituChatInputCommandFilter.GetSuppressMode();
+                try
                 {
-                    return menuItem.Tag as TResult;
-                }
+                    InSituChatInputCommandFilter.SetSuppressMode(false);
 
-                return null;
+                    var menuItem = await bridge.ShowAsync(
+                        menuItems,
+                        (int)point.X,
+                        (int)point.Y
+                        );
+
+                    if (menuItem is not null)
+                    {
+                        return menuItem.Tag as TResult;
+                    }
+
+                    return null;
+                }
+                finally
+                {
+                    InSituChatInputCommandFilter.SetSuppressMode(state);
+                }
             }
 
         }
