@@ -50,6 +50,10 @@ namespace FreeAIr.Find
                             {
                                 continue;
                             }
+                            if (findAllButton.Visibility != Visibility.Visible)
+                            {
+                                continue;
+                            }
 
                             telemetry.AddStep("after continue FindAll");
 
@@ -177,6 +181,11 @@ namespace FreeAIr.Find
                 };
             }
 
+            findAllButton.IsVisibleChanged += (sender, e) =>
+            {
+                useRAGCheckBox.Visibility = findAllButton.Visibility;
+            };
+
             useRAGCheckBox.Margin = findAllButton.Margin;
             useRAGCheckBox.VerticalAlignment = findAllButton.VerticalAlignment;
             useRAGCheckBox.VerticalContentAlignment = findAllButton.VerticalContentAlignment;
@@ -205,6 +214,11 @@ namespace FreeAIr.Find
             naturalSearchButton.Content = FreeAIr.Resources.Resources.Find_using_natural_language;
             naturalSearchButton.ToolTip = FreeAIr.Resources.Resources.Find_using_natural_language_in_current;
             naturalSearchButton.Style = findAllButton.Style;
+
+            findAllButton.IsVisibleChanged += (sender, e) =>
+            {
+                naturalSearchButton.Visibility = findAllButton.Visibility;
+            };
 
             naturalSearchButton.Click += (sender, e) =>
             {
