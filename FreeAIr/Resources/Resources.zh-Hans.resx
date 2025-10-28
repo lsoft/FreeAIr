@@ -872,7 +872,7 @@
   <data name="MCP_servers_did_not_respond__Save" xml:space="preserve">
     <value>MCP 服务器没有响应。是否要保存选项？</value>
   </data>
-  <data name="Вы_можете_диктовать_промпты" xml:space="preserve">
+  <data name="You_can_dictate_prompts" xml:space="preserve">
     <value>您可以使用语音口述提示。选择您首选的识别器，然后进行后处理。将光标置于提示文本框中，按住右 Ctrl 键。松开右 Ctrl 键后，提示识别开始，然后进行后处理（如果已启用）。
 
 识别器：

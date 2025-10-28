@@ -24,7 +24,7 @@ namespace FreeAIr.Record.Fake
         {
             return Task.FromResult(
                 RecordTranscribeResult.FromFailure(
-                    "Fake recorder cannot record. If you are see this recorder, then something inside FreeAIr went wrong."
+                    "Fake recorder cannot record. If you are see this message, then something inside FreeAIr went wrong."
                     )
                 );
         }

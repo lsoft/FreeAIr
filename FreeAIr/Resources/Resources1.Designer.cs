@@ -1867,9 +1867,9 @@ namespace FreeAIr.Resources {
         ///- WinRT and Microsoft speech API - built-in Windows recognizers. Work well and fast, however, do not support all languages.
         ///- Whisper local - is a built-in recognizer in FreeAIr based on Whisper.net. Works well and fast if Vulkan is su [rest of string was truncated]&quot;;.
         /// </summary>
-        public static string Вы_можете_диктовать_промпты {
+        public static string You_can_dictate_prompts {
             get {
-                return ResourceManager.GetString("Вы_можете_диктовать_промпты", resourceCulture);
+                return ResourceManager.GetString("You_can_dictate_prompts", resourceCulture);
             }
         }
     }

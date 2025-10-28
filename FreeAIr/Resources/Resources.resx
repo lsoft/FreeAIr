@@ -876,7 +876,7 @@
     <value>MCP servers did not respond. Save options anyway?</value>
     <comment>Used in FreeAIr\UI\ViewModels\ControlCenterViewModel.cs document</comment>
   </data>
-  <data name="Вы_можете_диктовать_промпты" xml:space="preserve">
+  <data name="You_can_dictate_prompts" xml:space="preserve">
     <value>You can dictate prompts using your voice. Select your preferred provider, postprocessing, place the cursor in the prompt TextBox, press and hold Right-Ctrl. After releasing Right-Ctrl, prompt recognition starts, and then postprocessing, if enabled.
 
 Recognition providers:

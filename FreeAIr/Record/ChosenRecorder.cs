@@ -18,7 +18,16 @@ namespace FreeAIr.Record
 
         public static async Task InitAsync()
         {
-            await SetNewRecorderAsync();
+            try
+            {
+                await SetNewRecorderAsync();
+            }
+            catch (Exception excp)
+            {
+                excp.ActivityLogException();
+
+                await ReplaceRecorderWithAsync(FakeRecorder.Instance);
+            }
         }
 
         public static bool IsReady() => _currentRecorder is not null;
@@ -83,7 +92,7 @@ namespace FreeAIr.Record
                         break;
                     case RecordingOtherActionEnum.ShowHelp:
                         await VS.MessageBox.ShowAsync(
-                            FreeAIr.Resources.Resources.Вы_можете_диктовать_промпты,
+                            FreeAIr.Resources.Resources.You_can_dictate_prompts,
                             buttons: OLEMSGBUTTON.OLEMSGBUTTON_OK
                             );
                         break;
