@@ -6,29 +6,29 @@ using System.Threading.Tasks;
 
 namespace FreeAIr.MCP.McpServerProxy.VS.Tools
 {
-    public sealed class GetSolutionItemBodyTool : VisualStudioMcpServerTool
+    public sealed class GetSolutionFileBodyTool : VisualStudioMcpServerTool
     {
-        private const string ItemNamePathParameterName = "item_name_or_full_path";
+        private const string FileNamePathParameterName = "file_name_or_full_path";
 
-        public static readonly GetSolutionItemBodyTool Instance = new();
+        public static readonly GetSolutionFileBodyTool Instance = new();
 
-        public const string VisualStudioToolName = "GetSolutionItemBody";
+        public const string VisualStudioToolName = "GetSolutionFileBody";
 
-        public GetSolutionItemBodyTool(
+        public GetSolutionFileBodyTool(
             ) : base(
                 VisualStudioMcpServerProxy.VisualStudioProxyName,
                 VisualStudioToolName,
-                "Returns a JSON-formatted information about solution item (document, file). The result of this function includes: item name, item full path, item kind and its content (body, text) for each found item.",
+                "Returns a JSON-formatted information about solution file (document, item). The result of this function includes: file name, file full path, file kind and its content (body, text) for each found file.",
                 $$$"""
                 {
                     "type": "object",
                     "properties": {
-                        "{{{ItemNamePathParameterName}}}": {
+                        "{{{FileNamePathParameterName}}}": {
                         "type": "string",
-                        "description": "Full path or name of solution item"
+                        "description": "Full path or name of solution file"
                         }
                     },
-                    "required": ["{{{ItemNamePathParameterName}}}"]
+                    "required": ["{{{FileNamePathParameterName}}}"]
                 }
                 """
                 )
@@ -43,9 +43,9 @@ namespace FreeAIr.MCP.McpServerProxy.VS.Tools
         {
             await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
 
-            if (!arguments.TryGetValue(ItemNamePathParameterName, out var nameOrPathOfItemObj))
+            if (!arguments.TryGetValue(FileNamePathParameterName, out var nameOrPathOfItemObj))
             {
-                return McpServerProxyToolCallResult.CreateFailed($"Parameter {ItemNamePathParameterName} does not found.");
+                return McpServerProxyToolCallResult.CreateFailed($"Parameter {FileNamePathParameterName} does not found.");
             }
 
             var nameOrPathOfItem = nameOrPathOfItemObj as string;

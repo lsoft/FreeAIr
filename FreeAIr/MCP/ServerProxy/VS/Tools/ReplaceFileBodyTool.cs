@@ -8,34 +8,34 @@ using System.Threading.Tasks;
 
 namespace FreeAIr.MCP.McpServerProxy.VS.Tools
 {
-    public sealed class ReplaceDocumentBodyTool : VisualStudioMcpServerTool
+    public sealed class ReplaceFileBodyTool : VisualStudioMcpServerTool
     {
-        public static readonly ReplaceDocumentBodyTool Instance = new();
+        public static readonly ReplaceFileBodyTool Instance = new();
 
-        public const string VisualStudioToolName = "ReplaceDocumentBody";
+        public const string VisualStudioToolName = "ReplaceFileBody";
 
-        public const string ItemNamePathParameterName = "item_name_or_full_path";
-        public const string NewItemBodyParameterName = "new_item_body";
+        public const string FileNamePathParameterName = "file_name_or_full_path";
+        public const string NewFileBodyParameterName = "new_file_body";
 
-        public ReplaceDocumentBodyTool(
+        public ReplaceFileBodyTool(
             ) : base(
                 VisualStudioMcpServerProxy.VisualStudioProxyName,
                 VisualStudioToolName,
-                "Replaces the item (document, file) body (content, text) with a new one. Use this function if you need to make a changes in the item (document, file).",
+                "Replaces the file (document, item) body (content, text) with a new one. Use this function if you need to make a changes in the file.",
                 $$$"""
                 {
                     "type": "object",
                     "properties": {
-                        "{{{ItemNamePathParameterName}}}": {
+                        "{{{FileNamePathParameterName}}}": {
                         "type": "string",
-                        "description": "Full path or name of the solution item (document, file) in which we change the body (text, content)"
+                        "description": "Full path or name of the solution file (document, item) in which you want to change the body (text, content)"
                         },
-                        "{{{NewItemBodyParameterName}}}": {
+                        "{{{NewFileBodyParameterName}}}": {
                         "type": "string",
-                        "description": "A new body (text, content) of solution item."
+                        "description": "A new body (text, content) of solution file."
                         }
                     },
-                    "required": ["{{{ItemNamePathParameterName}}}", "{{{NewItemBodyParameterName}}}"]
+                    "required": ["{{{FileNamePathParameterName}}}", "{{{NewFileBodyParameterName}}}"]
                 }
                 """
                 )
@@ -50,9 +50,9 @@ namespace FreeAIr.MCP.McpServerProxy.VS.Tools
         {
             await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
 
-            if (!arguments.TryGetValue(ItemNamePathParameterName, out var itemNamePathObj))
+            if (!arguments.TryGetValue(FileNamePathParameterName, out var itemNamePathObj))
             {
-                return McpServerProxyToolCallResult.CreateFailed($"Parameter {ItemNamePathParameterName} does not found.");
+                return McpServerProxyToolCallResult.CreateFailed($"Parameter {FileNamePathParameterName} does not found.");
             }
             var nameOrPathOfItem = itemNamePathObj as string;
 
@@ -65,9 +65,9 @@ namespace FreeAIr.MCP.McpServerProxy.VS.Tools
                 return McpServerProxyToolCallResult.CreateFailed($"File {nameOrPathOfItem} does not found in current solution.");
             }
 
-            if (!arguments.TryGetValue(NewItemBodyParameterName, out var draftBodyOfNewItemObj))
+            if (!arguments.TryGetValue(NewFileBodyParameterName, out var draftBodyOfNewItemObj))
             {
-                return McpServerProxyToolCallResult.CreateFailed($"Parameter {NewItemBodyParameterName} does not found.");
+                return McpServerProxyToolCallResult.CreateFailed($"Parameter {NewFileBodyParameterName} does not found.");
             }
             var draftBodyOfNewItem = draftBodyOfNewItemObj as string;
 

@@ -175,10 +175,10 @@
     <Compile Include="MCP\ServerProxy\VS\Tools\WebSearchTool.cs" />
     <Compile Include="MCP\ServerProxy\VS\Tools\GitCommitTool.cs" />
     <Compile Include="MCP\ServerProxy\VS\Tools\InstallNugetPackageTool.cs" />
-    <Compile Include="MCP\ServerProxy\VS\Tools\ReplaceDocumentBodyTool.cs" />
-    <Compile Include="MCP\ServerProxy\VS\Tools\GetAllSolutionItemsTool.cs" />
+    <Compile Include="MCP\ServerProxy\VS\Tools\ReplaceFileBodyTool.cs" />
+    <Compile Include="MCP\ServerProxy\VS\Tools\GetAllSolutionFilesTool.cs" />
     <Compile Include="MCP\ServerProxy\VS\Tools\BuildAndReturnBuildResultsTool.cs" />
-    <Compile Include="MCP\ServerProxy\VS\Tools\GetSolutionItemBodyTool.cs" />
+    <Compile Include="MCP\ServerProxy\VS\Tools\GetSolutionFileBodyTool.cs" />
     <Compile Include="MCP\ServerProxy\VS\Tools\GetAllWarningErrorsTool.cs" />
     <Compile Include="MCP\ServerProxy\VS\Tools\VisualStudioMcpServerTool.cs" />
     <Compile Include="MCP\ServerProxy\VS\VisualStudioMcpServerProxy.cs" />

@@ -10,17 +10,17 @@ using System.Threading.Tasks;
 
 namespace FreeAIr.MCP.McpServerProxy.VS.Tools
 {
-    public sealed class GetAllSolutionItemsTool : VisualStudioMcpServerTool
+    public sealed class GetAllSolutionFilesTool : VisualStudioMcpServerTool
     {
-        public static readonly GetAllSolutionItemsTool Instance = new();
+        public static readonly GetAllSolutionFilesTool Instance = new();
 
-        public const string VisualStudioToolName = "GetAllSolutionItems";
+        public const string VisualStudioToolName = "GetAllSolutionFiles";
 
-        public GetAllSolutionItemsTool(
+        public GetAllSolutionFilesTool(
             ) : base(
                 VisualStudioMcpServerProxy.VisualStudioProxyName,
                 VisualStudioToolName,
-                "Returns a JSON-formatted list of items (documents, files) metadata of an open solution. The result of this function includes: item name, item full path, item kind, and optional additional information about item content.",
+                "Returns a JSON-formatted list of files (documents, items) metadata of an open solution. The result of this function includes: file name, file full path, file kind, and optional additional information about file's content.",
                 "{}"
                 )
         {

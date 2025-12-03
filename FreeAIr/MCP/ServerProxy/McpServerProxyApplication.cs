@@ -99,10 +99,10 @@ namespace FreeAIr.MCP.McpServerProxy
                 );
             if (!string.IsNullOrEmpty(reply.ErrorMessage))
             {
-                throw new InvalidOperationException(reply.ErrorMessage);
+                ActivityLogHelper.ActivityLogWarning(reply.ErrorMessage);
             }
 
-            var approvedExternalMcpServers = reply.McpServers;
+            var approvedExternalMcpServers = reply.McpServers ?? new McpServers();
 
             var toolContainer = await AvailableToolContainer.ReadSystemAsync();
 
