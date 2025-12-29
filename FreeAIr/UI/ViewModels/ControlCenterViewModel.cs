@@ -791,7 +791,8 @@ $$$"""
                 var w = new AgentConfigureWindow(
                     );
                 w.DataContext = new AgentConfigureViewModel(
-                    options.AgentCollection
+                    options.AgentCollection,
+                    options.Supports
                     );
                 if ((await w.ShowDialogAsync()).GetValueOrDefault())
                 {
@@ -839,6 +840,7 @@ $$$"""
                 var w = new ActionConfigureWindow(
                     );
                 w.DataContext = new ActionConfigureViewModel(
+                    options.AgentCollection,
                     options.Supports
                     );
                 if ((await w.ShowDialogAsync()).GetValueOrDefault())

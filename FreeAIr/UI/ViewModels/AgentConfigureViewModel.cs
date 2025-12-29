@@ -1,5 +1,7 @@
 ﻿using FreeAIr.Options2.Agent;
+using FreeAIr.Options2.Support;
 using FreeAIr.UI.ContextMenu;
+using System.Linq;
 using System.Windows;
 using System.Windows.Input;
 using WpfHelpers;
@@ -19,6 +21,7 @@ namespace FreeAIr.UI.ViewModels
         private ICommand _upAgentCommand;
         private ICommand _downAgentCommand;
         private ICommand _cloneAgentCommand;
+        private readonly SupportCollectionJson _actionCollection;
 
         public Action<bool>? CloseWindow
         {
@@ -233,6 +236,19 @@ namespace FreeAIr.UI.ViewModels
                     _applyAndCloseCommand = new AsyncRelayCommand(
                         async a =>
                         {
+                            var actions = _actionCollection.Actions.FindAll(ac =>
+                                AgentCollection.Agents.All(ag => !string.IsNullOrEmpty(ac.AgentName) && ag.Name != ac.AgentName)
+                                );
+
+                            if (actions.Count > 0)
+                            {
+                                var actionNames = string.Join(",", actions.Select(ac => ac.Name));
+
+                                await VS.MessageBox.ShowErrorAsync(
+                                    string.Format(Resources.Resources.There_are_support_actions___actionNames, actionNames),
+                                    string.Empty
+                                    );
+                            }
 
                             if (CloseWindow is not null)
                             {
@@ -366,7 +382,8 @@ namespace FreeAIr.UI.ViewModels
         }
 
         public AgentConfigureViewModel(
-            AgentCollectionJson agentCollection
+            AgentCollectionJson agentCollection,
+            SupportCollectionJson actionCollection
             )
         {
             if (agentCollection is null)
@@ -374,7 +391,13 @@ namespace FreeAIr.UI.ViewModels
                 throw new ArgumentNullException(nameof(agentCollection));
             }
 
+            if (actionCollection is null)
+            {
+                throw new ArgumentNullException(nameof(actionCollection));
+            }
+
             AgentCollection = agentCollection;
+            _actionCollection = actionCollection;
             AvailableAgents = new ObservableCollection2<AgentJson>(agentCollection.Agents);
         }
     }

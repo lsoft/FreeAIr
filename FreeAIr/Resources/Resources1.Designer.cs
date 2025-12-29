@@ -19,7 +19,7 @@ namespace FreeAIr.Resources {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "18.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     public class Resources {
@@ -1650,6 +1650,15 @@ namespace FreeAIr.Resources {
         public static string Status_is_unknown {
             get {
                 return ResourceManager.GetString("Status_is_unknown", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to There are support actions ({0}) that references to unknown agent. These actions will be disabled..
+        /// </summary>
+        public static string There_are_support_actions___actionNames {
+            get {
+                return ResourceManager.GetString("There_are_support_actions___actionNames", resourceCulture);
             }
         }
         

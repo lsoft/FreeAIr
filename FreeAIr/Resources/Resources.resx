@@ -890,4 +890,8 @@ What is post-processing?
 Post-processing is the processing of a recognized prompt via an LLM call. For example, you said a prompt and `create a class my class` was recognized. Of course, the provider cannot know that the last two words are the name of the class `MyClass`. Post-processing is designed to correct such errors. You can add a post-processing agent in the FreeAIr control center.</value>
     <comment>Used in FreeAIr\Record\ChosenRecorder.cs document</comment>
   </data>
+  <data name="There_are_support_actions___actionNames" xml:space="preserve">
+    <value>There are support actions ({0}) that references to unknown agent. These actions will be disabled.</value>
+    <comment>Used in FreeAIr\UI\ViewModels\AgentConfigureViewModel.cs document</comment>
+  </data>
 </root>

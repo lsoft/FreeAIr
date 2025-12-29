@@ -1,9 +1,12 @@
 ﻿using FreeAIr.Helper;
+using FreeAIr.Options2.Agent;
 using FreeAIr.Options2.Support;
 using Microsoft.VisualStudio.Imaging;
 using Microsoft.VisualStudio.Imaging.Interop;
+using System.Linq;
 using System.Windows;
 using System.Windows.Input;
+using System.Windows.Media;
 using WpfHelpers;
 
 namespace FreeAIr.UI.ViewModels
@@ -18,6 +21,7 @@ namespace FreeAIr.UI.ViewModels
         private ICommand _downActionCommand;
         private ICommand _upActionCommand;
         private ICommand _cloneActionCommand;
+        private readonly AgentCollectionJson _agentCollection;
 
         public Action<bool>? CloseWindow
         {
@@ -255,6 +259,44 @@ namespace FreeAIr.UI.ViewModels
             }
         }
 
+        public string AgentName
+        {
+            get
+            {
+                return _selectedAction?.AgentName;
+            }
+
+            set
+            {
+                _selectedAction?.AgentName = value;
+
+                OnPropertyChanged();
+            }
+        }
+
+        public Brush AgentNameBorder
+        {
+            get
+            {
+                if (_selectedAction is null)
+                {
+                    return Brushes.Transparent;
+                }
+                if (string.IsNullOrEmpty(_selectedAction.AgentName))
+                {
+                    return Brushes.Transparent;
+                }
+
+                var agent = _agentCollection.Agents.FirstOrDefault(a => a.Name == _selectedAction.AgentName);
+                if (agent is not null)
+                {
+                    return Brushes.Transparent;
+                }
+
+                return Brushes.Red;
+            }
+        }
+
         public ObservableCollection2<string> MonikerList
         {
             get;
@@ -329,14 +371,21 @@ namespace FreeAIr.UI.ViewModels
 
 
         public ActionConfigureViewModel(
+            AgentCollectionJson agentCollection,
             SupportCollectionJson actionCollection
             )
         {
+            if (agentCollection is null)
+            {
+                throw new ArgumentNullException(nameof(agentCollection));
+            }
+
             if (actionCollection is null)
             {
                 throw new ArgumentNullException(nameof(actionCollection));
             }
 
+            _agentCollection = agentCollection;
             ActionCollection = actionCollection;
 
             ScopeList = new ObservableCollection2<ScopeViewModel>();

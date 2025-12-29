@@ -885,4 +885,7 @@
 什么是后处理？
 后处理是通过 LLM 调用对已识别的提示进行处理。例如，您输入了一个提示，并且“create a class my class”被识别。当然，提供者无法知道最后两个单词是类“MyClass”的名称。后处理旨在纠正此类错误。您可以在 FreeAIr 控制中心添加后处理代理。</value>
   </data>
+  <data name="There_are_support_actions___actionNames" xml:space="preserve">
+    <value>有引用未知代理的支持操作 ({0})。这些操作将被禁用。</value>
+  </data>
 </root>

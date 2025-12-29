@@ -23,6 +23,10 @@ My others extensions lives [here](https://marketplace.visualstudio.com/publisher
 
 # FreeAIr Release Notes
 
+## 4.2.7
+
+- Fixed #51 (improved agent <-> action pairing).
+
 ## 4.2.6
 
 - Fixed few bugs.

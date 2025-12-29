@@ -209,6 +209,7 @@
                 HorizontalAlignment="Stretch"
                 VerticalAlignment="Center"
                 Text="{Binding SelectedAction.Name, UpdateSourceTrigger=PropertyChanged}"
+                BorderThickness="1"
                 />
 
             <Label
@@ -219,13 +220,19 @@
                 Content="{x:Static resources:Resources.Agent_name}"
                 />
 
-            <TextBox
+            <Border
                 Grid.Row="2"
                 Grid.Column="1"
                 HorizontalAlignment="Stretch"
                 VerticalAlignment="Center"
-                Text="{Binding SelectedAction.AgentName, UpdateSourceTrigger=PropertyChanged}"
-                />
+                BorderThickness="1"
+                BorderBrush="{Binding AgentNameBorder}"
+                >
+                <TextBox
+                    Text="{Binding AgentName, UpdateSourceTrigger=PropertyChanged}"
+                    />
+            </Border>
+            
 
             <Label
                 Grid.Row="3"
