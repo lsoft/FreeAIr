@@ -99,6 +99,11 @@ namespace MarkdownParserTester
                 ConstantFontSizeProvider.Instance
                 );
 
+            //var body = System.IO.File.ReadAllText(@"C:\temp\1.txt");
+            //var parsedAnswer = answerParser.Parse(
+            //    body
+            //    );
+
             var parsedAnswer = answerParser.Parse(
 """
 <mynode>One line xml node!</mynode>
@@ -165,59 +170,17 @@ The table:
 | 1 | 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 |
 | 2 | 0 | 2 | 4 | 6 | 8 | 10 | 12 | 14 | 16 | 18 |
 
+
+
+
+
 That's all, folks!
+
+
 
 """.Replace("\r\n", "\n")
                 );
-//*/
 
-            /*
-            var parsedAnswer = answerParser.Parse(
-"""
-aaa , b,
-"""
-                );
-//*/
-
-/*
-            var parsedAnswer = answerParser.Parse(
-"""
-<think>
-dotnet run -r <path> -p <project> -- <args>
-</think>
-"""
-                );
-            //*/
-
-/*
-            var parsedAnswer = answerParser.Parse(
-"""
-not bolds at all
-
-fake **single bold
-
-**fake single bold
-
-fake single bold**
-
-**real** one bold
-
-real **one** bold
-
-real one **bold**
-
-**real one bold**
-
-**real** two bolds **yeah**
-
-**real** two **bolds** yeah
-
-real **two** bolds **yeah**
-
-fake **three** bolds **one** two **three and latest
-"""
-                );
-            //*/
 
             parsedAnswer.UpdateFlowDocument(
                 Document,

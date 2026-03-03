@@ -140,7 +140,7 @@ namespace FreeAIr.BLogic.Reader
 
                 OpenAI.Chat.ChatFinishReason? chatFinishReason = null;
                 var toolCalls = new List<StreamingChatToolCallUpdate>();
-                var contentParts = new List<ChatMessageContentPart>();
+                //var contentParts = new List<ChatMessageContentPart>();
 
                 _chat.Status = ChatStatusEnum.ReadingAnswer;
 
@@ -158,15 +158,15 @@ namespace FreeAIr.BLogic.Reader
                     chatFinishReason ??= completionUpdate.FinishReason;
                     toolCalls.AddRange(completionUpdate.ToolCallUpdates);
 
-                    if (completionUpdate.FinishReason != ChatFinishReason.ToolCalls
-                        || completionUpdate.ToolCallUpdates.Count == 0
-                        )
-                    {
-                        if (completionUpdate.ContentUpdate.Count > 0)
-                        {
-                            contentParts.AddRange(completionUpdate.ContentUpdate);
-                        }
-                    }
+                    //if (completionUpdate.FinishReason != ChatFinishReason.ToolCalls
+                    //    || completionUpdate.ToolCallUpdates.Count == 0
+                    //    )
+                    //{
+                    //    if (completionUpdate.ContentUpdate.Count > 0)
+                    //    {
+                    //        contentParts.AddRange(completionUpdate.ContentUpdate);
+                    //    }
+                    //}
 
                     foreach (ChatMessageContentPart contentPart in completionUpdate.ContentUpdate)
                     {

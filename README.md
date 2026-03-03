@@ -279,7 +279,7 @@ This MCP server is available immediately and does not require any configuration 
 
 Github.com MCP server is a server that provides LLM with the ability to work with a repository on github.com. For example, through this server you can ask LLM to get a list of issues and ask LLM to fix one of them.
 
-To install this server, click the corresponding button in the FreeAIr Command Center. The latest version of github.com MCP server will be downloaded and installed.
+To install this server, click the corresponding button in the FreeAIr Control Center. The latest version of github.com MCP server will be downloaded and installed.
 
 ## Commit message building
 
@@ -293,7 +293,7 @@ An example of a prompt: `suggest me the best commit message for my uncommitted c
 
 ## Natural Language Search
 
-Using natural language to search for a solution or project helps you search code using fuzzy queries that focus on the meaning of the code rather than its text.
+Using natural language to search in a solution or project helps you search code using fuzzy queries that focus on the meaning of the code rather than its text.
 
 <a href="https://raw.githubusercontent.com/lsoft/FreeAIr/main/nlos0.png" target="_blank">
   <img src="https://raw.githubusercontent.com/lsoft/FreeAIr/main/nlos0.png" style="height: 150px; width: auto; object-fit: contain; border: 1px solid #ccc;" alt="Searching with natural language" />
@@ -374,7 +374,7 @@ the `Use RAG` checkbox will become available. When selected, FreeAIr first selec
 
 It is recommended to save these Json files to a git repository so that the natural language search function works for all team members.
 
-WARNING: In the 3.0 version of FreeAIr the checkbox `Use RAG` DOES NOT IMPLEMENTED YET.
+WARNING: In the 4.0 version of FreeAIr the checkbox `Use RAG` DOES NOT IMPLEMENTED YET.
 
 # How I can access to AI if my country is banned from Copilot and from any other LLM provider?
 

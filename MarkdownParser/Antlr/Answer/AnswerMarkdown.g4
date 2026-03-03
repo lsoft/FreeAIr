@@ -1,7 +1,7 @@
 ﻿grammar AnswerMarkdown;
 
 markdownFile
-  : (block newline)+ EOF
+  : newline* (block newline)+ EOF
   ;
 
 block

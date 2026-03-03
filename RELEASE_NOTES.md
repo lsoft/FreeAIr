@@ -23,6 +23,10 @@ My others extensions lives [here](https://marketplace.visualstudio.com/publisher
 
 # FreeAIr Release Notes
 
+## 4.2.8
+
+- Fixed bug with parsing markdown with leading \n\n.
+
 ## 4.2.7
 
 - Fixed #51 (improved agent <-> action pairing).
