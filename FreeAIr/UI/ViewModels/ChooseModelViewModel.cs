@@ -16,24 +16,14 @@ namespace FreeAIr.UI.ViewModels
     {
         private readonly HttpClient _httpClient = new HttpClient();
 
-        private string _message;
         private bool _loadFreeModels;
-        private ModelWrapper _selectedModel;
-
-        private ICommand _chooseCommand;
-        private ICommand _updatePageCommand;
-        private AgentJson _chosenAgent;
 
         public ObservableCollection2<AgentJson> AgentList
         {
             get;
         }
 
-        public AgentJson? ChosenAgent
-        {
-            get => _chosenAgent;
-            set => _chosenAgent = value;
-        }
+        public AgentJson? ChosenAgent { get; set; }
 
         public ObservableCollection2<ModelWrapper> ModelList
         {
@@ -42,10 +32,10 @@ namespace FreeAIr.UI.ViewModels
 
         public string Message
         {
-            get => _message;
+            get;
             private set
             {
-                _message = value;
+                field = value;
 
                 OnPropertyChanged();
             }
@@ -53,10 +43,10 @@ namespace FreeAIr.UI.ViewModels
 
         public ModelWrapper SelectedModel
         {
-            get => _selectedModel;
+            get;
             set
             {
-                _selectedModel = value;
+                field = value;
 
                 OnPropertyChanged();
             }
@@ -85,43 +75,44 @@ namespace FreeAIr.UI.ViewModels
         {
             get
             {
-                if (_chooseCommand == null)
+                if (field == null)
                 {
-                    _chooseCommand = new AsyncRelayCommand(
+                    field = new AsyncRelayCommand(
                         async a =>
                         {
                             await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
 
                             ModelList.ForEach(m => m.IsSelected = false);
-                            _selectedModel.IsSelected = true;
+                            SelectedModel.IsSelected = true;
 
                             var agents = await FreeAIrOptions.DeserializeAgentCollectionAsync();
-                            if (!_chosenAgent.Technical.IsOpenRouterAgent())
+                            if (!ChosenAgent.Technical.IsOpenRouterAgent())
                             {
                                 return;
                             }
 
-                            _chosenAgent.Technical.ChosenModel = _selectedModel.ModelId;
+                            ChosenAgent.Technical.ChosenModel = SelectedModel.ModelId;
                             await FreeAIrOptions.SaveAgentsAsync(agents);
                         },
                         a =>
-                            _chosenAgent is not null
-                            && _chosenAgent.Technical.IsOpenRouterAgent()
-                            && _selectedModel is not null
-                            && !_selectedModel.IsSelected
+                            ChosenAgent is not null
+                            && ChosenAgent.Technical.IsOpenRouterAgent()
+                            && SelectedModel is not null
+                            && !SelectedModel.IsSelected
                         );
                 }
 
-                return _chooseCommand;
+                return field;
             }
         }
+
         public ICommand UpdatePageCommand
         {
             get
             {
-                if (_updatePageCommand == null)
+                if (field == null)
                 {
-                    _updatePageCommand = new RelayCommand(
+                    field = new RelayCommand(
                         a =>
                         {
                             Task.Run(LoadModelListAsync)
@@ -130,7 +121,7 @@ namespace FreeAIr.UI.ViewModels
                         );
                 }
 
-                return _updatePageCommand;
+                return field;
             }
         }
         
@@ -175,7 +166,7 @@ namespace FreeAIr.UI.ViewModels
                     .ToList()
                     ;
 
-                var chosenModel = _chosenAgent?.Technical.ChosenModel;
+                var chosenModel = ChosenAgent?.Technical.ChosenModel;
 
                 ModelList.AddRange(
                     models

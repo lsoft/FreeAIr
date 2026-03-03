@@ -14,14 +14,6 @@ namespace FreeAIr.UI.ViewModels
     public sealed class ActionConfigureViewModel : BaseViewModel
     {
         private SupportActionJson _selectedAction;
-        private ICommand _addNewActionCommand;
-        private ICommand _deleteActionCommand;
-        private ICommand _applyAndCloseCommand;
-        private ICommand _addAnchorCommand;
-        private ICommand _downActionCommand;
-        private ICommand _upActionCommand;
-        private ICommand _cloneActionCommand;
-        private readonly AgentCollectionJson _agentCollection;
 
         public Action<bool>? CloseWindow
         {
@@ -33,6 +25,8 @@ namespace FreeAIr.UI.ViewModels
         {
             get;
         }
+
+        private readonly AgentCollectionJson _agentCollection;
 
         public SupportCollectionJson ActionCollection
         {
@@ -47,10 +41,10 @@ namespace FreeAIr.UI.ViewModels
 
         public SupportActionJson SelectedAction
         {
-            get => _selectedAction;
+            get;
             set
             {
-                _selectedAction = value;
+                field = value;
 
                 RefillScopes();
                 UpdateSelectedMoniker();
@@ -79,9 +73,9 @@ namespace FreeAIr.UI.ViewModels
         {
             get
             {
-                if (_addNewActionCommand is null)
+                if (field is null)
                 {
-                    _addNewActionCommand = new RelayCommand(
+                    field = new RelayCommand(
                         a =>
                         {
                             var newAction = new SupportActionJson
@@ -95,7 +89,7 @@ namespace FreeAIr.UI.ViewModels
                         });
                 }
 
-                return _addNewActionCommand;
+                return field;
             }
         }
 
@@ -103,9 +97,9 @@ namespace FreeAIr.UI.ViewModels
         {
             get
             {
-                if (_deleteActionCommand is null)
+                if (field is null)
                 {
-                    _deleteActionCommand = new RelayCommand(
+                    field = new RelayCommand(
                         a =>
                         {
                             ActionCollection.Actions.Remove(_selectedAction);
@@ -122,7 +116,7 @@ namespace FreeAIr.UI.ViewModels
                         });
                 }
 
-                return _deleteActionCommand;
+                return field;
             }
         }
 
@@ -130,9 +124,9 @@ namespace FreeAIr.UI.ViewModels
         {
             get
             {
-                if (_upActionCommand is null)
+                if (field is null)
                 {
-                    _upActionCommand = new RelayCommand(
+                    field = new RelayCommand(
                         a =>
                         {
                             var index = ActionCollection.Actions.IndexOf(_selectedAction);
@@ -163,7 +157,7 @@ namespace FreeAIr.UI.ViewModels
                         });
                 }
 
-                return _upActionCommand;
+                return field;
             }
         }
 
@@ -171,9 +165,9 @@ namespace FreeAIr.UI.ViewModels
         {
             get
             {
-                if (_downActionCommand is null)
+                if (field is null)
                 {
-                    _downActionCommand = new RelayCommand(
+                    field = new RelayCommand(
                         a =>
                         {
                             var index = ActionCollection.Actions.IndexOf(_selectedAction);
@@ -204,7 +198,7 @@ namespace FreeAIr.UI.ViewModels
                         });
                 }
 
-                return _downActionCommand;
+                return field;
             }
         }
 
@@ -212,9 +206,9 @@ namespace FreeAIr.UI.ViewModels
         {
             get
             {
-                if (_cloneActionCommand is null)
+                if (field is null)
                 {
-                    _cloneActionCommand = new RelayCommand(
+                    field = new RelayCommand(
                         a =>
                         {
                             var clone = (SupportActionJson)_selectedAction.Clone();
@@ -235,7 +229,7 @@ namespace FreeAIr.UI.ViewModels
                         });
                 }
 
-                return _cloneActionCommand;
+                return field;
             }
         }
 
@@ -243,9 +237,9 @@ namespace FreeAIr.UI.ViewModels
         {
             get
             {
-                if (_applyAndCloseCommand is null)
+                if (field is null)
                 {
-                    _applyAndCloseCommand = new AsyncRelayCommand(
+                    field = new AsyncRelayCommand(
                         async a =>
                         {
                             if (CloseWindow is not null)
@@ -255,7 +249,7 @@ namespace FreeAIr.UI.ViewModels
                         });
                 }
 
-                return _applyAndCloseCommand;
+                return field;
             }
         }
 
@@ -344,9 +338,9 @@ namespace FreeAIr.UI.ViewModels
         {
             get
             {
-                if (_addAnchorCommand is null)
+                if (field is null)
                 {
-                    _addAnchorCommand = new RelayCommand(
+                    field = new RelayCommand(
                         a =>
                         {
                             var avm = a as AnchorViewModel;
@@ -365,7 +359,7 @@ namespace FreeAIr.UI.ViewModels
                         });
                 }
 
-                return _addAnchorCommand;
+                return field;
             }
         }
 

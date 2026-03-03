@@ -76,19 +76,7 @@ namespace FreeAIr.UI.Chat
 
         #endregion
 
-        private ICommand _chooseChatAgentCommand;
-        private ICommand _editChatToolsCommand;
-        private ICommand _addCustomFileToContextCommand;
-        private ICommand _removeAllAutomaticItemsFromContextCommand;
-        private ICommand _deleteItemFromContextCommand;
-        private ICommand _addRelatedItemsToContextCommand;
-        private ICommand _openContextItemCommand;
-        private ICommand _addItemToContextCommand;
-        private ICommand _createPromptCommand;
-        private ICommand _stopCommand;
-
         private FreeAIr.Chat.Chat? _chat;
-        private ICommand _chooseRecorderCommand;
 
         /// <summary>
         /// Событие изменения свойства
@@ -111,9 +99,9 @@ namespace FreeAIr.UI.Chat
         {
             get
             {
-                if (_chooseChatAgentCommand == null)
+                if (field == null)
                 {
-                    _chooseChatAgentCommand = new AsyncRelayCommand(
+                    field = new AsyncRelayCommand(
                         async a =>
                         {
                             var chosenAgent = await VisualStudioContextMenuCommandBridge.ShowAsync<AgentJson>(
@@ -150,7 +138,7 @@ namespace FreeAIr.UI.Chat
                         );
                 }
 
-                return _chooseChatAgentCommand;
+                return field;
             }
         }
 
@@ -158,9 +146,9 @@ namespace FreeAIr.UI.Chat
         {
             get
             {
-                if (_editChatToolsCommand == null)
+                if (field == null)
                 {
-                    _editChatToolsCommand = new AsyncRelayCommand(
+                    field = new AsyncRelayCommand(
                         async a =>
                         {
                             var w = new NestedCheckBoxWindow();
@@ -188,7 +176,7 @@ namespace FreeAIr.UI.Chat
                         );
                 }
 
-                return _editChatToolsCommand;
+                return field;
             }
         }
 
@@ -196,9 +184,9 @@ namespace FreeAIr.UI.Chat
         {
             get
             {
-                if (_addCustomFileToContextCommand == null)
+                if (field == null)
                 {
-                    _addCustomFileToContextCommand = new AsyncRelayCommand(
+                    field = new AsyncRelayCommand(
                         async a =>
                         {
                             if (_chat is null)
@@ -270,7 +258,7 @@ namespace FreeAIr.UI.Chat
                         );
                 }
 
-                return _addCustomFileToContextCommand;
+                return field;
             }
         }
 
@@ -278,9 +266,9 @@ namespace FreeAIr.UI.Chat
         {
             get
             {
-                if (_removeAllAutomaticItemsFromContextCommand == null)
+                if (field == null)
                 {
-                    _removeAllAutomaticItemsFromContextCommand = new RelayCommand(
+                    field = new RelayCommand(
                         a =>
                         {
                             if (_chat is null)
@@ -314,7 +302,7 @@ namespace FreeAIr.UI.Chat
                         );
                 }
 
-                return _removeAllAutomaticItemsFromContextCommand;
+                return field;
             }
         }
 
@@ -322,9 +310,9 @@ namespace FreeAIr.UI.Chat
         {
             get
             {
-                if (_deleteItemFromContextCommand == null)
+                if (field == null)
                 {
-                    _deleteItemFromContextCommand = new RelayCommand(
+                    field = new RelayCommand(
                         a =>
                         {
                             if (_chat is null)
@@ -368,7 +356,7 @@ namespace FreeAIr.UI.Chat
                         );
                 }
 
-                return _deleteItemFromContextCommand;
+                return field;
             }
         }
 
@@ -376,9 +364,9 @@ namespace FreeAIr.UI.Chat
         {
             get
             {
-                if (_addRelatedItemsToContextCommand == null)
+                if (field == null)
                 {
-                    _addRelatedItemsToContextCommand = new AsyncRelayCommand(
+                    field = new AsyncRelayCommand(
                         async a =>
                         {
                             if (_chat is null)
@@ -464,7 +452,7 @@ namespace FreeAIr.UI.Chat
                         );
                 }
 
-                return _addRelatedItemsToContextCommand;
+                return field;
             }
         }
 
@@ -472,9 +460,9 @@ namespace FreeAIr.UI.Chat
         {
             get
             {
-                if (_openContextItemCommand == null)
+                if (field == null)
                 {
-                    _openContextItemCommand = new AsyncRelayCommand(
+                    field = new AsyncRelayCommand(
                         async a =>
                         {
                             if (a is not ChatContextItemViewModel item)
@@ -489,7 +477,7 @@ namespace FreeAIr.UI.Chat
                         );
                 }
 
-                return _openContextItemCommand;
+                return field;
             }
         }
 
@@ -497,9 +485,9 @@ namespace FreeAIr.UI.Chat
         {
             get
             {
-                if (_addItemToContextCommand == null)
+                if (field == null)
                 {
-                    _addItemToContextCommand = new AsyncRelayCommand(
+                    field = new AsyncRelayCommand(
                         async a =>
                         {
                             if (_chat is null)
@@ -553,7 +541,7 @@ namespace FreeAIr.UI.Chat
                         );
                 }
 
-                return _addItemToContextCommand;
+                return field;
             }
         }
 
@@ -561,9 +549,9 @@ namespace FreeAIr.UI.Chat
         {
             get
             {
-                if (_createPromptCommand == null)
+                if (field == null)
                 {
-                    _createPromptCommand = new AsyncRelayCommand(
+                    field = new AsyncRelayCommand(
                         async a =>
                         {
                             if (_chat is null)
@@ -623,7 +611,7 @@ namespace FreeAIr.UI.Chat
                         );
                 }
 
-                return _createPromptCommand;
+                return field;
             }
         }
 
@@ -631,9 +619,9 @@ namespace FreeAIr.UI.Chat
         {
             get
             {
-                if (_stopCommand == null)
+                if (field == null)
                 {
-                    _stopCommand = new AsyncRelayCommand(
+                    field = new AsyncRelayCommand(
                         async a =>
                         {
                             var componentModel = (IComponentModel)await FreeAIrPackage.Instance.GetServiceAsync(typeof(SComponentModel));
@@ -653,7 +641,7 @@ namespace FreeAIr.UI.Chat
                         });
                 }
 
-                return _stopCommand;
+                return field;
             }
         }
 
@@ -796,9 +784,9 @@ namespace FreeAIr.UI.Chat
         {
             get
             {
-                if (_chooseRecorderCommand == null)
+                if (field == null)
                 {
-                    _chooseRecorderCommand = new AsyncRelayCommand(
+                    field = new AsyncRelayCommand(
                         async a =>
                         {
                             await ChosenRecorder.ChooseRecorderAsync();
@@ -832,7 +820,7 @@ namespace FreeAIr.UI.Chat
                         );
                 }
 
-                return _chooseRecorderCommand;
+                return field;
             }
         }
 

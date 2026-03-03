@@ -12,8 +12,6 @@ namespace FreeAIr.UI.ViewModels
     {
         private readonly AvailableToolContainer _toolContainer;
 
-        private ICommand _saveCommand;
-
         public string Header => FreeAIr.Resources.Resources.Choose_the_MCP_tools_you_want_to;
 
         public ObservableCollection2<CheckableItem> Groups
@@ -26,9 +24,9 @@ namespace FreeAIr.UI.ViewModels
         {
             get
             {
-                if (_saveCommand == null)
+                if (field == null)
                 {
-                    _saveCommand = new RelayCommand(
+                    field = new RelayCommand(
                         a =>
                         {
                             foreach (var group in Groups)
@@ -64,7 +62,7 @@ namespace FreeAIr.UI.ViewModels
                         });
                 }
 
-                return _saveCommand;
+                return field;
             }
         }
 

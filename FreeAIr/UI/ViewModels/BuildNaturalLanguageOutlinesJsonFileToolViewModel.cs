@@ -28,11 +28,7 @@ namespace FreeAIr.UI.ViewModels
     [Export(typeof(BuildNaturalLanguageOutlinesJsonFileToolViewModel))]
     public sealed class BuildNaturalLanguageOutlinesJsonFileToolViewModel : BaseViewModel
     {
-        private string _jsonFilePath;
-        private ICommand _reloadPageCommand;
         private bool _completeRebuild;
-        private ICommand _openJsonFolderCommand;
-        private ICommand _updateJsonFileCommand;
 
         public bool GlobalEnabled
         {
@@ -44,10 +40,10 @@ namespace FreeAIr.UI.ViewModels
 
         public string JsonFilePath
         {
-            get => _jsonFilePath;
+            get;
             private set
             {
-                _jsonFilePath = value;
+                field = value;
                 OnPropertyChanged(nameof(JsonFilePath));
             }
         }
@@ -56,12 +52,12 @@ namespace FreeAIr.UI.ViewModels
         {
             get
             {
-                if (_openJsonFolderCommand is null)
+                if (field is null)
                 {
-                    _openJsonFolderCommand = new RelayCommand(
+                    field = new RelayCommand(
                         a =>
                         {
-                            var fi = new FileInfo(_jsonFilePath);
+                            var fi = new FileInfo(JsonFilePath);
                             var folderPath = fi.Directory.FullName;
                             if (!Directory.Exists(folderPath))
                             {
@@ -73,7 +69,7 @@ namespace FreeAIr.UI.ViewModels
                         );
                 }
 
-                return _openJsonFolderCommand;
+                return field;
             }
         }
 
@@ -81,16 +77,16 @@ namespace FreeAIr.UI.ViewModels
         {
             get
             {
-                if (_reloadPageCommand is null)
+                if (field is null)
                 {
-                    _reloadPageCommand = new AsyncRelayCommand(
+                    field = new AsyncRelayCommand(
                         async a =>
                         {
                             await UpdatePageAsync();
                         });
                 }
 
-                return _reloadPageCommand;
+                return field;
             }
         }
 
@@ -179,9 +175,9 @@ namespace FreeAIr.UI.ViewModels
         {
             get
             {
-                if (_updateJsonFileCommand is null)
+                if (field is null)
                 {
-                    _updateJsonFileCommand = new AsyncRelayCommand(
+                    field = new AsyncRelayCommand(
                         async a =>
                         {
                             try
@@ -237,7 +233,7 @@ namespace FreeAIr.UI.ViewModels
                         });
                 }
 
-                return _updateJsonFileCommand;
+                return field;
             }
         }
 

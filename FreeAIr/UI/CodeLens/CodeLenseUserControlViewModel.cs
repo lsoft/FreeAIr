@@ -76,7 +76,6 @@ namespace FreeAIr.UI.CodeLens
         private readonly CodeLensUnitInfo _unitInfo;
         private readonly string _commandName;
         private readonly CommandID _commandId;
-        private ICommand _applyCommand;
 
         public string CommandName => "✓   " + _commandName + "...";
 
@@ -84,9 +83,9 @@ namespace FreeAIr.UI.CodeLens
         {
             get
             {
-                if (_applyCommand is null)
+                if (field is null)
                 {
-                    _applyCommand = new AsyncRelayCommand(
+                    field = new AsyncRelayCommand(
                         async a =>
                         {
                             await ProcessAsync(
@@ -95,7 +94,7 @@ namespace FreeAIr.UI.CodeLens
                         );
                 }
 
-                return _applyCommand;
+                return field;
             }
         }
 
@@ -173,17 +172,15 @@ namespace FreeAIr.UI.CodeLens
         private readonly CodeLensUnitInfo _unitInfo;
         private readonly SupportActionJson _support;
 
-        private ICommand _applyCommand;
-
         public string CommandName => "✓   " + _support.Name + "...";
 
         public ICommand ApplyCommand
         {
             get
             {
-                if (_applyCommand is null)
+                if (field is null)
                 {
-                    _applyCommand = new AsyncRelayCommand(
+                    field = new AsyncRelayCommand(
                         async a =>
                         {
                             await ProcessAsync(
@@ -192,7 +189,7 @@ namespace FreeAIr.UI.CodeLens
                         );
                 }
 
-                return _applyCommand;
+                return field;
             }
         }
 

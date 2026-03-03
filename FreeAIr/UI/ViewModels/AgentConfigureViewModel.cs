@@ -11,16 +11,6 @@ namespace FreeAIr.UI.ViewModels
     public sealed class AgentConfigureViewModel : BaseViewModel
     {
         private AgentJson _selectedAgent;
-        private ICommand _addNewAgentCommand;
-        private ICommand _deleteAgentCommand;
-        private ICommand _applyAndCloseCommand;
-        private ICommand _replaceGeneralSystemPromptCommand;
-        private ICommand _replaceGenerateNLOSystemPromptCommand;
-        private ICommand _replaceExtractNLOSystemPromptCommand;
-        private ICommand _chooseModelCommand;
-        private ICommand _upAgentCommand;
-        private ICommand _downAgentCommand;
-        private ICommand _cloneAgentCommand;
         private readonly SupportCollectionJson _actionCollection;
 
         public Action<bool>? CloseWindow
@@ -69,9 +59,9 @@ namespace FreeAIr.UI.ViewModels
         {
             get
             {
-                if (_addNewAgentCommand is null)
+                if (field is null)
                 {
-                    _addNewAgentCommand = new RelayCommand(
+                    field = new RelayCommand(
                         a =>
                         {
                             var newAgent = new AgentJson
@@ -83,7 +73,7 @@ namespace FreeAIr.UI.ViewModels
                         });
                 }
 
-                return _addNewAgentCommand;
+                return field;
             }
         }
 
@@ -91,9 +81,9 @@ namespace FreeAIr.UI.ViewModels
         {
             get
             {
-                if (_deleteAgentCommand is null)
+                if (field is null)
                 {
-                    _deleteAgentCommand = new RelayCommand(
+                    field = new RelayCommand(
                         a =>
                         {
                             AgentCollection.Agents.Remove(_selectedAgent);
@@ -110,7 +100,7 @@ namespace FreeAIr.UI.ViewModels
                         });
                 }
 
-                return _deleteAgentCommand;
+                return field;
             }
         }
 
@@ -118,9 +108,9 @@ namespace FreeAIr.UI.ViewModels
         {
             get
             {
-                if (_upAgentCommand is null)
+                if (field is null)
                 {
-                    _upAgentCommand = new RelayCommand(
+                    field = new RelayCommand(
                         a =>
                         {
                             var index = AgentCollection.Agents.IndexOf(_selectedAgent);
@@ -151,7 +141,7 @@ namespace FreeAIr.UI.ViewModels
                         });
                 }
 
-                return _upAgentCommand;
+                return field;
             }
         }
 
@@ -159,9 +149,9 @@ namespace FreeAIr.UI.ViewModels
         {
             get
             {
-                if (_downAgentCommand is null)
+                if (field is null)
                 {
-                    _downAgentCommand = new RelayCommand(
+                    field = new RelayCommand(
                         a =>
                         {
                             var index = AgentCollection.Agents.IndexOf(_selectedAgent);
@@ -192,7 +182,7 @@ namespace FreeAIr.UI.ViewModels
                         });
                 }
 
-                return _downAgentCommand;
+                return field;
             }
         }
 
@@ -200,9 +190,9 @@ namespace FreeAIr.UI.ViewModels
         {
             get
             {
-                if (_cloneAgentCommand is null)
+                if (field is null)
                 {
-                    _cloneAgentCommand = new RelayCommand(
+                    field = new RelayCommand(
                         a =>
                         {
                             var clone = (AgentJson)_selectedAgent.Clone();
@@ -223,7 +213,7 @@ namespace FreeAIr.UI.ViewModels
                         });
                 }
 
-                return _cloneAgentCommand;
+                return field;
             }
         }
 
@@ -231,9 +221,9 @@ namespace FreeAIr.UI.ViewModels
         {
             get
             {
-                if (_applyAndCloseCommand is null)
+                if (field is null)
                 {
-                    _applyAndCloseCommand = new AsyncRelayCommand(
+                    field = new AsyncRelayCommand(
                         async a =>
                         {
                             var actions = _actionCollection.Actions.FindAll(ac =>
@@ -257,7 +247,7 @@ namespace FreeAIr.UI.ViewModels
                         });
                 }
 
-                return _applyAndCloseCommand;
+                return field;
             }
         }
 
@@ -265,9 +255,9 @@ namespace FreeAIr.UI.ViewModels
         {
             get
             {
-                if (_chooseModelCommand is null)
+                if (field is null)
                 {
-                    _chooseModelCommand = new AsyncRelayCommand(
+                    field = new AsyncRelayCommand(
                         async a =>
                         {
                             var chosenModelId = await ModelContextMenu.ChooseModelFromProviderAsync(
@@ -296,7 +286,7 @@ namespace FreeAIr.UI.ViewModels
                         });
                 }
 
-                return _chooseModelCommand;
+                return field;
             }
         }
 
@@ -304,9 +294,9 @@ namespace FreeAIr.UI.ViewModels
         {
             get
             {
-                if (_replaceGeneralSystemPromptCommand is null)
+                if (field is null)
                 {
-                    _replaceGeneralSystemPromptCommand = new AsyncRelayCommand(
+                    field = new AsyncRelayCommand(
                         async a =>
                         {
                             SelectedAgent.SystemPrompt = AgentCollectionJson.DefaultSystemPrompt;
@@ -323,7 +313,7 @@ namespace FreeAIr.UI.ViewModels
                         });
                 }
 
-                return _replaceGeneralSystemPromptCommand;
+                return field;
             }
         }
 
@@ -331,9 +321,9 @@ namespace FreeAIr.UI.ViewModels
         {
             get
             {
-                if (_replaceGenerateNLOSystemPromptCommand is null)
+                if (field is null)
                 {
-                    _replaceGenerateNLOSystemPromptCommand = new AsyncRelayCommand(
+                    field = new AsyncRelayCommand(
                         async a =>
                         {
                             SelectedAgent.SystemPrompt = AgentCollectionJson.CreateNewOutlinesSystemPrompt;
@@ -350,7 +340,7 @@ namespace FreeAIr.UI.ViewModels
                         });
                 }
 
-                return _replaceGenerateNLOSystemPromptCommand;
+                return field;
             }
         }
 
@@ -358,9 +348,9 @@ namespace FreeAIr.UI.ViewModels
         {
             get
             {
-                if (_replaceExtractNLOSystemPromptCommand is null)
+                if (field is null)
                 {
-                    _replaceExtractNLOSystemPromptCommand = new AsyncRelayCommand(
+                    field = new AsyncRelayCommand(
                         async a =>
                         {
                             SelectedAgent.SystemPrompt = AgentCollectionJson.ExtractFileOutlinesSystemPrompt;
@@ -377,7 +367,7 @@ namespace FreeAIr.UI.ViewModels
                         });
                 }
 
-                return _replaceExtractNLOSystemPromptCommand;
+                return field;
             }
         }
 

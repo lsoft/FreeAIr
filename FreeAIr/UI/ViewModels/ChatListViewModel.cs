@@ -17,14 +17,7 @@ namespace FreeAIr.UI.ViewModels
     {
         private readonly ChatContainer _chatContainer;
 
-        private ChatWrapper _selectedChat;
-
         private bool _showOnlyUserChats;
-
-        private ICommand _removeChatCommand;
-        private ICommand _startChatCommand;
-        private ICommand _openControlCenterCommand;
-        private ICommand _stopChatCommand;
 
         public event Action ContextControlFocus;
         public event Action PromptControlFocus;
@@ -48,21 +41,21 @@ namespace FreeAIr.UI.ViewModels
         {
             get
             {
-                if (_selectedChat is null)
+                if (SelectedChat is null)
                 {
                     return KnownMonikers.Pause;
                 }
 
-                return _selectedChat.StatusMoniker;
+                return SelectedChat.StatusMoniker;
             }
         }
 
         public ChatWrapper? SelectedChat
         {
-            get => _selectedChat;
+            get;
             set
             {
-                _selectedChat = value;
+                field = value;
 
                 OnPropertyChanged();
             }
@@ -132,19 +125,19 @@ namespace FreeAIr.UI.ViewModels
         {
             get
             {
-                if (_removeChatCommand == null)
+                if (field == null)
                 {
-                    _removeChatCommand = new RelayCommand(
+                    field = new RelayCommand(
                         a =>
                         {
-                            _chatContainer.RemoveChatAsync(_selectedChat.Chat)
+                            _chatContainer.RemoveChatAsync(SelectedChat.Chat)
                                 .FileAndForget(nameof(ChatContainer.RemoveChatAsync));
                         },
-                        a => _selectedChat is not null && _selectedChat.Chat.Status.In(ChatStatusEnum.Failed, ChatStatusEnum.NotStarted, ChatStatusEnum.Ready)
+                        a => SelectedChat is not null && SelectedChat.Chat.Status.In(ChatStatusEnum.Failed, ChatStatusEnum.NotStarted, ChatStatusEnum.Ready)
                         );
                 }
 
-                return _removeChatCommand;
+                return field;
             }
         }
 
@@ -152,9 +145,9 @@ namespace FreeAIr.UI.ViewModels
         {
             get
             {
-                if (_stopChatCommand == null)
+                if (field == null)
                 {
-                    _stopChatCommand = new RelayCommand(
+                    field = new RelayCommand(
                         a =>
                         {
                             var wrapper = a as ChatWrapper;
@@ -178,7 +171,7 @@ namespace FreeAIr.UI.ViewModels
                         });
                 }
 
-                return _stopChatCommand;
+                return field;
             }
         }
 
@@ -186,9 +179,9 @@ namespace FreeAIr.UI.ViewModels
         {
             get
             {
-                if (_startChatCommand == null)
+                if (field == null)
                 {
-                    _startChatCommand = new AsyncRelayCommand(
+                    field = new AsyncRelayCommand(
                         async a =>
                         {
                             var chosenAgent = await AgentContextMenu.ChooseAgentWithTokenAsync(
@@ -210,7 +203,7 @@ namespace FreeAIr.UI.ViewModels
                         );
                 }
 
-                return _startChatCommand;
+                return field;
             }
         }
 
@@ -218,9 +211,9 @@ namespace FreeAIr.UI.ViewModels
         {
             get
             {
-                if (_openControlCenterCommand == null)
+                if (field == null)
                 {
-                    _openControlCenterCommand = new AsyncRelayCommand(
+                    field = new AsyncRelayCommand(
                         async a =>
                         {
                             await Commands.Other.OpenControlCenterCommand.ShowAsync(
@@ -230,7 +223,7 @@ namespace FreeAIr.UI.ViewModels
                         );
                 }
 
-                return _openControlCenterCommand;
+                return field;
             }
         }
 

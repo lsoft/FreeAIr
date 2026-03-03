@@ -18,15 +18,6 @@ namespace FreeAIr.UI.ViewModels
     public sealed class McpServerConfigureViewModel : BaseViewModel
     {
         private McpServerWrapper _selectedServer;
-        private ICommand _addNewCommand;
-        private ICommand _deleteCommand;
-        private ICommand _applyAndCloseCommand;
-        private ICommand _upCommand;
-        private ICommand _downCommand;
-        private ICommand _cloneCommand;
-        private ICommand _checkForConnectionCommand;
-        private bool _formEnabled = true;
-        private ICommand _searchCommand;
 
         public Action<bool>? CloseWindow
         {
@@ -57,13 +48,14 @@ namespace FreeAIr.UI.ViewModels
 
         public bool FormEnabled
         {
-            get => _formEnabled;
+            get;
             set
             {
-                _formEnabled = value;
+                field = value;
                 OnPropertyChanged();
             }
-        }
+        } = true;
+
         public Visibility ShowServerPanel
         {
             get
@@ -121,16 +113,16 @@ namespace FreeAIr.UI.ViewModels
         {
             get
             {
-                if (_addNewCommand is null)
+                if (field is null)
                 {
-                    _addNewCommand = new AsyncRelayCommand(
+                    field = new AsyncRelayCommand(
                         async a =>
                         {
                             await CreateServerAsync();
                         });
                 }
 
-                return _addNewCommand;
+                return field;
             }
         }
 
@@ -138,9 +130,9 @@ namespace FreeAIr.UI.ViewModels
         {
             get
             {
-                if (_deleteCommand is null)
+                if (field is null)
                 {
-                    _deleteCommand = new RelayCommand(
+                    field = new RelayCommand(
                         a =>
                         {
                             ServerCollection.Remove(_selectedServer);
@@ -157,7 +149,7 @@ namespace FreeAIr.UI.ViewModels
                         });
                 }
 
-                return _deleteCommand;
+                return field;
             }
         }
 
@@ -165,9 +157,9 @@ namespace FreeAIr.UI.ViewModels
         {
             get
             {
-                if (_upCommand is null)
+                if (field is null)
                 {
-                    _upCommand = new RelayCommand(
+                    field = new RelayCommand(
                         a =>
                         {
                             var index = ServerCollection.IndexOf(_selectedServer);
@@ -198,7 +190,7 @@ namespace FreeAIr.UI.ViewModels
                         });
                 }
 
-                return _upCommand;
+                return field;
             }
         }
 
@@ -206,9 +198,9 @@ namespace FreeAIr.UI.ViewModels
         {
             get
             {
-                if (_downCommand is null)
+                if (field is null)
                 {
-                    _downCommand = new RelayCommand(
+                    field = new RelayCommand(
                         a =>
                         {
                             var index = ServerCollection.IndexOf(_selectedServer);
@@ -239,7 +231,7 @@ namespace FreeAIr.UI.ViewModels
                         });
                 }
 
-                return _downCommand;
+                return field;
             }
         }
 
@@ -247,9 +239,9 @@ namespace FreeAIr.UI.ViewModels
         {
             get
             {
-                if (_cloneCommand is null)
+                if (field is null)
                 {
-                    _cloneCommand = new RelayCommand(
+                    field = new RelayCommand(
                         a =>
                         {
                             var clone = (McpServerWrapper)_selectedServer.Clone();
@@ -270,7 +262,7 @@ namespace FreeAIr.UI.ViewModels
                         });
                 }
 
-                return _cloneCommand;
+                return field;
             }
         }
 
@@ -278,9 +270,9 @@ namespace FreeAIr.UI.ViewModels
         {
             get
             {
-                if (_searchCommand is null)
+                if (field is null)
                 {
-                    _searchCommand = new AsyncRelayCommand(
+                    field = new AsyncRelayCommand(
                         async a =>
                         {
                             var w = new SearchForDockerMcpServerWindow(
@@ -302,7 +294,7 @@ namespace FreeAIr.UI.ViewModels
                         });
                 }
 
-                return _searchCommand;
+                return field;
             }
         }
 
@@ -310,9 +302,9 @@ namespace FreeAIr.UI.ViewModels
         {
             get
             {
-                if (_applyAndCloseCommand is null)
+                if (field is null)
                 {
-                    _applyAndCloseCommand = new AsyncRelayCommand(
+                    field = new AsyncRelayCommand(
                         async a =>
                         {
                             if (CloseWindow is not null)
@@ -322,7 +314,7 @@ namespace FreeAIr.UI.ViewModels
                         });
                 }
 
-                return _applyAndCloseCommand;
+                return field;
             }
         }
 
@@ -330,9 +322,9 @@ namespace FreeAIr.UI.ViewModels
         {
             get
             {
-                if (_checkForConnectionCommand is null)
+                if (field is null)
                 {
-                    _checkForConnectionCommand = new AsyncRelayCommand(
+                    field = new AsyncRelayCommand(
                         async a =>
                         {
                             try
@@ -382,7 +374,7 @@ namespace FreeAIr.UI.ViewModels
                         });
                 }
 
-                return _checkForConnectionCommand;
+                return field;
             }
         }
 

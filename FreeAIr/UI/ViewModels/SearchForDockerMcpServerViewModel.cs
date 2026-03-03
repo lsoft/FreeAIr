@@ -17,8 +17,6 @@ namespace FreeAIr.UI.ViewModels
     public sealed class SearchForDockerMcpServerViewModel : BaseViewModel
     {
         private readonly List<DockerMcpServerInfo> _serverList;
-        private string _filter;
-        private ICommand _installAndSetupCommand;
 
         public Action<bool>? CloseWindow
         {
@@ -28,10 +26,10 @@ namespace FreeAIr.UI.ViewModels
 
         public string Filter
         {
-            get => _filter;
+            get;
             set
             {
-                _filter = value;
+                field = value;
 
                 Refilter();
             }
@@ -52,9 +50,9 @@ namespace FreeAIr.UI.ViewModels
         {
             get
             {
-                if (_installAndSetupCommand is null)
+                if (field is null)
                 {
-                    _installAndSetupCommand = new AsyncRelayCommand(
+                    field = new AsyncRelayCommand(
                         async a =>
                         {
                             var server = a as DockerMcpServerInfo;
@@ -71,7 +69,7 @@ namespace FreeAIr.UI.ViewModels
                         });
                 }
 
-                return _installAndSetupCommand;
+                return field;
             }
         }
 
@@ -249,7 +247,7 @@ namespace FreeAIr.UI.ViewModels
 
         private void Refilter()
         {
-            var lfilter = _filter?.ToLower();
+            var lfilter = Filter?.ToLower();
 
             FilteredServerList.Clear();
             foreach (var server in _serverList)

@@ -28,9 +28,6 @@ namespace FreeAIr.UI.ViewModels
     public sealed class NaturalLanguageResultsViewModel : BaseViewModel
     {
         private FreeAIr.Chat.Chat? _chat;
-        private ICommand _gotoCommand;
-        private ICommand _cancelChatCommand;
-        
         private string _status = Resources.Resources.Idle;
 
         private CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
@@ -55,9 +52,9 @@ namespace FreeAIr.UI.ViewModels
         {
             get
             {
-                if (_gotoCommand is null)
+                if (field is null)
                 {
-                    _gotoCommand = new AsyncRelayCommand(
+                    field = new AsyncRelayCommand(
                         async a =>
                         {
                             try
@@ -140,7 +137,7 @@ namespace FreeAIr.UI.ViewModels
                         );
                 }
 
-                return _gotoCommand;
+                return field;
             }
         }
 
@@ -148,9 +145,9 @@ namespace FreeAIr.UI.ViewModels
         {
             get
             {
-                if (_cancelChatCommand is null)
+                if (field is null)
                 {
-                    _cancelChatCommand = new AsyncRelayCommand(
+                    field = new AsyncRelayCommand(
                         async a =>
                         {
                             var processingTask = Interlocked.Exchange(ref _processingTask, null);
@@ -187,7 +184,7 @@ namespace FreeAIr.UI.ViewModels
                         );
                 }
 
-                return _cancelChatCommand;
+                return field;
             }
         }
 

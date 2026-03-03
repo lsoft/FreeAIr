@@ -24,14 +24,10 @@ namespace FreeAIr.UI.ViewModels
     public sealed class NaturalLanguageOutlinesViewModel : BaseViewModel
     {
         private FreeAIr.Chat.Chat? _chat;
-        private ICommand _gotoCommand;
-        private ICommand _cancelChatCommand;
-        
         private string _status = FreeAIr.Resources.Resources.Idle;
 
         private CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
         private Task? _processingTask;
-        private ICommand _applyCommand;
 
         public string Status
         {
@@ -52,9 +48,9 @@ namespace FreeAIr.UI.ViewModels
         {
             get
             {
-                if (_gotoCommand is null)
+                if (field is null)
                 {
-                    _gotoCommand = new AsyncRelayCommand(
+                    field = new AsyncRelayCommand(
                         async a =>
                         {
                             try
@@ -104,7 +100,7 @@ namespace FreeAIr.UI.ViewModels
                         );
                 }
 
-                return _gotoCommand;
+                return field;
             }
         }
 
@@ -112,9 +108,9 @@ namespace FreeAIr.UI.ViewModels
         {
             get
             {
-                if (_applyCommand is null)
+                if (field is null)
                 {
-                    _applyCommand = new AsyncRelayCommand(
+                    field = new AsyncRelayCommand(
                         async a =>
                         {
                             try
@@ -168,7 +164,7 @@ namespace FreeAIr.UI.ViewModels
                         );
                 }
 
-                return _applyCommand;
+                return field;
             }
         }
 
@@ -176,9 +172,9 @@ namespace FreeAIr.UI.ViewModels
         {
             get
             {
-                if (_cancelChatCommand is null)
+                if (field is null)
                 {
-                    _cancelChatCommand = new AsyncRelayCommand(
+                    field = new AsyncRelayCommand(
                         async a =>
                         {
                             var processingTask = Interlocked.Exchange(ref _processingTask, null);
@@ -215,7 +211,7 @@ namespace FreeAIr.UI.ViewModels
                         );
                 }
 
-                return _cancelChatCommand;
+                return field;
             }
         }
 

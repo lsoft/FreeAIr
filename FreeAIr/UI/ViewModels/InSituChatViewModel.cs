@@ -7,9 +7,6 @@ namespace FreeAIr.UI.ViewModels
 {
     public sealed class InSituChatViewModel : BaseViewModel
     {
-        private ICommand _closeCommand;
-        private ICommand _openFullWindowCommand;
-
         public FreeAIr.Chat.Chat CurrentChat
         {
             get;
@@ -39,9 +36,9 @@ namespace FreeAIr.UI.ViewModels
         {
             get
             {
-                if (_openFullWindowCommand is null)
+                if (field is null)
                 {
-                    _openFullWindowCommand = new AsyncRelayCommand(
+                    field = new AsyncRelayCommand(
                         async a =>
                         {
                             await OpenChatListToolWindowCommand.ExecuteCommandAsync();
@@ -50,7 +47,7 @@ namespace FreeAIr.UI.ViewModels
                         });
                 }
 
-                return _openFullWindowCommand;
+                return field;
             }
         }
 
@@ -58,16 +55,16 @@ namespace FreeAIr.UI.ViewModels
         {
             get
             {
-                if (_closeCommand is null)
+                if (field is null)
                 {
-                    _closeCommand = new RelayCommand(
+                    field = new RelayCommand(
                         a =>
                         {
                             CloseWindow?.Invoke();
                         });
                 }
 
-                return _closeCommand;
+                return field;
             }
         }
 

@@ -14,12 +14,6 @@ namespace FreeAIr.UI.Dialog.Content
 {
     public sealed class ToolCallDialogContent : DialogContent<ToolCallChatContent>
     {
-        private ICommand? _clickCommand;
-        private ICommand? _allowThisToolAllTimeCommand;
-        private ICommand? _allowAnyToolAllTimeCommand;
-        private ICommand? _blockAtThisTimeCommand;
-        private ICommand? _showResultCommand;
-
         public ToolCallStatusEnum Status => TypedContent.Status;
 
         public string Name => TypedContent.Name;
@@ -50,9 +44,9 @@ namespace FreeAIr.UI.Dialog.Content
         {
             get
             {
-                if (_clickCommand is null)
+                if (field is null)
                 {
-                    _clickCommand = new AsyncRelayCommand(
+                    field = new AsyncRelayCommand(
                         async a =>
                         {
                             await ExecuteToolAsync();
@@ -70,7 +64,7 @@ namespace FreeAIr.UI.Dialog.Content
                         });
                 }
 
-                return _clickCommand;
+                return field;
             }
         }
 
@@ -78,9 +72,9 @@ namespace FreeAIr.UI.Dialog.Content
         {
             get
             {
-                if (_blockAtThisTimeCommand is null)
+                if (field is null)
                 {
-                    _blockAtThisTimeCommand = new RelayCommand(
+                    field = new RelayCommand(
                         a =>
                         {
                             SetBlocked();
@@ -96,7 +90,7 @@ namespace FreeAIr.UI.Dialog.Content
                         });
                 }
 
-                return _blockAtThisTimeCommand;
+                return field;
             }
         }
 
@@ -104,9 +98,9 @@ namespace FreeAIr.UI.Dialog.Content
         {
             get
             {
-                if (_allowThisToolAllTimeCommand is null)
+                if (field is null)
                 {
-                    _allowThisToolAllTimeCommand = new AsyncRelayCommand(
+                    field = new AsyncRelayCommand(
                         async a =>
                         {
                             SetStatus(ToolCallStatusEnum.Executing);
@@ -126,7 +120,7 @@ namespace FreeAIr.UI.Dialog.Content
                         });
                 }
 
-                return _allowThisToolAllTimeCommand;
+                return field;
             }
         }
 
@@ -134,9 +128,9 @@ namespace FreeAIr.UI.Dialog.Content
         {
             get
             {
-                if (_allowAnyToolAllTimeCommand is null)
+                if (field is null)
                 {
-                    _allowAnyToolAllTimeCommand = new AsyncRelayCommand(
+                    field = new AsyncRelayCommand(
                         async a =>
                         {
                             SetStatus(ToolCallStatusEnum.Executing);
@@ -156,7 +150,7 @@ namespace FreeAIr.UI.Dialog.Content
                         });
                 }
 
-                return _allowAnyToolAllTimeCommand;
+                return field;
             }
         }
 
@@ -164,9 +158,9 @@ namespace FreeAIr.UI.Dialog.Content
         {
             get
             {
-                if (_showResultCommand is null)
+                if (field is null)
                 {
-                    _showResultCommand = new AsyncRelayCommand(
+                    field = new AsyncRelayCommand(
                         async a =>
                         {
                             await VS.MessageBox.ShowAsync(
@@ -187,7 +181,7 @@ namespace FreeAIr.UI.Dialog.Content
                         });
                 }
 
-                return _showResultCommand;
+                return field;
             }
         }
 
