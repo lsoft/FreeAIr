@@ -19,8 +19,7 @@ namespace FreeAIr.UI.ContextMenu
             }
 
             var agentCollection = await FreeAIrOptions.DeserializeAgentCollectionAsync();
-            var agents = agentCollection.Agents;
-            var filteredAgents = agents.FindAll(a => !string.IsNullOrEmpty(a.Technical.GetToken()));
+            var filteredAgents = agentCollection.FilterAgents();
             if (filteredAgents.Count == 0)
             {
                 return null;

@@ -87,58 +87,14 @@ namespace FreeAIr.UI.ViewModels
             }
         }
 
-        public Brush StatusJsonBorder
-        {
-            get
-            {
-                if (!_cachedDeserializer.TryDeserializeFromString(_optionsJson, out _, out _))
-                {
-                    return Brushes.Red;
-                }
+        public Brush StatusJsonBorder => GetOptionsJsonErrorAndColor().BorderColor;
 
-                if (_originalJson != _optionsJson)
-                {
-                    return Brushes.Orange;
-                }
+        public string OptionsJsonError => GetOptionsJsonErrorAndColor().Message;
 
-                return Brushes.Green;
-            }
-        }
-
-        public string OptionsJsonError
-        {
-            get
-            {
-                if (!_cachedDeserializer.TryDeserializeFromString(_optionsJson, out _, out var errorMessage))
-                {
-                    return errorMessage;
-                }
-
-                if (_originalJson != _optionsJson)
-                {
-                    return FreeAIr.Resources.Resources.Current_json_is_different_from_the;
-                }
-
-                return string.Empty;
-            }
-        }
-
-        public Visibility OptionsJsonVisibility
-        {
-            get
-            {
-                if (!_cachedDeserializer.TryDeserializeFromString(_optionsJson, out _, out _))
-                {
-                    return Visibility.Visible;
-                }
-                if (_originalJson != _optionsJson)
-                {
-                    return Visibility.Visible;
-                }
-
-                return Visibility.Collapsed;
-            }
-        }
+        public Visibility OptionsJsonVisibility =>
+            string.IsNullOrEmpty(GetOptionsJsonErrorAndColor().Message)
+                ? Visibility.Collapsed
+                : Visibility.Visible;
 
         public SetDefaultOptionsCmd SetDefaultOptionsCommand
         {
@@ -215,6 +171,27 @@ namespace FreeAIr.UI.ViewModels
 
             AcceptOptionsAsync()
                 .FileAndForget(nameof(AcceptOptionsAsync));
+        }
+
+        private (string Message, Brush BorderColor) GetOptionsJsonErrorAndColor()
+        {
+            if (!_cachedDeserializer.TryDeserializeFromString(_optionsJson, out var options, out var errorMessage))
+            {
+                return (errorMessage, Brushes.Red);
+            }
+
+            var filteredAgents = options.AgentCollection.FilterAgents();
+            if (filteredAgents.Count == 0)
+            {
+                return (FreeAIr.Resources.Resources.No_active_agents_found__Make_sure, Brushes.Red);
+            }
+
+            if (_originalJson != _optionsJson)
+            {
+                return (FreeAIr.Resources.Resources.Current_json_is_different_from_the, Brushes.Orange);
+            }
+
+            return (string.Empty, Brushes.Green);
         }
 
         private async Task UpdateGithubMcpStatusAsync()

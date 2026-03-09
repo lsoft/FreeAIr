@@ -888,4 +888,7 @@
   <data name="There_are_support_actions___actionNames" xml:space="preserve">
     <value>有引用未知代理的支持操作 ({0})。这些操作将被禁用。</value>
   </data>
+  <data name="No_active_agents_found__Make_sure" xml:space="preserve">
+    <value>未找到活跃代理。请确保至少有一个代理的令牌不为空。本地 LLM 允许使用伪造令牌。</value>
+  </data>
 </root>

@@ -734,4 +734,7 @@
   <data name="There_are_support_actions___actionNames" xml:space="preserve">
     <value>Эти действия ({0}) ссылаются на неизвестного агента. Такие действия будут отключены.</value>
   </data>
+  <data name="No_active_agents_found__Make_sure" xml:space="preserve">
+    <value>Активных агентов не найдено. Убедитесь, что хотя бы у одного агента есть непустой токен. Использование поддельных токенов разрешено для локального LLM.</value>
+  </data>
 </root>

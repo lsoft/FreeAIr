@@ -894,4 +894,8 @@ Post-processing is the processing of a recognized prompt via an LLM call. For ex
     <value>There are support actions ({0}) that references to unknown agent. These actions will be disabled.</value>
     <comment>Used in FreeAIr\UI\ViewModels\AgentConfigureViewModel.cs document</comment>
   </data>
+  <data name="No_active_agents_found__Make_sure" xml:space="preserve">
+    <value>No active agents found. Make sure at least one agent have non-empty token. Fake tokens are allowed for local LLM.</value>
+    <comment>Used in FreeAIr\UI\ViewModels\ControlCenterViewModel.cs document</comment>
+  </data>
 </root>

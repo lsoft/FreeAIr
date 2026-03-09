@@ -1249,6 +1249,15 @@ namespace FreeAIr.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to No active agents found. Make sure at least one agent have non-empty token. Fake tokens are allowed for local LLM..
+        /// </summary>
+        public static string No_active_agents_found__Make_sure {
+            get {
+                return ResourceManager.GetString("No_active_agents_found__Make_sure", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to No comments applied.
         /// </summary>
         public static string No_comments_applied {

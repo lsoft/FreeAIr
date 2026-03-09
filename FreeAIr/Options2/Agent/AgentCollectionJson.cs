@@ -1,4 +1,5 @@
-﻿using FreeAIr.Helper;
+﻿using EnvDTE;
+using FreeAIr.Helper;
 using System.Collections.Generic;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -27,6 +28,13 @@ namespace FreeAIr.Options2.Agent
             {
                 Agents = Agents.ConvertAll(a => (AgentJson)a.Clone())
             };
+        }
+
+        public List<AgentJson> FilterAgents(
+            )
+        {
+            var filteredAgents = Agents.FindAll(a => !string.IsNullOrEmpty(a.Technical.GetToken()));
+            return filteredAgents;
         }
 
         public static bool TryParse(
