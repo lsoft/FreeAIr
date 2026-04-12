@@ -2,7 +2,7 @@
 <Project ToolsVersion="15.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
-    <LangVersion>Latest</LangVersion>
+    <LangVersion>Preview</LangVersion>
   </PropertyGroup>
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
@@ -616,7 +616,7 @@
   <PropertyGroup>
     <PostBuildEvent>set "DIRS_TO_ZIP=win-x64 vulkan\win-x64"
 set "ZIP_NAME=$(SolutionDir).art\WhisperNet.Runtime.zip"
-PowerShell.exe -ExecutionPolicy Bypass -File "$(SolutionDir).CreateZipArchive.ps1" -DirsToZip "%25DIRS_TO_ZIP%25" -ZipName "%25ZIP_NAME%25" -RootDir "$(TargetDir)runtimes"
+PowerShell.exe -ExecutionPolicy Bypass -File "$(SolutionDir).\.CreateZipArchive.ps1" -DirsToZip "%25DIRS_TO_ZIP%25" -ZipName "%25ZIP_NAME%25" -RootDir "$(TargetDir)runtimes"
 </PostBuildEvent>
   </PropertyGroup>
 </Project>
