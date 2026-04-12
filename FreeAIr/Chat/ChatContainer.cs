@@ -1,17 +1,29 @@
 ﻿using EnvDTE;
 using EnvDTE80;
+using FreeAIr.Options2.Agent;
 using FreeAIr.Shared.Helper;
 using FreeAIr.UI.Informer;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Windows.Forms;
+
 
 namespace FreeAIr.Chat
 {
     [Export(typeof(ChatContainer))]
     public sealed class ChatContainer
     {
+        public Guid? LastUsedChatId { get; set; } = null;
+        public Chat GetLastUsed()
+        {
+            var ctrlPressed = (Control.ModifierKeys & Keys.Control) == Keys.Control;
+            if (ctrlPressed || LastUsedChatId == null) return (null);
+            return (_chats?.FirstOrDefault(c => c.Id == LastUsedChatId));
+        }
+
+
         private readonly object _locker = new();
 
         private readonly UIInformer _uIInformer;

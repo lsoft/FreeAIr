@@ -8,7 +8,9 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Input;
 using WpfHelpers;
+using WpfHelpers.ish;
 using FreeAIr.Chat;
+using FreeAIr.Shared.ish;
 
 namespace FreeAIr.UI.ViewModels
 {
@@ -119,6 +121,27 @@ namespace FreeAIr.UI.ViewModels
                     ;
             }
         }
+
+        #region ish
+        public cMyCommand cmdRenameChat => field ??= cMyCommand.Create(RenameChat);
+        void RenameChat()
+        {
+            var wrapper = SelectedChat;
+            if (wrapper == null) return;
+
+            var newName =  ShowRenameDialog(wrapper.Title);
+            if (!string.IsNullOrEmpty(newName))
+            {
+                wrapper.Title = newName;
+                wrapper.Update();
+            }
+        }
+        string ShowRenameDialog(string currentTitle)
+        {
+            var input = new cInputDlg("New chat name", currentTitle, "Enter new name ");
+            return ((input.ShowDialog() == true) ? (string)input.Value : string.Empty);
+        }
+        #endregion
 
 
         public ICommand RemoveChatCommand
@@ -313,7 +336,7 @@ namespace FreeAIr.UI.ViewModels
             SelectedChat = ChatList.FirstOrDefault();
         }
 
-        public sealed class ChatWrapper : BaseViewModel
+        public sealed class  ChatWrapper : BaseViewModel
         {
             public FreeAIr.Chat.Chat Chat
             {
@@ -357,6 +380,12 @@ namespace FreeAIr.UI.ViewModels
                         : Visibility.Visible
                         ;
                 }
+            }
+
+            public string Title
+            {
+                get => Chat.Description?.Title;
+                set => Chat.Description?.Title = value;
             }
 
             public string SecondRow

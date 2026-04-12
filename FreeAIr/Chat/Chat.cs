@@ -10,11 +10,13 @@ using System.Threading.Tasks;
 using FreeAIr.Chat.Content;
 using FreeAIr.Chat.Context;
 using FreeAIr.BLogic.Reader;
+using stdole;
 
 namespace FreeAIr.Chat
 {
     public sealed class Chat : IAsyncDisposable
     {
+        public Guid Id { get; } = Guid.NewGuid();
         private readonly List<IChatContent> _contents = new();
 
         //private CancellationTokenSource _cancellationTokenSource = new();

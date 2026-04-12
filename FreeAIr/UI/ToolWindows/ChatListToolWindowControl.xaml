@@ -21,10 +21,13 @@
     mc:Ignorable="d"
     d:DesignHeight="300"
     d:DesignWidth="300"
-    Name="ChatListToolWindow"
+    d:DataContext ="{d:DesignInstance Type=viewmodels:ChatListViewModel, IsDesignTimeCreatable=False}"
+    x:Name="ChatListToolWindow"
+    
     IsVisibleChanged="ChatListToolWindow_IsVisibleChanged"
     DragDrop.Drop="ChatListToolWindow_Drop"
     >
+    
     <Grid
         Margin="2"
         >
@@ -145,12 +148,16 @@
                 ScrollViewer.HorizontalScrollBarVisibility="Auto"
                 ScrollViewer.VerticalScrollBarVisibility="Auto"
                 >
+                <ListBox.ContextMenu>
+                        <ContextMenu>
+                            <MenuItem Header="Rename" Command="{Binding cmdRenameChat}"/>
+                        </ContextMenu>
+                </ListBox.ContextMenu>
                 <ListBox.ItemTemplate>
                     <DataTemplate>
 
-                        <StackPanel
-                            Opacity="{Binding OpacityLevel}"
-                            >
+                        <StackPanel Opacity="{Binding OpacityLevel}">
+                            <Label Content="{Binding Title}" />
                             <TextBlock
                                 FontFamily="Cascadia Code"
                                 Visibility="{Binding SecondRowVisibility}"
