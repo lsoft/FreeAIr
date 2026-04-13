@@ -62,10 +62,7 @@ namespace FreeAIr.UI.Embedillo.Answer.Parser
             SelectedSpan? selection
             )
         {
-            if (solutionFilePath is null)
-            {
-                throw new ArgumentNullException(nameof(solutionFilePath));
-            }
+            
 
             if (filePath is null)
             {

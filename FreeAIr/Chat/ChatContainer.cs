@@ -19,8 +19,8 @@ namespace FreeAIr.Chat
         public Chat GetLastUsed()
         {
             var ctrlPressed = (Control.ModifierKeys & Keys.Control) == Keys.Control;
-            if (ctrlPressed || LastUsedChatId == null) return (null);
-            return (_chats?.FirstOrDefault(c => c.Id == LastUsedChatId));
+            if (ctrlPressed && LastUsedChatId != null) return (_chats?.FirstOrDefault(c => c.Id == LastUsedChatId));
+            return (null);
         }
 
 
@@ -92,7 +92,7 @@ namespace FreeAIr.Chat
             {
                 chat.AddPrompt(prompt);
             }
-
+            LastUsedChatId = chat.Id;
             return chat;
         }
 

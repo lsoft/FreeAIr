@@ -9,34 +9,24 @@ namespace FreeAIr.Commands
     [Command(PackageIds.ShowInSituChatCommandId)]
     public sealed class ShowInSituChatCommand : BaseCommand<ShowInSituChatCommand>
     {
-        public ShowInSituChatCommand(
-            )
-        {
-        }
+        public ShowInSituChatCommand(){ }
 
         protected override async Task ExecuteAsync(OleMenuCmdEventArgs e)
         {
-            var chosenAgent = await AgentContextMenu.ChooseAgentWithTokenAsync(
-                FreeAIr.Resources.Resources.Choose_agent__with_a_non_empty_token
-                );
-            if (chosenAgent is null)
-            {
-                return;
-            }
-
             var componentModel = (IComponentModel)await FreeAIrPackage.Instance.GetServiceAsync(typeof(SComponentModel));
             var chatContainer = componentModel.GetService<ChatContainer>();
 
-            var chat = await chatContainer.StartChatAsync(
-                new ChatDescription(null),
-                null,
-                await FreeAIr.Chat.ChatOptions.GetDefaultAsync(chosenAgent)
-                );
+            var chat = chatContainer.GetLastUsed();
 
-            await ChatWindowShower.ShowChatWindowAsync(
-                chat,
-                true
-                );
+            if (chat == null)
+            {
+                var chosenAgent = await AgentContextMenu.ChooseAgentWithTokenAsync(FreeAIr.Resources.Resources.Choose_agent__with_a_non_empty_token);
+                if (chosenAgent is null) return;
+
+                chat = await chatContainer.StartChatAsync(new ChatDescription(null),null,await FreeAIr.Chat.ChatOptions.GetDefaultAsync(chosenAgent));
+            }
+
+            await ChatWindowShower.ShowChatWindowAsync(chat,true);
         }
 
     }

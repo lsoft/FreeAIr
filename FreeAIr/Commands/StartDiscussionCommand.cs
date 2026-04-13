@@ -6,6 +6,7 @@ using Microsoft.VisualStudio.ComponentModelHost;
 using FreeAIr.Chat;
 using FreeAIr.Chat.Context.Item;
 using System.Windows.Input;
+using System.Diagnostics;
 
 namespace FreeAIr.Commands
 {
@@ -38,23 +39,9 @@ namespace FreeAIr.Commands
 
             if (chat == null)
             {
-                var chosenAgent = await AgentContextMenu.ChooseAgentWithTokenAsync(
-                    "Choose agent:"
-                    );
-                if (chosenAgent is null)
-                {
-                    return;
-                }
-
-
-                    chat = await chatContainer.StartChatAsync(
-                    new ChatDescription(
-                        null
-                        ),
-                    null,
-                    await FreeAIr.Chat.ChatOptions.GetDefaultAsync(chosenAgent)
-                    );
-                chatContainer.LastUsedChatId = chat.Id;
+                var chosenAgent = await AgentContextMenu.ChooseAgentWithTokenAsync("Choose agent:");
+                if (chosenAgent == null) return;
+                chat = await chatContainer.StartChatAsync( new ChatDescription(null), null, await FreeAIr.Chat.ChatOptions.GetDefaultAsync(chosenAgent));
             }
             if (chat == null) return;
 
@@ -70,7 +57,7 @@ namespace FreeAIr.Commands
             }
             catch (Exception ex)
             {
-                int a = 1;
+                Debug.WriteLine( ex.Message );
             }
 
             await ChatWindowShower.ShowChatWindowAsync(chat);
