@@ -194,6 +194,11 @@ namespace FreeAIr.BLogic.Reader
                 {
                     foreach (var toolCall in toolCalls)
                     {
+                        if (string.IsNullOrEmpty(toolCall.FunctionName))
+                        {
+                            continue;
+                        }
+
                         var toolCallContent = _chat.CreateToolCall(
                             toolCall
                             );

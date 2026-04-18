@@ -23,6 +23,10 @@ My others extensions lives [here](https://marketplace.visualstudio.com/publisher
 
 # FreeAIr Release Notes
 
+## 4.2.10
+
+- Fixed bug with GetAllSolutionFiles MCP tool.
+
 ## 4.2.9
 
 - Improved usability in case of no agent with non-empty token exists.

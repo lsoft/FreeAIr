@@ -48,9 +48,7 @@ namespace FreeAIr.MCP.McpServerProxy.VS.Tools
                     cancellationToken
                     );
 
-                var jsonEmbeddingFilePath = await FreeAIrOptions.ComposeEmbeddingsFilePathAsync();
-                var existingOutlineRoot = await OutlineNode.CreateAsync(
-                    jsonEmbeddingFilePath,
+                var existingOutlineRoot = await OutlineNode.TryCreateAsync(
                     true
                     );
 
@@ -69,7 +67,7 @@ namespace FreeAIr.MCP.McpServerProxy.VS.Tools
                         {
                             var sijrp = i.SolutionItem.FullPath.MakeRelativeAgainst(solution.FullPath);
 
-                            existingOutlineRoot.ApplyRecursive(
+                            existingOutlineRoot?.ApplyRecursive(
                                 node =>
                                 {
                                     if (sijrp != node.RelativePath)
