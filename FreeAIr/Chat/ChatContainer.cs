@@ -1,17 +1,26 @@
 ﻿using EnvDTE;
 using EnvDTE80;
+using FreeAIr.Options2.Agent;
 using FreeAIr.Shared.Helper;
 using FreeAIr.UI.Informer;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Windows.Forms;
+
 
 namespace FreeAIr.Chat
 {
     [Export(typeof(ChatContainer))]
     public sealed class ChatContainer
     {
+        public Guid? LastCreatedChatId
+        {
+            get;
+            private set;
+        }
+
         private readonly object _locker = new();
 
         private readonly UIInformer _uIInformer;
@@ -23,7 +32,6 @@ namespace FreeAIr.Chat
 
         public event ChatCollectionChangedDelegate ChatCollectionChangedEvent;
         public event ChatStatusChangedDelegate ChatStatusChangedEvent;
-        //public event PromptAddedDelegate PromptStateChangedEvent;
 
         [ImportingConstructor]
         public ChatContainer(
@@ -40,6 +48,16 @@ namespace FreeAIr.Chat
             var dte = AsyncPackage.GetGlobalService(typeof(EnvDTE.DTE)) as DTE2;
             _dteEvents = ((Events2)dte.Events).DTEEvents;
             _dteEvents.OnBeginShutdown += DTEEvents_OnBeginShutdown;
+        }
+
+        public Chat? GetLastCreatedChat()
+        {
+            if (!LastCreatedChatId.HasValue)
+            {
+                return null;
+            }
+
+            return _chats.FirstOrDefault(c => c.Id == LastCreatedChatId.Value);
         }
 
         public async Task<Chat?> StartChatAsync(
@@ -80,7 +98,7 @@ namespace FreeAIr.Chat
             {
                 chat.AddPrompt(prompt);
             }
-
+            LastCreatedChatId = chat.Id;
             return chat;
         }
 

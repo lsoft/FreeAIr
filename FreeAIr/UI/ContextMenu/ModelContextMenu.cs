@@ -1,8 +1,10 @@
 ﻿using FreeAIr.Helper;
 using FreeAIr.Shared.Helper;
+using Microsoft.Build.Utilities;
 using OpenAI;
 using OpenAI.Models;
 using System.ClientModel;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -14,7 +16,7 @@ namespace FreeAIr.UI.ContextMenu
             string token,
             string endpoint,
             string title,
-            string? preferredModelId = null
+            ModelFilterer? filterer = null
             )
         {
             if (title is null)
@@ -45,20 +47,26 @@ namespace FreeAIr.UI.ContextMenu
                 return models[0].Id;
             }
 
-            if (!string.IsNullOrEmpty(preferredModelId))
+            var filteredModels = filterer is not null
+                ? filterer.Apply(models)
+                : new List<OpenAIModel>(models)
+                ;
+            if (filteredModels is null
+                || filteredModels.Count == 0)
             {
-                var preferred = models.FirstOrDefault(a => a.Id == preferredModelId);
-                if (preferred is not null)
-                {
-                    return preferred.Id;
-                }
+                return null;
+            }
+
+            if (models.Count > 30)
+            {
+                title += $" ({filteredModels.Count} out of {models.Count})";
             }
 
             var chosen = await VisualStudioContextMenuCommandBridge.ShowAsync<OpenAIModel>(
                 title,
-                models
-                    .ConvertAll(a => (a.Id, a as object))
+                filteredModels.ConvertAll(m => (m.Id, (object)m))
                 );
+
             if (chosen is null)
             {
                 return null;
@@ -66,6 +74,7 @@ namespace FreeAIr.UI.ContextMenu
 
             return chosen.Id;
         }
+
 
     }
 }

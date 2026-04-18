@@ -9,6 +9,7 @@ using System.Windows;
 using System.Windows.Input;
 using WpfHelpers;
 using FreeAIr.Chat;
+using FreeAIr.UI.Windows;
 
 namespace FreeAIr.UI.ViewModels
 {
@@ -175,6 +176,49 @@ namespace FreeAIr.UI.ViewModels
             }
         }
 
+        public ICommand RenameChatCommand
+        {
+            get
+            {
+                if (field == null)
+                {
+                    field = new RelayCommand(
+                        a =>
+                        {
+                            var wrapper = a as ChatWrapper;
+                            if (wrapper is null)
+                            {
+                                return;
+                            }
+
+                            var renameViewModel = new RenameChatViewModel(
+                                wrapper.Title
+                                );
+                            var renameWindow = new RenameChatWindow
+                            {
+                                DataContext = renameViewModel
+                            };
+                            if (renameWindow.ShowDialog() != true)
+                            {
+                                return;
+                            }
+
+                            var newChatName = renameViewModel.ChatName;
+                            if (string.IsNullOrEmpty(newChatName))
+                            {
+                                return;
+                            }
+
+                            wrapper.Title = newChatName;
+                            wrapper.Update();
+                        }
+                        );
+                }
+
+                return field;
+            }
+        }
+
         public ICommand StartChatCommand
         {
             get
@@ -313,7 +357,7 @@ namespace FreeAIr.UI.ViewModels
             SelectedChat = ChatList.FirstOrDefault();
         }
 
-        public sealed class ChatWrapper : BaseViewModel
+        public sealed class  ChatWrapper : BaseViewModel
         {
             public FreeAIr.Chat.Chat Chat
             {
@@ -357,6 +401,12 @@ namespace FreeAIr.UI.ViewModels
                         : Visibility.Visible
                         ;
                 }
+            }
+
+            public string Title
+            {
+                get => Chat.Description?.Title;
+                set => Chat.Description?.Title = value;
             }
 
             public string SecondRow

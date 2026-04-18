@@ -2,7 +2,7 @@
 <Project ToolsVersion="15.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
-    <LangVersion>Latest</LangVersion>
+    <LangVersion>Preview</LangVersion>
   </PropertyGroup>
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
@@ -58,6 +58,7 @@
     <Compile Include="BLogic\Reader\LLMReaderPool.cs" />
     <Compile Include="BLogic\RecorderTranscriberPostProcessor.cs" />
     <Compile Include="Commands\ApplySupportCommand.cs" />
+    <Compile Include="Commands\CreateOrReuseChatCommand.cs" />
     <Compile Include="Commands\File\AddFilesToContextCommand.cs" />
     <Compile Include="Commands\File\ApplyFileSupportCommand.cs" />
     <Compile Include="Commands\Other\OpenPropertiesCommand.cs" />
@@ -243,6 +244,7 @@
     <Compile Include="UI\Chat\ChatControl.xaml.cs">
       <DependentUpon>ChatControl.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UI\ContextMenu\ModelFilterer.cs" />
     <Compile Include="UI\ContextMenu\RecorderContextMenu.cs" />
     <Compile Include="UI\ContextMenu\AgentContextMenu.cs" />
     <Compile Include="UI\ContextMenu\ModelContextMenu.cs" />
@@ -333,6 +335,7 @@
     <Compile Include="UI\ViewModels\NaturalLanguageOutlinesViewModel.cs" />
     <Compile Include="UI\ViewModels\NaturalLanguageResultsViewModel.cs" />
     <Compile Include="UI\ViewModels\OutlineEmbeddingOutputPanel.cs" />
+    <Compile Include="UI\ViewModels\RenameChatViewModel.cs" />
     <Compile Include="UI\ViewModels\SearchForDockerMcpServerViewModel.cs" />
     <Compile Include="UI\Windows\RecorderSetupWindow.xaml.cs">
       <DependentUpon>RecorderSetupWindow.xaml</DependentUpon>
@@ -357,6 +360,9 @@
     <Compile Include="UI\ViewModels\AvailableToolsViewModel.cs" />
     <Compile Include="UI\Windows\ControlCenterWindow.xaml.cs">
       <DependentUpon>ControlCenterWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\Windows\RenameChatWindow.xaml.cs">
+      <DependentUpon>RenameChatWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\Windows\SearchForDockerMcpServerWindow.xaml.cs">
       <DependentUpon>SearchForDockerMcpServerWindow.xaml</DependentUpon>
@@ -583,6 +589,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="UI\Windows\RenameChatWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="UI\Windows\SearchForDockerMcpServerWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -602,6 +612,7 @@
       <SubType>Designer</SubType>
     </EmbeddedResource>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(VSToolsPath)\VSSDK\Microsoft.VsSDK.targets" Condition="'$(VSToolsPath)' != ''" />
   <Target Name="IncludeNuGetPackageReferences" AfterTargets="GetVsixSourceItems">
@@ -616,7 +627,7 @@
   <PropertyGroup>
     <PostBuildEvent>set "DIRS_TO_ZIP=win-x64 vulkan\win-x64"
 set "ZIP_NAME=$(SolutionDir).art\WhisperNet.Runtime.zip"
-PowerShell.exe -ExecutionPolicy Bypass -File "$(SolutionDir).CreateZipArchive.ps1" -DirsToZip "%25DIRS_TO_ZIP%25" -ZipName "%25ZIP_NAME%25" -RootDir "$(TargetDir)runtimes"
+PowerShell.exe -ExecutionPolicy Bypass -File "$(SolutionDir).\.CreateZipArchive.ps1" -DirsToZip "%25DIRS_TO_ZIP%25" -ZipName "%25ZIP_NAME%25" -RootDir "$(TargetDir)runtimes"
 </PostBuildEvent>
   </PropertyGroup>
 </Project>

@@ -21,10 +21,13 @@
     mc:Ignorable="d"
     d:DesignHeight="300"
     d:DesignWidth="300"
-    Name="ChatListToolWindow"
+    d:DataContext ="{d:DesignInstance Type=viewmodels:ChatListViewModel, IsDesignTimeCreatable=False}"
+    x:Name="ChatListToolWindow"
+    
     IsVisibleChanged="ChatListToolWindow_IsVisibleChanged"
     DragDrop.Drop="ChatListToolWindow_Drop"
     >
+    
     <Grid
         Margin="2"
         >
@@ -148,9 +151,14 @@
                 <ListBox.ItemTemplate>
                     <DataTemplate>
 
-                        <StackPanel
-                            Opacity="{Binding OpacityLevel}"
-                            >
+                        <StackPanel Opacity="{Binding OpacityLevel}">
+                            <Button
+                                FontFamily="Cascadia Code"
+                                Content="{Binding Title}"
+                                Style="{DynamicResource TextBlockLikeButtonStyle}"
+                                Command="{Binding ElementName=ChatListToolWindow, Path=DataContext.RenameChatCommand}"
+                                CommandParameter="{Binding}"
+                                />
                             <TextBlock
                                 FontFamily="Cascadia Code"
                                 Visibility="{Binding SecondRowVisibility}"

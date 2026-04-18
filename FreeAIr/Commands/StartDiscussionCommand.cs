@@ -1,15 +1,15 @@
 ﻿using EnvDTE;
-using FreeAIr.Helper;
-using FreeAIr.UI.ContextMenu;
-using FreeAIr.UI.ToolWindows;
-using Microsoft.VisualStudio.ComponentModelHost;
 using FreeAIr.Chat;
 using FreeAIr.Chat.Context.Item;
+using FreeAIr.Helper;
+using FreeAIr.UI.ToolWindows;
+using Microsoft.VisualStudio.ComponentModelHost;
+using System.Diagnostics;
 
 namespace FreeAIr.Commands
 {
     [Command(PackageIds.StartDiscussionCommandId)]
-    internal sealed class StartDiscussionCommand : BaseCommand<StartDiscussionCommand>
+    public sealed class StartDiscussionCommand : CreateOrReuseChatCommand<StartDiscussionCommand>
     {
         public StartDiscussionCommand(
             )
@@ -33,77 +33,29 @@ namespace FreeAIr.Commands
                 return;
             }
 
-
-            //try
-            //{
-            //    var dte = AsyncPackage.GetGlobalService(typeof(EnvDTE.DTE)) as DTE2;
-            //    dte.ExecuteCommand("OtherContextMenus.inlinediffsettings.Diff.InlineView");
-
-            //    var differenceService = (IVsDifferenceService)await FreeAIrPackage.Instance.GetServiceAsync(typeof(SVsDifferenceService));
-
-            //    var leftPath = @"C:\temp\file1.txt";
-            //    var rightPath = @"C:\temp\file2.txt";
-            //    var caption = "My Diff";
-            //    var tooltip = "Inline diff between two files";
-
-            //    IVsWindowFrame frame = differenceService.OpenComparisonWindow2(
-            //        leftFileMoniker: leftPath,
-            //        rightFileMoniker: rightPath,
-            //        caption: caption,
-            //        Tooltip: tooltip,
-            //        leftLabel: "left file", // не используется
-            //        rightLabel: "right file", // не используется
-            //        inlineLabel: "inline label", // не используется
-            //        roles: "roles roles", // не используется
-            //        grfDiffOptions: (uint)__VSDIFFSERVICEOPTIONS.VSDIFFOPT_DoNotShow
-            //    );
-
-            //    frame.Show();
-
-            //    //OtherContextMenus.inlinediffsettings.Diff.InlineView
-
-
-            //}
-            //catch (Exception excp)
-            //{
-            //    int g = 0;
-            //}
-            //return;
-
-
-
-
-            var chosenAgent = await AgentContextMenu.ChooseAgentWithTokenAsync(
-                "Choose agent:"
-                );
-            if (chosenAgent is null)
-            {
-                return;
-            }
-
-
-            var chat = await chatContainer.StartChatAsync(
-                new ChatDescription(
-                    null
-                    ),
-                null,
-                await FreeAIr.Chat.ChatOptions.GetDefaultAsync(chosenAgent)
-                );
+            var chat = await CreateOrReuseChatAsync();
             if (chat is null)
             {
                 return;
             }
 
-            chat.ChatContext.AddItem(
-                new SolutionItemChatContextItem(
-                    std.CreateSelectedIdentifier(),
-                    false,
-                    AddLineNumbersMode.NotRequired
-                    )
-                );
+            try
+            {
+                chat.ChatContext.AddItem(
+                    new SolutionItemChatContextItem(
+                        std.CreateSelectedIdentifier(),
+                        false,
+                        AddLineNumbersMode.NotRequired
+                        )
+                    );
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine( ex.Message );
+            }
 
             await ChatWindowShower.ShowChatWindowAsync(chat);
         }
-
     }
+
 }

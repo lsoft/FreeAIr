@@ -251,6 +251,32 @@ namespace FreeAIr.UI.ViewModels
             }
         }
 
+        public string ModelFilter
+        {
+            get => field;
+            set
+            {
+                if (value != field)
+                {
+                    field = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        public bool IsMaskRegex
+        {
+            get => field;
+            set
+            {
+                if (value != field)
+                {
+                    field = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
         public ICommand ChooseModelCommand
         {
             get
@@ -264,7 +290,10 @@ namespace FreeAIr.UI.ViewModels
                                 token: SelectedAgent.Technical.GetToken(),
                                 endpoint: SelectedAgent.Technical.Endpoint,
                                 title: FreeAIr.Resources.Resources.Choose_model_from_this_api_endpoint,
-                                null
+                                filterer: new ModelFilterer(
+                                    ModelFilter,
+                                    IsMaskRegex
+                                    )
                                 );
                             if (string.IsNullOrEmpty(chosenModelId))
                             {

@@ -192,7 +192,7 @@
         <Icon guid="ImageCatalogGuid" id="ApplyCodeChanges" />
         <CommandFlag>IconIsMoniker</CommandFlag>
         <Strings>
-          <ButtonText>FreeAIr start discussion with...</ButtonText>
+          <ButtonText>FreeAIr start discussion with (Ctrl = previous chat)...</ButtonText>
         </Strings>
       </Button>
       <Button guid="FreeAIr" id="GenerateWholeLineSuggestionCommandId" priority="0x0002" type="Button">
@@ -208,7 +208,7 @@
         <Icon guid="ImageCatalogGuid" id="NeuralNetwork" />
         <CommandFlag>IconIsMoniker</CommandFlag>
         <Strings>
-          <ButtonText>FreeAIr start chat here...</ButtonText>
+          <ButtonText>FreeAIr start chat here  (Ctrl = previous chat)...</ButtonText>
         </Strings>
       </Button>
 

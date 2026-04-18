@@ -17,6 +17,8 @@
     Title="{x:Static resources:Resources.FreeAIr_Agent_Configuration_Window}"
     Loaded="Window_Loaded"
     xmlns:resources="clr-namespace:FreeAIr.Resources"
+    xmlns:vm="clr-namespace:FreeAIr.UI.ViewModels"
+    d:DataContext="{d:DesignInstance Type=vm:AgentConfigureViewModel, IsDesignTimeCreatable=False}"
     >
     <Grid>
         <Grid.RowDefinitions>
@@ -238,6 +240,9 @@
                 >
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition />
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="auto" />
                     <ColumnDefinition Width="auto" />
                 </Grid.ColumnDefinitions>
             
@@ -248,13 +253,29 @@
                     FontFamily="Cascadia Code"
                     Text="{Binding SelectedAgent.Technical.ChosenModel, UpdateSourceTrigger=PropertyChanged}"
                     />
-
-                <Button
+                <Label
                     Grid.Column="1"
+                    Content="Filter"
+                    Margin="5,0,2,0"
+                    />
+                <TextBox
+                    Grid.Column="2"
+                    FontFamily="Cascadia Code"
+                    Text="{Binding ModelFilter}"
+                    />
+                <CheckBox
+                    Grid.Column="3"
+                    Content="Rx"
+                    IsChecked="{Binding IsMaskRegex}"
+                    Margin="2"
+                    />
+                <Button
+                    Grid.Column="4"
                     HorizontalAlignment="Stretch"
                     VerticalAlignment="Center"
                     Margin="2,0,0,0"
                     Command="{Binding ChooseModelCommand}"
+                    ToolTip="Show model list"
                     >
                     <Button.Content>
                         <ui:PseudoCrispImage

@@ -15,12 +15,8 @@ namespace FreeAIr.Chat
 {
     public sealed class Chat : IAsyncDisposable
     {
+        public Guid Id { get; } = Guid.NewGuid();
         private readonly List<IChatContent> _contents = new();
-
-        //private CancellationTokenSource _cancellationTokenSource = new();
-        //private Task? _task;
-
-        //public CancellationToken CancellationToken => _cancellationTokenSource.Token;
 
         private ChatStatusEnum _status;
 
