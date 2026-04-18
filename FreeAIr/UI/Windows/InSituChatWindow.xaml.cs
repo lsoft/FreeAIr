@@ -1,7 +1,9 @@
 ﻿using FreeAIr.Helper;
 using FreeAIr.UI.InSitu;
 using FreeAIr.UI.ViewModels;
+using System.Diagnostics;
 using System.Windows;
+using System.Windows.Input;
 using System.Windows.Media;
 
 namespace FreeAIr.UI.Windows
@@ -145,6 +147,71 @@ namespace FreeAIr.UI.Windows
         {
             DragMove();
         }
+
+
+        #region resize window
+
+        private bool _isResizing = false;
+        private System.Drawing.Point _lastPos; // Храним позицию относительно экрана
+
+        private void Resize_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            if (e.LeftButton != MouseButtonState.Pressed)
+            {
+                return;
+            }
+
+            _isResizing = true;
+
+            // Переводим локальную точку в экранные координаты
+            _lastPos = System.Windows.Forms.Cursor.Position;
+            ((UIElement)sender).CaptureMouse();
+
+            e.Handled = true;
+        }
+
+        private void Resize_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (!_isResizing)
+            {
+                return;
+            }
+
+            // Получаем текущую позицию относительно экрана
+            var currentPos = System.Windows.Forms.Cursor.Position;
+
+            var deltaX = (currentPos.X - _lastPos.X) / 2;
+            var deltaY = (currentPos.Y - _lastPos.Y) / 2;
+
+            if (deltaX == 0 && deltaY == 0)
+            {
+                return;
+            }
+
+            // Применяем изменения
+            if (Width + deltaX > 50)
+            {
+                Width += deltaX;
+            }
+            if (Height + deltaY > 50)
+            {
+                Height += deltaY;
+            }
+
+            _lastPos = currentPos;
+
+            e.Handled = true;
+        }
+
+        private void Resize_MouseUp(object sender, MouseButtonEventArgs e)
+        {
+            _isResizing = false;
+            ((UIElement)sender).ReleaseMouseCapture();
+
+            e.Handled = true;
+        }
+
+        #endregion
     }
 
 }

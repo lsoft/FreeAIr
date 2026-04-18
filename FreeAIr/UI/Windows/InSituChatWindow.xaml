@@ -43,8 +43,8 @@
                 Grid.Row="0">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="auto" />
-                    <ColumnDefinition Width="auto" />
                     <ColumnDefinition />
+                    <ColumnDefinition Width="auto" />
                 </Grid.ColumnDefinitions>
 
                 <Button
@@ -66,17 +66,27 @@
                     IsChecked="{Binding CloseIfSwitchAway}"
                     />
 
-                <Button
+                <Border
                     Grid.Column="1"
-                    HorizontalAlignment="Left"
+                    HorizontalAlignment="Right"
                     VerticalAlignment="Center"
-                    Margin="10,2,5,2"
-                    Content="Open full window"
-                    Background="Transparent"
-                    FontFamily="Cascadia Code"
-                    Command="{Binding Path=OpenFullWindowCommand}"
-                    Style="{DynamicResource TextBlockLikeButtonStyle}"
-                    />
+                    Margin="10,2,15,2"
+                    BorderThickness="1"
+                    CornerRadius="0"
+                    BorderBrush="#569CD6"
+                    Background="#569CD6"
+                    MouseDown="Resize_MouseDown"
+                    MouseMove="Resize_MouseMove"
+                    MouseUp="Resize_MouseUp"
+                    ToolTip="Click, hold and move to resize this window"
+                    >
+
+                    <Label
+                        Content="✥"
+                        Background="Transparent"
+                        FontFamily="Cascadia Code"
+                        />
+                </Border>
 
                 <Button
                     Grid.Column="2"
