@@ -215,26 +215,35 @@ namespace FreeAIr.UI.Dialog.Content
             ToolCallChatContent content
             )
         {
-            var json = content.ToolCall.FunctionArgumentsUpdate.ToString();
-            var nameValueDict = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, object>>(json);
-            if (nameValueDict.Count <= 0)
+            try
             {
-                return Visibility.Collapsed;
+                var json = content.ToolCall.FunctionArgumentsUpdate.ToString();
+                var nameValueDict = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, object>>(json);
+                if (nameValueDict.Count <= 0)
+                {
+                    return Visibility.Collapsed;
+                }
+
+                var md = new ParsedMarkdown(
+                    FontSizePage.Instance
+                    );
+
+                md.AddTableRow($"|Argument name|Argument value|");
+                md.AddTableRow($"|---|---|");
+                foreach (var pair in nameValueDict)
+                {
+                    md.AddTableRow($"|{pair.Key}|{pair.Value}|");
+                }
+                md.UpdateFlowDocument(ToolArgumentsFlowDocument, null, false);
+
+                return Visibility.Visible;
+            }
+            catch (Exception excp)
+            {
+                excp.ActivityLogException();
             }
 
-            var md = new ParsedMarkdown(
-                FontSizePage.Instance
-                );
-
-            md.AddTableRow($"|Argument name|Argument value|");
-            md.AddTableRow($"|---|---|");
-            foreach (var pair in nameValueDict)
-            {
-                md.AddTableRow($"|{pair.Key}|{pair.Value}|");
-            }
-            md.UpdateFlowDocument(ToolArgumentsFlowDocument, null, false);
-
-            return Visibility.Visible;
+            return Visibility.Collapsed;
         }
 
         private async Task AllowThisToolAllTimeAsync()

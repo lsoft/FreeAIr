@@ -746,9 +746,7 @@ namespace FreeAIr.UI.ViewModels
                 ProcessItem(checkedPaths, root);
             }
 
-            var jsonEmbeddingFilePath = await FreeAIrOptions.ComposeEmbeddingsFilePathAsync();
-            var existingOutlineRoot = await OutlineNode.CreateAsync(
-                jsonEmbeddingFilePath,
+            var existingOutlineRoot = await OutlineNode.TryCreateAsync(
                 true
                 );
 

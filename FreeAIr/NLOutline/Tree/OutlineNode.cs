@@ -1,5 +1,6 @@
 ﻿using FreeAIr.Embedding.Json;
 using FreeAIr.NLOutline.Json;
+using FreeAIr.Options2;
 using System.Collections.Generic;
 using System.Security.Cryptography;
 using System.Text;
@@ -149,14 +150,14 @@ namespace FreeAIr.NLOutline.Tree
             return result;
         }
 
-        public static async Task<OutlineNode?> CreateAsync(
-            string jsonEmbeddingFilePath,
+        public static async Task<OutlineNode?> TryCreateAsync(
             bool full
             )
         {
-            if (jsonEmbeddingFilePath is null)
+            var jsonEmbeddingFilePath = await FreeAIrOptions.ComposeEmbeddingsFilePathAsync();
+            if (!System.IO.File.Exists(jsonEmbeddingFilePath))
             {
-                throw new ArgumentNullException(nameof(jsonEmbeddingFilePath));
+                return null;
             }
 
             var json = await EmbeddingOutlineJsonObject.DeserializeAsync(
