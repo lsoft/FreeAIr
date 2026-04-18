@@ -15,14 +15,11 @@ namespace FreeAIr.Chat
     [Export(typeof(ChatContainer))]
     public sealed class ChatContainer
     {
-        public Guid? LastUsedChatId { get; set; } = null;
-        public Chat GetLastUsed()
+        public Guid? LastCreatedChatId
         {
-            var ctrlPressed = (Control.ModifierKeys & Keys.Control) == Keys.Control;
-            if (ctrlPressed && LastUsedChatId != null) return (_chats?.FirstOrDefault(c => c.Id == LastUsedChatId));
-            return (null);
+            get;
+            private set;
         }
-
 
         private readonly object _locker = new();
 
@@ -35,7 +32,6 @@ namespace FreeAIr.Chat
 
         public event ChatCollectionChangedDelegate ChatCollectionChangedEvent;
         public event ChatStatusChangedDelegate ChatStatusChangedEvent;
-        //public event PromptAddedDelegate PromptStateChangedEvent;
 
         [ImportingConstructor]
         public ChatContainer(
@@ -52,6 +48,16 @@ namespace FreeAIr.Chat
             var dte = AsyncPackage.GetGlobalService(typeof(EnvDTE.DTE)) as DTE2;
             _dteEvents = ((Events2)dte.Events).DTEEvents;
             _dteEvents.OnBeginShutdown += DTEEvents_OnBeginShutdown;
+        }
+
+        public Chat? GetLastCreatedChat()
+        {
+            if (!LastCreatedChatId.HasValue)
+            {
+                return null;
+            }
+
+            return _chats.FirstOrDefault(c => c.Id == LastCreatedChatId.Value);
         }
 
         public async Task<Chat?> StartChatAsync(
@@ -92,7 +98,7 @@ namespace FreeAIr.Chat
             {
                 chat.AddPrompt(prompt);
             }
-            LastUsedChatId = chat.Id;
+            LastCreatedChatId = chat.Id;
             return chat;
         }
 

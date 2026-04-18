@@ -8,9 +8,8 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Input;
 using WpfHelpers;
-using WpfHelpers.ish;
 using FreeAIr.Chat;
-using FreeAIr.Shared.ish;
+using FreeAIr.UI.Windows;
 
 namespace FreeAIr.UI.ViewModels
 {
@@ -122,27 +121,6 @@ namespace FreeAIr.UI.ViewModels
             }
         }
 
-        #region ish
-        public cMyCommand cmdRenameChat => field ??= cMyCommand.Create(RenameChat);
-        void RenameChat()
-        {
-            var wrapper = SelectedChat;
-            if (wrapper == null) return;
-
-            var newName =  ShowRenameDialog(wrapper.Title);
-            if (!string.IsNullOrEmpty(newName))
-            {
-                wrapper.Title = newName;
-                wrapper.Update();
-            }
-        }
-        string ShowRenameDialog(string currentTitle)
-        {
-            var input = new cInputDlg("New chat name", currentTitle, "Enter new name ");
-            return ((input.ShowDialog() == true) ? (string)input.Value : string.Empty);
-        }
-        #endregion
-
 
         public ICommand RemoveChatCommand
         {
@@ -192,6 +170,49 @@ namespace FreeAIr.UI.ViewModels
 
                             return wrapper.Chat.Status.In(ChatStatusEnum.WaitingForAnswer, ChatStatusEnum.ReadingAnswer);
                         });
+                }
+
+                return field;
+            }
+        }
+
+        public ICommand RenameChatCommand
+        {
+            get
+            {
+                if (field == null)
+                {
+                    field = new RelayCommand(
+                        a =>
+                        {
+                            var wrapper = a as ChatWrapper;
+                            if (wrapper is null)
+                            {
+                                return;
+                            }
+
+                            var renameViewModel = new RenameChatViewModel(
+                                wrapper.Title
+                                );
+                            var renameWindow = new RenameChatWindow
+                            {
+                                DataContext = renameViewModel
+                            };
+                            if (renameWindow.ShowDialog() != true)
+                            {
+                                return;
+                            }
+
+                            var newChatName = renameViewModel.ChatName;
+                            if (string.IsNullOrEmpty(newChatName))
+                            {
+                                return;
+                            }
+
+                            wrapper.Title = newChatName;
+                            wrapper.Update();
+                        }
+                        );
                 }
 
                 return field;

@@ -1,0 +1,58 @@
+﻿<Window x:Class="FreeAIr.UI.Windows.RenameChatWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:FreeAIr.UI.Windows"
+        xmlns:ui="clr-namespace:FreeAIr.UI"
+        mc:Ignorable="d"
+        ui:VsTheme.UseVsTheme="True"
+        WindowStyle="SingleBorderWindow"
+        ResizeMode="NoResize"
+        ShowInTaskbar="False"
+        Title="Rename chat"
+        Height="110" Width="400"
+        FontFamily="Cascadia Code"
+        WindowStartupLocation="CenterOwner"
+        Loaded="Window_Loaded"
+        >
+
+    <Grid Margin="2">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <TextBox
+            Grid.Row="0"
+            FontFamily="Cascadia Code"
+            Margin="2,10,2,0"
+            Text="{Binding ChatName, UpdateSourceTrigger=PropertyChanged}"
+            />
+
+        <StackPanel
+            Grid.Row="1"
+            Margin="0,10,5,10"
+            Orientation="Horizontal"
+            HorizontalAlignment="Right"
+            >
+            
+            <Button
+                Content="OK"
+                MinWidth="40"
+                Margin="2"
+                Command="{Binding ConfirmRenameCommand}"
+                Style="{DynamicResource TextBlockLikeButtonStyle}"
+                />
+            <Button
+                Content="Отмена"
+                IsCancel="True"
+                Margin="2"
+                IsDefault="True"
+                Command="{Binding CancelRenameCommand}"
+                Style="{DynamicResource TextBlockLikeButtonStyle}"
+                />
+            
+        </StackPanel>
+    </Grid>
+</Window>

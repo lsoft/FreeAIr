@@ -148,16 +148,17 @@
                 ScrollViewer.HorizontalScrollBarVisibility="Auto"
                 ScrollViewer.VerticalScrollBarVisibility="Auto"
                 >
-                <ListBox.ContextMenu>
-                        <ContextMenu>
-                            <MenuItem Header="Rename" Command="{Binding cmdRenameChat}"/>
-                        </ContextMenu>
-                </ListBox.ContextMenu>
                 <ListBox.ItemTemplate>
                     <DataTemplate>
 
                         <StackPanel Opacity="{Binding OpacityLevel}">
-                            <Label Content="{Binding Title}" />
+                            <Button
+                                FontFamily="Cascadia Code"
+                                Content="{Binding Title}"
+                                Style="{DynamicResource TextBlockLikeButtonStyle}"
+                                Command="{Binding ElementName=ChatListToolWindow, Path=DataContext.RenameChatCommand}"
+                                CommandParameter="{Binding}"
+                                />
                             <TextBlock
                                 FontFamily="Cascadia Code"
                                 Visibility="{Binding SecondRowVisibility}"

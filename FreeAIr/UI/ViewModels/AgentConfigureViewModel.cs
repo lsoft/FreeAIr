@@ -290,7 +290,10 @@ namespace FreeAIr.UI.ViewModels
                                 token: SelectedAgent.Technical.GetToken(),
                                 endpoint: SelectedAgent.Technical.Endpoint,
                                 title: FreeAIr.Resources.Resources.Choose_model_from_this_api_endpoint,
-                                null, ModelFilter, IsMaskRegex
+                                filterer: new ModelFilterer(
+                                    ModelFilter,
+                                    IsMaskRegex
+                                    )
                                 );
                             if (string.IsNullOrEmpty(chosenModelId))
                             {

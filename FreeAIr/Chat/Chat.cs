@@ -10,7 +10,6 @@ using System.Threading.Tasks;
 using FreeAIr.Chat.Content;
 using FreeAIr.Chat.Context;
 using FreeAIr.BLogic.Reader;
-using stdole;
 
 namespace FreeAIr.Chat
 {
@@ -18,11 +17,6 @@ namespace FreeAIr.Chat
     {
         public Guid Id { get; } = Guid.NewGuid();
         private readonly List<IChatContent> _contents = new();
-
-        //private CancellationTokenSource _cancellationTokenSource = new();
-        //private Task? _task;
-
-        //public CancellationToken CancellationToken => _cancellationTokenSource.Token;
 
         private ChatStatusEnum _status;
 

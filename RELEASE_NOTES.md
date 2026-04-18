@@ -23,6 +23,13 @@ My others extensions lives [here](https://marketplace.visualstudio.com/publisher
 
 # FreeAIr Release Notes
 
+## 4.2.10
+
+- Added chat name.
+- Added ability to rename chat (by clicking on its name).
+- Added ability to filter models when asking a model provider about its available models.
+- Thanks to [ish-1313](https://github.com/ish-1313) for his\her first contribution to FreeAIr project!
+
 ## 4.2.9
 
 - Improved usability in case of no agent with non-empty token exists.

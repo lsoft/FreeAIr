@@ -253,9 +253,22 @@
                     FontFamily="Cascadia Code"
                     Text="{Binding SelectedAgent.Technical.ChosenModel, UpdateSourceTrigger=PropertyChanged}"
                     />
-                <Label Grid.Column="1" Content="Filter" Margin="5,0,2,0" />
-                <TextBox Grid.Column="2" Text="{Binding ModelFilter }" />
-                <CheckBox Grid.Column="3" Content="Rx" IsChecked="{Binding IsMaskRegex}" Margin="2" />
+                <Label
+                    Grid.Column="1"
+                    Content="Filter"
+                    Margin="5,0,2,0"
+                    />
+                <TextBox
+                    Grid.Column="2"
+                    FontFamily="Cascadia Code"
+                    Text="{Binding ModelFilter}"
+                    />
+                <CheckBox
+                    Grid.Column="3"
+                    Content="Rx"
+                    IsChecked="{Binding IsMaskRegex}"
+                    Margin="2"
+                    />
                 <Button
                     Grid.Column="4"
                     HorizontalAlignment="Stretch"

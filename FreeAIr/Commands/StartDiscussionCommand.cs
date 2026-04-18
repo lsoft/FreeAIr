@@ -1,17 +1,15 @@
 ﻿using EnvDTE;
-using FreeAIr.Helper;
-using FreeAIr.UI.ContextMenu;
-using FreeAIr.UI.ToolWindows;
-using Microsoft.VisualStudio.ComponentModelHost;
 using FreeAIr.Chat;
 using FreeAIr.Chat.Context.Item;
-using System.Windows.Input;
+using FreeAIr.Helper;
+using FreeAIr.UI.ToolWindows;
+using Microsoft.VisualStudio.ComponentModelHost;
 using System.Diagnostics;
 
 namespace FreeAIr.Commands
 {
     [Command(PackageIds.StartDiscussionCommandId)]
-    internal sealed class StartDiscussionCommand : BaseCommand<StartDiscussionCommand>
+    public sealed class StartDiscussionCommand : CreateOrReuseChatCommand<StartDiscussionCommand>
     {
         public StartDiscussionCommand(
             )
@@ -35,15 +33,11 @@ namespace FreeAIr.Commands
                 return;
             }
 
-            var chat = chatContainer.GetLastUsed();
-
-            if (chat == null)
+            var chat = await CreateOrReuseChatAsync();
+            if (chat is null)
             {
-                var chosenAgent = await AgentContextMenu.ChooseAgentWithTokenAsync("Choose agent:");
-                if (chosenAgent == null) return;
-                chat = await chatContainer.StartChatAsync( new ChatDescription(null), null, await FreeAIr.Chat.ChatOptions.GetDefaultAsync(chosenAgent));
+                return;
             }
-            if (chat == null) return;
 
             try
             {
@@ -62,6 +56,6 @@ namespace FreeAIr.Commands
 
             await ChatWindowShower.ShowChatWindowAsync(chat);
         }
-
     }
+
 }

@@ -1,14 +1,13 @@
-﻿using FreeAIr.Shared.ish;
+﻿using WpfHelpers;
 
 namespace FreeAIr.Chat
 {
-    public sealed class ChatDescription : cNotifyBase, IDisposable
+    public sealed class ChatDescription : BaseViewModel, IDisposable
     {
-
         public string Title
         {
-            get => field;
-            set => SetProperty(ref field, value);
+            get;
+            set;
         }
 
         public IOriginalTextDescriptor? SelectedTextDescriptor
@@ -24,7 +23,7 @@ namespace FreeAIr.Chat
             Title = "Untitled";
         }
 
-        public void Dispose()
+        protected override void DisposeViewModel()
         {
             SelectedTextDescriptor?.Dispose();
         }
