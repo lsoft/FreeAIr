@@ -23,14 +23,17 @@ My others extensions lives [here](https://marketplace.visualstudio.com/publisher
 
 # FreeAIr Release Notes
 
-## 4.2.10
+## 4.2.11
 
 - Thanks to [ish-1313](https://github.com/ish-1313) for his\her first contribution to FreeAIr project:
   - Added chat name.
   - Added ability to rename chat (by clicking on its name).
   - Added ability to filter models when asking a model provider about its available models.
-- Fixed bug with GetAllSolutionFiles MCP tool.
 - Added ability to resize in situ chat window by dragging a special control.
+
+## 4.2.10
+
+- Fixed bug with GetAllSolutionFiles MCP tool.
 
 ## 4.2.9
 
