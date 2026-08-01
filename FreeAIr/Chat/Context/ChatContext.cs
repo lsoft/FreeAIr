@@ -6,6 +6,17 @@ using FreeAIr.Chat.Context.Item;
 
 namespace FreeAIr.Chat.Context
 {
+    /// <summary>
+    /// The material handed to the LLM in addition to the prompts: solution documents, selections,
+    /// external files, images and so on.
+    ///
+    /// Context items are compared by <see cref="IChatContextItem.IsSame"/> rather than by
+    /// reference, so adding the same document twice is a no-op no matter how it was added
+    /// (typed as `#name`, dragged from Solution Explorer, pulled in as a C# dependency, ...).
+    ///
+    /// See <see cref="FreeAIr.Chat.Chat.GetMessageListAsync"/> for where exactly the context lands in the
+    /// request.
+    /// </summary>
     public sealed class ChatContext
     {
         public const string CopilotInstructionFilePath = ".github/copilot-instructions.md";
@@ -40,6 +51,11 @@ namespace FreeAIr.Chat.Context
             return context;
         }
 
+        /// <summary>
+        /// Looks for `copilot-instructions.md` first in the git repository root and then next to
+        /// the solution. If your project already tells Copilot how to behave, FreeAIr obeys the
+        /// same instructions instead of asking you to duplicate them.
+        /// </summary>
         private static async System.Threading.Tasks.Task<string?> GetFullPathToCopilotInstructionAsync()
         {
             var repositoryFolder = await GitRepositoryProvider.GetRepositoryFolderAsync();
@@ -145,6 +161,10 @@ namespace FreeAIr.Chat.Context
             RaiseChatContextChanged();
         }
 
+        /// <summary>
+        /// Drops the items the scanner found on its own, keeping the ones the user added
+        /// deliberately (see <see cref="IChatContextItem.IsAutoFound"/>).
+        /// </summary>
         public void RemoveAutomaticItems()
         {
             var removedCount = _items.RemoveAll(i => i.IsAutoFound);

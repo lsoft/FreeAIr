@@ -10,6 +10,18 @@ using System.Threading.Tasks;
 
 namespace FreeAIr.Record
 {
+    /// <summary>
+    /// The currently active speech-to-text backend.
+    ///
+    /// FreeAIr ships several recorders (Microsoft Speech API, WinRT, local Whisper.Net, Whisper
+    /// over an OpenAI-compatible endpoint) and the user picks one at run time; the choice is kept
+    /// in <see cref="RecordingPage"/>. This class hides the swap from the rest of the code: it
+    /// always hands out something, falling back to <see cref="FakeRecorder"/> when the chosen
+    /// backend cannot be created (no model file, no microphone, no token, ...).
+    ///
+    /// Only the recording itself lives here; the record → transcribe → post-process pipeline is
+    /// <see cref="FreeAIr.BLogic.RecorderTranscriberPostProcessor"/>.
+    /// </summary>
     public static class ChosenRecorder
     {
         private static IRecorder? _currentRecorder;
@@ -56,6 +68,11 @@ namespace FreeAIr.Record
             return FakeRecorder.Instance;
         }
 
+        /// <summary>
+        /// Shows the recorder menu and applies whatever the user picked there: another backend
+        /// (possibly with its own configuration window), another post-process support action, or
+        /// one of the service commands.
+        /// </summary>
         public static async Task ChooseRecorderAsync(
             )
         {
@@ -132,6 +149,10 @@ namespace FreeAIr.Record
             await ReplaceRecorderWithAsync(recorder);
         }
 
+        /// <summary>
+        /// Installs a new recorder and disposes the previous one. The swap is atomic so that a
+        /// status signal arriving in the middle cannot be routed to a half-replaced recorder.
+        /// </summary>
         private static async Task ReplaceRecorderWithAsync(
             IRecorder newRecorder
             )

@@ -13,12 +13,26 @@ namespace FreeAIr.MCP.McpServerProxy
 {
 
     /// <summary>
-    /// Коллекция текущих инициализированных MCP servers.
+    /// The collection of currently initialized MCP servers (Коллекция текущих инициализированных
+    /// MCP servers).
+    ///
+    /// There are three flavours behind the common <see cref="IMcpServerProxy"/> interface:
+    /// the built-in Visual Studio server (runs inside devenv and therefore can touch DTE/Roslyn),
+    /// the github.com server and any number of user-configured external servers — the latter two
+    /// are hosted by `Proxy.exe`.
+    ///
+    /// This class also owns the tool catalogue: after every reconfiguration the tools of the
+    /// started servers are merged into <see cref="AvailableToolContainer"/>, and the tools of the
+    /// servers that went away are dropped from it.
     /// </summary>
     public static class McpServerProxyCollection
     {
         private static readonly List<McpServerProxyWrapper> _mcpServerProxyWrappers = new();
 
+        /// <summary>
+        /// Brings the running set of servers in line with the requested one. The two built-in
+        /// servers are always in the requested set, so they are (re)started on every call.
+        /// </summary>
         public static async Task<McpServersSetupConfigurationResult> SetupConfigurationAsync(
             AvailableToolContainer toolContainer,
             McpServers mcpServers
@@ -138,6 +152,11 @@ namespace FreeAIr.MCP.McpServerProxy
             toolContainer.DeleteAllToolsForMcpServerProxies(deletedMcpServerProxies);
         }
 
+        /// <summary>
+        /// Starts a single server and registers its tools.
+        /// Returns false when the server is not installed or refused to start; in that case its
+        /// tools are removed from the container so they are not offered to the LLM.
+        /// </summary>
         public static async Task<bool> ProcessMcpServerProxyAsync(
             AvailableToolContainer toolContainer,
             IMcpServerProxy mcpServerProxy
@@ -175,6 +194,10 @@ namespace FreeAIr.MCP.McpServerProxy
             return true;
         }
 
+        /// <summary>
+        /// Joins the tools published by the running servers with their enabled/disabled state
+        /// taken from the given container (global one, or a chat-scoped one).
+        /// </summary>
         public static McpServerProxiesToolsStatusCollection GetTools(
             AvailableToolContainer toolContainer
             )
@@ -207,6 +230,14 @@ namespace FreeAIr.MCP.McpServerProxy
             return result;
         }
 
+        /// <summary>
+        /// Finds the server which owns the tool and invokes it there.
+        /// </summary>
+        /// <param name="toolName">
+        /// The full name (`&lt;server&gt;.&lt;tool&gt;`) as it was given to the LLM. Matched
+        /// case-insensitively, because models are not reliable about the casing they echo back.
+        /// </param>
+        /// <returns>Null when no running server publishes such a tool.</returns>
         public static async Task<McpServerProxyToolCallResult?> CallToolAsync(
             string toolName,
             Dictionary<string, object?> arguments,

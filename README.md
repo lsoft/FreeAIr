@@ -35,6 +35,8 @@ A: No problem! You can use local LLM, for example via KoboldCpp. Local LLM sends
 
 Main functions:
 
+- Chat with any OpenAI-compatible LLM, in a tool window or in a small floating window right at the caret (`in situ` chat)
+- Voice prompting: dictate your prompt instead of typing it (4 speech-to-text backends, including a fully local one)
 - Searching with natural language (with RAG support)
 - Explain the code
   - selected piece of the code
@@ -50,6 +52,9 @@ Main functions:
 - Support for MCP servers and their tools.
 - A Visual Studio MCP server is built into FreeAIr.
 - Support for MSDN MCP server.
+- Works in Visual Studio 2022 (17.14 and above) and Visual Studio 2026.
+
+Are you a contributor rather than a user? Then [ARCHITECTURE.md](ARCHITECTURE.md) is for you.
 
 # FreeAIr images (click to open)
 
@@ -136,11 +141,13 @@ Main functions:
 # Basic concepts of FreeAIr
 
 - Agent is a specific combination of `endpoint`, `token`, model name and its system prompt. The same LLM can act in different roles, the role is defined by its system prompt (for example, `You are an experienced programmer...`, `You are a database programmer...`). In this case, you will have two agents that have the same `endpoint`, `token` and model name, but different system prompts.
-- Chat is a dialogue with LLM. You can have several dialogues and delete obsolete ones.
+- Chat is a dialogue with LLM. You can have several dialogues, rename them and delete obsolete ones.
+- In situ chat is the same chat, but shown in a small floating window right at the caret instead of a tool window.
 - Chat context is additional information that is available to LLM, various files, selections, etc. are added there. This is more convenient than providing texts in the prompt itself.
 - Natural Language Search is a FreeAIr feature that allows you to search your code base in natural human language.
 - Natural Language Outlines are comments inside your solution documents. They are ultimately used by Natural Language Search to speed up searches.
 - Support Action is an action that FreeAIr can take in response to user actions in Visual Studio.
+- Recorder is a speech-to-text backend which turns your dictation into the text of a prompt.
 - MCP Servers are Model Context Protocol servers that provide additional capabilities to LLM.
 - Tools are capabilities that selected MCP Servers offer.
 
@@ -160,6 +167,8 @@ For example, these are font size settings for the LLM dialog. They can be opened
 ## FreeAIr JSON settings
 
 This is a group of settings that makes sense to keep common for all members of your team. These settings can be saved in a json file, which is recommended to be committed to the git repository. Also, these settings can be saved inside Visual Studio, if, for some reason, it is undesirable to create a file.
+
+The file is placed next to your solution, in `.freeair\<solution name>_options.json`. FreeAIr prefers it over the settings stored in Visual Studio: if the file exists, it wins.
 
 These settings contain:
 - agent settings
@@ -223,6 +232,56 @@ If your project is configured to use Microsoft Copilot, the `copilot-instruction
 
 If your project is written in C#, you can add all files dependent on the already added file to the chat context so that LLM gets more context. There is a corresponding button next to the document name for this.
 
+### Chat name
+
+Every chat has a name which is shown in the chat list. FreeAIr suggests a name automatically, and you can rename any chat by clicking on its name.
+
+## In situ chat
+
+Besides the chat tool window, FreeAIr can open a small floating chat window right at the caret, without taking you away from the code you are editing. Press `Alt+Z` (or use `FreeAIr start chat here` in the editor context menu) and the window will appear at the current position. Hold `Ctrl` while invoking the command to continue the previous chat instead of starting a new one.
+
+<a href="https://raw.githubusercontent.com/lsoft/FreeAIr/main/in_situ_chat.gif" target="_blank">
+  <img src="https://raw.githubusercontent.com/lsoft/FreeAIr/main/in_situ_chat.gif" style="height: 150px; width: auto; object-fit: contain; border: 1px solid #ccc;" alt="FreeAIr in situ chat" />
+</a>
+
+The in situ window:
+
+- becomes semi-transparent when it loses the focus, so it does not hide your code;
+- can be resized by dragging the resize control in its corner;
+- can be closed automatically as soon as you switch away from it — this behaviour is controlled in `Tools` -> `Options` -> `FreeAIr` -> `UI`.
+
+## Voice prompting
+
+Instead of typing a prompt you can dictate it. In the chat prompt area, **press and hold the right `Ctrl` key** and speak; when you release the key the recognized text is appended to the prompt.
+
+Left-clicking the recorder icon opens a menu where you can:
+
+- choose the speech-to-text backend;
+- choose the post-process support action;
+- enable or disable voice prompting entirely.
+
+Four backends are available:
+
+- `Microsoft speech API recorder and transcriber` — the classic System.Speech recognizer, works out of the box.
+- `WinRT recorder and transcriber` — the Windows speech recognizer.
+- `Whisper local (using Whisper.Net; processing on Vulkan or CPU)` — a fully local Whisper. You need to download a model file from [huggingface](https://huggingface.co/sandrohanea/whisper.net/tree/main) and specify its path.
+- `Whisper OpenAI API (including local LLMs)` — Whisper behind any OpenAI-compatible endpoint, local or remote.
+
+Backend-specific settings (model paths, tokens, endpoints, prompts) live in `Tools` -> `Options` -> `FreeAIr` -> `Recording audio`.
+
+Speech recognition of technical speech is far from perfect, so the transcribed text can optionally be passed through an LLM before it lands into the prompt area. That post-processing step is an ordinary [support action](#support-action) with the `RecordPostProcess` scope, so you fully control its prompt and the agent that performs it.
+
+## Keyboard shortcuts
+
+| Shortcut | Action |
+| --- | --- |
+| `Alt+L` | Apply a support action to the current selection. |
+| `Alt+C` | Start a discussion about the current selection. Hold `Ctrl` to add to the previous chat. |
+| `Alt+A` | Generate a whole line suggestion at the caret. |
+| `Alt+Z` | Open the in situ chat at the caret. Hold `Ctrl` to add to the previous chat. |
+| `Ctrl+Enter` | Send the prompt (in the chat prompt area). |
+| hold right `Ctrl` | Record the prompt by voice (in the chat prompt area). |
+
 ## Support Action
 
 The actions that FreeAIr can offer the user are not encoded in the FreeAIr code. The list of actions is part of the Json settings file in the `Supports/Actions` section.
@@ -234,14 +293,37 @@ Each action consists of:
 - name of the agent who should perform this action. If the agent name is not specified, FreeAIr will offer the user to select an agent manually.
 - image moniker - used as an icon to display in the prompt input control in the FreeAIr chat.
 
-Anchors are placeholders in which the corresponding contextual information is added. They can be:
-- name of the document(s) in the chat context.
-- text of the compilation error.
-- the line where the compilation error occurred.
-- the column where the compilation error occurred.
-- the preferred unit test framework.
-- a git diff with your changes.
-- a natural language search query.
+The scopes are:
+
+| Scope | When the action is offered |
+| --- | --- |
+| `SelectedCodeInDocument` | A piece of code is selected in the editor. |
+| `CodelensInDocument` | The FreeAIr codelens is clicked. |
+| `FileInSolutionTree` | Files are selected in Solution Explorer. |
+| `BuildErrorWindow` | An error is selected in the Error List. |
+| `EnterPromptControl` | `/` is typed in the chat prompt area. |
+| `CommitMessageBuilding` | A commit message is being composed in `Git Changes`. |
+| `NaturalLanguageSearch` | A natural language search is started. |
+| `GenerateNaturalLanguageOutlines` | Natural language outlines are being generated. |
+| `BuildNaturalLanguageOutlines` | NLO embedding json files are being built. |
+| `WholeLineCompletion` | A whole line completion is requested. |
+| `RecordPostProcess` | A dictated prompt has been transcribed and is about to be post-processed. |
+
+Anchors are placeholders in which the corresponding contextual information is added:
+
+| Anchor | Replaced with |
+| --- | --- |
+| `{CONTEXT_ITEM_NAME}` | name of the document(s) in the chat context. |
+| `{BUILD_ERROR_MESSAGE}` | text of the compilation error. |
+| `{BUILD_ERROR_LINE}` | the line where the compilation error occurred. |
+| `{BUILD_ERROR_COLUMN}` | the column where the compilation error occurred. |
+| `{UNIT_TEST_FRAMEWORK}` | the preferred unit test framework. |
+| `{GIT_DIFF}` | a git diff with your changes. |
+| `{NATURAL_LANGUAGE_SEARCH_QUERY}` | a natural language search query. |
+| `{WHOLE_LINE_COMPLETION_ANCHOR}` | the marker of the place where the whole line completion is requested. |
+| `{RECORDED_TEXT}` | the text transcribed from your voice. |
+
+An anchor that has no value in the current context is replaced with an empty string.
 
 You can edit existing and add your own support actions.
 
@@ -359,7 +441,7 @@ In any case, a window will open:
   <img src="https://raw.githubusercontent.com/lsoft/FreeAIr/main/nlof0.png" style="height: 150px; width: auto; object-fit: contain; border: 1px solid #ccc;" alt="Generate NLO-embedding json files" />
 </a>
 
-Set up everything you need and create (update) json files. These files contain:
+Set up everything you need and create (update) json files. They are placed next to your solution, in `.freeair\<solution name>_embeddings.json`, and contain:
 
 - information about all NLOs (as well as regular comments in the code)
 - embeddings of all NLOs
@@ -374,7 +456,7 @@ the `Use RAG` checkbox will become available. When selected, FreeAIr first selec
 
 It is recommended to save these Json files to a git repository so that the natural language search function works for all team members.
 
-WARNING: In the 4.0 version of FreeAIr the checkbox `Use RAG` DOES NOT IMPLEMENTED YET.
+WARNING: as of FreeAIr 4.2.12 the `Use RAG` checkbox IS NOT IMPLEMENTED YET. Outlines can already be generated and their embedding json files can already be built, but the search itself still scans every document.
 
 # How I can access to AI if my country is banned from Copilot and from any other LLM provider?
 

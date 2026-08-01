@@ -6,12 +6,25 @@ using System.Linq;
 namespace FreeAIr.MCP.McpServerProxy
 {
     /// <summary>
-    /// Тулзы, доступные согласно настройкам.
+    /// The tools that are enabled by the settings (Тулзы, доступные согласно настройкам).
+    ///
+    /// This is a switchboard, not a catalogue: it stores an on/off flag per server/tool pair and
+    /// knows nothing about what those tools actually do. The catalogue itself belongs to
+    /// <see cref="McpServerProxyCollection"/>, which joins the two in
+    /// <see cref="McpServerProxyCollection.GetTools"/>.
+    ///
+    /// Two kinds of containers exist. The global one is read from and saved to the settings; each
+    /// chat gets its own copy at creation time (<see cref="FreeAIr.Chat.Chat.ChatTools"/>), so toggling a tool
+    /// inside a chat affects that chat only. A tool which is not mentioned at all counts as
+    /// disabled.
     /// </summary>
     public sealed class AvailableToolContainer
     {
         private readonly AvailableMcpServersJson _servers;
 
+        /// <summary>
+        /// Reads the global container from the active FreeAIr settings.
+        /// </summary>
         public static async System.Threading.Tasks.Task<AvailableToolContainer> ReadSystemAsync()
         {
             var tools = await FreeAIrOptions.DeserializeAvailableToolsAsync();
@@ -19,6 +32,10 @@ namespace FreeAIr.MCP.McpServerProxy
             return c;
         }
 
+        /// <summary>
+        /// Reads a container from a json text rather than from the active settings. Used by the
+        /// Control Center, which edits a settings document the user has not saved yet.
+        /// </summary>
         public static AvailableToolContainer ReadFromOptions(
             string optionsJson
             )
@@ -72,6 +89,14 @@ namespace FreeAIr.MCP.McpServerProxy
         }
 
 
+        /// <summary>
+        /// Reconciles the stored tool list of a server with the tools it has just published:
+        /// tools that no longer exist are dropped, and the remaining ones end up enabled.
+        ///
+        /// Beware: the reconciliation switches the surviving tools ON, it does not preserve their
+        /// previous flags. This is harmless only as long as the container being reconciled is a
+        /// throwaway one and is not saved back into the settings.
+        /// </summary>
         public void AddToolsIfNotExists(
             string serverName,
             IReadOnlyList<string> toolNames

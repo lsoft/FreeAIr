@@ -9,6 +9,15 @@ using FreeAIr.Chat.Content;
 
 namespace FreeAIr.BLogic.Reader
 {
+    /// <summary>
+    /// Performs one streaming completion request for a chat and pushes the result back into it.
+    ///
+    /// A reader serves exactly one chat and only one request at a time: <see cref="AsyncStartRead"/>
+    /// does nothing while the previous read is still running. The reader never throws to its
+    /// caller — every failure is turned into a chat answer plus a `Failed` chat status.
+    ///
+    /// Use <see cref="LLMReaderPool"/> to get one; do not create readers directly.
+    /// </summary>
     public sealed class LLMReader : IDisposable
     {
         private readonly object _taskLocker = new();
@@ -17,6 +26,9 @@ namespace FreeAIr.BLogic.Reader
 
         private CancellationTokenSource _cancellationTokenSource = new();
 
+        /// <summary>
+        /// The read in flight, or null when the reader is idle. Guarded by <see cref="_taskLocker"/>.
+        /// </summary>
         private Task? _task;
 
         public LLMReader(
@@ -31,6 +43,10 @@ namespace FreeAIr.BLogic.Reader
             _chat = chat;
         }
 
+        /// <summary>
+        /// Starts reading in the background and returns at once.
+        /// Silently ignored if a read is already in progress.
+        /// </summary>
         public void AsyncStartRead(
             )
         {
@@ -62,6 +78,10 @@ namespace FreeAIr.BLogic.Reader
             await task;
         }
 
+        /// <summary>
+        /// Cancels the read in flight and waits for it to unwind, then arms a fresh cancellation
+        /// source so the reader can be used again. Never throws.
+        /// </summary>
         public async Task StopSafelyAsync()
         {
             try
@@ -112,9 +132,19 @@ namespace FreeAIr.BLogic.Reader
             }
         }
 
+        /// <summary>
+        /// The body of a single turn:
+        /// build the request from the chat, stream the completion, append the text to the answer
+        /// as it arrives (so the UI updates live) and register the tool calls the model asked for.
+        ///
+        /// The tools are NOT invoked here. Each <see cref="ToolCallChatContent"/> executes itself
+        /// (possibly after asking the user for a permission), and the last one to finish restarts
+        /// this reader through <see cref="FreeAIr.Chat.Chat.CreateToolCall"/>.
+        /// </summary>
         private async Task ReadSafelyPrivateAsync(
             )
         {
+            //never block the UI thread while streaming
             await TaskScheduler.Default;
 
             AnswerChatContent? chatAnswer = null;
@@ -148,6 +178,9 @@ namespace FreeAIr.BLogic.Reader
                 {
                     //completionUpdate.Usage.OutputTokenDetails.
 
+                    //a chunk without a completion id means the endpoint replied with
+                    //something which is not a completion at all (an error page, a quota
+                    //message, etc.); there is nothing to read further
                     if (completionUpdate.CompletionId is null)
                     {
                         chatAnswer = await CreateOrAppendAnswerPartAsync(chatAnswer, "Server returns error.");

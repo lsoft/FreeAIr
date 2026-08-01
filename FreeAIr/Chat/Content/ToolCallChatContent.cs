@@ -4,8 +4,20 @@ using System.Collections.Generic;
 
 namespace FreeAIr.Chat.Content
 {
+    /// <summary>
+    /// A tool the model asked to invoke, together with the outcome of that invocation.
+    ///
+    /// The lifecycle is Asking (waiting for the user's permission) → Executing → Succeeded /
+    /// Failed / Blocked. A tool call which never leaves a terminal state would stall the whole
+    /// dialogue, because the chat resumes the conversation only when every tool call of the turn
+    /// is finished.
+    /// </summary>
     public sealed class ToolCallChatContent : IChatContent
     {
+        /// <summary>
+        /// Tells the chat to check whether the turn can be continued.
+        /// Supplied by <see cref="FreeAIr.Chat.Chat.CreateToolCall"/>.
+        /// </summary>
         private readonly Action _checkForRequestAnswer;
 
         public ChatContentTypeEnum Type => ChatContentTypeEnum.ToolCall;
@@ -67,6 +79,10 @@ namespace FreeAIr.Chat.Content
             Status = status;
         }
 
+        /// <summary>
+        /// Records the terminal state of the call and lets the chat know it may go on.
+        /// This is the only place from which the conversation is resumed after tool calls.
+        /// </summary>
         public void SetResult(
             ToolCallStatusEnum status,
             string? result
@@ -102,10 +118,24 @@ namespace FreeAIr.Chat.Content
 
     public enum ToolCallStatusEnum
     {
+        /// <summary>
+        /// The user is being asked whether this tool may run.
+        /// </summary>
         Asking,
+
         Executing,
+
         Succeeded,
+
+        /// <summary>
+        /// The tool ran and threw. The failure is reported back to the model, which usually makes
+        /// it try something else.
+        /// </summary>
         Failed,
+
+        /// <summary>
+        /// The user refused to let the tool run.
+        /// </summary>
         Blocked
     }
 

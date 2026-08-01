@@ -8,6 +8,13 @@ using System.Threading;
 
 namespace FreeAIr.Embedding
 {
+    /// <summary>
+    /// Turns the text of natural language outlines into embedding vectors, which are then stored
+    /// in `.freeair\&lt;solution name&gt;_embeddings.json` and used to narrow down a natural language
+    /// search.
+    ///
+    /// The agent given to the constructor must point at an embedding model, not at a chat one.
+    /// </summary>
     public sealed class EmbeddingGenerator
     {
         private readonly EmbeddingClient _embeddingClient;
@@ -34,6 +41,11 @@ namespace FreeAIr.Embedding
                 );
         }
 
+        /// <summary>
+        /// Walks the outline tree and fills in the embeddings that are still missing, in a single
+        /// batched request. Nodes which already have an embedding are left alone, so re-running
+        /// this after adding a few outlines is cheap.
+        /// </summary>
         public async Task GenerateEmbeddingsAsync(
             OutlineNode outline,
             CancellationToken cancellationToken

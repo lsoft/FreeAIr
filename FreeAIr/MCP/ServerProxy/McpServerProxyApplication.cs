@@ -12,6 +12,16 @@ using System.Threading.Tasks;
 
 namespace FreeAIr.MCP.McpServerProxy
 {
+    /// <summary>
+    /// Owns `Proxy.exe` — the child process which hosts every out-of-process MCP server.
+    ///
+    /// MCP servers cannot be hosted inside devenv: the extension targets .NET Framework 4.8, while
+    /// the MCP SDK needs a modern .NET. So the proxy is a .NET 9 executable shipped inside the VSIX
+    /// as `Proxy.zip`, unpacked on the first use and talked to over JSON-RPC on its stdin/stdout.
+    ///
+    /// Everything here happens in the static constructor, which means that merely touching this
+    /// class starts the child process.
+    /// </summary>
     public static class McpServerProxyApplication
     {
         public const string ProxyApplicationZipFileName = "Proxy.zip";
@@ -45,6 +55,8 @@ namespace FreeAIr.MCP.McpServerProxy
 
             UnpackProxy();
 
+            //derive a per-devenv identifier so that several Visual Studio instances
+            //running side by side do not fight over the same proxy
             var visualStudioProcessId = System.Diagnostics.Process.GetCurrentProcess().Id;
             var proxyProcessId = 30000 + (visualStudioProcessId % 10000);
 
@@ -74,6 +86,18 @@ namespace FreeAIr.MCP.McpServerProxy
             Started = true;
         }
 
+        /// <summary>
+        /// Pushes the configured MCP servers into the proxy, then reconciles the local tool
+        /// catalogue with what actually started.
+        ///
+        /// Servers the proxy refused to start are simply missing from the result, which is how the
+        /// caller learns about the failure — see
+        /// <see cref="McpServersSetupConfigurationResult.SuccessStartedMcpServers"/>.
+        /// </summary>
+        /// <param name="mcpServers">
+        /// The servers to run. When null they are taken from the current FreeAIr settings.
+        /// </param>
+        /// <returns>Null when the settings could not even be read.</returns>
         public static async Task<McpServersSetupConfigurationResult?> UpdateExternalServersAsync(
             McpServers? mcpServers = null
             )
@@ -137,6 +161,11 @@ namespace FreeAIr.MCP.McpServerProxy
         //    await _processTask;
         //}
 
+        /// <summary>
+        /// Extracts `Proxy.zip` into the extension folder. The presence of the target folder is
+        /// taken as "already unpacked", so an upgraded VSIX unpacks into a new folder rather than
+        /// merging into the old one.
+        /// </summary>
         private static void UnpackProxy()
         {
             if (!Directory.Exists(ProxyUnpackedFolderPath))

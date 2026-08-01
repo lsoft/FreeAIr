@@ -104,6 +104,18 @@ namespace FreeAIr.Options2.Support
         }
     }
 
+    /// <summary>
+    /// The values to substitute into a support action prompt.
+    ///
+    /// Support action prompts are written by the user in the json settings and contain anchors
+    /// like `{GIT_DIFF}` or `{BUILD_ERROR_MESSAGE}`. Every place that triggers an action builds a
+    /// context with the `With...Async` factory that matches it, and the anchors it knows about get
+    /// their values; the rest are replaced with an empty string, so a prompt written for one scope
+    /// never breaks when it is reused in another.
+    ///
+    /// The preferred unit test framework is added by every factory, because "generate unit tests"
+    /// can be invoked from almost anywhere.
+    /// </summary>
     public sealed class SupportContext
     {
         private Dictionary<SupportContextVariableEnum, string> _contextVariables = new();
@@ -118,6 +130,10 @@ namespace FreeAIr.Options2.Support
             _contextVariables[variable] = value;
         }
 
+        /// <summary>
+        /// Replaces every known anchor in the prompt with its value from this context, or with an
+        /// empty string when this context has nothing for it.
+        /// </summary>
         public string ApplyVariablesToPrompt(
             string prompt
             )

@@ -39,13 +39,30 @@ namespace FreeAIr
     [ProvideToolWindow(typeof(NaturalLanguageOutlinesToolWindow.Pane), Style = VsDockStyle.Tabbed, Window = WindowGuids.DocumentWell)]
     [ProvideToolWindow(typeof(BuildNaturalLanguageOutlinesJsonFileToolWindow.Pane), Style = VsDockStyle.Tabbed, Window = WindowGuids.DocumentWell)]
     [ProvideService(typeof(VisualStudioContextMenuCommandBridge), IsAsyncQueryable = true)]
+    /// <summary>
+    /// The extension entry point.
+    ///
+    /// The package auto-loads both with and without a solution, because parts of FreeAIr (the chat
+    /// list, the control center, the MCP proxy) must be usable before any solution is opened.
+    /// </summary>
     public sealed class FreeAIrPackage : ToolkitPackage
     {
         public static FreeAIrPackage Instance = null;
 
+        /// <summary>
+        /// Folder the extension assembly was loaded from. Everything shipped inside the VSIX
+        /// (the MCP proxy, the Whisper runtimes, ...) is unpacked relative to it.
+        /// </summary>
         public static readonly string WorkingFolder;
 
+        /// <summary>
+        /// Raised for every WPF window loaded in devenv, not only FreeAIr's own ones.
+        /// The in situ chat listens to this pair to give up its topmost state while some other
+        /// window is open, and to take it back afterwards.
+        /// </summary>
         public static event Action<Window>? WindowOpened;
+
+        /// <inheritdoc cref="WindowOpened"/>
         public static event Action<Window>? WindowClosed;
 
         static FreeAIrPackage()
@@ -61,6 +78,13 @@ namespace FreeAIr
             Instance = this;
         }
 
+        /// <summary>
+        /// Wires up everything the extension needs.
+        ///
+        /// Most of the long-running parts are started with `FileAndForget` on purpose: package
+        /// initialization blocks Visual Studio, so nothing here is allowed to wait for a network,
+        /// a child process or a background scan.
+        /// </summary>
         protected override async Task InitializeAsync(
             CancellationToken cancellationToken,
             IProgress<ServiceProgressData> progress

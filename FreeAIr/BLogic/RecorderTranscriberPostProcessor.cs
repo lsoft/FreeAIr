@@ -10,6 +10,18 @@ using FreeAIr.Chat;
 
 namespace FreeAIr.BLogic
 {
+    /// <summary>
+    /// The voice prompting pipeline: record → transcribe → optionally post-process with an LLM.
+    ///
+    /// The post-processing step exists because speech recognition of technical speech is poor;
+    /// it is an ordinary support action with the `RecordPostProcess` scope, so the user fully
+    /// controls both the prompt and the agent doing the clean-up. When no action is chosen, or
+    /// anything about it is misconfigured, the raw transcription is returned unchanged.
+    ///
+    /// One instance serves one chat control. A background loop waits for a cycle to be requested,
+    /// produces exactly one result and goes back to waiting, so a second recording cannot start
+    /// while the first is still in flight.
+    /// </summary>
     public sealed class RecorderTranscriberPostProcessor
     {
         private readonly AsyncAwaitProductionCycle<RecordTranscribeResult> _productionCycle = new();
@@ -31,6 +43,11 @@ namespace FreeAIr.BLogic
             _task = WorkAsync();
         }
 
+        /// <summary>
+        /// Runs the whole pipeline once and returns its result.
+        /// Returns null if a recording is already going on, or if the recorder produced neither
+        /// text nor an error (the user simply said nothing).
+        /// </summary>
         public async Task<RecordTranscribeResult?> RecordTranscribeAndPostProcessAsync(
             )
         {
@@ -143,6 +160,12 @@ namespace FreeAIr.BLogic
             }
         }
 
+        /// <summary>
+        /// Passes the transcribed text through the chosen `RecordPostProcess` support action.
+        /// Every reason to skip the step (no action chosen, action or agent gone from the settings,
+        /// chat could not be started, empty answer) yields the original text — the user must never
+        /// lose what they dictated.
+        /// </summary>
         private async Task<string> PostProcessAsync(
             string text
             )

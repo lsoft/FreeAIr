@@ -15,6 +15,19 @@ using FreeAIr.BLogic;
 
 namespace FreeAIr.Options2
 {
+    /// <summary>
+    /// The root of the FreeAIr json settings: agents, MCP servers and their tools, support actions
+    /// and the unsorted knobs. These settings are shared by the whole team, as opposed to the
+    /// per-user Visual Studio option pages (`FreeAIr.Options`).
+    ///
+    /// The settings live in one of two places, see <see cref="OptionsPlaceEnum"/>:
+    /// the solution-related file `.freeair\&lt;solution name&gt;_options.json` (preferred, meant to be
+    /// committed) or the Visual Studio option store. When both exist, the file wins.
+    ///
+    /// Reads are cheap: they go through <see cref="DataPieceCache"/> and re-parse only when the
+    /// file timestamp (or the stored string) changes, so the `Deserialize*Async` shortcuts may be
+    /// called freely from hot paths.
+    /// </summary>
     public sealed partial class FreeAIrOptions : ICloneable
     {
         #region static fields and constructor
@@ -151,6 +164,18 @@ namespace FreeAIr.Options2
             return options.Supports.Actions.FindAll(a => filter(a));
         }
 
+        /// <summary>
+        /// Loads the settings.
+        /// </summary>
+        /// <param name="place">
+        /// Where to read from. When null, the solution-related file is tried first and the Visual
+        /// Studio option store is used as a fallback; when set, only that place is consulted.
+        /// </param>
+        /// <returns>
+        /// The settings, or a brand new default instance if nothing could be read.
+        /// This method never throws: a broken json is logged into the activity log and treated as
+        /// an absent one, because settings are read from paths where a failure would be fatal.
+        /// </returns>
         public static async Task<FreeAIrOptions> DeserializeAsync(
             OptionsPlaceEnum? place = null
             )
@@ -227,6 +252,11 @@ namespace FreeAIr.Options2
             return new FreeAIrOptions();
         }
 
+        /// <summary>
+        /// Non-throwing counterpart of <see cref="DeserializeFromString"/>. Use it when the json
+        /// comes from a text box the user is still typing in, and an invalid json is a normal
+        /// intermediate state rather than an error.
+        /// </summary>
         public static bool TryDeserializeFromString(
             string optionsJson,
             out FreeAIrOptions? options,
@@ -264,6 +294,14 @@ namespace FreeAIr.Options2
 
         #region serialize and related
 
+        /// <summary>
+        /// Saves the settings and reports where they went.
+        /// </summary>
+        /// <param name="place">
+        /// Where to save. When null the destination is chosen automatically: the solution-related
+        /// file if it already exists, the Visual Studio option store otherwise. In other words,
+        /// saving never creates the json file on its own — the user has to ask for it explicitly.
+        /// </param>
         public async Task<OptionsPlaceEnum> SerializeAsync(
             OptionsPlaceEnum? place
             )
@@ -334,6 +372,11 @@ namespace FreeAIr.Options2
 
         #endregion
 
+        /// <summary>
+        /// Validates the MCP servers subnode by actually starting the servers it describes.
+        /// Returns true only when every configured server came up; otherwise the user is told
+        /// which ones failed and the caller is expected to abandon the save.
+        /// </summary>
         public static async Task<bool> ApplyMcpServerNodeAsync(
             McpServers servers
             )
@@ -404,6 +447,11 @@ namespace FreeAIr.Options2
             return ComposeFilePathAsync("embeddings");
         }
 
+        /// <summary>
+        /// Builds the path of a solution-related FreeAIr file:
+        /// `&lt;solution folder&gt;\.freeair\&lt;solution name&gt;_&lt;suffix&gt;.json`.
+        /// Returns null when no solution is opened. The folder is not created here.
+        /// </summary>
         public static async Task<string?> ComposeFilePathAsync(
             string suffix
             )
@@ -444,7 +492,16 @@ namespace FreeAIr.Options2
     /// </summary>
     public enum OptionsPlaceEnum
     {
+        /// <summary>
+        /// `&lt;solution folder&gt;\.freeair\&lt;solution name&gt;_options.json`.
+        /// Recommended: it can be committed and shared with the team.
+        /// </summary>
         SolutionRelatedFilePath,
+
+        /// <summary>
+        /// Visual Studio's own option store. Used when creating a file next to the solution is
+        /// undesirable; the settings then stay on this machine only.
+        /// </summary>
         VisualStudioOption
     }
 

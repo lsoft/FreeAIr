@@ -12,9 +12,21 @@ using System.Windows.Forms;
 
 namespace FreeAIr.Chat
 {
+    /// <summary>
+    /// The owner of every live <see cref="Chat"/>.
+    ///
+    /// This is a MEF singleton: obtain it via `IComponentModel.GetService&lt;ChatContainer&gt;()`,
+    /// never construct it. Besides keeping the collection, it aggregates the status of all chats
+    /// into a single indicator shown by <see cref="UIInformer"/>, and disposes everything when
+    /// Visual Studio shuts down.
+    /// </summary>
     [Export(typeof(ChatContainer))]
     public sealed class ChatContainer
     {
+        /// <summary>
+        /// Id of the most recently created chat. Commands invoked with Ctrl held down reuse this
+        /// chat instead of starting a new one.
+        /// </summary>
         public Guid? LastCreatedChatId
         {
             get;
@@ -60,6 +72,11 @@ namespace FreeAIr.Chat
             return _chats.FirstOrDefault(c => c.Id == LastCreatedChatId.Value);
         }
 
+        /// <summary>
+        /// Creates a chat and, if a prompt is given, immediately starts the first turn.
+        /// Returns null if the chosen agent is not usable (no token, no endpoint, etc.);
+        /// the error is reported to the user by the agent verification itself.
+        /// </summary>
         public async Task<Chat?> StartChatAsync(
             ChatDescription kind,
             UserPrompt? prompt,

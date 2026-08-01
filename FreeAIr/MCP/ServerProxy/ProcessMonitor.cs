@@ -6,6 +6,15 @@ using System.Threading;
 
 namespace FreeAIr.McpServerProxy
 {
+    /// <summary>
+    /// Keeps a child process alive: starts it, waits for it, and restarts it if it died on its own.
+    /// The loop ends only on cancellation (Visual Studio shutting down) or on an unexpected error;
+    /// in both cases the process is killed.
+    ///
+    /// Standard input and output are redirected, because that is the JSON-RPC channel to
+    /// `Proxy.exe`; standard error is drained separately and ends up in the activity log,
+    /// which is the only way to see why the proxy refused to run.
+    /// </summary>
     public sealed class ProcessMonitor
     {
         private readonly string _folderPath;

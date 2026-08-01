@@ -13,13 +13,34 @@ using FreeAIr.BLogic.Reader;
 
 namespace FreeAIr.Chat
 {
+    /// <summary>
+    /// A single dialogue with the LLM.
+    ///
+    /// The chat owns everything a completion request is built from: the ordered list of contents
+    /// (prompts, answers, tool calls), the chat context (documents and other material given to the
+    /// model), the chat-scoped MCP tool switches and the chosen agent.
+    ///
+    /// The chat itself does not talk to the model. It only signals, via <see cref="LLMReaderPool"/>,
+    /// that there is something new to send; the actual streaming is done by <see cref="LLMReader"/>.
+    ///
+    /// Instances are created by <see cref="ChatContainer"/>, never directly.
+    /// </summary>
     public sealed class Chat : IAsyncDisposable
     {
         public Guid Id { get; } = Guid.NewGuid();
+
+        /// <summary>
+        /// The whole dialogue in chronological order. See <see cref="GetMessageListAsync"/>
+        /// for how it is converted into a request.
+        /// </summary>
         private readonly List<IChatContent> _contents = new();
 
         private ChatStatusEnum _status;
 
+        /// <summary>
+        /// Chat-scoped enabled/disabled state of MCP tools. It is a copy of the global state made
+        /// at the moment of the chat creation, so switching a tool here does not affect other chats.
+        /// </summary>
         public AvailableToolContainer ChatTools
         {
             get;
@@ -99,6 +120,10 @@ namespace FreeAIr.Chat
             ChatContext.ChatContextChangedEvent += ChatContextChangedRaised;
         }
 
+        /// <summary>
+        /// Creates a chat with a fresh context (with `copilot-instructions.md` picked up
+        /// automatically, if there is one) and a snapshot of the global MCP tool statuses.
+        /// </summary>
         public static async System.Threading.Tasks.Task<Chat> CreateChatAsync(
             ChatDescription description,
             FreeAIr.Chat.ChatOptions options
@@ -117,6 +142,10 @@ namespace FreeAIr.Chat
             return result;
         }
 
+        /// <summary>
+        /// Appends a user prompt and immediately asks the reader pool to send the dialogue to the
+        /// model. This is the only entry point which starts a new turn.
+        /// </summary>
         public void AddPrompt(
             UserPrompt userPrompt
             )
@@ -143,6 +172,14 @@ namespace FreeAIr.Chat
             return content;
         }
 
+        /// <summary>
+        /// Registers a tool call requested by the model.
+        ///
+        /// The callback passed to the content is invoked when this particular tool call reaches a
+        /// terminal state. Once every tool call of the current turn is finished (succeeded, failed
+        /// or blocked by the user), the reader is started again so the model can consume the
+        /// results — this is what makes the tool-calling loop go round.
+        /// </summary>
         public ToolCallChatContent CreateToolCall(
             StreamingChatToolCallUpdate toolCall
             )
@@ -212,6 +249,11 @@ namespace FreeAIr.Chat
             }
         }
 
+        /// <summary>
+        /// Builds the completion options for the next request. Only the tools which are enabled in
+        /// <see cref="ChatTools"/> are offered to the model; if there are none, tool choice is
+        /// forced to `none` because some providers reject an empty tool list.
+        /// </summary>
         public async Task<ChatCompletionOptions> CreateChatCompletionOptionsAsync()
         {
             var toolCollection = McpServerProxyCollection.GetTools(ChatTools);
@@ -237,6 +279,10 @@ namespace FreeAIr.Chat
             return cco;
         }
 
+        /// <summary>
+        /// Creates an OpenAI client configured for the agent chosen for this chat. The network
+        /// timeout is deliberately huge: a local LLM on a slow machine can think for a long time.
+        /// </summary>
         public ChatClient CreateChatClient()
         {
             var chosenAgent = this.Options.ChosenAgent;
@@ -283,6 +329,15 @@ namespace FreeAIr.Chat
             }
         }
 
+        /// <summary>
+        /// Flattens the chat into the message list to be sent to the model:
+        /// system prompt, then everything before the last prompt, then the chat context items,
+        /// then the last prompt and everything after it.
+        ///
+        /// The context is injected right before the last prompt on purpose: models pay much more
+        /// attention to what stands close to the instruction they are asked to follow.
+        /// Archived contents are skipped entirely.
+        /// </summary>
         public async Task<IReadOnlyList<OpenAI.Chat.ChatMessage>> GetMessageListAsync()
         {
             var result = new List<OpenAI.Chat.ChatMessage>();
