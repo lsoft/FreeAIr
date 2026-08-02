@@ -71,8 +71,14 @@ namespace FreeAIr.MCP.McpServerProxy
             )
         {
             var known = _mcpServerProxyWrappers.ConvertAll(a => a.McpServerProxy.Name);
+
+            //серверы, которых больше не заказывали: их надо погасить
             var deleted = known.Except(mcpServerProxiesToProcess).ToList();
-            var addedOrUpdated = mcpServerProxiesToProcess.Except(deleted).ToList();
+
+            //все заказанные - и новые, и уже работающие: последние тоже надо перечитать,
+            //потому что набор их тулзов мог измениться. Distinct - на случай дублей в конфигурации.
+            //Раньше здесь было Except(deleted), что по построению deleted не отсеивало ничего
+            var addedOrUpdated = mcpServerProxiesToProcess.Distinct().ToList();
 
             DeleteMcpServerProxies(toolContainer, deleted);
             var successStarted = await AddOrUpdateMcpServerProxiesAsync(
@@ -173,6 +179,11 @@ namespace FreeAIr.MCP.McpServerProxy
             }
 
             var mcpServerProxyWrapper = await McpServerProxyWrapper.CreateAsync(mcpServerProxy);
+
+            //этот сервер мог быть запущен раньше; его старая обёртка более не актуальна,
+            //иначе её тулзы будут выданы модели ещё раз (и ещё раз на следующем перезапуске)
+            _mcpServerProxyWrappers.RemoveAll(w => w.McpServerProxy.Name == mcpServerProxy.Name);
+
             if (mcpServerProxyWrapper is null)
             {
                 //агент не запущен, выключаем его тулзы

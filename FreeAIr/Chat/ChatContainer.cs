@@ -40,7 +40,21 @@ namespace FreeAIr.Chat
         
         private readonly DTEEvents _dteEvents;
 
-        public IReadOnlyList<Chat> Chats => _chats;
+        /// <summary>
+        /// A snapshot of the live chats, not a view over the collection: chats are added and
+        /// removed from the UI thread while their statuses change on the background threads which
+        /// stream the answers, so handing out the list itself would break every enumeration of it.
+        /// </summary>
+        public IReadOnlyList<Chat> Chats
+        {
+            get
+            {
+                lock (_locker)
+                {
+                    return _chats.ToList();
+                }
+            }
+        }
 
         public event ChatCollectionChangedDelegate ChatCollectionChangedEvent;
         public event ChatStatusChangedDelegate ChatStatusChangedEvent;
@@ -55,9 +69,18 @@ namespace FreeAIr.Chat
                 throw new ArgumentNullException(nameof(uiInformer));
             }
 
+            //DTE is not free-threaded; the imported UIInformer asserts the same thing in its own
+            //constructor, so this only makes the requirement of this class explicit as well
+            ThreadHelper.ThrowIfNotOnUIThread();
+
             _uIInformer = uiInformer;
 
             var dte = AsyncPackage.GetGlobalService(typeof(EnvDTE.DTE)) as DTE2;
+            if (dte is null)
+            {
+                throw new InvalidOperationException("Cannot obtain DTE service.");
+            }
+
             _dteEvents = ((Events2)dte.Events).DTEEvents;
             _dteEvents.OnBeginShutdown += DTEEvents_OnBeginShutdown;
         }
@@ -69,7 +92,10 @@ namespace FreeAIr.Chat
                 return null;
             }
 
-            return _chats.FirstOrDefault(c => c.Id == LastCreatedChatId.Value);
+            lock (_locker)
+            {
+                return _chats.FirstOrDefault(c => c.Id == LastCreatedChatId.Value);
+            }
         }
 
         /// <summary>
@@ -108,14 +134,20 @@ namespace FreeAIr.Chat
             lock (_locker)
             {
                 _chats.Add(chat);
-                FireChatCollectionChanged();
             }
 
+            //подписчики - это viewmodel'и, они лезут обратно в контейнер за списком чатов;
+            //звать их из-под лока значит однажды получить дедлок на ровном месте
+            FireChatCollectionChanged();
+
+            LastCreatedChatId = chat.Id;
+
+            //последним, чтобы к моменту старта чтения чат уже был и в коллекции, и в LastCreatedChatId
             if (prompt is not null)
             {
                 chat.AddPrompt(prompt);
             }
-            LastCreatedChatId = chat.Id;
+
             return chat;
         }
 
@@ -140,8 +172,9 @@ namespace FreeAIr.Chat
             lock (_locker)
             {
                 _chats.Remove(chat);
-                FireChatCollectionChanged();
             }
+
+            FireChatCollectionChanged();
 
             await chat.DisposeAsync();
         }
@@ -152,9 +185,20 @@ namespace FreeAIr.Chat
             ThreadHelper.JoinableTaskFactory.RunAsync(
                 async () =>
                 {
-                    while (_chats.Count > 0)
+                    while (true)
                     {
-                        await RemoveChatAsync(_chats[0]);
+                        Chat chat;
+                        lock (_locker)
+                        {
+                            if (_chats.Count == 0)
+                            {
+                                break;
+                            }
+
+                            chat = _chats[0];
+                        }
+
+                        await RemoveChatAsync(chat);
                     }
                 }).FileAndForget(nameof(RemoveAllChats));
         }
@@ -201,7 +245,12 @@ namespace FreeAIr.Chat
 
         private void ChatStatusChanged(object sender, ChatEventArgs ea)
         {
-            var anyIsInProgress = _chats.Any(c => c.Status.In(ChatStatusEnum.WaitingForAnswer, ChatStatusEnum.ReadingAnswer));
+            bool anyIsInProgress;
+            lock (_locker)
+            {
+                anyIsInProgress = _chats.Any(c => c.Status.In(ChatStatusEnum.WaitingForAnswer, ChatStatusEnum.ReadingAnswer));
+            }
+
             if (anyIsInProgress)
             {
                 _uIInformer.UpdateUIStatusAsync(ChatsStatusEnum.Working);

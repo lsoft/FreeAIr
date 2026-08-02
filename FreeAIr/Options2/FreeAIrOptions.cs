@@ -208,12 +208,17 @@ namespace FreeAIr.Options2
                                 return options;
                             }
                             );
-                        if (fileResult is not null
-                            || (place.HasValue && place.Value == OptionsPlaceEnum.SolutionRelatedFilePath)
-                            )
+                        if (fileResult is not null)
                         {
                             return fileResult;
                         }
+                    }
+
+                    if (place.HasValue)
+                    {
+                        //the file was asked for by name, so falling back to the Visual Studio
+                        //option store would answer a question nobody has asked
+                        return new FreeAIrOptions();
                     }
                 }
                 //file does not exists
@@ -234,9 +239,7 @@ namespace FreeAIr.Options2
                             return Task.FromResult((ICloneable)result.Clone());
                         }
                         );
-                    if (vsResult is not null
-                        || (place.HasValue && place.Value == OptionsPlaceEnum.VisualStudioOption)
-                        )
+                    if (vsResult is not null)
                     {
                         return vsResult;
                     }
@@ -310,6 +313,15 @@ namespace FreeAIr.Options2
             var filePath = await ComposeOptionsFilePathAsync();
             if ((!place.HasValue && File.Exists(filePath)) || place == OptionsPlaceEnum.SolutionRelatedFilePath)
             {
+                if (string.IsNullOrEmpty(filePath))
+                {
+                    //сюда попадаем только при явно запрошенном месте: без открытого решения
+                    //пути у файла настроек попросту нет
+                    throw new InvalidOperationException(
+                        "Cannot save the options into a solution-related file: no solution is opened."
+                        );
+                }
+
                 var fileInfo = new FileInfo(filePath);
                 var directoryPath = fileInfo.Directory.FullName;
                 if (!Directory.Exists(directoryPath))

@@ -8,8 +8,10 @@ namespace FreeAIr.McpServerProxy
 {
     /// <summary>
     /// Keeps a child process alive: starts it, waits for it, and restarts it if it died on its own.
-    /// The loop ends only on cancellation (Visual Studio shutting down) or on an unexpected error;
-    /// in both cases the process is killed.
+    /// A failed start is retried too, with a pause in between; the loop gives up only after
+    /// <see cref="MaxConsecutiveFailures"/> failures in a row, which means the process is not going
+    /// to run at all. Cancellation (Visual Studio shutting down) ends the loop as well, and in
+    /// every case the process is killed on the way out.
     ///
     /// Standard input and output are redirected, because that is the JSON-RPC channel to
     /// `Proxy.exe`; standard error is drained separately and ends up in the activity log,
@@ -17,6 +19,14 @@ namespace FreeAIr.McpServerProxy
     /// </summary>
     public sealed class ProcessMonitor
     {
+        /// <summary>
+        /// How many times in a row the process may fail to start before the monitoring gives up.
+        /// A process which has managed to run resets the counter.
+        /// </summary>
+        private const int MaxConsecutiveFailures = 5;
+
+        private static readonly TimeSpan RestartDelayAfterFailure = TimeSpan.FromSeconds(5);
+
         private readonly string _folderPath;
         private readonly string _fileName;
         private readonly string? _arguments;
@@ -26,6 +36,13 @@ namespace FreeAIr.McpServerProxy
             get;
             private set;
         }
+
+        /// <summary>
+        /// Raised right after the process has been started, every time — including each restart.
+        /// The subscriber gets the brand new <see cref="System.Diagnostics.Process"/>: the streams
+        /// of the previous one are dead by then and have to be re-bound.
+        /// </summary>
+        public event Action<Process>? ProcessStarted;
 
         public ProcessMonitor(
             string folderPath,
@@ -47,6 +64,8 @@ namespace FreeAIr.McpServerProxy
             CancellationToken cancellationToken = default
             )
         {
+            var consecutiveFailures = 0;
+
             while (true)
             {
                 Process = new Process();
@@ -77,9 +96,14 @@ namespace FreeAIr.McpServerProxy
                         Process.BeginErrorReadLine();
                         //var output = await Process.StandardOutput.ReadToEndAsync();
 
+                        ProcessStarted?.Invoke(Process);
+
                         _ = await Process.WaitForExitAsync(cancellationToken);
 
                         cancellationToken.ThrowIfCancellationRequested();
+
+                        //процесс худо-бедно, но отработал, счётчик неудачных запусков более не актуален
+                        consecutiveFailures = 0;
 
                         var msg = new StringBuilder();
                         msg.AppendLine("Процесс завершён нештатно. Перезапуск...");
@@ -108,7 +132,27 @@ namespace FreeAIr.McpServerProxy
                         excp.ActivityLogException();
 
                         Process.SafelyKill();
-                        break;
+
+                        consecutiveFailures++;
+                        if (consecutiveFailures >= MaxConsecutiveFailures)
+                        {
+                            //проблема, судя по всему, не рассосётся сама: нет смысла дёргать ОС дальше
+                            ActivityLog.LogError(
+                                "FreeAIr",
+                                $"Процесс {_fileName} не удалось запустить {consecutiveFailures} раз подряд. Мониторинг прекращён."
+                                );
+                            break;
+                        }
+
+                        try
+                        {
+                            //чтобы не ДДОСить ОС запусками, которые почти наверняка снова упадут
+                            await Task.Delay(RestartDelayAfterFailure, cancellationToken);
+                        }
+                        catch (OperationCanceledException)
+                        {
+                            break;
+                        }
                     }
 
                 }

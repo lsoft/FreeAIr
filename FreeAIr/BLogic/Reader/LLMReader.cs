@@ -24,6 +24,11 @@ namespace FreeAIr.BLogic.Reader
 
         private readonly FreeAIr.Chat.Chat _chat;
 
+        /// <summary>
+        /// The source the read in flight was started with. Replaced by every
+        /// <see cref="StopSafelyAsync"/>, so its identity also tells a read whether it is still the
+        /// current one. Guarded by <see cref="_taskLocker"/>.
+        /// </summary>
         private CancellationTokenSource _cancellationTokenSource = new();
 
         /// <summary>
@@ -57,7 +62,10 @@ namespace FreeAIr.BLogic.Reader
                     return;
                 }
 
-                _task = ReadSafelyAsync();
+                //the source is taken here, under the lock, and not somewhere inside the read:
+                //a concurrent StopSafelyAsync replaces the field, and the read which is being
+                //started right now must not pick up the source that stop has just cancelled
+                _task = ReadSafelyAsync(_cancellationTokenSource);
             }
         }
 
@@ -79,31 +87,45 @@ namespace FreeAIr.BLogic.Reader
         }
 
         /// <summary>
-        /// Cancels the read in flight and waits for it to unwind, then arms a fresh cancellation
-        /// source so the reader can be used again. Never throws.
+        /// Cancels the read in flight and waits for it to unwind. Never throws.
+        ///
+        /// The fresh cancellation source is armed before the wait, not after it: the reader is
+        /// public and a new read may be requested the very moment the old one has been let go, and
+        /// that read has to start with a source nobody has cancelled.
         /// </summary>
         public async Task StopSafelyAsync()
         {
             try
             {
-                Task? task = null;
+                Task? task;
+                CancellationTokenSource cancellationTokenSource;
                 lock (_taskLocker)
                 {
                     task = _task;
                     _task = null;
+
+                    cancellationTokenSource = _cancellationTokenSource;
+                    _cancellationTokenSource = new CancellationTokenSource();
                 }
 
                 if (task is null)
                 {
+                    //nothing was reading, so nobody has ever seen the source we have just replaced
+                    cancellationTokenSource.Dispose();
                     return;
                 }
 
-                _cancellationTokenSource.Cancel();
+                cancellationTokenSource.Cancel();
 
-                await task;
-
-                _cancellationTokenSource.Dispose();
-                _cancellationTokenSource = new CancellationTokenSource();
+                try
+                {
+                    await task;
+                }
+                finally
+                {
+                    //only now, when the read which held the token has unwound, the source is free
+                    cancellationTokenSource.Dispose();
+                }
             }
             catch (Exception excp)
             {
@@ -117,17 +139,23 @@ namespace FreeAIr.BLogic.Reader
         }
 
         private async Task ReadSafelyAsync(
+            CancellationTokenSource cancellationTokenSource
             )
         {
             try
             {
-                await ReadSafelyPrivateAsync();
+                await ReadSafelyPrivateAsync(cancellationTokenSource.Token);
             }
             finally
             {
                 lock (_taskLocker)
                 {
-                    _task = null;
+                    //if the reader has been stopped and started again while this read was
+                    //unwinding, _task belongs to that newer read and must be left alone
+                    if (ReferenceEquals(_cancellationTokenSource, cancellationTokenSource))
+                    {
+                        _task = null;
+                    }
                 }
             }
         }
@@ -142,6 +170,7 @@ namespace FreeAIr.BLogic.Reader
         /// this reader through <see cref="FreeAIr.Chat.Chat.CreateToolCall"/>.
         /// </summary>
         private async Task ReadSafelyPrivateAsync(
+            CancellationToken cancellationToken
             )
         {
             //never block the UI thread while streaming
@@ -152,8 +181,6 @@ namespace FreeAIr.BLogic.Reader
             try
             {
                 _chat.Status = ChatStatusEnum.WaitingForAnswer;
-
-                var cancellationToken = _cancellationTokenSource.Token;
 
                 var chatClient = _chat.CreateChatClient();
                 var chatCompletionOptions = await _chat.CreateChatCompletionOptionsAsync();

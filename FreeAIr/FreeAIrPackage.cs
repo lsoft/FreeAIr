@@ -23,6 +23,12 @@ using System.Windows;
 
 namespace FreeAIr
 {
+    /// <summary>
+    /// The extension entry point.
+    ///
+    /// The package auto-loads both with and without a solution, because parts of FreeAIr (the chat
+    /// list, the control center, the MCP proxy) must be usable before any solution is opened.
+    /// </summary>
     [PackageRegistration(UseManagedResourcesOnly = true, AllowsBackgroundLoading = true)]
     [InstalledProductRegistration(Vsix.Name, Vsix.Description, Vsix.Version)]
     [ProvideMenuResource("Menus.ctmenu", 1)]
@@ -39,12 +45,6 @@ namespace FreeAIr
     [ProvideToolWindow(typeof(NaturalLanguageOutlinesToolWindow.Pane), Style = VsDockStyle.Tabbed, Window = WindowGuids.DocumentWell)]
     [ProvideToolWindow(typeof(BuildNaturalLanguageOutlinesJsonFileToolWindow.Pane), Style = VsDockStyle.Tabbed, Window = WindowGuids.DocumentWell)]
     [ProvideService(typeof(VisualStudioContextMenuCommandBridge), IsAsyncQueryable = true)]
-    /// <summary>
-    /// The extension entry point.
-    ///
-    /// The package auto-loads both with and without a solution, because parts of FreeAIr (the chat
-    /// list, the control center, the MCP proxy) must be usable before any solution is opened.
-    /// </summary>
     public sealed class FreeAIrPackage : ToolkitPackage
     {
         public static FreeAIrPackage Instance = null;
@@ -165,7 +165,10 @@ namespace FreeAIr
             // Or, if "Loaded" is good enough:
             WindowOpened?.Invoke(w);
 
-            // track close
+            // track close. Loaded fires again every time the window is re-attached to the visual
+            // tree, so the handler has to be dropped first — otherwise a single Closed would be
+            // reported as many times as the window has been loaded
+            w.Closed -= AnyWindowClosed;
             w.Closed += AnyWindowClosed;
         }
 

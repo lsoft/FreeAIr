@@ -18,8 +18,22 @@ namespace FreeAIr.Find
 {
     public static class FindWindowModifier
     {
+        /// <summary>
+        /// Put into <see cref="FrameworkElement.Tag"/> of the controls this class inserts, so that
+        /// a repeated scan recognizes its own work and does not add a second set of them.
+        /// </summary>
+        private const string NaturalSearchButtonTag = "FreeAIr.NaturalLanguageSearch";
+        private const string UseRagCheckBoxTag = "FreeAIr.UseRAG";
+
+        /// <summary>
+        /// Remembered so that the scan can be restarted when the dialog it has patched goes away.
+        /// </summary>
+        private static CancellationToken _cancellationToken;
+
         public static async Task StartScanAsync(CancellationToken ct)
         {
+            _cancellationToken = ct;
+
             await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
 
             try
@@ -56,6 +70,21 @@ namespace FreeAIr.Find
                         }
 
                         //telemetry.AddStep("after continue FindAll");
+
+                        //put the new button
+                        var parent = VisualTreeHelper.GetParent(findAllButton) as WrapPanel;
+                        if (parent is null)
+                        {
+                            continue;
+                        }
+
+                        var alreadyInsertedButton = FindOwnControl(parent, NaturalSearchButtonTag);
+                        if (alreadyInsertedButton is not null)
+                        {
+                            //диалог уже дополнен: второй комплект контролов ему не нужен
+                            WatchForDialogTeardown(alreadyInsertedButton);
+                            return;
+                        }
 
                         var textBoxes = new List<TextBox>();
                         findFilesDialogControl.GetRecursiveByType(ref textBoxes);
@@ -101,14 +130,6 @@ namespace FreeAIr.Find
 
                         //telemetry.AddStep($"after naturalSearchButton");
 
-                        //put the new button
-                        var parent = VisualTreeHelper.GetParent(findAllButton) as WrapPanel;
-
-                        //if (parent is not null)
-                        //    telemetry.AddStep($"after find parent, parent is NOT null");
-                        //else
-                        //    telemetry.AddStep($"after find parent, parent is null");
-
                         parent.Children.Insert(
                             0,
                             naturalSearchButton
@@ -123,6 +144,7 @@ namespace FreeAIr.Find
 
                         //telemetry.AddStep($"SUCCESS");
 
+                        WatchForDialogTeardown(naturalSearchButton);
                         return;
                     }
                     //}
@@ -159,6 +181,52 @@ namespace FreeAIr.Find
             }
         }
 
+        private static FrameworkElement? FindOwnControl(
+            WrapPanel panel,
+            string tag
+            )
+        {
+            foreach (var child in panel.Children)
+            {
+                if (child is FrameworkElement element && (element.Tag as string) == tag)
+                {
+                    return element;
+                }
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// "Find in Files" is a dialog: it is built anew every time the user opens it, so the
+        /// controls inserted into it live exactly as long as one dialog does. The scan stops as
+        /// soon as it has patched the dialog, so without this the second and every further opening
+        /// of the dialog would come without the natural language search.
+        /// </summary>
+        private static void WatchForDialogTeardown(
+            FrameworkElement ownControl
+            )
+        {
+            ownControl.Unloaded -= OwnControlUnloaded;
+            ownControl.Unloaded += OwnControlUnloaded;
+        }
+
+        private static void OwnControlUnloaded(object sender, RoutedEventArgs e)
+        {
+            if (sender is FrameworkElement element)
+            {
+                element.Unloaded -= OwnControlUnloaded;
+            }
+
+            if (_cancellationToken.IsCancellationRequested)
+            {
+                return;
+            }
+
+            StartScanAsync(_cancellationToken)
+                .FileAndForget(nameof(FindWindowModifier));
+        }
+
         private static CheckBox CreateUseRAGCheckBox(
             CheckBox? styleSourceCheckBox,
             Button findAllButton,
@@ -186,6 +254,7 @@ namespace FreeAIr.Find
                 useRAGCheckBox.Visibility = findAllButton.Visibility;
             };
 
+            useRAGCheckBox.Tag = UseRagCheckBoxTag;
             useRAGCheckBox.Margin = findAllButton.Margin;
             useRAGCheckBox.VerticalAlignment = findAllButton.VerticalAlignment;
             useRAGCheckBox.VerticalContentAlignment = findAllButton.VerticalContentAlignment;
@@ -207,6 +276,7 @@ namespace FreeAIr.Find
             )
         {
             var naturalSearchButton = findAllButton.GetType().GetConstructors()[0].Invoke(null) as Button;
+            naturalSearchButton.Tag = NaturalSearchButtonTag;
             naturalSearchButton.Margin = findAllButton.Margin;
             naturalSearchButton.VerticalAlignment = findAllButton.VerticalAlignment;
             naturalSearchButton.VerticalContentAlignment = findAllButton.VerticalContentAlignment;

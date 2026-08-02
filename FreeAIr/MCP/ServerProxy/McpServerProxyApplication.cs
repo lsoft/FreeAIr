@@ -21,11 +21,22 @@ namespace FreeAIr.MCP.McpServerProxy
     ///
     /// Everything here happens in the static constructor, which means that merely touching this
     /// class starts the child process.
+    ///
+    /// The proxy is restartable: <see cref="ProcessMonitor"/> brings it back if it dies, and the
+    /// JSON-RPC channel is re-attached to the streams of the new process every time, see
+    /// <see cref="ProxyProcessStarted"/>. A restarted proxy hosts no MCP servers, so the current
+    /// configuration is pushed into it again.
     /// </summary>
     public static class McpServerProxyApplication
     {
         public const string ProxyApplicationZipFileName = "Proxy.zip";
         public const string ProxyApplicationExeFileName = "Proxy.exe";
+
+        /// <summary>
+        /// Written into the unpacked folder after the last entry of the archive has been extracted.
+        /// Its presence — and only it — means the folder can be trusted.
+        /// </summary>
+        private const string UnpackedMarkerFileName = "unpacked.marker";
 
         public static readonly string ProxyUnpackedFolderPath;
         private static readonly string _proxyZipFolderPath;
@@ -38,10 +49,25 @@ namespace FreeAIr.MCP.McpServerProxy
 
         //private static readonly HttpClient _httpClient;
 
-        public static readonly bool Started;
-        private static IMcpProxyInterface _proxyInterface;
+        /// <summary>
+        /// The rpc channel to the process which is running right now, or null while there is none.
+        /// Replaced on every restart of the proxy.
+        /// </summary>
+        private static JsonRpc? _rpc;
+        private static IMcpProxyInterface? _proxyInterface;
 
-        public static IMcpProxyInterface ProxyInterface => _proxyInterface;
+        /// <summary>
+        /// True while the rpc channel to the proxy is alive. It goes false between a crash of the
+        /// proxy and its restart, so it has to be re-checked before every call — which is exactly
+        /// what every <see cref="IMcpServerProxy"/> hosted by the proxy does.
+        /// </summary>
+        public static bool Started => _proxyInterface is not null;
+
+        /// <summary>
+        /// Null until the proxy has been started for the first time, and between a crash of the
+        /// proxy and its restart.
+        /// </summary>
+        public static IMcpProxyInterface? ProxyInterface => _proxyInterface;
 
         //public static HttpClient HttpClient =>
         //    Started
@@ -69,21 +95,83 @@ namespace FreeAIr.MCP.McpServerProxy
                 $"{proxyProcessId} {visualStudioProcessId}"
                 );
 
+            //must be subscribed before the monitoring starts: the first process is started
+            //synchronously, so the very first event is raised from inside this constructor
+            _processMonitor.ProcessStarted += ProxyProcessStarted;
+
             _processTask = _processMonitor.StartMonitoringAsync(
                 _cancellationTokenSource.Token
                 );
 
-            var rpc = JsonRpc.Attach(
-                _processMonitor.Process.StandardInput.BaseStream,
-                _processMonitor.Process.StandardOutput.BaseStream
-                );
-            _proxyInterface = rpc.Attach<IMcpProxyInterface>();
-
+            //a static constructor which throws poisons the type for the rest of the session, and
+            //failing to subscribe to the shutdown is not a reason to lose the whole MCP subsystem
             var dte = AsyncPackage.GetGlobalService(typeof(EnvDTE.DTE)) as DTE2;
+            if (dte is null)
+            {
+                ActivityLogHelper.ActivityLogWarning(
+                    "Cannot obtain DTE service, MCP proxy will not be stopped on the shutdown of Visual Studio."
+                    );
+                return;
+            }
+
             _dteEvents = ((Events2)dte.Events).DTEEvents;
             _dteEvents.OnBeginShutdown += DTEEvents_OnBeginShutdown;
+        }
 
-            Started = true;
+        /// <summary>
+        /// Re-binds the rpc channel to the process which has just started. Invoked on the first
+        /// start and on every restart of the proxy.
+        ///
+        /// Never throws: it runs inside the monitoring loop, and a failure here must not take the
+        /// monitoring down with it.
+        /// </summary>
+        private static void ProxyProcessStarted(
+            System.Diagnostics.Process process
+            )
+        {
+            try
+            {
+                var isRestart = _rpc is not null;
+
+                //the previous channel is bound to the streams of the process which has already died
+                var oldRpc = _rpc;
+                _rpc = null;
+                _proxyInterface = null;
+                if (oldRpc is not null)
+                {
+                    try
+                    {
+                        oldRpc.Dispose();
+                    }
+                    catch (Exception excp)
+                    {
+                        excp.ActivityLogException();
+                    }
+                }
+
+                var rpc = JsonRpc.Attach(
+                    process.StandardInput.BaseStream,
+                    process.StandardOutput.BaseStream
+                    );
+                _proxyInterface = rpc.Attach<IMcpProxyInterface>();
+                _rpc = rpc;
+
+                if (isRestart)
+                {
+                    //a freshly started proxy hosts no MCP servers at all,
+                    //so the current configuration has to be pushed into it again
+                    ActivityLogHelper.ActivityLogInformation(
+                        "MCP proxy has been restarted, reapplying the MCP servers configuration."
+                        );
+
+                    UpdateExternalServersAsync()
+                        .FileAndForget(nameof(UpdateExternalServersAsync));
+                }
+            }
+            catch (Exception excp)
+            {
+                excp.ActivityLogException();
+            }
         }
 
         /// <summary>
@@ -97,11 +185,25 @@ namespace FreeAIr.MCP.McpServerProxy
         /// <param name="mcpServers">
         /// The servers to run. When null they are taken from the current FreeAIr settings.
         /// </param>
-        /// <returns>Null when the settings could not even be read.</returns>
+        /// <returns>
+        /// Null when the settings could not even be read, or when the proxy is not running right
+        /// now. In the latter case the configuration is pushed again by
+        /// <see cref="ProxyProcessStarted"/> as soon as the proxy comes back.
+        /// </returns>
         public static async Task<McpServersSetupConfigurationResult?> UpdateExternalServersAsync(
             McpServers? mcpServers = null
             )
         {
+            var proxyInterface = _proxyInterface;
+            if (proxyInterface is null)
+            {
+                ActivityLogHelper.ActivityLogWarning(
+                    "MCP proxy is not running, MCP servers configuration is not applied."
+                    );
+
+                return null;
+            }
+
             if (mcpServers is null)
             {
                 try
@@ -116,7 +218,7 @@ namespace FreeAIr.MCP.McpServerProxy
                 }
             }
 
-            var reply = await _proxyInterface.UpdateExternalServersAsync(
+            var reply = await proxyInterface.UpdateExternalServersAsync(
                 new UpdateExternalServersRequest(
                     mcpServers
                     )
@@ -162,23 +264,73 @@ namespace FreeAIr.MCP.McpServerProxy
         //}
 
         /// <summary>
-        /// Extracts `Proxy.zip` into the extension folder. The presence of the target folder is
-        /// taken as "already unpacked", so an upgraded VSIX unpacks into a new folder rather than
-        /// merging into the old one.
+        /// Extracts `Proxy.zip` into the extension folder. Since the folder path is derived from
+        /// the folder the extension itself was loaded from, an upgraded VSIX unpacks into a new
+        /// folder rather than merging into the old one.
+        ///
+        /// "Already unpacked" is decided by the marker file, not by the presence of the folder:
+        /// the folder appears before the first entry is written, so a run interrupted halfway
+        /// (devenv killed, antivirus, no disk space) would otherwise leave a truncated folder which
+        /// is never repaired. Without the marker the extraction simply runs again, overwriting
+        /// whatever has been written before.
+        ///
+        /// Never throws: a proxy which could not be unpacked simply fails to start, and
+        /// <see cref="ProcessMonitor"/> reports that in the activity log in a much more telling way
+        /// than a type initialization error would.
         /// </summary>
         private static void UnpackProxy()
         {
-            if (!Directory.Exists(ProxyUnpackedFolderPath))
+            try
             {
-                Directory.CreateDirectory(ProxyUnpackedFolderPath);
+                var markerFilePath = Path.Combine(
+                    ProxyUnpackedFolderPath,
+                    UnpackedMarkerFileName
+                    );
+                if (File.Exists(markerFilePath))
+                {
+                    return;
+                }
+
+                if (!Directory.Exists(ProxyUnpackedFolderPath))
+                {
+                    Directory.CreateDirectory(ProxyUnpackedFolderPath);
+                }
 
                 var zipFilePath = Path.Combine(
-                    FreeAIrPackage.WorkingFolder,
                     _proxyZipFolderPath,
                     ProxyApplicationZipFileName
                     );
-                using var zip = ZipFile.OpenRead(zipFilePath);
-                zip.ExtractToDirectory(ProxyUnpackedFolderPath);
+
+                using (var zip = ZipFile.OpenRead(zipFilePath))
+                {
+                    foreach (var entry in zip.Entries)
+                    {
+                        var entryFilePath = Path.Combine(ProxyUnpackedFolderPath, entry.FullName);
+
+                        var entryFolderPath = Path.GetDirectoryName(entryFilePath);
+                        if (!string.IsNullOrEmpty(entryFolderPath) && !Directory.Exists(entryFolderPath))
+                        {
+                            Directory.CreateDirectory(entryFolderPath);
+                        }
+
+                        if (string.IsNullOrEmpty(entry.Name))
+                        {
+                            //каталог, а не файл
+                            continue;
+                        }
+
+                        entry.ExtractToFile(entryFilePath, overwrite: true);
+                    }
+                }
+
+                //маркер пишется последним: пока его нет, распаковка считается незавершённой
+                File.WriteAllText(markerFilePath, ProxyApplicationZipFileName);
+            }
+            catch (Exception excp)
+            {
+                excp.ActivityLogException(
+                    $"Cannot unpack {ProxyApplicationZipFileName} into {ProxyUnpackedFolderPath}"
+                    );
             }
         }
 

@@ -94,6 +94,13 @@ namespace FreeAIr.BLogic
         private readonly Func<string, Task<ICloneable>> _converter;
 
         /// <summary>
+        /// Обновление значения не атомарно (внутри есть await), а настройки читаются
+        /// одновременно из UI и из фоновых потоков. Без этого семафора два читателя способны
+        /// оставить подпись от одного чтения, а значение - от другого.
+        /// </summary>
+        private readonly NonDisposableSemaphoreSlim _semaphore = new(1, 1);
+
+        /// <summary>
         /// Ключ для получения значения.
         /// </summary>
         public string Key
@@ -147,18 +154,35 @@ namespace FreeAIr.BLogic
         /// Асинхронно получает кэшированное значение или обновляет его, если необходимо.
         /// </summary>
         /// <typeparam name="T">Тип возвращаемого значения.</typeparam>
-        /// <returns>Кэшированное значение.</returns>
+        /// <returns>Копия кэшированного значения, либо null, если значение получить не удалось.</returns>
         public async Task<T?> GetCachedValueAsync<T>()
             where T : class
         {
-            var newSignature = _signatureProvider(Key);
-            if (_oldSignature is null || _oldSignature.CompareTo(newSignature) != 0)
+            await _semaphore.WaitAsync();
+            try
             {
-                _cached = await _converter(Key);
-                _oldSignature = newSignature;
-            }
+                var newSignature = _signatureProvider(Key);
+                if (_oldSignature is null || _oldSignature.CompareTo(newSignature) != 0)
+                {
+                    var converted = await _converter(Key);
+                    if (converted is null)
+                    {
+                        //конвертер не смог прочитать значение (например, файл исчез между
+                        //проверкой существования и чтением); подпись не запоминаем, чтобы
+                        //следующий вызов попробовал ещё раз
+                        return null;
+                    }
 
-            return (T)_cached.Clone();
+                    _cached = converted;
+                    _oldSignature = newSignature;
+                }
+
+                return (T)_cached.Clone();
+            }
+            finally
+            {
+                _semaphore.Release();
+            }
         }
     }
 }

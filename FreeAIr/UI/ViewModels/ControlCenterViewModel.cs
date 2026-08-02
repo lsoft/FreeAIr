@@ -307,6 +307,7 @@ namespace FreeAIr.UI.ViewModels
         public sealed class InstallMicrosoftMsdnMCPServerCmd : AsyncBaseRelayCommand
         {
             const string MsdnEndpoint = "https://learn.microsoft.com/api/mcp";
+            const string MsdnServerName = "microsoft.docs.mcp";
 
             private readonly ControlCenterViewModel _viewModel;
 
@@ -328,8 +329,10 @@ namespace FreeAIr.UI.ViewModels
                     _viewModel.OptionsJson
                     );
 
-                options.AvailableMcpServers.Servers.Add(
-                    "microsoft.docs.mcp",
+                //именно индексатор, а не Add: имя сервера уже может быть занято - например,
+                //тем же сервером, но с другим (устаревшим) endpoint-ом. Add в этом случае
+                //бросает исключение, хотя команда как раз и предлагает прописать нужный endpoint
+                options.AvailableMcpServers.Servers[MsdnServerName] =
                     new McpServer(
                         McpServerType.Http,
 $$$"""
@@ -338,8 +341,7 @@ $$$"""
   "url": "{{{MsdnEndpoint}}}"
 }
 """
-                    )
-                );
+                    );
 
                 _viewModel.OptionsJson = FreeAIrOptions.SerializeToString(options);
                 _viewModel.OnGithubPropertyChanged();
@@ -347,9 +349,15 @@ $$$"""
 
             protected override bool CanExecuteInternal(object parameter)
             {
-                var options = FreeAIrOptions.DeserializeFromString(
-                    _viewModel.OptionsJson
+                var success = FreeAIrOptions.TryDeserializeFromString(
+                    _viewModel.OptionsJson,
+                    out var options,
+                    out _
                     );
+                if (!success)
+                {
+                    return false;
+                }
 
                 if (options.AvailableMcpServers.Servers.Any(s => s.Value.IsHttpAndHasEndpoint(MsdnEndpoint)))
                 {
