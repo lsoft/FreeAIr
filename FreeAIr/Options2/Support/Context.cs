@@ -6,20 +6,48 @@ using FreeAIr.Chat.Context.Item;
 
 namespace FreeAIr.Options2.Support
 {
+    /// <summary>
+    /// Everything a support action prompt may ask to have filled in. The user writes the matching
+    /// anchor, such as `{GIT_DIFF}`, into the prompt in the settings file, and
+    /// <see cref="SupportContext"/> supplies the value.
+    /// </summary>
     public enum SupportContextVariableEnum
     {
+        /// <summary>An anchor which is not one of ours. Substituted with an empty string.</summary>
         Unknown,
+
+        /// <summary>The files or selections the action was invoked on, as a comma separated list of paths.</summary>
         ContextItemName,
+
+        /// <summary>Text of the compiler error the action was invoked from in the error list.</summary>
         BuildErrorMessage,
+
+        /// <summary>Line the compiler error points at.</summary>
         BuildErrorLine,
+
+        /// <summary>Column the compiler error points at.</summary>
         BuildErrorColumn,
+
+        /// <summary>The test framework configured in the settings, so generated tests come out in the right one.</summary>
         UnitTestFramework,
+
+        /// <summary>The staged diff, used by the action which writes a commit message.</summary>
         GitDiff,
+
+        /// <summary>What the user typed into the natural language search box.</summary>
         NaturalLanguageSearchQuery,
+
+        /// <summary>The marker string standing where the caret is, for whole line completion.</summary>
         WholeLineCompletionAnchor,
+
+        /// <summary>What the microphone recording was transcribed into.</summary>
         RecordedText
     }
 
+    /// <summary>
+    /// Maps the anchor strings the user writes in the settings file to the variables the code knows
+    /// about, and back. The spelling of every anchor lives here and nowhere else.
+    /// </summary>
     public static class SupportContextVariableHelper
     {
         private const string ContextItemName = "{CONTEXT_ITEM_NAME}";
@@ -32,6 +60,10 @@ namespace FreeAIr.Options2.Support
         private const string WholeLineCompletionAnchor = "{WHOLE_LINE_COMPLETION_ANCHOR}";
         private const string RecordedText = "{RECORDED_TEXT}";
 
+        /// <summary>
+        /// Every anchor, in the order they are substituted. This is also the list the prompt editor
+        /// offers for completion, so an anchor missing from here is invisible to the user.
+        /// </summary>
         public static readonly string[] Anchors =
             [
                 ContextItemName,
@@ -45,6 +77,10 @@ namespace FreeAIr.Options2.Support
                 RecordedText
             ];
 
+        /// <summary>
+        /// The variable an anchor stands for, or <see cref="SupportContextVariableEnum.Unknown"/>
+        /// for anything unrecognized — a prompt may legitimately contain braces of its own.
+        /// </summary>
         public static SupportContextVariableEnum GetVariableEnum(
             string anchor
             )
@@ -74,6 +110,10 @@ namespace FreeAIr.Options2.Support
             return SupportContextVariableEnum.Unknown;
         }
 
+        /// <summary>
+        /// The anchor text of a variable. Used to compose the shipped default prompts in code, so
+        /// they and the settings file speak the same language.
+        /// </summary>
         public static string GetAnchor(
             this SupportContextVariableEnum variable
             )
@@ -118,10 +158,16 @@ namespace FreeAIr.Options2.Support
     /// </summary>
     public sealed class SupportContext
     {
+        /// <summary>Only the variables this particular context knows. Everything else resolves to empty.</summary>
         private Dictionary<SupportContextVariableEnum, string> _contextVariables = new();
 
+        /// <summary>What has been collected, for the prompt preview shown before an action is sent.</summary>
         public IReadOnlyDictionary<SupportContextVariableEnum, string> ContextVariables => _contextVariables;
 
+        /// <summary>
+        /// Records one value, overwriting any previous one. Called by the factories below rather
+        /// than from the outside.
+        /// </summary>
         public void AddContextVariable(
             SupportContextVariableEnum variable,
             string value
@@ -150,6 +196,10 @@ namespace FreeAIr.Options2.Support
         }
 
 
+        /// <summary>
+        /// An empty context, for the actions invoked from the prompt box where the user has already
+        /// written everything themselves and no anchor has a value.
+        /// </summary>
         public static SupportContext WithPrompt()
         {
             var result = new SupportContext();
@@ -157,6 +207,7 @@ namespace FreeAIr.Options2.Support
             return result;
         }
 
+        /// <summary>For the voice actions: carries what the microphone recording was transcribed into.</summary>
         public static async Task<SupportContext> WithRecordedTextAsync(
             string recordedText
             )
@@ -182,6 +233,7 @@ namespace FreeAIr.Options2.Support
             return result;
         }
 
+        /// <summary>For the commit message action: carries the staged diff the message is to describe.</summary>
         public static async Task<SupportContext> WithGitDiffAsync(
             string gitDiff
             )
@@ -207,6 +259,7 @@ namespace FreeAIr.Options2.Support
             return result;
         }
 
+        /// <summary>For the natural language search: carries the query the user typed into the search box.</summary>
         public static async Task<SupportContext> WithNaturalLanguageSearchQueryAsync(
             string searchQuery
             )
@@ -232,6 +285,13 @@ namespace FreeAIr.Options2.Support
             return result;
         }
 
+        /// <summary>
+        /// For the actions invoked on chat context items: names every attached file, quoted, in one
+        /// comma separated list.
+        ///
+        /// Overloaded with the one taking a plain name; both end up as the same node in the outline
+        /// index, so nothing that matters may live in this summary alone.
+        /// </summary>
         public static async Task<SupportContext> WithContextItemAsync(
             IReadOnlyList<SolutionItemChatContextItem> contextItems
             )
@@ -257,6 +317,10 @@ namespace FreeAIr.Options2.Support
             return result;
         }
 
+        /// <summary>
+        /// For the actions invoked on the solution tree: names the selected projects and files by
+        /// their full paths.
+        /// </summary>
         public static async Task<SupportContext> WithSolutionItemsAsync(
             List<SolutionItem> solutionItems
             )
@@ -282,6 +346,10 @@ namespace FreeAIr.Options2.Support
             return result;
         }
 
+        /// <summary>
+        /// For the actions which know nothing but a name — a document path, an MCP tool result. See
+        /// the overload taking context items.
+        /// </summary>
         public static async Task<SupportContext> WithContextItemAsync(
             string contextItemName
             )
@@ -307,6 +375,10 @@ namespace FreeAIr.Options2.Support
             return result;
         }
 
+        /// <summary>
+        /// For the fix build error action: carries the message, the file and the exact line and
+        /// column the compiler complained about.
+        /// </summary>
         public static async Task<SupportContext> WithErrorInformationAsync(
             BuildResultInformation errorInformation
             )
@@ -344,6 +416,10 @@ namespace FreeAIr.Options2.Support
             return result;
         }
 
+        /// <summary>
+        /// For whole line completion: names the document and the marker string which stands where
+        /// the caret is, so the prompt can ask what belongs in its place.
+        /// </summary>
         public static async Task<SupportContext> WithWholeLineDataAsync(
             string contextItemName
             )
@@ -373,6 +449,10 @@ namespace FreeAIr.Options2.Support
             return result;
         }
 
+        /// <summary>
+        /// The value behind an anchor, or an empty string when this context does not have it. Empty
+        /// rather than an error, so a prompt written for one scope stays usable in another.
+        /// </summary>
         private string GetVariableValue(
             string anchor
             )

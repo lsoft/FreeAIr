@@ -27,6 +27,11 @@ namespace FreeAIr.Chat
     /// </summary>
     public sealed class Chat : IAsyncDisposable
     {
+        /// <summary>
+        /// Identifies the chat for the lifetime of the Visual Studio session. Not persisted — it is
+        /// how the tool windows and <see cref="ChatContainer.LastCreatedChatId"/> refer to a chat
+        /// without holding it alive.
+        /// </summary>
         public Guid Id { get; } = Guid.NewGuid();
 
         /// <summary>
@@ -46,27 +51,51 @@ namespace FreeAIr.Chat
             get;
         }
 
+        /// <summary>
+        /// The documents, selections and images given to the model alongside the prompts. Editing it
+        /// raises the status changed event, because the chat window draws the context chips.
+        /// </summary>
         public ChatContext ChatContext
         {
             get;
         }
 
+        /// <summary>
+        /// The agent, the tool choice and the response format fixed when the chat was created. They
+        /// do not change afterwards: a dialogue half of which was answered by another model with
+        /// another system prompt is not a dialogue the model can make sense of.
+        /// </summary>
         public ChatOptions Options
         {
             get;
         }
 
+        /// <summary>The dialogue as the UI reads it: prompts, answers and tool calls in order.</summary>
         public IReadOnlyList<IChatContent> Contents => _contents;
 
+        /// <summary>
+        /// Raised when the chat changes state or its context is edited. <see cref="ChatContainer"/>
+        /// listens in order to aggregate all chats into the single progress indicator in the status
+        /// bar.
+        /// </summary>
         public event ChatStatusChangedDelegate ChatStatusChangedEvent;
 
+        /// <summary>
+        /// Raised once per new prompt, answer or tool call, so the chat window can append a control
+        /// instead of rebuilding the whole transcript.
+        /// </summary>
         public event ChatContentAddedDelegate ContentAddedEvent;
 
+        /// <summary>
+        /// What the chat is called in the tool window and what it was started from — a document, a
+        /// selection or nothing at all.
+        /// </summary>
         public ChatDescription Description
         {
             get;
         }
 
+        /// <summary>When the chat was created. Shown in the chat list to tell several of them apart.</summary>
         public DateTime? Started
         {
             get;
@@ -74,7 +103,9 @@ namespace FreeAIr.Chat
         }
 
         /// <summary>
-        /// Status of the chat.
+        /// Where the chat currently is: not started, waiting for an answer, reading one, done or
+        /// failed. Assigning it notifies the subscribers, so the status bar and the chat list follow
+        /// the streaming without polling.
         /// </summary>
         public ChatStatusEnum Status
         {
@@ -87,6 +118,10 @@ namespace FreeAIr.Chat
             }
         }
 
+        /// <summary>
+        /// Private on purpose: a chat has to be registered with <see cref="ChatContainer"/> to be
+        /// stopped, disposed and shown, so it is built by <see cref="CreateChatAsync"/> only.
+        /// </summary>
         private Chat(
             ChatContext chatContext,
             ChatDescription description,
@@ -162,6 +197,10 @@ namespace FreeAIr.Chat
             RaiseContentAdded(userPrompt);
         }
 
+        /// <summary>
+        /// Opens an empty answer for the reader to stream text into. Created before the first token
+        /// arrives so the chat window can show the answer growing rather than appearing at the end.
+        /// </summary>
         public AnswerChatContent CreateAnswer()
         {
             var content = new AnswerChatContent();
@@ -214,16 +253,30 @@ namespace FreeAIr.Chat
             return content;
         }
 
+        /// <summary>
+        /// Cancels the request in flight, if any, and drops the reader. The contents already
+        /// received are kept — a half streamed answer is still worth reading.
+        /// </summary>
         public async Task StopAsync()
         {
             await LLMReaderPool.StopAndDeleteReaderForAsync(this);
         }
 
+        /// <summary>
+        /// Waits until the current turn is over, including any tool calls it triggered. Used by the
+        /// features which need the answer rather than a chat window: whole line completion, commit
+        /// message generation, natural language outlines.
+        /// </summary>
         public Task WaitForPromptResultAsync()
         {
             return WaitForTaskAsync();
         }
 
+        /// <summary>
+        /// Marks everything said so far as archived, which keeps it on screen but leaves it out of
+        /// the next request. This is how the user clears the history of a long dialogue without
+        /// losing what they can read, and how the token cost of a chat is brought back down.
+        /// </summary>
         public void ArchiveAllPrompts()
         {
             _contents.ForEach(p =>
@@ -232,6 +285,11 @@ namespace FreeAIr.Chat
             });
         }
 
+        /// <summary>
+        /// Releases the description and every content which holds something — the temporary files
+        /// behind images, the editor subscriptions behind selections. Called by
+        /// <see cref="ChatContainer.RemoveChatAsync"/> after the reader has been stopped.
+        /// </summary>
         public async ValueTask DisposeAsync()
         {
             Description.Dispose();
@@ -305,6 +363,10 @@ namespace FreeAIr.Chat
             await LLMReaderPool.WaitForTaskAsync(this);
         }
 
+        /// <summary>
+        /// Reports a context edit as a status change. The two are separate things, but every
+        /// subscriber redraws on either, and one event spares them a second subscription.
+        /// </summary>
         private void ChatContextChangedRaised(object sender, ChatContextEventArgs e)
         {
             StatusChanged();
@@ -367,6 +429,11 @@ namespace FreeAIr.Chat
             return result;
         }
 
+        /// <summary>
+        /// Appends one content to the request. A content may expand into several messages — a tool
+        /// call becomes the assistant's request plus the tool's reply — which is why this is not a
+        /// one-to-one mapping.
+        /// </summary>
         private static void FillMessageList(
             IChatContent content,
             List<OpenAI.Chat.ChatMessage> result
@@ -384,16 +451,25 @@ namespace FreeAIr.Chat
 
     }
 
+    /// <summary>Handler shape of <see cref="Chat.ChatStatusChangedEvent"/>.</summary>
     public delegate void ChatStatusChangedDelegate(object sender, ChatEventArgs e);
+
+    /// <summary>Handler shape of <see cref="Chat.ContentAddedEvent"/>.</summary>
     public delegate void ChatContentAddedDelegate(object sender, ChatContentAddedEventArgs e);
 
+    /// <summary>
+    /// Says which content was appended and to which chat, so a window bound to one chat can ignore
+    /// the others.
+    /// </summary>
     public sealed class ChatContentAddedEventArgs : EventArgs
     {
+        /// <summary>The chat the content was added to.</summary>
         public Chat Chat
         {
             get;
         }
 
+        /// <summary>The prompt, answer or tool call just appended.</summary>
         public IChatContent ChatContent
         {
             get;
@@ -406,8 +482,13 @@ namespace FreeAIr.Chat
         }
     }
 
+    /// <summary>
+    /// Carries the chat whose status or context has changed. The new status is read from the chat
+    /// rather than copied here, so a late handler sees the current value and not a stale one.
+    /// </summary>
     public sealed class ChatEventArgs : EventArgs
     {
+        /// <summary>The chat that changed.</summary>
         public Chat Chat
         {
             get;

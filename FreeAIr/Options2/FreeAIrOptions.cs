@@ -36,6 +36,11 @@ namespace FreeAIr.Options2
         private static readonly JsonSerializerOptions _readOptions;
         private static readonly JsonSerializerOptions _writeOptions;
 
+        /// <summary>
+        /// Builds the two serializer configurations, which differ on purpose: reading skips comments
+        /// so a hand edited settings file may be annotated, and writing indents and leaves non ASCII
+        /// unescaped so prompts written in any language stay readable in the file.
+        /// </summary>
         static FreeAIrOptions()
         {
             _readOptions = new JsonSerializerOptions
@@ -55,30 +60,42 @@ namespace FreeAIr.Options2
 
         #endregion
 
+        /// <summary>The knobs which have not earned a section of their own: timeouts, limits, feature switches.</summary>
         public UnsortedJson Unsorted
         {
             get;
             set;
         }
 
+        /// <summary>The configured LLM endpoints. Everything that talks to a model picks one from here by name.</summary>
         public AgentCollectionJson AgentCollection
         {
             get;
             set;
         }
 
+        /// <summary>
+        /// How to launch the external MCP servers — the same shape Claude Desktop and the other MCP
+        /// clients use, so an existing configuration can be pasted in as is.
+        /// </summary>
         public McpServers AvailableMcpServers
         {
             get;
             set;
         }
 
+        /// <summary>
+        /// Which of the discovered tools the user has left enabled. Kept apart from
+        /// <see cref="AvailableMcpServers"/> because that describes what exists and this records a
+        /// decision about it.
+        /// </summary>
         public AvailableMcpServersJson AvailableTools
         {
             get;
             set;
         }
 
+        /// <summary>The prompts offered in the menus. See <see cref="SupportCollectionJson"/>.</summary>
         public SupportCollectionJson Supports
         {
             get;
@@ -118,30 +135,35 @@ namespace FreeAIr.Options2
 
         #region deserialize and related
 
+        /// <summary>Shortcut to the enabled tool state alone. Cached like every other read.</summary>
         public static async Task<AvailableMcpServersJson> DeserializeAvailableToolsAsync()
         {
             var options = await DeserializeAsync(null);
             return options.AvailableTools;
         }
 
+        /// <summary>Shortcut to the MCP server launch configuration alone.</summary>
         public static async Task<McpServers> DeserializeMcpServersAsync()
         {
             var options = await DeserializeAsync(null);
             return options.AvailableMcpServers;
         }
 
+        /// <summary>Shortcut to the unsorted knobs. The most called of these, being read on the typing path.</summary>
         public static async Task<UnsortedJson> DeserializeUnsortedAsync()
         {
             var options = await DeserializeAsync(null);
             return options.Unsorted;
         }
 
+        /// <summary>Shortcut to the RAG settings: the embedding agent, the thresholds, the index behaviour.</summary>
         public static async Task<RagJson> DeserializeRagAsync()
         {
             var options = await DeserializeAsync(null);
             return options.Rag;
         }
 
+        /// <summary>Shortcut to the agent list, for the pickers which let the user choose one.</summary>
         public static async Task<AgentCollectionJson> DeserializeAgentCollectionAsync()
         {
             var options = await DeserializeAsync(null);
@@ -169,12 +191,17 @@ namespace FreeAIr.Options2
                 );
         }
 
+        /// <summary>Shortcut to the whole set of support actions.</summary>
         public static async Task<SupportCollectionJson> DeserializeSupportCollectionAsync()
         {
             var options = await DeserializeAsync(null);
             return options.Supports;
         }
 
+        /// <summary>
+        /// The support actions matching a predicate — in practice, the ones whose scope fits the
+        /// menu about to be shown.
+        /// </summary>
         public static async Task<List<SupportActionJson>> DeserializeSupportActionsAsync(
             Func<SupportActionJson, bool> filter
             )
@@ -299,6 +326,11 @@ namespace FreeAIr.Options2
             }
         }
 
+        /// <summary>
+        /// Parses settings out of a json string, throwing on anything malformed. Used by the
+        /// settings editor when the user presses save, where a silent default would discard their
+        /// work.
+        /// </summary>
         public static FreeAIrOptions DeserializeFromString(
             string optionsJson
             )
@@ -359,6 +391,7 @@ namespace FreeAIr.Options2
             return OptionsPlaceEnum.VisualStudioOption;
         }
 
+        /// <summary>Renders the settings as indented json — what the settings editor shows and what the option store keeps.</summary>
         public static string SerializeToString(
             FreeAIrOptions options
             )
@@ -373,6 +406,10 @@ namespace FreeAIr.Options2
             return result;
         }
 
+        /// <summary>
+        /// Replaces the enabled tool state and saves. Re-reads the settings first, so a tool being
+        /// toggled does not overwrite an unrelated change made in the meantime.
+        /// </summary>
         public static async Task SaveExternalMCPToolsAsync(
             AvailableMcpServersJson tools
             )
@@ -387,6 +424,7 @@ namespace FreeAIr.Options2
             await options.SerializeAsync(null);
         }
 
+        /// <summary>Replaces the agent list and saves, re-reading the rest of the settings first.</summary>
         public static async Task SaveAgentsAsync(
             AgentCollectionJson agentCollection
             )
@@ -466,12 +504,17 @@ namespace FreeAIr.Options2
             return false;
         }
 
+        /// <summary>Path of the settings file, `.freeair\&lt;solution name&gt;_options.json`.</summary>
         public static Task<string?> ComposeOptionsFilePathAsync(
             )
         {
             return ComposeFilePathAsync("options");
         }
 
+        /// <summary>
+        /// Base path of the RAG index, `.freeair\&lt;solution name&gt;_embeddings.json`. The outlines and
+        /// the vectors are stored beside it under related names.
+        /// </summary>
         public static Task<string?> ComposeEmbeddingsFilePathAsync(
             )
         {
@@ -537,8 +580,15 @@ namespace FreeAIr.Options2
     }
 
 
+    /// <summary>
+    /// Names the storage places for the settings window, which offers them as a dropdown.
+    /// </summary>
     public static class OptionsPlaceHelper
     {
+        /// <summary>
+        /// What to call a place in the UI. Null means neither in particular — the settings actually
+        /// in force, wherever they were read from.
+        /// </summary>
         public static string GetTitle(this OptionsPlaceEnum? place)
         {
             if (!place.HasValue)

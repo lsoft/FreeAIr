@@ -56,9 +56,19 @@ namespace FreeAIr.Chat
             }
         }
 
+        /// <summary>Raised when a chat is added or removed, which rebuilds the chat list in the tool window.</summary>
         public event ChatCollectionChangedDelegate ChatCollectionChangedEvent;
+
+        /// <summary>
+        /// Relays the status change of any chat, so a subscriber does not have to subscribe to every
+        /// chat and follow the collection as it changes.
+        /// </summary>
         public event ChatStatusChangedDelegate ChatStatusChangedEvent;
 
+        /// <summary>
+        /// Composed by MEF with the informer it reports into, and hooks the DTE shutdown event here
+        /// so that chats are stopped while the shell is still alive enough to close their documents.
+        /// </summary>
         [ImportingConstructor]
         public ChatContainer(
             UIInformer uiInformer
@@ -85,6 +95,10 @@ namespace FreeAIr.Chat
             _dteEvents.OnBeginShutdown += DTEEvents_OnBeginShutdown;
         }
 
+        /// <summary>
+        /// The chat a Ctrl-clicked command should continue, or null when there is none — it was
+        /// never created, or the user has since closed it.
+        /// </summary>
         public Chat? GetLastCreatedChat()
         {
             if (!LastCreatedChatId.HasValue)
@@ -151,6 +165,11 @@ namespace FreeAIr.Chat
             return chat;
         }
 
+        /// <summary>
+        /// Closes a chat for good: stops the reader, unsubscribes, drops it from the collection and
+        /// disposes it. Doing nothing for a chat which is not in the collection makes this safe to
+        /// call twice, which the shutdown path and the close button both rely on.
+        /// </summary>
         public async Task RemoveChatAsync(
             Chat chat
             )
@@ -180,6 +199,14 @@ namespace FreeAIr.Chat
         }
 
 
+        /// <summary>
+        /// Empties the collection at shutdown. Always takes the first chat and lets
+        /// <see cref="RemoveChatAsync"/> remove it rather than iterating, because awaiting inside
+        /// the loop lets the collection change underneath.
+        ///
+        /// Fire and forget: `OnBeginShutdown` is a synchronous COM callback which cannot be awaited,
+        /// and blocking it would deadlock against the UI thread the chats are being closed on.
+        /// </summary>
         private void RemoveAllChats()
         {
             ThreadHelper.JoinableTaskFactory.RunAsync(
@@ -203,6 +230,10 @@ namespace FreeAIr.Chat
                 }).FileAndForget(nameof(RemoveAllChats));
         }
 
+        /// <summary>
+        /// Cancels what a chat is doing but keeps it open, which is the stop button in the chat
+        /// window as opposed to the close one.
+        /// </summary>
         public async Task StopChatAsync(
             Chat chat
             )
@@ -220,6 +251,11 @@ namespace FreeAIr.Chat
             await chat.StopAsync();
         }
 
+        /// <summary>
+        /// Whether this very chat is still held. Compares by reference rather than by id, because
+        /// the question being asked is whether this object is the live one, not whether some chat
+        /// with the same id exists.
+        /// </summary>
         private bool CheckIfChatIsInCollection(Chat chat)
         {
             lock (_locker)
@@ -243,6 +279,11 @@ namespace FreeAIr.Chat
         //}
 
 
+        /// <summary>
+        /// Collapses the states of all chats into the one thing the status bar can show: working if
+        /// any chat is waiting for or reading an answer, idle otherwise. Runs on whichever thread
+        /// streamed the change, so the informer is the one that marshals to the UI.
+        /// </summary>
         private void ChatStatusChanged(object sender, ChatEventArgs ea)
         {
             bool anyIsInProgress;
@@ -281,6 +322,11 @@ namespace FreeAIr.Chat
             }
         }
 
+        /// <summary>
+        /// Visual Studio is closing: cancel every request in flight. Without this the readers keep
+        /// streaming into objects the shell is tearing down, which surfaces as an exception in the
+        /// activity log on every exit.
+        /// </summary>
         private void DTEEvents_OnBeginShutdown()
         {
             RemoveAllChats();
@@ -288,5 +334,6 @@ namespace FreeAIr.Chat
 
     }
 
+    /// <summary>Handler shape of <see cref="ChatContainer.ChatCollectionChangedEvent"/>.</summary>
     public delegate void ChatCollectionChangedDelegate(object sender, EventArgs e);
 }

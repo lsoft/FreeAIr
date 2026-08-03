@@ -6,9 +6,16 @@ using System.Text.Json.Serialization;
 
 namespace FreeAIr.Options2.Agent
 {
+    /// <summary>
+    /// Every configured agent, plus the system prompts that ship with the product.
+    ///
+    /// Agents are referred to by name from everywhere else in the settings — support actions, the
+    /// RAG configuration — so renaming one here silently unbinds whatever pointed at it.
+    /// </summary>
     [JsonConverter(typeof(JsonDescriptionCommentConverter<AgentCollectionJson>))]
     public sealed class AgentCollectionJson : ICloneable
     {
+        /// <summary>The agents, in the order they are offered in the pickers.</summary>
         public List<AgentJson> Agents
         {
             get;
@@ -16,6 +23,7 @@ namespace FreeAIr.Options2.Agent
         } = new();
 
 
+        /// <summary>Starts out with the sample agents, which are what a fresh installation shows in the pickers.</summary>
         public AgentCollectionJson()
         {
             Agents = GetDefaultAgents();
@@ -30,6 +38,11 @@ namespace FreeAIr.Options2.Agent
             };
         }
 
+        /// <summary>
+        /// The agents worth offering in a picker: those with a token. A local model needs none and
+        /// is therefore hidden here, which is why the callers that already know which agent they
+        /// want look it up by name instead.
+        /// </summary>
         public List<AgentJson> FilterAgents(
             )
         {
@@ -37,6 +50,10 @@ namespace FreeAIr.Options2.Agent
             return filteredAgents;
         }
 
+        /// <summary>
+        /// Parses an agent list out of json without throwing, logging anything malformed. For the
+        /// places where the json comes from the user and a failure means keep what you had.
+        /// </summary>
         public static bool TryParse(
             string optionAgentsJson,
             out AgentCollectionJson? agents
@@ -57,6 +74,14 @@ namespace FreeAIr.Options2.Agent
             return false;
         }
 
+        /// <summary>
+        /// The samples a fresh installation starts with: Yandex, a local KoboldCpp for chatting and
+        /// two more for the outline work, and OpenRouter.
+        ///
+        /// They are examples rather than working agents — the tokens are placeholders and the model
+        /// names are not real. Their point is to show the shape of each provider's configuration, so
+        /// that the user edits one instead of writing it from scratch.
+        /// </summary>
         private static List<AgentJson> GetDefaultAgents() =>
             [
                 new AgentJson
@@ -121,6 +146,14 @@ namespace FreeAIr.Options2.Agent
                 },
             ];
 
+        /// <summary>
+        /// The system prompt every chat agent starts with: the assistant's rules, a description of
+        /// what a Visual Studio solution is, and permission to call the MCP tools without asking.
+        ///
+        /// The middle section exists because a model has no idea what the words solution, item or
+        /// project mean here; without it, tool calls come back asking for things which do not exist.
+        /// The culture anchor is substituted per request.
+        /// </summary>
         public const string DefaultSystemPrompt = @"
 Your general rules:
 #01 You are an highly experienced AI programming assistant working inside Visual Studio.
@@ -159,6 +192,11 @@ Your behavior against available functions:
 #8 If user asks to analyze the database or its data, you should compose appropriate SQL query and then use available functions to execute the SQL query. If you need information (metadata) about a table (or database) structure, gather it first via available functions.
 ";
         
+        /// <summary>
+        /// The system prompt for summarizing a file into natural language outlines. Asks for one
+        /// sentence per entity, purpose rather than behaviour, and plain text only — the answer goes
+        /// straight into the embedding index.
+        /// </summary>
         public const string ExtractFileOutlinesSystemPrompt =
 """
 SYSTEM INSTRUCTIONS:
@@ -178,6 +216,17 @@ Follow these rules:
 #8 Your respond must contain only plain text, avoid add anything other.
 """;
 
+        /// <summary>
+        /// The system prompt for writing outline comments into source code, following the natural
+        /// language outlines paper: partition the code into logical sections, one sentence each, at
+        /// most three comments for a short function and five for a long one, explain why only where
+        /// the reasoning is unclear.
+        ///
+        /// The star convention is what makes this safe to re-run: the model may only touch comments
+        /// marked with a leading star, so what a human wrote is never rewritten. The answer comes
+        /// back as json of file, line and comment, because the model is shown numbered lines rather
+        /// than asked to reproduce the file.
+        /// </summary>
         public const string CreateNewOutlinesSystemPrompt =
 """
 SYSTEM INSTRUCTIONS:
