@@ -17,6 +17,7 @@ namespace FreeAIr.Options2.Rag
     [JsonConverter(typeof(JsonDescriptionCommentConverter<RagJson>))]
     public sealed class RagJson : ICloneable
     {
+        /// <summary>How many natural language outlines are taken from the embedding index before they are aggregated into files.</summary>
         [Description("'Use RAG' search: how many natural language outlines are taken from the embedding index before they are aggregated into files. Raise it if the search misses files which contain many outlines each.")]
         public int TopOutlineCount
         {
@@ -24,6 +25,7 @@ namespace FreeAIr.Options2.Rag
             set;
         } = 50;
 
+        /// <summary>The maximum count of files the shortlist is allowed to pass to the LLM; kept low to keep the search cheap.</summary>
         [Description("'Use RAG' search: the maximum count of files the shortlist is allowed to pass to the LLM. This is what makes the search cheap, so keep it low.")]
         public int MaxFileCount
         {
@@ -31,6 +33,7 @@ namespace FreeAIr.Options2.Rag
             set;
         } = 15;
 
+        /// <summary>How far above the measured noise of the index a file has to stand to be taken — see the class summary for why this is not a cosine threshold.</summary>
         [Description("'Use RAG' search: how far above the noise of your index a file has to stand to be taken. 0.1 is generous, 0.2 is the default, 0.35 is strict. This is NOT a cosine similarity: it is a share of the room between the noise measured at index build time and a perfect match, which is what makes one value work on different embedding models. Has no effect until the index has been calibrated.")]
         public double Sensitivity
         {
@@ -38,6 +41,7 @@ namespace FreeAIr.Options2.Rag
             set;
         } = 0.2d;
 
+        /// <summary>The probe queries the index is calibrated with at the end of every build — see <see cref="RagCalibrationJson"/>.</summary>
         [Description("'Use RAG' search: the questions the index is calibrated with, at the end of every index build. Write queries your solution CANNOT answer into 'Irrelevant' - the closer they are to being plausible for this codebase, the more honest the threshold. Put queries whose answer you know into 'Relevant' together with the file which is supposed to win; the threshold is then never allowed to climb up to them, and a query which does not find its file is reported as a miss, meaning this model does not understand this codebase.")]
         public RagCalibrationJson Calibration
         {
@@ -49,6 +53,7 @@ namespace FreeAIr.Options2.Rag
         {
         }
 
+        /// <inheritdoc/>
         public object Clone()
         {
             return new RagJson
@@ -61,6 +66,11 @@ namespace FreeAIr.Options2.Rag
         }
     }
 
+    /// <summary>
+    /// The probe queries a calibration run scores against the index, so the noise floor
+    /// <see cref="RagJson.Sensitivity"/> is measured against reflects this solution rather than a
+    /// number picked in the abstract.
+    /// </summary>
     public sealed class RagCalibrationJson : ICloneable
     {
         /// <summary>
@@ -83,6 +93,7 @@ namespace FreeAIr.Options2.Rag
             set;
         } = new();
 
+        /// <inheritdoc/>
         public object Clone()
         {
             return new RagCalibrationJson
@@ -93,8 +104,10 @@ namespace FreeAIr.Options2.Rag
         }
     }
 
+    /// <summary>One calibration probe: a query paired with the file it must retrieve.</summary>
     public sealed class RagRelevantProbeJson : ICloneable
     {
+        /// <summary>The natural language query, as if typed into the 'Use RAG' search box.</summary>
         public string Query
         {
             get;
@@ -108,6 +121,7 @@ namespace FreeAIr.Options2.Rag
             set;
         } = string.Empty;
 
+        /// <inheritdoc/>
         public object Clone()
         {
             return new RagRelevantProbeJson
