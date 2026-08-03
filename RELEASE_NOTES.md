@@ -25,7 +25,6 @@ My others extensions lives [here](https://marketplace.visualstudio.com/publisher
 
 ## 4.3.0
 
-- Fixed bug, thanks to nrmncr for [reporting it](https://github.com/lsoft/FreeAIr/issues/61).
 - The `Use RAG` checkbox of the natural language search is implemented. The search now takes the
   files whose outlines are the closest to the query and asks the LLM about those only, instead of
   reading through the whole solution.
@@ -92,6 +91,29 @@ My others extensions lives [here](https://marketplace.visualstudio.com/publisher
 - The `RagTopOutlineCount`, `RagMaxFileCount` and `RagMinScore` options moved from the unsorted
   settings into a `Rag` node of their own, and `RagMinScore` is gone: it is replaced by `Sensitivity`
   above.
+- The MCP proxy is restarted properly now. `ProcessMonitor` did restart a proxy which had died, but
+  the JSON-RPC channel stayed bound to the streams of the dead process, so every MCP call after the
+  first crash was lost. The channel is re-attached to the streams of the new process, and the
+  configuration is pushed into it again — a freshly started proxy hosts no MCP servers until it is
+  told about them.
+- A server which is reconfigured while it runs no longer has its tools offered to the model twice,
+  three times and so on: the wrapper of the running server is reused instead of a second one being
+  appended, and the wrapper of a server which failed to start is dropped along with its tools.
+- A proxy which fails to start is retried after a pause instead of ending the monitoring for the
+  rest of the session, and is given up on only after several failures in a row.
+- `Proxy.zip` decides that it is already unpacked by a marker file written after the last entry. The
+  folder used to be created before the first one, so an unpacking which was interrupted left behind
+  a truncated folder which was never repaired.
+- Installing the MSDN MCP server overwrites its entry instead of adding a second one under a name
+  which may be taken already.
+- Asking the options for a place explicitly and finding nothing there no longer returns the null its
+  callers dereference, and saving solution related options with no solution opened reports what has
+  happened instead of throwing `ArgumentNullException`.
+- A set of concurrency defects is fixed: the list of chats used to be handed out live and read
+  without its lock, while chats are added from the UI thread and their statuses change on the
+  threads which stream the answers; a read started right after a stop could be given the cancelled
+  token source of the previous one; and the file cache updated its value and its signature around an
+  await without any synchronization.
 - The built-in Visual Studio MCP server has a new tool, `VisualStudio.SearchFileContent`: the model
   can ask where a text occurs and gets the matching lines back — each with its file and its line
   number — instead of reading whole files one by one until it finds them. Nothing is installed and
@@ -114,6 +136,10 @@ My others extensions lives [here](https://marketplace.visualstudio.com/publisher
   file which makes it misbehave is reported and the rest of the search survives.
 - **The new format is not backward compatible: an index built by FreeAIr 4.2.11 or earlier has to be
   rebuilt.**
+
+## 4.2.12
+
+- Fixed bug, thanks to nrmncr for [reporting it](https://github.com/lsoft/FreeAIr/issues/61).
 
 ## 4.2.11
 
