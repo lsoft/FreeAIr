@@ -8,7 +8,7 @@ looking for the user manual, read the [README](README.md) instead.
 | Project | Target | Purpose |
 | --- | --- | --- |
 | `FreeAIr` | .NET Framework 4.8 (VSIX) | The extension itself: package, commands, tool windows, chats, options, MCP client side. |
-| `FreeAIr.Rag` | netstandard2.0 | The natural-language-search machinery that does not need Visual Studio: index format, vector codec, outline tree, ranking. |
+| `FreeAIr.Rag` | netstandard2.0 | The searching machinery that does not need Visual Studio: index format, vector codec, outline tree, ranking, and the `Grep/` text matching behind the SearchFileContent MCP tool. |
 | `FreeAIr.Rag.Tests` | .NET 8 (xunit) | Unit tests of `FreeAIr.Rag`. Not shipped. |
 | `MCP/Proxy` | .NET 9 (exe) | Out-of-process host for MCP servers. Shipped inside the VSIX as `.art/Proxy.zip` and unpacked on first run. |
 | `MCP/Dto` | netstandard | Request/reply contracts of the JSON-RPC channel between `FreeAIr` and `Proxy.exe`. |
@@ -104,8 +104,11 @@ internal). These are intentionally *not* part of the JSON settings.
   reconciles the configured server list against the running one, refreshes the tool catalogue and
   dispatches `CallToolAsync` to the owning server.
 - `MCP/ServerProxy/VS` — the built-in Visual Studio MCP server. Its tools (build, git commit,
-  nuget install, read/replace document body, solution tree, error list, web search) run **inside**
-  devenv and therefore have direct access to DTE/Roslyn.
+  nuget install, read/replace document body, solution tree, error list, text search, web search)
+  run **inside** devenv and therefore have direct access to DTE/Roslyn.
+  `Tools/SearchFileContentTool.cs` is the grep of the solution: the matching itself is `Rag/Grep`
+  and nothing is installed or spawned, while running inside devenv is what lets it search the
+  editor buffers which have not been saved yet.
 - `MCP/ServerProxy/Github` and `MCP/ServerProxy/External` — the github.com server and any
   user-configured server, both hosted by `Proxy.exe`.
 - `MCP/AvailableToolContainer.cs` — enabled/disabled state of individual tools, globally and

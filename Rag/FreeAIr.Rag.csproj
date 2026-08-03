@@ -1,10 +1,10 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <!--
-    The part of the natural language search which does not need Visual Studio: the index file
-    format, the vector codec, the outline tree and the ranking. It is a separate assembly so that
-    all of it can be exercised by an ordinary test runner - the VSIX project itself cannot be
-    loaded by one.
+    The part of the searching which does not need Visual Studio: the index file format, the vector
+    codec, the outline tree and the ranking of the natural language search, and the text matching
+    of `Grep/`. It is a separate assembly so that all of it can be exercised by an ordinary test
+    runner - the VSIX project itself cannot be loaded by one.
 
     netstandard2.0 on purpose: it has to be consumable both by FreeAIr (net48) and by the test
     projects (net8.0).

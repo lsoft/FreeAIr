@@ -183,6 +183,7 @@
     <Compile Include="MCP\ServerProxy\VS\Tools\BuildAndReturnBuildResultsTool.cs" />
     <Compile Include="MCP\ServerProxy\VS\Tools\GetSolutionFileBodyTool.cs" />
     <Compile Include="MCP\ServerProxy\VS\Tools\GetAllWarningErrorsTool.cs" />
+    <Compile Include="MCP\ServerProxy\VS\Tools\SearchFileContentTool.cs" />
     <Compile Include="MCP\ServerProxy\VS\Tools\VisualStudioMcpServerTool.cs" />
     <Compile Include="MCP\ServerProxy\VS\VisualStudioMcpServerProxy.cs" />
     <Compile Include="MCP\AvailableToolContainer.cs" />
