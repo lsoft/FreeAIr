@@ -737,4 +737,235 @@
   <data name="No_active_agents_found__Make_sure" xml:space="preserve">
     <value>Активных агентов не найдено. Убедитесь, что хотя бы у одного агента есть непустой токен. Использование поддельных токенов разрешено для локального LLM.</value>
   </data>
+  <data name="RAG__loading_the_index__0___1_MB" xml:space="preserve">
+    <value>Загрузка NLO-индекса... {0}/{1} МБ</value>
+  </data>
+  <data name="RAG__preparing_the_index" xml:space="preserve">
+    <value>Подготовка NLO-индекса...</value>
+  </data>
+  <data name="RAG__vectorizing_the_query" xml:space="preserve">
+    <value>Векторизация запроса...</value>
+  </data>
+  <data name="RAG__ranking__0__outlines" xml:space="preserve">
+    <value>Ранжирование {0} outline...</value>
+  </data>
+  <data name="RAG__selected__0__files_of__1_" xml:space="preserve">
+    <value>Отобрано {0} файлов из {1}</value>
+  </data>
+  <data name="RAG__there_is_no_index" xml:space="preserve">
+    <value>Для этого солюшена нет NLO-индекса. Постройте его командой 'Build natural language outlines' или ищите со снятой галкой 'Use RAG'.</value>
+  </data>
+  <data name="RAG__nothing_matched_the_query" xml:space="preserve">
+    <value>Ни один файл индекса недостаточно близок к запросу. Уменьшите 'Sensitivity' в узле 'Rag' файла настроек или ищите со снятой галкой 'Use RAG'.</value>
+  </data>
+  <data name="RAG__the_agent_does_not_match" xml:space="preserve">
+    <value>Выбранный агент выдаёт векторы длиной {0}, а в индексе лежат векторы длиной {1}. Это разные модели, сравнивать их нельзя: выберите агента, которым построен индекс.</value>
+  </data>
+  <data name="RAG__choose_the_embedding_agent" xml:space="preserve">
+    <value>Выберите агента, чьей моделью эмбеддинга построен NLO-индекс:</value>
+  </data>
+  <data name="RAG___0__files_are_out_of_the_index" xml:space="preserve">
+    <value>Файлов вне индекса: {0}</value>
+  </data>
+  <data name="RAG__these_files_are_not_covered" xml:space="preserve">
+    <value>Эти файлы не покрыты NLO-индексом, поэтому поиск в них не заходит. Чтобы включить их, перестройте индекс:</value>
+  </data>
+  <data name="RAG__index_of__0___model__1_" xml:space="preserve">
+    <value>NLO-индекс от {0}, модель {1}</value>
+  </data>
+  <data name="RAG__narrows_the_search_down" xml:space="preserve">
+    <value>Сужает поиск до файлов, чьи natural language outline ближе всего к запросу, вместо того чтобы спрашивать LLM про каждый файл солюшена. Намного дешевле и быстрее, но файл, которого нет в индексе, не будет найден никогда.</value>
+  </data>
+  <data name="RAG__the_index_has_been_built__0_" xml:space="preserve">
+    <value>Индекс построен {0}.</value>
+  </data>
+  <data name="RAG__there_is_no_index_short" xml:space="preserve">
+    <value>Для этого солюшена нет NLO-индекса: постройте его командой 'Build natural language outlines', чтобы галка стала доступна.</value>
+  </data>
+  <data name="Found__0__items_" xml:space="preserve">
+    <value>Найдено совпадений: {0}</value>
+  </data>
+  <data name="RAG__calibrating_the_index" xml:space="preserve">
+    <value>Калибровка индекса...</value>
+  </data>
+  <data name="RAG__calibrated__noise__0___threshold__1_" xml:space="preserve">
+    <value>Индекс откалиброван: бессмысленный запрос набирает на этой модели {0}, поэтому поиск берёт файлы от {1}.</value>
+  </data>
+  <data name="RAG__calibration__0__of__1__probes_missed" xml:space="preserve">
+    <value>{0} из {1} запросов с известным ответом не нашли указанный в них файл.</value>
+  </data>
+  <data name="RAG__calibration_model_does_not_separate" xml:space="preserve">
+    <value>Эта embedding-модель не различает ваш код: запрос с известным ответом набирает {0}, а запрос ни о чём доходит до {1}. Порог тут не поможет - попробуйте другую embedding-модель.</value>
+  </data>
+  <data name="RAG__calibration_failed__0_" xml:space="preserve">
+    <value>Индекс построен, но откалибровать его не удалось: {0}. Поиск будет работать по нему без порога.</value>
+  </data>
+  <data name="RAG__another_model_built_the_index__0_" xml:space="preserve">
+    <value>Индекс построен другой embedding-моделью: контрольные фразы совпадают лишь на {0}. Пересоберите индекс или ищите тем агентом, которым он собран.</value>
+  </data>
+  <data name="RAG_calibration__window_title" xml:space="preserve">
+    <value>FreeAIr: калибровка RAG</value>
+  </data>
+  <data name="RAG_calibration__index_summary" xml:space="preserve">
+    <value>Индекс от {0}, модель {1}, сервер называет её {2}. Строк описаний: {3}, чисел в векторе: {4}.</value>
+  </data>
+  <data name="RAG_calibration__not_calibrated" xml:space="preserve">
+    <value>Этот индекс не калиброван: поиск работает по нему без порога и отдаёт все файлы, которые ранжировал.</value>
+  </data>
+  <data name="RAG_calibration__summary" xml:space="preserve">
+    <value>Шум {0}, порог {1} при чувствительности {2}. Измерено по {3} безответным и {4} отвеченным запросам.</value>
+  </data>
+  <data name="RAG_calibration__probe" xml:space="preserve">
+    <value>Спросить</value>
+  </data>
+  <data name="RAG_calibration__probe_hint" xml:space="preserve">
+    <value>Отметьте файл, который отвечает на запрос, либо скажите, что ответа здесь нет. Порог учится и на том, и на другом, а на втором - сильнее.</value>
+  </data>
+  <data name="RAG_calibration__mark_as_answer" xml:space="preserve">
+    <value>это ответ</value>
+  </data>
+  <data name="RAG_calibration__mark_as_hopeless" xml:space="preserve">
+    <value>ответа здесь нет</value>
+  </data>
+  <data name="RAG_calibration__queries_header" xml:space="preserve">
+    <value>Запросы, по которым измеряется порог</value>
+  </data>
+  <data name="RAG_calibration__expected_path_hint" xml:space="preserve">
+    <value>Пустой файл означает, что решение не может ответить на этот запрос вовсе. Путь указывается относительно папки решения.</value>
+  </data>
+  <data name="RAG_calibration__sensitivity" xml:space="preserve">
+    <value>Чувствительность</value>
+  </data>
+  <data name="RAG_calibration__recalculate" xml:space="preserve">
+    <value>Пересчитать</value>
+  </data>
+  <data name="RAG_calibration__save" xml:space="preserve">
+    <value>Сохранить</value>
+  </data>
+  <data name="RAG_calibration__reload" xml:space="preserve">
+    <value>Перечитать</value>
+  </data>
+  <data name="RAG_calibration__remove" xml:space="preserve">
+    <value>убрать</value>
+  </data>
+  <data name="RAG_calibration__kind_answered" xml:space="preserve">
+    <value>с ответом</value>
+  </data>
+  <data name="RAG_calibration__kind_hopeless" xml:space="preserve">
+    <value>без ответа</value>
+  </data>
+  <data name="RAG_calibration__passes" xml:space="preserve">
+    <value>проходит</value>
+  </data>
+  <data name="RAG_calibration__cut_off" xml:space="preserve">
+    <value>отсечён</value>
+  </data>
+  <data name="RAG_calibration__probed__0__files" xml:space="preserve">
+    <value>Найдено файлов: {0}, порог этого индекса - {1}.</value>
+  </data>
+  <data name="RAG_calibration__nothing_found" xml:space="preserve">
+    <value>На этот запрос в индексе нет вообще ничего.</value>
+  </data>
+  <data name="RAG_calibration__recalculating" xml:space="preserve">
+    <value>Измеряю запросы по индексу...</value>
+  </data>
+  <data name="RAG_calibration__recalculated" xml:space="preserve">
+    <value>Измерено. Пока ничего не сохранено.</value>
+  </data>
+  <data name="RAG_calibration__nothing_to_measure" xml:space="preserve">
+    <value>Измерять нечего: индекс пуст либо все запросы пустые.</value>
+  </data>
+  <data name="RAG_calibration__saving" xml:space="preserve">
+    <value>Сохраняю...</value>
+  </data>
+  <data name="RAG_calibration__saved__0_" xml:space="preserve">
+    <value>Запросы сохранены в {0}, измеренные числа - в индекс. Поиск использует их с этого момента.</value>
+  </data>
+  <data name="RAG_calibration__saved_settings_only__0_" xml:space="preserve">
+    <value>Запросы сохранены в {0}. Индекс не тронут: чтобы записать числа в него, сначала нажмите 'Пересчитать'.</value>
+  </data>
+  <data name="RAG_calibration__query_added" xml:space="preserve">
+    <value>Запрос добавлен в список ниже. Он будет использован при каждой следующей сборке индекса.</value>
+  </data>
+  <data name="RAG_calibration__query_replaced" xml:space="preserve">
+    <value>Такой запрос уже был в списке, его ответ заменён.</value>
+  </data>
+  <data name="RAG_calibration__no_agent" xml:space="preserve">
+    <value>Нет агента, которым можно векторизовать запрос, поэтому измерить ничего нельзя.</value>
+  </data>
+  <data name="RAG_calibration__change_agent" xml:space="preserve">
+    <value>Агент...</value>
+  </data>
+  <data name="RAG_calibration__agent__0___1___2_" xml:space="preserve">
+    <value>Спрашиваем агента '{0}': модель {1} на {2}.</value>
+  </data>
+  <data name="RAG_calibration__agent_not_found__0_" xml:space="preserve">
+    <value>Индекс построен агентом '{0}', которого в настройках больше нет. Нажмите 'Агент...', чтобы выбрать другого.</value>
+  </data>
+  <data name="RAG_calibration__agent_unknown" xml:space="preserve">
+    <value>Индекс не сообщает, каким агентом он построен. Нажмите 'Агент...', чтобы выбрать его.</value>
+  </data>
+  <data name="RAG_calibration__help_10" xml:space="preserve">
+    <value>Это окно измеряет порог близости для поиска с галкой `Use RAG` - вместо того, чтобы вы угадывали его. Всё считается по индексу, который уже лежит на диске; векторы при этом никогда не пересобираются.</value>
+  </data>
+  <data name="RAG_calibration__help_20" xml:space="preserve">
+    <value>Синяя строка выше называет агента, через которого идёт каждый запрос. Это должна быть та модель, которой построен индекс: другую окно отвергает, а не измеряет, потому что её числа ничего не значат. Кнопка 'Агент...' выбирает другого.</value>
+  </data>
+  <data name="RAG_calibration__help_30" xml:space="preserve">
+    <value>Введите вопрос так, как ввели бы его в поиск на естественном языке, и нажмите 'Спросить' или Enter. Файлы, которые предложил индекс, показываются со своими оценками, включая те, которые текущий порог отсекает: о пороге судят по тому, что он выбрасывает.</value>
+  </data>
+  <data name="RAG_calibration__help_40" xml:space="preserve">
+    <value>Нажмите 'это ответ' у файла, который действительно отвечает на вопрос, либо 'ответа здесь нет', если решение не может ответить вовсе. Нужны оба вида: безответные показывают, как высоко забирается чистый шум на вашей модели, а отвеченные не дают порогу залезть выше файла, про который вы точно знаете, что он верный.</value>
+  </data>
+  <data name="RAG_calibration__help_50" xml:space="preserve">
+    <value>Запрос попадает в список внизу - это и есть все исходные данные измерения. Там его можно править руками: слева вопрос, справа файл, который на него отвечает, относительно папки решения. Пустой файл означает, что ответа нет вовсе. Enter фиксирует отредактированное поле.</value>
+  </data>
+  <data name="RAG_calibration__help_60" xml:space="preserve">
+    <value>'Чувствительность' - это насколько выше измеренного шума должен стоять файл, в долях расстояния от шума до идеального совпадения: 0.1 - щедро, 0.2 - по умолчанию, 0.35 - строго. Её изменение перечитывает то же самое измерение и ничего не спрашивает у модели.</value>
+  </data>
+  <data name="RAG_calibration__help_70" xml:space="preserve">
+    <value>'Пересчитать' измеряет запросы по индексу и показывает, какой шум и какой порог из них получается. Никуда ничего не пишется, так что нажимайте сколько угодно.</value>
+  </data>
+  <data name="RAG_calibration__help_80" xml:space="preserve">
+    <value>'Сохранить' кладёт запросы в файл настроек, откуда их возьмёт каждая следующая сборка индекса, а измеренные числа - в сам индекс, переписывая только его маленький файл метаданных. 'Перечитать' заново читает индекс и настройки, 'Отмена' прерывает то, что сейчас работает.</value>
+  </data>
+  <data name="Help_header_what_this_window_is" xml:space="preserve">
+    <value>Что это за окно и как им пользоваться</value>
+  </data>
+  <data name="RAG_calibration__cancel" xml:space="preserve">
+    <value>Отмена</value>
+  </data>
+  <data name="RAG_calibration__help_15" xml:space="preserve">
+    <value>Калибровка - это выборка, а не каталог: пяти-десяти запросов достаточно, и добавлять каждый вопрос, который вы когда-нибудь зададите, не нужно. Порог - одно число на весь индекс, и горсть честных запросов задаёт его не хуже сотни. Поиск работает и вовсе без калибровки - просто без порога, отдавая все файлы, которые он отранжировал.</value>
+  </data>
+  <data name="FreeAIr_natural_language_search" xml:space="preserve">
+    <value>FreeAIr: поиск на естественном языке</value>
+  </data>
+  <data name="Search__no_action_is_configured" xml:space="preserve">
+    <value>Не настроено ни одного действия с областью NaturalLanguageSearch, поэтому нечем спросить модель. Добавьте его в Центре управления FreeAIr.</value>
+  </data>
+  <data name="Search__no_agent_with_a_token" xml:space="preserve">
+    <value>Не найдено ни одного агента с токеном, а поиску нужен агент, чтобы обратиться к модели. Задайте токен нужному агенту в Центре управления FreeAIr.</value>
+  </data>
+  <data name="Search__there_is_nothing_to_search_in" xml:space="preserve">
+    <value>Искать не в чем: либо не открыто решение, либо выбрана область «текущий проект», а активного проекта нет.</value>
+  </data>
+  <data name="Search__the_chat_has_not_started" xml:space="preserve">
+    <value>Не удалось создать чат с агентом, поиск не выполнялся.</value>
+  </data>
+  <data name="Search__agent__0___1___2_" xml:space="preserve">
+    <value>Отвечает на запрос: {0} ({1}, модель {2})</value>
+  </data>
+  <data name="Search__embedding_agent__0___1_" xml:space="preserve">
+    <value>Векторизует запрос: {0} ({1})</value>
+  </data>
+  <data name="Confidence__high" xml:space="preserve">
+    <value>Высокая</value>
+  </data>
+  <data name="Confidence__medium" xml:space="preserve">
+    <value>Средняя</value>
+  </data>
+  <data name="Confidence__low" xml:space="preserve">
+    <value>Низкая</value>
+  </data>
 </root>

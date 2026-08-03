@@ -1,7 +1,9 @@
-﻿using FreeAIr.Helper;
+﻿using FreeAIr.Embedding;
+using FreeAIr.Helper;
 using FreeAIr.NLOutline.Tree;
 using FreeAIr.Options2;
 using FreeAIr.Shared.Helper;
+using Microsoft.VisualStudio.ComponentModelHost;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
@@ -48,9 +50,18 @@ namespace FreeAIr.MCP.McpServerProxy.VS.Tools
                     cancellationToken
                     );
 
-                var existingOutlineRoot = await OutlineNode.TryCreateAsync(
-                    true
+                //without the vectors: this tool reports the outline texts and nothing else, and the
+                //vectors are the megabytes of the index. The container keeps the parsed files, so
+                //a second call does not reread them either.
+                var componentModel = (IComponentModel)await FreeAIrPackage.Instance.GetServiceAsync(typeof(SComponentModel));
+                var indexContainer = componentModel.GetService<EmbeddingIndexContainer>();
+
+                var existingOutlineRoot = await indexContainer.GetOutlineTreeAsync(
+                    false,
+                    cancellationToken: cancellationToken
                     );
+
+                await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
 
                 var converted = items
                     .Select(i =>

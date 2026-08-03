@@ -39,12 +39,17 @@ namespace FreeAIr.UI.ViewModels
             get;
         }
 
+        /// <summary>
+        /// Stored in <see cref="_selectedAction"/> rather than in the backing field of the property:
+        /// the rest of the class reads that one, and a `field = value` here left it null for ever,
+        /// which hid the whole editing panel and disabled every command of the window.
+        /// </summary>
         public SupportActionJson SelectedAction
         {
-            get;
+            get => _selectedAction;
             set
             {
-                field = value;
+                _selectedAction = value;
 
                 RefillScopes();
                 UpdateSelectedMoniker();

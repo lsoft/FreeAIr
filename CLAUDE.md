@@ -23,6 +23,50 @@ Both `Debug` and `Release` build clean (0 errors). A full build takes roughly 20
 
 Quote `"-p:Platform=Any CPU"` as shown — the space in the value needs the whole switch inside quotes.
 
+## Running the tests
+
+`Rag.Tests\FreeAIr.Rag.Tests.csproj` (net8.0, xunit) covers `Rag\FreeAIr.Rag.csproj` — the index
+format, the vector codec, the outline tree and the ranking of the natural language search.
+
+Use the script; it builds with MSBuild and only then hands over to the SDK:
+
+```bash
+run-tests.bat
+```
+
+Anything you add to the command line goes on to `dotnet test`, e.g.
+`run-tests.bat --filter FullyQualifiedName~VectorCodec`. `FREEAIR_CONFIG` picks the configuration
+(`Release` by default), `FREEAIR_MSBUILD` overrides the compiler path.
+
+Only the test project and `FreeAIr.Rag` are built by the script — both are SDK style, so it takes a
+couple of seconds and does not go near the VSIX. Build the solution yourself when you need the VSIX
+too; the script will then find everything up to date.
+
+By hand it is the same two steps, and the second one must **not** let the .NET SDK build anything:
+
+```bash
+dotnet test Rag.Tests/FreeAIr.Rag.Tests.csproj --no-build -c Release --nologo
+```
+
+`--no-build` is what makes this safe: it implies `--no-restore`, so the SDK never rewrites the
+`obj\` of the VSIX projects (see the next section). Dropping that flag reproduces exactly the
+breakage described below.
+
+### Integration tests
+
+`EmbeddingIntegrationFacts` talks to a real embedding server through the shipping
+`OpenAIEmbeddingVectorizer`. It skips itself unless `FREEAIR_TEST_EMBEDDING_ENDPOINT` names one, so
+a plain `run-tests.bat` stays green without a model:
+
+```bash
+run-integration-tests.bat
+```
+
+That defaults to a local OpenAI compatible server at `http://localhost:5001/v1` and runs the
+integration tests only, with the console logger verbose enough to show what the model answered.
+`FREEAIR_TEST_EMBEDDING_MODEL` (default: the first model the server lists) and
+`FREEAIR_TEST_EMBEDDING_TOKEN` (default: none) override the rest.
+
 ## Never use `dotnet build`
 
 It fails, and it also **breaks the next MSBuild build**.
@@ -62,7 +106,7 @@ but the MCP proxy or voice recording will fail at runtime.
 
 ## Expected warnings
 
-A successful build emits ~739 warnings. These are pre-existing and not a regression:
+A successful full build emits ~800 warnings. These are pre-existing and not a regression:
 
 - `NU1902` / `NU1903` — known vulnerabilities in `MessagePack` 3.1.4.
 - `VSTHRD010` — access to VS objects off the main thread.

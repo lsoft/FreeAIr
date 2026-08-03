@@ -3,6 +3,7 @@ using FreeAIr.Helper;
 using FreeAIr.MCP.McpServerProxy;
 using FreeAIr.Options2.Agent;
 using FreeAIr.Options2.Mcp;
+using FreeAIr.Options2.Rag;
 using FreeAIr.Options2.Support;
 using FreeAIr.Options2.Unsorted;
 using System.Collections.Generic;
@@ -84,6 +85,13 @@ namespace FreeAIr.Options2
             set;
         }
 
+        /// <summary>Settings of the `Use RAG` natural language search, see <see cref="RagJson"/>.</summary>
+        public RagJson Rag
+        {
+            get;
+            set;
+        }
+
         public FreeAIrOptions()
         {
             Unsorted = new();
@@ -91,6 +99,7 @@ namespace FreeAIr.Options2
             AvailableMcpServers = new();
             AvailableTools = new();
             Supports = new();
+            Rag = new();
         }
 
         public object Clone()
@@ -102,6 +111,7 @@ namespace FreeAIr.Options2
                 AvailableMcpServers = (McpServers)AvailableMcpServers.Clone(),
                 AvailableTools = (AvailableMcpServersJson)AvailableTools.Clone(),
                 Supports = (SupportCollectionJson)Supports.Clone(),
+                Rag = (RagJson)Rag.Clone(),
             };
         }
 
@@ -126,28 +136,37 @@ namespace FreeAIr.Options2
             return options.Unsorted;
         }
 
+        public static async Task<RagJson> DeserializeRagAsync()
+        {
+            var options = await DeserializeAsync(null);
+            return options.Rag;
+        }
+
         public static async Task<AgentCollectionJson> DeserializeAgentCollectionAsync()
         {
             var options = await DeserializeAsync(null);
             return options.AgentCollection;
         }
 
+        /// <summary>
+        /// The agent stored under this name, or null when the settings no longer have one.
+        ///
+        /// Deliberately without the `has a token` filter the pickers apply. A local server wants no
+        /// token at all, and the agent this returns has been chosen by something which already
+        /// knows what it needs — the index knows which agent built it, a support action names its
+        /// own. Hiding a named agent because it has no token used to send both of those looking for
+        /// a substitute, and the substitute was whatever cloud agent happened to be configured:
+        /// asking it for embeddings gets a flat HTTP 400 out of a chat endpoint.
+        /// </summary>
         public static async Task<AgentJson?> DeserializeAgentByNameAsync(
             string agentName
             )
         {
             var options = await DeserializeAsync(null);
-            var agents = options.AgentCollection.Agents;
-            var filteredAgents = agents.FindAll(a => !string.IsNullOrEmpty(a.Technical.GetToken()));
-            if (filteredAgents.Count == 0)
-            {
-                return null;
-            }
 
-            var result = filteredAgents.FirstOrDefault(
+            return options.AgentCollection.Agents.FirstOrDefault(
                 a => a.Name == agentName
                 );
-            return result;
         }
 
         public static async Task<SupportCollectionJson> DeserializeSupportCollectionAsync()

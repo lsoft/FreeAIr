@@ -64,6 +64,7 @@
     <Compile Include="Commands\Other\OpenPropertiesCommand.cs" />
     <Compile Include="Commands\Other\OpenActivityLogCommand.cs" />
     <Compile Include="Commands\Other\OpenProxyLogCommand.cs" />
+    <Compile Include="Commands\Other\OpenRagCalibrationWindowCommand.cs" />
     <Compile Include="Commands\Other\ResetMCPToolsCommand.cs" />
     <Compile Include="Commands\ShowInSituChatCommand.cs" />
     <Compile Include="Helper\ActivityLogHelper.cs" />
@@ -90,8 +91,8 @@
     <Compile Include="Chat\ChatHelper.cs" />
     <Compile Include="Chat\ChatStatusEnum.cs" />
     <Compile Include="Commands\Other\OpenBuildingNaturalLanguageOutlinesWindowCommand.cs" />
-    <Compile Include="Embedding\EmbeddingGenerator.cs" />
-    <Compile Include="Embedding\Json\Objects.cs" />
+    <Compile Include="Embedding\AgentEmbedding.cs" />
+    <Compile Include="Embedding\EmbeddingIndexContainer.cs" />
     <Compile Include="Find\DoSearch.cs" />
     <Compile Include="Git\CommitMessageBuilder.cs" />
     <Compile Include="BLogic\CompletionProposal.cs" />
@@ -115,6 +116,7 @@
     <Compile Include="Find\FileTypeFilter.cs" />
     <Compile Include="Find\FileTypesFilter.cs" />
     <Compile Include="Find\FindWindowModifier.cs" />
+    <Compile Include="Find\SearchTrace.cs" />
     <Compile Include="Git\GitCollectBackgroundTask.cs" />
     <Compile Include="Git\GitDiffCollector.cs" />
     <Compile Include="Git\GitDiffCreator.cs" />
@@ -184,12 +186,10 @@
     <Compile Include="MCP\ServerProxy\VS\Tools\VisualStudioMcpServerTool.cs" />
     <Compile Include="MCP\ServerProxy\VS\VisualStudioMcpServerProxy.cs" />
     <Compile Include="MCP\AvailableToolContainer.cs" />
-    <Compile Include="NLOutline\Json\Objects.cs" />
     <Compile Include="NLOutline\NaturalLanguageOutline.cs" />
     <Compile Include="NLOutline\NaturalLanguageOutlineCollection.cs" />
     <Compile Include="NLOutline\Tree\Builder\File\FileScanner.cs" />
     <Compile Include="NLOutline\Tree\Builder\TreeBuilder.cs" />
-    <Compile Include="NLOutline\Tree\OutlineNode.cs" />
     <Compile Include="Options2\FreeAIrOptions.cs" />
     <Compile Include="Options2\Mcp\McpServersJson.cs" />
     <Compile Include="BLogic\DataPieceCache.cs" />
@@ -197,6 +197,7 @@
     <Compile Include="Options2\Support\StringEnumConverter.cs" />
     <Compile Include="Options2\Support\SupportCollectionJson.cs" />
     <Compile Include="Options2\Support\SupportScopeEnum.cs" />
+    <Compile Include="Options2\Rag\RagJson.cs" />
     <Compile Include="Options2\Unsorted\UnsortedJson.cs" />
     <Compile Include="Options\FontSizePage.cs" />
     <Compile Include="Options\FontSizeProxy.cs" />
@@ -322,6 +323,10 @@
     <Compile Include="UI\ToolWindows\NaturalLanguageResultsToolWindowControl.xaml.cs">
       <DependentUpon>NaturalLanguageResultsToolWindowControl.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UI\ToolWindows\RagCalibrationToolWindow.cs" />
+    <Compile Include="UI\ToolWindows\RagCalibrationToolWindowControl.xaml.cs">
+      <DependentUpon>RagCalibrationToolWindowControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI\ToolWindows\RelativeMaxHeightConverter.cs" />
     <Compile Include="UI\ViewModels\ActionConfigureViewModel.cs" />
     <Compile Include="UI\ViewModels\AddRelatedItemsToContextBackgroundTask.cs" />
@@ -334,6 +339,7 @@
     <Compile Include="UI\ViewModels\BuildNaturalLanguageOutlinesJsonFileToolViewModel.cs" />
     <Compile Include="UI\ViewModels\NaturalLanguageOutlinesViewModel.cs" />
     <Compile Include="UI\ViewModels\NaturalLanguageResultsViewModel.cs" />
+    <Compile Include="UI\ViewModels\RagCalibrationViewModel.cs" />
     <Compile Include="UI\ViewModels\OutlineEmbeddingOutputPanel.cs" />
     <Compile Include="UI\ViewModels\RenameChatViewModel.cs" />
     <Compile Include="UI\ViewModels\SearchForDockerMcpServerViewModel.cs" />
@@ -494,6 +500,10 @@
       <Project>{2F2E14EA-0DB3-1CC8-B8A2-D6C94D74026B}</Project>
       <Name>Dto</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Rag\FreeAIr.Rag.csproj">
+      <Project>{7B4E0C1F-9A2D-4C63-9E31-6D5F0B84A2E7}</Project>
+      <Name>FreeAIr.Rag</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Shared\FreeAIr.Shared.csproj">
       <Project>{e2646cf6-c92f-94ee-f875-5a7c18451b93}</Project>
       <Name>FreeAIr.Shared</Name>
@@ -554,6 +564,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UI\ToolWindows\NaturalLanguageOutlinesToolWindowControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\ToolWindows\RagCalibrationToolWindowControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

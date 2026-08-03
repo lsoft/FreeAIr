@@ -70,6 +70,10 @@ namespace FreeAIr.Options2.Unsorted
             set;
         } = false;
 
+        //the three RagTopOutlineCount / RagMaxFileCount / RagMinScore knobs used to live here and
+        //have moved into the `Rag` node of the settings, where they are joined by the calibration
+        //the threshold is now derived from
+
         public UnsortedJson()
         {
         }
@@ -83,6 +87,7 @@ namespace FreeAIr.Options2.Unsorted
                 PreferredUnitTestFramework = PreferredUnitTestFramework,
                 AutomaticSearchForContextItemsTimeoutMsec = AutomaticSearchForContextItemsTimeoutMsec,
                 GitHubToken = GitHubToken,
+                WholeLineCompletionAnchorName = WholeLineCompletionAnchorName,
                 IsImplicitWholeLineCompletionEnabled = IsImplicitWholeLineCompletionEnabled,
             };
         }

@@ -260,12 +260,45 @@ namespace FreeAIr.Find
             useRAGCheckBox.VerticalContentAlignment = findAllButton.VerticalContentAlignment;
             useRAGCheckBox.Height = findAllButton.ActualHeight;
             useRAGCheckBox.Content = FreeAIr.Resources.Resources.Use_RAG;
-            //userRAGCheckBox.ToolTip = "Use NLO embedding JSON files to narrow down search scope, if the files exists for this solution";
-            useRAGCheckBox.ToolTip = "DOES NOT IMPLEMENTED YET";
 
+            //the checkbox starts disabled and is enabled below if an index turns up: reading the
+            //solution folder cannot be done synchronously here, and offering a search which has
+            //nothing to search in is worse than a checkbox which lights up a moment later
             useRAGCheckBox.IsEnabled = false;
+            useRAGCheckBox.ToolTip = FreeAIr.Resources.Resources.RAG__there_is_no_index_short;
+
+            EnableUseRAGCheckBoxAsync(useRAGCheckBox)
+                .FileAndForget(nameof(EnableUseRAGCheckBoxAsync));
 
             return useRAGCheckBox;
+        }
+
+        /// <summary>
+        /// Enables the `Use RAG` checkbox when the solution has an embedding index, and tells the
+        /// user how old that index is — a search is only as good as the index behind it, and an
+        /// index built a month ago knows nothing about anything written since.
+        /// </summary>
+        private static async Task EnableUseRAGCheckBoxAsync(
+            CheckBox useRAGCheckBox
+            )
+        {
+            var metadata = await Embedding.EmbeddingIndexContainer.TryReadMetadataAsync();
+            if (metadata is null)
+            {
+                return;
+            }
+
+            await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+
+            useRAGCheckBox.IsEnabled = true;
+            useRAGCheckBox.ToolTip =
+                FreeAIr.Resources.Resources.RAG__narrows_the_search_down
+                + Environment.NewLine
+                + string.Format(
+                    FreeAIr.Resources.Resources.RAG__the_index_has_been_built__0_,
+                    metadata.GenerateDateTime.ToString("g")
+                    )
+                ;
         }
 
         private static Button CreateNaturalLanguageSearchButton(

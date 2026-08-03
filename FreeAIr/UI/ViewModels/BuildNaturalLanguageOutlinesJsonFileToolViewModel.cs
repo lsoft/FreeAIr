@@ -1,6 +1,7 @@
 ﻿using FreeAIr.Options2.Agent;
 using FreeAIr.Embedding;
 using FreeAIr.Embedding.Json;
+using FreeAIr.Find;
 using FreeAIr.Git;
 using FreeAIr.Git.Parser;
 using FreeAIr.Helper;
@@ -9,6 +10,7 @@ using FreeAIr.NLOutline.Tree.Builder;
 using FreeAIr.Shared.Helper;
 using FreeAIr.UI.NestedCheckBox;
 using FreeAIr.UI.Windows;
+using Microsoft.VisualStudio.ComponentModelHost;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Diagnostics;
@@ -641,19 +643,41 @@ namespace FreeAIr.UI.ViewModels
 
                     await ShowMessageAsync(outputPanel, FreeAIr.Resources.Resources.Start_embedding_generation);
 
-                    var eg = new EmbeddingGenerator(
-                        _embeddingAgent
+                    //one vectorizer for the whole build: the calibration below asks it which model
+                    //the server said it was, and that is only known after the first request
+                    var vectorizer = AgentEmbedding.CreateVectorizer(_embeddingAgent);
+
+                    var eg = new OutlineEmbedder(
+                        vectorizer
                         );
                     await eg.GenerateEmbeddingsAsync(
                         outlineRoot,
                         _cancellationTokenSource.Token
                         );
 
-                    var jsonObject = new EmbeddingOutlineJsonObject(outlineRoot);
+                    var jsonObject = new EmbeddingOutlineJsonObject(
+                        outlineRoot,
+                        _embeddingAgent.Name,
+                        _embeddingAgent.Technical.ChosenModel,
+                        _embeddingAgent.Technical.Endpoint
+                        );
+
+                    await CalibrateAsync(
+                        jsonObject,
+                        vectorizer,
+                        outputPanel,
+                        _cancellationTokenSource.Token
+                        );
+
                     await jsonObject.SerializeAsync(
                         _jsonFilePath,
                         CancellationToken.None //cannot be stopped in the middle!
                         );
+
+                    //the cache keys itself on the write time of the files, so it would notice on
+                    //its own; this is about releasing the megabytes of the previous index now
+                    //rather than at the next search
+                    (await GetIndexContainerAsync()).Invalidate();
 
                     await ShowMessageAsync(outputPanel, FreeAIr.Resources.Resources.Process_SUCESSFULLY_completed);
                     //await outputPane.HideAsync();
@@ -686,6 +710,90 @@ namespace FreeAIr.UI.ViewModels
         {
             SetNewStatus(message);
             await panel.WriteLineAsync(message);
+        }
+
+        /// <summary>
+        /// Measures where this model's similarity lies on this solution and stores the numbers in
+        /// the index, so that the search has a threshold which means the same thing whichever
+        /// embedding model the user has chosen. Also writes down the fingerprint of the model, so
+        /// that a search with another one is refused instead of silently returning noise.
+        ///
+        /// A failure here is reported and swallowed: an index without calibration is a working
+        /// index — the search simply applies no threshold to it — and losing an hour of embedding
+        /// over a hiccup of the server at the very end of it would not be a fair trade.
+        /// </summary>
+        private async Task CalibrateAsync(
+            EmbeddingOutlineJsonObject jsonObject,
+            IEmbeddingVectorizer vectorizer,
+            OutputWindowPane outputPanel,
+            CancellationToken cancellationToken
+            )
+        {
+            await ShowMessageAsync(outputPanel, FreeAIr.Resources.Resources.RAG__calibrating_the_index);
+
+            var rag = await FreeAIrOptions.DeserializeRagAsync();
+
+            try
+            {
+                await RagCalibrator.ApplyToAsync(
+                    jsonObject,
+                    vectorizer,
+                    AgentEmbedding.CreateCalibrationProbes(rag),
+                    cancellationToken
+                    );
+            }
+            catch (OperationCanceledException)
+            {
+                throw;
+            }
+            catch (Exception excp)
+            {
+                await outputPanel.WriteLineAsync(
+                    string.Format(
+                        FreeAIr.Resources.Resources.RAG__calibration_failed__0_,
+                        excp.Message
+                        )
+                    );
+                return;
+            }
+
+            var calibration = jsonObject.Calibration?.ToCalibration();
+            if (calibration is null)
+            {
+                return;
+            }
+
+            await outputPanel.WriteLineAsync(
+                string.Format(
+                    FreeAIr.Resources.Resources.RAG__calibrated__noise__0___threshold__1_,
+                    calibration.NoiseCeiling.ToString("F3"),
+                    calibration.ComputeThreshold(rag.Sensitivity).ToString("F3")
+                    )
+                );
+
+            if (calibration.RelevantMissCount > 0)
+            {
+                await outputPanel.WriteLineAsync(
+                    string.Format(
+                        FreeAIr.Resources.Resources.RAG__calibration__0__of__1__probes_missed,
+                        calibration.RelevantMissCount,
+                        calibration.RelevantProbeCount
+                        )
+                    );
+            }
+
+            if (!calibration.ModelSeparates)
+            {
+                //the one outcome no setting can rescue: the model scores nonsense as high as the
+                //answers the user has pointed at
+                await outputPanel.WriteLineAsync(
+                    string.Format(
+                        FreeAIr.Resources.Resources.RAG__calibration_model_does_not_separate,
+                        calibration.RelevantFloor.ToString("F3"),
+                        calibration.NoiseCeiling.ToString("F3")
+                        )
+                    );
+            }
         }
 
         private async Task<(HashSet<string>? checkedPaths, OutlineNode? existingOutlineRoot)> GetExistingInformationAsync(
@@ -746,11 +854,25 @@ namespace FreeAIr.UI.ViewModels
                 ProcessItem(checkedPaths, root);
             }
 
-            var existingOutlineRoot = await OutlineNode.TryCreateAsync(
-                true
+            //with the vectors: the whole point of an incremental rebuild is to reuse the outlines
+            //of the untouched files together with the embeddings already paid for
+            var existingOutlineRoot = await (await GetIndexContainerAsync()).GetOutlineTreeAsync(
+                true,
+                cancellationToken: _cancellationTokenSource.Token
                 );
 
+            //the container reads the index on a background thread and leaves the caller there,
+            //while the rest of the rebuild walks the solution
+            await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync(_cancellationTokenSource.Token);
+
             return (checkedPaths, existingOutlineRoot);
+        }
+
+        private static async Task<EmbeddingIndexContainer> GetIndexContainerAsync(
+            )
+        {
+            var componentModel = (IComponentModel)await FreeAIrPackage.Instance.GetServiceAsync(typeof(SComponentModel));
+            return componentModel.GetService<EmbeddingIndexContainer>();
         }
     }
 

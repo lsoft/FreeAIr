@@ -44,6 +44,7 @@ namespace FreeAIr
     [ProvideToolWindow(typeof(NaturalLanguageResultsToolWindow.Pane), Style = VsDockStyle.Tabbed, Window = WindowGuids.DocumentWell)]
     [ProvideToolWindow(typeof(NaturalLanguageOutlinesToolWindow.Pane), Style = VsDockStyle.Tabbed, Window = WindowGuids.DocumentWell)]
     [ProvideToolWindow(typeof(BuildNaturalLanguageOutlinesJsonFileToolWindow.Pane), Style = VsDockStyle.Tabbed, Window = WindowGuids.DocumentWell)]
+    [ProvideToolWindow(typeof(RagCalibrationToolWindow.Pane), Style = VsDockStyle.Tabbed, Window = WindowGuids.DocumentWell)]
     [ProvideService(typeof(VisualStudioContextMenuCommandBridge), IsAsyncQueryable = true)]
     public sealed class FreeAIrPackage : ToolkitPackage
     {

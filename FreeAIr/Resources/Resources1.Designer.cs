@@ -1890,5 +1890,698 @@ namespace FreeAIr.Resources {
                 return ResourceManager.GetString("You_can_dictate_prompts", resourceCulture);
             }
         }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Loading the NLO index... {0}/{1} MB.
+        /// </summary>
+        public static string RAG__loading_the_index__0___1_MB {
+            get {
+                return ResourceManager.GetString("RAG__loading_the_index__0___1_MB", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Preparing the NLO index....
+        /// </summary>
+        public static string RAG__preparing_the_index {
+            get {
+                return ResourceManager.GetString("RAG__preparing_the_index", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Vectorizing the query....
+        /// </summary>
+        public static string RAG__vectorizing_the_query {
+            get {
+                return ResourceManager.GetString("RAG__vectorizing_the_query", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Ranking {0} outlines....
+        /// </summary>
+        public static string RAG__ranking__0__outlines {
+            get {
+                return ResourceManager.GetString("RAG__ranking__0__outlines", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Selected {0} files of {1}.
+        /// </summary>
+        public static string RAG__selected__0__files_of__1_ {
+            get {
+                return ResourceManager.GetString("RAG__selected__0__files_of__1_", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to There is no NLO embedding index for this solution. Build it with the &apos;Build natural language outlines&apos; command, or search with the &apos;Use RAG&apos; checkbox off..
+        /// </summary>
+        public static string RAG__there_is_no_index {
+            get {
+                return ResourceManager.GetString("RAG__there_is_no_index", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to No file of the index is close enough to the query. Lower &apos;Sensitivity&apos; in the &apos;Rag&apos; node of the options json, or search with the &apos;Use RAG&apos; checkbox off..
+        /// </summary>
+        public static string RAG__nothing_matched_the_query {
+            get {
+                return ResourceManager.GetString("RAG__nothing_matched_the_query", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to The chosen agent produces vectors of {0} numbers, while the index stores vectors of {1}. These are different models and cannot be compared: choose the agent the index has been built with..
+        /// </summary>
+        public static string RAG__the_agent_does_not_match {
+            get {
+                return ResourceManager.GetString("RAG__the_agent_does_not_match", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Choose the agent whose embedding model has built the NLO index:.
+        /// </summary>
+        public static string RAG__choose_the_embedding_agent {
+            get {
+                return ResourceManager.GetString("RAG__choose_the_embedding_agent", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to {0} file(s) out of the index.
+        /// </summary>
+        public static string RAG___0__files_are_out_of_the_index {
+            get {
+                return ResourceManager.GetString("RAG___0__files_are_out_of_the_index", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to These files are not covered by the NLO index, so the search does not look into them. Rebuild the index to include them:.
+        /// </summary>
+        public static string RAG__these_files_are_not_covered {
+            get {
+                return ResourceManager.GetString("RAG__these_files_are_not_covered", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to NLO index of {0}, model {1}.
+        /// </summary>
+        public static string RAG__index_of__0___model__1_ {
+            get {
+                return ResourceManager.GetString("RAG__index_of__0___model__1_", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Narrows the search down to the files whose natural language outlines are the closest to the query, instead of asking the LLM about every file of the solution. Much cheaper and faster, but a file which is not in the index is never found..
+        /// </summary>
+        public static string RAG__narrows_the_search_down {
+            get {
+                return ResourceManager.GetString("RAG__narrows_the_search_down", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to The index has been built {0}..
+        /// </summary>
+        public static string RAG__the_index_has_been_built__0_ {
+            get {
+                return ResourceManager.GetString("RAG__the_index_has_been_built__0_", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to There is no NLO embedding index for this solution: build it with the &apos;Build natural language outlines&apos; command to enable this checkbox..
+        /// </summary>
+        public static string RAG__there_is_no_index_short {
+            get {
+                return ResourceManager.GetString("RAG__there_is_no_index_short", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Found {0} items:.
+        /// </summary>
+        public static string Found__0__items_ {
+            get {
+                return ResourceManager.GetString("Found__0__items_", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Calibrating the index....
+        /// </summary>
+        public static string RAG__calibrating_the_index {
+            get {
+                return ResourceManager.GetString("RAG__calibrating_the_index", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to The index has been calibrated: nonsense reaches {0} on this model, so the search takes a file from {1}..
+        /// </summary>
+        public static string RAG__calibrated__noise__0___threshold__1_ {
+            get {
+                return ResourceManager.GetString("RAG__calibrated__noise__0___threshold__1_", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to {0} of {1} queries with a known answer did not find the file they name..
+        /// </summary>
+        public static string RAG__calibration__0__of__1__probes_missed {
+            get {
+                return ResourceManager.GetString("RAG__calibration__0__of__1__probes_missed", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to This embedding model does not tell your solution apart: a query with a known answer scores {0}, while a query about nothing reaches {1}. No threshold helps here - try another embedding model..
+        /// </summary>
+        public static string RAG__calibration_model_does_not_separate {
+            get {
+                return ResourceManager.GetString("RAG__calibration_model_does_not_separate", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to The index has been built, but could not be calibrated: {0}. The search will apply no threshold to it..
+        /// </summary>
+        public static string RAG__calibration_failed__0_ {
+            get {
+                return ResourceManager.GetString("RAG__calibration_failed__0_", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to The index has been built by a different embedding model: the check sentences agree only by {0}. Rebuild the index, or search with the agent it has been built with..
+        /// </summary>
+        public static string RAG__another_model_built_the_index__0_ {
+            get {
+                return ResourceManager.GetString("RAG__another_model_built_the_index__0_", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to FreeAIr RAG calibration.
+        /// </summary>
+        public static string RAG_calibration__window_title {
+            get {
+                return ResourceManager.GetString("RAG_calibration__window_title", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Index of {0}, model {1}, the server calls it {2}. {3} outlines of {4} numbers each..
+        /// </summary>
+        public static string RAG_calibration__index_summary {
+            get {
+                return ResourceManager.GetString("RAG_calibration__index_summary", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to This index has never been calibrated: the search applies no threshold to it and passes every file it ranks..
+        /// </summary>
+        public static string RAG_calibration__not_calibrated {
+            get {
+                return ResourceManager.GetString("RAG_calibration__not_calibrated", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Noise {0}, threshold {1} at sensitivity {2}. Measured on {3} unanswerable and {4} answered queries..
+        /// </summary>
+        public static string RAG_calibration__summary {
+            get {
+                return ResourceManager.GetString("RAG_calibration__summary", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Ask.
+        /// </summary>
+        public static string RAG_calibration__probe {
+            get {
+                return ResourceManager.GetString("RAG_calibration__probe", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Mark the file which answers the query, or say that nothing here does. Both teach the threshold, and the second one teaches it more..
+        /// </summary>
+        public static string RAG_calibration__probe_hint {
+            get {
+                return ResourceManager.GetString("RAG_calibration__probe_hint", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to this answers it.
+        /// </summary>
+        public static string RAG_calibration__mark_as_answer {
+            get {
+                return ResourceManager.GetString("RAG_calibration__mark_as_answer", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to nothing answers this.
+        /// </summary>
+        public static string RAG_calibration__mark_as_hopeless {
+            get {
+                return ResourceManager.GetString("RAG_calibration__mark_as_hopeless", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Queries the threshold is measured with.
+        /// </summary>
+        public static string RAG_calibration__queries_header {
+            get {
+                return ResourceManager.GetString("RAG_calibration__queries_header", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to An empty file means the solution cannot answer this query at all. A path is taken relative to the solution folder..
+        /// </summary>
+        public static string RAG_calibration__expected_path_hint {
+            get {
+                return ResourceManager.GetString("RAG_calibration__expected_path_hint", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Sensitivity.
+        /// </summary>
+        public static string RAG_calibration__sensitivity {
+            get {
+                return ResourceManager.GetString("RAG_calibration__sensitivity", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Recalculate.
+        /// </summary>
+        public static string RAG_calibration__recalculate {
+            get {
+                return ResourceManager.GetString("RAG_calibration__recalculate", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Save.
+        /// </summary>
+        public static string RAG_calibration__save {
+            get {
+                return ResourceManager.GetString("RAG_calibration__save", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Reload.
+        /// </summary>
+        public static string RAG_calibration__reload {
+            get {
+                return ResourceManager.GetString("RAG_calibration__reload", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to remove.
+        /// </summary>
+        public static string RAG_calibration__remove {
+            get {
+                return ResourceManager.GetString("RAG_calibration__remove", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to answered.
+        /// </summary>
+        public static string RAG_calibration__kind_answered {
+            get {
+                return ResourceManager.GetString("RAG_calibration__kind_answered", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to no answer.
+        /// </summary>
+        public static string RAG_calibration__kind_hopeless {
+            get {
+                return ResourceManager.GetString("RAG_calibration__kind_hopeless", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to passes.
+        /// </summary>
+        public static string RAG_calibration__passes {
+            get {
+                return ResourceManager.GetString("RAG_calibration__passes", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to cut off.
+        /// </summary>
+        public static string RAG_calibration__cut_off {
+            get {
+                return ResourceManager.GetString("RAG_calibration__cut_off", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to {0} file(s) found, the threshold of this index is {1}..
+        /// </summary>
+        public static string RAG_calibration__probed__0__files {
+            get {
+                return ResourceManager.GetString("RAG_calibration__probed__0__files", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to The index has nothing at all for this query..
+        /// </summary>
+        public static string RAG_calibration__nothing_found {
+            get {
+                return ResourceManager.GetString("RAG_calibration__nothing_found", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Measuring the queries against the index....
+        /// </summary>
+        public static string RAG_calibration__recalculating {
+            get {
+                return ResourceManager.GetString("RAG_calibration__recalculating", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Measured. Nothing has been saved yet..
+        /// </summary>
+        public static string RAG_calibration__recalculated {
+            get {
+                return ResourceManager.GetString("RAG_calibration__recalculated", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to There is nothing to measure: the index is empty, or every query has been left blank..
+        /// </summary>
+        public static string RAG_calibration__nothing_to_measure {
+            get {
+                return ResourceManager.GetString("RAG_calibration__nothing_to_measure", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Saving....
+        /// </summary>
+        public static string RAG_calibration__saving {
+            get {
+                return ResourceManager.GetString("RAG_calibration__saving", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to The queries went into {0}, the measured numbers into the index. The search uses them from now on..
+        /// </summary>
+        public static string RAG_calibration__saved__0_ {
+            get {
+                return ResourceManager.GetString("RAG_calibration__saved__0_", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to The queries went into {0}. The index has been left alone: press &apos;Recalculate&apos; first to store the numbers in it..
+        /// </summary>
+        public static string RAG_calibration__saved_settings_only__0_ {
+            get {
+                return ResourceManager.GetString("RAG_calibration__saved_settings_only__0_", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to The query has been added to the list below. It will be reused by every later index build..
+        /// </summary>
+        public static string RAG_calibration__query_added {
+            get {
+                return ResourceManager.GetString("RAG_calibration__query_added", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to This query was already in the list; its answer has been replaced..
+        /// </summary>
+        public static string RAG_calibration__query_replaced {
+            get {
+                return ResourceManager.GetString("RAG_calibration__query_replaced", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to No agent to vectorize the query with, so nothing can be measured..
+        /// </summary>
+        public static string RAG_calibration__no_agent {
+            get {
+                return ResourceManager.GetString("RAG_calibration__no_agent", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Agent....
+        /// </summary>
+        public static string RAG_calibration__change_agent {
+            get {
+                return ResourceManager.GetString("RAG_calibration__change_agent", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Asking agent &apos;{0}&apos;: model {1} at {2}..
+        /// </summary>
+        public static string RAG_calibration__agent__0___1___2_ {
+            get {
+                return ResourceManager.GetString("RAG_calibration__agent__0___1___2_", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to The index was built by agent &apos;{0}&apos;, which the settings no longer have. Press &apos;Agent...&apos; to pick another one..
+        /// </summary>
+        public static string RAG_calibration__agent_not_found__0_ {
+            get {
+                return ResourceManager.GetString("RAG_calibration__agent_not_found__0_", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to The index does not say which agent built it. Press &apos;Agent...&apos; to pick one..
+        /// </summary>
+        public static string RAG_calibration__agent_unknown {
+            get {
+                return ResourceManager.GetString("RAG_calibration__agent_unknown", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to This window measures the similarity threshold of the `Use RAG` search instead of leaving you to guess it. Everything happens against the index which is already on disk, and the vectors are never rebuilt..
+        /// </summary>
+        public static string RAG_calibration__help_10 {
+            get {
+                return ResourceManager.GetString("RAG_calibration__help_10", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to The blue line above names the agent every request goes through. It has to be the model which built the index; a different one is refused rather than measured, because its numbers would mean nothing. `Agent...` picks another one..
+        /// </summary>
+        public static string RAG_calibration__help_20 {
+            get {
+                return ResourceManager.GetString("RAG_calibration__help_20", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Type a question the way you would type it into the natural language search and press `Ask` or Enter. The files the index offers are listed with their score, including the ones the current threshold would cut off - a threshold can only be judged by what it throws away..
+        /// </summary>
+        public static string RAG_calibration__help_30 {
+            get {
+                return ResourceManager.GetString("RAG_calibration__help_30", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Press `this answers it` next to the file which really answers the question, or `nothing answers this` when the solution cannot answer it at all. Both kinds are needed: the unanswerable ones show how high pure noise climbs on your model, the answered ones stop the threshold from climbing over a file you know is right..
+        /// </summary>
+        public static string RAG_calibration__help_40 {
+            get {
+                return ResourceManager.GetString("RAG_calibration__help_40", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to The query lands in the list at the bottom, which is the whole input of the measurement. You can edit it by hand there: the left field is the question, the right one is the file which answers it, relative to the solution folder. Leave the file empty to say that nothing answers the question. Enter commits an edited field..
+        /// </summary>
+        public static string RAG_calibration__help_50 {
+            get {
+                return ResourceManager.GetString("RAG_calibration__help_50", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to `Sensitivity` is how far above the measured noise a file has to stand, as a share of the room between that noise and a perfect match: 0.1 is generous, 0.2 is the default, 0.35 is strict. Changing it re-reads the same measurement and asks the model nothing..
+        /// </summary>
+        public static string RAG_calibration__help_60 {
+            get {
+                return ResourceManager.GetString("RAG_calibration__help_60", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to `Recalculate` measures the queries against the index and shows the noise and the threshold they give. It writes nothing anywhere, so press it as often as you like..
+        /// </summary>
+        public static string RAG_calibration__help_70 {
+            get {
+                return ResourceManager.GetString("RAG_calibration__help_70", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to `Save` puts the queries into the settings file, where every later index build reuses them, and the measured numbers into the index itself - only its small metadata file is rewritten. `Reload` rereads the index and the settings, `Cancel` stops whatever is running..
+        /// </summary>
+        public static string RAG_calibration__help_80 {
+            get {
+                return ResourceManager.GetString("RAG_calibration__help_80", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to What this window is and how to use it.
+        /// </summary>
+        public static string Help_header_what_this_window_is {
+            get {
+                return ResourceManager.GetString("Help_header_what_this_window_is", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Cancel.
+        /// </summary>
+        public static string RAG_calibration__cancel {
+            get {
+                return ResourceManager.GetString("RAG_calibration__cancel", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Calibration is a sample, not a catalogue: five or ten queries are enough, and there is no need to add every question you are ever going to ask. The threshold is one number for the whole index, and a handful of honest queries pins it down as well as a hundred would. The search works without any calibration at all - it then applies no threshold and passes every file it ranked..
+        /// </summary>
+        public static string RAG_calibration__help_15 {
+            get {
+                return ResourceManager.GetString("RAG_calibration__help_15", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to FreeAIr natural language search.
+        /// </summary>
+        public static string FreeAIr_natural_language_search {
+            get {
+                return ResourceManager.GetString("FreeAIr_natural_language_search", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to No action with the NaturalLanguageSearch scope is configured, so there is no prompt to ask the model with. Add one in the FreeAIr control center..
+        /// </summary>
+        public static string Search__no_action_is_configured {
+            get {
+                return ResourceManager.GetString("Search__no_action_is_configured", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to No agent with a token has been found, and the search needs one to talk to a model. Set a token for the agent you want to search with in the FreeAIr control center..
+        /// </summary>
+        public static string Search__no_agent_with_a_token {
+            get {
+                return ResourceManager.GetString("Search__no_agent_with_a_token", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to There is nothing to search in: either no solution is open, or the scope is the current project and there is no active one..
+        /// </summary>
+        public static string Search__there_is_nothing_to_search_in {
+            get {
+                return ResourceManager.GetString("Search__there_is_nothing_to_search_in", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to The chat with the agent could not be started, so the search has not run..
+        /// </summary>
+        public static string Search__the_chat_has_not_started {
+            get {
+                return ResourceManager.GetString("Search__the_chat_has_not_started", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Answers the query: {0} ({1}, model {2}).
+        /// </summary>
+        public static string Search__agent__0___1___2_ {
+            get {
+                return ResourceManager.GetString("Search__agent__0___1___2_", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Vectorizes the query: {0} ({1}).
+        /// </summary>
+        public static string Search__embedding_agent__0___1_ {
+            get {
+                return ResourceManager.GetString("Search__embedding_agent__0___1_", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to High.
+        /// </summary>
+        public static string Confidence__high {
+            get {
+                return ResourceManager.GetString("Confidence__high", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Medium.
+        /// </summary>
+        public static string Confidence__medium {
+            get {
+                return ResourceManager.GetString("Confidence__medium", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Low.
+        /// </summary>
+        public static string Confidence__low {
+            get {
+                return ResourceManager.GetString("Confidence__low", resourceCulture);
+            }
+        }
     }
 }

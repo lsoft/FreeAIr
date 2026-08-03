@@ -898,4 +898,312 @@ Post-processing is the processing of a recognized prompt via an LLM call. For ex
     <value>No active agents found. Make sure at least one agent have non-empty token. Fake tokens are allowed for local LLM.</value>
     <comment>Used in FreeAIr\UI\ViewModels\ControlCenterViewModel.cs document</comment>
   </data>
+  <data name="RAG__loading_the_index__0___1_MB" xml:space="preserve">
+    <value>Loading the NLO index... {0}/{1} MB</value>
+    <comment>Used in FreeAIr\UI\ViewModels\NaturalLanguageResultsViewModel.cs document</comment>
+  </data>
+  <data name="RAG__preparing_the_index" xml:space="preserve">
+    <value>Preparing the NLO index...</value>
+    <comment>Used in FreeAIr\UI\ViewModels\NaturalLanguageResultsViewModel.cs document</comment>
+  </data>
+  <data name="RAG__vectorizing_the_query" xml:space="preserve">
+    <value>Vectorizing the query...</value>
+    <comment>Used in FreeAIr\UI\ViewModels\NaturalLanguageResultsViewModel.cs document</comment>
+  </data>
+  <data name="RAG__ranking__0__outlines" xml:space="preserve">
+    <value>Ranking {0} outlines...</value>
+    <comment>Used in FreeAIr\UI\ViewModels\NaturalLanguageResultsViewModel.cs document</comment>
+  </data>
+  <data name="RAG__selected__0__files_of__1_" xml:space="preserve">
+    <value>Selected {0} files of {1}</value>
+    <comment>Used in FreeAIr\UI\ViewModels\NaturalLanguageResultsViewModel.cs document</comment>
+  </data>
+  <data name="RAG__there_is_no_index" xml:space="preserve">
+    <value>There is no NLO embedding index for this solution. Build it with the 'Build natural language outlines' command, or search with the 'Use RAG' checkbox off.</value>
+    <comment>Used in FreeAIr\UI\ViewModels\NaturalLanguageResultsViewModel.cs document</comment>
+  </data>
+  <data name="RAG__nothing_matched_the_query" xml:space="preserve">
+    <value>No file of the index is close enough to the query. Lower 'Sensitivity' in the 'Rag' node of the options json, or search with the 'Use RAG' checkbox off.</value>
+    <comment>Used in FreeAIr\UI\ViewModels\NaturalLanguageResultsViewModel.cs document</comment>
+  </data>
+  <data name="RAG__the_agent_does_not_match" xml:space="preserve">
+    <value>The chosen agent produces vectors of {0} numbers, while the index stores vectors of {1}. These are different models and cannot be compared: choose the agent the index has been built with.</value>
+    <comment>Used in FreeAIr\UI\ViewModels\NaturalLanguageResultsViewModel.cs document</comment>
+  </data>
+  <data name="RAG__choose_the_embedding_agent" xml:space="preserve">
+    <value>Choose the agent whose embedding model has built the NLO index:</value>
+    <comment>Used in FreeAIr\Find\DoSearch.cs document</comment>
+  </data>
+  <data name="RAG___0__files_are_out_of_the_index" xml:space="preserve">
+    <value>{0} file(s) out of the index</value>
+    <comment>Used in FreeAIr\UI\ViewModels\NaturalLanguageResultsViewModel.cs document</comment>
+  </data>
+  <data name="RAG__these_files_are_not_covered" xml:space="preserve">
+    <value>These files are not covered by the NLO index, so the search does not look into them. Rebuild the index to include them:</value>
+    <comment>Used in FreeAIr\UI\ViewModels\NaturalLanguageResultsViewModel.cs document</comment>
+  </data>
+  <data name="RAG__index_of__0___model__1_" xml:space="preserve">
+    <value>NLO index of {0}, model {1}</value>
+    <comment>Used in FreeAIr\UI\ViewModels\NaturalLanguageResultsViewModel.cs document</comment>
+  </data>
+  <data name="RAG__narrows_the_search_down" xml:space="preserve">
+    <value>Narrows the search down to the files whose natural language outlines are the closest to the query, instead of asking the LLM about every file of the solution. Much cheaper and faster, but a file which is not in the index is never found.</value>
+    <comment>Used in FreeAIr\Find\FindWindowModifier.cs document</comment>
+  </data>
+  <data name="RAG__the_index_has_been_built__0_" xml:space="preserve">
+    <value>The index has been built {0}.</value>
+    <comment>Used in FreeAIr\Find\FindWindowModifier.cs document</comment>
+  </data>
+  <data name="RAG__there_is_no_index_short" xml:space="preserve">
+    <value>There is no NLO embedding index for this solution: build it with the 'Build natural language outlines' command to enable this checkbox.</value>
+    <comment>Used in FreeAIr\Find\FindWindowModifier.cs document</comment>
+  </data>
+  <data name="Found__0__items_" xml:space="preserve">
+    <value>Found {0} items:</value>
+    <comment>Used in FreeAIr\UI\ViewModels\NaturalLanguageResultsViewModel.cs document</comment>
+  </data>
+  <data name="RAG__calibrating_the_index" xml:space="preserve">
+    <value>Calibrating the index...</value>
+    <comment>Used in FreeAIr\UI\ViewModels document</comment>
+  </data>
+  <data name="RAG__calibrated__noise__0___threshold__1_" xml:space="preserve">
+    <value>The index has been calibrated: nonsense reaches {0} on this model, so the search takes a file from {1}.</value>
+    <comment>Used in FreeAIr\UI\ViewModels document</comment>
+  </data>
+  <data name="RAG__calibration__0__of__1__probes_missed" xml:space="preserve">
+    <value>{0} of {1} queries with a known answer did not find the file they name.</value>
+    <comment>Used in FreeAIr\UI\ViewModels document</comment>
+  </data>
+  <data name="RAG__calibration_model_does_not_separate" xml:space="preserve">
+    <value>This embedding model does not tell your solution apart: a query with a known answer scores {0}, while a query about nothing reaches {1}. No threshold helps here - try another embedding model.</value>
+    <comment>Used in FreeAIr\UI\ViewModels document</comment>
+  </data>
+  <data name="RAG__calibration_failed__0_" xml:space="preserve">
+    <value>The index has been built, but could not be calibrated: {0}. The search will apply no threshold to it.</value>
+    <comment>Used in FreeAIr\UI\ViewModels document</comment>
+  </data>
+  <data name="RAG__another_model_built_the_index__0_" xml:space="preserve">
+    <value>The index has been built by a different embedding model: the check sentences agree only by {0}. Rebuild the index, or search with the agent it has been built with.</value>
+    <comment>Used in FreeAIr\UI\ViewModels document</comment>
+  </data>
+  <data name="RAG_calibration__window_title" xml:space="preserve">
+    <value>FreeAIr RAG calibration</value>
+    <comment>Used in FreeAIr\UI\ViewModels document</comment>
+  </data>
+  <data name="RAG_calibration__index_summary" xml:space="preserve">
+    <value>Index of {0}, model {1}, the server calls it {2}. {3} outlines of {4} numbers each.</value>
+    <comment>Used in FreeAIr\UI\ViewModels document</comment>
+  </data>
+  <data name="RAG_calibration__not_calibrated" xml:space="preserve">
+    <value>This index has never been calibrated: the search applies no threshold to it and passes every file it ranks.</value>
+    <comment>Used in FreeAIr\UI\ViewModels document</comment>
+  </data>
+  <data name="RAG_calibration__summary" xml:space="preserve">
+    <value>Noise {0}, threshold {1} at sensitivity {2}. Measured on {3} unanswerable and {4} answered queries.</value>
+    <comment>Used in FreeAIr\UI\ViewModels document</comment>
+  </data>
+  <data name="RAG_calibration__probe" xml:space="preserve">
+    <value>Ask</value>
+    <comment>Used in FreeAIr\UI\ViewModels document</comment>
+  </data>
+  <data name="RAG_calibration__probe_hint" xml:space="preserve">
+    <value>Mark the file which answers the query, or say that nothing here does. Both teach the threshold, and the second one teaches it more.</value>
+    <comment>Used in FreeAIr\UI\ViewModels document</comment>
+  </data>
+  <data name="RAG_calibration__mark_as_answer" xml:space="preserve">
+    <value>this answers it</value>
+    <comment>Used in FreeAIr\UI\ViewModels document</comment>
+  </data>
+  <data name="RAG_calibration__mark_as_hopeless" xml:space="preserve">
+    <value>nothing answers this</value>
+    <comment>Used in FreeAIr\UI\ViewModels document</comment>
+  </data>
+  <data name="RAG_calibration__queries_header" xml:space="preserve">
+    <value>Queries the threshold is measured with</value>
+    <comment>Used in FreeAIr\UI\ViewModels document</comment>
+  </data>
+  <data name="RAG_calibration__expected_path_hint" xml:space="preserve">
+    <value>An empty file means the solution cannot answer this query at all. A path is taken relative to the solution folder.</value>
+    <comment>Used in FreeAIr\UI\ViewModels document</comment>
+  </data>
+  <data name="RAG_calibration__sensitivity" xml:space="preserve">
+    <value>Sensitivity</value>
+    <comment>Used in FreeAIr\UI\ViewModels document</comment>
+  </data>
+  <data name="RAG_calibration__recalculate" xml:space="preserve">
+    <value>Recalculate</value>
+    <comment>Used in FreeAIr\UI\ViewModels document</comment>
+  </data>
+  <data name="RAG_calibration__save" xml:space="preserve">
+    <value>Save</value>
+    <comment>Used in FreeAIr\UI\ViewModels document</comment>
+  </data>
+  <data name="RAG_calibration__reload" xml:space="preserve">
+    <value>Reload</value>
+    <comment>Used in FreeAIr\UI\ViewModels document</comment>
+  </data>
+  <data name="RAG_calibration__remove" xml:space="preserve">
+    <value>remove</value>
+    <comment>Used in FreeAIr\UI\ViewModels document</comment>
+  </data>
+  <data name="RAG_calibration__kind_answered" xml:space="preserve">
+    <value>answered</value>
+    <comment>Used in FreeAIr\UI\ViewModels document</comment>
+  </data>
+  <data name="RAG_calibration__kind_hopeless" xml:space="preserve">
+    <value>no answer</value>
+    <comment>Used in FreeAIr\UI\ViewModels document</comment>
+  </data>
+  <data name="RAG_calibration__passes" xml:space="preserve">
+    <value>passes</value>
+    <comment>Used in FreeAIr\UI\ViewModels document</comment>
+  </data>
+  <data name="RAG_calibration__cut_off" xml:space="preserve">
+    <value>cut off</value>
+    <comment>Used in FreeAIr\UI\ViewModels document</comment>
+  </data>
+  <data name="RAG_calibration__probed__0__files" xml:space="preserve">
+    <value>{0} file(s) found, the threshold of this index is {1}.</value>
+    <comment>Used in FreeAIr\UI\ViewModels document</comment>
+  </data>
+  <data name="RAG_calibration__nothing_found" xml:space="preserve">
+    <value>The index has nothing at all for this query.</value>
+    <comment>Used in FreeAIr\UI\ViewModels document</comment>
+  </data>
+  <data name="RAG_calibration__recalculating" xml:space="preserve">
+    <value>Measuring the queries against the index...</value>
+    <comment>Used in FreeAIr\UI\ViewModels document</comment>
+  </data>
+  <data name="RAG_calibration__recalculated" xml:space="preserve">
+    <value>Measured. Nothing has been saved yet.</value>
+    <comment>Used in FreeAIr\UI\ViewModels document</comment>
+  </data>
+  <data name="RAG_calibration__nothing_to_measure" xml:space="preserve">
+    <value>There is nothing to measure: the index is empty, or every query has been left blank.</value>
+    <comment>Used in FreeAIr\UI\ViewModels document</comment>
+  </data>
+  <data name="RAG_calibration__saving" xml:space="preserve">
+    <value>Saving...</value>
+    <comment>Used in FreeAIr\UI\ViewModels document</comment>
+  </data>
+  <data name="RAG_calibration__saved__0_" xml:space="preserve">
+    <value>The queries went into {0}, the measured numbers into the index. The search uses them from now on.</value>
+    <comment>Used in FreeAIr\UI\ViewModels document</comment>
+  </data>
+  <data name="RAG_calibration__saved_settings_only__0_" xml:space="preserve">
+    <value>The queries went into {0}. The index has been left alone: press 'Recalculate' first to store the numbers in it.</value>
+    <comment>Used in FreeAIr\UI\ViewModels document</comment>
+  </data>
+  <data name="RAG_calibration__query_added" xml:space="preserve">
+    <value>The query has been added to the list below. It will be reused by every later index build.</value>
+    <comment>Used in FreeAIr\UI\ViewModels document</comment>
+  </data>
+  <data name="RAG_calibration__query_replaced" xml:space="preserve">
+    <value>This query was already in the list; its answer has been replaced.</value>
+    <comment>Used in FreeAIr\UI\ViewModels document</comment>
+  </data>
+  <data name="RAG_calibration__no_agent" xml:space="preserve">
+    <value>No agent to vectorize the query with, so nothing can be measured.</value>
+    <comment>Used in FreeAIr\UI\ViewModels document</comment>
+  </data>
+  <data name="RAG_calibration__change_agent" xml:space="preserve">
+    <value>Agent...</value>
+    <comment>Used in FreeAIr\UI\ViewModels document</comment>
+  </data>
+  <data name="RAG_calibration__agent__0___1___2_" xml:space="preserve">
+    <value>Asking agent '{0}': model {1} at {2}.</value>
+    <comment>Used in FreeAIr\UI\ViewModels document</comment>
+  </data>
+  <data name="RAG_calibration__agent_not_found__0_" xml:space="preserve">
+    <value>The index was built by agent '{0}', which the settings no longer have. Press 'Agent...' to pick another one.</value>
+    <comment>Used in FreeAIr\UI\ViewModels document</comment>
+  </data>
+  <data name="RAG_calibration__agent_unknown" xml:space="preserve">
+    <value>The index does not say which agent built it. Press 'Agent...' to pick one.</value>
+    <comment>Used in FreeAIr\UI\ViewModels document</comment>
+  </data>
+  <data name="RAG_calibration__help_10" xml:space="preserve">
+    <value>This window measures the similarity threshold of the `Use RAG` search instead of leaving you to guess it. Everything happens against the index which is already on disk, and the vectors are never rebuilt.</value>
+    <comment>Used in FreeAIr\UI\ViewModels document</comment>
+  </data>
+  <data name="RAG_calibration__help_20" xml:space="preserve">
+    <value>The blue line above names the agent every request goes through. It has to be the model which built the index; a different one is refused rather than measured, because its numbers would mean nothing. `Agent...` picks another one.</value>
+    <comment>Used in FreeAIr\UI\ViewModels document</comment>
+  </data>
+  <data name="RAG_calibration__help_30" xml:space="preserve">
+    <value>Type a question the way you would type it into the natural language search and press `Ask` or Enter. The files the index offers are listed with their score, including the ones the current threshold would cut off - a threshold can only be judged by what it throws away.</value>
+    <comment>Used in FreeAIr\UI\ViewModels document</comment>
+  </data>
+  <data name="RAG_calibration__help_40" xml:space="preserve">
+    <value>Press `this answers it` next to the file which really answers the question, or `nothing answers this` when the solution cannot answer it at all. Both kinds are needed: the unanswerable ones show how high pure noise climbs on your model, the answered ones stop the threshold from climbing over a file you know is right.</value>
+    <comment>Used in FreeAIr\UI\ViewModels document</comment>
+  </data>
+  <data name="RAG_calibration__help_50" xml:space="preserve">
+    <value>The query lands in the list at the bottom, which is the whole input of the measurement. You can edit it by hand there: the left field is the question, the right one is the file which answers it, relative to the solution folder. Leave the file empty to say that nothing answers the question. Enter commits an edited field.</value>
+    <comment>Used in FreeAIr\UI\ViewModels document</comment>
+  </data>
+  <data name="RAG_calibration__help_60" xml:space="preserve">
+    <value>`Sensitivity` is how far above the measured noise a file has to stand, as a share of the room between that noise and a perfect match: 0.1 is generous, 0.2 is the default, 0.35 is strict. Changing it re-reads the same measurement and asks the model nothing.</value>
+    <comment>Used in FreeAIr\UI\ViewModels document</comment>
+  </data>
+  <data name="RAG_calibration__help_70" xml:space="preserve">
+    <value>`Recalculate` measures the queries against the index and shows the noise and the threshold they give. It writes nothing anywhere, so press it as often as you like.</value>
+    <comment>Used in FreeAIr\UI\ViewModels document</comment>
+  </data>
+  <data name="RAG_calibration__help_80" xml:space="preserve">
+    <value>`Save` puts the queries into the settings file, where every later index build reuses them, and the measured numbers into the index itself - only its small metadata file is rewritten. `Reload` rereads the index and the settings, `Cancel` stops whatever is running.</value>
+    <comment>Used in FreeAIr\UI\ViewModels document</comment>
+  </data>
+  <data name="Help_header_what_this_window_is" xml:space="preserve">
+    <value>What this window is and how to use it</value>
+    <comment>Used in FreeAIr\UI\ViewModels document</comment>
+  </data>
+  <data name="RAG_calibration__cancel" xml:space="preserve">
+    <value>Cancel</value>
+    <comment>Used in FreeAIr\UI\ViewModels document</comment>
+  </data>
+  <data name="RAG_calibration__help_15" xml:space="preserve">
+    <value>Calibration is a sample, not a catalogue: five or ten queries are enough, and there is no need to add every question you are ever going to ask. The threshold is one number for the whole index, and a handful of honest queries pins it down as well as a hundred would. The search works without any calibration at all - it then applies no threshold and passes every file it ranked.</value>
+    <comment>Used in FreeAIr\UI\ViewModels document</comment>
+  </data>
+  <data name="FreeAIr_natural_language_search" xml:space="preserve">
+    <value>FreeAIr natural language search</value>
+    <comment>Used in FreeAIr\Find document</comment>
+  </data>
+  <data name="Search__no_action_is_configured" xml:space="preserve">
+    <value>No action with the NaturalLanguageSearch scope is configured, so there is no prompt to ask the model with. Add one in the FreeAIr control center.</value>
+    <comment>Used in FreeAIr\Find document</comment>
+  </data>
+  <data name="Search__no_agent_with_a_token" xml:space="preserve">
+    <value>No agent with a token has been found, and the search needs one to talk to a model. Set a token for the agent you want to search with in the FreeAIr control center.</value>
+    <comment>Used in FreeAIr\Find document</comment>
+  </data>
+  <data name="Search__there_is_nothing_to_search_in" xml:space="preserve">
+    <value>There is nothing to search in: either no solution is open, or the scope is the current project and there is no active one.</value>
+    <comment>Used in FreeAIr\Find document</comment>
+  </data>
+  <data name="Search__the_chat_has_not_started" xml:space="preserve">
+    <value>The chat with the agent could not be started, so the search has not run.</value>
+    <comment>Used in FreeAIr\Find document</comment>
+  </data>
+  <data name="Search__agent__0___1___2_" xml:space="preserve">
+    <value>Answers the query: {0} ({1}, model {2})</value>
+    <comment>Used in FreeAIr\UI\ViewModels document</comment>
+  </data>
+  <data name="Search__embedding_agent__0___1_" xml:space="preserve">
+    <value>Vectorizes the query: {0} ({1})</value>
+    <comment>Used in FreeAIr\UI\ViewModels document</comment>
+  </data>
+  <data name="Confidence__high" xml:space="preserve">
+    <value>High</value>
+    <comment>Used in FreeAIr\UI\ViewModels document</comment>
+  </data>
+  <data name="Confidence__medium" xml:space="preserve">
+    <value>Medium</value>
+    <comment>Used in FreeAIr\UI\ViewModels document</comment>
+  </data>
+  <data name="Confidence__low" xml:space="preserve">
+    <value>Low</value>
+    <comment>Used in FreeAIr\UI\ViewModels document</comment>
+  </data>
 </root>

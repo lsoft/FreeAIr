@@ -130,6 +130,14 @@
           <ButtonText>Open building NLO JSON file window...</ButtonText>
         </Strings>
       </Button>
+      <Button guid="FreeAIr" id="OpenRagCalibrationWindowCommandId" priority="0x0102" type="Button">
+        <Parent guid="FreeAIr" id="SubExtensionMenuGroup2" />
+        <Icon guid="ImageCatalogGuid" id="MeasureCalculate" />
+        <CommandFlag>IconIsMoniker</CommandFlag>
+        <Strings>
+          <ButtonText>Open RAG search calibration window...</ButtonText>
+        </Strings>
+      </Button>
       <Button guid="FreeAIr" id="ShowReleaseNotesCommandId" priority="0x0103" type="Button">
         <Parent guid="FreeAIr" id="SubExtensionMenuGroup1" />
         <Icon guid="ImageCatalogGuid" id="MarkdownFile" />
@@ -330,6 +338,8 @@
       <IDSymbol name="ShowInSituChatCommandId" value="0x1058" />
 
       <IDSymbol name="ResetMCPToolsCommandId" value="0x1059" />
+
+      <IDSymbol name="OpenRagCalibrationWindowCommandId" value="0x1060" />
 
       <!-- context menu -->
       <IDSymbol name="VisualStudioContextMenu" value="0x8000"/>

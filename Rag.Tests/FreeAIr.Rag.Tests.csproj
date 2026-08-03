@@ -1,0 +1,38 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    Unit tests of the natural language search. They cover the two halves of the feature which have
+    no Visual Studio in them: building the index files out of an outline tree and reading them back,
+    and turning a query vector into a shortlist of files.
+
+    Integration tests against a real embedding model live next to these and are skipped unless the
+    environment names an endpoint, see EmbeddingIntegrationFacts.
+  -->
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <LangVersion>Latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <IsPackable>false</IsPackable>
+    <RootNamespace>FreeAIr.Rag.Tests</RootNamespace>
+    <AssemblyName>FreeAIr.Rag.Tests</AssemblyName>
+    <!-- the VSIX warns by the hundred and is judged by errors only; the tests are small enough to
+         be kept clean -->
+    <NoWarn>$(NoWarn);CS1591</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" />
+    <PackageReference Include="xunit" />
+    <PackageReference Include="xunit.runner.visualstudio" />
+    <!-- the same override FreeAIr.Rag needs, because transitive pinning would otherwise put the
+         version the VSIX pins back on top of it -->
+    <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" VersionOverride="9.0.7" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Rag\FreeAIr.Rag.csproj" />
+  </ItemGroup>
+
+</Project>
