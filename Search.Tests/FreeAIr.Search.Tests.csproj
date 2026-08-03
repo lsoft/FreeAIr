@@ -15,8 +15,8 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <IsPackable>false</IsPackable>
-    <RootNamespace>FreeAIr.Rag.Tests</RootNamespace>
-    <AssemblyName>FreeAIr.Rag.Tests</AssemblyName>
+    <RootNamespace>FreeAIr.Search.Tests</RootNamespace>
+    <AssemblyName>FreeAIr.Search.Tests</AssemblyName>
     <!-- the VSIX warns by the hundred and is judged by errors only; the tests are small enough to
          be kept clean -->
     <NoWarn>$(NoWarn);CS1591</NoWarn>
@@ -26,13 +26,13 @@
     <PackageReference Include="Microsoft.NET.Test.Sdk" />
     <PackageReference Include="xunit" />
     <PackageReference Include="xunit.runner.visualstudio" />
-    <!-- the same override FreeAIr.Rag needs, because transitive pinning would otherwise put the
+    <!-- the same override FreeAIr.Search needs, because transitive pinning would otherwise put the
          version the VSIX pins back on top of it -->
     <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" VersionOverride="9.0.7" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Rag\FreeAIr.Rag.csproj" />
+    <ProjectReference Include="..\Search\FreeAIr.Search.csproj" />
   </ItemGroup>
 
 </Project>

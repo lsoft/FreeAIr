@@ -3,7 +3,7 @@ using FreeAIr.NLOutline.Json;
 using FreeAIr.NLOutline.Tree;
 using Xunit;
 
-namespace FreeAIr.Rag.Tests
+namespace FreeAIr.Search.Tests
 {
     /// <summary>
     /// The shape of the index used to be a fourth file. These are the facts which let it go away.

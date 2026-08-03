@@ -15,7 +15,7 @@
     <LangVersion>Latest</LangVersion>
     <Nullable>enable</Nullable>
     <RootNamespace>FreeAIr</RootNamespace>
-    <AssemblyName>FreeAIr.Rag</AssemblyName>
+    <AssemblyName>FreeAIr.Search</AssemblyName>
     <GenerateDocumentationFile>false</GenerateDocumentationFile>
   </PropertyGroup>
 
@@ -23,7 +23,7 @@
     <!-- the aggregation of the shortlist and the wording of a failed embedding request are steps
          inside a public operation; they are worth a test of their own without being worth a place
          in the API of the assembly -->
-    <InternalsVisibleTo Include="FreeAIr.Rag.Tests" />
+    <InternalsVisibleTo Include="FreeAIr.Search.Tests" />
   </ItemGroup>
 
   <ItemGroup>

@@ -5,7 +5,7 @@ using FreeAIr.NLOutline.Tree;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace FreeAIr.Rag.Tests
+namespace FreeAIr.Search.Tests
 {
     /// <summary>
     /// The whole point of the calibration, checked against a real model: a threshold measured on

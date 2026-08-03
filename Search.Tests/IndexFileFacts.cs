@@ -3,7 +3,7 @@ using FreeAIr.Embedding.Json;
 using FreeAIr.NLOutline.Tree;
 using Xunit;
 
-namespace FreeAIr.Rag.Tests
+namespace FreeAIr.Search.Tests
 {
     /// <summary>
     /// Building the index files out of an outline tree, and reading them back.

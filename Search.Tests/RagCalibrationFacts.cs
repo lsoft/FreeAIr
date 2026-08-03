@@ -5,7 +5,7 @@ using FreeAIr.NLOutline.Json;
 using FreeAIr.NLOutline.Tree;
 using Xunit;
 
-namespace FreeAIr.Rag.Tests
+namespace FreeAIr.Search.Tests
 {
     /// <summary>
     /// The measurement which replaces the cosine threshold nobody could pick: the index is asked a

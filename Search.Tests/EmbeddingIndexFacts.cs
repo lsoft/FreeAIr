@@ -4,7 +4,7 @@ using FreeAIr.NLOutline.Json;
 using FreeAIr.NLOutline.Tree;
 using Xunit;
 
-namespace FreeAIr.Rag.Tests
+namespace FreeAIr.Search.Tests
 {
     public sealed class EmbeddingIndexFacts
     {

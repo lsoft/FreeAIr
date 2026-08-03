@@ -6,7 +6,7 @@ using System.Collections.Generic;
 namespace FreeAIr.Embedding
 {
     /// <summary>
-    /// Binds the index pipeline of FreeAIr.Rag to the settings of the extension. Everything in
+    /// Binds the index pipeline of FreeAIr.Search to the settings of the extension. Everything in
     /// here is a translation from a FreeAIr type into a plain one, and nothing else: the pipeline
     /// deliberately does not know about agents or about the settings file.
     /// </summary>

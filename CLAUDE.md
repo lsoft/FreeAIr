@@ -25,9 +25,9 @@ Quote `"-p:Platform=Any CPU"` as shown — the space in the value needs the whol
 
 ## Running the tests
 
-`Rag.Tests\FreeAIr.Rag.Tests.csproj` (net8.0, xunit) covers `Rag\FreeAIr.Rag.csproj` — the index
-format, the vector codec, the outline tree and the ranking of the natural language search, plus the
-`Grep\` text matching behind the SearchFileContent MCP tool.
+`Search.Tests\FreeAIr.Search.Tests.csproj` (net8.0, xunit) covers `Search\FreeAIr.Search.csproj` — the
+index format, the vector codec, the outline tree and the ranking of the natural language search,
+plus the `Grep\` text matching behind the SearchFileContent MCP tool.
 
 Use the script; it builds with MSBuild and only then hands over to the SDK:
 
@@ -39,14 +39,14 @@ Anything you add to the command line goes on to `dotnet test`, e.g.
 `run-tests.bat --filter FullyQualifiedName~VectorCodec`. `FREEAIR_CONFIG` picks the configuration
 (`Release` by default), `FREEAIR_MSBUILD` overrides the compiler path.
 
-Only the test project and `FreeAIr.Rag` are built by the script — both are SDK style, so it takes a
+Only the test project and `FreeAIr.Search` are built by the script — both are SDK style, so it takes a
 couple of seconds and does not go near the VSIX. Build the solution yourself when you need the VSIX
 too; the script will then find everything up to date.
 
 By hand it is the same two steps, and the second one must **not** let the .NET SDK build anything:
 
 ```bash
-dotnet test Rag.Tests/FreeAIr.Rag.Tests.csproj --no-build -c Release --nologo
+dotnet test Search.Tests/FreeAIr.Search.Tests.csproj --no-build -c Release --nologo
 ```
 
 `--no-build` is what makes this safe: it implies `--no-restore`, so the SDK never rewrites the
@@ -165,7 +165,7 @@ The baseline when this section was written was 918 of 4299 nodes (21%).
   legacy format and lists every file in a `<Compile Include="..." />` item; a file which is not
   listed is silently not compiled, and the build still reports 0 errors. Nothing fails, the code
   is simply not there at runtime — which for something found by reflection (an MCP tool, a MEF
-  export) looks like the feature not working rather than like a build problem. `Rag\`, `Shared\`
+  export) looks like the feature not working rather than like a build problem. `Search\`, `Shared\`
   and the other SDK style projects need nothing of the sort.
 - `FreeAIr\FreeAIr_4kvisczc_wpftmp.csproj` is a transient project the WPF build generates. It is not
   part of the solution; ignore it and never edit it.

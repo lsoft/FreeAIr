@@ -501,9 +501,9 @@
       <Project>{2F2E14EA-0DB3-1CC8-B8A2-D6C94D74026B}</Project>
       <Name>Dto</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Rag\FreeAIr.Rag.csproj">
+    <ProjectReference Include="..\Search\FreeAIr.Search.csproj">
       <Project>{7B4E0C1F-9A2D-4C63-9E31-6D5F0B84A2E7}</Project>
-      <Name>FreeAIr.Rag</Name>
+      <Name>FreeAIr.Search</Name>
     </ProjectReference>
     <ProjectReference Include="..\Shared\FreeAIr.Shared.csproj">
       <Project>{e2646cf6-c92f-94ee-f875-5a7c18451b93}</Project>

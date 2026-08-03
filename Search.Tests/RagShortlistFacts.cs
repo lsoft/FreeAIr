@@ -5,7 +5,7 @@ using FreeAIr.NLOutline.Json;
 using FreeAIr.NLOutline.Tree;
 using Xunit;
 
-namespace FreeAIr.Rag.Tests
+namespace FreeAIr.Search.Tests
 {
     /// <summary>
     /// The search itself: a query goes in, a handful of files comes out.

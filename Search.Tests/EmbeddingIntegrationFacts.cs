@@ -2,7 +2,7 @@ using FreeAIr.Embedding;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace FreeAIr.Rag.Tests
+namespace FreeAIr.Search.Tests
 {
     /// <summary>
     /// The first contact with a real embedding server: is it there, does it answer, and are its

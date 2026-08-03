@@ -1,7 +1,7 @@
 using FreeAIr.Embedding;
 using Xunit;
 
-namespace FreeAIr.Rag.Tests
+namespace FreeAIr.Search.Tests
 {
     /// <summary>
     /// What the user is shown when the embedding server says no. `HTTP 400` on its own sends the

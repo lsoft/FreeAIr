@@ -17,7 +17,7 @@ namespace FreeAIr.Embedding
     /// GetAllSolutionFiles MCP tool on every call.
     ///
     /// This class is where the index meets Visual Studio; everything about the format itself lives
-    /// in FreeAIr.Rag, which knows nothing about the IDE and can therefore be tested.
+    /// in FreeAIr.Search, which knows nothing about the IDE and can therefore be tested.
     /// </summary>
     [Export(typeof(EmbeddingIndexContainer))]
     public sealed class EmbeddingIndexContainer

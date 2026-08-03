@@ -1,7 +1,7 @@
 using FreeAIr.Embedding;
 using FreeAIr.NLOutline.Tree;
 
-namespace FreeAIr.Rag.Tests
+namespace FreeAIr.Search.Tests
 {
     /// <summary>
     /// An <see cref="IEmbeddingVectorizer"/> which answers from a table instead of from a server.

@@ -11,7 +11,7 @@ namespace FreeAIr.Grep
     /// A mask without a directory separator is matched against the file name alone, so that the
     /// obvious `*.cs` means what it looks like; a mask which carries one is matched against the
     /// path relative to the solution. `*` and `?` are the only metacharacters, and `*` crosses
-    /// directories - `Rag\*.cs` finds `Rag\Find\RagShortlist.cs`.
+    /// directories - `Search\*.cs` finds `Search\Find\RagShortlist.cs`.
     ///
     /// A mask which starts with `!` subtracts instead of adding: `*.cs;!*.Designer.cs` is the whole
     /// point of this being more than a list. Generated code is what a search over a solution drowns

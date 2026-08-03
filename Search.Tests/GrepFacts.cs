@@ -2,7 +2,7 @@ using FreeAIr.Grep;
 using System.Text;
 using Xunit;
 
-namespace FreeAIr.Rag.Tests
+namespace FreeAIr.Search.Tests
 {
     /// <summary>
     /// The matching behind the SearchFileContent tool: what a pattern finds, what it reports and

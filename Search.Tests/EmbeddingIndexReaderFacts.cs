@@ -2,7 +2,7 @@ using FreeAIr.Embedding;
 using FreeAIr.Embedding.Json;
 using Xunit;
 
-namespace FreeAIr.Rag.Tests
+namespace FreeAIr.Search.Tests
 {
     public sealed class EmbeddingIndexReaderFacts
     {

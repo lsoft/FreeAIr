@@ -1,7 +1,7 @@
 using FreeAIr.Embedding;
 using Xunit;
 
-namespace FreeAIr.Rag.Tests
+namespace FreeAIr.Search.Tests
 {
     public sealed class VectorCodecFacts
     {

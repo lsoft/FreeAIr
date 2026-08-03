@@ -8,8 +8,8 @@ looking for the user manual, read the [README](README.md) instead.
 | Project | Target | Purpose |
 | --- | --- | --- |
 | `FreeAIr` | .NET Framework 4.8 (VSIX) | The extension itself: package, commands, tool windows, chats, options, MCP client side. |
-| `FreeAIr.Rag` | netstandard2.0 | The searching machinery that does not need Visual Studio: index format, vector codec, outline tree, ranking, and the `Grep/` text matching behind the SearchFileContent MCP tool. |
-| `FreeAIr.Rag.Tests` | .NET 8 (xunit) | Unit tests of `FreeAIr.Rag`. Not shipped. |
+| `FreeAIr.Search` | netstandard2.0 | The searching machinery that does not need Visual Studio: index format, vector codec, outline tree, ranking, and the `Grep/` text matching behind the SearchFileContent MCP tool. |
+| `FreeAIr.Search.Tests` | .NET 8 (xunit) | Unit tests of `FreeAIr.Search`. Not shipped. |
 | `MCP/Proxy` | .NET 9 (exe) | Out-of-process host for MCP servers. Shipped inside the VSIX as `.art/Proxy.zip` and unpacked on first run. |
 | `MCP/Dto` | netstandard | Request/reply contracts of the JSON-RPC channel between `FreeAIr` and `Proxy.exe`. |
 | `CodeLens` | .NET Framework 4.8 | CodeLens data point provider. Runs in the separate Visual Studio CodeLens process. |
@@ -106,7 +106,7 @@ internal). These are intentionally *not* part of the JSON settings.
 - `MCP/ServerProxy/VS` — the built-in Visual Studio MCP server. Its tools (build, git commit,
   nuget install, read/replace document body, solution tree, error list, text search, web search)
   run **inside** devenv and therefore have direct access to DTE/Roslyn.
-  `Tools/SearchFileContentTool.cs` is the grep of the solution: the matching itself is `Rag/Grep`
+  `Tools/SearchFileContentTool.cs` is the grep of the solution: the matching itself is `Search/Grep`
   and nothing is installed or spawned, while running inside devenv is what lets it search the
   editor buffers which have not been saved yet.
 - `MCP/ServerProxy/Github` and `MCP/ServerProxy/External` — the github.com server and any
@@ -125,9 +125,9 @@ internal). These are intentionally *not* part of the JSON settings.
   early state the reason and repeat it into the activity log.
 - `NLOutline/` generates and stores natural-language outlines — LLM-written comments embedded in
   the source, following [arxiv 2408.04820](https://arxiv.org/html/2408.04820v4).
-Everything below `Embedding/` and `Find/RagShortlist.cs` lives in the **`FreeAIr.Rag`** project, not
+Everything below `Embedding/` and `Find/RagShortlist.cs` lives in the **`FreeAIr.Search`** project, not
 in the VSIX. That split is what makes the feature testable: the VSIX assembly cannot be loaded by a
-test runner, while `FreeAIr.Rag` knows nothing about the IDE and is covered by `FreeAIr.Rag.Tests`.
+test runner, while `FreeAIr.Search` knows nothing about the IDE and is covered by `FreeAIr.Search.Tests`.
 
 - `Embedding/Json/Objects.cs` writes and reads the index files. `Embedding/VectorCodec.cs` is the
   storage format of a vector: int8 quantization in base64, normalized on the way back in, so a
