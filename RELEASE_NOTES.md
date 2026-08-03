@@ -23,6 +23,29 @@ My others extensions lives [here](https://marketplace.visualstudio.com/publisher
 
 # FreeAIr Release Notes
 
+## 4.3.0
+
+- The built-in Visual Studio MCP server has a new tool, `VisualStudio.SearchFileContent`: the model
+  can ask where a text occurs and gets the matching lines back — each with its file and its line
+  number — instead of reading whole files one by one until it finds them. Nothing is installed and
+  no process is started, the matching is done by the extension itself.
+- The pattern is literal by default and a .NET regular expression on request, both through the same
+  code path. `case_sensitive` and `whole_word` are the other two switches, and `invert_match`
+  reports the lines which do not match, the way `grep -v` does.
+- `search_scope` chooses between the files of the projects — the default — and every file in the
+  solution folder. The walk skips `bin`, `obj`, `.git`, `node_modules` and the like either way, so
+  a search does not answer with build output.
+- `file_mask` is a list like `*.cs;*.xaml`, and a mask which starts with `!` subtracts:
+  `*.cs;!*.Designer.cs` is what keeps generated code from eating the context budget.
+- The answer is capped — 100 matching lines by default, 500 at most — and says whether the cap was
+  reached. A truncated list which does not admit to being one is read by the model as the whole
+  truth.
+- A document which is open and edited but not saved yet is searched as you see it on the screen
+  rather than as it is on the disk. Those buffers are collected on the main thread and the scan
+  itself runs off it, so a solution of thousands of files does not freeze the IDE.
+- The pattern is written by a model, so a regular expression is given a five second timeout: the
+  file which makes it misbehave is reported and the rest of the search survives.
+
 ## 4.2.12
 
 - Fixed bug, thanks to nrmncr for [reporting it](https://github.com/lsoft/FreeAIr/issues/61).
