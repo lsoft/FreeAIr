@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using FreeAIr.Chat;
 using FreeAIr.Chat.Context.Item;
@@ -304,80 +305,171 @@ namespace FreeAIr.NLOutline.Tree.Builder.File
                     []
                     );
 
-                // Find all top-level types (not nested)
-                var rootTypes = new List<TypeDeclarationSyntax>();
+                // Find all top-level declarations (not nested)
+                var rootDeclarations = new List<MemberDeclarationSyntax>();
 
                 foreach (var node in rootSyntax.DescendantNodes())
                 {
-                    if (node is TypeDeclarationSyntax typeDecl && !IsNestedType(typeDecl))
+                    if (node is BaseTypeDeclarationSyntax or DelegateDeclarationSyntax
+                        && node is MemberDeclarationSyntax declaration
+                        && !IsNested(declaration)
+                        )
                     {
-                        rootTypes.Add(typeDecl);
+                        rootDeclarations.Add(declaration);
                     }
                 }
 
-                foreach (var typeDecl in rootTypes)
+                foreach (var declaration in rootDeclarations)
                 {
-                    var typeNode = ProcessTypeDeclaration(typeDecl);
-                    fileNode.AddChild(typeNode);
+                    var declarationNode = ProcessDeclaration(declaration);
+                    if (declarationNode is not null)
+                    {
+                        fileNode.AddChild(declarationNode);
+                    }
                 }
 
                 return fileNode;
             }
 
-            private bool IsNestedType(TypeDeclarationSyntax typeDecl)
+            private bool IsNested(MemberDeclarationSyntax declaration)
             {
-                // A nested type is inside another type
-                return typeDecl.Parent is TypeDeclarationSyntax;
+                // A nested declaration is inside another type
+                return declaration.Parent is TypeDeclarationSyntax;
+            }
+
+            /// <summary>
+            /// One node for anything a file can declare at namespace level. Enums and delegates get
+            /// one too: their kind in the tree is <see cref="OutlineKindEnum.ClassOrSimilarEntity"/>,
+            /// same as a class, because the index has no finer kind and every consumer only asks
+            /// which file a node belongs to.
+            /// </summary>
+            private OutlineNode ProcessDeclaration(MemberDeclarationSyntax declaration)
+            {
+                switch (declaration)
+                {
+                    case TypeDeclarationSyntax typeDecl:
+                        return ProcessTypeDeclaration(typeDecl);
+                    case EnumDeclarationSyntax enumDecl:
+                        return ProcessEnumDeclaration(enumDecl);
+                    case DelegateDeclarationSyntax delegateDecl:
+                        return CreateEntityNode(
+                            delegateDecl.Identifier.Text,
+                            GetOutlineText(delegateDecl, true),
+                            []
+                            );
+                    default:
+                        return null;
+                }
             }
 
             private OutlineNode ProcessTypeDeclaration(TypeDeclarationSyntax typeDecl)
             {
                 var typeName = typeDecl.Identifier.Text;
 
-                var commentText = GetOutlineText(typeDecl, true);
-                var outlineText = string.IsNullOrEmpty(commentText) ? typeName : commentText;
-
-                var typeNode = new OutlineNode(
-                    OutlineKindEnum.ClassOrSimilarEntity,
-                    _document.FilePath.MakeRelativeAgainst(_rootPath),
+                var typeNode = CreateEntityNode(
                     typeName,
-                    outlineText,
-                    null,
+                    GetOutlineText(typeDecl, true),
                     []
                     );
 
                 foreach (var member in typeDecl.Members)
                 {
-                    if (member is not (BaseMethodDeclarationSyntax or PropertyDeclarationSyntax or FieldDeclarationSyntax or ConstructorDeclarationSyntax))
+                    //BaseMethodDeclarationSyntax covers methods, constructors, destructors and
+                    //operators; BasePropertyDeclarationSyntax covers properties, indexers and
+                    //property-style events; BaseFieldDeclarationSyntax covers fields and field-style
+                    //events. Anything a developer can put a summary on is in one of the three.
+                    if (member is not (BaseMethodDeclarationSyntax or BasePropertyDeclarationSyntax or BaseFieldDeclarationSyntax))
                         continue;
 
-                    var memberName = GetMemberName(member);
-                    var memberComment = GetOutlineText(member, false);
-                    var typeMemberNames = $"{typeName}.{memberName}";
-                    var memberOutlineText = string.IsNullOrEmpty(memberComment)
-                        ? typeMemberNames
-                        : memberComment
-                        ;
-
-                    var memberNode = new OutlineNode(
-                        OutlineKindEnum.MethodOfClassOrSimilarPart,
-                        _document.FilePath.MakeRelativeAgainst(_rootPath),
-                        typeMemberNames,
-                        memberOutlineText,
-                        null,
-                        []
+                    typeNode.AddChild(
+                        CreateMemberNode(
+                            typeName,
+                            GetMemberName(member),
+                            GetOutlineText(member, false)
+                            )
                         );
-
-                    typeNode.AddChild(memberNode);
                 }
 
-                foreach (var nestedType in typeDecl.Members.OfType<TypeDeclarationSyntax>())
+                foreach (var nested in typeDecl.Members)
                 {
-                    var nestedNode = ProcessTypeDeclaration(nestedType);
-                    typeNode.AddChild(nestedNode);
+                    if (nested is not (BaseTypeDeclarationSyntax or DelegateDeclarationSyntax))
+                    {
+                        continue;
+                    }
+
+                    var nestedNode = ProcessDeclaration(nested);
+                    if (nestedNode is not null)
+                    {
+                        typeNode.AddChild(nestedNode);
+                    }
                 }
 
                 return typeNode;
+            }
+
+            /// <summary>
+            /// The enum itself plus one node per constant. The constants are worth their own nodes
+            /// for the same reason members are: a comment on a single value is often the only place
+            /// its meaning is written down.
+            /// </summary>
+            private OutlineNode ProcessEnumDeclaration(EnumDeclarationSyntax enumDecl)
+            {
+                var enumName = enumDecl.Identifier.Text;
+
+                var enumNode = CreateEntityNode(
+                    enumName,
+                    GetOutlineText(enumDecl, true),
+                    []
+                    );
+
+                foreach (var member in enumDecl.Members)
+                {
+                    enumNode.AddChild(
+                        CreateMemberNode(
+                            enumName,
+                            member.Identifier.Text,
+                            GetOutlineText(member, false)
+                            )
+                        );
+                }
+
+                return enumNode;
+            }
+
+            private OutlineNode CreateEntityNode(
+                string target,
+                string commentText,
+                List<OutlineNode> children
+                )
+            {
+                return new OutlineNode(
+                    OutlineKindEnum.ClassOrSimilarEntity,
+                    _document.FilePath.MakeRelativeAgainst(_rootPath),
+                    target,
+                    string.IsNullOrEmpty(commentText) ? target : commentText,
+                    null,
+                    children
+                    );
+            }
+
+            private OutlineNode CreateMemberNode(
+                string ownerName,
+                string memberName,
+                string commentText
+                )
+            {
+                //`Owner.Member` is the naming OutlineTreeAssembler splits on to find the owner of a
+                //member when it rebuilds the tree out of the flat index
+                var target = $"{ownerName}.{memberName}";
+
+                return new OutlineNode(
+                    OutlineKindEnum.MethodOfClassOrSimilarPart,
+                    _document.FilePath.MakeRelativeAgainst(_rootPath),
+                    target,
+                    string.IsNullOrEmpty(commentText) ? target : commentText,
+                    null,
+                    []
+                    );
             }
 
             private string GetOutlineText(
@@ -448,23 +540,10 @@ namespace FreeAIr.NLOutline.Tree.Builder.File
                         if (child is XmlElementSyntax xmlElement &&
                             xmlElement.StartTag?.Name?.ToString() == "summary")
                         {
-                            var xmlChildren = xmlElement
-                                .ChildNodes()
-                                .OfType<XmlTextSyntax>()
-                                .ToList();
+                            var builder = new StringBuilder();
+                            AppendXmlText(xmlElement.Content, builder);
 
-                            var su = string.Join(
-                                " ",
-                                xmlChildren.SelectMany(
-                                    x => x
-                                        .GetText()
-                                        .ToString()
-                                        .Split('\r', '\n')
-                                        .Select(p => p.Trim('\r', '\n', ' ', '\t', '/'))
-                                    )
-                                ).Trim();
-
-                            return su;
+                            return NormalizeWhitespace(builder.ToString());
                         }
                     }
                 }
@@ -472,12 +551,137 @@ namespace FreeAIr.NLOutline.Tree.Builder.File
                 return string.Empty;
             }
 
+            /// <summary>
+            /// The prose inside a `summary`, nested markup included.
+            ///
+            /// Everything here ends up in the embedding of the node, so what is dropped is invisibly
+            /// lost: taking only the bare text runs would silently throw away every `list` of items
+            /// and turn "reads the OutlineNode tree" into "reads the tree". The names inside `see`
+            /// and `paramref` are kept for the same reason — a type name is often the single most
+            /// searchable word of the whole sentence.
+            /// </summary>
+            private static void AppendXmlText(
+                IEnumerable<XmlNodeSyntax> nodes,
+                StringBuilder builder
+                )
+            {
+                foreach (var node in nodes)
+                {
+                    switch (node)
+                    {
+                        case XmlTextSyntax text:
+                            builder.Append(text.GetText().ToString());
+                            break;
+
+                        case XmlElementSyntax element:
+                            //`c`, `para`, `list`, `item`, `see` with a body — the tag itself carries
+                            //no meaning for a search, its content does
+                            AppendXmlText(element.Content, builder);
+
+                            //an `item` ends a thought; without this the bullets of a list run into
+                            //one another as a single sentence
+                            builder.Append(' ');
+                            break;
+
+                        case XmlEmptyElementSyntax empty:
+                            AppendCrefOrName(empty, builder);
+                            break;
+                    }
+                }
+            }
+
+            /// <summary>
+            /// The identifier an empty tag points at: `see cref`, `paramref name`, `typeparamref
+            /// name`. The `T:`/`M:` prefix a cref may carry is cut off, and so is the namespace —
+            /// what is left is the name as it appears in the code, which is what a query would use.
+            /// </summary>
+            private static void AppendCrefOrName(
+                XmlEmptyElementSyntax element,
+                StringBuilder builder
+                )
+            {
+                foreach (var attribute in element.Attributes)
+                {
+                    string value;
+
+                    switch (attribute)
+                    {
+                        case XmlCrefAttributeSyntax cref:
+                            value = cref.Cref.ToString();
+                            break;
+                        case XmlNameAttributeSyntax name:
+                            value = name.Identifier.ToString();
+                            break;
+                        default:
+                            continue;
+                    }
+
+                    if (string.IsNullOrWhiteSpace(value))
+                    {
+                        continue;
+                    }
+
+                    var colon = value.IndexOf(':');
+                    if (colon >= 0 && colon + 1 < value.Length)
+                    {
+                        value = value.Substring(colon + 1);
+                    }
+
+                    builder.Append(' ');
+                    builder.Append(value);
+                    builder.Append(' ');
+                }
+            }
+
+            /// <summary>
+            /// Collapses the line breaks and the leading slashes of the comment syntax into single
+            /// spaces, so that a summary written across several lines embeds the same as the one
+            /// sentence it is.
+            /// </summary>
+            private static string NormalizeWhitespace(
+                string text
+                )
+            {
+                if (string.IsNullOrWhiteSpace(text))
+                {
+                    return string.Empty;
+                }
+
+                var parts = text.Split('\r', '\n');
+                var builder = new StringBuilder(text.Length);
+
+                foreach (var part in parts)
+                {
+                    var trimmed = part.Trim(' ', '\t', '/');
+                    if (trimmed.Length == 0)
+                    {
+                        continue;
+                    }
+
+                    if (builder.Length > 0)
+                    {
+                        builder.Append(' ');
+                    }
+
+                    builder.Append(trimmed);
+                }
+
+                //nested markup leaves double spaces behind where a tag used to be
+                var result = builder.ToString();
+                while (result.IndexOf("  ", StringComparison.Ordinal) >= 0)
+                {
+                    result = result.Replace("  ", " ");
+                }
+
+                return result.Trim();
+            }
+
             private string GetMemberName(MemberDeclarationSyntax member)
             {
                 return member switch
                 {
                     PropertyDeclarationSyntax property => property.Identifier.Text,
-                    FieldDeclarationSyntax field when field.Declaration.Variables.Count > 0 =>
+                    BaseFieldDeclarationSyntax field when field.Declaration.Variables.Count > 0 =>
                         field.Declaration.Variables[0].Identifier.Text,
                     ConstructorDeclarationSyntax => "constructor",
                     DestructorDeclarationSyntax => "destructor",

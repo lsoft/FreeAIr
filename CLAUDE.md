@@ -116,6 +116,49 @@ A successful full build emits ~800 warnings. These are pre-existing and not a re
 
 Judge a build by the error count, not the warning count.
 
+## Writing comments the NLO index can use
+
+FreeAIr indexes its own source through `CSharpFileScanner`
+(`FreeAIr\NLOutline\Tree\Builder\File\FileScanner.cs`), and the comments are the *only* thing that
+ends up in the embedding index — no code is ever vectorized. A node whose outline text equals its
+own identifier is dropped by `OutlineEmbedder.SelectNodesToEmbed`, so **an uncommented member is
+absent from the RAG search entirely**. Comments here are a searchable artifact, not decoration.
+
+What the scanner actually reads:
+
+| Declaration | What it takes |
+| --- | --- |
+| class / struct / interface / record / enum / delegate | leading trivia only: the `<summary>` plus any `//` lines directly above it |
+| method / ctor / property / field / event / indexer / enum constant | the `<summary>` **and every `//` comment inside the body**, joined by newlines |
+| the file node itself | nothing — it is always empty for C# |
+
+Consequences worth knowing before writing anything:
+
+- Only `<summary>` is read. `<remarks>`, `<param>`, `<returns>` and `<example>` are ignored, so
+  nothing that matters may live there alone. Nested markup inside `<summary>` *is* read, including
+  the names in `<see cref="..."/>` and `<paramref name="..."/>`.
+- A comment at the very top of a file, above the `using`s, reaches nothing. The purpose of the file
+  belongs on its main type.
+- Inline `//` comments partitioning a method body land in that method's embedding. This is the
+  natural-language-outline mechanism and the cheapest way to make a long method findable.
+- Overloads share the target `Type.Method` and therefore one node id; only one of their summaries
+  survives into the index. Put anything that distinguishes them where it is not lost.
+
+How to write them (following the NL outlines paper, `NLO.pdf`):
+
+- One to three sentences of plain prose. Say what the thing is *for* and how it fits with the rest,
+  never what the signature already states.
+- Use the nouns somebody would type into the search box: the domain terms, the file formats, the
+  protocols, the name of the window or the settings page. Those words are the entire retrieval
+  surface.
+- Explain *why* where the reasoning is not obvious; do not narrate the code.
+- Inside a body, one `//` line per logical section — at most three for a short method, five for a
+  long one. Never comment every line.
+- Detail costs the reader time and blurs the vector. Enough to understand, no more.
+
+`run-coverage` is not a script; to measure, count the nodes whose outline differs from their target.
+The baseline when this section was written was 918 of 4299 nodes (21%).
+
 ## Odds and ends
 
 - **A new `.cs` file in `FreeAIr\` has to be added to `FreeAIr.csproj` by hand.** The project is

@@ -19,19 +19,32 @@ namespace FreeAIr.Chat.Context
     /// </summary>
     public sealed class ChatContext
     {
+        /// <summary>
+        /// The repository-relative path of the instruction file shared with GitHub Copilot, looked
+        /// for in every new chat.
+        /// </summary>
         public const string CopilotInstructionFilePath = ".github/copilot-instructions.md";
 
         private readonly List<IChatContextItem> _items = new();
 
+        /// <summary>
+        /// Raised whenever items are added or removed, which is what redraws the row of context
+        /// chips under the prompt box.
+        /// </summary>
         public event ChatContextChangedDelegate ChatContextChangedEvent;
 
         public IReadOnlyList<IChatContextItem> Items => _items;
 
         private ChatContext()
         {
-            
+
         }
 
+        /// <summary>
+        /// A context for a new chat, already carrying the project's Copilot instructions when there
+        /// are any. Attached as auto-found, so a user who does not want them can clear them along
+        /// with the rest of the automatic context.
+        /// </summary>
         public static async System.Threading.Tasks.Task<ChatContext> CreateChatContextAsync(
             )
         {
@@ -88,6 +101,11 @@ namespace FreeAIr.Chat.Context
             return null;
         }
 
+        /// <summary>
+        /// Removes every item matching one of the given ones. Matching is by
+        /// <see cref="IChatContextItem.IsSame"/>, so a caller may pass a freshly built item to drop
+        /// the equivalent one already held.
+        /// </summary>
         public void RemoveItems(
             IReadOnlyList<IChatContextItem> items
             )
@@ -120,6 +138,10 @@ namespace FreeAIr.Chat.Context
             }
         }
 
+        /// <summary>
+        /// Adds the items that are not there yet, then notifies once for the whole batch — the
+        /// reference walker adds dozens at a time, and a redraw per item would be visible.
+        /// </summary>
         public void AddItems(
             IReadOnlyList<IChatContextItem> items
             )
@@ -142,6 +164,11 @@ namespace FreeAIr.Chat.Context
             RaiseChatContextChanged();
         }
 
+        /// <summary>
+        /// Adds one item unless an equivalent one is already attached. Silent about the duplicate:
+        /// the same file arriving from the user and from the reference walker is expected, not an
+        /// error worth telling anybody about.
+        /// </summary>
         public void AddItem(
             IChatContextItem item
             )
@@ -185,5 +212,6 @@ namespace FreeAIr.Chat.Context
 
     }
 
+    /// <summary>Handler shape of <see cref="ChatContext.ChatContextChangedEvent"/>.</summary>
     public delegate void ChatContextChangedDelegate(object sender, ChatContextEventArgs e);
 }

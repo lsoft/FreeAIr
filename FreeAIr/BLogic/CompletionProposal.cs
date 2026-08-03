@@ -22,6 +22,18 @@ using FreeAIr.Chat.Context.Item;
 #nullable enable
 namespace FreeAIr.BLogic
 {
+    /// <summary>
+    /// Whole line completion: the grey inline suggestion Visual Studio shows ahead of the caret,
+    /// produced here by asking an LLM instead of by IntelliCode.
+    ///
+    /// Visual Studio asks this source for a proposal on practically every keystroke, and every
+    /// proposal is a full request to a model. That is why the ordering attributes put this source
+    /// ahead of the built-in ones, why the class waits before doing anything at all, and why the
+    /// feature is off unless the user turns it on in the settings.
+    ///
+    /// One source instance serves one editor view; the views are handed out by
+    /// <see cref="ProposalSourceProvider"/>.
+    /// </summary>
     [Export(typeof(ProposalSource))]
     [Name("FreeAIrProposalSource")]
     [Order(Before = "InlineCSharpProposalSourceProvider")]
@@ -29,6 +41,11 @@ namespace FreeAIr.BLogic
     [ContentType("any")]
     public sealed class ProposalSource : ProposalSourceBase
     {
+        /// <summary>
+        /// How long the typing has to stop before a request goes out. Anything shorter turns a
+        /// sentence being typed into a request per character, all but the last one cancelled and
+        /// all of them paid for.
+        /// </summary>
         private const int MinDelayBeforeRequestsMsec = 500;
 
         private readonly ITextView _textView;
@@ -45,6 +62,13 @@ namespace FreeAIr.BLogic
             _textView = textView;
         }
 
+        /// <summary>
+        /// Called by the editor whenever it would like something to suggest at the caret.
+        ///
+        /// The whole body of the method is the debounce: it sleeps first, and the editor cancels
+        /// the token the moment the user types again, so only the pause at the end of a burst of
+        /// typing ever reaches the model. A cancellation is the normal outcome here, not a failure.
+        /// </summary>
         public override async Task<ProposalCollectionBase?> RequestProposalsAsync(
             VirtualSnapshotPoint caret,
             CompletionState? completionState,
@@ -77,6 +101,19 @@ namespace FreeAIr.BLogic
             }
         }
 
+        /// <summary>
+        /// Builds one suggestion for the caret position: finds the configured action and agent,
+        /// sends the document with an anchor marking where the code should go, and turns the answer
+        /// into a proposal the editor can display.
+        ///
+        /// The anchor is the trick that makes this work at all. Rather than describing the position
+        /// in words, the document is sent with a marker string inserted at the caret, and the
+        /// prompt asks for the code that belongs where the marker is. The document itself is never
+        /// modified — only the copy that goes into the request.
+        ///
+        /// Everything is swallowed and logged: this runs on the typing path, and a dialog or an
+        /// exception here would interrupt the user rather than help them.
+        /// </summary>
         public async Task<ProposalCollectionBase?> CreateProposalSourceAsync(
             int caretPosition
             )
@@ -85,6 +122,8 @@ namespace FreeAIr.BLogic
             {
                 var options = await FreeAIrOptions.DeserializeAsync();
 
+                //the feature needs an action wired to a named agent; without one there is nothing
+                //to ask, and the complaint is worth showing only if the user believes it is enabled
                 var support = await FreeAIrOptions.DeserializeSupportCollectionAsync();
                 var action = support.Actions.FirstOrDefault(
                     a =>
@@ -148,6 +187,9 @@ namespace FreeAIr.BLogic
                     return null;
                 }
 
+                //this is the whole point of the request: the model is shown the file with a marker
+                //where the caret is and asked what belongs there. Only the copy sent to the model
+                //carries the anchor; the buffer the user is typing in is untouched.
                 documentText = documentText.Insert(
                     caretPosition,
                     options.Unsorted.WholeLineCompletionAnchorName
@@ -199,6 +241,16 @@ namespace FreeAIr.BLogic
         }
     }
 
+    /// <summary>
+    /// The MEF entry point Visual Studio finds: it hands out a <see cref="ProposalSource"/> per
+    /// editor view, and refuses to hand out any while whole line completion is switched off in the
+    /// settings.
+    ///
+    /// The constructor also subscribes to four internal events of the suggestion service through
+    /// reflection. They are not part of any public API — see <see cref="SuggestionHijackHelper"/> —
+    /// and the handlers are deliberately empty: the subscription exists to keep the hooks in place
+    /// for the telemetry that would tell whether a suggestion was shown, accepted or thrown away.
+    /// </summary>
     [Export(typeof(ProposalSourceProvider))]
     [Export(typeof(ProposalSourceProviderBase))]
     [Name("FreeAIrProposalSourceProvider")]
@@ -254,6 +306,13 @@ namespace FreeAIr.BLogic
         {
         }
 
+        /// <summary>
+        /// A proposal source for this view, or null when the feature is off — returning null is how
+        /// a provider opts out and leaves the editor to the other suggestion sources.
+        ///
+        /// The setting is read on every call rather than cached, so switching the feature off takes
+        /// effect on the next keystroke instead of on the next restart.
+        /// </summary>
         public override async Task<ProposalSourceBase?> GetProposalSourceAsync(
             ITextView view,
             CancellationToken cancel
