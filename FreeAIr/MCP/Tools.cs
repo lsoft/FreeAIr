@@ -1,6 +1,9 @@
 ﻿using OpenAI.Chat;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Text;
+using System.Text.Json;
 
 namespace FreeAIr.MCP.McpServerProxy
 {
@@ -26,6 +29,19 @@ namespace FreeAIr.MCP.McpServerProxy
 
     public /*sealed*/ class McpServerTool
     {
+        /// <summary>
+        /// The schema a tool taking no arguments has to declare. A bare `{}` is not a valid
+        /// function schema: LM Studio validates `function.parameters` and answers the whole
+        /// request with 400 Bad Request when a single offered tool fails that validation.
+        /// </summary>
+        public const string NoParameters =
+            """
+            {
+                "type": "object",
+                "properties": {}
+            }
+            """;
+
         public string McpServerProxyName
         {
             get;
@@ -92,10 +108,91 @@ namespace FreeAIr.MCP.McpServerProxy
                 functionName: FullName,
                 functionDescription: Description,
                 functionParameters: BinaryData.FromString(
-                    Parameters
+                    NormalizeParameterSchema(Parameters)
                     ),
                 functionSchemaIsStrict: true
                 );
+        }
+
+        /// <summary>
+        /// Brings a tool schema to the shape every OpenAI compatible endpoint accepts: an object
+        /// schema carrying a `properties` member.
+        ///
+        /// This is not cosmetic. A tool without arguments is habitually declared as `{}` — both by
+        /// FreeAIr's own Visual Studio tools and by third party MCP servers, whose schemas arrive
+        /// here unseen — and LM Studio rejects the entire completion request with 400 Bad Request
+        /// when one such tool is offered, taking the whole chat down with it.
+        ///
+        /// The schema is repaired rather than replaced, so that a schema which merely forgot its
+        /// `type` keeps the parameters it does declare.
+        /// </summary>
+        private static string NormalizeParameterSchema(
+            string parameters
+            )
+        {
+            try
+            {
+                using var document = JsonDocument.Parse(parameters);
+
+                var root = document.RootElement;
+                if (root.ValueKind != JsonValueKind.Object)
+                {
+                    return NoParameters;
+                }
+
+                var hasObjectType =
+                    root.TryGetProperty("type", out var type)
+                    && type.ValueKind == JsonValueKind.String
+                    && type.ValueEquals("object")
+                    ;
+                var hasProperties =
+                    root.TryGetProperty("properties", out var properties)
+                    && properties.ValueKind == JsonValueKind.Object
+                    ;
+                if (hasObjectType && hasProperties)
+                {
+                    return parameters;
+                }
+
+                using var stream = new MemoryStream();
+                using (var writer = new Utf8JsonWriter(stream))
+                {
+                    writer.WriteStartObject();
+
+                    //the two members the endpoints insist on come first, then everything the
+                    //original schema said which we have not just written ourselves
+                    writer.WriteString("type", "object");
+                    if (!hasProperties)
+                    {
+                        writer.WriteStartObject("properties");
+                        writer.WriteEndObject();
+                    }
+
+                    foreach (var member in root.EnumerateObject())
+                    {
+                        if (member.NameEquals("type"))
+                        {
+                            continue;
+                        }
+                        if (member.NameEquals("properties") && !hasProperties)
+                        {
+                            continue;
+                        }
+
+                        member.WriteTo(writer);
+                    }
+
+                    writer.WriteEndObject();
+                }
+
+                return Encoding.UTF8.GetString(stream.ToArray());
+            }
+            catch (JsonException)
+            {
+                //a schema which is not even json cannot be repaired, only replaced
+            }
+
+            return NoParameters;
         }
     }
 

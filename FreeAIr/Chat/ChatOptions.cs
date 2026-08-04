@@ -47,9 +47,16 @@ namespace FreeAIr.Chat
         }
 
         /// <summary>
-        /// Same as <see cref="NoToolAutoProcessedTextResponseAsync"/>, but the model is asked for a
-        /// json object. Used where the answer has to be parsed rather than shown — natural language
-        /// outlines, search results and the like.
+        /// Same as <see cref="NoToolAutoProcessedTextResponseAsync"/>, but the answer has to be
+        /// parsed rather than shown — natural language outlines, search results and the like.
+        ///
+        /// The json is asked for in the prompt rather than through `response_format`: LM Studio
+        /// accepts only `text` and `json_schema` there and answers 400 Bad Request to the
+        /// `json_object` mode, while the shapes FreeAIr expects are too loose to be pinned down by
+        /// a schema (the outline reader takes both an object and a bare array). Nothing is lost —
+        /// every caller runs the answer through
+        /// <see cref="FreeAIr.Helper.AnswerHelper.CleanupFromQuotesAndThinks"/> first, which
+        /// strips the markdown fences and the reasoning blocks the mode was guarding against.
         /// </summary>
         public static async Task<ChatOptions> NoToolAutoProcessedJsonResponseAsync(
             AgentJson? chosenAgent
@@ -61,7 +68,7 @@ namespace FreeAIr.Chat
                 ChatToolChoice.CreateNoneChoice(),
                 agentCollection,
                 chosenAgent,
-                OpenAI.Chat.ChatResponseFormat.CreateJsonObjectFormat(),
+                OpenAI.Chat.ChatResponseFormat.CreateTextFormat(),
                 true
                 );
         }

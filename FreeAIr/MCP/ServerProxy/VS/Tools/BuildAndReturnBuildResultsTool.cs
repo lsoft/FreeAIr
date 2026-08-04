@@ -18,7 +18,7 @@ namespace FreeAIr.MCP.McpServerProxy.VS.Tools
                 VisualStudioMcpServerProxy.VisualStudioProxyName,
                 VisualStudioToolName,
                 "Build (compile) a solution and returns a JSON-formatted list of build warning and build errors of current solution. The result of this function includes: a type (error, warning), a description, file path, and line and column where error (warning) was found.",
-                "{}"
+                NoParameters
                 )
         {
         }

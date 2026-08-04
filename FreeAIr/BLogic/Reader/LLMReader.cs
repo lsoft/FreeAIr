@@ -2,6 +2,7 @@
 using Microsoft.VisualStudio.Threading;
 using OpenAI.Chat;
 using System.Collections.Generic;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using FreeAIr.Chat;
@@ -196,7 +197,7 @@ namespace FreeAIr.BLogic.Reader
                     );
 
                 OpenAI.Chat.ChatFinishReason? chatFinishReason = null;
-                var toolCalls = new List<StreamingChatToolCallUpdate>();
+                var toolCallAccumulator = new StreamingToolCallAccumulator();
                 //var contentParts = new List<ChatMessageContentPart>();
 
                 _chat.Status = ChatStatusEnum.ReadingAnswer;
@@ -216,7 +217,7 @@ namespace FreeAIr.BLogic.Reader
                     }
 
                     chatFinishReason ??= completionUpdate.FinishReason;
-                    toolCalls.AddRange(completionUpdate.ToolCallUpdates);
+                    toolCallAccumulator.Append(completionUpdate.ToolCallUpdates);
 
                     //if (completionUpdate.FinishReason != ChatFinishReason.ToolCalls
                     //    || completionUpdate.ToolCallUpdates.Count == 0
@@ -250,15 +251,10 @@ namespace FreeAIr.BLogic.Reader
                     }
                 }
 
-                if (chatFinishReason == ChatFinishReason.ToolCalls && toolCalls.Count > 0)
+                if (chatFinishReason == ChatFinishReason.ToolCalls)
                 {
-                    foreach (var toolCall in toolCalls)
+                    foreach (var toolCall in toolCallAccumulator.Build())
                     {
-                        if (string.IsNullOrEmpty(toolCall.FunctionName))
-                        {
-                            continue;
-                        }
-
                         var toolCallContent = _chat.CreateToolCall(
                             toolCall
                             );
@@ -306,6 +302,107 @@ namespace FreeAIr.BLogic.Reader
                 _chat.Status = ChatStatusEnum.Failed;
 
                 excp.ActivityLogException();
+            }
+        }
+
+        /// <summary>
+        /// Rebuilds whole tool calls out of the fragments a streaming completion delivers.
+        ///
+        /// An endpoint is free to announce the id and the name of a call in one chunk and to send
+        /// its arguments as a series of deltas in the chunks that follow; the protocol only
+        /// promises that the fragments of one call share their index. Taking a single fragment
+        /// therefore yields a call whose arguments are empty or cut in half — the tool then runs
+        /// without arguments, and the broken fragment is carried back to the server with the next
+        /// request, which LM Studio answers with an Internal Server Error.
+        /// </summary>
+        private sealed class StreamingToolCallAccumulator
+        {
+            private readonly Dictionary<int, ToolCallParts> _byIndex = new();
+
+            /// <summary>
+            /// The indices in the order the model opened them, so that the tool calls are offered
+            /// to the user in the order they were asked for rather than in hash order.
+            /// </summary>
+            private readonly List<int> _order = new();
+
+            public void Append(
+                IReadOnlyList<StreamingChatToolCallUpdate> updates
+                )
+            {
+                foreach (var update in updates)
+                {
+                    if (!_byIndex.TryGetValue(update.Index, out var parts))
+                    {
+                        parts = new ToolCallParts();
+                        _byIndex.Add(update.Index, parts);
+                        _order.Add(update.Index);
+                    }
+
+                    //everything but the arguments is sent once, by whichever chunk opens the call
+                    if (!string.IsNullOrEmpty(update.ToolCallId))
+                    {
+                        parts.ToolCallId = update.ToolCallId;
+                    }
+                    if (!string.IsNullOrEmpty(update.FunctionName))
+                    {
+                        parts.FunctionName = update.FunctionName;
+                        parts.Kind = update.Kind;
+                    }
+
+                    var argumentsUpdate = update.FunctionArgumentsUpdate;
+                    if (argumentsUpdate is not null && argumentsUpdate.Length > 0)
+                    {
+                        parts.Arguments.Append(argumentsUpdate.ToString());
+                    }
+                }
+            }
+
+            /// <summary>
+            /// The complete calls, in the order the model opened them. A fragment group which never
+            /// received a name is not a call the chat could execute and is dropped here rather than
+            /// passed on as a tool nobody can find.
+            /// </summary>
+            public IReadOnlyList<StreamingChatToolCallUpdate> Build()
+            {
+                var result = new List<StreamingChatToolCallUpdate>();
+
+                foreach (var index in _order)
+                {
+                    var parts = _byIndex[index];
+                    if (string.IsNullOrEmpty(parts.FunctionName))
+                    {
+                        continue;
+                    }
+
+                    result.Add(
+                        OpenAIChatModelFactory.StreamingChatToolCallUpdate(
+                            index: index,
+                            toolCallId: parts.ToolCallId,
+                            kind: parts.Kind,
+                            functionName: parts.FunctionName,
+                            functionArgumentsUpdate: BinaryData.FromString(
+                                //a call without arguments still has to carry a json object:
+                                //an empty string is not one, and the endpoints reject it
+                                parts.Arguments.Length > 0
+                                    ? parts.Arguments.ToString()
+                                    : "{}"
+                                )
+                            )
+                        );
+                }
+
+                return result;
+            }
+
+            private sealed class ToolCallParts
+            {
+                public string? ToolCallId;
+
+                public string? FunctionName;
+
+                public ChatToolCallKind Kind;
+
+                public readonly StringBuilder Arguments = new();
             }
         }
 

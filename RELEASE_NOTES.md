@@ -134,6 +134,23 @@ My others extensions lives [here](https://marketplace.visualstudio.com/publisher
   itself runs off it, so a solution of thousands of files does not freeze the IDE.
 - The pattern is written by a model, so a regular expression is given a five second timeout: the
   file which makes it misbehave is reported and the rest of the search survives.
+- Fixed a chat against LM Studio dying with `Service request failed. Status: 400 (Bad Request)`
+  before the model was ever asked anything. Four of the built-in Visual Studio tools take no
+  arguments and said so with an empty `{}` schema, which LM Studio validates and rejects — and it
+  rejects the whole request, so a single such tool took every other tool and the conversation down
+  with it. Every tool schema is now brought to the shape the endpoints ask for on its way to the
+  model, which also covers the tools of third party MCP servers: their schemas reach FreeAIr unseen
+  and are just as free to declare no arguments that way.
+- Fixed the same 400 in the natural language search and in the generation of the outlines, from the
+  other end: they asked for the answer in the `json_object` response format, which LM Studio does not
+  implement at all. The json is asked for in the prompt now, as it already was, and the answer goes
+  through the same cleanup that strips the markdown fences and the reasoning blocks before it is
+  parsed.
+- Tool calls are reassembled from the whole stream rather than from its first chunk. An endpoint may
+  send the name of a tool in one chunk and its arguments in the chunks that follow, and only the
+  first was being read: the tool then ran with no arguments at all, and the half-read call was sent
+  back to the server with the next request, which ended the conversation with an Internal Server
+  Error.
 - **The new format is not backward compatible: an index built by FreeAIr 4.2.11 or earlier has to be
   rebuilt.**
 

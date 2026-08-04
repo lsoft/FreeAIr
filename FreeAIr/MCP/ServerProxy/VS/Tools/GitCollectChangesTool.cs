@@ -16,7 +16,7 @@ namespace FreeAIr.MCP.McpServerProxy.VS.Tools
                 VisualStudioMcpServerProxy.VisualStudioProxyName,
                 VisualStudioToolName,
                 "Returns an uncommitted git changes in plain text format.",
-                "{}"
+                NoParameters
                 )
         {
         }

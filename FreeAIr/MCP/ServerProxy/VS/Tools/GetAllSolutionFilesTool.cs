@@ -23,7 +23,7 @@ namespace FreeAIr.MCP.McpServerProxy.VS.Tools
                 VisualStudioMcpServerProxy.VisualStudioProxyName,
                 VisualStudioToolName,
                 "Returns a JSON-formatted list of files (documents, items) metadata of an open solution. The result of this function includes: file name, file full path, file kind, and optional additional information about file's content.",
-                "{}"
+                NoParameters
                 )
         {
         }
