@@ -27,6 +27,7 @@ namespace FreeAIr.MCP.McpServerProxy
     /// </summary>
     public static class McpServerProxyCollection
     {
+        /// <summary>The servers currently started, each paired with the tool list it reported. Rebuilt on every call to <see cref="SetupConfigurationAsync"/>.</summary>
         private static readonly List<McpServerProxyWrapper> _mcpServerProxyWrappers = new();
 
         /// <summary>
@@ -64,6 +65,7 @@ namespace FreeAIr.MCP.McpServerProxy
             return new McpServersSetupConfigurationResult(toolContainer, successStartedMcpServerProxies);
         }
 
+        /// <summary>Splits the requested server names into those to tear down and those to (re)start, then applies both.</summary>
         private static async Task<List<IMcpServerProxy>> ProcessMcpServerProxiesAsync(
             AvailableToolContainer toolContainer,
             List<string> mcpServerProxiesToProcess,
@@ -90,6 +92,7 @@ namespace FreeAIr.MCP.McpServerProxy
             return successStarted;
         }
 
+        /// <summary>Starts or refreshes each named server - the two built-ins by identity, everything else as an <see cref="ExternalMcpServerProxy"/> - and collects the ones that came up successfully.</summary>
         private static async Task<List<IMcpServerProxy>> AddOrUpdateMcpServerProxiesAsync(
             AvailableToolContainer toolContainer,
             List<string> addedOrUpdatedMcpServerProxies,
@@ -149,6 +152,7 @@ namespace FreeAIr.MCP.McpServerProxy
             return successStarted;
         }
 
+        /// <summary>Removes the named servers' wrappers from the running set and drops their tools from the container.</summary>
         private static void DeleteMcpServerProxies(
             AvailableToolContainer toolContainer,
             List<string> deletedMcpServerProxies
@@ -275,13 +279,19 @@ namespace FreeAIr.MCP.McpServerProxy
             return null;
         }
 
+        /// <summary>
+        /// A started MCP server paired with the tool list it reported when it came up, so the tool
+        /// list does not have to be re-fetched from the server on every use.
+        /// </summary>
         public sealed class McpServerProxyWrapper
         {
+            /// <summary>The started server this wrapper caches tools for.</summary>
             public IMcpServerProxy McpServerProxy
             {
                 get;
             }
 
+            /// <summary>The tools the server reported when it was started.</summary>
             public McpServerTools Tools
             {
                 get;
@@ -297,6 +307,10 @@ namespace FreeAIr.MCP.McpServerProxy
                 Tools = tools;
             }
 
+            /// <summary>
+            /// Checks the server is installed, fetches its tool list, and wraps both together;
+            /// returns null when the server is not installed so the caller can skip it.
+            /// </summary>
             public static async Task<McpServerProxyWrapper?> CreateAsync(
                 IMcpServerProxy mcpServerProxy
                 )
@@ -319,17 +333,25 @@ namespace FreeAIr.MCP.McpServerProxy
         }
     }
 
+    /// <summary>
+    /// The tool status of every running MCP server, grouped by server, as returned by
+    /// <see cref="McpServerProxyCollection.GetTools"/> for display and for building the tool list
+    /// actually sent to the chat model.
+    /// </summary>
     public sealed class McpServerProxiesToolsStatusCollection
     {
         private readonly List<McpServerToolsStatus> _toolsStatuses;
 
+        /// <summary>The per-server tool status groups collected so far.</summary>
         public IReadOnlyList<McpServerToolsStatus> ToolsStatuses => _toolsStatuses;
 
+        /// <summary>Creates an empty collection to be filled with per-server tool status groups.</summary>
         public McpServerProxiesToolsStatusCollection()
         {
             _toolsStatuses = new();
         }
 
+        /// <summary>Adds one server's tool status group to the collection.</summary>
         public void AddToolsStatus(McpServerToolsStatus toolsStatus)
         {
             if (toolsStatus is null)
@@ -340,6 +362,7 @@ namespace FreeAIr.MCP.McpServerProxy
             _toolsStatuses.Add(toolsStatus);
         }
 
+        /// <summary>Flattens every server's tools down to just the ones currently enabled, for sending to the chat model.</summary>
         public IReadOnlyList<McpServerToolStatus> GetActiveToolList()
         {
             var result = new List<McpServerToolStatus>();
@@ -359,17 +382,23 @@ namespace FreeAIr.MCP.McpServerProxy
         }
     }
 
+    /// <summary>
+    /// The enabled/disabled status of every tool published by one MCP server.
+    /// </summary>
     public sealed class McpServerToolsStatus
     {
         private readonly List<McpServerToolStatus> _tools;
 
+        /// <summary>The name of the server these tools belong to.</summary>
         public string McpServerProxyName
         {
             get;
         }
 
+        /// <summary>The tools published by this server, each with its enabled/disabled state.</summary>
         public IReadOnlyList<McpServerToolStatus> Tools => _tools;
 
+        /// <summary>Creates an empty status group for the named server.</summary>
         public McpServerToolsStatus(string mcpServerProxyName)
         {
             if (mcpServerProxyName is null)
@@ -381,6 +410,7 @@ namespace FreeAIr.MCP.McpServerProxy
             _tools = new();
         }
 
+        /// <summary>Adds one tool's status to this server's group.</summary>
         public void AddTool(
             McpServerToolStatus tool
             )
@@ -394,18 +424,25 @@ namespace FreeAIr.MCP.McpServerProxy
         }
     }
 
+    /// <summary>
+    /// Pairs a single MCP tool with whether it is currently enabled for use, i.e. whether it will be
+    /// offered to the chat model.
+    /// </summary>
     public sealed class McpServerToolStatus
     {
+        /// <summary>The tool this status describes.</summary>
         public McpServerTool Tool
         {
             get;
         }
 
+        /// <summary>Whether the tool is currently enabled and therefore offered to the chat model.</summary>
         public bool Enabled
         {
             get;
         }
 
+        /// <summary>Pairs the given tool with its enabled state.</summary>
         public McpServerToolStatus(
             McpServerTool tool,
             bool enabled
@@ -420,23 +457,31 @@ namespace FreeAIr.MCP.McpServerProxy
             Enabled = enabled;
         }
 
+        /// <summary>Converts this tool's description into the OpenAI SDK's <see cref="ChatTool"/> shape for the chat request.</summary>
         public ChatTool CreateChatTool()
         {
             return Tool.CreateChatTool();
         }
     }
 
+    /// <summary>
+    /// The outcome of <see cref="McpServerProxyCollection.SetupConfigurationAsync"/>: the tool
+    /// container as updated and the list of servers that came up successfully.
+    /// </summary>
     public sealed class McpServersSetupConfigurationResult
     {
+        /// <summary>The tool container after the requested servers' tools were merged into it.</summary>
         public AvailableToolContainer ToolContainer
         {
             get;
         }
+        /// <summary>The servers that were requested and started (or refreshed) successfully.</summary>
         public List<IMcpServerProxy> SuccessStartedMcpServers
         {
             get;
         }
 
+        /// <summary>Pairs the updated tool container with the list of servers that started successfully.</summary>
         public McpServersSetupConfigurationResult(
             AvailableToolContainer toolContainer,
             List<IMcpServerProxy> successStartedMcpServers

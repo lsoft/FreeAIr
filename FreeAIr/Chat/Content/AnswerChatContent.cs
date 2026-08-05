@@ -17,8 +17,10 @@ namespace FreeAIr.Chat.Content
     /// </summary>
     public sealed class AnswerChatContent : IChatContent, IAsyncDisposable
     {
+        /// <summary>Accumulates the streamed answer chunks into the full answer text.</summary>
         private readonly StringBuilder _answerBody = new();
 
+        /// <summary>Always <see cref="ChatContentTypeEnum.LLMAnswer"/>.</summary>
         public ChatContentTypeEnum Type => ChatContentTypeEnum.LLMAnswer;
 
         /// <summary>
@@ -40,6 +42,9 @@ namespace FreeAIr.Chat.Content
         /// <summary>Everything the model has said so far, as one string.</summary>
         public string AnswerBody => _answerBody.ToString();
 
+        /// <summary>
+        /// Creates an empty, growing answer and sets up the coalesced change notification.
+        /// </summary>
         public AnswerChatContent()
         {
             //every pending notification says the same thing — "the answer has changed" — so a queued
@@ -96,6 +101,7 @@ namespace FreeAIr.Chat.Content
                 ];
         }
 
+        /// <summary>Disposes the underlying <see cref="AnswerChangedEvent"/> proxy.</summary>
         public async ValueTask DisposeAsync()
         {
             await AnswerChangedEvent.DisposeAsync();
@@ -109,6 +115,7 @@ namespace FreeAIr.Chat.Content
     /// </summary>
     public sealed class AnswerChangedEventArgs : EventArgs
     {
+        /// <summary>The single shared, payload-less instance raised for every answer change.</summary>
         public static readonly AnswerChangedEventArgs Instance = new();
     }
 

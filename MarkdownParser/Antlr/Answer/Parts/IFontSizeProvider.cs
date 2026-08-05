@@ -50,20 +50,28 @@
     /// <summary>Fixed-size <see cref="IFontSizeProvider"/> used wherever no per-instance font scaling is needed.</summary>
     public sealed class ConstantFontSizeProvider : IFontSizeProvider
     {
+        /// <summary>Shared singleton instance, since the fixed sizes need no per-caller state.</summary>
         public static readonly ConstantFontSizeProvider Instance = new();
 
+        /// <summary>Fixed font size for inline action buttons.</summary>
         public int ContextButtonSize => 14;
 
+        /// <summary>Fixed font size for fenced code blocks.</summary>
         public int CodeBlockSize => 14;
 
+        /// <summary>Fixed font size for individual code lines.</summary>
         public int CodeLineSize => 14;
 
+        /// <summary>Fixed font size for regular paragraph text.</summary>
         public int TextSize => 14;
 
+        /// <summary>Fixed font size for table header cells.</summary>
         public int TableHeaderSize => 18;
 
+        /// <summary>Fixed font size for table body cells.</summary>
         public int TableBodySize => 14;
 
+        /// <summary>Returns a size that shrinks as the header level increases, so `#` renders larger than `######`.</summary>
         public int GetHeaderFontSize(int level)
         {
             return 24 - level;

@@ -11,11 +11,13 @@ namespace Proxy.Server
     /// </summary>
     public sealed class Servers
     {
+        /// <summary>The registered servers by name, seeded with the built-in GitHub server and grown with external ones.</summary>
         private Dictionary<string, IServer> _servers = new()
         {
             [GithubServer.PublicMCPServerName] = new GithubServer(),
         };
 
+        /// <summary>Creates the registry with only the built-in GitHub server registered.</summary>
         public Servers()
         {
         }

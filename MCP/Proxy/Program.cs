@@ -16,6 +16,7 @@ namespace Proxy
     {
         private static readonly ILogger _log = SerilogLogger.Logger.ForContext<Program>();
 
+        /// <summary>The registry of configured MCP servers this proxy process forwards calls to.</summary>
         public static Servers Servers = new();
 
         /// <summary>Wires up logging, starts watching the parent VS process, then serves RPC calls over stdio until the process is killed.</summary>
@@ -55,9 +56,7 @@ namespace Proxy
             }
         }
 
-        /// <summary>
-        /// Получение ID родительского процесса через WMI
-        /// </summary>
+        /// <summary>Finds the process id of the VS instance that launched this proxy, via a WMI query, so <see cref="ParentProcessWatcher"/> can watch it.</summary>
         private static int? GetParentProcessId()
         {
             using (var process = Process.GetCurrentProcess())

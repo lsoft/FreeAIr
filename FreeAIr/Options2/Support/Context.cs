@@ -50,14 +50,23 @@ namespace FreeAIr.Options2.Support
     /// </summary>
     public static class SupportContextVariableHelper
     {
+        /// <summary>Anchor text for <see cref="SupportContextVariableEnum.ContextItemName"/>.</summary>
         private const string ContextItemName = "{CONTEXT_ITEM_NAME}";
+        /// <summary>Anchor text for <see cref="SupportContextVariableEnum.BuildErrorMessage"/>.</summary>
         private const string BuildErrorMessage = "{BUILD_ERROR_MESSAGE}";
+        /// <summary>Anchor text for <see cref="SupportContextVariableEnum.BuildErrorLine"/>.</summary>
         private const string BuildErrorLine = "{BUILD_ERROR_LINE}";
+        /// <summary>Anchor text for <see cref="SupportContextVariableEnum.BuildErrorColumn"/>.</summary>
         private const string BuildErrorColumn = "{BUILD_ERROR_COLUMN}";
+        /// <summary>Anchor text for <see cref="SupportContextVariableEnum.UnitTestFramework"/>.</summary>
         private const string UnitTestFramework = "{UNIT_TEST_FRAMEWORK}";
+        /// <summary>Anchor text for <see cref="SupportContextVariableEnum.GitDiff"/>.</summary>
         private const string GitDiff = "{GIT_DIFF}";
+        /// <summary>Anchor text for <see cref="SupportContextVariableEnum.NaturalLanguageSearchQuery"/>.</summary>
         private const string NaturalLanguageSearchQuery = "{NATURAL_LANGUAGE_SEARCH_QUERY}";
+        /// <summary>Anchor text for <see cref="SupportContextVariableEnum.WholeLineCompletionAnchor"/>.</summary>
         private const string WholeLineCompletionAnchor = "{WHOLE_LINE_COMPLETION_ANCHOR}";
+        /// <summary>Anchor text for <see cref="SupportContextVariableEnum.RecordedText"/>.</summary>
         private const string RecordedText = "{RECORDED_TEXT}";
 
         /// <summary>

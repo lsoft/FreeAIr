@@ -12,13 +12,16 @@ using System.Windows.Media;
 
 namespace FreeAIr.UI.Embedillo.VisualLine.Command
 {
+    /// <summary>Creates <see cref="CommandVisualLineGenerator"/> instances so the prompt editor can render `/command` mentions inline.</summary>
     public sealed class CommandVisualLineGeneratorFactory : IMentionVisualLineGeneratorFactory
     {
+        /// <summary>Creates the factory. No setup is required until <see cref="Create"/> is called.</summary>
         public CommandVisualLineGeneratorFactory(
             )
         {
         }
 
+        /// <summary>Creates a new command visual-line generator for a prompt editor instance.</summary>
         public MentionVisualLineGenerator Create(
             )
         {
@@ -27,16 +30,25 @@ namespace FreeAIr.UI.Embedillo.VisualLine.Command
         }
     }
 
+    /// <summary>
+    /// Recognizes `/command` mentions typed in the prompt editor, offers matching support actions as
+    /// autocomplete suggestions, and renders a highlighted chip in the input showing whether the typed
+    /// command resolves to a known support action.
+    /// </summary>
     public sealed class CommandVisualLineGenerator : MentionVisualLineGenerator
     {
+        /// <summary>The character that introduces a command mention in the prompt text.</summary>
         public const char Anchor = '/';
+        /// <summary>Support-action suggestions generated for the current autocomplete session.</summary>
         private List<CommandSuggestion>? _suggestions;
 
+        /// <summary>Creates the generator, registering <see cref="Anchor"/> as the mention trigger character.</summary>
         public CommandVisualLineGenerator(
             ) : base(Anchor)
         {
         }
 
+        /// <summary>Resolves a typed command to its support action's prompt template, with context variables applied.</summary>
         public override IParsedPart? CreatePart(string partPayload)
         {
             var suggestion = _suggestions?.FirstOrDefault(s => StringComparer.CurrentCultureIgnoreCase.Compare(s.PublicData, partPayload) == 0);
@@ -55,12 +67,14 @@ namespace FreeAIr.UI.Embedillo.VisualLine.Command
             return new CommandAnswerPart(promptText);
         }
 
+        /// <summary>Loads the current list of support actions available as `/command` autocomplete suggestions.</summary>
         public override async System.Threading.Tasks.Task<List<ISuggestion>> GetSuggestionsAsync()
         {
             _suggestions = await GenerateSuggestionsAsync();
             return _suggestions.ConvertAll(s => (ISuggestion)s);
         }
 
+        /// <summary>Builds the inline chip shown for a typed command, colored green when it matches a known support action and red otherwise.</summary>
         protected override UIElement CreateControl(string command)
         {
             command = command.TrimStart(Anchor);
@@ -150,6 +164,7 @@ namespace FreeAIr.UI.Embedillo.VisualLine.Command
             return border;
         }
 
+        /// <summary>Loads support actions scoped to the prompt input control and converts each into a command suggestion.</summary>
         private static async Task<List<CommandSuggestion>> GenerateSuggestionsAsync()
         {
             var suggestions = new List<CommandSuggestion>();
@@ -174,6 +189,7 @@ namespace FreeAIr.UI.Embedillo.VisualLine.Command
             return suggestions;
         }
 
+        /// <summary>Formats the tooltip for a command chip, showing the support action's name and its underlying prompt template.</summary>
         private static string GenerateTooltip(SupportActionJson action)
         {
             return
@@ -185,6 +201,7 @@ $"""
 
         }
 
+        /// <summary>Converts a support action's display name into the CamelCase form used as its `/command` invocation text.</summary>
         private static string TransformSupportActionName(string name)
         {
             var sb = new StringBuilder();

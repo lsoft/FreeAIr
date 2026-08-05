@@ -10,8 +10,17 @@ using System.Threading.Tasks;
 
 namespace FreeAIr.UI.ContextMenu
 {
+    /// <summary>
+    /// Queries an OpenAI compatible endpoint for its available models and shows a Visual Studio
+    /// context menu so the user can pick one, optionally narrowed by a <see cref="ModelFilterer"/>.
+    /// </summary>
     public static class ModelContextMenu
     {
+        /// <summary>
+        /// Fetches the model list from the given endpoint/token, filters it if a
+        /// <see cref="ModelFilterer"/> is supplied, and shows the picker menu, returning the
+        /// chosen model id (or the only one, if just a single model matches).
+        /// </summary>
         public static async Task<string?> ChooseModelFromProviderAsync(
             string token,
             string endpoint,

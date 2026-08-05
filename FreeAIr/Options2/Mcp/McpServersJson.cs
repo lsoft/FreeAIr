@@ -21,11 +21,13 @@ namespace FreeAIr.Options2.Mcp
             set;
         }
 
+        /// <summary>Starts with no servers, which is what a fresh installation shows before any MCP server is configured.</summary>
         public AvailableMcpServersJson()
         {
             Servers = [];
         }
 
+        /// <summary>Deep copy of the server list, used before edits so a cancelled settings dialog leaves the original untouched.</summary>
         public object Clone()
         {
             return new AvailableMcpServersJson
@@ -78,12 +80,14 @@ namespace FreeAIr.Options2.Mcp
             set;
         }
 
+        /// <summary>Unnamed, with no tools, for the json deserializer.</summary>
         public AvailableMcpServerJson()
         {
             Name = string.Empty;
             Tools = [];
         }
 
+        /// <summary>Deep copy of this server's name and tool switches.</summary>
         public object Clone()
         {
             return new AvailableMcpServerJson
@@ -93,6 +97,7 @@ namespace FreeAIr.Options2.Mcp
             };
         }
 
+        /// <summary>Builds an entry for a newly discovered server, with every one of its tools enabled by default.</summary>
         public AvailableMcpServerJson(
             string name,
             IReadOnlyList<string> toolNames
@@ -191,6 +196,7 @@ namespace FreeAIr.Options2.Mcp
             Name = name;
         }
 
+        /// <summary>Builds a tool switch with an explicit initial state, used when reconciling with what the settings file already recorded.</summary>
         public AvailableMcpServerToolJson(string name, bool enabled)
         {
             if (name is null)
@@ -202,6 +208,7 @@ namespace FreeAIr.Options2.Mcp
             Enabled = enabled;
         }
 
+        /// <summary>Deep copy of this tool's name and enabled state.</summary>
         public object Clone()
         {
             return new AvailableMcpServerToolJson

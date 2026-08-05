@@ -11,12 +11,26 @@ using System.Windows.Media.Imaging;
 
 namespace FreeAIr.UI.Embedillo
 {
+    /// <summary>
+    /// Adapts an <see cref="ISuggestion"/> mention candidate to AvalonEdit's <see cref="ICompletionData"/>
+    /// contract, so it can be shown and inserted by the mention autocomplete popup, including rendering the
+    /// suggestion's icon through the Visual Studio image service.
+    /// </summary>
     public class CompletionData : ICompletionData
     {
+        /// <summary>
+        /// The mention candidate this completion entry wraps and inserts when accepted.
+        /// </summary>
         private readonly ISuggestion _suggestion;
 
+        /// <summary>
+        /// The short, human-readable text shown for this entry in the completion list.
+        /// </summary>
         public string Text => _suggestion.PublicData;
 
+        /// <summary>
+        /// Wraps the given mention suggestion as a completion entry.
+        /// </summary>
         public CompletionData(
             ISuggestion suggestion
             )
@@ -29,6 +43,10 @@ namespace FreeAIr.UI.Embedillo
             _suggestion = suggestion;
         }
 
+        /// <summary>
+        /// Replaces the partially-typed mention text in the editor with this suggestion's full data (e.g.
+        /// the complete file path or identifier) when the user accepts this completion entry.
+        /// </summary>
         public void Complete(
             TextArea textArea,
             ISegment completionSegment,
@@ -43,15 +61,36 @@ namespace FreeAIr.UI.Embedillo
 
         #region Реализация остальных членов ICompletionData
 
+        /// <summary>
+        /// The content displayed for this entry in the completion list; same as <see cref="Text"/>.
+        /// </summary>
         public object Content => Text;
+
+        /// <summary>
+        /// Extended description shown for this entry; unused, always null.
+        /// </summary>
         public object? Description => null;
+
+        /// <summary>
+        /// Sort priority among competing completion entries; unused, always zero.
+        /// </summary>
         public double Priority => 0;
+
+        /// <summary>
+        /// The icon shown next to this entry, rendered from the suggestion's image moniker via the VS image
+        /// service.
+        /// </summary>
         public ImageSource? Image => ConvertMonikerToImageSource(
             _suggestion.Image
             );
 
         #endregion
 
+        /// <summary>
+        /// Renders a Visual Studio <see cref="ImageMoniker"/> (the icon catalog used throughout the VS
+        /// shell) into a WPF <see cref="ImageSource"/> themed to match the current tool window background,
+        /// so mention/completion icons look native inside the chat editor.
+        /// </summary>
         public static ImageSource? ConvertMonikerToImageSource(
             ImageMoniker imageMoniker,
             int? width = null,

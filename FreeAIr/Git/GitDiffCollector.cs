@@ -7,8 +7,16 @@ using System.Threading.Tasks;
 
 namespace FreeAIr.Git
 {
+    /// <summary>
+    /// Collects the pending changes of the current git repository — both tracked modifications and
+    /// untracked files — as unified diff text, for feeding into an AI commit message prompt.
+    /// </summary>
     public static class GitDiffCollector
     {
+        /// <summary>
+        /// Collects every pending diff and concatenates them into one block of text. Returns null
+        /// when there is nothing to diff.
+        /// </summary>
         public static async Task<string?> CombineDiffAsync(
             CancellationToken cancellationToken = default
             )
@@ -29,6 +37,11 @@ namespace FreeAIr.Git
             return summaryDiff.ToString();
         }
 
+        /// <summary>
+        /// Diffs the index against HEAD and diffs every untracked file individually against an empty
+        /// file, so newly added files show up in the commit message prompt too. Returns null when
+        /// the index diff itself fails or is empty.
+        /// </summary>
         public static async Task<List<string>?> CollectDiffAsync(
             CancellationToken cancellationToken = default
             )
@@ -61,6 +74,11 @@ namespace FreeAIr.Git
             return result;
         }
 
+        /// <summary>
+        /// Runs `git diff` for either the tracked index (when <paramref name="nonVersionedFile"/> is
+        /// empty) or one untracked file, swallowing any failure so one bad file cannot abort the
+        /// whole commit message build.
+        /// </summary>
         private static async Task<string?> RunAndParseGitDiffSilentlyAsync(
             string? nonVersionedFile,
             CancellationToken cancellationToken

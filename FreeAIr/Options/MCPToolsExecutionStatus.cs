@@ -23,6 +23,7 @@ namespace FreeAIr
             set;
         }
 
+        /// <summary>Creates a status with no tools approved yet.</summary>
         public MCPToolsExecutionStatus()
         {
             EnabledTools = new();
@@ -61,6 +62,7 @@ namespace FreeAIr
             Save();
         }
 
+        /// <summary>Serializes this status into <see cref="InternalPage"/> and persists it, so approvals survive across Visual Studio sessions.</summary>
         private void Save()
         {
             InternalPage.Instance.MCPToolsExecutionStatus = System.Text.Json.JsonSerializer.Serialize(this);

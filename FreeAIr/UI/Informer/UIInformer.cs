@@ -10,19 +10,51 @@ using WpfHelpers;
 
 namespace FreeAIr.UI.Informer
 {
+    /// <summary>
+    /// Owns the small status indicator ("⏸"/"▶") injected into the Visual Studio status bar that shows
+    /// whether any FreeAIr chat is currently working, plus the popup tooltip that explains the current
+    /// state and the double-click gesture used to jump to the activity log.
+    /// </summary>
     [Export(typeof(UIInformer))]
     public sealed class UIInformer
     {
+        /// <summary>
+        /// The Visual Studio main window, used to locate the status bar panel the indicator is attached to.
+        /// </summary>
         private readonly System.Windows.Window _mainWindow;
+
+        /// <summary>
+        /// DTE shutdown event source, subscribed to so the background retry loop in <see cref="InitAsync"/>
+        /// stops cleanly when Visual Studio begins closing.
+        /// </summary>
         private readonly DTEEvents _dteEvents;
+
+        /// <summary>
+        /// Cancels the polling loop that waits for the status bar panel to become available and stops
+        /// pending work when the IDE begins shutting down.
+        /// </summary>
         private readonly CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
 
+        /// <summary>
+        /// The status bar label control showing the current chat activity indicator; null until the status
+        /// bar panel becomes available and <see cref="CreateControl"/> has run.
+        /// </summary>
         private Label _statusControl;
 
+        /// <summary>
+        /// The chat activity state currently reflected by the status indicator.
+        /// </summary>
         private ChatsStatusEnum _status = ChatsStatusEnum.Idle;
 
+        /// <summary>
+        /// Raised when the user double-clicks the status indicator; used to open the activity log.
+        /// </summary>
         public event DoubleClickDelegate DoubleClickEvent;
 
+        /// <summary>
+        /// MEF constructor that captures the main window and subscribes to DTE shutdown so the status
+        /// indicator can later be created and torn down.
+        /// </summary>
         [ImportingConstructor]
         public UIInformer(
             )
@@ -36,6 +68,10 @@ namespace FreeAIr.UI.Informer
             _dteEvents.OnBeginShutdown += DTEEvents_OnBeginShutdown;
         }
 
+        /// <summary>
+        /// Updates the status indicator to reflect a new chat activity state (idle vs. working), switching
+        /// to the UI thread and refreshing the control text only when the state actually changed.
+        /// </summary>
         public async void UpdateUIStatusAsync(
             ChatsStatusEnum status
             )
@@ -64,6 +100,10 @@ namespace FreeAIr.UI.Informer
             }
         }
 
+        /// <summary>
+        /// Refreshes the status indicator's glyph and tooltip text to match <see cref="_status"/>, and opens
+        /// the tooltip popup so the change is briefly visible to the user.
+        /// </summary>
         private void UpdateControlText(
             )
         {
@@ -101,6 +141,11 @@ namespace FreeAIr.UI.Informer
             pup.IsOpen = true;
         }
 
+        /// <summary>
+        /// Repeatedly attempts to create and attach the status indicator to the VS status bar, retrying once
+        /// a second until the status bar panel exists (it may not be ready yet during IDE startup) or the
+        /// operation is cancelled.
+        /// </summary>
         public async Task InitAsync()
         {
             try
@@ -129,11 +174,19 @@ namespace FreeAIr.UI.Informer
             }
         }
 
+        /// <summary>
+        /// Cancels pending status-indicator work when Visual Studio begins shutting down.
+        /// </summary>
         private void DTEEvents_OnBeginShutdown()
         {
             _cancellationTokenSource.Cancel();
         }
 
+        /// <summary>
+        /// Builds the status label and its tooltip popup, styled to match the VS status bar's default font
+        /// and colors, and adds it to the status bar panel. Returns false if the panel or the reference
+        /// control used to read the default styling cannot be found yet.
+        /// </summary>
         private bool CreateControl()
         {
             if (_statusControl is not null)
@@ -185,6 +238,9 @@ namespace FreeAIr.UI.Informer
             return true;
         }
 
+        /// <summary>
+        /// Raises <see cref="DoubleClickEvent"/> when the user left-double-clicks the status indicator.
+        /// </summary>
         private void StatusControl_MouseDoubleClick(
             object sender, 
             System.Windows.Input.MouseButtonEventArgs e
@@ -202,6 +258,10 @@ namespace FreeAIr.UI.Informer
             }
         }
 
+        /// <summary>
+        /// Reads the font family, font size and foreground brush from the VS status bar's built-in source
+        /// control indicator, via reflection, so the FreeAIr status label can visually match it.
+        /// </summary>
         private DefaultUIParameters? GetDefaultUiParameters()
         {
             var scc = _mainWindow.GetRecursiveByName("PART_SccCompartmentText");
@@ -233,11 +293,24 @@ namespace FreeAIr.UI.Informer
     }
 
 
+    /// <summary>
+    /// The chat activity state shown by the status bar indicator.
+    /// </summary>
     public enum ChatsStatusEnum
     {
+        /// <summary>
+        /// At least one chat has a request in progress.
+        /// </summary>
         Working,
+
+        /// <summary>
+        /// No chat currently has a request in progress.
+        /// </summary>
         Idle
     }
 
+    /// <summary>
+    /// Signature for the event raised when the user double-clicks the status bar indicator.
+    /// </summary>
     public delegate void DoubleClickDelegate(object sender, EventArgs e);
 }

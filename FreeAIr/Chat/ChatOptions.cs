@@ -73,22 +73,26 @@ namespace FreeAIr.Chat
                 );
         }
 
+        /// <summary>Whether and how the model may call tools while answering in this chat.</summary>
         public ChatToolChoice ToolChoice
         {
             get;
         }
 
+        /// <summary>The agents configured for the workspace, from which <see cref="ChosenAgent"/> is picked.</summary>
         public AgentCollectionJson ChatAgents
         {
             get;
         }
 
+        /// <summary>The agent that currently answers prompts in this chat.</summary>
         public AgentJson ChosenAgent
         {
             get;
             private set;
         }
 
+        /// <summary>The response shape requested from the model: plain text or JSON.</summary>
         public OpenAI.Chat.ChatResponseFormat ResponseFormat
         {
             get;
@@ -103,6 +107,10 @@ namespace FreeAIr.Chat
             get;
         }
 
+        /// <summary>
+        /// Validates and stores the option set; use the named factory methods above rather than
+        /// calling this directly.
+        /// </summary>
         private ChatOptions(
             ChatToolChoice toolChoice,
             AgentCollectionJson chatAgents,
@@ -133,6 +141,7 @@ namespace FreeAIr.Chat
             AutomaticallyProcessed = automaticallyProcessed;
         }
 
+        /// <summary>Switches which agent answers subsequent prompts in this chat.</summary>
         public void ChangeChosenAgent(AgentJson chosenAgent)
         {
             if (chosenAgent is null)

@@ -9,12 +9,14 @@ namespace Proxy
     /// </summary>
     public static class SerilogLogger
     {
+        /// <summary>Folder the rolling log files are written under, set by <see cref="Init"/>.</summary>
         public static string LogFolderPath
         {
             get;
             private set;
         }
 
+        /// <summary>The proxy process's shared Serilog logger instance.</summary>
         public static Serilog.Core.Logger Logger
         {
             get;
@@ -80,6 +82,7 @@ namespace Proxy
                 );
         }
 
+        /// <summary>Logs at Fatal level on <paramref name="logger"/>, prefixed with the caller's class/member/line.</summary>
         public static void Fatal(
             this ILogger logger,
             Exception? exception,
@@ -93,6 +96,7 @@ namespace Proxy
             logger.Fatal(exception, "{ClassName}.{MemberName}({LineNumber}): {Message}", className, memberName, sourceLineNumber, message);
         }
 
+        /// <summary>Logs at Fatal level on the shared logger, prefixed with the caller's class/member/line.</summary>
         public static void Fatal(
             string message,
             [CallerMemberName] string memberName = "",
@@ -110,6 +114,7 @@ namespace Proxy
                 );
         }
 
+        /// <summary>Logs at Fatal level on <paramref name="logger"/>, prefixed with the caller's class/member/line.</summary>
         public static void Fatal(
             this ILogger logger,
             string message,
@@ -141,6 +146,7 @@ namespace Proxy
                 );
         }
 
+        /// <summary>Logs at Error level on <paramref name="logger"/>, prefixed with the caller's class/member/line.</summary>
         public static void Error(
             this ILogger logger,
             Exception? exception,
@@ -154,6 +160,7 @@ namespace Proxy
             logger.Error(exception, "{ClassName}.{MemberName}({LineNumber}): {Message}", className, memberName, sourceLineNumber, message);
         }
 
+        /// <summary>Logs at Error level on the shared logger, prefixed with the caller's class/member/line.</summary>
         public static void Error(
             string message,
             [CallerMemberName] string memberName = "",
@@ -170,6 +177,7 @@ namespace Proxy
                 );
         }
 
+        /// <summary>Logs at Error level on <paramref name="logger"/>, prefixed with the caller's class/member/line.</summary>
         public static void Error(
             this ILogger logger,
             string message,
@@ -199,6 +207,7 @@ namespace Proxy
                 );
         }
 
+        /// <summary>Logs at Warning level on <paramref name="logger"/>, prefixed with the caller's class/member/line.</summary>
         public static void Warning(
             this ILogger logger,
             string message,
@@ -228,6 +237,7 @@ namespace Proxy
                 );
         }
 
+        /// <summary>Logs at Information level on <paramref name="logger"/>, prefixed with the caller's class/member/line.</summary>
         public static void Information(
             this ILogger logger,
             string message,

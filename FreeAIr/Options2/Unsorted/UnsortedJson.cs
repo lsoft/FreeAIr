@@ -96,6 +96,7 @@ namespace FreeAIr.Options2.Unsorted
         //have moved into the `Rag` node of the settings, where they are joined by the calibration
         //the threshold is now derived from
 
+        /// <summary>Starts with the built-in defaults for every knob; used by the deserializer and by a fresh settings file.</summary>
         public UnsortedJson()
         {
         }

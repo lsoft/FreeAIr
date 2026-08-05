@@ -4,6 +4,7 @@
     public sealed class CallToolRequest : BaseRequest
     {
 
+        /// <summary>Name of the tool being invoked on the target MCP server.</summary>
         public string ToolName
         {
             get;
@@ -17,10 +18,12 @@
             set;
         }
 
+        /// <summary>Parameterless constructor for JSON deserialization.</summary>
         public CallToolRequest()
         {
         }
 
+        /// <summary>Builds a tool call for <paramref name="toolName"/> on <paramref name="mcpServerName"/> with the given <paramref name="arguments"/>.</summary>
         public CallToolRequest(
             string mcpServerName,
             string toolName,
@@ -48,16 +51,19 @@
             set;
         }
 
+        /// <summary>The tool's output, one entry per content block returned by the MCP server.</summary>
         public string[] Content
         {
             get;
             set;
         }
 
+        /// <summary>Parameterless constructor for JSON deserialization.</summary>
         public CallToolReply()
         {
         }
 
+        /// <summary>Wraps a tool call's outcome: whether the server flagged it as an error, plus its returned content.</summary>
         public CallToolReply(bool isError, string[] content)
         {
             if (content is null)

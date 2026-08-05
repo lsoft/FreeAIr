@@ -19,11 +19,13 @@ namespace FreeAIr.CodeLens
     /// </summary>
     public class CodeLensDataPoint : IAsyncCodeLensDataPoint, IDisposable
     {
+        /// <summary>Details-pane command that opens the "add XML comment" support action; the id and guid must stay in sync with the VSCT command definition.</summary>
         public static readonly CodeLensDetailEntryCommand AddXmlCommentCommand = new CodeLensDetailEntryCommand
         {
             CommandId = 0x1036, //must match with the command id from vsct file
             CommandSet = new Guid("faec8da8-74ca-4afa-8b7d-64be3914fbac") //must match with the command group guid from vsct file
         };
+        /// <summary>Details-pane command that opens the "generate unit tests" support action; the id and guid must stay in sync with the VSCT command definition.</summary>
         public static readonly CodeLensDetailEntryCommand GenerateUnitTestsCommand = new CodeLensDetailEntryCommand
         {
             CommandId = 0x1037, //must match with the command id from vsct file
@@ -32,18 +34,26 @@ namespace FreeAIr.CodeLens
 
 
 
+        /// <summary>Callback channel used to invoke methods on the owning Visual Studio process, such as <see cref="ICodeLensListener.GetUnitInformationAsync"/>.</summary>
         private readonly ICodeLensCallbackService _callbackService;
+        /// <summary>Identifies which code element (project, file, method) this data point represents.</summary>
         private readonly CodeLensDescriptor _descriptor;
 
+        /// <summary>The named-pipe connection back to Visual Studio, opened once via <see cref="ConnectToVisualStudioAsync"/>.</summary>
         private RemoteCodeLensConnectionHandler? _visualStudioConnection;
+        /// <summary>Signaled once <see cref="_codeLensUnitInfo"/> has been fetched, so a concurrent <see cref="GetDetailsAsync"/> call knows whether to wait or re-fetch.</summary>
         private readonly ManualResetEventSlim _dataHasLoaded = new ManualResetEventSlim(initialState: false);
 
+        /// <summary>The most recently fetched unit info for this code element, cached between <see cref="GetDataAsync"/> and <see cref="GetDetailsAsync"/>.</summary>
         private CodeLensUnitInfo? _codeLensUnitInfo;
 
+        /// <summary>Raised to tell Visual Studio this data point's indicator needs to be re-queried.</summary>
         public event AsyncEventHandler? InvalidatedAsync;
 
+        /// <summary>The code element (project, file, method) this data point represents.</summary>
         public CodeLensDescriptor Descriptor => this._descriptor;
 
+        /// <summary>Identifier this data point registers itself under with the Visual Studio side, so a targeted refresh can find it again.</summary>
         public Guid UniqueIdentifier
         {
             get;
@@ -83,11 +93,13 @@ namespace FreeAIr.CodeLens
         }
 
         // Called from VS via JSON RPC.
+        /// <summary>Called remotely by Visual Studio to tell this data point its underlying data changed.</summary>
         public void Refresh()
         {
             Invalidate();
         }
 
+        /// <summary>Closes the connection to Visual Studio and releases the wait handle.</summary>
         public void Dispose()
         {
             _visualStudioConnection?.Dispose();

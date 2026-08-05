@@ -7,13 +7,18 @@ using StreamJsonRpc;
 namespace FreeAIr.CodeLens
 {
     /// <summary>
+    /// Client side of the CodeLens named pipe, living in the out-of-process CodeLens host: connects one
+    /// <see cref="CodeLensDataPoint"/> to the main Visual Studio process and relays refresh calls back to it.
     /// Taken from  https://github.com/bert2/microscope completely.
     /// Take a look to that repo, it's amazing!
     /// </summary>
     public class RemoteCodeLensConnectionHandler : IRemoteCodeLens, IDisposable
     {
+        /// <summary>The CodeLens data point this handler represents on the Visual Studio side of the pipe.</summary>
         private readonly CodeLensDataPoint _owner;
+        /// <summary>The named pipe client connected to the Visual Studio process hosting <see cref="_owner"/>.</summary>
         private readonly NamedPipeClientStream _stream;
+        /// <summary>The JSON-RPC channel attached to <see cref="_stream"/> once the connection is open.</summary>
         private JsonRpc? _rpc;
 
         /// <summary>Creates a handler and connects its pipe to the Visual Studio side before returning it.</summary>
@@ -36,6 +41,7 @@ namespace FreeAIr.CodeLens
                 );
         }
 
+        /// <summary>Closes the named pipe connection to Visual Studio.</summary>
         public void Dispose() => _stream.Dispose();
 
         /// <summary>Called remotely by the Visual Studio side to tell this data point its data changed.</summary>

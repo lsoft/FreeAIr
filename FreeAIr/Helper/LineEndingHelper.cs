@@ -2,8 +2,10 @@
 
 namespace FreeAIr.Helper
 {
+    /// <summary>Helpers for determining which line-ending style (CRLF/LF/CR) a file uses, checked several ways: via `.editorconfig`, via an already-open Visual Studio document, or by inspecting the file's own content.</summary>
     public static class LineEndingHelper
     {
+        /// <summary>Resolves the line ending from `.editorconfig` settings for a given file path.</summary>
         public static class EditorConfig
         {
             /// <summary>
@@ -33,6 +35,7 @@ namespace FreeAIr.Helper
             }
         }
 
+        /// <summary>Resolves the line ending by looking at an actual document — either open in Visual Studio or read from disk — rather than `.editorconfig` settings.</summary>
         public static class Actual
         {
             /// <summary>
@@ -128,6 +131,7 @@ namespace FreeAIr.Helper
                 return Environment.NewLine;
             }
 
+            /// <summary>Determines the line ending by scanning the file's own content when it exists on disk, falling back to <see cref="EditorConfig.GetLineEndingFor"/> if it doesn't.</summary>
             public static string GetDocumentLineEnding(
                 string filePath
                 )
@@ -154,6 +158,7 @@ namespace FreeAIr.Helper
                 return Environment.NewLine;
             }
 
+            /// <summary>Reads the line ending directly from an open Visual Studio text document via an edit point.</summary>
             private static string GetDocumentLineEnding(
                 EnvDTE.Document activeDoc
                 )

@@ -18,8 +18,10 @@ namespace FreeAIr.Extension
     /// </summary>
     public class CodeLensListener : ICodeLensCallbackListener, ICodeLensListener
     {
+        /// <summary>The Visual Studio MEF component model, used to resolve services needed to answer CodeLens callbacks.</summary>
         private readonly IComponentModel _componentModel;
 
+        /// <summary>Creates the listener and grabs the global <see cref="IComponentModel"/> service from the Visual Studio shell.</summary>
         [ImportingConstructor]
         public CodeLensListener(
             )

@@ -5,14 +5,25 @@ using FreeAIr.Helper;
 namespace FreeAIr.Commands
 {
 
+    /// <summary>
+    /// The editor command that triggers an AI-generated whole-line completion suggestion at the
+    /// caret and shows it through the editor's autocomplete/proposal UI.
+    /// </summary>
     [Command(PackageIds.GenerateWholeLineSuggestionCommandId)]
     public sealed class GenerateWholeLineSuggestionCommand : BaseCommand<GenerateWholeLineSuggestionCommand>
     {
+        /// <summary>
+        /// Creates the command instance; no setup is required beyond the base VS command wiring.
+        /// </summary>
         public GenerateWholeLineSuggestionCommand(
             )
         {
         }
 
+        /// <summary>
+        /// Builds a proposal source for the active text view at the caret position and shows the
+        /// generated whole-line suggestion via the autocomplete hijack helper.
+        /// </summary>
         protected override async Task ExecuteAsync(OleMenuCmdEventArgs e)
         {
             await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();

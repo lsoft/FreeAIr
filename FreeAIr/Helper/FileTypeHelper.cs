@@ -5,9 +5,16 @@ using System.Text;
 
 namespace FreeAIr.Helper
 {
+    /// <summary>
+    /// Decides whether a file is text or binary, first by its extension and, when that is
+    /// inconclusive, by sniffing its content for a BOM or invalid UTF-8. Used to keep binary files
+    /// out of chat context and out of the natural language outline scan.
+    /// </summary>
     public static class FileTypeHelper
     {
-        // Список известных текстовых расширений
+        /// <summary>
+        /// The extensions treated as text without inspecting file content.
+        /// </summary>
         public static readonly IReadOnlyCollection<string> TextFileExtensions = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
         {
             ".ada", ".adoc", ".ampl", ".asp", ".aspx", ".babelcache", ".babelignore", ".babelrc", ".bas",
@@ -25,6 +32,11 @@ namespace FreeAIr.Helper
             ".xml", ".yaml", ".yarnrc", ".yml", ".zsh"
         };
 
+        /// <summary>
+        /// Classifies a file as empty, text or binary: known text extensions are trusted outright,
+        /// otherwise the file's leading bytes are checked for null bytes, a byte-order mark, or
+        /// valid UTF-8.
+        /// </summary>
         public static FileTypeEnum GetFileType(
             this string filePath
             )
@@ -80,12 +92,18 @@ namespace FreeAIr.Helper
             }
         }
 
+        /// <summary>
+        /// Whether the file's extension is one of <see cref="TextFileExtensions"/>.
+        /// </summary>
         private static bool IsTextExtension(string filePath)
         {
             var ext = Path.GetExtension(filePath);
             return !string.IsNullOrEmpty(ext) && TextFileExtensions.Contains(ext);
         }
 
+        /// <summary>
+        /// Whether the given byte range contains a null byte, a strong signal of binary content.
+        /// </summary>
         private static bool HasNullByte(byte[] buffer, int length)
         {
             for (int i = 0; i < length; i++)
@@ -99,6 +117,10 @@ namespace FreeAIr.Helper
             return false;
         }
 
+        /// <summary>
+        /// Detects the text encoding from a leading byte-order mark (UTF-8, UTF-16 or UTF-32, either
+        /// endianness), or null when none of the leading bytes match a known BOM.
+        /// </summary>
         private static Encoding? DetectEncodingFromBom(byte[] data)
         {
             if (data.Length >= 3 && data[0] == 0xEF && data[1] == 0xBB && data[2] == 0xBF)
@@ -139,10 +161,22 @@ namespace FreeAIr.Helper
         }
     }
 
+    /// <summary>
+    /// The classification <see cref="FileTypeHelper.GetFileType"/> assigns to a file.
+    /// </summary>
     public enum FileTypeEnum
     {
+        /// <summary>
+        /// The file has no content.
+        /// </summary>
         Empty,
+        /// <summary>
+        /// The file is plain text.
+        /// </summary>
         Text,
+        /// <summary>
+        /// The file is not text and should be excluded from text-based processing.
+        /// </summary>
         Binary
     }
 }

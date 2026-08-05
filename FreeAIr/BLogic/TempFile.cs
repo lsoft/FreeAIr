@@ -21,6 +21,7 @@ namespace FreeAIr.BLogic
             get;
         }
 
+        /// <summary>Reserves a path for the temp file without creating it; use one of the static factory methods instead of calling this directly.</summary>
         private TempFile(
             string filePath
             )
@@ -28,11 +29,13 @@ namespace FreeAIr.BLogic
             FilePath = filePath;
         }
 
+        /// <summary>Opens the temp file for writing, creating it if it does not exist yet.</summary>
         public FileStream OpenWrite()
         {
             return File.OpenWrite(FilePath);
         }
 
+        /// <summary>Opens the temp file for reading.</summary>
         public FileStream OpenRead()
         {
             return File.OpenRead(FilePath);
@@ -54,6 +57,7 @@ namespace FreeAIr.BLogic
             return new TempFile(filePath);
         }
 
+        /// <summary>A temp file with a bare guid name and no extension.</summary>
         public static TempFile Create()
         {
             var filePath = Path.Combine(
@@ -105,11 +109,13 @@ namespace FreeAIr.BLogic
             }
         }
 
+        /// <summary>Writes the given text to the temp file, creating or overwriting it.</summary>
         public void WriteAllText(string newItemBody)
         {
             File.WriteAllText(FilePath, newItemBody);
         }
 
+        /// <summary>Reads the whole content of the temp file as text.</summary>
         public string ReadAllText()
         {
             return File.ReadAllText(FilePath);

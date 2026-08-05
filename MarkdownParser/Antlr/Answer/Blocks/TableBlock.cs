@@ -13,15 +13,21 @@ namespace MarkdownParser.Antlr.Answer.Blocks
     /// </summary>
     public sealed class TableBlock : IBlock
     {
+        /// <summary>Background brush used for header cells, a light gray at low opacity.</summary>
         private static readonly Brush _semiTransparentGray = new SolidColorBrush(Color.FromArgb(0x40, 0x80, 0x80, 0x80));
-        
+
+        /// <summary>Supplies the font sizes used for header and body cells, kept in sync with the rest of the answer rendering.</summary>
         private readonly IFontSizeProvider _fontSizeProvider;
-        
+
+        /// <summary>True once the dash-only header/body separator row has been seen, marking the row before it as the header.</summary>
         private bool _headerRowAdded = false;
+        /// <summary>The accumulated table rows, each a list of cell texts, in the order <see cref="AddRow"/> received them.</summary>
         private List<List<string>> _rows;
 
+        /// <summary>Identifies this block as a table for block-type dispatch.</summary>
         public BlockTypeEnum Type => BlockTypeEnum.Table;
 
+        /// <summary>Creates an empty table block that accumulates rows via <see cref="AddRow"/>.</summary>
         public TableBlock(
             IFontSizeProvider fontSizeProvider
             )
@@ -164,6 +170,7 @@ namespace MarkdownParser.Antlr.Answer.Blocks
             return new Thickness(left, top, right, bottom);
         }
 
+        /// <summary>Builds one WPF <see cref="TableCell"/> containing the given text, font size, border and optional background.</summary>
         private TableCell CreateTableCell(
             string cellText,
             double fontSize,

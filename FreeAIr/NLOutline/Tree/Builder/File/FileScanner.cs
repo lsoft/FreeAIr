@@ -18,28 +18,52 @@ using FreeAIr.Chat.Context.Item;
 
 namespace FreeAIr.NLOutline.Tree.Builder.File
 {
+    /// <summary>
+    /// Contract for a scanner that turns the files of a solution into <see cref="OutlineNode"/>
+    /// entries for the natural language outline tree. Implementations are MEF-exported and picked
+    /// per file by extension, or as the LLM-driven fallback for anything unrecognized.
+    /// </summary>
     public interface IFileScanner
     {
+        /// <summary>
+        /// Selection priority among the registered scanners: lower runs first, and
+        /// <see cref="int.MaxValue"/> marks the LLM-driven fallback that only matches when nothing
+        /// more specific claims the file.
+        /// </summary>
         int Order
         {
             get;
         }
 
+        /// <summary>
+        /// Short display name for this scanner, shown wherever the available NLO scanners are listed.
+        /// </summary>
         string Name
         {
             get;
         }
 
+        /// <summary>
+        /// One-line explanation of what this scanner does and how it produces outlines.
+        /// </summary>
         string Description
         {
             get;
         }
 
+        /// <summary>
+        /// File extensions (including the leading dot) this scanner handles; an empty list means it
+        /// matches any file not claimed by a more specific scanner.
+        /// </summary>
         IReadOnlyList<string> FileExtensions
         {
             get;
         }
 
+        /// <summary>
+        /// Scans <paramref name="items"/> and appends the resulting outline nodes as children of
+        /// <paramref name="root"/>.
+        /// </summary>
         Task BuildAsync(
             SupportActionJson action,
             AgentJson agent,
@@ -56,22 +80,42 @@ namespace FreeAIr.NLOutline.Tree.Builder.File
     [Export(typeof(IFileScanner))]
     public sealed class FileScanner : IFileScanner
     {
+        /// <summary>
+        /// Runs last among the registered scanners, so it only picks up files no other scanner
+        /// claimed by extension.
+        /// </summary>
         public int Order => int.MaxValue;
-        
+
+        /// <summary>
+        /// Display name for this fallback scanner.
+        /// </summary>
         public string Name => "GetDefaultAsync file scanner";
 
+        /// <summary>
+        /// Explains that this scanner asks the LLM to produce the NLO tree for a file, rather than
+        /// parsing it itself.
+        /// </summary>
         public string Description => "GetDefaultAsync scanner for NLO. It asks LLM to produce NLO tree for the file.";
 
+        /// <summary>
+        /// Always empty: this is the catch-all scanner, so it matches any file extension not
+        /// claimed by a more specific <see cref="IFileScanner"/>.
+        /// </summary>
         public IReadOnlyList<string> FileExtensions
         {
             get;
         }
 
+        /// <summary>Creates the fallback scanner with an empty extension list, so it matches whatever no other <see cref="IFileScanner"/> claims.</summary>
         public FileScanner()
         {
             FileExtensions = new List<string>();
         }
 
+        /// <summary>
+        /// Entry point that hands the file list to the LLM-based outline generation and folds the
+        /// results into <paramref name="root"/>.
+        /// </summary>
         public async Task BuildAsync(
             SupportActionJson action,
             AgentJson agent,
@@ -89,6 +133,12 @@ namespace FreeAIr.NLOutline.Tree.Builder.File
                 );
         }
 
+        /// <summary>
+        /// Starts a throwaway chat with the configured NLO agent, feeds it each file in turn as
+        /// context, and stores the LLM's outline reply as a file-level node under
+        /// <paramref name="root"/>. The chat prompt is archived and the context item removed after
+        /// each file so the next file starts from a clean slate.
+        /// </summary>
         private async Task BuildInternalAsync(
             SupportActionJson action,
             AgentJson agent,
@@ -164,6 +214,7 @@ namespace FreeAIr.NLOutline.Tree.Builder.File
             }
         }
 
+        /// <summary>Builds the outline prompt for one file from the support action's template, sends it to the already-open chat, and waits for the model's cleaned-up answer.</summary>
         private static async Task<string> ProcessOutlinePromptAsync(
             SupportActionJson action,
             FreeAIr.Chat.Chat chat,
@@ -194,22 +245,28 @@ namespace FreeAIr.NLOutline.Tree.Builder.File
     [Export(typeof(IFileScanner))]
     public sealed class CSharpFileScanner : IFileScanner
     {
+        /// <summary>Runs before the LLM-driven fallback so any `.cs` file is parsed with Roslyn rather than sent to the model.</summary>
         public int Order => 1000;
 
+        /// <summary>Display name for this scanner.</summary>
         public string Name => "C# code file scanner";
 
+        /// <summary>Explains that this scanner parses C# source with Roslyn to extract the NLO comments already embedded in it, rather than asking the LLM to generate them.</summary>
         public string Description => "Scanner for NLO in C# source code. It uses Roslyn to extract all embedded NLO in the file.";
 
+        /// <summary>Only `.cs` files are handled by this scanner.</summary>
         public IReadOnlyList<string> FileExtensions
         {
             get;
         }
 
+        /// <summary>Creates the scanner restricted to `.cs` files.</summary>
         public CSharpFileScanner()
         {
             FileExtensions = [".cs"];
         }
 
+        /// <summary>Resolves each item's Roslyn <see cref="Microsoft.CodeAnalysis.Document"/> from the Visual Studio workspace and runs a <see cref="FileOutlineTreeBuilder"/> over it, adding the resulting file node to <paramref name="root"/>.</summary>
         public async Task BuildAsync(
             SupportActionJson action,
             AgentJson agent,
@@ -267,11 +324,20 @@ namespace FreeAIr.NLOutline.Tree.Builder.File
             }
         }
 
+        /// <summary>
+        /// Walks one C# document's Roslyn syntax tree and builds its NLO subtree: a file node whose
+        /// children are the top-level types/enums/delegates, each carrying its own members. This is
+        /// the piece that decides exactly what text from a comment ends up embedded — see the
+        /// class-level notes on <see cref="CSharpFileScanner"/> for what gets read.
+        /// </summary>
         public sealed class FileOutlineTreeBuilder
         {
+            /// <summary>Solution root, used to compute the file's path relative to it for the outline node's path.</summary>
             private readonly string _rootPath;
+            /// <summary>The Roslyn document being scanned.</summary>
             private readonly Document _document;
 
+            /// <summary>Creates a builder scoped to one document, resolving relative paths against <paramref name="rootPath"/>.</summary>
             public FileOutlineTreeBuilder(
                 string rootPath,
                 Document document
@@ -291,6 +357,7 @@ namespace FreeAIr.NLOutline.Tree.Builder.File
                 _document = document;
             }
 
+            /// <summary>Parses the document's syntax tree, finds every top-level (non-nested) type, enum and delegate declaration, and builds the file's outline node from them.</summary>
             public async Task<OutlineNode> CreateOutlineTreeAsync()
             {
                 var relative = _document.FilePath.MakeRelativeAgainst(_rootPath);
@@ -331,6 +398,7 @@ namespace FreeAIr.NLOutline.Tree.Builder.File
                 return fileNode;
             }
 
+            /// <summary>True when <paramref name="declaration"/> sits inside another type declaration, so it is excluded from the top-level scan and instead visited when its containing type is processed.</summary>
             private bool IsNested(MemberDeclarationSyntax declaration)
             {
                 // A nested declaration is inside another type
@@ -362,6 +430,7 @@ namespace FreeAIr.NLOutline.Tree.Builder.File
                 }
             }
 
+            /// <summary>Builds the node for a class/struct/interface/record: one child per method/property/field/event/indexer/constructor member, plus a recursive child for each nested type/enum/delegate.</summary>
             private OutlineNode ProcessTypeDeclaration(TypeDeclarationSyntax typeDecl)
             {
                 var typeName = typeDecl.Identifier.Text;
@@ -436,6 +505,7 @@ namespace FreeAIr.NLOutline.Tree.Builder.File
                 return enumNode;
             }
 
+            /// <summary>Builds an <see cref="OutlineKindEnum.ClassOrSimilarEntity"/> node for a type/enum/delegate; falls back to the bare identifier as the outline text when there is no comment, which is what later causes <c>OutlineEmbedder.SelectNodesToEmbed</c> to drop it from the index.</summary>
             private OutlineNode CreateEntityNode(
                 string target,
                 string commentText,
@@ -452,6 +522,7 @@ namespace FreeAIr.NLOutline.Tree.Builder.File
                     );
             }
 
+            /// <summary>Builds an <see cref="OutlineKindEnum.MethodOfClassOrSimilarPart"/> node for one member, named `Owner.Member`; falls back to that name as the outline text when there is no comment, which is what later causes <c>OutlineEmbedder.SelectNodesToEmbed</c> to drop it from the index.</summary>
             private OutlineNode CreateMemberNode(
                 string ownerName,
                 string memberName,
@@ -472,6 +543,7 @@ namespace FreeAIr.NLOutline.Tree.Builder.File
                     );
             }
 
+            /// <summary>Collects the comment text embedded for one declaration: for a type/enum/delegate only its leading trivia (the `&lt;summary&gt;` plus `//` lines directly above it); for a member, every comment in its leading and descendant trivia, i.e. inline `//` comments inside the body too.</summary>
             private string GetOutlineText(
                 SyntaxNode node,
                 bool onlyXmlComments
@@ -497,6 +569,7 @@ namespace FreeAIr.NLOutline.Tree.Builder.File
                 return string.Join(Environment.NewLine, comments);
             }
 
+            /// <summary>Scans a trivia list for `//`, `/* */` and XML doc comments, cleans each one via <see cref="CleanCommentText"/>, and appends the non-empty results to <paramref name="comments"/>.</summary>
             private static void ExtractComments(
                 IEnumerable<SyntaxTrivia> triviaList,
                 ref List<string> comments
@@ -521,6 +594,7 @@ namespace FreeAIr.NLOutline.Tree.Builder.File
                 }
             }
 
+            /// <summary>For a plain `//`/`/* */` comment, strips the comment markers; for an XML doc comment, extracts and returns only the `&lt;summary&gt;` content via <see cref="AppendXmlText"/> — every other doc tag (`&lt;remarks&gt;`, `&lt;param&gt;`, `&lt;returns&gt;`, `&lt;example&gt;`) is ignored.</summary>
             private static string CleanCommentText(
                 SyntaxTrivia trivia,
                 SyntaxKind kind
@@ -676,6 +750,7 @@ namespace FreeAIr.NLOutline.Tree.Builder.File
                 return result.Trim();
             }
 
+            /// <summary>Derives the display name used in a member's `Owner.Member` outline target: the declared identifier for most member kinds, and a fixed placeholder (`constructor`, `destructor`, `this[]`, `conversion`) for the kinds that have none.</summary>
             private string GetMemberName(MemberDeclarationSyntax member)
             {
                 return member switch
@@ -697,11 +772,18 @@ namespace FreeAIr.NLOutline.Tree.Builder.File
     }
 
 
+    /// <summary>
+    /// MEF-imports every registered <see cref="IFileScanner"/> and dispatches a batch of solution
+    /// files to the right one by extension (or to the LLM-driven fallback), reusing outline nodes
+    /// from a previous run for files whose checkbox in the NLO tree UI is unchecked.
+    /// </summary>
     [Export(typeof(FileOutlineTreeProcessor))]
     public sealed class FileOutlineTreeProcessor
     {
+        /// <summary>Every MEF-registered <see cref="IFileScanner"/>, in import order; sorted by <see cref="IFileScanner.Order"/> when splitting files across them.</summary>
         private readonly IFileScanner[] _scanners;
 
+        /// <summary>Creates the processor with all MEF-imported file scanners.</summary>
         [ImportingConstructor]
         public FileOutlineTreeProcessor(
             [ImportMany] IFileScanner[] scanners
@@ -716,6 +798,7 @@ namespace FreeAIr.NLOutline.Tree.Builder.File
         }
 
 
+        /// <summary>Splits <paramref name="fileItems"/> across the registered scanners by extension, reuses each unchecked file's old outline node from <paramref name="parameters"/> where available, and runs the remaining files through their scanner, adding every result under <paramref name="newOutlineRoot"/>.</summary>
         public async Task CreateFileTreesAsync(
             TreeBuilderParameters parameters,
             string rootPath,
@@ -779,6 +862,7 @@ namespace FreeAIr.NLOutline.Tree.Builder.File
             }
         }
 
+        /// <summary>Assigns each file to the first scanner (in <see cref="IFileScanner.Order"/> order) whose <see cref="IFileScanner.FileExtensions"/> matches it, or forces every file onto the LLM-driven fallback when <see cref="TreeBuilderParameters.ForceUseNLOAgent"/> is set.</summary>
         private List<(IFileScanner FileScanner, List<SolutionItem> SolutionItems)> SplitItemsByScanners(
             TreeBuilderParameters parameters,
             List<SolutionItem> fileItems

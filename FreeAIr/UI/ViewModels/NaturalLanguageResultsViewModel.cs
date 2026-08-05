@@ -27,29 +27,66 @@ using FreeAIr.Chat.Context.Item;
 
 namespace FreeAIr.UI.ViewModels
 {
+    /// <summary>
+    /// Backs the natural language search results tool window: runs the search (plain or RAG-narrowed)
+    /// against the solution, streams status and progress to the UI, and holds the found items the
+    /// user can jump to in the editor.
+    /// </summary>
     [Export(typeof(NaturalLanguageResultsViewModel))]
     public sealed class NaturalLanguageResultsViewModel : BaseViewModel
     {
+        /// <summary>
+        /// The chat driving the current search. Torn down and replaced whenever a new search starts.
+        /// </summary>
         private FreeAIr.Chat.Chat? _chat;
+        /// <summary>
+        /// Backing field for <see cref="Status"/>, the text shown on the results panel's status line.
+        /// </summary>
         private string _status = Resources.Resources.Idle;
 
+        /// <summary>Backing field for <see cref="ProgressValue"/>.</summary>
         private double _progressValue;
+        /// <summary>Backing field for <see cref="ProgressMaximum"/>.</summary>
         private double _progressMaximum;
+        /// <summary>Backing field for <see cref="IsProgressIndeterminate"/>.</summary>
         private bool _isProgressIndeterminate;
+        /// <summary>Backing field for <see cref="ProgressVisibility"/>.</summary>
         private Visibility _progressVisibility = Visibility.Collapsed;
 
+        /// <summary>Backing field for <see cref="AgentsDescription"/>.</summary>
         private string _agentsDescription = string.Empty;
 
+        /// <summary>Backing field for <see cref="RagPanelVisibility"/>.</summary>
         private Visibility _ragPanelVisibility = Visibility.Collapsed;
+        /// <summary>Backing field for <see cref="RagIndexDescription"/>.</summary>
         private string _ragIndexDescription = string.Empty;
+        /// <summary>Backing field for <see cref="CandidatesHeader"/>.</summary>
         private string _candidatesHeader = string.Empty;
+        /// <summary>Backing field for <see cref="UncoveredVisibility"/>.</summary>
         private Visibility _uncoveredVisibility = Visibility.Collapsed;
+        /// <summary>Backing field for <see cref="UncoveredText"/>.</summary>
         private string _uncoveredText = string.Empty;
+        /// <summary>
+        /// Solution-relative paths of the files the RAG index does not cover, used both to build
+        /// <see cref="UncoveredText"/> and to answer <see cref="ShowUncoveredFilesCommand"/>.
+        /// </summary>
         private List<string> _uncoveredFiles = new();
 
+        /// <summary>
+        /// Cancels the search currently running; replaced every time a new search is started so an
+        /// old, already-cancelled token never leaks into a fresh run.
+        /// </summary>
         private CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
+        /// <summary>
+        /// The task processing the solution documents for the current search, tracked so
+        /// <see cref="CancelChatCommand"/> knows whether there is anything left to cancel.
+        /// </summary>
         private Task? _processingTask;
 
+        /// <summary>
+        /// The text shown on the results panel's status line — idle, in-progress, cancelled, or the
+        /// final "Found N items" summary of a search.
+        /// </summary>
         public string Status
         {
             get => _status;
@@ -60,6 +97,10 @@ namespace FreeAIr.UI.ViewModels
             }
         }
 
+        /// <summary>
+        /// Current position of the search progress bar; meaningful only while
+        /// <see cref="IsProgressIndeterminate"/> is false.
+        /// </summary>
         public double ProgressValue
         {
             get => _progressValue;
@@ -70,6 +111,10 @@ namespace FreeAIr.UI.ViewModels
             }
         }
 
+        /// <summary>
+        /// Upper bound of the search progress bar, e.g. the total number of files or index bytes to
+        /// process for the current search.
+        /// </summary>
         public double ProgressMaximum
         {
             get => _progressMaximum;
@@ -94,6 +139,10 @@ namespace FreeAIr.UI.ViewModels
             }
         }
 
+        /// <summary>
+        /// Whether the search progress bar is shown at all; collapsed once the search finishes,
+        /// fails or is cancelled.
+        /// </summary>
         public Visibility ProgressVisibility
         {
             get => _progressVisibility;
@@ -120,6 +169,10 @@ namespace FreeAIr.UI.ViewModels
             }
         }
 
+        /// <summary>
+        /// Shows the agents line only once <see cref="AgentsDescription"/> has something to say —
+        /// there is nothing to display before the search has picked its agent(s).
+        /// </summary>
         public Visibility AgentsVisibility =>
             string.IsNullOrEmpty(_agentsDescription)
                 ? Visibility.Collapsed
@@ -140,6 +193,10 @@ namespace FreeAIr.UI.ViewModels
             }
         }
 
+        /// <summary>
+        /// Which index the RAG shortlist was built from and when it was generated — shown so the
+        /// user can tell a stale index apart from a fresh one before trusting its candidates.
+        /// </summary>
         public string RagIndexDescription
         {
             get => _ragIndexDescription;
@@ -150,6 +207,10 @@ namespace FreeAIr.UI.ViewModels
             }
         }
 
+        /// <summary>
+        /// Header line above <see cref="Candidates"/>, reporting how many of the scope's files the
+        /// RAG shortlist kept.
+        /// </summary>
         public string CandidatesHeader
         {
             get => _candidatesHeader;
@@ -160,6 +221,10 @@ namespace FreeAIr.UI.ViewModels
             }
         }
 
+        /// <summary>
+        /// Shows the "files not covered by the index" warning only when a RAG search actually left
+        /// some of the scope's files out of the index.
+        /// </summary>
         public Visibility UncoveredVisibility
         {
             get => _uncoveredVisibility;
@@ -170,6 +235,10 @@ namespace FreeAIr.UI.ViewModels
             }
         }
 
+        /// <summary>
+        /// Count of files the RAG index does not cover, shown next to <see cref="ShowUncoveredFilesCommand"/>
+        /// so the user knows there is a list worth opening.
+        /// </summary>
         public string UncoveredText
         {
             get => _uncoveredText;
@@ -180,6 +249,10 @@ namespace FreeAIr.UI.ViewModels
             }
         }
 
+        /// <summary>
+        /// The matches the search has found so far, ordered by confidence — this is what the results
+        /// list on the tool window is bound to.
+        /// </summary>
         public ObservableCollection2<FoundResultItem> FoundItems
         {
             get;
@@ -195,6 +268,11 @@ namespace FreeAIr.UI.ViewModels
             get;
         }
 
+        /// <summary>
+        /// Opens the file of the clicked <see cref="FoundResultItem"/> in the editor and selects the
+        /// matched text, falling back to a fuzzy search of the document body when the line/column the
+        /// model reported does not line up with what is actually there.
+        /// </summary>
         public ICommand GotoCommand
         {
             get
@@ -288,6 +366,10 @@ namespace FreeAIr.UI.ViewModels
             }
         }
 
+        /// <summary>
+        /// Cancels the currently running search: stops the chat, waits for the processing task to
+        /// unwind, and is only enabled while a search is actually in flight.
+        /// </summary>
         public ICommand CancelChatCommand
         {
             get
@@ -344,6 +426,11 @@ namespace FreeAIr.UI.ViewModels
             }
         }
 
+        /// <summary>
+        /// Pops up the list of files the RAG index does not cover, so the user can decide whether
+        /// to rebuild the index before trusting the search results. Enabled only when the list is
+        /// non-empty.
+        /// </summary>
         public ICommand ShowUncoveredFilesCommand
         {
             get
@@ -366,6 +453,10 @@ namespace FreeAIr.UI.ViewModels
             }
         }
 
+        /// <summary>
+        /// Creates the (singleton, MEF-exported) view model behind the natural language search
+        /// results tool window, with empty result and candidate collections.
+        /// </summary>
         public NaturalLanguageResultsViewModel()
         {
             FoundItems = new();
@@ -393,6 +484,11 @@ namespace FreeAIr.UI.ViewModels
             }
         }
 
+        /// <summary>
+        /// Tears down whatever chat and search were previously running on this panel, starts a fresh
+        /// chat with the chosen agent, and kicks off <see cref="ProcessSolutionDocumentsAsync"/> for
+        /// the new natural language search.
+        /// </summary>
         private async Task SetNewChatCoreAsync(
             NaturalLanguageSearchParameters parameters
             )
@@ -480,6 +576,11 @@ namespace FreeAIr.UI.ViewModels
                 );
         }
 
+        /// <summary>
+        /// The core of a natural language search: walks the solution/project scope for matching
+        /// files, optionally narrows them through the RAG shortlist, then asks the agent about each
+        /// portion in turn and accumulates the matches it reports into <see cref="FoundItems"/>.
+        /// </summary>
         private async Task ProcessSolutionDocumentsAsync(
             NaturalLanguageSearchParameters parameters,
             FileTypesFilter filesTypeFilters
@@ -897,6 +998,10 @@ namespace FreeAIr.UI.ViewModels
             return result;
         }
 
+        /// <summary>
+        /// Shows the progress bar, optionally as an indeterminate spinner for steps whose length is
+        /// not known ahead of time (waiting on a server, for instance).
+        /// </summary>
         private void ShowProgress(
             bool indeterminate
             )
@@ -905,6 +1010,9 @@ namespace FreeAIr.UI.ViewModels
             ProgressVisibility = Visibility.Visible;
         }
 
+        /// <summary>
+        /// Shows a determinate progress bar at the given value/maximum, e.g. "N of M files processed".
+        /// </summary>
         private void ReportProgress(
             double value,
             double maximum
@@ -916,6 +1024,9 @@ namespace FreeAIr.UI.ViewModels
             ProgressVisibility = Visibility.Visible;
         }
 
+        /// <summary>
+        /// Hides the progress bar and resets it, called once a search finishes, fails or is cancelled.
+        /// </summary>
         private void HideProgress(
             )
         {
@@ -932,12 +1043,22 @@ namespace FreeAIr.UI.ViewModels
         /// </summary>
         private sealed class IndexLoadProgress : IProgress<EmbeddingIndexLoadProgress>
         {
+            /// <summary>Conversion factor from bytes to megabytes, used to throttle status updates.</summary>
             private const double _bytesInMegabyte = 1024d * 1024d;
 
+            /// <summary>The results view model whose status line and progress bar this reports to.</summary>
             private readonly NaturalLanguageResultsViewModel _viewModel;
 
+            /// <summary>
+            /// The last megabyte count reported to the UI, so repeated reports within the same
+            /// megabyte are dropped instead of flooding the status line.
+            /// </summary>
             private long _reportedMegabytes = -1L;
 
+            /// <summary>
+            /// Creates a progress reporter that forwards index-loading progress to the given results
+            /// view model's status line and progress bar.
+            /// </summary>
             public IndexLoadProgress(
                 NaturalLanguageResultsViewModel viewModel
                 )
@@ -945,6 +1066,11 @@ namespace FreeAIr.UI.ViewModels
                 _viewModel = viewModel;
             }
 
+            /// <summary>
+            /// Translates one load-progress notification from the RAG index into the view model's
+            /// status line and progress bar, collapsing the flood of per-line reports down to one per
+            /// megabyte actually read.
+            /// </summary>
             public void Report(
                 EmbeddingIndexLoadProgress value
                 )
@@ -973,6 +1099,7 @@ namespace FreeAIr.UI.ViewModels
             }
         }
 
+        /// <summary>Resolves the chosen search scope to the actual solution item to walk: the whole solution or just the active project.</summary>
         private static async Task<SolutionItem?> DetermineRootAsync(
             NaturalSearchScopeEnum scope
             )
@@ -987,6 +1114,7 @@ namespace FreeAIr.UI.ViewModels
             }
         }
 
+        /// <summary>Parses the agent's JSON answer for this portion, escaping stray backslashes in `fullpath` values, and appends every match with all the required properties to <paramref name="foundItems"/>.</summary>
         private static void FillFoundItemsByLLMJson(
             string jsonBody,
             ref List<FoundResultItem> foundItems
@@ -1059,6 +1187,7 @@ $"""
         }
 
 
+        /// <summary>Searches the parsed answer, at any nesting depth, for a `matches` array — the model does not always put it at the top level of the JSON object.</summary>
         private static JsonElement? FindMatchesElement(JsonElement element)
         {
             // Если текущий элемент содержит "matches" - возвращаем его
@@ -1093,11 +1222,13 @@ $"""
             return null;
         }
 
+        /// <summary>The property names a `matches` array entry must carry to be accepted as a <see cref="FoundResultItem"/>.</summary>
         private static readonly string[] _requiredProperties = new[]
         {
             "fullpath", "found_text", "confidence_level", "line", "reason"
         };
 
+        /// <summary>Whether a matches-array entry carries every property <see cref="_requiredProperties"/> lists.</summary>
         private static bool HasRequiredProperties(JsonElement element)
         {
             if (element.ValueKind != JsonValueKind.Object)
@@ -1116,6 +1247,7 @@ $"""
             return true;
         }
 
+        /// <summary>Falls back to a plain-text search of the whole document body for <see cref="FoundResultItem.FoundText"/> when the model's reported line/column does not actually hold that text.</summary>
         private static bool FindSelectionFromDocumentBody(
             Microsoft.VisualStudio.Text.ITextSnapshot snapshot,
             FoundResultItem foundItem,
@@ -1145,6 +1277,7 @@ $"""
             return true;
         }
 
+        /// <summary>Computes the editor selection directly from the line and text the model reported, before any fuzzy fallback is attempted.</summary>
         private static void FindSelectionFromLLMData(
             Microsoft.VisualStudio.Text.ITextSnapshot snapshot,
             FoundResultItem foundItem,
@@ -1172,6 +1305,7 @@ $"""
             endColumnIndex = endOffset - endLine.Start.Position;
         }
 
+        /// <summary>Opens the natural language search results tool window and kicks off a new search on its view model, without waiting for the search to finish.</summary>
         public static async Task ShowPanelAsync(
             NaturalLanguageSearchParameters parameters
             )
@@ -1200,32 +1334,40 @@ $"""
     }
 
 
+    /// <summary>The top-level shape expected from the agent's JSON answer to a natural language search: a `matches` array.</summary>
     public class NaturalSearchResults
     {
+        /// <summary>The matches the agent reported for the current portion of files.</summary>
         public Match[] matches
         {
             get; set;
         }
     }
 
+    /// <summary>One match reported by the agent's JSON answer, deserialized straight from the `matches` array before it is turned into a <see cref="FoundResultItem"/>.</summary>
     public class Match
     {
+        /// <summary>The absolute path of the file the match was found in, as reported by the agent.</summary>
         public string fullpath
         {
             get; set;
         }
+        /// <summary>The exact text the agent says matched the search query.</summary>
         public string found_text
         {
             get; set;
         }
+        /// <summary>The agent's own 0-100 confidence that this is a genuine match.</summary>
         public double confidence_level
         {
             get; set;
         }
+        /// <summary>The zero-based line number the agent reports the match on.</summary>
         public int line
         {
             get; set;
         }
+        /// <summary>The agent's explanation of why this text matches the search query.</summary>
         public string reason
         {
             get; set;
@@ -1233,28 +1375,34 @@ $"""
     }
 
 
+    /// <summary>One row of the natural language search results list: a match the agent reported, resolved to a file and location the user can jump to.</summary>
     public sealed class FoundResultItem
     {
+        /// <summary>Absolute path of the file the match was found in.</summary>
         public string FilePath
         {
             get;
         }
 
+        /// <summary>The file's bare name, shown in the results list where the full path would be too long.</summary>
         public string FileName
         {
             get;
         }
 
+        /// <summary>The exact text the agent identified as matching the search query.</summary>
         public string FoundText
         {
             get;
         }
 
+        /// <summary>The agent's explanation of why this text answers the search query.</summary>
         public string Reason
         {
             get;
         }
 
+        /// <summary>The agent's confidence in this match, clamped to the 0-100 range.</summary>
         public double ConfidenceLevel
         {
             get;
@@ -1267,9 +1415,12 @@ $"""
         /// </summary>
         public string ConfidenceText => $"{DescribeConfidence(ConfidenceLevel)} ({ConfidenceLevel:F0})";
 
+        /// <summary>Confidence level at or above which a match is described as "high".</summary>
         private const double HighConfidenceLevel = 70d;
+        /// <summary>Confidence level at or above which a match is described as "medium" (below this it is "low").</summary>
         private const double MediumConfidenceLevel = 40d;
 
+        /// <summary>Buckets a raw 0-100 confidence level into the localized "high"/"medium"/"low" word shown next to the number.</summary>
         private static string DescribeConfidence(
             double level
             )
@@ -1287,12 +1438,14 @@ $"""
             return FreeAIr.Resources.Resources.Confidence__low;
         }
 
+        /// <summary>Zero-based line number of the match, used to place the editor caret when the user jumps to it.</summary>
         public int LineIndex
         {
             get;
         }
 
 
+        /// <summary>Builds a result row from the agent's reported match, clamping the confidence level into 0-100 and deriving the file name from the path.</summary>
         public FoundResultItem(
             string filePath,
             string foundText,
@@ -1317,9 +1470,12 @@ $"""
         }
     }
 
+    /// <summary>How far a natural language search reaches into the solution tree.</summary>
     public enum NaturalSearchScopeEnum
     {
+        /// <summary>Search every file of every project in the solution.</summary>
         WholeSolution,
+        /// <summary>Search only the files of the currently active project.</summary>
         CurrentProject
     }
 }

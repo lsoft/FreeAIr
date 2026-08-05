@@ -11,10 +11,13 @@ namespace Proxy
     /// </summary>
     public sealed class McpProxyInterface : IMcpProxyInterface
     {
+        /// <summary>Serilog logger scoped to this class, used to record request failures before they are turned into an <see cref="BaseReply.ErrorMessage"/>.</summary>
         private static readonly ILogger _log = SerilogLogger.Logger.ForContext<McpProxyInterface>();
 
+        /// <summary>Registry of MCP servers the proxy currently knows about, used to resolve a request's target server by name.</summary>
         private readonly Servers _servers;
 
+        /// <summary>Creates the proxy's RPC surface backed by the given server registry.</summary>
         public McpProxyInterface(
             Servers servers
             )

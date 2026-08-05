@@ -13,11 +13,13 @@ namespace Proxy.Server.External
     {
         private readonly McpServer _server;
 
+        /// <summary>The server's display name, as configured on the VS side; also used as the transport's client name.</summary>
         public string Name
         {
             get;
         }
 
+        /// <summary>Wraps an externally configured server's stored connection info under <paramref name="name"/>.</summary>
         public ExternalServer(
             string name,
             McpServer server

@@ -14,10 +14,13 @@ namespace FreeAIr.MCP.McpServerProxy.VS.Tools
     /// </summary>
     public sealed class GetAllWarningErrorsTool : VisualStudioMcpServerTool
     {
+        /// <summary>The single shared instance of this tool.</summary>
         public static readonly GetAllWarningErrorsTool Instance = new();
 
+        /// <summary>The tool name exposed to the model, "GetAllWarningErrors".</summary>
         public const string VisualStudioToolName = "GetAllWarningErrors";
 
+        /// <summary>Registers this tool's name and description; it takes no parameters, since it always reports the whole solution's current build items.</summary>
         public GetAllWarningErrorsTool(
             ) : base(
                 VisualStudioMcpServerProxy.VisualStudioProxyName,
@@ -62,6 +65,7 @@ namespace FreeAIr.MCP.McpServerProxy.VS.Tools
         /// <summary>The tool's JSON result: the flat list of build items for the whole solution.</summary>
         private sealed class BuildInformationsJson
         {
+            /// <summary>The flat list of build errors and warnings currently known for the solution.</summary>
             public BuildInformationJson[] SolutionItems
             {
                 get;
@@ -72,28 +76,35 @@ namespace FreeAIr.MCP.McpServerProxy.VS.Tools
         /// <summary>One build error or warning: its kind, message and source location.</summary>
         private sealed class BuildInformationJson
         {
+            /// <summary>The compiler's error or warning message text.</summary>
             public string Description
             {
                 get;
                 set;
             }
 
+            /// <summary>Whether this item is an "error" or a "warning".</summary>
             public string Type
             {
                 get;
                 set;
             }
 
+            /// <summary>Full path of the source file the error or warning was reported against.</summary>
             public string FullPath
             {
                 get;
                 set;
             }
+
+            /// <summary>Line number in the source file where the error or warning was reported.</summary>
             public int TextLine
             {
                 get;
                 set;
             }
+
+            /// <summary>Column number in the source file where the error or warning was reported.</summary>
             public int TextColumn
             {
                 get;

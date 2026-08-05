@@ -14,12 +14,16 @@ namespace FreeAIr.MCP.McpServerProxy.Github
     /// </summary>
     public sealed class GithubMcpServerProxy : IMcpServerProxy
     {
+        /// <summary>The name under which the built-in GitHub server is registered and shown to the user.</summary>
         public const string PublicMCPServerName = "github.com";
 
+        /// <summary>The single shared proxy instance for the `github.com` server.</summary>
         public static readonly GithubMcpServerProxy Instance = new();
 
+        /// <summary>The server name reported to callers, matching <see cref="PublicMCPServerName"/>.</summary>
         public string Name => "github.com";
 
+        /// <summary>Prevents external construction; use <see cref="Instance"/> instead.</summary>
         private GithubMcpServerProxy(
             )
         {

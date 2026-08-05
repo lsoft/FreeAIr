@@ -6,8 +6,17 @@ using System.Windows.Markup;
 
 namespace FreeAIr.Helper
 {
+    /// <summary>
+    /// Loads a XAML resource dictionary embedded in the extension assembly and merges it into
+    /// <see cref="Application.Resources"/>, used to register styles and templates that ship inside
+    /// the VSIX rather than as loose files.
+    /// </summary>
     public static class EmbeddedResourceHelper
     {
+        /// <summary>
+        /// Reads the named embedded XAML resource dictionary and merges every entry into the current
+        /// WPF application's resources.
+        /// </summary>
         public static void LoadXamlEmbeddedResource(string resourceName)
         {
             var assembly = Assembly.GetExecutingAssembly();

@@ -11,12 +11,17 @@ namespace MarkdownParser.Antlr.Answer.Blocks
     /// </summary>
     public sealed class ParagraphBlock : IBlock, ITextualBlock
     {
+        /// <summary>The inline parts accumulated for this paragraph, in order.</summary>
         private readonly List<IPart> _parts = new();
+        /// <summary>Supplies the font size used by parts added via the various Add* methods.</summary>
         private readonly IFontSizeProvider _fontSizeProvider;
+        /// <summary>Cached WPF paragraph built by <see cref="CreateBlock"/>, reused on subsequent calls instead of rebuilding.</summary>
         private BlockUIContainer? _blockContainer;
 
+        /// <summary>Identifies this block as a paragraph for block-type dispatch.</summary>
         public BlockTypeEnum Type => BlockTypeEnum.Paragraph;
 
+        /// <summary>Creates an empty paragraph block that will use <paramref name="fontSizeProvider"/> for its parts.</summary>
         public ParagraphBlock(
             IFontSizeProvider fontSizeProvider
             )

@@ -13,6 +13,7 @@ namespace Proxy.Server
     public abstract class BaseServer2<T> : BaseServer<T>
         where T : IServer
     {
+        /// <summary>Always reports "Not applicable" - a real MCP client has no separate install-check step.</summary>
         protected override Task<IsInstalledReply> IsInstalledInternalAsync(
             IParameterProvider parameterProvider
             )
@@ -22,6 +23,7 @@ namespace Proxy.Server
                 );
         }
 
+        /// <summary>Always reports "Not applicable" - a real MCP client has nothing to install.</summary>
         protected override Task<InstallReply> InstallInternalAsync(
             IParameterProvider parameterProvider
             )
@@ -31,6 +33,7 @@ namespace Proxy.Server
                 );
         }
 
+        /// <summary>Asks the connected MCP client for its tool list and maps it to <see cref="GetToolsReply"/>.</summary>
         protected override async Task<GetToolsReply> GetToolsInternalAsync(
             IMcpClient mcpClient
             )
@@ -45,6 +48,7 @@ namespace Proxy.Server
         }
 
 
+        /// <summary>Invokes the tool through the connected MCP client and collects its text content into a <see cref="CallToolReply"/>.</summary>
         protected override async Task<CallToolReply> CallToolInternalAsync(
             IMcpClient mcpClient,
             string toolName,
@@ -112,6 +116,7 @@ namespace Proxy.Server
             await mcpClient.PingAsync();
         }
 
+        /// <summary>Connects to the server and invokes one of its tools, or returns an error reply if the connection fails.</summary>
         public async Task<CallToolReply> CallToolAsync(
             IParameterProvider parameterProvider,
             string toolName,
@@ -136,6 +141,7 @@ namespace Proxy.Server
                 );
         }
 
+        /// <summary>Connects to the server and returns its tool list, or an error reply if the connection fails.</summary>
         public async Task<GetToolsReply> GetToolsAsync(
             IParameterProvider parameterProvider
             )
@@ -154,6 +160,7 @@ namespace Proxy.Server
                 );
         }
 
+        /// <summary>Delegates to the server kind's install logic, e.g. running `npm install` for a GitHub-hosted server.</summary>
         public async Task<InstallReply> InstallAsync(
             IParameterProvider parameterProvider
             )
@@ -163,6 +170,7 @@ namespace Proxy.Server
                 );
         }
 
+        /// <summary>Delegates to the server kind's install-check logic.</summary>
         public async Task<IsInstalledReply> IsInstalledAsync(
             IParameterProvider parameterProvider
             )
@@ -180,18 +188,22 @@ namespace Proxy.Server
             IParameterProvider parameterProvider
             );
 
+        /// <summary>Checks whether this server kind's dependency is already installed.</summary>
         protected abstract Task<IsInstalledReply> IsInstalledInternalAsync(
             IParameterProvider parameterProvider
             );
 
+        /// <summary>Installs this server kind's dependency.</summary>
         protected abstract Task<InstallReply> InstallInternalAsync(
             IParameterProvider parameterProvider
             );
 
+        /// <summary>Reads the tool list from an already-connected client.</summary>
         protected abstract Task<GetToolsReply> GetToolsInternalAsync(
             IMcpClient mcpClient
             );
 
+        /// <summary>Invokes a tool on an already-connected client.</summary>
         protected abstract Task<CallToolReply> CallToolInternalAsync(
             IMcpClient mcpClient,
             string toolName,

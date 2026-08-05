@@ -23,6 +23,7 @@ namespace FreeAIr.Chat.Context.Item
     [DebuggerDisplay("{SelectedIdentifier.FilePath}")]
     public sealed class SolutionItemChatContextItem : IChatContextItem
     {
+        /// <summary>Whether, and how, line numbers are prefixed onto the body sent to the model.</summary>
         private readonly AddLineNumbersMode _addLineNumberMode;
 
         /// <summary>Which file, and which part of it — the whole file when the selection is null.</summary>
@@ -31,6 +32,7 @@ namespace FreeAIr.Chat.Context.Item
             get;
         }
 
+        /// <summary>The label shown on the context chip in the chat window.</summary>
         public string ContextUIDescription => SelectedIdentifier.ContextUIDescription;
 
         /// <summary>
@@ -43,6 +45,7 @@ namespace FreeAIr.Chat.Context.Item
             get;
         }
 
+        /// <summary>Creates a context item for a solution file or fragment, with the given line-numbering mode.</summary>
         public SolutionItemChatContextItem(
             SelectedIdentifier selectedIdentifier,
             bool isAutoFound,
@@ -97,6 +100,7 @@ namespace FreeAIr.Chat.Context.Item
             return true;
         }
 
+        /// <summary>Opens the underlying file (and selection, if any) in a Visual Studio editor tab.</summary>
         public async Task OpenInNewWindowAsync()
         {
             await SelectedIdentifier.OpenInNewWindowAsync();
@@ -175,6 +179,7 @@ namespace FreeAIr.Chat.Context.Item
             }
         }
 
+        /// <summary>Applies <see cref="_addLineNumberMode"/> to the given body text before it is sent to the model.</summary>
         private string AddLineNumbers(string body, string lineEnding)
         {
             return _addLineNumberMode.AddLineNumbers(body, lineEnding);

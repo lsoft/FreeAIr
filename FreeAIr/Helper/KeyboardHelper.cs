@@ -5,8 +5,18 @@ using System.Windows.Input;
 
 namespace FreeAIr.Helper
 {
+    /// <summary>
+    /// Helper for classifying keyboard input while the user is typing a chat prompt: determines
+    /// whether a key press or key combination changes the edited text (and what text it inserts),
+    /// and provides low-level virtual-key-to-character translation via user32.dll.
+    /// </summary>
     public static class KeyboardHelper
     {
+        /// <summary>
+        /// Classifies a key press together with its modifiers, deciding whether it changes the text
+        /// being edited (e.g. typing a character, backspace, paste) and what text it would insert.
+        /// Used to keep prompt-input tracking in sync with what the user actually typed.
+        /// </summary>
         public static TextChangingKeyInfo IsTextChangedCombination(
             this Key key,
             ModifierKeys modifiers
@@ -69,19 +79,33 @@ namespace FreeAIr.Helper
             };
         }
 
+        /// <summary>
+        /// Result of classifying a key press: whether it changes the edited text, what text it
+        /// inserts (if any), and whether the caller should additionally copy text to the clipboard
+        /// afterward (used for cut/copy shortcuts).
+        /// </summary>
         public sealed class TextChangingKeyInfo
         {
             private readonly bool _postProcessCopyToClipboard;
 
+            /// <summary>
+            /// Whether the classified key combination changes the text being edited.
+            /// </summary>
             public bool IsTextChangedCombination
             {
                 get;
             }
+            /// <summary>
+            /// The text the key combination would insert, or null/empty when it does not insert text.
+            /// </summary>
             public string? EnteredText
             {
                 get;
             }
 
+            /// <summary>
+            /// Creates a classification result for a key combination.
+            /// </summary>
             public TextChangingKeyInfo(
                 bool isTextChangedCombination,
                 string? enteredText,
@@ -93,6 +117,10 @@ namespace FreeAIr.Helper
                 _postProcessCopyToClipboard = postProcessCopyToClipboard;
             }
 
+            /// <summary>
+            /// Copies the given text to the system clipboard, but only if this key combination was
+            /// classified as one that should trigger a clipboard copy (e.g. Ctrl+X).
+            /// </summary>
             public void PostProcessCopyToClipboard(string text)
             {
                 if (!_postProcessCopyToClipboard)
@@ -107,14 +135,26 @@ namespace FreeAIr.Helper
 
         #region unmanaged
 
+        /// <summary>
+        /// Conversion mode passed to the user32.dll <c>MapVirtualKey</c> function, selecting which
+        /// direction to translate between virtual key codes and scan codes/characters.
+        /// </summary>
         public enum MapType : uint
         {
+            /// <summary>Translate a virtual-key code into a scan code.</summary>
             MAPVK_VK_TO_VSC = 0x0,
+            /// <summary>Translate a scan code into a virtual-key code.</summary>
             MAPVK_VSC_TO_VK = 0x1,
+            /// <summary>Translate a virtual-key code into an unshifted character value.</summary>
             MAPVK_VK_TO_CHAR = 0x2,
+            /// <summary>Translate a scan code into a virtual-key code, distinguishing left/right keys.</summary>
             MAPVK_VSC_TO_VK_EX = 0x3,
         }
 
+        /// <summary>
+        /// P/Invoke wrapper for the Win32 <c>ToUnicode</c> function, translating a virtual key and
+        /// current keyboard state into the Unicode character(s) it would produce.
+        /// </summary>
         [DllImport("user32.dll")]
         public static extern int ToUnicode(
             uint wVirtKey,
@@ -125,19 +165,35 @@ namespace FreeAIr.Helper
             int cchBuff,
             uint wFlags);
 
+        /// <summary>
+        /// P/Invoke wrapper for the Win32 <c>GetKeyboardState</c> function, filling in the current
+        /// state of all virtual keys for use by <see cref="ToUnicode"/>.
+        /// </summary>
         [DllImport("user32.dll")]
         public static extern bool GetKeyboardState(byte[] lpKeyState);
 
+        /// <summary>
+        /// P/Invoke wrapper for the Win32 <c>MapVirtualKey</c> function, translating between
+        /// virtual-key codes, scan codes and characters according to <see cref="MapType"/>.
+        /// </summary>
         [DllImport("user32.dll")]
         public static extern uint MapVirtualKey(uint uCode, MapType uMapType);
 
         #endregion
 
+        /// <summary>
+        /// Returns the character a WPF <see cref="Key"/> produces on the current keyboard layout, as a string.
+        /// </summary>
         public static string GetStringFromKey(this Key key)
         {
             return GetCharFromKey(key).ToString();
         }
 
+        /// <summary>
+        /// Resolves the Unicode character a WPF <see cref="Key"/> produces on the current keyboard
+        /// layout, using the Win32 keyboard-state and virtual-key APIs; returns a space if it cannot
+        /// be resolved.
+        /// </summary>
         public static char GetCharFromKey(this Key key)
         {
             char ch = ' ';

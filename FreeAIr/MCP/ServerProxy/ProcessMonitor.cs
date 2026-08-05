@@ -25,12 +25,17 @@ namespace FreeAIr.McpServerProxy
         /// </summary>
         private const int MaxConsecutiveFailures = 5;
 
+        /// <summary>Pause before retrying the process after a failed start, so a persistently broken process does not hammer the OS with restart attempts.</summary>
         private static readonly TimeSpan RestartDelayAfterFailure = TimeSpan.FromSeconds(5);
 
+        /// <summary>Working directory the process is started from.</summary>
         private readonly string _folderPath;
+        /// <summary>Executable file name, resolved relative to <see cref="_folderPath"/>.</summary>
         private readonly string _fileName;
+        /// <summary>Command-line arguments passed to the process, if any.</summary>
         private readonly string? _arguments;
 
+        /// <summary>The currently running (or most recently started) child process; replaced with a new instance on every restart.</summary>
         public Process Process
         {
             get;
@@ -44,6 +49,7 @@ namespace FreeAIr.McpServerProxy
         /// </summary>
         public event Action<Process>? ProcessStarted;
 
+        /// <summary>Configures the monitor with the child process's location and arguments; the process is not started until <see cref="StartMonitoringAsync"/> runs.</summary>
         public ProcessMonitor(
             string folderPath,
             string fileName,
@@ -60,6 +66,7 @@ namespace FreeAIr.McpServerProxy
             _arguments = arguments;
         }
 
+        /// <summary>Runs the start/wait/restart loop described on the class, until cancelled or <see cref="MaxConsecutiveFailures"/> consecutive start failures occur.</summary>
         public async Task StartMonitoringAsync(
             CancellationToken cancellationToken = default
             )

@@ -5,9 +5,16 @@ using System.Text.Json.Serialization;
 
 namespace FreeAIr.Options2
 {
+    /// <summary>
+    /// A json converter that writes each property's <see cref="DescriptionAttribute"/> as a `/* ... */`
+    /// comment right above it, so a hand edited settings file explains its own fields in place. Reading
+    /// tolerates the comments (and any property order) since the base <see cref="JsonSerializerOptions"/>
+    /// is set to skip them.
+    /// </summary>
     public class JsonDescriptionCommentConverter<T> : JsonConverter<T>
         where T : class, new()
     {
+        /// <summary>Deserializes an instance of <typeparamref name="T"/> by matching each json property name against the type's public properties, ignoring the description comments this converter writes.</summary>
         public override T Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
             if (reader.TokenType != JsonTokenType.StartObject)
@@ -52,6 +59,7 @@ namespace FreeAIr.Options2
             return instance;
         }
 
+        /// <summary>Writes each property of <paramref name="value"/> as json, prefixing it with a `/* ... */` comment when the property carries a <see cref="DescriptionAttribute"/> — this is what makes the settings file self-documenting.</summary>
         public override void Write(Utf8JsonWriter writer, T value, JsonSerializerOptions options)
         {
             writer.WriteStartObject();
@@ -85,6 +93,7 @@ namespace FreeAIr.Options2
             writer.WriteEndObject();
         }
 
+        /// <summary>The name a property is written under: its <see cref="JsonPropertyNameAttribute"/> if set, otherwise the CLR property name.</summary>
         private string GetJsonPropertyName(PropertyInfo prop)
         {
             var jsonPropAttr = prop.GetCustomAttribute<JsonPropertyNameAttribute>();

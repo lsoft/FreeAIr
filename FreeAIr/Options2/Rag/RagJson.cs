@@ -49,6 +49,7 @@ namespace FreeAIr.Options2.Rag
             set;
         } = new();
 
+        /// <summary>Starts with the built-in defaults for every knob; used by the deserializer and by a fresh settings file.</summary>
         public RagJson()
         {
         }

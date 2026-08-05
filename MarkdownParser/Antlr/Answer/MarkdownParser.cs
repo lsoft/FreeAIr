@@ -20,13 +20,18 @@ namespace MarkdownParser.Antlr.Answer
     [Export(typeof(CachedMarkdownParser))]
     public sealed class CachedMarkdownParser : IMarkdownParser
     {
+        /// <summary>Guards <see cref="_previousText"/>/<see cref="_previousMarkdown"/> against concurrent parse calls.</summary>
         private readonly object _locker = new();
 
+        /// <summary>The actual ANTLR-based parser invoked on a cache miss.</summary>
         private readonly DirectMarkdownParser _parser;
 
+        /// <summary>The text of the most recent <see cref="Parse"/> call, compared against new calls to detect a cache hit.</summary>
         private string? _previousText;
+        /// <summary>The parsed result cached from the most recent <see cref="Parse"/> call.</summary>
         private ParsedMarkdown? _previousMarkdown;
 
+        /// <summary>Creates the caching wrapper around the given ANTLR-based parser.</summary>
         [ImportingConstructor]
         public CachedMarkdownParser(
             DirectMarkdownParser parser
@@ -65,8 +70,10 @@ namespace MarkdownParser.Antlr.Answer
     [Export(typeof(DirectMarkdownParser))]
     public sealed class DirectMarkdownParser : IMarkdownParser
     {
+        /// <summary>Supplies the font sizes handed to the resulting <see cref="ParsedMarkdown"/> for its blocks and parts.</summary>
         private readonly IFontSizeProvider _fontSizeProvider;
 
+        /// <summary>Creates the ANTLR-based parser with the font sizes to use when building the result.</summary>
         [ImportingConstructor]
         public DirectMarkdownParser(
             IFontSizeProvider fontSizeProvider

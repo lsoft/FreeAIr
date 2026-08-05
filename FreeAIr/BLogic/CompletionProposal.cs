@@ -48,8 +48,10 @@ namespace FreeAIr.BLogic
         /// </summary>
         private const int MinDelayBeforeRequestsMsec = 500;
 
+        /// <summary>The editor view this suggestion source produces inline completions for.</summary>
         private readonly ITextView _textView;
 
+        /// <summary>Binds this source to the editor view it will serve proposals for.</summary>
         public ProposalSource(
             ITextView textView
             )
@@ -260,13 +262,21 @@ namespace FreeAIr.BLogic
     [ContentType("any")]
     public sealed class ProposalSourceProvider : ProposalSourceProviderBase, IDisposable
     {
+        /// <summary>MEF-imported service used to resolve the text document behind an editor view.</summary>
         private readonly ITextDocumentFactoryService _textDocumentFactoryService;
+        /// <summary>MEF-imported async service provider, used to reach package-level services.</summary>
         private readonly IAsyncServiceProvider _serviceProvider;
 
+        /// <summary>Parameterless constructor required by MEF for provider discovery.</summary>
         internal ProposalSourceProvider()
         {
         }
 
+        /// <summary>
+        /// MEF import constructor: also hooks the suggestion service's internal display/accept/
+        /// reject/dismiss events through reflection, purely to keep the hooks alive for telemetry —
+        /// see <see cref="SuggestionHijackHelper"/> for why reflection is needed here.
+        /// </summary>
         [ImportingConstructor]
         internal ProposalSourceProvider(
           ITextDocumentFactoryService textDocumentFactoryService,
@@ -285,23 +295,28 @@ namespace FreeAIr.BLogic
         }
 
 
+        /// <summary>Empty handler kept only to hold the reflection-based subscription to the suggestion service's proposal-displayed event.</summary>
         private void OnProposalDisplayed(object sender, EventArgs e)
         {
         }
 
+        /// <summary>Empty handler kept only to hold the reflection-based subscription to the suggestion service's proposal-rejected event.</summary>
         private void OnProposalRejected(object sender, EventArgs e)
         {
         }
 
+        /// <summary>Empty handler kept only to hold the reflection-based subscription to the suggestion service's suggestion-accepted event.</summary>
         private void OnSuggestionAccepted(object sender, EventArgs e)
         {
         }
 
+        /// <summary>Empty handler kept only to hold the reflection-based subscription to the suggestion service's suggestion-dismissed event.</summary>
         private void OnSuggestionDismissed(object sender, EventArgs e)
         {
         }
 
 
+        /// <summary>No unmanaged or disposable state to release; present to satisfy <see cref="IDisposable"/>.</summary>
         public void Dispose()
         {
         }

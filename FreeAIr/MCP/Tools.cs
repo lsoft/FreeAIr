@@ -7,13 +7,21 @@ using System.Text.Json;
 
 namespace FreeAIr.MCP.McpServerProxy
 {
+    /// <summary>
+    /// An immutable list of the tools a single MCP server proxy currently publishes, as offered
+    /// to the chat completion request.
+    /// </summary>
     public sealed class McpServerTools
     {
+        /// <summary>The tools published by the server, in discovery order.</summary>
         public IReadOnlyList<McpServerTool> Tools
         {
             get;
         }
 
+        /// <summary>
+        /// Wraps a fixed list of tools published by an MCP server proxy.
+        /// </summary>
         public McpServerTools(
             IReadOnlyList<McpServerTool> tools
             )
@@ -27,6 +35,10 @@ namespace FreeAIr.MCP.McpServerProxy
         }
     }
 
+    /// <summary>
+    /// A single tool offered by an MCP server proxy, carrying the name, description and JSON
+    /// schema needed to advertise it to the chat model and to route a tool call back to its server.
+    /// </summary>
     public /*sealed*/ class McpServerTool
     {
         /// <summary>
@@ -42,28 +54,37 @@ namespace FreeAIr.MCP.McpServerProxy
             }
             """;
 
+        /// <summary>The name of the MCP server proxy (e.g. "Github", "VS") that publishes this tool.</summary>
         public string McpServerProxyName
         {
             get;
         }
 
+        /// <summary>The tool's own name, as published by the server, without the proxy prefix.</summary>
         public string ToolName
         {
             get;
         }
 
+        /// <summary>The fully qualified <c>Server.Tool</c> name used as the function name sent to the model.</summary>
         public string FullName => McpServerProxyName + "." + ToolName;
 
+        /// <summary>Human-readable description of what the tool does, shown to the model as function description.</summary>
         public string Description
         {
             get;
         }
 
+        /// <summary>The tool's JSON parameter schema, as published by its MCP server.</summary>
         public string Parameters
         {
             get;
         }
 
+        /// <summary>
+        /// Wraps a tool published by an MCP server proxy, validating that its fully qualified
+        /// name contains no spaces (which some LLM providers reject as a function name).
+        /// </summary>
         public McpServerTool(
             string mcpServerProxyName,
             string toolName,
@@ -102,6 +123,10 @@ namespace FreeAIr.MCP.McpServerProxy
             }
         }
 
+        /// <summary>
+        /// Builds the OpenAI SDK <see cref="ChatTool"/> for this tool, normalizing its parameter
+        /// schema first so endpoints (e.g. LM Studio) that require a strict object schema accept it.
+        /// </summary>
         public ChatTool CreateChatTool()
         {
             return ChatTool.CreateFunctionTool(
@@ -196,18 +221,27 @@ namespace FreeAIr.MCP.McpServerProxy
         }
     }
 
+    /// <summary>
+    /// The outcome of invoking a tool through an MCP server proxy: whether it succeeded, failed,
+    /// or must be postponed, together with the resulting content lines to feed back to the model.
+    /// </summary>
     public sealed class McpServerProxyToolCallResult
     {
+        /// <summary>Which of success, failure or postponement this call resulted in.</summary>
         public McpServerProxyToolCallResultEnum Result
         {
             get;
         }
 
+        /// <summary>The result content (or error message) lines to return to the chat model.</summary>
         public string[] Content
         {
             get;
         }
 
+        /// <summary>
+        /// Creates a tool call result with the given outcome and content lines.
+        /// </summary>
         public McpServerProxyToolCallResult(
             McpServerProxyToolCallResultEnum result,
             string[] content
@@ -222,6 +256,9 @@ namespace FreeAIr.MCP.McpServerProxy
             Content = content;
         }
 
+        /// <summary>
+        /// Creates a successful result carrying multiple content lines.
+        /// </summary>
         public static McpServerProxyToolCallResult CreateSuccess(
             IEnumerable<string> content
             )
@@ -232,6 +269,9 @@ namespace FreeAIr.MCP.McpServerProxy
                 );
         }
 
+        /// <summary>
+        /// Creates a successful result carrying a single content string.
+        /// </summary>
         public static McpServerProxyToolCallResult CreateSuccess(
             string content
             )
@@ -242,6 +282,9 @@ namespace FreeAIr.MCP.McpServerProxy
                 );
         }
 
+        /// <summary>
+        /// Creates a failed result carrying the error message to surface back to the model.
+        /// </summary>
         public static McpServerProxyToolCallResult CreateFailed(
             string errorMessage
             )
@@ -252,6 +295,10 @@ namespace FreeAIr.MCP.McpServerProxy
                 );
         }
 
+        /// <summary>
+        /// Creates a postponed result, used when the tool call cannot complete yet (e.g. it needs
+        /// user confirmation or the server is still starting) and should be retried later.
+        /// </summary>
         public static McpServerProxyToolCallResult CreatePostponed(
             )
         {
@@ -262,10 +309,17 @@ namespace FreeAIr.MCP.McpServerProxy
         }
     }
 
+    /// <summary>
+    /// Outcome of a single MCP tool call: <see cref="Success"/>, <see cref="Fail"/>, or
+    /// <see cref="Postpone"/> when it needs to be retried later.
+    /// </summary>
     public enum McpServerProxyToolCallResultEnum
     {
+        /// <summary>The tool call completed and produced usable content.</summary>
         Success,
+        /// <summary>The tool call failed; the content carries the error message.</summary>
         Fail,
+        /// <summary>The tool call could not run yet and should be retried later.</summary>
         Postpone
     }
 }

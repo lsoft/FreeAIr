@@ -14,8 +14,10 @@ namespace FreeAIr.BLogic
     /// </summary>
     public sealed class NonDisposableSemaphoreSlim
     {
+        /// <summary>The real semaphore doing the work; never disposed, left for its finalizer to reclaim.</summary>
         private readonly SemaphoreSlim _semaphoreSlim;
 
+        /// <summary>Creates the semaphore with an initial count and no upper bound.</summary>
         public NonDisposableSemaphoreSlim(
             int initialCount
             )
@@ -23,6 +25,7 @@ namespace FreeAIr.BLogic
             _semaphoreSlim = new SemaphoreSlim(initialCount);
         }
 
+        /// <summary>Creates the semaphore with an initial count and a maximum count.</summary>
         public NonDisposableSemaphoreSlim(
             int initialCount,
             int maxCount
@@ -31,14 +34,19 @@ namespace FreeAIr.BLogic
             _semaphoreSlim = new SemaphoreSlim(initialCount, maxCount);
         }
 
+        /// <summary>Blocks the calling thread until a slot is available.</summary>
         public void Wait() => _semaphoreSlim.Wait();
 
+        /// <summary>Blocks the calling thread until a slot is available or the timeout elapses.</summary>
         public bool Wait(TimeSpan timeout) => _semaphoreSlim.Wait(timeout);
 
+        /// <summary>Asynchronously waits until a slot is available.</summary>
         public Task WaitAsync() => _semaphoreSlim.WaitAsync();
 
+        /// <summary>Asynchronously waits until a slot is available or the timeout elapses.</summary>
         public Task<bool> WaitAsync(TimeSpan timeout) => _semaphoreSlim.WaitAsync(timeout);
 
+        /// <summary>Releases one slot, waking a waiter if one is blocked.</summary>
         public void Release() => _semaphoreSlim.Release();
     }
 }

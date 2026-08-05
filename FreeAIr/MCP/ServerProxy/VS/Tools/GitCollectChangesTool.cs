@@ -8,10 +8,13 @@ namespace FreeAIr.MCP.McpServerProxy.VS.Tools
     /// <summary>The `GitCollectChanges` MCP tool: hands the model the current uncommitted diff, e.g. so it can write a commit message before calling <see cref="GitCommitTool"/>.</summary>
     public sealed class GitCollectChangesTool : VisualStudioMcpServerTool
     {
+        /// <summary>Shared singleton instance registered with the MCP tool catalog.</summary>
         public static readonly GitCollectChangesTool Instance = new();
 
+        /// <summary>The MCP tool name exposed to the model.</summary>
         public const string VisualStudioToolName = "GitCollectChanges";
 
+        /// <summary>Registers the tool under <see cref="VisualStudioToolName"/> with no input parameters.</summary>
         public GitCollectChangesTool(
             ) : base(
                 VisualStudioMcpServerProxy.VisualStudioProxyName,

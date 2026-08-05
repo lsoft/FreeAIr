@@ -8,20 +8,38 @@ using System.Threading.Tasks;
 
 namespace FreeAIr.Record.WhisperOpenAI
 {
+    /// <summary>
+    /// Speech-to-text via an OpenAI-compatible audio transcription endpoint (OpenAI itself, or any
+    /// server implementing the same `/audio/transcriptions` API, such as a local Whisper server).
+    /// Used when dictation should run on a cloud model or a self-hosted server rather than in-process.
+    /// </summary>
     public sealed class WhisperOAIRecorder : IRecorder
     {
+        /// <summary>Name of the model to request transcriptions from at the configured endpoint.</summary>
         private readonly string _modelName;
+
+        /// <summary>API token (or environment variable reference) used to authenticate with the endpoint.</summary>
         private readonly string _token;
+
+        /// <summary>Base URL of the OpenAI-compatible audio transcription endpoint.</summary>
         private readonly string _endpoint;
+
+        /// <summary>Decoding prompt passed to the transcription API to bias its output (e.g. domain vocabulary).</summary>
         private readonly string _prompt;
 
+        /// <summary>Backing field for <see cref="Status"/>.</summary>
         private RecorderStatusEnum _status = RecorderStatusEnum.Idle;
+
+        /// <summary>The configured OpenAI audio client used to send transcription requests, created by <see cref="InitAsync"/>.</summary>
         private AudioClient? _audioClient;
 
+        /// <inheritdoc/>
         public event RecorderStatusChangedDelegate RecorderStatusChangedSignal;
 
+        /// <inheritdoc/>
         public string Name => WhisperOAIRecorderFactory.RecorderName;
 
+        /// <inheritdoc/>
         public RecorderStatusEnum Status
         {
             get => _status;
@@ -33,6 +51,7 @@ namespace FreeAIr.Record.WhisperOpenAI
             }
         }
 
+        /// <summary>Wraps the model name, token, endpoint and decoding prompt taken from the recording settings.</summary>
         public WhisperOAIRecorder(
             string modelName,
             string token,
@@ -66,6 +85,7 @@ namespace FreeAIr.Record.WhisperOpenAI
             _prompt = prompt;
         }
 
+        /// <summary>Builds the audio client for the configured endpoint, with a generous one-hour timeout for slow local servers.</summary>
         public Task InitAsync()
         {
             _audioClient = new OpenAI.Audio.AudioClient(
@@ -84,6 +104,7 @@ namespace FreeAIr.Record.WhisperOpenAI
             return Task.CompletedTask;
         }
 
+        /// <summary>Records to a temporary wav file via <see cref="MicrophoneRecorder"/>, then uploads it to the configured endpoint for transcription.</summary>
         public async Task<RecordTranscribeResult> RecordAndTranscribeAsync(
             CancellationToken recordingCancellationToken
             )
@@ -131,6 +152,7 @@ namespace FreeAIr.Record.WhisperOpenAI
             }
         }
 
+        /// <summary>No-op; the audio client holds no unmanaged resources to release.</summary>
         public async ValueTask DisposeAsync()
         {
             //nothing to do

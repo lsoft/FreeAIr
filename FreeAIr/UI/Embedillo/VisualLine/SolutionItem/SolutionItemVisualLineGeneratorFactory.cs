@@ -11,6 +11,7 @@ using System.Windows.Media;
 
 namespace FreeAIr.UI.Embedillo.VisualLine.SolutionItem
 {
+    /// <summary>Creates <see cref="SolutionItemVisualLineGenerator"/> instances so the prompt editor can render `#file` mentions inline.</summary>
     public sealed class SolutionItemVisualLineGeneratorFactory : IMentionVisualLineGeneratorFactory
     {
         public SolutionItemVisualLineGeneratorFactory(
@@ -18,6 +19,7 @@ namespace FreeAIr.UI.Embedillo.VisualLine.SolutionItem
         {
         }
 
+        /// <summary>Creates a new solution-item visual-line generator for a prompt editor instance.</summary>
         public MentionVisualLineGenerator Create()
         {
             return new SolutionItemVisualLineGenerator(
@@ -25,20 +27,29 @@ namespace FreeAIr.UI.Embedillo.VisualLine.SolutionItem
         }
     }
 
+    /// <summary>
+    /// Recognizes `#file` mentions typed in the prompt editor, offers solution files/projects as
+    /// autocomplete suggestions, and renders a chip showing whether the referenced path still exists
+    /// on disk.
+    /// </summary>
     public sealed class SolutionItemVisualLineGenerator : MentionVisualLineGenerator
     {
+        /// <summary>The character that introduces a solution-item mention in the prompt text.</summary>
         public const char Anchor = '#';
 
+        /// <summary>Creates the generator, registering <see cref="Anchor"/> as the mention trigger character.</summary>
         public SolutionItemVisualLineGenerator(
             ) : base(Anchor)
         {
         }
 
+        /// <summary>Wraps a mentioned file path (with optional selection) as a resolvable answer part.</summary>
         public override IParsedPart? CreatePart(string partPayload)
         {
             return new SolutionItemAnswerPart(partPayload);
         }
 
+        /// <summary>Enumerates the current solution's projects and files as mention autocomplete suggestions.</summary>
         public override async System.Threading.Tasks.Task<List<ISuggestion>> GetSuggestionsAsync()
         {
             var solution = await VS.Solutions.GetCurrentSolutionAsync();
@@ -91,6 +102,7 @@ namespace FreeAIr.UI.Embedillo.VisualLine.SolutionItem
             return suggestions;
         }
 
+        /// <summary>Builds the inline chip shown for a `#file` mention, colored green when the file exists on disk and red otherwise.</summary>
         protected override UIElement CreateControl(string combinedFilePath)
         {
             var selectedIdentifier = SelectedIdentifier.Parse(combinedFilePath);

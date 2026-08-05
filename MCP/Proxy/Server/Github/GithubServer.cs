@@ -10,8 +10,10 @@ namespace Proxy.Server.Github
     /// </summary>
     public class GithubServer : BaseServer2<GithubServer>
     {
+        /// <summary>Registry name of the built-in GitHub server, used to look it up in <see cref="Servers"/> and as its stdio transport's client name.</summary>
         public const string PublicMCPServerName = "github.com";
 
+        /// <summary>Creates the built-in GitHub server entry.</summary>
         public GithubServer()
         {
         }

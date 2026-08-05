@@ -19,6 +19,7 @@ namespace MarkdownParser.Antlr.Answer
         /// <summary>The registered commands.</summary>
         public IReadOnlyList<AdditionalCommand> AdditionalCommands => _additionalCommands;
 
+        /// <summary>Creates an empty container with no commands registered.</summary>
         public AdditionalCommandContainer()
         {
             _additionalCommands = new();
@@ -125,6 +126,7 @@ namespace MarkdownParser.Antlr.Answer
             get;
         }
 
+        /// <summary>Defines one action button offered next to parts of <paramref name="partType"/>.</summary>
         public AdditionalCommand(
             IFontSizeProvider fontSizeProvider,
             PartTypeEnum partType,

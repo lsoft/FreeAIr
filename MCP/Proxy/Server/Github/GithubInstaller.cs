@@ -11,10 +11,14 @@ namespace Proxy.Server.Github
     /// </summary>
     public static class GithubInstaller
     {
+        /// <summary>GitHub Releases API URL for the latest `github-mcp-server` release.</summary>
         public const string AssetsUrl = "https://api.github.com/repos/github/github-mcp-server/releases/latest";
+        /// <summary>File name of the Windows x64 release asset to download.</summary>
         public const string WinX64AssetFileName = "github-mcp-server_Windows_x86_64.zip";
 
+        /// <summary>Name of the folder the executable is unpacked into.</summary>
         public const string ExeFolderName = "github-mcp-server";
+        /// <summary>File name of the unpacked `github-mcp-server` executable.</summary>
         public const string ExeFileName = "github-mcp-server.exe";
 
         /// <summary>Whether the executable is already unpacked at <paramref name="mcpServerFolderPath"/>.</summary>

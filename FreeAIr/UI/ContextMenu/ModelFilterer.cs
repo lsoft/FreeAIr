@@ -10,15 +10,26 @@ namespace FreeAIr.UI.ContextMenu
     /// </summary>
     public sealed class ModelFilterer
     {
+        /// <summary>
+        /// The text used to match a model's id (or owner) — either a plain substring or a regex
+        /// pattern, depending on <see cref="IsRegex"/>.
+        /// </summary>
         public string ModelNameMask
         {
             get;
         }
+        /// <summary>
+        /// Whether <see cref="ModelNameMask"/> should be interpreted as a regular expression
+        /// rather than a plain case-insensitive substring.
+        /// </summary>
         public bool IsRegex
         {
             get;
         }
 
+        /// <summary>
+        /// Creates a filter for the model picker's list using the given name mask and matching mode.
+        /// </summary>
         public ModelFilterer(
             string modelNameMask,
             bool isRegex
@@ -28,6 +39,10 @@ namespace FreeAIr.UI.ContextMenu
             IsRegex = isRegex;
         }
 
+        /// <summary>
+        /// Narrows a provider's model collection down to the ones matching <see cref="ModelNameMask"/>,
+        /// falling back to a plain substring match if the mask is not valid as a regex.
+        /// </summary>
         public List<OpenAIModel>? Apply(
             OpenAIModelCollection models
             )
@@ -58,6 +73,10 @@ namespace FreeAIr.UI.ContextMenu
             return filteredModels;
         }
 
+        /// <summary>
+        /// Builds the predicate used to test a model's id and owner against the mask: match-all when
+        /// the mask is empty, a regex match when requested, otherwise a case-insensitive substring match.
+        /// </summary>
         private static Func<OpenAIModel, bool> ComposeFilter(
             string modelNameMask,
             bool isRegex

@@ -14,14 +14,27 @@ using FreeAIr.Chat.Context.Item;
 
 namespace FreeAIr.Commands.File
 {
+    /// <summary>
+    /// The Solution Explorer menu command that applies a chosen support action (from
+    /// Options2/Support) to the selected files: it starts a new chat, adds the files' composed
+    /// context, and seeds the chat with the support action's prompt.
+    /// </summary>
     [Command(PackageIds.ApplyFileSupportCommandId)]
     internal sealed class ApplyFileSupportCommand : BaseCommand<ApplyFileSupportCommand>
     {
+        /// <summary>
+        /// Creates the command instance; no setup is required beyond the base VS command wiring.
+        /// </summary>
         public ApplyFileSupportCommand(
             )
         {
         }
 
+        /// <summary>
+        /// Runs the apply-file-support flow: gathers the selected files, lets the user pick a
+        /// support action and agent, starts a chat, adds the files to its context, and sends the
+        /// resulting prompt.
+        /// </summary>
         protected override async Task ExecuteAsync(OleMenuCmdEventArgs e)
         {
             await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
@@ -83,6 +96,10 @@ namespace FreeAIr.Commands.File
             await ChatWindowShower.ShowChatWindowAsync(chat);
         }
 
+        /// <summary>
+        /// Adds each given solution file to the chat's context, both as a raw file reference and
+        /// as its composed C# context items (symbols, outlines, etc.).
+        /// </summary>
         public static async Task AddFilesToContextAsync(
             FreeAIr.Chat.Chat chat,
             List<SolutionItem> allSelectedFiles
@@ -111,6 +128,10 @@ namespace FreeAIr.Commands.File
             }
         }
 
+        /// <summary>
+        /// Returns the text files currently selected in Solution Explorer, expanding any selected
+        /// folders into their child files.
+        /// </summary>
         public static async System.Threading.Tasks.Task<List<SolutionItem>> GetSelectedFilesAsync()
         {
             var sew = await VS.Windows.GetSolutionExplorerWindowAsync();
@@ -121,6 +142,10 @@ namespace FreeAIr.Commands.File
                 );
         }
 
+        /// <summary>
+        /// Recursively expands each given solution item into its visible, text-file descendants
+        /// (or itself, if it already is one), used to flatten folder selections to files.
+        /// </summary>
         public static async System.Threading.Tasks.Task<List<SolutionItem>> GetChildrenOfFilesAsync(
             IEnumerable<SolutionItem> selections
             )

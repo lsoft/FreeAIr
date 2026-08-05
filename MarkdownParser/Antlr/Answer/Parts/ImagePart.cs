@@ -11,30 +11,37 @@ namespace MarkdownParser.Antlr.Answer.Parts
     /// </summary>
     public sealed class ImagePart : IPart
     {
+        /// <summary>Supplies the font size used for the streaming placeholder text.</summary>
         private readonly IFontSizeProvider _fontSizeProvider;
 
+        /// <summary>Identifies this part as an image for part-type dispatch.</summary>
         public PartTypeEnum Type => PartTypeEnum.Image;
 
+        /// <summary>The raw matched markdown text for this image, shown as a placeholder while streaming.</summary>
         public string Text
         {
             get;
         }
 
+        /// <summary>The image's alt/description text from `![description](...)`.</summary>
         public string Description
         {
             get;
         }
 
+        /// <summary>The image source, either a local `/`-rooted path or a web URL.</summary>
         public string Link
         {
             get;
         }
 
+        /// <summary>The optional tooltip title from `![desc](link "title")`.</summary>
         public string Title
         {
             get;
         }
 
+        /// <summary>Creates an image part from its parsed markdown pieces.</summary>
         public ImagePart(
             IFontSizeProvider fontSizeProvider,
             string text,

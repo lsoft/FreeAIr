@@ -30,27 +30,92 @@ namespace FreeAIr.MCP.McpServerProxy.VS.Tools
         /// </summary>
         private const long MaxFileSizeBytes = 5L * 1024 * 1024;
 
+        /// <summary>
+        /// Upper bound on how many matching lines a single search may return, regardless of what the
+        /// caller asks for in max_result_count.
+        /// </summary>
         private const int MaxAllowedResultCount = 500;
+
+        /// <summary>
+        /// Upper bound on how many lines of context may be returned around a match.
+        /// </summary>
         private const int MaxAllowedContextLineCount = 5;
 
+        /// <summary>
+        /// JSON schema key for the text or regular expression to search for.
+        /// </summary>
         private const string PatternParameterName = "pattern";
+
+        /// <summary>
+        /// JSON schema key for whether the pattern is a .NET regular expression rather than plain text.
+        /// </summary>
         private const string IsRegularExpressionParameterName = "is_regular_expression";
+
+        /// <summary>
+        /// JSON schema key for whether the search should respect the case of the pattern.
+        /// </summary>
         private const string CaseSensitiveParameterName = "case_sensitive";
+
+        /// <summary>
+        /// JSON schema key for restricting matches to whole words only.
+        /// </summary>
         private const string WholeWordParameterName = "whole_word";
+
+        /// <summary>
+        /// JSON schema key for inverting the match, returning lines which do not match the pattern.
+        /// </summary>
         private const string InvertMatchParameterName = "invert_match";
+
+        /// <summary>
+        /// JSON schema key for the semicolon separated include/exclude file mask list.
+        /// </summary>
         private const string FileMaskParameterName = "file_mask";
+
+        /// <summary>
+        /// JSON schema key selecting whether to search solution items only or every file on disk.
+        /// </summary>
         private const string SearchScopeParameterName = "search_scope";
+
+        /// <summary>
+        /// JSON schema key for narrowing the search to a folder relative to the solution root.
+        /// </summary>
         private const string SubfolderParameterName = "subfolder";
+
+        /// <summary>
+        /// JSON schema key for how many lines of context to return around each match.
+        /// </summary>
         private const string ContextLineCountParameterName = "context_line_count";
+
+        /// <summary>
+        /// JSON schema key for the maximum number of matches to return.
+        /// </summary>
         private const string MaxResultCountParameterName = "max_result_count";
 
+        /// <summary>
+        /// search_scope value meaning only files included in the solution's projects are searched.
+        /// </summary>
         private const string SolutionItemsScopeValue = "solution_items";
+
+        /// <summary>
+        /// search_scope value meaning every file under the solution folder is searched, including
+        /// ones not part of any project.
+        /// </summary>
         private const string AllFilesScopeValue = "all_files";
 
+        /// <summary>
+        /// The single shared instance of this tool, registered by <see cref="VisualStudioMcpServerProxy"/>.
+        /// </summary>
         public static readonly SearchFileContentTool Instance = new();
 
+        /// <summary>
+        /// The tool name advertised to the chat model for the file content search operation.
+        /// </summary>
         public const string VisualStudioToolName = "SearchFileContent";
 
+        /// <summary>
+        /// Declares the tool's name and JSON schema describing the pattern, matching options and
+        /// scope parameters accepted by a search call.
+        /// </summary>
         public SearchFileContentTool(
             ) : base(
                 VisualStudioMcpServerProxy.VisualStudioProxyName,
@@ -109,6 +174,11 @@ namespace FreeAIr.MCP.McpServerProxy.VS.Tools
         {
         }
 
+        /// <summary>
+        /// Parses the search parameters, builds a <see cref="GrepEngine"/>, walks either the solution
+        /// items or the whole solution folder off the main thread, and serializes the matches (using
+        /// unsaved editor buffers instead of disk content where applicable) into a JSON result.
+        /// </summary>
         public override async Task<McpServerProxyToolCallResult?> CallToolAsync(
             string toolName,
             IReadOnlyDictionary<string, object?>? arguments = null,
@@ -265,6 +335,11 @@ namespace FreeAIr.MCP.McpServerProxy.VS.Tools
                 );
         }
 
+        /// <summary>
+        /// Enumerates the candidate files (either a precomputed solution item list or a folder walk),
+        /// applies the folder restriction, binary and mask filters, and runs the grep engine over each
+        /// file's text, preferring an unsaved editor buffer over the file on disk when one exists.
+        /// </summary>
         private static GrepSearchResult Search(
             GrepEngine engine,
             string solutionFilePath,
@@ -323,6 +398,10 @@ namespace FreeAIr.MCP.McpServerProxy.VS.Tools
             return result;
         }
 
+        /// <summary>
+        /// Reads and decodes a file's text for searching, skipping it (rather than failing the whole
+        /// scan) when it is missing, over <see cref="MaxFileSizeBytes"/>, or locked by another process.
+        /// </summary>
         private static bool TryReadFile(
             string filePath,
             out string text
@@ -402,6 +481,10 @@ namespace FreeAIr.MCP.McpServerProxy.VS.Tools
             return result;
         }
 
+        /// <summary>
+        /// Tests whether a path lies inside a folder, used to keep the subfolder parameter from
+        /// escaping the requested directory or the solution root.
+        /// </summary>
         private static bool IsUnderFolder(
             string path,
             string folder
@@ -414,6 +497,9 @@ namespace FreeAIr.MCP.McpServerProxy.VS.Tools
             return path.StartsWith(normalizedFolder, StringComparison.InvariantCultureIgnoreCase);
         }
 
+        /// <summary>
+        /// Reads a string-typed tool argument by name, returning null when it is absent or not a string.
+        /// </summary>
         private static string? ReadString(
             IReadOnlyDictionary<string, object?> arguments,
             string parameterName
@@ -455,6 +541,10 @@ namespace FreeAIr.MCP.McpServerProxy.VS.Tools
             return false;
         }
 
+        /// <summary>
+        /// Reads an integer-typed tool argument by name, accepting numeric or numeric-string JSON
+        /// values and falling back to a default when absent or unparseable.
+        /// </summary>
         private static int ReadInteger(
             IReadOnlyDictionary<string, object?> arguments,
             string parameterName,
@@ -481,6 +571,10 @@ namespace FreeAIr.MCP.McpServerProxy.VS.Tools
             }
         }
 
+        /// <summary>
+        /// Restricts a value to the given inclusive range, used to keep model-supplied limits within
+        /// the tool's allowed bounds.
+        /// </summary>
         private static int Clamp(
             int value,
             int min,
@@ -500,8 +594,15 @@ namespace FreeAIr.MCP.McpServerProxy.VS.Tools
             return value;
         }
 
+        /// <summary>
+        /// The JSON payload returned to the chat model for a SearchFileContent call: the echoed
+        /// search parameters, scan statistics and the list of matching lines.
+        /// </summary>
         private sealed class SearchResultJson
         {
+            /// <summary>
+            /// The pattern that was searched for, echoed back for the model's own reference.
+            /// </summary>
             public string Pattern
             {
                 get;
@@ -518,30 +619,45 @@ namespace FreeAIr.MCP.McpServerProxy.VS.Tools
                 set;
             }
 
+            /// <summary>
+            /// Which scope was actually searched, solution items or all files.
+            /// </summary>
             public string SearchScope
             {
                 get;
                 set;
             }
 
+            /// <summary>
+            /// The folder that was searched, relative to the solution root, or "." for the whole solution.
+            /// </summary>
             public string SearchedFolder
             {
                 get;
                 set;
             }
 
+            /// <summary>
+            /// How many files were examined by the scan.
+            /// </summary>
             public int FilesScanned
             {
                 get;
                 set;
             }
 
+            /// <summary>
+            /// How many of the scanned files contained at least one match.
+            /// </summary>
             public int FilesWithMatches
             {
                 get;
                 set;
             }
 
+            /// <summary>
+            /// How many matching lines are included in <see cref="Matches"/>.
+            /// </summary>
             public int MatchCount
             {
                 get;
@@ -558,12 +674,19 @@ namespace FreeAIr.MCP.McpServerProxy.VS.Tools
                 set;
             }
 
+            /// <summary>
+            /// How many files were skipped because searching them exceeded the per-file time budget.
+            /// </summary>
             public int TimedOutFileCount
             {
                 get;
                 set;
             }
 
+            /// <summary>
+            /// The matching lines found by the search, each with its file, line number and any
+            /// requested context lines.
+            /// </summary>
             public MatchJson[] Matches
             {
                 get;
@@ -571,26 +694,43 @@ namespace FreeAIr.MCP.McpServerProxy.VS.Tools
             }
         }
 
+        /// <summary>
+        /// One matching line of a SearchFileContent result, identifying where it was found and,
+        /// optionally, the lines surrounding it.
+        /// </summary>
         private sealed class MatchJson
         {
+            /// <summary>
+            /// The path of the file containing the match, relative to the solution.
+            /// </summary>
             public string RelativePath
             {
                 get;
                 set;
             }
 
+            /// <summary>
+            /// The 1-based line number of the match within its file.
+            /// </summary>
             public int LineNumber
             {
                 get;
                 set;
             }
 
+            /// <summary>
+            /// The text of the matching line.
+            /// </summary>
             public string Line
             {
                 get;
                 set;
             }
 
+            /// <summary>
+            /// The lines immediately before the match, when context_line_count was requested;
+            /// omitted from the JSON entirely when there is none.
+            /// </summary>
             [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
             public string[]? ContextBefore
             {
@@ -598,6 +738,10 @@ namespace FreeAIr.MCP.McpServerProxy.VS.Tools
                 set;
             }
 
+            /// <summary>
+            /// The lines immediately after the match, when context_line_count was requested;
+            /// omitted from the JSON entirely when there is none.
+            /// </summary>
             [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
             public string[]? ContextAfter
             {

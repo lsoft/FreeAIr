@@ -26,6 +26,7 @@ namespace FreeAIr.Chat.Context.Composer
             get;
         }
 
+        /// <summary>Pairs a selected identifier with whether it was found automatically.</summary>
         public ContextSelectedIdentifier(
             SelectedIdentifier selectedIdentifier,
             bool isAutoFound

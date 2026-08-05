@@ -14,6 +14,10 @@ namespace FreeAIr.NLOutline
     /// </summary>
     public sealed class NaturalLanguageOutline
     {
+        /// <summary>
+        /// Path of the source file this outline comment belongs to, relative to the project or
+        /// solution as reported by the LLM.
+        /// </summary>
         [JsonPropertyName("file_path")]
         public string FilePath
         {
@@ -21,6 +25,9 @@ namespace FreeAIr.NLOutline
             set;
         }
 
+        /// <summary>
+        /// The line number in <see cref="FilePath"/> that the comment should be attached to.
+        /// </summary>
         [JsonPropertyName("line")]
         public int Line
         {
@@ -28,6 +35,9 @@ namespace FreeAIr.NLOutline
             set;
         }
 
+        /// <summary>
+        /// The natural language comment text itself, written by the LLM for that line.
+        /// </summary>
         [JsonPropertyName("comment")]
         public string Comment
         {
@@ -35,6 +45,7 @@ namespace FreeAIr.NLOutline
             set;
         }
 
+        /// <summary>Creates an outline with empty defaults, ready for the deserializer to fill in.</summary>
         public NaturalLanguageOutline()
         {
             FilePath = string.Empty;

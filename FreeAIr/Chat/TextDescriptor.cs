@@ -77,11 +77,13 @@ namespace FreeAIr.Chat
         /// </summary>
         private readonly string _lineEnding;
 
+        /// <summary>Full path of the file this descriptor writes back to.</summary>
         public string FilePath
         {
             get;
         }
 
+        /// <summary>File name alone, used to title the chat in the tool window.</summary>
         public string FileName
         {
             get;
@@ -165,11 +167,13 @@ namespace FreeAIr.Chat
         /// <summary>The open document, or null once it has been closed. See <see cref="IsAbleToManipulate"/>.</summary>
         private DocumentView? _documentView;
 
+        /// <summary>Full path of the document the selected span belongs to.</summary>
         public string FilePath
         {
             get;
         }
 
+        /// <summary>File name alone, used to title the chat in the tool window.</summary>
         public string FileName
         {
             get;

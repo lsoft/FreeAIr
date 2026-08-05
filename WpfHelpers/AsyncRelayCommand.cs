@@ -9,13 +9,16 @@ namespace WpfHelpers
     /// </summary>
     public abstract class AsyncBaseRelayCommand : ICommand
     {
+        /// <summary>Nonzero while an <see cref="Execute"/> call is in flight; guarded with <see cref="Interlocked"/> since WPF can query <see cref="CanExecute"/> from another thread.</summary>
         private long _isExecuting;
 
+        /// <summary>Default constructor; derived commands need no extra setup here.</summary>
         public AsyncBaseRelayCommand(
             )
         {
         }
 
+        /// <summary>Forwards to WPF's <see cref="CommandManager.RequerySuggested"/> so bound controls re-evaluate <see cref="CanExecute"/> automatically.</summary>
         public event EventHandler CanExecuteChanged
         {
             add
@@ -101,9 +104,12 @@ namespace WpfHelpers
     /// <summary>Delegate-backed async <see cref="ICommand"/>: same busy-guarding and error-reporting behavior as <see cref="AsyncBaseRelayCommand"/>, without requiring a subclass per command.</summary>
     public sealed class AsyncRelayCommand : ICommand
     {
+        /// <summary>The delegate invoked when the command runs.</summary>
         private readonly Func<object, Task> _execute;
+        /// <summary>The delegate consulted for <see cref="CanExecute"/>, beyond the busy check.</summary>
         private readonly Predicate<object> _canExecute;
 
+        /// <summary>Nonzero while an <see cref="Execute"/> call is in flight; guarded with <see cref="Interlocked"/> since WPF can query <see cref="CanExecute"/> from another thread.</summary>
         private long _isExecuting;
 
         /// <summary>Wraps <paramref name="execute"/> (and optional <paramref name="canExecute"/>, default always-true) as an <see cref="ICommand"/>.</summary>
@@ -116,6 +122,7 @@ namespace WpfHelpers
             _canExecute = canExecute ?? (o => true);
         }
 
+        /// <summary>Forwards to WPF's <see cref="CommandManager.RequerySuggested"/> so bound controls re-evaluate <see cref="CanExecute"/> automatically.</summary>
         public event EventHandler CanExecuteChanged
         {
             add { CommandManager.RequerySuggested += value; }
@@ -173,9 +180,12 @@ namespace WpfHelpers
     public sealed class AsyncRelayCommand<TParameter> : ICommand
         where TParameter : class
     {
+        /// <summary>The delegate invoked when the command runs, receiving the parameter cast to <typeparamref name="TParameter"/>.</summary>
         private readonly Func<TParameter, Task> _execute;
+        /// <summary>The delegate consulted for <see cref="CanExecute"/>, beyond the busy check.</summary>
         private readonly Func<TParameter, bool> _canExecute;
 
+        /// <summary>Nonzero while an <see cref="Execute"/> call is in flight; guarded with <see cref="Interlocked"/> since WPF can query <see cref="CanExecute"/> from another thread.</summary>
         private long _isExecuting;
 
         /// <summary>Wraps <paramref name="execute"/> (and optional <paramref name="canExecute"/>, default always-true) as an <see cref="ICommand"/>.</summary>
@@ -188,6 +198,7 @@ namespace WpfHelpers
             _canExecute = canExecute ?? (o => true);
         }
 
+        /// <summary>Forwards to WPF's <see cref="CommandManager.RequerySuggested"/> so bound controls re-evaluate <see cref="CanExecute"/> automatically.</summary>
         public event EventHandler CanExecuteChanged
         {
             add { CommandManager.RequerySuggested += value; }

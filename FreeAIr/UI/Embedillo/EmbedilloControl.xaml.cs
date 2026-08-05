@@ -11,17 +11,39 @@ using System.Windows.Input;
 
 namespace FreeAIr.UI.Embedillo
 {
+    /// <summary>
+    /// The Embedillo chat input editor: an AvalonEdit-based text box that supports @-mention
+    /// completion (files, commands, solution items) via <see cref="MentionVisualLineGenerator"/>
+    /// and turns the typed text into a <see cref="Parsed"/> prompt through an <see cref="IParser"/>.
+    /// </summary>
     public partial class EmbedilloControl : UserControl
     {
+        /// <summary>
+        /// The mention completion generators registered by <see cref="Setup(IParser)"/>, one per
+        /// anchor symbol (e.g. '@' for files, '/' for commands), used to trigger completion popups
+        /// as the user types.
+        /// </summary>
         private readonly List<MentionVisualLineGenerator> _generators = new();
+        /// <summary>
+        /// The parser that turns the raw editor text into a <see cref="Parsed"/> prompt once the
+        /// user submits; set by <see cref="Setup(IParser)"/>.
+        /// </summary>
         private IParser? _parser;
 
+        /// <summary>
+        /// Dependency property backing <see cref="EnterCommand"/>, the command invoked when the
+        /// user submits the Embedillo prompt (typically by pressing Enter).
+        /// </summary>
         public static readonly DependencyProperty EnterCommandProperty =
             DependencyProperty.Register(
                 nameof(EnterCommand),
                 typeof(ICommand),
                 typeof(EmbedilloControl));
 
+        /// <summary>
+        /// Dependency property backing <see cref="ControlEnabled"/>, which toggles whether the
+        /// Embedillo input accepts text and shows its hint placeholder.
+        /// </summary>
         public static readonly DependencyProperty ControlEnabledProperty =
             DependencyProperty.Register(
                 nameof(ControlEnabled),
@@ -30,6 +52,10 @@ namespace FreeAIr.UI.Embedillo
                 new PropertyMetadata(default(bool), OnControlEnabledChanged)
                 );
 
+        /// <summary>
+        /// Dependency property backing <see cref="MaxHeight"/>, the maximum height the Embedillo
+        /// text editor may grow to before scrolling.
+        /// </summary>
         public static readonly DependencyProperty MaxHeightProperty =
             DependencyProperty.Register(
                 nameof(MaxHeight),
@@ -38,30 +64,48 @@ namespace FreeAIr.UI.Embedillo
                 new PropertyMetadata(default(int), OnControlEnabledChanged)
                 );
 
+        /// <summary>
+        /// The maximum height, in pixels, the underlying AvalonEdit text area is allowed to expand to.
+        /// </summary>
         public int MaxHeight
         {
             get => (int)GetValue(MaxHeightProperty);
             set => SetValue(MaxHeightProperty, value);
         }
 
+        /// <summary>
+        /// Whether the Embedillo input is currently interactive; when false the hint placeholder
+        /// is hidden and the control behaves as disabled.
+        /// </summary>
         public bool ControlEnabled
         {
             get => (bool)GetValue(ControlEnabledProperty);
             set => SetValue(ControlEnabledProperty, value);
         }
 
+        /// <summary>
+        /// The placeholder text shown in the editor (e.g. "Ask a question...") while it is empty.
+        /// </summary>
         public string HintText
         {
             get;
             set;
         }
 
+        /// <summary>
+        /// The command executed when the user submits the current prompt, typically bound to the
+        /// chat view model's "send message" action.
+        /// </summary>
         public ICommand EnterCommand
         {
             get => (ICommand)GetValue(EnterCommandProperty);
             set => SetValue(EnterCommandProperty, value);
         }
 
+        /// <summary>
+        /// Computes whether the hint placeholder should be visible: hidden when the control is
+        /// disabled or the editor already contains text.
+        /// </summary>
         public Visibility HintVisibility
         {
             get
@@ -78,6 +122,11 @@ namespace FreeAIr.UI.Embedillo
             }
         }
 
+        /// <summary>
+        /// Wires up the AvalonEdit text area: mention-completion popups on trigger characters,
+        /// hint visibility refresh on text changes, and custom handling of backspace/delete/ctrl
+        /// combinations so multi-character mention tokens are deleted as a unit.
+        /// </summary>
         public EmbedilloControl()
         {
             InitializeComponent();
@@ -185,6 +234,11 @@ namespace FreeAIr.UI.Embedillo
             #endregion
         }
 
+        /// <summary>
+        /// Attaches the prompt parser that <see cref="Parse"/> will use and registers each of its
+        /// <see cref="MentionVisualLineGenerator"/> so their mention symbols (e.g. '@', '/') trigger
+        /// completion popups in the editor. Must be called before the control is used.
+        /// </summary>
         public void Setup(
             IParser parser
             )
@@ -204,11 +258,20 @@ namespace FreeAIr.UI.Embedillo
 
         }
 
+        /// <summary>
+        /// Moves keyboard focus to the Embedillo text editor, used when the chat panel opens or is
+        /// activated so the user can type immediately.
+        /// </summary>
         public void MakeFocused()
         {
             AvalonTextEditor.Focus();
         }
 
+        /// <summary>
+        /// Runs the currently entered text through the configured <see cref="IParser"/>, resolving
+        /// any mentions (files, commands, solution items) into a structured <see cref="Parsed"/>
+        /// prompt ready to send to the model.
+        /// </summary>
         public Parsed Parse()
         {
             if (_parser is null)
@@ -221,12 +284,21 @@ namespace FreeAIr.UI.Embedillo
             return parsed;
         }
 
+        /// <summary>
+        /// Refreshes the bound <see cref="HintVisibility"/> and hint text bindings on the hint
+        /// label, called after the editor's content or enabled state changes.
+        /// </summary>
         public void UpdateHintStatus()
         {
             HintLabel.GetBindingExpression(System.Windows.Controls.TextBlock.VisibilityProperty).UpdateTarget();
             HintLabel.GetBindingExpression(System.Windows.Controls.TextBlock.TextProperty).UpdateTarget();
         }
 
+        /// <summary>
+        /// Opens the AvalonEdit completion popup for the given mention generator right after its
+        /// anchor character (e.g. '@') was typed, populating it with the generator's suggestions
+        /// and closing it once the caret moves past the typed token or no suggestion matches.
+        /// </summary>
         private async Task ShowCompletionWindowAsync(
             MentionVisualLineGenerator generator
             )
@@ -294,6 +366,12 @@ namespace FreeAIr.UI.Embedillo
             completionWindow.Show();
         }
 
+        /// <summary>
+        /// Applies a backspace/delete/ctrl-variant edit to the AvalonEdit document, either replacing
+        /// the current selection with <paramref name="insertText"/> or deleting the character/word
+        /// range computed by <see cref="CalculateDeleteCharCount"/> so mention tokens and CRLF pairs
+        /// are removed as a single unit rather than character by character.
+        /// </summary>
         private void ProcessLogic(
             TextChangeModeEnum changeMode,
             string insertText

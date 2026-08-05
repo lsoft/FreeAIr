@@ -7,13 +7,18 @@ namespace MarkdownParser.Antlr.Answer.Parts
     /// <summary>Plain-text part supporting `**bold**` runs; repeated <see cref="Append"/> calls accumulate into one part instead of fragmenting the paragraph.</summary>
     public sealed class TextPart : IPart
     {
+        /// <summary>Raw text fragments accumulated by successive <see cref="Append"/> calls; joined on demand to form <see cref="Text"/>.</summary>
         private List<string> _text;
+        /// <summary>Supplies the font size used when rendering the part's runs.</summary>
         private readonly IFontSizeProvider _fontSizeProvider;
 
+        /// <summary>Identifies this part as plain text for part-type dispatch.</summary>
         public PartTypeEnum Type => PartTypeEnum.Text;
 
+        /// <summary>The full accumulated text, including any `**bold**` markers, as parsed so far.</summary>
         public string Text => string.Join("", _text);
 
+        /// <summary>Creates a text part starting with the given raw text.</summary>
         public TextPart(
             IFontSizeProvider fontSizeProvider,
             string text

@@ -33,11 +33,15 @@ namespace FreeAIr.Chat
             private set;
         }
 
+        /// <summary>Guards every read and write of <see cref="_chats"/>.</summary>
         private readonly object _locker = new();
 
+        /// <summary>The status bar indicator this container reports the aggregate chat status into.</summary>
         private readonly UIInformer _uIInformer;
+        /// <summary>The live chats owned by this container.</summary>
         private readonly List<Chat> _chats = new();
-        
+
+        /// <summary>DTE shutdown events, subscribed to so chats are stopped before the shell tears down.</summary>
         private readonly DTEEvents _dteEvents;
 
         /// <summary>
@@ -304,6 +308,7 @@ namespace FreeAIr.Chat
             FireChatStatusChanged(ea);
         }
 
+        /// <summary>Raises <see cref="ChatCollectionChangedEvent"/> if anyone is listening.</summary>
         private void FireChatCollectionChanged()
         {
             var e = ChatCollectionChangedEvent;
@@ -313,6 +318,7 @@ namespace FreeAIr.Chat
             }
         }
         
+        /// <summary>Raises <see cref="ChatStatusChangedEvent"/> if anyone is listening.</summary>
         private void FireChatStatusChanged(ChatEventArgs ea)
         {
             var e = ChatStatusChangedEvent;

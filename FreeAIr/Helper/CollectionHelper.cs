@@ -4,8 +4,15 @@ using System.Text.RegularExpressions;
 
 namespace FreeAIr.Helper
 {
+    /// <summary>
+    /// Small collection extensions missing from `ICollection&lt;T&gt;` and
+    /// <see cref="CaptureCollection"/>: index lookups by predicate, and ordering regex captures.
+    /// </summary>
     public static class CollectionHelper
     {
+        /// <summary>
+        /// The index of the last item matching the predicate, or -1 when none match.
+        /// </summary>
         public static int FindLastIndex<T>(
             this ICollection<T> items,
             Func<T, bool> predicate
@@ -26,6 +33,9 @@ namespace FreeAIr.Helper
             return result;
         }
 
+        /// <summary>
+        /// The index of the first item matching the predicate, or -1 when none match.
+        /// </summary>
         public static int FindIndex<T>(
             this ICollection<T> items,
             Func<T, bool> predicate
@@ -45,6 +55,10 @@ namespace FreeAIr.Helper
             return -1;
         }
 
+        /// <summary>
+        /// Orders a regex <see cref="CaptureCollection"/> by the given key, since it does not
+        /// implement `IEnumerable&lt;Capture&gt;` on its own.
+        /// </summary>
         public static IEnumerable<Capture> OrderBy<TKey>(
             this CaptureCollection collection,
             Func<Capture, TKey> keySelector

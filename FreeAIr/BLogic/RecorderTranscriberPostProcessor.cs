@@ -24,11 +24,15 @@ namespace FreeAIr.BLogic
     /// </summary>
     public sealed class RecorderTranscriberPostProcessor
     {
+        /// <summary>The rendezvous between the caller requesting a recording cycle and the background worker that runs it.</summary>
         private readonly AsyncAwaitProductionCycle<RecordTranscribeResult> _productionCycle = new();
 
+        /// <summary>The background loop task started by the constructor; runs for the lifetime of this processor.</summary>
         private readonly Task _task;
 
+        /// <summary>Cancellation source for the recording currently in progress; refreshed at the start of every cycle.</summary>
         private CancellationTokenSource? _recordingCancellation;
+        /// <summary>Backing field for <see cref="RecordingProcessStatus"/>.</summary>
         private RecordingProcessStatusEnum _recordingProcessStatus = RecordingProcessStatusEnum.Idle;
 
         /// <summary>Where the pipeline is right now — idle, recording, transcribing or post-processing. Drives the UI's recording indicator.</summary>
@@ -278,9 +282,13 @@ namespace FreeAIr.BLogic
     /// <summary>Where the record → transcribe → post-process pipeline is at any given moment.</summary>
     public enum RecordingProcessStatusEnum
     {
+        /// <summary>No recording cycle is in progress.</summary>
         Idle,
+        /// <summary>Audio is currently being captured from the microphone.</summary>
         Recording,
+        /// <summary>The captured audio is being turned into text.</summary>
         Transcribing,
+        /// <summary>The transcribed text is being cleaned up by the chosen `RecordPostProcess` support action.</summary>
         PostProcessing
     }
 

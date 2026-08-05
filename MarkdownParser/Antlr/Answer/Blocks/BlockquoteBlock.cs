@@ -8,14 +8,20 @@ namespace MarkdownParser.Antlr.Answer.Blocks
     /// <summary>A `&gt;` blockquote block, rendered as a single indented WPF <see cref="Paragraph"/> with a green left border.</summary>
     public sealed class BlockquoteBlock : IBlock, ITextualBlock
     {
+        /// <summary>Background brush for the quote paragraph, a light gray at low opacity.</summary>
         private static readonly Brush _semiTransparentGray = new SolidColorBrush(Color.FromArgb(0x40, 0x80, 0x80, 0x80));
 
+        /// <summary>The inline parts accumulated for this blockquote, in order.</summary>
         private readonly List<IPart> _parts = new();
+        /// <summary>Supplies the font size used by text parts added via <see cref="AddText"/>.</summary>
         private readonly IFontSizeProvider _fontSizeProvider;
+        /// <summary>Cached WPF paragraph built by <see cref="CreateBlock"/>, reused on subsequent calls instead of rebuilding.</summary>
         private BlockUIContainer? _blockContainer;
 
+        /// <summary>Always <see cref="BlockTypeEnum.Blockquote"/>.</summary>
         public BlockTypeEnum Type => BlockTypeEnum.Blockquote;
 
+        /// <summary>Creates an empty blockquote block that will use <paramref name="fontSizeProvider"/> for its text parts.</summary>
         public BlockquoteBlock(
             IFontSizeProvider fontSizeProvider
             )

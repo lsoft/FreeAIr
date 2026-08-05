@@ -2,8 +2,15 @@
 
 namespace FreeAIr.Helper
 {
+    /// <summary>
+    /// Formats enum values for display in the chat UI.
+    /// </summary>
     public static class EnumHelper
     {
+        /// <summary>
+        /// The localized, user-facing text for a chat's <see cref="ChatStatusEnum"/>, shown in the
+        /// chat window's status indicator.
+        /// </summary>
         public static string AsUIString(
             this ChatStatusEnum status
             )

@@ -10,8 +10,16 @@ using FreeAIr.Chat;
 
 namespace FreeAIr.BLogic
 {
+    /// <summary>
+    /// Generates a commit message from the current git diff and writes it into the Team Explorer /
+    /// Git Changes commit message box. Backs the "Build commit message with AI" command.
+    /// </summary>
     public static class CommitMessageBuilder
     {
+        /// <summary>
+        /// Asks the user which support action and agent to use, then builds the commit message with
+        /// them.
+        /// </summary>
         public static async Task ChooseAgentAsync(
             )
         {
@@ -48,6 +56,12 @@ namespace FreeAIr.BLogic
             }
         }
 
+        /// <summary>
+        /// Collects the pending git diff in a wait dialog, sends it to the chosen agent through the
+        /// given support action, and writes the answer into Visual Studio's commit message box.
+        /// Shows an error and opens the chat window when the diff cannot be collected or the agent
+        /// gives no answer.
+        /// </summary>
         private static async Task BuildCommitMessageAsync(
             SupportActionJson action,
             AgentJson agent
@@ -108,6 +122,9 @@ namespace FreeAIr.BLogic
             await ChatWindowShower.ShowChatWindowAsync(chat);
         }
 
+        /// <summary>
+        /// Shows a modal error message box with the given text.
+        /// </summary>
         private static async Task ShowErrorAsync(
             string error
             )

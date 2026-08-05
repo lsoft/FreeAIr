@@ -3,13 +3,23 @@ using Microsoft.VisualStudio.Shell.Interop;
 
 namespace FreeAIr.InfoBar
 {
+    /// <summary>
+    /// Shows the "a new version of FreeAIr has been installed" info bar with a link to the
+    /// release notes, displayed once after an update when the installed version has changed.
+    /// </summary>
     public class ReleaseNotesInfoBarService : InfoBarService
     {
+        /// <summary>Guards lazy creation of the singleton <see cref="Instance"/>.</summary>
         private static readonly object _locker = new object();
+        /// <summary>Backing field for the process-wide singleton instance.</summary>
         private static volatile ReleaseNotesInfoBarService _instance;
 
+        /// <summary>The singleton instance created by <see cref="Initialize"/>.</summary>
         public static ReleaseNotesInfoBarService Instance => _instance;
 
+        /// <summary>
+        /// Creates the singleton instance on first call; subsequent calls are no-ops.
+        /// </summary>
         public static void Initialize(IServiceProvider serviceProvider)
         {
             if (_instance is null)
@@ -26,6 +36,9 @@ namespace FreeAIr.InfoBar
             }
         }
 
+        /// <summary>
+        /// Creates the release-notes info bar service bound to the given VS service provider.
+        /// </summary>
         public ReleaseNotesInfoBarService(
             IServiceProvider serviceProvider
             )
@@ -33,6 +46,10 @@ namespace FreeAIr.InfoBar
         {
         }
 
+        /// <summary>
+        /// Handles the user's choice on the info bar: opens the "Show release notes" command when
+        /// clicked, or just records the current version as seen when dismissed as "not interested".
+        /// </summary>
         public override void OnActionItemClicked(IVsInfoBarUIElement infoBarUIElement, IVsInfoBarActionItem actionItem)
         {
             ThreadHelper.ThrowIfNotOnUIThread();
@@ -61,6 +78,10 @@ namespace FreeAIr.InfoBar
         }
 
 
+        /// <summary>
+        /// Builds the "new version installed" info bar text with the neural-network icon and its
+        /// "Show release notes" / "Not interested" links.
+        /// </summary>
         protected override InfoBarModel GetModel()
         {
             return new InfoBarModel(

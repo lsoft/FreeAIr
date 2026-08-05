@@ -3,8 +3,18 @@ using Microsoft.VisualStudio.Text;
 
 namespace FreeAIr.UI.ToolWindows
 {
+    /// <summary>
+    /// Decides where a chat should appear - the in-situ popup anchored at the editor caret, or
+    /// the docked chat list tool window - based on the caller's request and the UI options page,
+    /// and opens it there.
+    /// </summary>
     public static class ChatWindowShower
     {
+        /// <summary>
+        /// Shows the given chat either as an in-situ window positioned at the current caret, or
+        /// in the docked <see cref="ChatListToolWindow"/>, honoring the forced overrides and the
+        /// user's "switch to" preferences from the UI options page.
+        /// </summary>
         public static async Task ShowChatWindowAsync(
             FreeAIr.Chat.Chat chat,
             bool inSituForce = false,

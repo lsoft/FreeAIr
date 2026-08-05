@@ -41,11 +41,26 @@ namespace FreeAIr.UI.ViewModels
         /// </summary>
         private const int _probeFileCount = 20;
 
+        /// <summary>
+        /// Ensures at most one calibration step (reload, probe, recalculate, save) runs at a
+        /// time via <see cref="WithBusyAsync"/>.
+        /// </summary>
         private readonly SemaphoreSlim _locker = new SemaphoreSlim(1, 1);
 
+        /// <summary>
+        /// Token source for the currently running step, cancelled by <see cref="CancelCommand"/>.
+        /// </summary>
         private CancellationTokenSource? _cancellationTokenSource;
 
+        /// <summary>
+        /// The embedding index loaded from disk that probes and recalculation run against.
+        /// </summary>
         private EmbeddingIndex? _index;
+
+        /// <summary>
+        /// The agent whose model is used to vectorize probe queries and recalibrate; resolved
+        /// once and reused for every request in the window's lifetime.
+        /// </summary>
         private AgentJson? _embeddingAgent;
 
         /// <summary>
@@ -66,16 +81,37 @@ namespace FreeAIr.UI.ViewModels
         /// </summary>
         private EmbeddingCalibration? _measured;
 
+        /// <summary>Backing field for <see cref="Status"/>.</summary>
         private string _status = string.Empty;
+
+        /// <summary>Backing field for <see cref="IndexDescription"/>.</summary>
         private string _indexDescription = string.Empty;
+
+        /// <summary>Backing field for <see cref="AgentDescription"/>.</summary>
         private string _agentDescription = string.Empty;
+
+        /// <summary>Backing field for <see cref="CalibrationDescription"/>.</summary>
         private string _calibrationDescription = string.Empty;
+
+        /// <summary>Backing field for <see cref="Warning"/>.</summary>
         private string _warning = string.Empty;
+
+        /// <summary>Backing field for <see cref="WarningVisibility"/>.</summary>
         private Visibility _warningVisibility = Visibility.Collapsed;
+
+        /// <summary>Backing field for <see cref="Query"/>.</summary>
         private string _query = string.Empty;
+
+        /// <summary>Backing field for <see cref="Sensitivity"/>.</summary>
         private double _sensitivity = 0.2d;
+
+        /// <summary>Backing field for <see cref="IsBusy"/>.</summary>
         private bool _isBusy;
 
+        /// <summary>
+        /// Free-text status line shown at the bottom of the window: progress, results summary,
+        /// or the reason the last step could not run.
+        /// </summary>
         public string Status
         {
             get => _status;
@@ -86,6 +122,10 @@ namespace FreeAIr.UI.ViewModels
             }
         }
 
+        /// <summary>
+        /// Summary text describing the loaded index: when it was built, which embedding model,
+        /// entry count and vector dimensions.
+        /// </summary>
         public string IndexDescription
         {
             get => _indexDescription;
@@ -112,6 +152,10 @@ namespace FreeAIr.UI.ViewModels
             }
         }
 
+        /// <summary>
+        /// Summary text describing the current calibration: noise ceiling, computed threshold at
+        /// the current sensitivity, and probe counts.
+        /// </summary>
         public string CalibrationDescription
         {
             get => _calibrationDescription;
@@ -136,6 +180,9 @@ namespace FreeAIr.UI.ViewModels
             }
         }
 
+        /// <summary>
+        /// Whether the <see cref="Warning"/> banner should be shown.
+        /// </summary>
         public Visibility WarningVisibility
         {
             get => _warningVisibility;
@@ -146,6 +193,9 @@ namespace FreeAIr.UI.ViewModels
             }
         }
 
+        /// <summary>
+        /// The search-box text typed by the user, probed against the index by <see cref="ProbeCommand"/>.
+        /// </summary>
         public string Query
         {
             get => _query;
@@ -172,6 +222,10 @@ namespace FreeAIr.UI.ViewModels
             }
         }
 
+        /// <summary>
+        /// Whether a calibration step is currently running; disables the other commands and
+        /// enables <see cref="CancelCommand"/> while true.
+        /// </summary>
         public bool IsBusy
         {
             get => _isBusy;
@@ -182,6 +236,9 @@ namespace FreeAIr.UI.ViewModels
             }
         }
 
+        /// <summary>
+        /// Whether the busy/progress indicator should be shown, mirroring <see cref="IsBusy"/>.
+        /// </summary>
         public Visibility ProgressVisibility => _isBusy
             ? Visibility.Visible
             : Visibility.Collapsed
@@ -204,6 +261,10 @@ namespace FreeAIr.UI.ViewModels
             get;
         }
 
+        /// <summary>
+        /// Command that reloads the settings and the on-disk index from scratch, resetting every
+        /// cached state in the window.
+        /// </summary>
         public ICommand ReloadCommand
         {
             get
@@ -248,6 +309,10 @@ namespace FreeAIr.UI.ViewModels
             }
         }
 
+        /// <summary>
+        /// Command that vectorizes <see cref="Query"/> and runs it against the loaded index,
+        /// populating <see cref="Results"/> with the shortlisted candidate files.
+        /// </summary>
         public ICommand ProbeCommand
         {
             get
@@ -319,6 +384,9 @@ namespace FreeAIr.UI.ViewModels
             }
         }
 
+        /// <summary>
+        /// Command that removes the given probe from <see cref="Probes"/>.
+        /// </summary>
         public ICommand RemoveProbeCommand
         {
             get
@@ -345,6 +413,10 @@ namespace FreeAIr.UI.ViewModels
             }
         }
 
+        /// <summary>
+        /// Command that runs <see cref="RecalculateAsync"/>, measuring the current probes against
+        /// the loaded index without saving anything.
+        /// </summary>
         public ICommand RecalculateCommand
         {
             get
@@ -364,6 +436,10 @@ namespace FreeAIr.UI.ViewModels
             }
         }
 
+        /// <summary>
+        /// Command that runs <see cref="SaveAsync"/>, writing the probe queries to settings and
+        /// the measured calibration into the index metadata.
+        /// </summary>
         public ICommand SaveCommand
         {
             get
@@ -383,6 +459,9 @@ namespace FreeAIr.UI.ViewModels
             }
         }
 
+        /// <summary>
+        /// Command that cancels whichever step is currently running via the shared cancellation token.
+        /// </summary>
         public ICommand CancelCommand
         {
             get
@@ -402,6 +481,9 @@ namespace FreeAIr.UI.ViewModels
             }
         }
 
+        /// <summary>
+        /// Creates the view model with empty results and probe lists.
+        /// </summary>
         public RagCalibrationViewModel()
         {
             Results = new ObservableCollection2<RagProbeResultViewModel>();
@@ -501,6 +583,11 @@ namespace FreeAIr.UI.ViewModels
             OnPropertyChanged();
         }
 
+        /// <summary>
+        /// Vectorizes the current query and shortlists candidate files from the loaded index,
+        /// handling embedding-space and model mismatches, then populates <see cref="Results"/>
+        /// with the ranked candidates and their pass/fail verdict against the current threshold.
+        /// </summary>
         private async Task ProbeAsync()
         {
             var query = Query?.Trim();
@@ -732,6 +819,11 @@ namespace FreeAIr.UI.ViewModels
             return true;
         }
 
+        /// <summary>
+        /// Converts the on-screen <see cref="Probes"/> list into the settings JSON shape, sorting
+        /// probes with no expected path into the "irrelevant/hopeless" bucket and the rest into
+        /// the "relevant" bucket.
+        /// </summary>
         private RagCalibrationJson BuildSettingsNode()
         {
             var result = new RagCalibrationJson();
@@ -763,6 +855,10 @@ namespace FreeAIr.UI.ViewModels
             return result;
         }
 
+        /// <summary>
+        /// Builds the calibrator's probe set from the current on-screen probes, via the same
+        /// settings-shape conversion used for saving.
+        /// </summary>
         private RagCalibrationProbes BuildProbes()
         {
             var node = BuildSettingsNode();
@@ -775,6 +871,10 @@ namespace FreeAIr.UI.ViewModels
                 );
         }
 
+        /// <summary>
+        /// Adds a new probe for the given query and expected path, or updates the expected path
+        /// of an existing probe with the same query text (case-insensitive) if one already exists.
+        /// </summary>
         private void AddProbe(
             string query,
             string expectedPath
@@ -806,6 +906,11 @@ namespace FreeAIr.UI.ViewModels
             OnPropertyChanged();
         }
 
+        /// <summary>
+        /// Updates <see cref="CalibrationDescription"/> and the warning banner from the given
+        /// calibration: reports when the model fails to separate relevant from noise, or when
+        /// some relevant probes were missed, and clears the warning otherwise.
+        /// </summary>
         private void ShowCalibration(
             EmbeddingCalibration? calibration
             )
@@ -905,6 +1010,10 @@ namespace FreeAIr.UI.ViewModels
             return _sameSpace.Value;
         }
 
+        /// <summary>
+        /// Reports through the status line and warning banner that the current agent's model
+        /// does not match the embedding space the index was built with.
+        /// </summary>
         private void ShowSpaceMismatch(
             float? similarity
             )
@@ -920,6 +1029,9 @@ namespace FreeAIr.UI.ViewModels
             ShowWarning(message);
         }
 
+        /// <summary>
+        /// Shows the given message in the warning banner.
+        /// </summary>
         private void ShowWarning(
             string message
             )
@@ -928,12 +1040,19 @@ namespace FreeAIr.UI.ViewModels
             WarningVisibility = Visibility.Visible;
         }
 
+        /// <summary>
+        /// Clears and hides the warning banner.
+        /// </summary>
         private void HideWarning()
         {
             Warning = string.Empty;
             WarningVisibility = Visibility.Collapsed;
         }
 
+        /// <summary>
+        /// Returns the already-loaded index, or loads it from the container if not yet cached,
+        /// updating the calibration summary on a (re)load so the screen matches what search will use.
+        /// </summary>
         private async Task<EmbeddingIndex?> RequireIndexAsync(
             CancellationToken cancellationToken
             )
@@ -1013,6 +1132,10 @@ namespace FreeAIr.UI.ViewModels
             ShowAgent();
         }
 
+        /// <summary>
+        /// Prompts the user to pick an embedding agent explicitly, replacing the currently
+        /// resolved one, invalidating the cached same-space check, and clearing stale results.
+        /// </summary>
         private async Task ChangeAgentAsync()
         {
             await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
@@ -1041,6 +1164,10 @@ namespace FreeAIr.UI.ViewModels
             OnPropertyChanged();
         }
 
+        /// <summary>
+        /// Updates <see cref="AgentDescription"/> from the resolved embedding agent, or explains
+        /// why none is resolved (unknown, or named but no longer found in settings).
+        /// </summary>
         private void ShowAgent()
         {
             if (_embeddingAgent is not null)
@@ -1120,9 +1247,15 @@ namespace FreeAIr.UI.ViewModels
     /// </summary>
     public sealed class RagProbeViewModel : BaseViewModel
     {
+        /// <summary>Backing field for <see cref="Query"/>.</summary>
         private string _query;
+
+        /// <summary>Backing field for <see cref="ExpectedPath"/>.</summary>
         private string _expectedPath;
 
+        /// <summary>
+        /// The probe question text, as it will be sent to the embedding model and stored in settings.
+        /// </summary>
         public string Query
         {
             get => _query;
@@ -1134,6 +1267,10 @@ namespace FreeAIr.UI.ViewModels
             }
         }
 
+        /// <summary>
+        /// The relative path of the file that answers <see cref="Query"/>, or empty if the query
+        /// is a deliberately hopeless one that no file should answer.
+        /// </summary>
         public string ExpectedPath
         {
             get => _expectedPath;
@@ -1145,11 +1282,19 @@ namespace FreeAIr.UI.ViewModels
             }
         }
 
+        /// <summary>
+        /// Display text describing whether this probe is a "hopeless" (no answer) or "answered"
+        /// (has an expected path) probe.
+        /// </summary>
         public string KindDescription => string.IsNullOrWhiteSpace(_expectedPath)
             ? FreeAIr.Resources.Resources.RAG_calibration__kind_hopeless
             : FreeAIr.Resources.Resources.RAG_calibration__kind_answered
             ;
 
+        /// <summary>
+        /// Creates a probe entry with the given query and expected answer path (empty for a
+        /// hopeless probe).
+        /// </summary>
         public RagProbeViewModel(
             string query,
             string expectedPath
@@ -1166,28 +1311,44 @@ namespace FreeAIr.UI.ViewModels
     /// </summary>
     public sealed class RagProbeResultViewModel : BaseViewModel
     {
+        /// <summary>Backing field for <see cref="Passes"/>.</summary>
         private bool _passes;
 
+        /// <summary>
+        /// Path of the candidate file, relative to the solution, as returned by the probe.
+        /// </summary>
         public string RelativePath
         {
             get;
         }
 
+        /// <summary>
+        /// The candidate's similarity score against the probed query.
+        /// </summary>
         public float Score
         {
             get;
         }
 
+        /// <summary>
+        /// The best-matching outline node's target identifier within the candidate file.
+        /// </summary>
         public string BestTarget
         {
             get;
         }
 
+        /// <summary>
+        /// The outline text of the best-matching node, shown so the user can judge relevance at a glance.
+        /// </summary>
         public string BestOutlineText
         {
             get;
         }
 
+        /// <summary>
+        /// Whether this candidate's score is at or above the currently applied threshold.
+        /// </summary>
         public bool Passes
         {
             get => _passes;
@@ -1199,11 +1360,18 @@ namespace FreeAIr.UI.ViewModels
             }
         }
 
+        /// <summary>
+        /// Display text for the current pass/cut-off verdict.
+        /// </summary>
         public string VerdictDescription => _passes
             ? FreeAIr.Resources.Resources.RAG_calibration__passes
             : FreeAIr.Resources.Resources.RAG_calibration__cut_off
             ;
 
+        /// <summary>
+        /// Creates a result row from a probe candidate, computing the initial pass/fail verdict
+        /// against the given minimum score.
+        /// </summary>
         public RagProbeResultViewModel(
             RagCandidate candidate,
             float minScore
@@ -1222,6 +1390,10 @@ namespace FreeAIr.UI.ViewModels
             _passes = candidate.Score >= minScore;
         }
 
+        /// <summary>
+        /// Recomputes <see cref="Passes"/> against a new minimum score, used when the threshold
+        /// changes after a recalculation.
+        /// </summary>
         public void ApplyThreshold(
             float minScore
             )

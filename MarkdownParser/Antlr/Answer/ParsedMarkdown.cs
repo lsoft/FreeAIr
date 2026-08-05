@@ -11,12 +11,15 @@ namespace MarkdownParser.Antlr.Answer
     /// </summary>
     public sealed class ParsedMarkdown
     {
+        /// <summary>The blocks parsed so far, in document order; the backing store for <see cref="Blocks"/>.</summary>
         private readonly List<IBlock> _blocks = new();
+        /// <summary>Supplies the font sizes passed to every block created here.</summary>
         private readonly IFontSizeProvider _fontSizeProvider;
 
         /// <summary>The parsed blocks, in document order.</summary>
         public IReadOnlyList<IBlock> Blocks => _blocks;
 
+        /// <summary>Creates an empty parse result that will use <paramref name="fontSizeProvider"/> for every block it creates.</summary>
         public ParsedMarkdown(
             IFontSizeProvider fontSizeProvider
             )
@@ -40,6 +43,7 @@ namespace MarkdownParser.Antlr.Answer
             table.AddRow(row);
         }
 
+        /// <summary>Returns the trailing block if it is already a table, otherwise starts and appends a new one.</summary>
         private TableBlock GetOrCreateTableBlock(
             )
         {
@@ -79,6 +83,7 @@ namespace MarkdownParser.Antlr.Answer
             _ = CreateHorizontalRuleBlock(blockUIContainer);
         }
 
+        /// <summary>Appends a new horizontal-rule block wrapping the given WPF element.</summary>
         private HorizontalRuleBlock CreateHorizontalRuleBlock(
             BlockUIContainer blockUIContainer
             )
@@ -102,6 +107,7 @@ namespace MarkdownParser.Antlr.Answer
             _ = CreateBlockquoteBlock();
         }
 
+        /// <summary>Appends a new blockquote block.</summary>
         private BlockquoteBlock CreateBlockquoteBlock()
         {
             var block = new BlockquoteBlock(
@@ -123,6 +129,7 @@ namespace MarkdownParser.Antlr.Answer
             _ = CreateParagraphBlock();
         }
 
+        /// <summary>Appends a new paragraph block.</summary>
         private ParagraphBlock CreateParagraphBlock()
         {
             var block = new ParagraphBlock(
@@ -194,12 +201,14 @@ namespace MarkdownParser.Antlr.Answer
             lastBlock.AddImage(text, description, link, title);
         }
 
+        /// <summary>Returns the trailing block as an <see cref="ITextualBlock"/> if it is one, otherwise null.</summary>
         private ITextualBlock? GetTextualBlock()
         {
             var block = _blocks[_blocks.Count - 1] as ITextualBlock;
             return block;
         }
 
+        /// <summary>Returns the trailing block cast to <see cref="ParagraphBlock"/>, assumed to be the current paragraph being built.</summary>
         private ParagraphBlock GetParagraphBlock()
         {
             var block = _blocks[_blocks.Count - 1] as ParagraphBlock;

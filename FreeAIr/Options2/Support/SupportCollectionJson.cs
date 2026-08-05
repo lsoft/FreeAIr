@@ -26,11 +26,13 @@ namespace FreeAIr.Options2.Support
             set;
         }
 
+        /// <summary>Starts out with the shipped default actions, which is what a fresh installation offers in its menus.</summary>
         public SupportCollectionJson()
         {
             Actions = GetDefaultActions();
         }
 
+        /// <summary>Deep copy of the action list.</summary>
         public object Clone()
         {
             return new SupportCollectionJson
@@ -217,6 +219,7 @@ namespace FreeAIr.Options2.Support
             set;
         }
 
+        /// <summary>Name of the Visual Studio image moniker shown next to this action in its menus, e.g. `SQLServerObjectExplorer`.</summary>
         [Description("Install KnownMonikers Explorer Visual Studio extension to choose correct image moniker.")]
         public string? KnownMoniker
         {
@@ -224,6 +227,7 @@ namespace FreeAIr.Options2.Support
             set;
         }
 
+        /// <summary>Empty action bound to no scope and no agent, for the json deserializer and the `add action` button.</summary>
         public SupportActionJson()
         {
             Scopes = new();
@@ -233,6 +237,7 @@ namespace FreeAIr.Options2.Support
             KnownMoniker = null;
         }
 
+        /// <summary>Deep copy of this action's scopes, name, agent, prompt and icon.</summary>
         public object Clone()
         {
             return new SupportActionJson

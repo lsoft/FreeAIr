@@ -6,8 +6,17 @@ using System.Threading.Tasks;
 namespace FreeAIr.UI.ContextMenu
 {
 
+    /// <summary>
+    /// Builds and shows the Visual Studio context menu used to pick a configured agent (an
+    /// endpoint/model pairing) for a chat or command, falling back automatically when there is
+    /// nothing to choose between.
+    /// </summary>
     public static class AgentContextMenu
     {
+        /// <summary>
+        /// Shows the agent picker restricted to agents that carry an authentication token,
+        /// auto-selecting when only one candidate (or a matching preferred agent) is available.
+        /// </summary>
         public static async Task<AgentJson?> ChooseAgentWithTokenAsync(
             string title,
             string? preferredAgentName = null

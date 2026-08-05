@@ -15,9 +15,12 @@ namespace FreeAIr.Extension.CodeLens
     /// </summary>
     public class CodeLensConnectionHandler : IRemoteVisualStudioCodeLens, IDisposable
     {
+        /// <summary>Every currently-connected CodeLens data point, keyed by the id it registered with, so a refresh can be dispatched to a specific one.</summary>
         private static readonly ConcurrentDictionary<Guid, CodeLensConnectionHandler> _connections = new ();
 
+        /// <summary>The JSON-RPC channel attached to this handler's named pipe connection.</summary>
         private JsonRpc? _rpc;
+        /// <summary>The id of the CodeLens data point this handler serves, set once it registers itself.</summary>
         private Guid? _dataPointId;
 
         /// <summary>Runs forever, accepting one named-pipe connection per CodeLens data point and handing each off to <see cref="CodeLensConnectionHandler"/>.</summary>
@@ -81,6 +84,7 @@ namespace FreeAIr.Extension.CodeLens
             return Task.CompletedTask;
         }
 
+        /// <summary>Unregisters this handler's data point from <see cref="_connections"/> so refreshes stop targeting a disconnected pipe.</summary>
         public void Dispose()
         {
             if (_dataPointId.HasValue)

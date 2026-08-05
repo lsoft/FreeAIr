@@ -31,6 +31,7 @@ namespace FreeAIr.Chat.Context.Composer
         /// </summary>
         public IReadOnlyCollection<ITypeSymbol> Types => _types;
 
+        /// <summary>Creates an empty result, ready to accumulate found files and types.</summary>
         public ContextComposeResult(
             )
         {
@@ -57,6 +58,10 @@ namespace FreeAIr.Chat.Context.Composer
                 );
         }
 
+        /// <summary>
+        /// Records the given file paths as found identifiers, tagging each with whether it was
+        /// found automatically by the reference walk or supplied by the caller.
+        /// </summary>
         public void AddFilePaths(
             IEnumerable<string> filePaths,
             bool isAutoFound
@@ -73,6 +78,7 @@ namespace FreeAIr.Chat.Context.Composer
             }
         }
 
+        /// <summary>Marks the given types as already visited by the reference walk.</summary>
         public void AddTypes(
             IEnumerable<ITypeSymbol> types
             )

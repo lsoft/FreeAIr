@@ -25,6 +25,7 @@ namespace FreeAIr.Chat.Context
         /// </summary>
         public const string CopilotInstructionFilePath = ".github/copilot-instructions.md";
 
+        /// <summary>The context items currently attached to the chat, backing <see cref="Items"/>.</summary>
         private readonly List<IChatContextItem> _items = new();
 
         /// <summary>
@@ -33,8 +34,10 @@ namespace FreeAIr.Chat.Context
         /// </summary>
         public event ChatContextChangedDelegate ChatContextChangedEvent;
 
+        /// <summary>The context items currently attached to the chat, in the order they were added.</summary>
         public IReadOnlyList<IChatContextItem> Items => _items;
 
+        /// <summary>Creates an empty context; use <see cref="CreateChatContextAsync"/> to also pick up the project's Copilot instructions.</summary>
         private ChatContext()
         {
 
@@ -122,6 +125,9 @@ namespace FreeAIr.Chat.Context
             }
         }
 
+        /// <summary>
+        /// Removes every item equivalent to the given one, per <see cref="IChatContextItem.IsSame"/>.
+        /// </summary>
         public void RemoveItem(
             IChatContextItem item
             )
@@ -201,6 +207,7 @@ namespace FreeAIr.Chat.Context
             }
         }
 
+        /// <summary>Fires <see cref="ChatContextChangedEvent"/> so the UI redraws the row of context chips.</summary>
         private void RaiseChatContextChanged()
         {
             var e = ChatContextChangedEvent;

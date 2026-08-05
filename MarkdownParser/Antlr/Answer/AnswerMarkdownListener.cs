@@ -28,6 +28,7 @@ namespace MarkdownParser.Antlr.Answer
 
         private readonly ParsedMarkdown _answer;
 
+        /// <summary>Creates a listener that feeds every recognized markdown construct into <paramref name="answer"/>.</summary>
         public AnswerMarkdownListener(
             ParsedMarkdown answer
             )

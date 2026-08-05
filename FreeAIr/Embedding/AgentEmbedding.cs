@@ -31,6 +31,7 @@ namespace FreeAIr.Embedding
                 );
         }
 
+        /// <summary>Translates the RAG settings' shortlist knobs (top outline count, max files, sensitivity) into the pipeline's own options type.</summary>
         public static RagShortlistOptions CreateShortlistOptions(
             RagJson rag
             )

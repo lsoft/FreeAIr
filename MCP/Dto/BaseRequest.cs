@@ -9,6 +9,7 @@ namespace Dto
     /// </summary>
     public abstract class BaseRequest : IParameterProvider
     {
+        /// <summary>The free-form parameter values keyed by lower-cased name, serialized alongside the request across the pipe.</summary>
         [JsonInclude]
         public Dictionary<string, string> Pool
         {
@@ -16,6 +17,7 @@ namespace Dto
             set;
         } = new();
 
+        /// <summary>Looks up a parameter by name (case-insensitive) in <see cref="Pool"/>; throws if it is missing.</summary>
         public string this[string key]
         {
             get
@@ -34,21 +36,25 @@ namespace Dto
             }
         }
 
+        /// <summary>Name of the MCP server this request targets.</summary>
         public string MCPServerName
         {
             get;
             set;
         }
 
+        /// <summary>Attempts to read a parameter by name (case-insensitive) from <see cref="Pool"/> without throwing.</summary>
         public bool TryGetValue(string key, out string? value)
         {
             return Pool.TryGetValue(key.ToLower(), out value);
         }
 
+        /// <summary>Parameterless constructor for JSON deserialization.</summary>
         protected BaseRequest()
         {
         }
 
+        /// <summary>Creates a request targeting <paramref name="mcpServerName"/>, seeding <see cref="Pool"/> from <paramref name="parameters"/>.</summary>
         protected BaseRequest(
             string mcpServerName,
             IReadOnlyDictionary<string, string>? parameters

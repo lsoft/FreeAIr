@@ -18,20 +18,41 @@ using FreeAIr.Chat.Context;
 
 namespace FreeAIr.UI.ViewModels
 {
+    /// <summary>
+    /// View model backing the chat dialog panel. Turns a <see cref="FreeAIr.Chat.Chat"/>'s
+    /// prompts, LLM answers and tool calls into the <see cref="DialogContent"/> items the
+    /// dialog list box binds to, and wires up the per-part context menu actions (copy,
+    /// expand, replace selection, create file from code block).
+    /// </summary>
     public class DialogViewModel : BaseViewModel
     {
+        /// <summary>
+        /// The chat currently shown in the dialog, or null when no chat is selected.
+        /// </summary>
         private FreeAIr.Chat.Chat? _selectedChat;
 
+        /// <summary>
+        /// The ordered list of dialog items (prompts, answers, tool calls) rendered in the chat window.
+        /// </summary>
         public ObservableCollection2<DialogContent> Dialog
         {
             get;
         } = new();
 
+        /// <summary>
+        /// Registry of extra context-menu/toolbar commands (copy to clipboard, replace selection,
+        /// create file, expand/collapse) offered on code, XML, URL and image parts of the dialog.
+        /// </summary>
         public AdditionalCommandContainer AdditionalCommandContainer
         {
             get;
         } = new();
 
+        /// <summary>
+        /// Builds the dialog view model and registers all the additional per-part commands
+        /// (copy, expand XML nodes, replace context item body, replace selected text in the
+        /// document, create a new file from a code block, copy an image) shown in the chat UI.
+        /// </summary>
         public DialogViewModel(
             )
         {
@@ -293,6 +314,11 @@ namespace FreeAIr.UI.ViewModels
             #endregion
         }
 
+        /// <summary>
+        /// Switches the dialog to a different chat (or clears it when null): detaches from the
+        /// previous chat's content events, rebuilds the dialog list from the new chat's contents,
+        /// and subscribes to further additions.
+        /// </summary>
         public void UpdateDialog(
             FreeAIr.Chat.Chat? selectedChat
             )
@@ -314,6 +340,10 @@ namespace FreeAIr.UI.ViewModels
             }
         }
 
+        /// <summary>
+        /// Clears and repopulates the dialog list from every content item currently held by
+        /// the selected chat, used when switching the dialog to a different chat.
+        /// </summary>
         private void RewriteDialog()
         {
             foreach (var content in _selectedChat.Contents)
@@ -322,6 +352,11 @@ namespace FreeAIr.UI.ViewModels
             }
         }
 
+        /// <summary>
+        /// Handles the selected chat's content-added event by scheduling the new content to be
+        /// appended to the dialog on the UI thread, ignoring events from a chat that is no
+        /// longer selected.
+        /// </summary>
         private void ContentAddedRaised(object sender, ChatContentAddedEventArgs e)
         {
             if (_selectedChat is null || !ReferenceEquals(_selectedChat, e.Chat))
@@ -333,6 +368,10 @@ namespace FreeAIr.UI.ViewModels
                 .FileAndForget(nameof(AddDialogContentSafelyAsync));
         }
 
+        /// <summary>
+        /// Marshals onto the main thread and appends the newly added chat content to the dialog,
+        /// logging any failure to the activity log instead of letting it escape a fire-and-forget task.
+        /// </summary>
         private async Task AddDialogContentSafelyAsync(
             ChatContentAddedEventArgs e
             )
@@ -351,6 +390,10 @@ namespace FreeAIr.UI.ViewModels
 
         #region add dialog content
 
+        /// <summary>
+        /// Dispatches a chat content item to the matching dialog-builder method based on its
+        /// <see cref="IChatContent.Type"/> (prompt, LLM answer or tool call).
+        /// </summary>
         private void AddDialogContent(IChatContent content)
         {
             switch (content.Type)
@@ -367,6 +410,10 @@ namespace FreeAIr.UI.ViewModels
             }
         }
 
+        /// <summary>
+        /// Wraps a user prompt content item into a <see cref="PromptDialogContent"/> and adds
+        /// it to the dialog.
+        /// </summary>
         private void AddDialogPrompt(IChatContent content)
         {
             var p = PromptDialogContent.Create(
@@ -376,6 +423,10 @@ namespace FreeAIr.UI.ViewModels
             Dialog.Add(p);
         }
 
+        /// <summary>
+        /// Wraps an LLM answer content item into an <see cref="AnswerDialogContent"/>, marking
+        /// whether the answer is still streaming, and adds it to the dialog.
+        /// </summary>
         private void AddDialogAnswer(IChatContent content, bool isInProgress)
         {
             var a = AnswerDialogContent.Create(
@@ -386,6 +437,10 @@ namespace FreeAIr.UI.ViewModels
             Dialog.Add(a);
         }
 
+        /// <summary>
+        /// Wraps a tool call content item into a <see cref="ToolCallDialogContent"/> and adds
+        /// it to the dialog.
+        /// </summary>
         private void AddDialogToolCall(IChatContent content)
         {
             var tc = new ToolCallDialogContent(
@@ -397,11 +452,29 @@ namespace FreeAIr.UI.ViewModels
         #endregion
     }
 
+    /// <summary>
+    /// An additional command that, when clicked, lets the user pick one of the current chat's
+    /// context items and replaces that item's document body with the code from the dialog part
+    /// that raised the command. Used for the "replace context item" button on code blocks.
+    /// </summary>
     public sealed class ChatContextMenuAdditionalCommand : AdditionalCommand
     {
+        /// <summary>
+        /// Resolves the chat whose context items should be offered, evaluated lazily each time
+        /// the command runs since the selected chat can change between clicks.
+        /// </summary>
         private readonly Func<FreeAIr.Chat.Chat?> _chatFunc;
+
+        /// <summary>
+        /// The command invoked with the chosen context item and the part's code text once the
+        /// user selects which context item to replace.
+        /// </summary>
         private readonly ICommand? _actionCommand;
 
+        /// <summary>
+        /// Creates the command, storing the chat resolver, the target part types, the button
+        /// caption/tooltip and the action to run once a context item is chosen.
+        /// </summary>
         public ChatContextMenuAdditionalCommand(
             IFontSizeProvider fontSizeProvider,
             Func<FreeAIr.Chat.Chat?> chatFunc,
@@ -421,6 +494,10 @@ namespace FreeAIr.UI.ViewModels
             _actionCommand = actionCommand;
         }
 
+        /// <summary>
+        /// Creates the button for this command and wires its click handler to prompt for a
+        /// context item and replace its body, logging any failure to the activity log.
+        /// </summary>
         public override UIElement? CreateControl(IPart part)
         {
             var control = base.CreateControl(part);
@@ -445,6 +522,10 @@ namespace FreeAIr.UI.ViewModels
             return button;
         }
 
+        /// <summary>
+        /// Prompts the user to choose which of the current chat's context items to replace, then
+        /// invokes the action command with the chosen item and the clicked part's code text.
+        /// </summary>
         private async Task ReplaceDocumentBodyAsync(
             IPart part
             )

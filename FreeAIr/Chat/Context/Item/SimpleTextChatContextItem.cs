@@ -14,6 +14,7 @@ namespace FreeAIr.Chat.Context.Item
     /// </summary>
     public sealed class SimpleTextChatContextItem : IChatContextItem
     {
+        /// <summary>The generated or captured text this item carries, held in memory as a snapshot.</summary>
         private string _body;
 
         /// <summary>
@@ -25,11 +26,13 @@ namespace FreeAIr.Chat.Context.Item
             get;
         }
 
+        /// <summary>True when this text was captured automatically rather than added by the user.</summary>
         public bool IsAutoFound
         {
             get;
         }
 
+        /// <summary>Creates a text context item with the given chip label and body text.</summary>
         public SimpleTextChatContextItem(
             string contextUIDescription,
             string body,
@@ -51,11 +54,13 @@ namespace FreeAIr.Chat.Context.Item
             IsAutoFound = isAutoFound;
         }
 
+        /// <summary>Returns the held body text as-is, unwrapped in any markup.</summary>
         public Task<string> AsContextPromptTextAsync()
         {
             return Task.FromResult(_body);
         }
 
+        /// <summary>Wraps the held body text into a chat message ready for the request.</summary>
         public async Task<UserChatMessage> CreateChatMessageAsync()
         {
             return new UserChatMessage(

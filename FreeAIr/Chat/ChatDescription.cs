@@ -32,6 +32,9 @@ namespace FreeAIr.Chat
             get;
         }
 
+        /// <summary>
+        /// Creates the description for a new chat, optionally anchored to a selection in the editor.
+        /// </summary>
         public ChatDescription(
             IOriginalTextDescriptor? selectedTextDescriptor
             )
@@ -40,6 +43,7 @@ namespace FreeAIr.Chat
             Title = "Untitled";
         }
 
+        /// <summary>Releases the tracking span held by <see cref="SelectedTextDescriptor"/>, if any.</summary>
         protected override void DisposeViewModel()
         {
             //the descriptor holds a tracking span in the editor buffer, which keeps the document

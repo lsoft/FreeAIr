@@ -8,8 +8,18 @@ using System.Threading.Tasks;
 
 namespace FreeAIr.UI.ContextMenu
 {
+    /// <summary>
+    /// Builds the combined Visual Studio context menu for the voice recording feature: choosing
+    /// which recorder to use, which support action should post-process the transcript, and toggling
+    /// whether recording is enabled.
+    /// </summary>
     public static class RecorderContextMenu
     {
+        /// <summary>
+        /// Shows the recorder/post-process picker menu, listing every discovered
+        /// <see cref="IRecorderFactory"/> and every support action scoped to
+        /// <see cref="SupportScopeEnum.RecordPostProcess"/>, plus the enable/disable and help entries.
+        /// </summary>
         public static async Task<object?> OpenRecorderAndPostProcessMenuAsync(
             string? chosenRecorderName,
             string? chosenPostProcessActionName
@@ -72,6 +82,10 @@ namespace FreeAIr.UI.ContextMenu
             return chosenMenuItem;
         }
 
+        /// <summary>
+        /// Discovers every MEF-exported <see cref="IRecorderFactory"/> so the recorder picker can
+        /// list all recording backends registered with Visual Studio's component model.
+        /// </summary>
         public static async Task<List<IRecorderFactory>> ObtainRecorderFactoriesAsync()
         {
             var componentModel = (IComponentModel)await FreeAIrPackage.Instance.GetServiceAsync(typeof(SComponentModel));
@@ -84,9 +98,15 @@ namespace FreeAIr.UI.ContextMenu
 
     }
 
+    /// <summary>
+    /// The non-recorder, non-post-process entries in the recording context menu: toggling whether
+    /// recording is enabled, or opening the recording feature's help.
+    /// </summary>
     public enum RecordingOtherActionEnum
     {
+        /// <summary>Toggles <see cref="RecordingPage.Enabled"/>, turning voice recording on or off.</summary>
         EnableDisable,
+        /// <summary>Opens the help for the recording feature.</summary>
         ShowHelp
     }
 }

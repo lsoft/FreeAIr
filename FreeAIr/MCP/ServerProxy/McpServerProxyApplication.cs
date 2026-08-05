@@ -29,7 +29,9 @@ namespace FreeAIr.MCP.McpServerProxy
     /// </summary>
     public static class McpServerProxyApplication
     {
+        /// <summary>The name `Proxy.csproj`'s `PostBuild` target zips its output to and embeds into the VSIX; unpacked on first use.</summary>
         public const string ProxyApplicationZipFileName = "Proxy.zip";
+        /// <summary>The executable launched inside <see cref="ProxyUnpackedFolderPath"/> once the zip has been extracted.</summary>
         public const string ProxyApplicationExeFileName = "Proxy.exe";
 
         /// <summary>
@@ -38,13 +40,19 @@ namespace FreeAIr.MCP.McpServerProxy
         /// </summary>
         private const string UnpackedMarkerFileName = "unpacked.marker";
 
+        /// <summary>The folder `Proxy.zip` is extracted into, derived from the extension's own install folder so an upgraded VSIX never merges into a previous version's copy.</summary>
         public static readonly string ProxyUnpackedFolderPath;
+        /// <summary>The folder holding the embedded `Proxy.zip` archive before it is unpacked.</summary>
         private static readonly string _proxyZipFolderPath;
 
+        /// <summary>Cancelled on Visual Studio shutdown to stop <see cref="_processMonitor"/>'s monitoring loop.</summary>
         private static readonly CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
+        /// <summary>Keeps `Proxy.exe` running, restarting it if it dies; see <see cref="ProcessMonitor"/>.</summary>
         private static readonly ProcessMonitor _processMonitor;
+        /// <summary>The long-running task backing <see cref="_processMonitor"/>'s monitoring loop.</summary>
         private static readonly Task _processTask;
 
+        /// <summary>Subscribed to <c>OnBeginShutdown</c> so the proxy process is torn down when Visual Studio closes.</summary>
         private static readonly DTEEvents _dteEvents;
 
         //private static readonly HttpClient _httpClient;
@@ -240,6 +248,7 @@ namespace FreeAIr.MCP.McpServerProxy
             return setupResult;
         }
 
+        /// <summary>Cancels the proxy monitoring loop when Visual Studio starts shutting down, so `Proxy.exe` is not left running as an orphan.</summary>
         private static void DTEEvents_OnBeginShutdown()
         {
             _cancellationTokenSource.Cancel();

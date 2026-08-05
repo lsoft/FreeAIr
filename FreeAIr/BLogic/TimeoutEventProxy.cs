@@ -46,15 +46,19 @@ namespace FreeAIr.BLogic
         /// </summary>
         public delegate Task TimeoutEventProxyDelegate(object sender, TArgs args);
 
+        /// <summary>Guards the pending list, which the raising side and the delivering loop both touch.</summary>
         //guards the pending list, which the raising side and the delivering loop both touch
         private readonly NonDisposableSemaphoreSlim _semaphore = new(1);
 
+        /// <summary>Set by <see cref="DisposeAsync"/> to stop the delivery loop.</summary>
         private readonly ManualResetEvent _stopSignal = new(false);
 
         /// <summary>Skips the wait and delivers now. Set when the queue has grown past one entry.</summary>
         private readonly AutoResetEvent _immediatelySendSignal = new(false);
 
+        /// <summary>How long the delivery loop waits between flushes of the pending events.</summary>
         private readonly int _timeoutMsec;
+        /// <summary>The sender passed to every delivered event.</summary>
         private readonly object _sender;
 
         /// <summary>
@@ -66,14 +70,17 @@ namespace FreeAIr.BLogic
         /// <summary>One means the loop has not been started yet; flipped by an interlocked exchange.</summary>
         private int _firstCall = 1;
 
+        /// <summary>The background delivery loop, started lazily by the first <see cref="FireAsync"/> call.</summary>
         private Task? _workingTask;
 
         /// <summary>What has been raised but not delivered yet. Guarded by the semaphore.</summary>
         private List<TArgs> _argsList = new();
 
         /// <summary>Raised on a background thread, at most once per timeout per pending item.</summary>
+        /// <summary>Fired on a background thread with the throttled, collapsed-or-queued events.</summary>
         public event TimeoutEventProxyDelegate Event;
 
+        /// <summary>Configures the throttling interval, the sender identity delivered with every event, and the collapsing rule for events raised while one is still pending.</summary>
         public TimeoutEventProxy(
             int timeoutMsec,
             object sender,
@@ -229,6 +236,7 @@ namespace FreeAIr.BLogic
             _stopSignal.Dispose();
         }
 
+        /// <summary>Invokes <see cref="Event"/> with the given args, if anybody is subscribed.</summary>
         private async Task FireEventAsync(
             TArgs args
             )

@@ -15,13 +15,18 @@ namespace FreeAIr.MCP.McpServerProxy.VS.Tools
     /// </summary>
     public sealed class ReplaceFileBodyTool : VisualStudioMcpServerTool
     {
+        /// <summary>Shared singleton instance registered with the MCP tool catalog.</summary>
         public static readonly ReplaceFileBodyTool Instance = new();
 
+        /// <summary>The MCP tool name exposed to the model.</summary>
         public const string VisualStudioToolName = "ReplaceFileBody";
 
+        /// <summary>JSON schema property name for the target file's name or path.</summary>
         public const string FileNamePathParameterName = "file_name_or_full_path";
+        /// <summary>JSON schema property name for the proposed new file body.</summary>
         public const string NewFileBodyParameterName = "new_file_body";
 
+        /// <summary>Registers the tool under <see cref="VisualStudioToolName"/> with its JSON input schema for the target file and new body.</summary>
         public ReplaceFileBodyTool(
             ) : base(
                 VisualStudioMcpServerProxy.VisualStudioProxyName,
@@ -181,6 +186,7 @@ namespace FreeAIr.MCP.McpServerProxy.VS.Tools
         /// <summary>The tool's success result: a one-line confirmation that the document was updated.</summary>
         private sealed class UpdateBodyResultJson
         {
+            /// <summary>The confirmation text returned to the model, e.g. "The document successfully updated".</summary>
             public string ResultMessage
             {
                 get;

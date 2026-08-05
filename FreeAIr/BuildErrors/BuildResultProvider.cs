@@ -6,8 +6,16 @@ using System.Threading.Tasks;
 
 namespace FreeAIr.BuildErrors
 {
+    /// <summary>
+    /// Reads build errors, warnings and informational messages out of the Visual Studio Error List
+    /// (<c>SVsErrorList</c>) so FreeAIr can feed them to the AI for auto-fixing.
+    /// </summary>
     public static class BuildResultProvider
     {
+        /// <summary>
+        /// Enumerates every entry currently in the Error List and returns the ones matching
+        /// <paramref name="allowedTypes"/> as <see cref="BuildResultInformation"/> snapshots.
+        /// </summary>
         public static async Task<List<BuildResultInformation>> GetBuildResultInformationsAsync(
             ErrorInformationTypeEnum allowedTypes = ErrorInformationTypeEnum.Error
             )
@@ -71,6 +79,10 @@ namespace FreeAIr.BuildErrors
             return result;
         }
 
+        /// <summary>
+        /// Reads the single Error List row currently selected by the user, rejecting anything that
+        /// is not a build error (FreeAIr's "fix this error" command only ever acts on errors).
+        /// </summary>
         public static async Task<BuildResultInformation?> GetSelectedErrorInformationAsync()
         {
             await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();

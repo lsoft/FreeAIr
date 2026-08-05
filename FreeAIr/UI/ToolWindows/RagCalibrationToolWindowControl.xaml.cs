@@ -4,8 +4,15 @@ using System.Windows.Input;
 
 namespace FreeAIr.UI.ToolWindows
 {
+    /// <summary>
+    /// Code-behind for the RAG calibration window; binds the view model and makes Enter commit
+    /// the focused text box immediately instead of waiting for it to lose focus.
+    /// </summary>
     public partial class RagCalibrationToolWindowControl : UserControl
     {
+        /// <summary>
+        /// Creates the control and binds it to the RAG calibration view model.
+        /// </summary>
         public RagCalibrationToolWindowControl(
             RagCalibrationViewModel viewModel
             )

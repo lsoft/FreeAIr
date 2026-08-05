@@ -14,13 +14,16 @@ namespace FreeAIr.MCP.McpServerProxy.External
     /// </summary>
     public sealed class ExternalMcpServerProxy : IMcpServerProxy
     {
+        /// <summary>Unused; the server's configuration is looked up on the proxy side by <see cref="Name"/> instead of being held here.</summary>
         private readonly McpServer _server;
 
+        /// <summary>The configured external server's name, used by the proxy to look up its registered configuration.</summary>
         public string Name
         {
             get;
         }
 
+        /// <summary>Creates a proxy handle for the external server registered under the given name.</summary>
         public ExternalMcpServerProxy(
             string name
             )

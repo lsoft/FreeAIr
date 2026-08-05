@@ -13,6 +13,12 @@ using WpfHelpers;
 
 namespace FreeAIr.BLogic
 {
+    /// <summary>
+    /// Injects the "Build commit message", "Add natural language outlines" and "Build NLO json file"
+    /// buttons into Visual Studio's Git Changes pane, next to its own "Describe Changes" button. The
+    /// pane is not FreeAIr's own window and gets rebuilt whenever it is docked, undocked or reopened,
+    /// so this class keeps rescanning and re-inserting its buttons for as long as Visual Studio runs.
+    /// </summary>
     [Export(typeof(GitWindowModifier))]
     public sealed class GitWindowModifier
     {
@@ -21,38 +27,70 @@ namespace FreeAIr.BLogic
         /// repeated scan recognizes its own work and does not add a second set of them.
         /// </summary>
         private const string CommitMessageButtonTag = "FreeAIr.BuildCommitMessage";
+        /// <summary>
+        /// The <see cref="FrameworkElement.Tag"/> marking the injected "Add natural language
+        /// outlines" button.
+        /// </summary>
         private const string OutlinesButtonTag = "FreeAIr.AddNaturalLanguageOutlines";
+        /// <summary>
+        /// The <see cref="FrameworkElement.Tag"/> marking the injected "Build NLO json file" button.
+        /// </summary>
         private const string NLOJsonFileButtonTag = "FreeAIr.BuildNLOJsonFile";
 
+        /// <summary>
+        /// Used to detect the IDE shutting down, so the scan loop stops instead of outliving Visual
+        /// Studio.
+        /// </summary>
         private readonly DTEEvents _dteEvents;
 
+        /// <summary>
+        /// Cancelled on IDE shutdown, stopping the scan loop in <see cref="RunAsync"/>.
+        /// </summary>
         private readonly CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
 
+        /// <summary>
+        /// The Git Changes pane's own commit message text box, located by name; commit message
+        /// generation writes its result here.
+        /// </summary>
         public TextBox? CommitMessageTextBox
         {
             get;
             private set;
         }
 
+        /// <summary>
+        /// The injected button that generates a commit message with AI.
+        /// </summary>
         public Button? BuildCommitMessageButton
         {
             get;
             private set;
         }
 
+        /// <summary>
+        /// The injected button that adds natural language outlines to the files of the pending diff.
+        /// </summary>
         public Button? AddNaturalLanguageOutlinesButton
         {
             get;
             private set;
         }
 
+        /// <summary>
+        /// The injected button that opens the tool window for building the natural language
+        /// outlines json file.
+        /// </summary>
         public Button? BuildNLOJsonFileButton
         {
             get;
             private set;
         }
 
-        public bool IsEnabled => 
+        /// <summary>
+        /// Whether the Git Changes pane has been found and patched, meaning the commit message box
+        /// and buttons are usable.
+        /// </summary>
+        public bool IsEnabled =>
             CommitMessageTextBox is not null
             && BuildCommitMessageButton is not null
             ;
@@ -75,6 +113,12 @@ namespace FreeAIr.BLogic
             _cancellationTokenSource.Cancel();
         }
 
+        /// <summary>
+        /// Polls the open windows for the Git Changes pane and, once found, inserts the commit
+        /// message, outlines and NLO json file buttons next to its "Describe Changes" button. Keeps
+        /// polling on a delay until found or cancelled, and rearms itself through
+        /// <see cref="WatchForPanelTeardown"/> so the pane is patched again after it is rebuilt.
+        /// </summary>
         public async Task RunAsync()
         {
             try
@@ -203,6 +247,11 @@ namespace FreeAIr.BLogic
             }
         }
 
+        /// <summary>
+        /// Looks for a button this class has already inserted into the given panel, identified by
+        /// its <see cref="FrameworkElement.Tag"/>, so a repeated scan of the same pane does not
+        /// insert a duplicate.
+        /// </summary>
         private static Button? FindOwnButton(
             StackPanel panel,
             string tag
@@ -233,6 +282,11 @@ namespace FreeAIr.BLogic
             ownButton.Unloaded += OwnButtonUnloaded;
         }
 
+        /// <summary>
+        /// Fires when the injected button is unloaded along with the Git Changes pane it lives in;
+        /// clears the cached button/text box references and restarts <see cref="RunAsync"/> so the
+        /// pane is found and patched again whether it was hidden or fully rebuilt.
+        /// </summary>
         private void OwnButtonUnloaded(object sender, RoutedEventArgs e)
         {
             if (sender is Button button)
@@ -255,6 +309,9 @@ namespace FreeAIr.BLogic
                 .FileAndForget(nameof(GitWindowModifier));
         }
 
+        /// <summary>
+        /// Opens the tool window for building the natural language outlines json file.
+        /// </summary>
         private void BuildNLOJsonFileButton_Click(object sender, RoutedEventArgs e)
         {
             try
@@ -269,6 +326,10 @@ namespace FreeAIr.BLogic
             }
         }
 
+        /// <summary>
+        /// Starts <see cref="GitNaturalLanguageOutliner.CollectOutlinesAsync"/> for the files of the
+        /// pending git diff.
+        /// </summary>
         private void AddNaturalLanguageOutlinesButton_Click(object sender, RoutedEventArgs e)
         {
             try
@@ -282,6 +343,10 @@ namespace FreeAIr.BLogic
             }
         }
 
+        /// <summary>
+        /// Starts <see cref="CommitMessageBuilder.ChooseAgentAsync"/> to generate a commit message
+        /// with AI.
+        /// </summary>
         private void BuildCommitMessageButton_Click(object sender, RoutedEventArgs e)
         {
             CommitMessageBuilder.ChooseAgentAsync(

@@ -15,27 +15,50 @@ using WpfHelpers;
 
 namespace FreeAIr.UI.ViewModels
 {
+    /// <summary>
+    /// View model backing the MCP server configuration window, where the user adds, edits,
+    /// reorders and validates the MCP servers (stdio or HTTP) stored in the FreeAIr options.
+    /// </summary>
     public sealed class McpServerConfigureViewModel : BaseViewModel
     {
+        /// <summary>
+        /// The MCP server currently chosen in the list, or null when none is selected.
+        /// </summary>
         private McpServerWrapper _selectedServer;
 
+        /// <summary>
+        /// Callback invoked to close the configuration window, passing the dialog result
+        /// (true if the user applied their changes, false if they cancelled).
+        /// </summary>
         public Action<bool>? CloseWindow
         {
             get;
             set;
         }
 
+        /// <summary>
+        /// The full set of MCP servers being edited in this window, backing the persisted
+        /// server dictionary saved to the FreeAIr options.
+        /// </summary>
         public List<McpServerWrapper> ServerCollection
         {
             get;
             private set;
         }
 
+        /// <summary>
+        /// The observable projection of <see cref="ServerCollection"/> bound to the server
+        /// list UI, kept in sync as servers are added, removed, cloned or reordered.
+        /// </summary>
         public ObservableCollection2<McpServerWrapper> AvailableServers
         {
             get;
         }
 
+        /// <summary>
+        /// The MCP server the user has selected in the list, driving which server's
+        /// name/JSON panel is shown for editing.
+        /// </summary>
         public McpServerWrapper SelectedServer
         {
             get => _selectedServer;
@@ -46,6 +69,11 @@ namespace FreeAIr.UI.ViewModels
             }
         }
 
+        /// <summary>
+        /// Whether the configuration form is interactive; set to false while a long-running
+        /// operation such as the connection check is in progress, to keep the user from
+        /// editing the server list mid-operation.
+        /// </summary>
         public bool FormEnabled
         {
             get;
@@ -56,6 +84,10 @@ namespace FreeAIr.UI.ViewModels
             }
         } = true;
 
+        /// <summary>
+        /// Visibility of the server detail panel, shown only once a server is selected in
+        /// the list so the window starts with an empty right-hand side.
+        /// </summary>
         public Visibility ShowServerPanel
         {
             get
@@ -69,6 +101,10 @@ namespace FreeAIr.UI.ViewModels
             }
         }
 
+        /// <summary>
+        /// Border color for the server name field, turning red when the name is empty or
+        /// contains a space so the user gets immediate validation feedback.
+        /// </summary>
         public Brush StatusNameBorder
         {
             get
@@ -91,6 +127,10 @@ namespace FreeAIr.UI.ViewModels
             }
         }
 
+        /// <summary>
+        /// Border color for the server JSON configuration field, turning red when the JSON
+        /// fails to deserialize into a valid MCP server definition.
+        /// </summary>
         public Brush StatusJsonBorder
         {
             get
@@ -109,6 +149,10 @@ namespace FreeAIr.UI.ViewModels
             }
         }
 
+        /// <summary>
+        /// Command that prompts the user to pick an MCP server type (stdio or HTTP) and adds
+        /// a new server pre-filled with a sample JSON template to the list.
+        /// </summary>
         public ICommand AddNewCommand
         {
             get
@@ -126,6 +170,10 @@ namespace FreeAIr.UI.ViewModels
             }
         }
 
+        /// <summary>
+        /// Command that removes the currently selected server from both the working
+        /// collection and the bound list; disabled when nothing is selected.
+        /// </summary>
         public ICommand DeleteCommand
         {
             get
@@ -153,6 +201,10 @@ namespace FreeAIr.UI.ViewModels
             }
         }
 
+        /// <summary>
+        /// Command that moves the selected server one position earlier in the list, letting
+        /// the user control the order servers are shown and applied in.
+        /// </summary>
         public ICommand UpCommand
         {
             get
@@ -194,6 +246,10 @@ namespace FreeAIr.UI.ViewModels
             }
         }
 
+        /// <summary>
+        /// Command that moves the selected server one position later in the list, the
+        /// counterpart to <see cref="UpCommand"/> for reordering servers.
+        /// </summary>
         public ICommand DownCommand
         {
             get
@@ -235,6 +291,10 @@ namespace FreeAIr.UI.ViewModels
             }
         }
 
+        /// <summary>
+        /// Command that duplicates the selected server, appending a "cloned" suffix to its
+        /// name, as a quick way to base a new server configuration on an existing one.
+        /// </summary>
         public ICommand CloneCommand
         {
             get
@@ -266,6 +326,10 @@ namespace FreeAIr.UI.ViewModels
             }
         }
 
+        /// <summary>
+        /// Command that opens the Docker MCP server search window, letting the user browse
+        /// the Docker MCP catalog and add a chosen server straight into this configuration.
+        /// </summary>
         public ICommand SearchCommand
         {
             get
@@ -298,6 +362,10 @@ namespace FreeAIr.UI.ViewModels
             }
         }
 
+        /// <summary>
+        /// Command that closes the window with a positive dialog result, signalling the
+        /// caller to persist the edited MCP server list to the FreeAIr options.
+        /// </summary>
         public ICommand ApplyAndCloseCommand
         {
             get
@@ -318,6 +386,11 @@ namespace FreeAIr.UI.ViewModels
             }
         }
 
+        /// <summary>
+        /// Command that pings the selected server by applying the current server dictionary
+        /// through <see cref="FreeAIrOptions.ApplyMcpServerNodeAsync"/> and reports success
+        /// via a message box, so the user can verify a server is reachable before saving.
+        /// </summary>
         public ICommand CheckForConnectionCommand
         {
             get
@@ -378,6 +451,10 @@ namespace FreeAIr.UI.ViewModels
             }
         }
 
+        /// <summary>
+        /// Builds this view model from the MCP server dictionary read out of the FreeAIr
+        /// options, wrapping each entry so the UI can edit it independently.
+        /// </summary>
         public McpServerConfigureViewModel(
             Dictionary<string, McpServer> serverCollection
             )
@@ -386,6 +463,10 @@ namespace FreeAIr.UI.ViewModels
             AvailableServers = new ObservableCollection2<McpServerWrapper>(ServerCollection);
         }
 
+        /// <summary>
+        /// Converts the edited server list back into the name-to-server dictionary shape
+        /// the FreeAIr options persist, dropping any server whose JSON fails to deserialize.
+        /// </summary>
         public Dictionary<string, McpServer> BuildServerDictionary()
         {
             var result = ServerCollection
@@ -396,6 +477,10 @@ namespace FreeAIr.UI.ViewModels
             return result;
         }
 
+        /// <summary>
+        /// Wraps a server produced elsewhere (e.g. picked from the Docker MCP catalog search)
+        /// and adds it to both the working collection and the bound list.
+        /// </summary>
         private void AddServer(
             string name,
             McpServer server
@@ -409,6 +494,11 @@ namespace FreeAIr.UI.ViewModels
             AddServerToCollections(newServer);
         }
 
+        /// <summary>
+        /// Handles the "add new server" flow: asks the user to pick an MCP server type via
+        /// a context-menu style picker, then creates a new server of that type with a
+        /// default name and adds it to the list.
+        /// </summary>
         private async Task CreateServerAsync()
         {
             var types = new List<(string, object)>();
@@ -437,6 +527,11 @@ namespace FreeAIr.UI.ViewModels
             AddServerToCollections(newServer);
         }
 
+        /// <summary>
+        /// Shared tail of the add-server flows: appends the new wrapper to both
+        /// <see cref="ServerCollection"/> and <see cref="AvailableServers"/> so the model and
+        /// the UI stay in sync.
+        /// </summary>
         private void AddServerToCollections(
             McpServerWrapper newServer
             )
@@ -445,33 +540,77 @@ namespace FreeAIr.UI.ViewModels
             AvailableServers.Add(newServer);
         }
 
+        /// <summary>
+        /// Adapts an <see cref="McpServerType"/> enum value for display in the "choose MCP
+        /// server type" picker shown by <see cref="CreateServerAsync"/>.
+        /// </summary>
         private sealed class McpServerTypeWrapper
         {
+            /// <summary>
+            /// The MCP server type (stdio or HTTP) this picker entry represents.
+            /// </summary>
             public McpServerType Type
             {
                 get;
             }
 
+            /// <summary>
+            /// Wraps the given server type for display in the type picker.
+            /// </summary>
             public McpServerTypeWrapper(McpServerType type)
             {
                 Type = type;
             }
 
+            /// <summary>
+            /// The text shown for this entry in the type picker list.
+            /// </summary>
             public override string ToString()
             {
                 return Type.ToString();
             }
         }
 
+        /// <summary>
+        /// Editable representation of a single MCP server entry in the configuration window:
+        /// its name, type and raw JSON configuration, plus cached JSON deserialization used
+        /// to drive the validation borders and the connection check.
+        /// </summary>
         public sealed class McpServerWrapper : ICloneable
         {
+            /// <summary>
+            /// The server's display/lookup name as it will be saved in the MCP server
+            /// dictionary.
+            /// </summary>
             private string _name;
+
+            /// <summary>
+            /// The server's raw JSON configuration text as edited by the user.
+            /// </summary>
             private string _json;
+
+            /// <summary>
+            /// The owning configuration view model, used to raise property-changed
+            /// notifications when this wrapper's fields change.
+            /// </summary>
             private readonly McpServerConfigureViewModel _viewModel;
 
+            /// <summary>
+            /// The JSON text that produced <see cref="_lastDeserializedServer"/>, used to
+            /// avoid re-parsing on every access of <see cref="TryDeserialize"/>.
+            /// </summary>
             private string? _lastDeserializedJson = null;
+
+            /// <summary>
+            /// Cached result of the last successful JSON deserialization, or null if the
+            /// current JSON does not parse into a valid MCP server.
+            /// </summary>
             private McpServer? _lastDeserializedServer = null;
 
+            /// <summary>
+            /// The server's display/lookup name shown in the server list and used as the key
+            /// when the servers are saved back to the FreeAIr options.
+            /// </summary>
             public string Name
             {
                 get => _name;
@@ -482,11 +621,19 @@ namespace FreeAIr.UI.ViewModels
                 }
             }
 
+            /// <summary>
+            /// Whether this server connects over stdio or HTTP, which determines the sample
+            /// JSON template offered when the server is first created.
+            /// </summary>
             public McpServerType Type
             {
                 get;
             }
 
+            /// <summary>
+            /// The server's raw JSON configuration text as edited by the user; setting it
+            /// invalidates the cached deserialization used by <see cref="TryDeserialize"/>.
+            /// </summary>
             public string Json
             {
                 get => _json;
@@ -497,6 +644,9 @@ namespace FreeAIr.UI.ViewModels
                 }
             }
 
+            /// <summary>
+            /// Wraps an existing MCP server (loaded from the FreeAIr options) for editing.
+            /// </summary>
             public McpServerWrapper(
                 McpServerConfigureViewModel viewModel,
                 string name,
@@ -509,6 +659,9 @@ namespace FreeAIr.UI.ViewModels
                 Json = mcpServer.JsonConfiguration;
             }
 
+            /// <summary>
+            /// Wraps a server by raw name and JSON, used when cloning an existing wrapper.
+            /// </summary>
             public McpServerWrapper(
                 McpServerConfigureViewModel viewModel,
                 string name,
@@ -520,6 +673,10 @@ namespace FreeAIr.UI.ViewModels
                 Json = json;
             }
 
+            /// <summary>
+            /// Creates a brand-new server of the given type, pre-filling <see cref="Json"/>
+            /// with a sample stdio or HTTP configuration template for the user to edit.
+            /// </summary>
             public McpServerWrapper(
                 McpServerConfigureViewModel viewModel,
                 string name,
@@ -560,6 +717,11 @@ namespace FreeAIr.UI.ViewModels
                 }
             }
 
+            /// <summary>
+            /// Parses <see cref="Json"/> into an <see cref="McpServer"/>, caching the result
+            /// keyed on the JSON text so repeated calls (e.g. from the validation borders)
+            /// don't re-parse unchanged text; returns null when the JSON is invalid.
+            /// </summary>
             public McpServer? TryDeserialize()
             {
                 try
@@ -583,6 +745,10 @@ namespace FreeAIr.UI.ViewModels
                 return _lastDeserializedServer;
             }
 
+            /// <summary>
+            /// Creates an independent copy of this server wrapper, used by
+            /// <see cref="CloneCommand"/> to duplicate a server entry.
+            /// </summary>
             public object Clone()
             {
                 return new McpServerWrapper(

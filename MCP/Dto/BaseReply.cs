@@ -7,6 +7,7 @@
     /// </summary>
     public abstract class BaseReply
     {
+        /// <summary>The failure message when the call did not succeed, or null when it did.</summary>
         public string? ErrorMessage
         {
             get;

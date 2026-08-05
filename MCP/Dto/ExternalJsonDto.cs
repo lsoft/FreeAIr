@@ -12,12 +12,14 @@ namespace Dto
     /// </summary>
     public class McpServers : ICloneable
     {
+        /// <summary>The configured servers keyed by their display name, as found under the `mcpServers` key of the config file.</summary>
         [JsonPropertyName("mcpServers")]
         public Dictionary<string, McpServer> Servers
         {
             get; set;
         }
 
+        /// <summary>Creates an empty server list.</summary>
         public McpServers()
         {
             Servers = new();
@@ -46,6 +48,7 @@ namespace Dto
     /// </summary>
     public class McpServer : ICloneable
     {
+        /// <summary>How this server is reached - stdio process or HTTP endpoint - which determines how <see cref="JsonConfiguration"/> is decoded.</summary>
         [JsonPropertyName("Type")]
         public McpServerType Type
         {
@@ -53,6 +56,7 @@ namespace Dto
             set;
         }
 
+        /// <summary>The raw, transport-specific configuration JSON, decoded via <see cref="HttpMcpServerParameters"/> or <see cref="StdioMcpServerParameters"/> depending on <see cref="Type"/>.</summary>
         [JsonPropertyName("JsonConfiguration")]
         public string JsonConfiguration
         {
@@ -60,11 +64,13 @@ namespace Dto
             set;
         }
 
+        /// <summary>Creates a server entry with an empty configuration.</summary>
         public McpServer()
         {
             JsonConfiguration = string.Empty;
         }
 
+        /// <summary>Creates a server entry of the given transport <paramref name="type"/> with its raw <paramref name="jsonConfiguration"/>.</summary>
         public McpServer(
             McpServerType type,
             string jsonConfiguration
@@ -99,12 +105,14 @@ namespace Dto
     /// <summary>The decoded `JsonConfiguration` of an HTTP-transport <see cref="McpServer"/>: just an endpoint URL.</summary>
     public sealed class HttpMcpServerParameters
     {
+        /// <summary>The HTTP URL the MCP server listens on.</summary>
         [JsonPropertyName("url")]
         public string Endpoint
         {
             get; set;
         }
 
+        /// <summary>Creates parameters with an empty endpoint.</summary>
         public HttpMcpServerParameters()
         {
             Endpoint = string.Empty;
@@ -132,24 +140,28 @@ namespace Dto
     /// </summary>
     public sealed class StdioMcpServerParameters
     {
+        /// <summary>The executable or command to launch the server process.</summary>
         [JsonPropertyName("command")]
         public string Command
         {
             get; set;
         }
 
+        /// <summary>Command-line arguments passed to <see cref="Command"/> when launching the server process.</summary>
         [JsonPropertyName("args")]
         public string[]? Args
         {
             get; set;
         }
 
+        /// <summary>Environment variables set for the server process, such as API keys or tokens the server itself needs.</summary>
         [JsonPropertyName("env")]
         public Dictionary<string, string>? Env
         {
             get; set;
         }
 
+        /// <summary>Creates parameters with an empty command, args and environment.</summary>
         public StdioMcpServerParameters()
         {
             Command = string.Empty;
@@ -188,7 +200,9 @@ namespace Dto
     /// <summary>How an MCP server is reached: a spawned local process, or an HTTP endpoint.</summary>
     public enum McpServerType
     {
+        /// <summary>The server is a local process launched and talked to over standard input/output.</summary>
         Stdio = 0,
+        /// <summary>The server is reached over an HTTP endpoint.</summary>
         Http = 1
     }
 }

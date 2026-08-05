@@ -19,15 +19,19 @@ namespace FreeAIr.Chat.Context.Item
     /// </summary>
     public sealed class CustomFileChatContextItem : IChatContextItem
     {
+        /// <summary>The full path of the attached file, outside of any solution.</summary>
         private readonly string _filePath;
 
+        /// <summary>The label shown on the context chip in the chat window: the file's own path.</summary>
         public string ContextUIDescription => _filePath;
 
+        /// <summary>True when this file was attached automatically rather than by the user.</summary>
         public bool IsAutoFound
         {
             get;
         }
 
+        /// <summary>Attaches the file at <paramref name="filePath"/>, trimming stray whitespace from the path.</summary>
         public CustomFileChatContextItem(
             string filePath,
             bool isAutoFound
@@ -151,6 +155,7 @@ namespace FreeAIr.Chat.Context.Item
             return [];
         }
 
+        /// <summary>Wraps the file's rendered prompt text into a chat message ready for the request.</summary>
         public async Task<UserChatMessage> CreateChatMessageAsync()
         {
             return new UserChatMessage(

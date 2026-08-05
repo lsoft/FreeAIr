@@ -8,11 +8,18 @@ using System.Threading.Tasks;
 
 namespace FreeAIr.Seaarch
 {
+    /// <summary>
+    /// Scrapes Google search results by driving a headless Chromium instance through PuppeteerSharp
+    /// rather than calling any search API — typing the query, paging through results and parsing the
+    /// result page's html. Used by the web search support action when an LLM needs fresh information.
+    /// </summary>
     public class GoogleSearcher
     {
+        /// <summary>Google's home page, where the search box is found and the query is typed.</summary>
         public const string GoogleMainPageUrl = "https://www.google.com";
         private readonly string? _pageImagesFolder;
 
+        /// <summary>Wraps an optional folder to save a screenshot of each results page into, for debugging what the scraper actually saw.</summary>
         public GoogleSearcher(
             string? pageImagesFolder
             )
@@ -20,6 +27,10 @@ namespace FreeAIr.Seaarch
             _pageImagesFolder = pageImagesFolder;
         }
 
+        /// <summary>
+        /// Types the query into Google, then walks the result pages parsing titles, snippets and
+        /// links out of the html until enough results are collected or Google runs out of pages.
+        /// </summary>
         public async Task<List<SearchResult>> SearchAsync(
             string searchTerm,
             int itemCountNeeded
@@ -213,6 +224,7 @@ namespace FreeAIr.Seaarch
             return result;
         }
 
+        /// <summary>Saves a screenshot of the current results page under the configured images folder, named after the search term; a no-op when no folder was given.</summary>
         private async Task SavePageImageAsync(
             string searchTerm,
             IPage page,

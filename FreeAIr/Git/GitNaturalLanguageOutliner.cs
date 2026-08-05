@@ -9,8 +9,17 @@ using FreeAIr.Chat.Context.Item;
 
 namespace FreeAIr.Git
 {
+    /// <summary>
+    /// Drives the "Add natural language outlines to changed files" command: picks a support action
+    /// and agent, then feeds the files touched by the pending git diff to the NL outlines panel so
+    /// the AI can add the `&lt;summary&gt;` comments the NLO/RAG index relies on.
+    /// </summary>
     public static class GitNaturalLanguageOutliner
     {
+        /// <summary>
+        /// Asks the user for a support action and agent, collects the files changed in the pending
+        /// git diff, and opens the natural language outlines panel for them.
+        /// </summary>
         public static async Task CollectOutlinesAsync(
             )
         {
@@ -50,6 +59,11 @@ namespace FreeAIr.Git
             }
         }
 
+        /// <summary>
+        /// Builds the chat context items for the natural language outlines panel: one per changed
+        /// text file in the current git diff, each scoped to the diff's changed line ranges so only
+        /// touched code is re-outlined. Binary and non-text files are skipped.
+        /// </summary>
         private static async System.Threading.Tasks.Task<List<SolutionItemChatContextItem>> CreateChosenSolutionItemsAsync(
             )
         {

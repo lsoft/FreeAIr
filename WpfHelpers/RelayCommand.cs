@@ -15,7 +15,9 @@ namespace WpfHelpers
     {
         #region Fields
 
+        /// <summary>The delegate invoked when the command runs, receiving the parameter cast to <typeparamref name="T"/>.</summary>
         readonly Action<T> _execute;
+        /// <summary>Optional predicate consulted by <see cref="CanExecute"/>; null means always executable.</summary>
         readonly Predicate<T> _canExecute;
 
         #endregion // Fields
@@ -61,6 +63,7 @@ namespace WpfHelpers
             return _canExecute == null || _canExecute(parameter as T);
         }
 
+        /// <summary>Forwards to WPF's <see cref="CommandManager.RequerySuggested"/> so bound controls re-evaluate <see cref="CanExecute"/> automatically.</summary>
         public event EventHandler CanExecuteChanged
         {
             add { CommandManager.RequerySuggested += value; }
@@ -107,7 +110,9 @@ namespace WpfHelpers
     {
         #region Fields
 
+        /// <summary>The delegate invoked when the command runs.</summary>
         readonly Action<object> _execute;
+        /// <summary>Optional predicate consulted by <see cref="CanExecute"/>; null means always executable.</summary>
         readonly Predicate<object> _canExecute;
 
         #endregion // Fields
@@ -148,6 +153,7 @@ namespace WpfHelpers
             return _canExecute == null || _canExecute(parameter);
         }
 
+        /// <summary>Forwards to WPF's <see cref="CommandManager.RequerySuggested"/> so bound controls re-evaluate <see cref="CanExecute"/> automatically.</summary>
         public event EventHandler CanExecuteChanged
         {
             add { CommandManager.RequerySuggested += value; }

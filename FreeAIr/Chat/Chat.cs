@@ -40,6 +40,7 @@ namespace FreeAIr.Chat
         /// </summary>
         private readonly List<IChatContent> _contents = new();
 
+        /// <summary>Backing field for <see cref="Status"/>.</summary>
         private ChatStatusEnum _status;
 
         /// <summary>

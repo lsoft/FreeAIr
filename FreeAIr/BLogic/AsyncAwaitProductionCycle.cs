@@ -14,7 +14,9 @@ namespace FreeAIr.BLogic
     /// </summary>
     public sealed class AsyncAwaitProductionCycle<T>
     {
+        /// <summary>Released by the requester to wake the worker at the top of its loop.</summary>
         private readonly NonDisposableSemaphoreSlim _startSignal = new(0, 1);
+        /// <summary>Carries the worker's result back to the requester once the round is done.</summary>
         private readonly AsyncAwaitProduct<T> _productSignal = new();
 
         /// <summary>

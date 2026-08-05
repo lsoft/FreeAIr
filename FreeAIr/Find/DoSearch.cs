@@ -10,8 +10,18 @@ using System.Threading.Tasks;
 
 namespace FreeAIr.Find
 {
+    /// <summary>
+    /// Drives the "Find in Files" natural language search: asks the user for scope, support action
+    /// and agent (and, when RAG is on, the embedding agent), then opens the results panel. This is
+    /// the entry point invoked by the search button of the Find window.
+    /// </summary>
     public static class DoSearch
     {
+        /// <summary>
+        /// Walks the user through the modal pickers needed for a natural language search — scope,
+        /// support action, chat agent, and optionally the embedding agent — then closes the Find
+        /// window and opens the natural language results panel with the chosen parameters.
+        /// </summary>
         public static async Task SearchAsync(
             bool useRAG,
             string fileTypesFilterText,
@@ -227,8 +237,15 @@ namespace FreeAIr.Find
         }
     }
 
+    /// <summary>
+    /// Wraps the scope (whole solution or current project) the user picked for a natural language
+    /// search, as returned by the scope picker in <see cref="DoSearch.SearchAsync"/>.
+    /// </summary>
     public sealed class NaturalSearchScope
     {
+        /// <summary>
+        /// The chosen search scope.
+        /// </summary>
         public NaturalSearchScopeEnum Scope
         {
             get;
@@ -244,28 +261,53 @@ namespace FreeAIr.Find
     }
 
 
+    /// <summary>
+    /// Everything a natural language search run needs: the query text, file mask, scope, the support
+    /// action driving the answer, the chat agent, and (for RAG) the embedding agent. Built once the
+    /// user has clicked through all the pickers in <see cref="DoSearch.SearchAsync"/> and handed to
+    /// the results panel.
+    /// </summary>
     public sealed class NaturalLanguageSearchParameters
     {
+        /// <summary>
+        /// Whether this run searches the embedding index (RAG) rather than scanning file text
+        /// directly.
+        /// </summary>
         public bool UseRAG
         {
             get;
         }
+        /// <summary>
+        /// The file mask restricting which files are searched, e.g. "*.cs".
+        /// </summary>
         public string FileTypesFilterText
         {
             get;
         }
+        /// <summary>
+        /// The natural language query text entered by the user.
+        /// </summary>
         public string SearchText
         {
             get;
         }
+        /// <summary>
+        /// Whether the search covers the whole solution or only the current project.
+        /// </summary>
         public NaturalSearchScopeEnum ChosenScope
         {
             get;
         }
+        /// <summary>
+        /// The support action that turns the search results into an answer.
+        /// </summary>
         public SupportActionJson ChosenAction
         {
             get;
         }
+        /// <summary>
+        /// The chat agent that carries out <see cref="ChosenAction"/>.
+        /// </summary>
         public AgentJson ChosenAgent
         {
             get;

@@ -1,7 +1,15 @@
 ﻿namespace FreeAIr.Helper
 {
+    /// <summary>
+    /// Writes to Visual Studio's Activity Log under the "FreeAIr" source, the place to look when a
+    /// feature silently did nothing — most background operations report failures here rather than
+    /// throwing into the UI.
+    /// </summary>
     public static class ActivityLogHelper
     {
+        /// <summary>
+        /// Logs an informational message under the "FreeAIr" source.
+        /// </summary>
         public static void ActivityLogInformation(
             string message
             )
@@ -12,6 +20,9 @@
                 );
         }
 
+        /// <summary>
+        /// Logs a warning message under the "FreeAIr" source.
+        /// </summary>
         public static void ActivityLogWarning(
             string message
             )
@@ -22,6 +33,11 @@
                 );
         }
 
+        /// <summary>
+        /// Logs an exception's type, message and stack trace as errors, and recurses into
+        /// <see cref="Exception.InnerException"/>, indenting each nested level so the whole chain is
+        /// readable in the Activity Log.
+        /// </summary>
         public static void ActivityLogException(
             this Exception excp,
             string message = "",

@@ -3,18 +3,33 @@ using System.Text.RegularExpressions;
 
 namespace FreeAIr.Find
 {
+    /// <summary>
+    /// One entry of a `Find in Files` file mask, e.g. "*.cs" or "!*.g.cs", turned into the regex
+    /// used to test file paths against it. A mask starting with "!" excludes matching files instead
+    /// of including them.
+    /// </summary>
     public sealed class FileTypeFilter
     {
+        /// <summary>
+        /// Whether this filter excludes matching files rather than including them, set when the
+        /// original mask started with "!".
+        /// </summary>
         public bool Exclude
         {
             get;
         }
 
+        /// <summary>
+        /// The original wildcard mask, with any leading "!" already stripped.
+        /// </summary>
         public string WildcardFilter
         {
             get;
         }
 
+        /// <summary>
+        /// The regex compiled from <see cref="WildcardFilter"/>, used to test file paths.
+        /// </summary>
         public Regex RegexFilter
         {
             get;
@@ -43,6 +58,9 @@ namespace FreeAIr.Find
                 );
         }
 
+        /// <summary>
+        /// Whether the given file path matches this filter's wildcard mask.
+        /// </summary>
         public bool Match(string filePath)
         {
             if (filePath is null)

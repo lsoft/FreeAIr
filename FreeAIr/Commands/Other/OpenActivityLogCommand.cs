@@ -3,9 +3,16 @@
 namespace FreeAIr.Commands.Other
 {
 
+    /// <summary>
+    /// The menu command that opens Windows Explorer with the Visual Studio ActivityLog.xml file
+    /// selected, for inspecting VS's own diagnostic log.
+    /// </summary>
     [Command(PackageIds.OpenActivityLogCommandId)]
     public sealed class OpenActivityLogCommand : BaseCommand<OpenActivityLogCommand>
     {
+        /// <summary>
+        /// Opens Explorer with the ActivityLog file selected, or logs an error if that fails.
+        /// </summary>
         protected override async Task ExecuteAsync(OleMenuCmdEventArgs e)
         {
             await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
@@ -27,6 +34,9 @@ namespace FreeAIr.Commands.Other
             }
         }
 
+        /// <summary>
+        /// Enables the command only when the ActivityLog file currently exists on disk.
+        /// </summary>
         protected override void BeforeQueryStatus(EventArgs e)
         {
             var filePath = ActivityLog.LogFilePath;

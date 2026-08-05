@@ -12,6 +12,7 @@ namespace FreeAIr.BLogic
     /// </summary>
     public sealed class AsyncAwaitProduct<T>
     {
+        /// <summary>Gate the waiter blocks on; starts empty with room for one release per product.</summary>
         //starts empty with room for one: the waiter blocks until a product shows up
         private readonly NonDisposableSemaphoreSlim _signal = new(0, 1);
 

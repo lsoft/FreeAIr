@@ -31,9 +31,17 @@ using FreeAIr.Chat.Context.Item;
 
 namespace FreeAIr.UI.Chat
 {
+    /// <summary>
+    /// The main chat panel: shows the dialog history, the prompt editor, the context basket and the
+    /// recording button, and wires them all to the bound <see cref="FreeAIr.Chat.Chat"/> instance.
+    /// </summary>
     public partial class ChatControl : UserControl, INotifyPropertyChanged
     {
 
+        /// <summary>
+        /// WPF dependency property backing <see cref="Chat"/>; changing it swaps which
+        /// <see cref="FreeAIr.Chat.Chat"/> the control displays and rewires its status events.
+        /// </summary>
         public static readonly DependencyProperty ChatProperty =
             DependencyProperty.Register(
                 nameof(Chat),
@@ -44,6 +52,10 @@ namespace FreeAIr.UI.Chat
 
         #region Dependency properties changes callbacks
 
+        /// <summary>
+        /// Detaches status handlers from the previously bound chat and attaches them to the new one,
+        /// so the control's status moniker and command availability track whichever chat is active.
+        /// </summary>
         private static void OnChatPropertyChanged(
             DependencyObject d,
             DependencyPropertyChangedEventArgs e
@@ -76,6 +88,10 @@ namespace FreeAIr.UI.Chat
 
         #endregion
 
+        /// <summary>
+        /// The chat currently bound to this control, kept in sync with <see cref="Chat"/> so command
+        /// handlers do not have to go through the dependency property indirection.
+        /// </summary>
         private FreeAIr.Chat.Chat? _chat;
 
         /// <summary>
@@ -95,6 +111,10 @@ namespace FreeAIr.UI.Chat
 
         #region commands
 
+        /// <summary>
+        /// Opens the agent picker so the user can switch which chat agent (<see cref="AgentJson"/>)
+        /// answers this chat; enabled only while the chat is idle or ready for a new prompt.
+        /// </summary>
         public ICommand ChooseChatAgentCommand
         {
             get
@@ -142,6 +162,10 @@ namespace FreeAIr.UI.Chat
             }
         }
 
+        /// <summary>
+        /// Opens the nested checkbox dialog used to enable or disable individual MCP tools available
+        /// to this chat.
+        /// </summary>
         public ICommand EditChatToolsCommand
         {
             get
@@ -180,6 +204,10 @@ namespace FreeAIr.UI.Chat
             }
         }
 
+        /// <summary>
+        /// Shows a file-open dialog and adds each selected file to the chat context as a
+        /// <see cref="CustomFileChatContextItem"/>, letting the user attach arbitrary files to the prompt.
+        /// </summary>
         public ICommand AddCustomFileToContextCommand
         {
             get
@@ -262,6 +290,10 @@ namespace FreeAIr.UI.Chat
             }
         }
 
+        /// <summary>
+        /// Clears every automatically added item from the chat context basket, keeping only the ones
+        /// the user added by hand.
+        /// </summary>
         public ICommand RemoveAllAutomaticItemsFromContextCommand
         {
             get
@@ -306,6 +338,10 @@ namespace FreeAIr.UI.Chat
             }
         }
 
+        /// <summary>
+        /// Removes a single item, identified by its <see cref="ChatContextItemViewModel"/>, from the
+        /// chat context basket.
+        /// </summary>
         public ICommand DeleteItemFromContextCommand
         {
             get
@@ -360,6 +396,11 @@ namespace FreeAIr.UI.Chat
             }
         }
 
+        /// <summary>
+        /// Scans the solution for items related to a given context item (e.g. referencing files) via
+        /// <see cref="AddRelatedItemsToContextBackgroundTask"/> and adds any found to the chat context,
+        /// showing progress in a wait dialog and reporting when nothing was found.
+        /// </summary>
         public ICommand AddRelatedItemsToContextCommand
         {
             get
@@ -456,6 +497,9 @@ namespace FreeAIr.UI.Chat
             }
         }
 
+        /// <summary>
+        /// Opens a chat context item (file, snippet, or other solution item) in its own editor window.
+        /// </summary>
         public ICommand OpenContextItemCommand
         {
             get
@@ -481,6 +525,10 @@ namespace FreeAIr.UI.Chat
             }
         }
 
+        /// <summary>
+        /// Adds the mentions and file references parsed from the "add to context" input line
+        /// (a <see cref="Parsed"/> prompt) into the chat context basket without sending a prompt.
+        /// </summary>
         public ICommand AddItemToContextCommand
         {
             get
@@ -545,6 +593,10 @@ namespace FreeAIr.UI.Chat
             }
         }
 
+        /// <summary>
+        /// Sends the text typed into the prompt editor as a new user prompt to the chat, first
+        /// resolving any file/solution-item mentions in the text into context items.
+        /// </summary>
         public ICommand CreatePromptCommand
         {
             get
@@ -615,6 +667,10 @@ namespace FreeAIr.UI.Chat
             }
         }
 
+        /// <summary>
+        /// Cancels the chat's in-flight request by asking the owning <see cref="ChatContainer"/> to
+        /// stop it; enabled only while the chat is waiting for or reading an answer.
+        /// </summary>
         public ICommand StopCommand
         {
             get
@@ -647,6 +703,10 @@ namespace FreeAIr.UI.Chat
 
         #endregion
 
+        /// <summary>
+        /// The chat this control displays. Bound from the containing tool window; setting it triggers
+        /// <see cref="OnChatPropertyChanged"/> to rewire the dialog and status events.
+        /// </summary>
         public FreeAIr.Chat.Chat? Chat
         {
             get => (FreeAIr.Chat.Chat)GetValue(ChatProperty);
@@ -656,6 +716,10 @@ namespace FreeAIr.UI.Chat
             }
         }
 
+        /// <summary>
+        /// View models for every item currently in the chat's context basket, used to populate the
+        /// context list shown in the chat panel.
+        /// </summary>
         public ObservableCollection2<ChatContextItemViewModel> ChatContextItems
         {
             get
@@ -674,6 +738,10 @@ namespace FreeAIr.UI.Chat
             }
         }
 
+        /// <summary>
+        /// True when the prompt editor should accept a new prompt: the chat is bound, not configured
+        /// for automatic processing, and currently idle, ready or failed.
+        /// </summary>
         public bool IsReadyToAcceptNewPrompt
         {
             get
@@ -691,6 +759,10 @@ namespace FreeAIr.UI.Chat
             }
         }
 
+        /// <summary>
+        /// Display text for the "choose chat agent" button, showing the currently chosen agent's name
+        /// in parentheses when one is set.
+        /// </summary>
         public string ChatAgentText
         {
             get
@@ -708,11 +780,18 @@ namespace FreeAIr.UI.Chat
             }
         }
 
+        /// <summary>
+        /// View model backing the message-history dialog area of this chat panel.
+        /// </summary>
         public DialogViewModel DialogViewModel
         {
             get;
         }
 
+        /// <summary>
+        /// Icon shown for the chat's current status (e.g. paused, running), reflecting the bound
+        /// <see cref="FreeAIr.Chat.Chat"/>'s status via <see cref="ChatWrapper.GetStatusMoniker"/>.
+        /// </summary>
         public ImageMoniker StatusMoniker
         {
             get
@@ -727,6 +806,10 @@ namespace FreeAIr.UI.Chat
         }
 
 
+        /// <summary>
+        /// Builds the control, wiring up the prompt editor, the "add to context" editor and the
+        /// voice-recording pipeline.
+        /// </summary>
         public ChatControl()
         {
             InitializeComponent();
@@ -741,11 +824,18 @@ namespace FreeAIr.UI.Chat
             _rtpProcessor.RecordingStatusChangedSignal += RecordingStatusChangedSignal;
         }
 
+        /// <summary>
+        /// Refreshes the control's bindings whenever the bound chat's status changes.
+        /// </summary>
         private void ChatStatusChangedEvent(object sender, ChatEventArgs e)
         {
             OnPropertyChanged();
         }
 
+        /// <summary>
+        /// Adds every mention or file reference found in a parsed prompt to the chat context basket,
+        /// so items the user typed about are attached even if they never used "add to context" directly.
+        /// </summary>
         private void AddContextItemsFromPrompt(
             FreeAIr.Chat.Chat chat,
             Parsed parsed
@@ -777,9 +867,17 @@ namespace FreeAIr.UI.Chat
 
         #region recording
 
+        /// <summary>
+        /// Drives voice recording, transcription and post-processing for this chat's prompt input,
+        /// backing the microphone button and the right-Ctrl push-to-talk shortcut.
+        /// </summary>
         private readonly RecorderTranscriberPostProcessor _rtpProcessor = new RecorderTranscriberPostProcessor(
             );
 
+        /// <summary>
+        /// Opens the recorder-selection menu so the user can pick which speech-to-text engine
+        /// transcribes their voice prompts.
+        /// </summary>
         public ICommand ChooseRecorderCommand
         {
             get
@@ -824,6 +922,10 @@ namespace FreeAIr.UI.Chat
             }
         }
 
+        /// <summary>
+        /// Icon reflecting the current stage of voice recording (idle, recording, transcribing or
+        /// post-processing) shown on the microphone button.
+        /// </summary>
         public ImageMoniker RecordingMoniker
         {
             get
@@ -844,6 +946,10 @@ namespace FreeAIr.UI.Chat
             }
         }
 
+        /// <summary>
+        /// Tooltip text for the microphone button, summarizing the chosen recorder, the chosen
+        /// post-process action and the current recording status.
+        /// </summary>
         public string RecordingToolTip
         {
             get
@@ -868,6 +974,10 @@ namespace FreeAIr.UI.Chat
             }
         }
 
+        /// <summary>
+        /// Refreshes the recording icon and tooltip bindings whenever <see cref="_rtpProcessor"/>'s
+        /// status changes.
+        /// </summary>
         private void RecordingStatusChangedSignal(
             RecorderTranscriberPostProcessor sender,
             RecordingProcessStatusEnum newStatus
@@ -876,6 +986,10 @@ namespace FreeAIr.UI.Chat
             OnPropertyChanged();
         }
 
+        /// <summary>
+        /// Records, transcribes and post-processes a voice prompt, then appends the resulting text to
+        /// the prompt editor, or shows an error if transcription failed.
+        /// </summary>
         private async Task StartRecordingAsync()
         {
 
@@ -909,6 +1023,9 @@ namespace FreeAIr.UI.Chat
 
         }
 
+        /// <summary>
+        /// Stops an in-progress voice recording, letting the pipeline move on to transcription.
+        /// </summary>
         private async Task StopRecordingAsync()
         {
             await _rtpProcessor.StopRecordingAsync();
@@ -918,11 +1035,18 @@ namespace FreeAIr.UI.Chat
 
         #region key process
 
+        /// <summary>
+        /// Routes key-down events on the chat control to the push-to-talk recording logic.
+        /// </summary>
         private void ChatControlName_PreviewKeyDown(object sender, KeyEventArgs e)
         {
             ProcessRecording(e);
         }
 
+        /// <summary>
+        /// Implements push-to-talk: starts recording when the right Ctrl key is first pressed, and
+        /// stops it if any other key is pressed while recording is in progress.
+        /// </summary>
         private void ProcessRecording(KeyEventArgs e)
         {
             if (!RecordingPage.Instance.Enabled)
@@ -957,6 +1081,9 @@ namespace FreeAIr.UI.Chat
             }
         }
 
+        /// <summary>
+        /// Stops push-to-talk recording as soon as any key is released, regardless of which key it was.
+        /// </summary>
         private void ChatControlName_PreviewKeyUp(object sender, KeyEventArgs e)
         {
             if (_rtpProcessor.IsWorking)
@@ -973,6 +1100,9 @@ namespace FreeAIr.UI.Chat
 
         #region show child windows
 
+        /// <summary>
+        /// Shows a WinForms common dialog (used for the open-file picker) modally over this control.
+        /// </summary>
         private bool? ShowDialog(CommonDialog d)
         {
             try
@@ -987,6 +1117,10 @@ namespace FreeAIr.UI.Chat
             }
         }
 
+        /// <summary>
+        /// Shows a WPF window (such as the tools editor or the related-items wait dialog) modally
+        /// over this control.
+        /// </summary>
         private async Task ShowDialogAsync(Window w)
         {
             try
@@ -1005,6 +1139,9 @@ namespace FreeAIr.UI.Chat
 
         #region setup
 
+        /// <summary>
+        /// Wires the "add to context" input editor to a parser that recognizes solution-item mentions.
+        /// </summary>
         private void SetupAddToContextControl()
         {
             AddToContextControl.Setup(
@@ -1014,6 +1151,10 @@ namespace FreeAIr.UI.Chat
                 );
         }
 
+        /// <summary>
+        /// Wires the main prompt editor to a parser that recognizes solution-item mentions and slash
+        /// commands.
+        /// </summary>
         private void SetupPromptControl()
         {
             PromptControl.Setup(
@@ -1028,6 +1169,9 @@ namespace FreeAIr.UI.Chat
 
         #region focus
 
+        /// <summary>
+        /// Moves keyboard focus to the "add to context" input editor.
+        /// </summary>
         public void FocusContextControl()
         {
             _ = Dispatcher.BeginInvoke(() =>
@@ -1036,6 +1180,9 @@ namespace FreeAIr.UI.Chat
             });
         }
 
+        /// <summary>
+        /// Moves keyboard focus to the main prompt editor.
+        /// </summary>
         public void FocusPromptControl()
         {
             _ = Dispatcher.BeginInvoke(() =>
@@ -1048,6 +1195,10 @@ namespace FreeAIr.UI.Chat
 
         #region drag and drop
 
+        /// <summary>
+        /// Handles files dropped onto the prompt editor from Windows Explorer or Solution Explorer by
+        /// inserting solution-item mentions for the dropped paths and their descendants.
+        /// </summary>
         private void EmbedilloControl_Drop(object sender, DragEventArgs e)
         {
             var solutionItemsPaths = e.Data.GetData(DataFormats.FileDrop) as string[];
@@ -1070,6 +1221,10 @@ namespace FreeAIr.UI.Chat
                 ).FileAndForget(nameof(AddMovedFilesAndTheirDescendantsToChatPromptAsync));
         }
 
+        /// <summary>
+        /// Resolves dropped solution-item paths and their child items, then inserts a mention anchor
+        /// for each into the target editor's text so they become part of the prompt.
+        /// </summary>
         private async System.Threading.Tasks.Task AddMovedFilesAndTheirDescendantsToChatPromptAsync(
             Embedillo.EmbedilloControl embedillo,
             string[] solutionItemsPaths

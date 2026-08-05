@@ -13,11 +13,15 @@ namespace FreeAIr.BLogic
     /// </summary>
     public abstract class CallAwaiter<T>
     {
+        /// <summary>Released by <see cref="Fire"/> to wake whoever is inside <see cref="WaitForCallAsync"/>.</summary>
         private readonly NonDisposableSemaphoreSlim _semaphore = new NonDisposableSemaphoreSlim(0, 1);
+        /// <summary>How long <see cref="WaitForCallAsync"/> waits for <see cref="Fire"/> before giving up.</summary>
         private readonly TimeSpan _callTimeout;
 
+        /// <summary>Set once <see cref="WaitForCallAsync"/> has run, so a second call can be rejected.</summary>
         private bool _finished = false;
 
+        /// <summary>Sets the timeout <see cref="WaitForCallAsync"/> will wait for the callback to fire.</summary>
         protected CallAwaiter(
             TimeSpan callTimeout
             )
@@ -67,6 +71,7 @@ namespace FreeAIr.BLogic
             _semaphore.Release();
         }
 
+        /// <summary>Last-resort guard: releases the semaphore so a leaked instance whose callback never fired does not deadlock a waiter forever.</summary>
         ~CallAwaiter()
         {
             //additional guard against loss of Fire call

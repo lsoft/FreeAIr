@@ -240,13 +240,24 @@ namespace FreeAIr.Embedding
             }
         }
 
+        /// <summary>
+        /// Pairs a built <see cref="EmbeddingIndex"/> with the exact <see cref="EmbeddingIndexContent"/>
+        /// it was built from, so <see cref="GetAsync"/> can tell by reference whether the cached
+        /// index still matches the cached content before reusing it.
+        /// </summary>
         private sealed class BuiltIndex
         {
+            /// <summary>
+            /// The content the cached <see cref="Index"/> was built from.
+            /// </summary>
             public EmbeddingIndexContent Content
             {
                 get;
             }
 
+            /// <summary>
+            /// The searchable index built from <see cref="Content"/>.
+            /// </summary>
             public EmbeddingIndex Index
             {
                 get;

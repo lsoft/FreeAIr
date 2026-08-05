@@ -21,8 +21,10 @@ namespace FreeAIr.BLogic.Reader
     /// </summary>
     public sealed class LLMReader : IDisposable
     {
+        /// <summary>Guards <see cref="_task"/> and <see cref="_cancellationTokenSource"/> against concurrent start/stop calls.</summary>
         private readonly object _taskLocker = new();
 
+        /// <summary>The chat this reader streams completions into.</summary>
         private readonly FreeAIr.Chat.Chat _chat;
 
         /// <summary>
@@ -37,6 +39,7 @@ namespace FreeAIr.BLogic.Reader
         /// </summary>
         private Task? _task;
 
+        /// <summary>Creates a reader bound to the given chat; obtain one through <see cref="LLMReaderPool"/> instead of calling this directly.</summary>
         public LLMReader(
             FreeAIr.Chat.Chat chat
             )
@@ -70,6 +73,7 @@ namespace FreeAIr.BLogic.Reader
             }
         }
 
+        /// <summary>Awaits the read currently in flight, if any; returns immediately when the reader is idle.</summary>
         public async Task WaitForTaskAsync(
             )
         {
@@ -134,11 +138,13 @@ namespace FreeAIr.BLogic.Reader
             }
         }
 
+        /// <summary>Releases the current cancellation token source.</summary>
         public void Dispose()
         {
             _cancellationTokenSource?.Dispose();
         }
 
+        /// <summary>Runs one read and, when it finishes, clears <see cref="_task"/> unless a newer read has already replaced the cancellation source.</summary>
         private async Task ReadSafelyAsync(
             CancellationTokenSource cancellationTokenSource
             )
@@ -317,6 +323,7 @@ namespace FreeAIr.BLogic.Reader
         /// </summary>
         private sealed class StreamingToolCallAccumulator
         {
+            /// <summary>The tool call fragments seen so far, keyed by the index the streaming protocol assigns each call.</summary>
             private readonly Dictionary<int, ToolCallParts> _byIndex = new();
 
             /// <summary>
@@ -325,6 +332,7 @@ namespace FreeAIr.BLogic.Reader
             /// </summary>
             private readonly List<int> _order = new();
 
+            /// <summary>Merges one streaming update's tool-call fragments into the accumulator, tracking each call by its index.</summary>
             public void Append(
                 IReadOnlyList<StreamingChatToolCallUpdate> updates
                 )
@@ -394,18 +402,24 @@ namespace FreeAIr.BLogic.Reader
                 return result;
             }
 
+            /// <summary>The fragments collected so far for one tool call, before they are merged into a complete <see cref="StreamingChatToolCallUpdate"/>.</summary>
             private sealed class ToolCallParts
             {
+                /// <summary>The tool call's id, sent once by the chunk that opens the call.</summary>
                 public string? ToolCallId;
 
+                /// <summary>The name of the tool being called, sent once by the chunk that opens the call.</summary>
                 public string? FunctionName;
 
+                /// <summary>The kind of tool call being made.</summary>
                 public ChatToolCallKind Kind;
 
+                /// <summary>The call's arguments, accumulated across the deltas the endpoint streams for this index.</summary>
                 public readonly StringBuilder Arguments = new();
             }
         }
 
+        /// <summary>Formats an exception as answer text and appends it to the chat, creating the answer content if this is the first piece.</summary>
         private async Task<AnswerChatContent> CreateOrAppendAnswerPartAsync(
             AnswerChatContent? chatAnswer,
             Exception excp
@@ -427,6 +441,7 @@ namespace FreeAIr.BLogic.Reader
         }
 
 
+        /// <summary>Appends a piece of streamed text to the chat's answer, creating the answer content on the first call so the UI can update live.</summary>
         private async Task<AnswerChatContent> CreateOrAppendAnswerPartAsync(
             AnswerChatContent? chatAnswer,
             string answerPart

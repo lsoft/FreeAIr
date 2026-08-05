@@ -13,6 +13,7 @@ namespace FreeAIr.Chat.Content
     /// </summary>
     public interface IChatContent
     {
+        /// <summary>Which of prompt, answer or tool call this entry is.</summary>
         ChatContentTypeEnum Type
         {
             get;

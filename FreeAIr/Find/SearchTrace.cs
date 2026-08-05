@@ -18,9 +18,12 @@ namespace FreeAIr.Find
     /// </summary>
     public static class SearchTrace
     {
+        /// <summary>Serializes creation and lookup of the output pane so concurrent callers do not create it twice.</summary>
         private static readonly NonDisposableSemaphoreSlim _paneSemaphore = new(1, 1);
+        /// <summary>Guards <see cref="_tail"/> so lines queued from different threads chain in a single order.</summary>
         private static readonly object _chainLocker = new();
 
+        /// <summary>The lazily created output window pane the trace writes into.</summary>
         private static OutputWindowPane? _pane;
 
         /// <summary>
@@ -41,6 +44,9 @@ namespace FreeAIr.Find
             Write("=== " + message);
         }
 
+        /// <summary>
+        /// One intermediate step of a running search, e.g. which scope or agent was chosen.
+        /// </summary>
         public static void Step(
             string message
             )
@@ -62,6 +68,11 @@ namespace FreeAIr.Find
                 );
         }
 
+        /// <summary>
+        /// The search has thrown. Reports both to the pane and to the activity log, since an
+        /// unexpected exception is exactly the kind of failure a bug report needs the stack trace
+        /// for.
+        /// </summary>
         public static void Fail(
             string message,
             Exception excp
@@ -72,6 +83,7 @@ namespace FreeAIr.Find
             excp.ActivityLogException(message);
         }
 
+        /// <summary>Timestamps a line and queues it onto the tail chain so writes reach the pane in order.</summary>
         private static void Write(
             string message
             )
@@ -84,6 +96,7 @@ namespace FreeAIr.Find
             }
         }
 
+        /// <summary>Waits for the previous queued line, then writes this one; a failed prior write is swallowed so it cannot block later lines.</summary>
         private static async Task AppendAfterAsync(
             Task previous,
             string line
@@ -114,6 +127,7 @@ namespace FreeAIr.Find
             }
         }
 
+        /// <summary>Returns the shared output pane, creating it under the "FreeAIr natural language search" name on first use.</summary>
         private static async Task<OutputWindowPane?> CreateOrGetPaneAsync(
             )
         {

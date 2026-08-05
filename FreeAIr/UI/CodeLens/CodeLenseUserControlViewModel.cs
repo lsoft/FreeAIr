@@ -115,6 +115,7 @@ namespace FreeAIr.UI.CodeLens
             }
         }
 
+        /// <summary>Creates the row for an existing built-in Visual Studio command against the given method.</summary>
         public EmbeddedCommandViewModel(
             CodeLensUnitInfo unitInfo,
             string commandName,
@@ -288,6 +289,7 @@ namespace FreeAIr.UI.CodeLens
             /// <summary>The already-chosen support action to run.</summary>
             private readonly SupportActionJson _support;
 
+            /// <summary>Wraps the already-chosen <paramref name="support"/> action so it can be run without a picker.</summary>
             public ApplySupportAction(
                 SupportActionJson support
                 )

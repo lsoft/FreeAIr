@@ -18,6 +18,7 @@ namespace FreeAIr.Chat
     /// </summary>
     public sealed class AddLineNumbersMode
     {
+        /// <summary>Which of the three numbering shapes this instance represents.</summary>
         private readonly AddLineNumbersModeEnum _mode;
 
         /// <summary>
@@ -32,8 +33,10 @@ namespace FreeAIr.Chat
         /// <summary>Number every line of the fragment that goes into the prompt.</summary>
         public static readonly AddLineNumbersMode RequiredAllInScope = new AddLineNumbersMode(AddLineNumbersModeEnum.AllInScope);
 
+        /// <summary>True unless this is the <see cref="NotRequired"/> (disabled) mode.</summary>
         public bool Enabled => _mode != AddLineNumbersModeEnum.Disabled;
 
+        /// <summary>Creates the <see cref="NotRequired"/> or <see cref="RequiredAllInScope"/> singleton shapes.</summary>
         private AddLineNumbersMode(
             AddLineNumbersModeEnum mode
             )
@@ -42,6 +45,7 @@ namespace FreeAIr.Chat
             _scopes = new();
         }
 
+        /// <summary>Creates the <see cref="AddLineNumbersModeEnum.SpecificScopes"/> shape for the given ranges.</summary>
         private AddLineNumbersMode(
             List<(int StartLine, int LineCount)> scopes
             )

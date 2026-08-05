@@ -10,11 +10,13 @@ namespace WpfHelpers
     /// </summary>
     public sealed class CommandReference : Freezable, ICommand
     {
+        /// <summary>Default constructor required by <see cref="Freezable"/>; no extra setup needed.</summary>
         public CommandReference()
         {
             // Blank
         }
 
+        /// <summary>Dependency property backing <see cref="Command"/>; changes are routed through <see cref="OnCommandChanged"/> to re-subscribe <see cref="CanExecuteChanged"/>.</summary>
         public static readonly DependencyProperty CommandProperty = DependencyProperty.Register("Command", typeof(ICommand), typeof(CommandReference), new PropertyMetadata(new PropertyChangedCallback(OnCommandChanged)));
 
         /// <summary>The wrapped command, set via XAML data binding.</summary>
@@ -40,6 +42,7 @@ namespace WpfHelpers
             Command.Execute(parameter);
         }
 
+        /// <summary>Raised when the bound <see cref="Command"/>'s own can-execute state changes.</summary>
         public event EventHandler CanExecuteChanged;
 
         /// <summary>Re-wires <see cref="CanExecuteChanged"/> from the old bound command to the new one whenever <see cref="CommandProperty"/> changes.</summary>
