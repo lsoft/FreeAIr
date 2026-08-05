@@ -49,6 +49,7 @@ namespace WpfHelpers
 
         #region ICommand Members
 
+        /// <summary>False if <paramref name="parameter"/> isn't a <typeparamref name="T"/>, otherwise delegates to the optional can-execute predicate (default always true).</summary>
         [DebuggerStepThrough]
         public bool CanExecute(object parameter)
         {
@@ -66,6 +67,7 @@ namespace WpfHelpers
             remove { CommandManager.RequerySuggested -= value; }
         }
 
+        /// <summary>Casts <paramref name="parameter"/> to <typeparamref name="T"/> and runs the execute delegate, showing a message box on failure.</summary>
         public void Execute(object parameter)
         {
             try
@@ -139,6 +141,7 @@ namespace WpfHelpers
 
         #region ICommand Members
 
+        /// <summary>Delegates to the optional can-execute predicate (default always true).</summary>
         [DebuggerStepThrough]
         public bool CanExecute(object parameter)
         {
@@ -151,6 +154,7 @@ namespace WpfHelpers
             remove { CommandManager.RequerySuggested -= value; }
         }
 
+        /// <summary>Runs the execute delegate, showing a message box on failure.</summary>
         public void Execute(object parameter)
         {
             try

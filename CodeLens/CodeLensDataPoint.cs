@@ -12,6 +12,11 @@ using Microsoft.VisualStudio.Threading;
 namespace FreeAIr.CodeLens
 {
 
+    /// <summary>
+    /// One CodeLens indicator instance for a single method. Runs in the CodeLens data-point process,
+    /// separate from the main Visual Studio process, and talks back to it over the named pipe set up
+    /// by <see cref="RemoteCodeLensConnectionHandler"/> to fetch <see cref="Shared.Dto.UnitInfo"/>.
+    /// </summary>
     public class CodeLensDataPoint : IAsyncCodeLensDataPoint, IDisposable
     {
         public static readonly CodeLensDetailEntryCommand AddXmlCommentCommand = new CodeLensDetailEntryCommand
@@ -44,6 +49,7 @@ namespace FreeAIr.CodeLens
             get;
         } = Guid.NewGuid();
 
+        /// <summary>Creates the data point; the pipe to Visual Studio is opened separately via <see cref="ConnectToVisualStudioAsync"/>.</summary>
         public CodeLensDataPoint(
             ICodeLensCallbackService callbackService,
             CodeLensDescriptor descriptor
@@ -65,6 +71,7 @@ namespace FreeAIr.CodeLens
 
         #region network related code
 
+        /// <summary>Opens the named pipe to the owning Visual Studio process, identified by its PID.</summary>
         internal async Task ConnectToVisualStudioAsync(
             int vspid
             )
@@ -89,6 +96,7 @@ namespace FreeAIr.CodeLens
 
         #endregion
 
+        /// <summary>Builds the short text VS shows inline above the method (the CodeLens indicator's collapsed state).</summary>
         public async Task<CodeLensDataPointDescriptor> GetDataAsync(CodeLensDescriptorContext context, CancellationToken token)
         {
             try
@@ -114,6 +122,7 @@ namespace FreeAIr.CodeLens
         }
 
 
+        /// <summary>Builds the expanded details pane content shown when the user clicks the indicator.</summary>
         public async Task<CodeLensDetailsDescriptor> GetDetailsAsync(CodeLensDescriptorContext context, CancellationToken token)
         {
             try
@@ -160,6 +169,7 @@ namespace FreeAIr.CodeLens
         }
 
 
+        /// <summary>Builds a <see cref="CodeLensTarget"/> from the descriptor/context and calls back into Visual Studio via <see cref="ICodeLensListener.GetUnitInformationAsync"/> to resolve it.</summary>
         private async Task<CodeLensUnitInfo?> GetUnitInfoAsync(
             CodeLensDescriptorContext context,
             CancellationToken token
@@ -210,6 +220,7 @@ namespace FreeAIr.CodeLens
             return result;
         }
 
+        /// <summary>Icon id shown next to the CodeLens indicator text.</summary>
         private static ImageId GetExtensionIcon()
         {
             return new ImageId(
@@ -219,11 +230,13 @@ namespace FreeAIr.CodeLens
         }
 
 
+        /// <summary>Row entries for the details pane; currently none — the pane is populated via <see cref="CodeLensDetailsDescriptor.CustomData"/> instead.</summary>
         private static IEnumerable<CodeLensDetailEntryDescriptor> CreateEntries()
         {
             yield break;
         }
 
+        /// <summary>Column headers for the details pane; currently none, kept for a future tabular layout.</summary>
         private static List<CodeLensDetailHeaderDescriptor> CreateHeaders()
         {
             return new List<CodeLensDetailHeaderDescriptor>()

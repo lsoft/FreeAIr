@@ -53,6 +53,10 @@ namespace WpfHelpers
             CommandManager.InvalidateRequerySuggested();
         }
 
+        /// <summary>
+        /// Debug-only check that <paramref name="propertyName"/> matches a real public property on
+        /// this view model, catching typos in <see cref="OnPropertyChanged(string)"/> calls early.
+        /// </summary>
         [Conditional("DEBUG")]
         [DebuggerStepThrough]
         public void VerifyPropertyName(string propertyName)
@@ -76,13 +80,15 @@ namespace WpfHelpers
             }
         }
 
+        /// <summary>Override point for derived view models to release resources; called by <see cref="Dispose"/>.</summary>
         protected virtual void DisposeViewModel()
         {
-            
+
         }
 
         #region Implementation of IDisposable
 
+        /// <summary>Calls <see cref="DisposeViewModel"/>.</summary>
         public void Dispose()
         {
             this.DisposeViewModel();
