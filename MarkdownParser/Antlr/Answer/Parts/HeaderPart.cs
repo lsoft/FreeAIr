@@ -2,6 +2,7 @@
 
 namespace MarkdownParser.Antlr.Answer.Parts
 {
+    /// <summary>A `#`-`######` header part, rendered at a size scaled from its level via <see cref="IFontSizeProvider.GetHeaderFontSize"/>.</summary>
     public sealed class HeaderPart : IPart
     {
         private readonly IFontSizeProvider _fontSizeProvider;
@@ -44,11 +45,13 @@ namespace MarkdownParser.Antlr.Answer.Parts
             Header = header.TrimStart('#');
         }
 
+        /// <summary>The parameter passed to an <see cref="AdditionalCommand"/> button for this part — the `#`-stripped header text.</summary>
         public object GetContextForAdditionalCommand()
         {
             return Header;
         }
 
+        /// <summary>Renders the header text as a single <see cref="Run"/>, clamping levels beyond 6 to the smallest header size.</summary>
         public IEnumerable<Inline> GetInlines(bool isInProgress)
         {
             var level = Level - 1;

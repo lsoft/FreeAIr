@@ -3,6 +3,7 @@ using System.Windows.Documents;
 
 namespace MarkdownParser.Antlr.Answer.Parts
 {
+    /// <summary>A `[desc](link "title")` markdown link part, rendered as a WPF <see cref="Hyperlink"/> that opens the link with the OS shell instead of navigating the flow document.</summary>
     public sealed class UrlPart : IPart
     {
         private readonly IFontSizeProvider _fontSizeProvider;
@@ -69,11 +70,13 @@ namespace MarkdownParser.Antlr.Answer.Parts
             Title = string.IsNullOrEmpty(title) ? link : title;
         }
 
+        /// <summary>The parameter passed to an <see cref="AdditionalCommand"/> button for this part — the raw link.</summary>
         public object GetContextForAdditionalCommand()
         {
             return Link;
         }
 
+        /// <summary>Builds a hyperlink that, on click, launches <see cref="Link"/> via the OS shell instead of letting the FlowDocument navigate/scroll.</summary>
         public IEnumerable<Inline> GetInlines(bool isInProgress)
         {
             _ = Uri.TryCreate(Link, UriKind.RelativeOrAbsolute, out var uri);

@@ -3,6 +3,11 @@ using System.Windows.Media;
 
 namespace MarkdownParser.Antlr.Answer.Parts
 {
+    /// <summary>
+    /// An inline `&lt;tag&gt;body&lt;/tag&gt;` part. A `&lt;think&gt;` node starts collapsed to
+    /// `&lt;think&gt;...&lt;/think&gt;` since it carries reasoning output the user usually doesn't
+    /// need to read; <see cref="ExpandOrCollapse"/> toggles it on click.
+    /// </summary>
     public sealed class XmlNodePart : IPart
     {
         private readonly IFontSizeProvider _fontSizeProvider;
@@ -86,16 +91,19 @@ namespace MarkdownParser.Antlr.Answer.Parts
             };
         }
 
+        /// <summary>The parameter passed to an <see cref="AdditionalCommand"/> button for this part — the part itself, so a command can call <see cref="ExpandOrCollapse"/>.</summary>
         public object GetContextForAdditionalCommand()
         {
             return this;
         }
 
+        /// <summary>Yields the shared, mutable <see cref="Run"/> so later toggling by <see cref="ExpandOrCollapse"/> updates the already-rendered document.</summary>
         public IEnumerable<Inline> GetInlines(bool isInProgress)
         {
             yield return Run;
         }
 
+        /// <summary>Toggles the node's <see cref="Run"/> between its full text and the collapsed `&lt;tag&gt;...&lt;/tag&gt;` form.</summary>
         public void ExpandOrCollapse()
         {
             if (Run.Text == DefaultText)

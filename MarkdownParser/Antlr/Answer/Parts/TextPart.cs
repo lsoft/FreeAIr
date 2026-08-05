@@ -4,6 +4,7 @@ using System.Windows.Documents;
 
 namespace MarkdownParser.Antlr.Answer.Parts
 {
+    /// <summary>Plain-text part supporting `**bold**` runs; repeated <see cref="Append"/> calls accumulate into one part instead of fragmenting the paragraph.</summary>
     public sealed class TextPart : IPart
     {
         private List<string> _text;
@@ -32,6 +33,7 @@ namespace MarkdownParser.Antlr.Answer.Parts
             _fontSizeProvider = fontSizeProvider;
         }
 
+        /// <summary>Appends more raw text to this part without creating a new one.</summary>
         public void Append(string text)
         {
             if (text is null)
@@ -42,11 +44,13 @@ namespace MarkdownParser.Antlr.Answer.Parts
             _text.Add(text);
         }
 
+        /// <summary>The parameter passed to an <see cref="AdditionalCommand"/> button for this part — the full accumulated text.</summary>
         public object GetContextForAdditionalCommand()
         {
             return Text;
         }
 
+        /// <summary>Splits the text on `**` markers and yields alternating regular/bold <see cref="Run"/>s.</summary>
         public IEnumerable<Inline> GetInlines(bool isInProgress)
         {
             const string boldAnchor = "**";

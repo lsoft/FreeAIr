@@ -7,10 +7,16 @@ using System.Windows.Media;
 
 namespace MarkdownParser.Antlr.Answer
 {
+    /// <summary>
+    /// Holds the extra per-part action buttons (e.g. "copy code") a host registers so
+    /// <see cref="ParsedMarkdown.UpdateFlowDocument"/> can attach them next to matching
+    /// <see cref="IPart"/>s while rendering.
+    /// </summary>
     public sealed class AdditionalCommandContainer
     {
         private readonly List<AdditionalCommand> _additionalCommands;
 
+        /// <summary>The registered commands.</summary>
         public IReadOnlyList<AdditionalCommand> AdditionalCommands => _additionalCommands;
 
         public AdditionalCommandContainer()
@@ -18,6 +24,7 @@ namespace MarkdownParser.Antlr.Answer
             _additionalCommands = new();
         }
 
+        /// <summary>Registers a command so it is offered for any part whose <see cref="IPart.Type"/> matches.</summary>
         public void AddAdditionalCommand(
             AdditionalCommand additionalCommand
             )
@@ -25,6 +32,7 @@ namespace MarkdownParser.Antlr.Answer
             _additionalCommands.Add(additionalCommand);
         }
 
+        /// <summary>Builds the bordered button strip for all registered commands that apply to <paramref name="part"/>, or null if none do.</summary>
         public InlineUIContainer? GetCommandControls(
             IPart part
             )
@@ -79,30 +87,39 @@ namespace MarkdownParser.Antlr.Answer
 
     }
 
+    /// <summary>
+    /// One user-defined action button (e.g. "copy code", "insert into editor") that can be attached
+    /// next to any rendered <see cref="IPart"/> whose type matches <see cref="PartType"/>.
+    /// </summary>
     public /*sealed*/ class AdditionalCommand
     {
         private readonly IFontSizeProvider _fontSizeProvider;
 
+        /// <summary>Which part types this command should be offered for.</summary>
         public PartTypeEnum PartType
         {
             get;
         }
 
+        /// <summary>Button text.</summary>
         public string Title
         {
             get;
         }
 
+        /// <summary>Button tooltip.</summary>
         public string ToolTip
         {
             get;
         }
 
+        /// <summary>Command invoked on click; receives the part's context as its parameter, see <see cref="CreateControl"/>.</summary>
         public ICommand? ActionCommand
         {
             get;
         }
 
+        /// <summary>Optional override for the button's foreground brush.</summary>
         public System.Windows.Media.Brush? Foreground
         {
             get;
@@ -140,6 +157,7 @@ namespace MarkdownParser.Antlr.Answer
             Foreground = foreground;
         }
 
+        /// <summary>Builds the WPF button for this command, wiring <see cref="ActionCommand"/> with the part's own command parameter.</summary>
         public virtual UIElement? CreateControl(
             IPart part
             )

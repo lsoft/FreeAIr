@@ -4,6 +4,11 @@ using System.Windows.Media.Imaging;
 
 namespace MarkdownParser.Antlr.Answer.Parts
 {
+    /// <summary>
+    /// A `![desc](link "title")` image part. While the answer is still streaming
+    /// (<paramref name="isInProgress"/> in <see cref="GetInlines"/>) it renders as placeholder text
+    /// instead of loading the image, since the link may still be incomplete.
+    /// </summary>
     public sealed class ImagePart : IPart
     {
         private readonly IFontSizeProvider _fontSizeProvider;
@@ -50,6 +55,7 @@ namespace MarkdownParser.Antlr.Answer.Parts
             Title = title;
         }
 
+        /// <summary>The parameter passed to an <see cref="AdditionalCommand"/> button for this part — the loaded image bitmap.</summary>
         public object GetContextForAdditionalCommand()
         {
             var link = GetLink();
@@ -58,6 +64,7 @@ namespace MarkdownParser.Antlr.Answer.Parts
 
         }
 
+        /// <summary>While streaming, yields placeholder text; otherwise loads the image (async for 1x1 web-placeholder bitmaps) or, on failure, yields nothing.</summary>
         public IEnumerable<Inline> GetInlines(bool isInProgress)
         {
             if (isInProgress)
@@ -109,6 +116,7 @@ namespace MarkdownParser.Antlr.Answer.Parts
             return [];
         }
 
+        /// <summary>Resolves a `/`-rooted link relative to the current directory; leaves absolute/web links untouched.</summary>
         private string GetLink()
         {
             string link;

@@ -4,11 +4,17 @@ using System.Windows.Documents;
 
 namespace MarkdownParser.Antlr.Answer
 {
+    /// <summary>
+    /// The parse result <see cref="AnswerMarkdownListener"/> builds up: an ordered list of
+    /// <see cref="IBlock"/>s (paragraph, table, blockquote, horizontal rule) that
+    /// <see cref="UpdateFlowDocument"/> turns into WPF <c>Block</c>s for a chat answer's flow document.
+    /// </summary>
     public sealed class ParsedMarkdown
     {
         private readonly List<IBlock> _blocks = new();
         private readonly IFontSizeProvider _fontSizeProvider;
 
+        /// <summary>The parsed blocks, in document order.</summary>
         public IReadOnlyList<IBlock> Blocks => _blocks;
 
         public ParsedMarkdown(
@@ -25,6 +31,7 @@ namespace MarkdownParser.Antlr.Answer
 
         #region adding a table
 
+        /// <summary>Appends a raw markdown table row, reusing the trailing table block or starting a new one.</summary>
         public void AddTableRow(
             string row
             )
@@ -64,6 +71,7 @@ namespace MarkdownParser.Antlr.Answer
 
         #region adding a horizontal rule
 
+        /// <summary>Adds a horizontal-rule block wrapping the given WPF element.</summary>
         public void AddHorizontalRuleBlock(
             BlockUIContainer blockUIContainer
             )
@@ -87,6 +95,7 @@ namespace MarkdownParser.Antlr.Answer
 
         #region adding a blockquote
 
+        /// <summary>Starts a new blockquote block.</summary>
         public void AddBlockquoteBlock(
             )
         {
@@ -107,6 +116,7 @@ namespace MarkdownParser.Antlr.Answer
 
         #region adding a paragraph
 
+        /// <summary>Starts a new paragraph block.</summary>
         public void AddParagraphBlock(
             )
         {
@@ -124,6 +134,7 @@ namespace MarkdownParser.Antlr.Answer
         }
 
 
+        /// <summary>Appends plain text to the trailing textual block, or to a new paragraph if the last block isn't textual.</summary>
         public void AddText(string text)
         {
             var lastBlock = GetTextualBlock();
@@ -135,6 +146,7 @@ namespace MarkdownParser.Antlr.Answer
             lastBlock.AddText(text);
         }
 
+        /// <summary>Adds an inline `&lt;tag&gt;body&lt;/tag&gt;` XML node part to the trailing paragraph.</summary>
         public void AddXmlNode(string text, string nodeName, string body)
         {
             var lastBlock = GetParagraphBlock();
@@ -142,6 +154,7 @@ namespace MarkdownParser.Antlr.Answer
             lastBlock.AddXmlNode(text, nodeName, body);
         }
 
+        /// <summary>Adds a `[desc](link "title")` URL part to the trailing paragraph.</summary>
         public void AddUrl(string text, string description, string link, string title)
         {
             var lastBlock = GetParagraphBlock();
@@ -149,6 +162,7 @@ namespace MarkdownParser.Antlr.Answer
             lastBlock.AddUrl(text, description, link, title);
         }
 
+        /// <summary>Adds a header part (levels 1-6) to the trailing paragraph.</summary>
         public void AddHeader(int headerLevel, string text)
         {
             var lastBlock = GetParagraphBlock();
@@ -156,6 +170,7 @@ namespace MarkdownParser.Antlr.Answer
             lastBlock.AddHeader(headerLevel, text);
         }
 
+        /// <summary>Adds a fenced code block part to the trailing paragraph.</summary>
         public void AddCodeBlock(string text, string code)
         {
             var lastBlock = GetParagraphBlock();
@@ -163,6 +178,7 @@ namespace MarkdownParser.Antlr.Answer
             lastBlock.AddCodeBlock(text, code);
         }
 
+        /// <summary>Adds one code line part to the trailing paragraph.</summary>
         public void AddCodeLine(string text)
         {
             var lastBlock = GetParagraphBlock();
@@ -170,6 +186,7 @@ namespace MarkdownParser.Antlr.Answer
             lastBlock.AddCodeLine(text);
         }
 
+        /// <summary>Adds an image part to the trailing paragraph.</summary>
         public void AddImage(string text, string description, string link, string title)
         {
             var lastBlock = GetParagraphBlock();
@@ -192,6 +209,7 @@ namespace MarkdownParser.Antlr.Answer
 
         #endregion
 
+        /// <summary>Rebuilds a WPF <see cref="FlowDocument"/> from the parsed blocks, replacing its current contents.</summary>
         public void UpdateFlowDocument(
             FlowDocument document,
             AdditionalCommandContainer? acc,

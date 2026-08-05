@@ -1,5 +1,6 @@
 ﻿namespace MarkdownParser.Antlr.Answer.Parts
 {
+    /// <summary>The kind of inline part within a block; a flags enum so <see cref="AdditionalCommand.PartType"/> can match several kinds at once.</summary>
     [Flags]
     public enum PartTypeEnum
     {

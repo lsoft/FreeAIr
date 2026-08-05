@@ -3,6 +3,7 @@ using System.Windows.Media;
 
 namespace MarkdownParser.Antlr.Answer.Parts
 {
+    /// <summary>A fenced ` ```code``` ` block part, rendered as monospaced <c>Run</c> text.</summary>
     public sealed class CodeBlockPart : IPart
     {
         private static readonly Brush _foregroundBrush = new SolidColorBrush(Color.FromRgb(0x56, 0x9C, 0xD6));
@@ -45,11 +46,13 @@ namespace MarkdownParser.Antlr.Answer.Parts
             Code = code;
         }
 
+        /// <summary>The parameter passed to an <see cref="AdditionalCommand"/> button for this part — the raw code.</summary>
         public object GetContextForAdditionalCommand()
         {
             return Code;
         }
 
+        /// <summary>Renders the code as a single monospaced <see cref="Run"/>.</summary>
         public IEnumerable<Inline> GetInlines(bool isInProgress)
         {
             yield return new Run

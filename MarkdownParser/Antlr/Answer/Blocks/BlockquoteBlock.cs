@@ -5,6 +5,7 @@ using System.Windows.Media;
 
 namespace MarkdownParser.Antlr.Answer.Blocks
 {
+    /// <summary>A `&gt;` blockquote block, rendered as a single indented WPF <see cref="Paragraph"/> with a green left border.</summary>
     public sealed class BlockquoteBlock : IBlock, ITextualBlock
     {
         private static readonly Brush _semiTransparentGray = new SolidColorBrush(Color.FromArgb(0x40, 0x80, 0x80, 0x80));
@@ -27,6 +28,7 @@ namespace MarkdownParser.Antlr.Answer.Blocks
             _fontSizeProvider = fontSizeProvider;
         }
 
+        /// <summary>Appends text, merging into the trailing <see cref="TextPart"/> when possible instead of creating a new part.</summary>
         public void AddText(string text)
         {
             if (_parts.Count > 0)
@@ -43,6 +45,7 @@ namespace MarkdownParser.Antlr.Answer.Blocks
         }
 
 
+        /// <summary>Builds (and caches) the WPF paragraph from all added parts, appending any matching command controls from <paramref name="acc"/>.</summary>
         public System.Windows.Documents.Block CreateBlock(
             AdditionalCommandContainer? acc,
             bool isInProgress

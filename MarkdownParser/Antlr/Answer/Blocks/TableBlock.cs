@@ -5,6 +5,12 @@ using System.Windows.Media;
 
 namespace MarkdownParser.Antlr.Answer.Blocks
 {
+    /// <summary>
+    /// A markdown pipe table, accumulated row by row as <see cref="AnswerMarkdownListener.EnterTable_row"/>
+    /// fires and rendered as a bordered WPF <see cref="Table"/>. The row whose cells are all dashes
+    /// (the header/body separator) is detected in <see cref="AddRow"/> and consumed instead of stored,
+    /// marking the row before it as the header.
+    /// </summary>
     public sealed class TableBlock : IBlock
     {
         private static readonly Brush _semiTransparentGray = new SolidColorBrush(Color.FromArgb(0x40, 0x80, 0x80, 0x80));
@@ -29,6 +35,7 @@ namespace MarkdownParser.Antlr.Answer.Blocks
             _fontSizeProvider = fontSizeProvider;
         }
 
+        /// <summary>Parses one `|`-delimited row; the dash-only separator row is consumed to mark the preceding row as the header instead of being stored as data.</summary>
         public void AddRow(
             string row
             )
@@ -49,6 +56,7 @@ namespace MarkdownParser.Antlr.Answer.Blocks
             _rows.Add(columns);
         }
 
+        /// <summary>Builds the WPF <see cref="Table"/> from the accumulated rows, or null if none were added.</summary>
         public Block? CreateBlock(
             AdditionalCommandContainer? acc,
             bool isInProgress
@@ -131,6 +139,7 @@ namespace MarkdownParser.Antlr.Answer.Blocks
         }
 
 
+        /// <summary>Border thickness for a cell, drawing the outer table edge only on the first column and last row (interior cells share one border on each other side).</summary>
         public Thickness GetBorderThickness(
             int rowCount,
             int columnCount,

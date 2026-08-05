@@ -3,6 +3,7 @@ using System.Windows.Media;
 
 namespace MarkdownParser.Antlr.Answer.Parts
 {
+    /// <summary>A single inline `` `code` `` span part, rendered as monospaced <c>Run</c> text.</summary>
     public sealed class CodeLinePart : IPart
     {
         private static readonly Brush _foregroundBrush = new SolidColorBrush(Color.FromRgb(0x56, 0x9C, 0xD6));
@@ -39,11 +40,13 @@ namespace MarkdownParser.Antlr.Answer.Parts
             Code = code.Trim('`');
         }
 
+        /// <summary>The parameter passed to an <see cref="AdditionalCommand"/> button for this part — the backtick-stripped code.</summary>
         public object GetContextForAdditionalCommand()
         {
             return Code;
         }
 
+        /// <summary>Renders the line as a single monospaced <see cref="Run"/>.</summary>
         public IEnumerable<Inline> GetInlines(bool isInProgress)
         {
             yield return new Run
