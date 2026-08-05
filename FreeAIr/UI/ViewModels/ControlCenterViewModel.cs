@@ -3,6 +3,7 @@ using FreeAIr.Helper;
 using FreeAIr.MCP.McpServerProxy;
 using FreeAIr.MCP.McpServerProxy.Github;
 using FreeAIr.Options2;
+using FreeAIr.SetupWizard.Catalog;
 using FreeAIr.UI.Windows;
 using Microsoft.VisualStudio.Shell.Interop;
 using System.IO;
@@ -447,14 +448,16 @@ namespace FreeAIr.UI.ViewModels
         public sealed class InstallMicrosoftMsdnMCPServerCmd : AsyncBaseRelayCommand
         {
             /// <summary>
-            /// The well-known HTTP endpoint of the Microsoft Docs MCP server.
+            /// The well-known HTTP endpoint of the Microsoft Docs MCP server. Taken from the shared
+            /// catalog, which the setup wizard's opt-in checkbox reads too, so a server installed
+            /// from here is recognized as installed there.
             /// </summary>
-            const string MsdnEndpoint = "https://learn.microsoft.com/api/mcp";
+            const string MsdnEndpoint = KnownMcpServerCatalog.MicrosoftDocsEndpoint;
 
             /// <summary>
             /// The server name under which the Microsoft Docs MCP server is registered in options.
             /// </summary>
-            const string MsdnServerName = "microsoft.docs.mcp";
+            const string MsdnServerName = KnownMcpServerCatalog.MicrosoftDocsServerName;
 
             /// <summary>
             /// The Control Center view model whose options JSON is updated.
@@ -492,13 +495,8 @@ namespace FreeAIr.UI.ViewModels
                 options.AvailableMcpServers.Servers[MsdnServerName] =
                     new McpServer(
                         McpServerType.Http,
-$$$"""
-{
-  "type": "http",
-  "url": "{{{MsdnEndpoint}}}"
-}
-"""
-                    );
+                        KnownMcpServerCatalog.BuildHttpConfiguration(MsdnEndpoint)
+                        );
 
                 _viewModel.OptionsJson = FreeAIrOptions.SerializeToString(options);
                 _viewModel.OnGithubPropertyChanged();

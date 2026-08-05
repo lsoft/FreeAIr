@@ -1,4 +1,4 @@
-﻿using FreeAIr.Helper;
+﻿using FreeAIr.SetupWizard.Helper;
 using Microsoft.VisualStudio.Threading;
 using OpenAI;
 using OpenAI.Audio;

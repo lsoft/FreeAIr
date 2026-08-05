@@ -147,7 +147,10 @@ namespace FreeAIr
 
                 await ChosenRecorder.InitAsync();
 
-                ShowReleaseNotesInfoBarIfNeeded();
+                if (!ShowSetupWizardInfoBarIfNeeded())
+                {
+                    ShowReleaseNotesInfoBarIfNeeded();
+                }
 
                 EmbeddedResourceHelper.LoadXamlEmbeddedResource(
                     "FreeAIr.UI.ClickableText.ClickableTextResource.xaml"
@@ -243,6 +246,37 @@ namespace FreeAIr
                 var sp = new ServiceProvider((Microsoft.VisualStudio.OLE.Interop.IServiceProvider)dte);
                 ReleaseNotesInfoBarService.Initialize(sp);
                 ReleaseNotesInfoBarService.Instance.ShowInfoBar();
+            }
+        }
+
+        /// <summary>
+        /// Shows the first-run info bar (offering release notes plus the setup wizard) exactly
+        /// once per install, before <see cref="InternalPage.SetupWizardIntroduced"/> is set: it
+        /// supersedes the plain release-notes bar on this run, since its own action already opens
+        /// the release notes too. Returns whether it was shown, so the caller can fall back to the
+        /// ordinary "new version installed" bar otherwise.
+        /// </summary>
+        private static bool ShowSetupWizardInfoBarIfNeeded()
+        {
+            if (InternalPage.Instance.SetupWizardIntroduced)
+            {
+                return false;
+            }
+
+            //this runs during package initialization: failing to show a bar is worth logging, but
+            //never worth failing the load of the whole extension over
+            try
+            {
+                var dte = AsyncPackage.GetGlobalService(typeof(EnvDTE.DTE)) as DTE2;
+                var sp = new ServiceProvider((Microsoft.VisualStudio.OLE.Interop.IServiceProvider)dte);
+                SetupWizardInfoBarService.Initialize(sp);
+                SetupWizardInfoBarService.Instance.ShowInfoBar();
+                return true;
+            }
+            catch (Exception excp)
+            {
+                excp.ActivityLogException();
+                return false;
             }
         }
 

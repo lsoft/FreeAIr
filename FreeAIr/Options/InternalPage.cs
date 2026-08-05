@@ -53,6 +53,21 @@ namespace FreeAIr
         }
 
         /// <summary>
+        /// Whether the first-run setup wizard info bar has already been shown (or dismissed) once.
+        /// False on a brand new install; used to tell "first run" apart from "upgraded from an
+        /// older version" so the two info bars (setup wizard vs. release notes) don't both fire.
+        /// </summary>
+        [Category("Logic")]
+        [DisplayName("Setup Wizard Introduced")]
+        [DefaultValue(false)]
+        [Browsable(false)]
+        public bool SetupWizardIntroduced
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
         /// JSON-serialized <see cref="FreeAIr.MCPToolsExecutionStatus"/> tracking which MCP tools
         /// have been executed, persisted across sessions.
         /// </summary>

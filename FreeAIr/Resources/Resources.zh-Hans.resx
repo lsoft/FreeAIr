@@ -1122,4 +1122,241 @@
   <data name="Confidence__low" xml:space="preserve">
     <value>低</value>
   </data>
+  <data name="Wizard_title" xml:space="preserve">
+    <value>FreeAIr 设置向导</value>
+  </data>
+  <data name="Wizard_back" xml:space="preserve">
+    <value>上一步</value>
+  </data>
+  <data name="Wizard_next" xml:space="preserve">
+    <value>下一步</value>
+  </data>
+  <data name="Wizard_finish" xml:space="preserve">
+    <value>完成</value>
+  </data>
+  <data name="Wizard_cancel_confirm" xml:space="preserve">
+    <value>这将关闭设置向导且不保存任何内容。是否继续？</value>
+  </data>
+  <data name="Wizard_step_welcome_title" xml:space="preserve">
+    <value>欢迎使用 FreeAIr 设置向导</value>
+  </data>
+  <data name="Wizard_step_welcome_description" xml:space="preserve">
+    <value>本向导将逐步把 FreeAIr 的当前配置替换为您自己构建的配置。在到达最后一页并按“完成”之前不会写入任何内容——在此之前取消不会改变任何东西。</value>
+  </data>
+  <data name="Wizard_step_startingpoint_title" xml:space="preserve">
+    <value>起始配置</value>
+  </data>
+  <data name="Wizard_step_startingpoint_description" xml:space="preserve">
+    <value>请选择从什么开始编辑：内置示例配置（占位代理和随附的提示词库）、完全空白的配置，或本次安装的当前配置。</value>
+  </data>
+  <data name="Wizard_step_agents_title" xml:space="preserve">
+    <value>代理</value>
+  </data>
+  <data name="Wizard_step_agents_description" xml:space="preserve">
+    <value>代理就是您可以对话的一个大语言模型：在哪里访问它（端点）、如何认证（令牌）、请求哪个模型，以及它据以回答的系统提示词。聊天和操作按名称选择代理。从列表中选择已知的本地或云端端点，或输入您自己的；令牌可以直接保存，或者更适合可能提交到仓库的文件的做法——保存为对环境变量的引用。</value>
+  </data>
+  <data name="Wizard_step_mcpservers_title" xml:space="preserve">
+    <value>MCP 服务器</value>
+  </data>
+  <data name="Wizard_step_mcpservers_description" xml:space="preserve">
+    <value>MCP 服务器为您的代理提供额外工具——读取仓库、搜索文档等等。配置方式与从控制中心相同，包括在 Docker Hub 中搜索现成的服务器。</value>
+  </data>
+  <data name="Wizard_step_actions_title" xml:space="preserve">
+    <value>操作</value>
+  </data>
+  <data name="Wizard_step_actions_description" xml:space="preserve">
+    <value>操作是 FreeAIr 在菜单中提供的提示词。每个操作都指定回答它的代理，因此指向不存在代理的操作无法运行。</value>
+  </data>
+  <data name="Wizard_step_miscsettings_title" xml:space="preserve">
+    <value>其他设置</value>
+  </data>
+  <data name="Wizard_step_miscsettings_description" xml:space="preserve">
+    <value>一些没有单独页面的设置：输出长度、回答语言、生成时使用的单元测试框架，以及内置的 GitHub MCP 服务器。</value>
+  </data>
+  <data name="Wizard_step_summary_title" xml:space="preserve">
+    <value>摘要</value>
+  </data>
+  <data name="Wizard_step_summary_description" xml:space="preserve">
+    <value>以下是按“完成”后将写入的内容。</value>
+  </data>
+  <data name="Wizard_welcome_overwrite_warning" xml:space="preserve">
+    <value>这将替换 FreeAIr 当前配置的代理、MCP 服务器、操作和其他设置。</value>
+  </data>
+  <data name="Wizard_welcome_destination_header" xml:space="preserve">
+    <value>配置将写入：</value>
+  </data>
+  <data name="Wizard_welcome_destination_vs_store" xml:space="preserve">
+    <value>Visual Studio 的内部选项存储（未打开解决方案，因此没有可写入的 .freeair 文件夹）。</value>
+  </data>
+  <data name="Wizard_startingpoint_defaults" xml:space="preserve">
+    <value>内置示例配置</value>
+  </data>
+  <data name="Wizard_startingpoint_blank" xml:space="preserve">
+    <value>空白——从零开始</value>
+  </data>
+  <data name="Wizard_startingpoint_existing" xml:space="preserve">
+    <value>本次安装的当前配置</value>
+  </data>
+  <data name="Wizard_agent_guided_intro" xml:space="preserve">
+    <value>FreeAIr 的占位示例代理已被移除。请在下方填写您自己的一个代理——之后可以从控制中心添加更多。</value>
+  </data>
+  <data name="Wizard_agent_name_hint" xml:space="preserve">
+    <value>您自己选择的简短名称。聊天和操作按这个名称选择要对话的代理。</value>
+  </data>
+  <data name="Wizard_agent_endpoint_hint" xml:space="preserve">
+    <value>运行该模型的服务器的 OpenAI 兼容基础 URL——可以是 LM Studio 之类的本地服务器，也可以是云服务商。请从列表中选择已知地址、输入您自己的地址，或按测试按钮确认可达后再继续。</value>
+  </data>
+  <data name="Wizard_agent_token_hint" xml:space="preserve">
+    <value>LM Studio 之类的本地服务器通常不需要令牌——请留空。云服务商需要 API 密钥：可以直接粘贴，或勾选复选框并给出已保存该密钥的环境变量名称，这样令牌本身就永远不会进入提交到版本库的设置文件。</value>
+  </data>
+  <data name="Wizard_agent_model_hint" xml:space="preserve">
+    <value>该代理向端点请求的模型 id，例如服务器自身模型列表中显示的名称。</value>
+  </data>
+  <data name="Wizard_agent_contextsize_hint" xml:space="preserve">
+    <value>模型的上下文窗口大小（以令牌计）——FreeAIr 在一次请求中可以发送多少对话和代码。不确定时请查阅该模型的文档。</value>
+  </data>
+  <data name="Wizard_agent_systemprompt_hint" xml:space="preserve">
+    <value>每次对话前告知该代理的内容——它的角色与基本规则。不确定就保持原样；之后可以编辑。</value>
+  </data>
+  <data name="Wizard_agent_known_endpoint_tooltip" xml:space="preserve">
+    <value>选择一个已知端点</value>
+  </data>
+  <data name="Wizard_agent_use_env_variable" xml:space="preserve">
+    <value>使用环境变量</value>
+  </data>
+  <data name="Wizard_agent_test_connection" xml:space="preserve">
+    <value>测试连接</value>
+  </data>
+  <data name="Wizard_agent_test_checking" xml:space="preserve">
+    <value>正在检查...</value>
+  </data>
+  <data name="Wizard_agent_test_invalid_uri" xml:space="preserve">
+    <value>URL 无效——必须包含协议，例如 http://localhost:1234/v1。</value>
+  </data>
+  <data name="Wizard_agent_test_reachable" xml:space="preserve">
+    <value>可访问——报告了 {0} 个模型。</value>
+  </data>
+  <data name="Wizard_agent_test_failed" xml:space="preserve">
+    <value>无法访问该端点：{0}</value>
+  </data>
+  <data name="Wizard_agent_problem_missing_name" xml:space="preserve">
+    <value>代理必须有名称。</value>
+  </data>
+  <data name="Wizard_agent_problem_invalid_endpoint" xml:space="preserve">
+    <value>端点必须是有效的绝对 URI，例如 http://localhost:1234/v1。</value>
+  </data>
+  <data name="Wizard_agent_problem_invalid_token" xml:space="preserve">
+    <value>令牌必须为空、为字面值，或为 {{$VAR_NAME}} 形式的环境变量引用。</value>
+  </data>
+  <data name="Wizard_agent_problem_context_size" xml:space="preserve">
+    <value>上下文大小必须大于零。</value>
+  </data>
+  <data name="Wizard_agent_unnamed" xml:space="preserve">
+    <value>（未命名的代理）</value>
+  </data>
+  <data name="Wizard_mcp_count" xml:space="preserve">
+    <value>当前已配置 {0} 个 MCP 服务器。</value>
+  </data>
+  <data name="Wizard_mcp_configure" xml:space="preserve">
+    <value>配置 MCP 服务器...</value>
+  </data>
+  <data name="Wizard_mcp_msdn_optin" xml:space="preserve">
+    <value>安装 Microsoft Learn 文档 MCP 服务器</value>
+  </data>
+  <data name="Wizard_mcp_msdn_optin_hint" xml:space="preserve">
+    <value>让模型在 Microsoft 官方文档中查找答案，而不是依赖它对 .NET 和 Visual Studio 的记忆。它是 learn.microsoft.com 上的公开 HTTP 端点：不会向您的计算机下载或安装任何东西，也不需要令牌——勾选只是把该服务器写入设置。取消勾选则会将其移除。</value>
+  </data>
+  <data name="Wizard_actions_count" xml:space="preserve">
+    <value>当前已配置 {0} 个操作。</value>
+  </data>
+  <data name="Wizard_actions_configure" xml:space="preserve">
+    <value>配置操作...</value>
+  </data>
+  <data name="Wizard_actions_what_is_it" xml:space="preserve">
+    <value>操作是 FreeAIr 在菜单中提供的一个具名提示词：它指明由哪个代理回答、要问什么，以及出现在哪里——选中代码的上下文菜单、解决方案树、生成错误窗口、提交信息输入框。</value>
+  </data>
+  <data name="Wizard_actions_examples" xml:space="preserve">
+    <value>例如：对选中代码块的“Explain code”、对文件的“Add XML comments”、解决方案树中的“Generate unit tests”、错误列表中的“Fix build error”、根据 git diff 的“Build commit message”。</value>
+  </data>
+  <data name="Wizard_actions_use_defaults" xml:space="preserve">
+    <value>使用默认值</value>
+  </data>
+  <data name="Wizard_actions_use_defaults_hint" xml:space="preserve">
+    <value>用 FreeAIr 随附的默认操作重建操作列表，并把每一个都绑定到您的第一个代理。只有勾选上面的复选框后，整行补全才会被绑定——它在每次按键时都会触发，因此必须由您主动启用。</value>
+  </data>
+  <data name="Wizard_actions_wholeline" xml:space="preserve">
+    <value>键入时自动运行整行补全</value>
+  </data>
+  <data name="Wizard_actions_wholeline_hint" xml:space="preserve">
+    <value>启用后，FreeAIr 会在每次键入停顿后向模型请求本行的其余内容，并在光标前以灰色建议显示，也就是每次停顿都会发出一次请求。关闭后，整行补全操作处于休眠状态：下面的按钮不会把它绑定到代理，也不会把它报告为问题。无论哪种情况，都可以用 Alt+A 显式请求建议。</value>
+  </data>
+  <data name="Wizard_actions_defaults_need_an_agent" xml:space="preserve">
+    <value>请先创建代理：默认操作会绑定到您的第一个代理。</value>
+  </data>
+  <data name="Wizard_actions_defaults_applied" xml:space="preserve">
+    <value>已恢复 {0} 个默认操作，并全部绑定到代理“{1}”。</value>
+  </data>
+  <data name="Wizard_actions_problems_header" xml:space="preserve">
+    <value>以下操作按当前配置无法运行：</value>
+  </data>
+  <data name="Wizard_actions_problem_no_agent" xml:space="preserve">
+    <value>“{0}”未指定代理，因此每次调用时 FreeAIr 都会询问使用哪一个。</value>
+  </data>
+  <data name="Wizard_actions_problem_unknown_agent" xml:space="preserve">
+    <value>“{0}”绑定到代理“{1}”，但该代理不在此配置中。</value>
+  </data>
+  <data name="Wizard_misc_maxoutputtokens_label" xml:space="preserve">
+    <value>最大输出令牌数</value>
+  </data>
+  <data name="Wizard_misc_maxoutputtokens_hint" xml:space="preserve">
+    <value>代理回答最多可以达到的令牌数。</value>
+  </data>
+  <data name="Wizard_misc_culture_label" xml:space="preserve">
+    <value>强制回答语言（例如 ru-RU）</value>
+  </data>
+  <data name="Wizard_misc_culture_hint" xml:space="preserve">
+    <value>无论 Visual Studio 界面语言如何，都强制使用指定语言或区域回答。留空则由代理自行决定。</value>
+  </data>
+  <data name="Wizard_misc_unittestframework_label" xml:space="preserve">
+    <value>首选单元测试框架</value>
+  </data>
+  <data name="Wizard_misc_unittestframework_hint" xml:space="preserve">
+    <value>会写入“generate unit tests”操作所用的提示词，例如 xunit、nunit 或 mstest。</value>
+  </data>
+  <data name="Wizard_misc_searchtimeout_label" xml:space="preserve">
+    <value>上下文项搜索超时（毫秒）</value>
+  </data>
+  <data name="Wizard_misc_searchtimeout_hint" xml:space="preserve">
+    <value>FreeAIr 在放弃之前，为一次请求在解决方案中搜索相关文件和符号的时长。</value>
+  </data>
+  <data name="Wizard_misc_github_optin" xml:space="preserve">
+    <value>安装并使用内置的 GitHub MCP 服务器</value>
+  </data>
+  <data name="Wizard_misc_github_optin_hint" xml:space="preserve">
+    <value>让代理通过下载的 MCP 服务器读取 github.com 上的仓库、问题和拉取请求。未勾选时不会设置任何与 GitHub 相关的内容；勾选后仍需从控制中心安装该服务器。</value>
+  </data>
+  <data name="Wizard_misc_github_token_label" xml:space="preserve">
+    <value>GitHub MCP 服务器令牌</value>
+  </data>
+  <data name="Wizard_misc_github_token_hint" xml:space="preserve">
+    <value>github.com 个人访问令牌。可以直接粘贴，也可以写成 {{$MY_VAR}} 以改为从 MY_VAR 环境变量读取（设置后请重启 Visual Studio）。</value>
+  </data>
+  <data name="Wizard_summary_agents" xml:space="preserve">
+    <value>代理：{0}</value>
+  </data>
+  <data name="Wizard_summary_mcpservers" xml:space="preserve">
+    <value>MCP 服务器：{0}</value>
+  </data>
+  <data name="Wizard_summary_actions" xml:space="preserve">
+    <value>操作：{0}</value>
+  </data>
+  <data name="Wizard_summary_press_finish" xml:space="preserve">
+    <value>按“完成”写入此配置。</value>
+  </data>
+  <data name="Wizard_infobar_message" xml:space="preserve">
+    <value>FreeAIr 随附的示例配置用于编辑，而非日常使用。</value>
+  </data>
+  <data name="Wizard_infobar_open" xml:space="preserve">
+    <value>打开发行说明和设置向导</value>
+  </data>
 </root>

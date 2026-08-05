@@ -72,7 +72,6 @@
     <Compile Include="BLogic\AsyncAwaitProductionCycle.cs" />
     <Compile Include="BLogic\CallAwaiter.cs" />
     <Compile Include="Helper\ChatToolHelper.cs" />
-    <Compile Include="Helper\DirectOrEnvStringHelper.cs" />
     <Compile Include="Helper\DisposeHelper.cs" />
     <Compile Include="Helper\KnownMonikersHelper.cs" />
     <Compile Include="BLogic\NonDisposableSemaphoreSlim.cs" />
@@ -111,6 +110,7 @@
     <Compile Include="BuildErrors\BuildResultInformation.cs" />
     <Compile Include="Commands\File\AddNaturalLanguageOutlinesCommand.cs" />
     <Compile Include="Commands\Other\OpenControlCenterCommand.cs" />
+    <Compile Include="Commands\Other\OpenSetupWizardCommand.cs" />
     <Compile Include="Commands\Other\ShowReleaseNotesCommand.cs" />
     <Compile Include="Commands\Other\OpenNaturalSearchToolWindowCommand.cs" />
     <Compile Include="Find\FileTypeFilter.cs" />
@@ -165,6 +165,7 @@
     <Compile Include="ImageMonikers.cs" />
     <Compile Include="InfoBar\InfoBarService.cs" />
     <Compile Include="InfoBar\ReleaseNotesInfoBarService.cs" />
+    <Compile Include="InfoBar\SetupWizardInfoBarService.cs" />
     <Compile Include="MCP\ServerProxy\McpServerProxyCollection.cs" />
     <Compile Include="MCP\ServerProxy\McpServerProxyApplication.cs" />
     <Compile Include="MCP\ServerProxy\External\ExternalMcpServerProxy.cs" />
@@ -344,6 +345,10 @@
     <Compile Include="UI\ViewModels\OutlineEmbeddingOutputPanel.cs" />
     <Compile Include="UI\ViewModels\RenameChatViewModel.cs" />
     <Compile Include="UI\ViewModels\SearchForDockerMcpServerViewModel.cs" />
+    <Compile Include="UI\ViewModels\SetupWizardViewModel.cs" />
+    <Compile Include="UI\Wizard\SetupWizardWindow.xaml.cs">
+      <DependentUpon>SetupWizardWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI\Windows\RecorderSetupWindow.xaml.cs">
       <DependentUpon>RecorderSetupWindow.xaml</DependentUpon>
     </Compile>
@@ -505,6 +510,10 @@
       <Project>{7B4E0C1F-9A2D-4C63-9E31-6D5F0B84A2E7}</Project>
       <Name>FreeAIr.Search</Name>
     </ProjectReference>
+    <ProjectReference Include="..\SetupWizard\FreeAIr.SetupWizard.csproj">
+      <Project>{95C940A1-F08A-437A-83E7-996903DA7611}</Project>
+      <Name>FreeAIr.SetupWizard</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Shared\FreeAIr.Shared.csproj">
       <Project>{e2646cf6-c92f-94ee-f875-5a7c18451b93}</Project>
       <Name>FreeAIr.Shared</Name>
@@ -585,6 +594,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="UI\Windows\ActionConfigureWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI\Wizard\SetupWizardWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

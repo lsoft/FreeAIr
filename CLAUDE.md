@@ -29,6 +29,10 @@ Quote `"-p:Platform=Any CPU"` as shown — the space in the value needs the whol
 index format, the vector codec, the outline tree and the ranking of the natural language search,
 plus the `Grep\` text matching behind the SearchFileContent MCP tool.
 
+`SetupWizard.Tests\FreeAIr.SetupWizard.Tests.csproj` (net8.0, xunit) covers
+`SetupWizard\FreeAIr.SetupWizard.csproj` the same way — the first-run setup wizard's step
+navigation, agent-field validation and known-endpoint catalog.
+
 Use the script; it builds with MSBuild and only then hands over to the SDK:
 
 ```bash
@@ -39,9 +43,10 @@ Anything you add to the command line goes on to `dotnet test`, e.g.
 `run-tests.bat --filter FullyQualifiedName~VectorCodec`. `FREEAIR_CONFIG` picks the configuration
 (`Release` by default), `FREEAIR_MSBUILD` overrides the compiler path.
 
-Only the test project and `FreeAIr.Search` are built by the script — both are SDK style, so it takes a
-couple of seconds and does not go near the VSIX. Build the solution yourself when you need the VSIX
-too; the script will then find everything up to date.
+Only the two test projects and what they reference (`FreeAIr.Search`, `FreeAIr.SetupWizard`, `Dto`)
+are built by the script — all SDK style, so it takes a couple of seconds and does not go near the
+VSIX. Build the solution yourself when you need the VSIX too; the script will then find everything
+up to date.
 
 By hand it is the same two steps, and the second one must **not** let the .NET SDK build anything:
 

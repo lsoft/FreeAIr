@@ -1,0 +1,718 @@
+<Window
+    x:Class="FreeAIr.UI.Wizard.SetupWizardWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:ui="clr-namespace:FreeAIr.UI"
+    xmlns:vm="clr-namespace:FreeAIr.UI.ViewModels"
+    xmlns:resources="clr-namespace:FreeAIr.Resources"
+    mc:Ignorable="d"
+    d:DesignHeight="750" d:DesignWidth="1050"
+    Height="750" Width="1050"
+    ui:VsTheme.UseVsTheme="True"
+    ShowInTaskbar="False"
+    ResizeMode="NoResize"
+    WindowStyle="SingleBorderWindow"
+    WindowStartupLocation="CenterOwner"
+    Icon="/FreeAIr;component/Resources/Icon32.png"
+    Title="{x:Static resources:Resources.Wizard_title}"
+    Loaded="Window_Loaded"
+    d:DataContext="{d:DesignInstance Type=vm:SetupWizardViewModel, IsDesignTimeCreatable=False}"
+    >
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition />
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!--
+        Invisible anchor purely so plain TextBlock/RadioButton/CheckBox text can bind to a properly
+        VS-themed Foreground, the same way every other window here derives one control's Foreground
+        from a nearby themed Label (see AgentConfigureWindow's ContextSizeLabel). VsTheme.UseVsTheme
+        only themes the Window background plus TextBox/ComboBox/ScrollViewer - it does not touch
+        TextBlock, so without this an unthemed TextBlock renders default-black text, which is
+        unreadable once the window's background follows a dark VS theme.
+        -->
+        <Label x:Name="ThemedTextBrush" Visibility="Collapsed"/>
+
+        <!-- header: logo + step title -->
+        <StackPanel
+            Grid.Row="0"
+            Orientation="Horizontal"
+            Margin="0,0,0,5"
+            >
+            <Image
+                Source="/FreeAIr;component/Resources/Icon32.png"
+                Width="32"
+                Height="32"
+                Margin="0,0,10,0"
+                VerticalAlignment="Center"
+                />
+            <TextBlock
+                Text="{Binding StepTitle}"
+                FontSize="18"
+                FontWeight="Bold"
+                FontFamily="Cascadia Code"
+                VerticalAlignment="Center"
+                Foreground="{Binding ElementName=ThemedTextBrush, Path=Foreground}"
+                />
+        </StackPanel>
+
+        <TextBlock
+            Grid.Row="1"
+            Text="{Binding StepDescription}"
+            FontSize="12"
+            FontFamily="Cascadia Code"
+            TextWrapping="Wrap"
+            Margin="0,0,0,10"
+            Foreground="{Binding ElementName=ThemedTextBrush, Path=Foreground}"
+            />
+
+        <!-- step content -->
+        <Grid Grid.Row="2">
+
+            <!-- Welcome -->
+            <StackPanel Visibility="{Binding WelcomeVisibility}">
+                <TextBlock
+                    FontFamily="Cascadia Code"
+                    FontSize="12"
+                    TextWrapping="Wrap"
+                    Text="{x:Static resources:Resources.Wizard_welcome_overwrite_warning}"
+                    Margin="0,0,0,10"
+                    Foreground="{Binding ElementName=ThemedTextBrush, Path=Foreground}"
+                    />
+                <TextBlock
+                    FontFamily="Cascadia Code"
+                    FontSize="12"
+                    FontWeight="Bold"
+                    Text="{x:Static resources:Resources.Wizard_welcome_destination_header}"
+                    Foreground="{Binding ElementName=ThemedTextBrush, Path=Foreground}"
+                    />
+                <TextBlock
+                    FontFamily="Cascadia Code"
+                    FontSize="12"
+                    TextWrapping="Wrap"
+                    Text="{Binding DestinationDescription}"
+                    Margin="0,5,0,0"
+                    Foreground="{Binding ElementName=ThemedTextBrush, Path=Foreground}"
+                    />
+            </StackPanel>
+
+            <!-- Starting point -->
+            <StackPanel Visibility="{Binding StartingPointVisibility}">
+                <RadioButton
+                    GroupName="StartingPoint"
+                    Content="{x:Static resources:Resources.Wizard_startingpoint_defaults}"
+                    FontFamily="Cascadia Code"
+                    Margin="0,5,0,5"
+                    IsChecked="{Binding IsBuiltInDefaultsSelected}"
+                    Foreground="{Binding ElementName=ThemedTextBrush, Path=Foreground}"
+                    />
+                <RadioButton
+                    GroupName="StartingPoint"
+                    Content="{x:Static resources:Resources.Wizard_startingpoint_blank}"
+                    FontFamily="Cascadia Code"
+                    Margin="0,5,0,5"
+                    IsChecked="{Binding IsBlankSelected}"
+                    Foreground="{Binding ElementName=ThemedTextBrush, Path=Foreground}"
+                    />
+                <RadioButton
+                    GroupName="StartingPoint"
+                    Content="{x:Static resources:Resources.Wizard_startingpoint_existing}"
+                    FontFamily="Cascadia Code"
+                    Margin="0,5,0,5"
+                    IsChecked="{Binding IsExistingConfigSelected}"
+                    Foreground="{Binding ElementName=ThemedTextBrush, Path=Foreground}"
+                    />
+            </StackPanel>
+
+            <!-- Agents -->
+            <Grid Visibility="{Binding AgentsVisibility}">
+
+                <!-- First run: guided, one field at a time, with an explanation under each -->
+                <ScrollViewer
+                    Visibility="{Binding GuidedAgentVisibility}"
+                    VerticalScrollBarVisibility="Auto"
+                    HorizontalScrollBarVisibility="Disabled"
+                    >
+                    <StackPanel Margin="0,0,10,0">
+                        <TextBlock
+                            FontFamily="Cascadia Code"
+                            FontSize="12"
+                            TextWrapping="Wrap"
+                            Text="{x:Static resources:Resources.Wizard_agent_guided_intro}"
+                            Margin="0,0,0,15"
+                            Foreground="{Binding ElementName=ThemedTextBrush, Path=Foreground}"
+                            />
+
+                        <Label Content="{x:Static resources:Resources.Name}" FontFamily="Cascadia Code"/>
+                        <TextBox
+                            FontFamily="Cascadia Code"
+                            Text="{Binding GuidedAgent.Name, UpdateSourceTrigger=PropertyChanged}"
+                            />
+                        <TextBlock
+                            FontFamily="Cascadia Code"
+                            FontSize="11"
+                            TextWrapping="Wrap"
+                            Text="{x:Static resources:Resources.Wizard_agent_name_hint}"
+                            Margin="0,2,0,12"
+                            Foreground="{Binding ElementName=ThemedTextBrush, Path=Foreground}"
+                            />
+
+                        <Label Content="{x:Static resources:Resources.Endpoint}" FontFamily="Cascadia Code"/>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBox
+                                Width="300"
+                                FontFamily="Cascadia Code"
+                                Text="{Binding GuidedAgent.Technical.Endpoint, UpdateSourceTrigger=PropertyChanged}"
+                                />
+                            <ComboBox
+                                Width="200"
+                                Margin="10,0,0,0"
+                                FontFamily="Cascadia Code"
+                                ToolTip="{x:Static resources:Resources.Wizard_agent_known_endpoint_tooltip}"
+                                ItemsSource="{Binding KnownEndpoints}"
+                                DisplayMemberPath="DisplayName"
+                                SelectedItem="{Binding GuidedKnownEndpoint}"
+                                />
+                            <Button
+                                Content="{x:Static resources:Resources.Wizard_agent_test_connection}"
+                                Margin="10,0,0,0"
+                                FontFamily="Cascadia Code"
+                                FontWeight="Bold"
+                                Cursor="Hand"
+                                Foreground="#569CD6"
+                                Command="{Binding TestEndpointCommand}"
+                                Style="{DynamicResource TextBlockLikeButtonStyle}"
+                                />
+                        </StackPanel>
+                        <TextBlock
+                            FontFamily="Cascadia Code"
+                            FontSize="11"
+                            TextWrapping="Wrap"
+                            Text="{x:Static resources:Resources.Wizard_agent_endpoint_hint}"
+                            Margin="0,2,0,2"
+                            Foreground="{Binding ElementName=ThemedTextBrush, Path=Foreground}"
+                            />
+                        <TextBlock
+                            FontFamily="Cascadia Code"
+                            FontSize="11"
+                            FontWeight="Bold"
+                            TextWrapping="Wrap"
+                            Text="{Binding EndpointTestStatus}"
+                            Margin="0,2,0,12"
+                            Foreground="{Binding ElementName=ThemedTextBrush, Path=Foreground}"
+                            />
+
+                        <Label Content="{x:Static resources:Resources.Token}" FontFamily="Cascadia Code"/>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBox
+                                Width="300"
+                                FontFamily="Cascadia Code"
+                                Text="{Binding GuidedAgentTokenDisplay, UpdateSourceTrigger=PropertyChanged}"
+                                />
+                            <CheckBox
+                                Content="{x:Static resources:Resources.Wizard_agent_use_env_variable}"
+                                Margin="10,0,0,0"
+                                VerticalAlignment="Center"
+                                FontFamily="Cascadia Code"
+                                IsChecked="{Binding GuidedAgentUsesEnvToken}"
+                                Foreground="{Binding ElementName=ThemedTextBrush, Path=Foreground}"
+                                />
+                        </StackPanel>
+                        <TextBlock
+                            FontFamily="Cascadia Code"
+                            FontSize="11"
+                            TextWrapping="Wrap"
+                            Text="{x:Static resources:Resources.Wizard_agent_token_hint}"
+                            Margin="0,2,0,12"
+                            Foreground="{Binding ElementName=ThemedTextBrush, Path=Foreground}"
+                            />
+
+                        <Label Content="{x:Static resources:Resources.Chosen_model}" FontFamily="Cascadia Code"/>
+                        <TextBox
+                            FontFamily="Cascadia Code"
+                            Text="{Binding GuidedAgent.Technical.ChosenModel, UpdateSourceTrigger=PropertyChanged}"
+                            />
+                        <TextBlock
+                            FontFamily="Cascadia Code"
+                            FontSize="11"
+                            TextWrapping="Wrap"
+                            Text="{x:Static resources:Resources.Wizard_agent_model_hint}"
+                            Margin="0,2,0,12"
+                            Foreground="{Binding ElementName=ThemedTextBrush, Path=Foreground}"
+                            />
+
+                        <Label Content="{x:Static resources:Resources.Context_size}" FontFamily="Cascadia Code"/>
+                        <TextBox
+                            FontFamily="Cascadia Code"
+                            Text="{Binding GuidedAgent.Technical.ContextSize, UpdateSourceTrigger=PropertyChanged}"
+                            />
+                        <TextBlock
+                            FontFamily="Cascadia Code"
+                            FontSize="11"
+                            TextWrapping="Wrap"
+                            Text="{x:Static resources:Resources.Wizard_agent_contextsize_hint}"
+                            Margin="0,2,0,12"
+                            Foreground="{Binding ElementName=ThemedTextBrush, Path=Foreground}"
+                            />
+
+                        <Label Content="{x:Static resources:Resources.Agent_system_prompt}" FontFamily="Cascadia Code"/>
+                        <TextBox
+                            AcceptsReturn="True"
+                            TextWrapping="Wrap"
+                            FontFamily="Cascadia Code"
+                            MinHeight="100"
+                            MaxHeight="200"
+                            ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                            ScrollViewer.VerticalScrollBarVisibility="Auto"
+                            Text="{Binding GuidedAgent.SystemPrompt, UpdateSourceTrigger=PropertyChanged}"
+                            />
+                        <TextBlock
+                            FontFamily="Cascadia Code"
+                            FontSize="11"
+                            TextWrapping="Wrap"
+                            Text="{x:Static resources:Resources.Wizard_agent_systemprompt_hint}"
+                            Margin="0,2,0,0"
+                            Foreground="{Binding ElementName=ThemedTextBrush, Path=Foreground}"
+                            />
+                    </StackPanel>
+                </ScrollViewer>
+
+                <!-- Not first run: the existing multi-agent list editor, unchanged -->
+                <Grid Visibility="{Binding AgentListVisibility}">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="2*"/>
+                        <ColumnDefinition Width="6*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <Grid Grid.Column="0" Margin="0,0,5,0">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition />
+                        </Grid.RowDefinitions>
+
+                        <StackPanel Grid.Row="0" Orientation="Horizontal">
+                            <Button
+                                Content="＋"
+                                FontSize="20"
+                                Foreground="Green"
+                                FontFamily="Cascadia Code"
+                                ToolTip="{x:Static resources:Resources.Add_new_agent}"
+                                Command="{Binding AddAgentCommand}"
+                                Style="{DynamicResource TextBlockLikeButtonStyle}"
+                                />
+                            <Button
+                                Content="⛌"
+                                Margin="10,0,0,0"
+                                FontSize="12"
+                                Foreground="Red"
+                                FontFamily="Cascadia Code"
+                                VerticalAlignment="Center"
+                                ToolTip="{x:Static resources:Resources.Delete_selected_agent}"
+                                Command="{Binding DeleteAgentCommand}"
+                                Style="{DynamicResource TextBlockLikeButtonStyle}"
+                                />
+                        </StackPanel>
+
+                        <ListView
+                            Grid.Row="1"
+                            ItemsSource="{Binding AvailableAgents}"
+                            DisplayMemberPath="Name"
+                            SelectedItem="{Binding SelectedAgent}"
+                            />
+                    </Grid>
+
+                    <Grid
+                        Grid.Column="1"
+                        Margin="5,0,0,0"
+                        VerticalAlignment="Top"
+                        Visibility="{Binding ShowAgentPanel}"
+                        >
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition />
+                        </Grid.ColumnDefinitions>
+
+                        <Label Grid.Row="0" Grid.Column="0" Content="{x:Static resources:Resources.Name}" FontFamily="Cascadia Code"/>
+                        <TextBox
+                            Grid.Row="0" Grid.Column="1"
+                            FontFamily="Cascadia Code"
+                            Text="{Binding SelectedAgent.Name, UpdateSourceTrigger=PropertyChanged}"
+                            />
+
+                        <Label Grid.Row="1" Grid.Column="0" Content="{x:Static resources:Resources.Endpoint}" FontFamily="Cascadia Code"/>
+                        <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Horizontal">
+                            <TextBox
+                                Width="300"
+                                FontFamily="Cascadia Code"
+                                Text="{Binding SelectedAgent.Technical.Endpoint, UpdateSourceTrigger=PropertyChanged}"
+                                />
+                            <ComboBox
+                                Width="200"
+                                Margin="10,0,0,0"
+                                FontFamily="Cascadia Code"
+                                ToolTip="{x:Static resources:Resources.Wizard_agent_known_endpoint_tooltip}"
+                                ItemsSource="{Binding KnownEndpoints}"
+                                DisplayMemberPath="DisplayName"
+                                SelectedItem="{Binding SelectedKnownEndpoint}"
+                                />
+                        </StackPanel>
+
+                        <Label Grid.Row="2" Grid.Column="0" Content="{x:Static resources:Resources.Token}" FontFamily="Cascadia Code"/>
+                        <StackPanel Grid.Row="2" Grid.Column="1" Orientation="Horizontal">
+                            <TextBox
+                                Width="300"
+                                FontFamily="Cascadia Code"
+                                Text="{Binding SelectedAgentTokenDisplay, UpdateSourceTrigger=PropertyChanged}"
+                                />
+                            <CheckBox
+                                Content="{x:Static resources:Resources.Wizard_agent_use_env_variable}"
+                                Margin="10,0,0,0"
+                                VerticalAlignment="Center"
+                                FontFamily="Cascadia Code"
+                                IsChecked="{Binding SelectedAgentUsesEnvToken}"
+                                Foreground="{Binding ElementName=ThemedTextBrush, Path=Foreground}"
+                                />
+                        </StackPanel>
+
+                        <Label Grid.Row="3" Grid.Column="0" Content="{x:Static resources:Resources.Chosen_model}" FontFamily="Cascadia Code"/>
+                        <TextBox
+                            Grid.Row="3" Grid.Column="1"
+                            FontFamily="Cascadia Code"
+                            Text="{Binding SelectedAgent.Technical.ChosenModel, UpdateSourceTrigger=PropertyChanged}"
+                            />
+
+                        <Label Grid.Row="4" Grid.Column="0" Content="{x:Static resources:Resources.Context_size}" FontFamily="Cascadia Code"/>
+                        <TextBox
+                            Grid.Row="4" Grid.Column="1"
+                            FontFamily="Cascadia Code"
+                            Text="{Binding SelectedAgent.Technical.ContextSize, UpdateSourceTrigger=PropertyChanged}"
+                            />
+
+                        <Label Grid.Row="5" Grid.Column="0" Content="{x:Static resources:Resources.Agent_system_prompt}" FontFamily="Cascadia Code"/>
+                        <TextBox
+                            Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="2"
+                            AcceptsReturn="True"
+                            TextWrapping="Wrap"
+                            FontFamily="Cascadia Code"
+                            MinHeight="150"
+                            MaxHeight="300"
+                            ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                            ScrollViewer.VerticalScrollBarVisibility="Auto"
+                            Text="{Binding SelectedAgent.SystemPrompt, UpdateSourceTrigger=PropertyChanged}"
+                            />
+                    </Grid>
+                </Grid>
+            </Grid>
+
+            <!-- MCP servers -->
+            <StackPanel Visibility="{Binding McpServersVisibility}">
+                <TextBlock
+                    FontFamily="Cascadia Code"
+                    FontSize="12"
+                    Text="{Binding McpServerCountText}"
+                    Margin="0,0,0,10"
+                    Foreground="{Binding ElementName=ThemedTextBrush, Path=Foreground}"
+                    />
+                <!--
+                Opt-in for the one server FreeAIr can register on its own without downloading
+                anything: it is a plain HTTP endpoint, so a checkbox is the whole installation.
+                -->
+                <CheckBox
+                    Content="{x:Static resources:Resources.Wizard_mcp_msdn_optin}"
+                    FontFamily="Cascadia Code"
+                    IsChecked="{Binding WantsMsdnMcpServer}"
+                    Foreground="{Binding ElementName=ThemedTextBrush, Path=Foreground}"
+                    />
+                <TextBlock
+                    FontFamily="Cascadia Code" FontSize="11" TextWrapping="Wrap"
+                    Text="{x:Static resources:Resources.Wizard_mcp_msdn_optin_hint}"
+                    Margin="0,2,0,15"
+                    Foreground="{Binding ElementName=ThemedTextBrush, Path=Foreground}"
+                    />
+
+                <Button
+                    Content="{x:Static resources:Resources.Wizard_mcp_configure}"
+                    HorizontalAlignment="Left"
+                    FontFamily="Cascadia Code"
+                    FontWeight="Bold"
+                    Cursor="Hand"
+                    Foreground="#569CD6"
+                    Command="{Binding ConfigureMcpServersCommand}"
+                    Style="{DynamicResource TextBlockLikeButtonStyle}"
+                    />
+            </StackPanel>
+
+            <!-- Actions -->
+            <ScrollViewer
+                Visibility="{Binding ActionsVisibility}"
+                VerticalScrollBarVisibility="Auto"
+                HorizontalScrollBarVisibility="Disabled"
+                >
+                <StackPanel Margin="0,0,10,0">
+                    <TextBlock
+                        FontFamily="Cascadia Code"
+                        FontSize="12"
+                        TextWrapping="Wrap"
+                        Text="{x:Static resources:Resources.Wizard_actions_what_is_it}"
+                        Foreground="{Binding ElementName=ThemedTextBrush, Path=Foreground}"
+                        />
+                    <TextBlock
+                        FontFamily="Cascadia Code"
+                        FontSize="12"
+                        TextWrapping="Wrap"
+                        Text="{x:Static resources:Resources.Wizard_actions_examples}"
+                        Margin="0,8,0,15"
+                        Foreground="{Binding ElementName=ThemedTextBrush, Path=Foreground}"
+                        />
+
+                    <TextBlock
+                        FontFamily="Cascadia Code"
+                        FontSize="12"
+                        Text="{Binding ActionCountText}"
+                        Margin="0,0,0,10"
+                        Foreground="{Binding ElementName=ThemedTextBrush, Path=Foreground}"
+                        />
+
+                    <!--
+                    The switch of the whole line completion action lives here rather than among the
+                    other settings: it decides whether that action is bound by the defaults button
+                    below and whether it is checked at all by the warning under it.
+                    -->
+                    <CheckBox
+                        Content="{x:Static resources:Resources.Wizard_actions_wholeline}"
+                        FontFamily="Cascadia Code"
+                        IsChecked="{Binding IsWholeLineCompletionEnabled}"
+                        Foreground="{Binding ElementName=ThemedTextBrush, Path=Foreground}"
+                        />
+                    <TextBlock
+                        FontFamily="Cascadia Code" FontSize="11" TextWrapping="Wrap"
+                        Text="{x:Static resources:Resources.Wizard_actions_wholeline_hint}"
+                        Margin="0,2,0,15"
+                        Foreground="{Binding ElementName=ThemedTextBrush, Path=Foreground}"
+                        />
+
+                    <!-- broken agent bindings, refreshed every time this step is shown -->
+                    <TextBlock
+                        FontFamily="Cascadia Code"
+                        FontSize="12"
+                        FontWeight="Bold"
+                        TextWrapping="Wrap"
+                        Foreground="Red"
+                        Text="{Binding ActionProblems}"
+                        Visibility="{Binding ActionProblemsVisibility}"
+                        Margin="0,0,0,15"
+                        />
+
+                    <StackPanel Orientation="Horizontal">
+                        <Button
+                            Content="{x:Static resources:Resources.Wizard_actions_configure}"
+                            FontFamily="Cascadia Code"
+                            FontWeight="Bold"
+                            Cursor="Hand"
+                            Foreground="#569CD6"
+                            Command="{Binding ConfigureActionsCommand}"
+                            Style="{DynamicResource TextBlockLikeButtonStyle}"
+                            />
+                        <Button
+                            Content="{x:Static resources:Resources.Wizard_actions_use_defaults}"
+                            Margin="25,0,0,0"
+                            FontFamily="Cascadia Code"
+                            FontWeight="Bold"
+                            Cursor="Hand"
+                            Foreground="#569CD6"
+                            Command="{Binding UseDefaultActionsCommand}"
+                            Style="{DynamicResource TextBlockLikeButtonStyle}"
+                            />
+                    </StackPanel>
+
+                    <TextBlock
+                        FontFamily="Cascadia Code"
+                        FontSize="11"
+                        TextWrapping="Wrap"
+                        Text="{x:Static resources:Resources.Wizard_actions_use_defaults_hint}"
+                        Margin="0,8,0,0"
+                        Foreground="{Binding ElementName=ThemedTextBrush, Path=Foreground}"
+                        />
+                    <TextBlock
+                        FontFamily="Cascadia Code"
+                        FontSize="11"
+                        FontWeight="Bold"
+                        TextWrapping="Wrap"
+                        Text="{Binding ActionDefaultsStatus}"
+                        Margin="0,5,0,0"
+                        Foreground="{Binding ElementName=ThemedTextBrush, Path=Foreground}"
+                        />
+                </StackPanel>
+            </ScrollViewer>
+
+            <!-- Misc settings -->
+            <ScrollViewer
+                Visibility="{Binding MiscSettingsVisibility}"
+                VerticalScrollBarVisibility="Auto"
+                HorizontalScrollBarVisibility="Disabled"
+                >
+                <StackPanel Margin="0,0,10,0">
+
+                    <Label Content="{x:Static resources:Resources.Wizard_misc_maxoutputtokens_label}" FontFamily="Cascadia Code"/>
+                    <TextBox
+                        Width="150" HorizontalAlignment="Left"
+                        FontFamily="Cascadia Code"
+                        Text="{Binding Options.Unsorted.MaxOutputTokenCount, UpdateSourceTrigger=PropertyChanged}"
+                        />
+                    <TextBlock
+                        FontFamily="Cascadia Code" FontSize="11" TextWrapping="Wrap"
+                        Text="{x:Static resources:Resources.Wizard_misc_maxoutputtokens_hint}"
+                        Margin="0,2,0,12"
+                        Foreground="{Binding ElementName=ThemedTextBrush, Path=Foreground}"
+                        />
+
+                    <Label Content="{x:Static resources:Resources.Wizard_misc_culture_label}" FontFamily="Cascadia Code"/>
+                    <TextBox
+                        Width="150" HorizontalAlignment="Left"
+                        FontFamily="Cascadia Code"
+                        Text="{Binding Options.Unsorted.OverriddenCulture, UpdateSourceTrigger=PropertyChanged}"
+                        />
+                    <TextBlock
+                        FontFamily="Cascadia Code" FontSize="11" TextWrapping="Wrap"
+                        Text="{x:Static resources:Resources.Wizard_misc_culture_hint}"
+                        Margin="0,2,0,12"
+                        Foreground="{Binding ElementName=ThemedTextBrush, Path=Foreground}"
+                        />
+
+                    <Label Content="{x:Static resources:Resources.Wizard_misc_unittestframework_label}" FontFamily="Cascadia Code"/>
+                    <TextBox
+                        Width="150" HorizontalAlignment="Left"
+                        FontFamily="Cascadia Code"
+                        Text="{Binding Options.Unsorted.PreferredUnitTestFramework, UpdateSourceTrigger=PropertyChanged}"
+                        />
+                    <TextBlock
+                        FontFamily="Cascadia Code" FontSize="11" TextWrapping="Wrap"
+                        Text="{x:Static resources:Resources.Wizard_misc_unittestframework_hint}"
+                        Margin="0,2,0,12"
+                        Foreground="{Binding ElementName=ThemedTextBrush, Path=Foreground}"
+                        />
+
+                    <Label Content="{x:Static resources:Resources.Wizard_misc_searchtimeout_label}" FontFamily="Cascadia Code"/>
+                    <TextBox
+                        Width="150" HorizontalAlignment="Left"
+                        FontFamily="Cascadia Code"
+                        Text="{Binding Options.Unsorted.AutomaticSearchForContextItemsTimeoutMsec, UpdateSourceTrigger=PropertyChanged}"
+                        />
+                    <TextBlock
+                        FontFamily="Cascadia Code" FontSize="11" TextWrapping="Wrap"
+                        Text="{x:Static resources:Resources.Wizard_misc_searchtimeout_hint}"
+                        Margin="0,2,0,12"
+                        Foreground="{Binding ElementName=ThemedTextBrush, Path=Foreground}"
+                        />
+
+                    <CheckBox
+                        Content="{x:Static resources:Resources.Wizard_misc_github_optin}"
+                        FontFamily="Cascadia Code"
+                        IsChecked="{Binding WantsGithubMcpServer}"
+                        Foreground="{Binding ElementName=ThemedTextBrush, Path=Foreground}"
+                        />
+                    <TextBlock
+                        FontFamily="Cascadia Code" FontSize="11" TextWrapping="Wrap"
+                        Text="{x:Static resources:Resources.Wizard_misc_github_optin_hint}"
+                        Margin="0,2,0,12"
+                        Foreground="{Binding ElementName=ThemedTextBrush, Path=Foreground}"
+                        />
+
+                    <StackPanel Visibility="{Binding GithubTokenVisibility}">
+                        <Label Content="{x:Static resources:Resources.Wizard_misc_github_token_label}" FontFamily="Cascadia Code"/>
+                        <TextBox
+                            Width="300" HorizontalAlignment="Left"
+                            FontFamily="Cascadia Code"
+                            Text="{Binding Options.Unsorted.GitHubToken, UpdateSourceTrigger=PropertyChanged}"
+                            />
+                        <TextBlock
+                            FontFamily="Cascadia Code" FontSize="11" TextWrapping="Wrap"
+                            Text="{x:Static resources:Resources.Wizard_misc_github_token_hint}"
+                            Margin="0,2,0,12"
+                            Foreground="{Binding ElementName=ThemedTextBrush, Path=Foreground}"
+                            />
+                    </StackPanel>
+
+                </StackPanel>
+            </ScrollViewer>
+
+            <!-- Summary -->
+            <StackPanel Visibility="{Binding SummaryVisibility}">
+                <TextBlock FontFamily="Cascadia Code" FontSize="12" Text="{Binding SummaryAgentsText}" Foreground="{Binding ElementName=ThemedTextBrush, Path=Foreground}"/>
+                <TextBlock FontFamily="Cascadia Code" FontSize="12" Text="{Binding SummaryMcpServersText}" Margin="0,5,0,0" Foreground="{Binding ElementName=ThemedTextBrush, Path=Foreground}"/>
+                <TextBlock FontFamily="Cascadia Code" FontSize="12" Text="{Binding SummaryActionsText}" Margin="0,5,0,0" Foreground="{Binding ElementName=ThemedTextBrush, Path=Foreground}"/>
+                <TextBlock
+                    FontFamily="Cascadia Code" FontSize="12" FontWeight="Bold" TextWrapping="Wrap"
+                    Foreground="Red"
+                    Text="{Binding ActionProblems}"
+                    Visibility="{Binding ActionProblemsVisibility}"
+                    Margin="0,15,0,0"
+                    />
+                <TextBlock FontFamily="Cascadia Code" FontSize="12" Text="{x:Static resources:Resources.Wizard_summary_press_finish}" Margin="0,15,0,0" FontWeight="Bold" Foreground="{Binding ElementName=ThemedTextBrush, Path=Foreground}"/>
+            </StackPanel>
+
+        </Grid>
+
+        <!-- footer -->
+        <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,10,0,0">
+            <Button
+                Content="{x:Static resources:Resources.Cancel}"
+                Margin="5,0,5,0"
+                FontFamily="Cascadia Code"
+                FontWeight="Bold"
+                Cursor="Hand"
+                Foreground="#569CD6"
+                Command="{Binding CancelCommand}"
+                Style="{DynamicResource TextBlockLikeButtonStyle}"
+                />
+            <Button
+                Content="{x:Static resources:Resources.Wizard_back}"
+                Margin="5,0,5,0"
+                FontFamily="Cascadia Code"
+                FontWeight="Bold"
+                Cursor="Hand"
+                Foreground="#569CD6"
+                Visibility="{Binding BackButtonVisibility}"
+                Command="{Binding BackCommand}"
+                Style="{DynamicResource TextBlockLikeButtonStyle}"
+                />
+            <Button
+                Content="{x:Static resources:Resources.Wizard_next}"
+                Margin="5,0,5,0"
+                FontFamily="Cascadia Code"
+                FontWeight="Bold"
+                Cursor="Hand"
+                Foreground="#569CD6"
+                Visibility="{Binding NextButtonVisibility}"
+                Command="{Binding NextCommand}"
+                Style="{DynamicResource TextBlockLikeButtonStyle}"
+                />
+            <Button
+                Content="{x:Static resources:Resources.Wizard_finish}"
+                Margin="5,0,5,0"
+                FontFamily="Cascadia Code"
+                FontWeight="Bold"
+                Cursor="Hand"
+                Foreground="#569CD6"
+                Visibility="{Binding FinishButtonVisibility}"
+                Command="{Binding FinishCommand}"
+                Style="{DynamicResource TextBlockLikeButtonStyle}"
+                />
+        </StackPanel>
+
+    </Grid>
+</Window>

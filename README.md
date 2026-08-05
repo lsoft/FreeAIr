@@ -129,6 +129,17 @@ Are you a contributor rather than a user? Then [ARCHITECTURE.md](ARCHITECTURE.md
 - Install the extension through the [Visual Studio Marketplace](https://marketplace.visualstudio.com/items?itemName=lsoft.FreeAIr).
 - If you want to use local inference, run your model and get its `endpoint`, `token` and model name.
 - Run `Visual Studio` and open your solution.
+- The first time FreeAIr runs, an info bar offers the setup wizard - use it to replace the shipped
+  sample configuration with your own agents, MCP servers and actions, step by step, with each step
+  explaining what it configures and why. On a first run it guides you through creating one agent
+  field by field, checks its endpoint is reachable, and lets you store the token as a reference to
+  an environment variable instead of pasting it. Its actions page warns about any action bound to an
+  agent that no longer exists, and offers a `Use default values` button that restores the shipped
+  prompt library bound to your first agent. Whole line completion is switched on and off on that
+  same page: while it is off its action is left alone, and once you turn it on it is bound and
+  checked like any other. The MCP servers page can add the Microsoft Learn documentation server with
+  a single checkbox. The wizard can also be opened any time later from
+  `Extensions` -> `FreeAIr` -> `Open setup wizard...`; nothing is written until its last page.
 - Click `Extensions` -> `FreeAIr` -> `Open control center`.
 - In the window that opens, click `Edit agents`.
 - Select any agent (for example, `Yandex General`) and configure `endpoint`, `token`, `chosen model`. You can also fix the system prompt, but first use the `Replace with general system prompt` button.

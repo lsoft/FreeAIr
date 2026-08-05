@@ -10,6 +10,8 @@ looking for the user manual, read the [README](README.md) instead.
 | `FreeAIr` | .NET Framework 4.8 (VSIX) | The extension itself: package, commands, tool windows, chats, options, MCP client side. |
 | `FreeAIr.Search` | netstandard2.0 | The searching machinery that does not need Visual Studio: index format, vector codec, outline tree, ranking, and the `Grep/` text matching behind the SearchFileContent MCP tool. |
 | `FreeAIr.Search.Tests` | .NET 8 (xunit) | Unit tests of `FreeAIr.Search`. Not shipped. |
+| `SetupWizard` (`FreeAIr.SetupWizard`) | netstandard2.0 | The first-run setup wizard's logic that does not need Visual Studio or WPF: step navigation/skipping, the agent-field validator, the known-endpoint catalog. |
+| `SetupWizard.Tests` (`FreeAIr.SetupWizard.Tests`) | .NET 8 (xunit) | Unit tests of `FreeAIr.SetupWizard`. Not shipped. |
 | `MCP/Proxy` | .NET 9 (exe) | Out-of-process host for MCP servers. Shipped inside the VSIX as `.art/Proxy.zip` and unpacked on first run. |
 | `MCP/Dto` | netstandard | Request/reply contracts of the JSON-RPC channel between `FreeAIr` and `Proxy.exe`. |
 | `CodeLens` | .NET Framework 4.8 | CodeLens data point provider. Runs in the separate Visual Studio CodeLens process. |
@@ -215,6 +217,55 @@ prompt template before it is sent.
 - `UI/ClickableText` — renders parsed markdown blocks with the per-block action buttons.
 - `ViewElementFactory.cs` — converts `CodeLensUnitInfo` coming from the CodeLens process into a
   WPF control.
+
+### Setup wizard
+
+`UI/Wizard/SetupWizardWindow` + `UI/ViewModels/SetupWizardViewModel` are the first-run wizard that
+replaces `FreeAIrOptions` with one the user builds step by step, opened by
+`Commands/Other/OpenSetupWizardCommand` and, on a first run, by the info bar
+`InfoBar/SetupWizardInfoBarService` wires up (gated on `InternalPage.SetupWizardIntroduced`).
+
+Its step sequencing (`WizardNavigator`, skipping the "starting point" step on a first run), its
+agent-field validation and its known-endpoint catalog live in the separate `SetupWizard` project
+instead of `FreeAIr` itself, for the same reason `FreeAIr.Search` is split out: `FreeAIr` is a
+legacy net48 VSIX project with no test runner attached, so anything worth unit testing has to live
+somewhere an ordinary `dotnet test` can reach (see `SetupWizard.Tests`). That project carries no
+resources, so `WizardValidator` reports its findings as enum codes (`AgentFieldProblem`,
+`ActionBindingProblem`) which `SetupWizardViewModel.Describe` turns into the localized sentences the
+user reads — every string the window shows comes from `FreeAIr\Resources\Resources.resx` and its
+`.ru`/`.zh-Hans` satellites, like the rest of the product.
+
+The wizard does not reimplement editors that already exist: its MCP servers and actions steps open
+`McpServerConfigureWindow`/`ActionConfigureWindow` directly (against a clone of the relevant
+`FreeAIrOptions` node, so a cancelled sub-dialog leaves the wizard untouched). The MCP servers step
+adds one checkbox of its own for the Microsoft Learn documentation server, which is a plain HTTP
+endpoint and therefore needs no download: `WantsMsdnMcpServer` writes and removes the same entry the
+control center's install command writes, both reading its name and endpoint from
+`KnownMcpServerCatalog` in the `SetupWizard` project. The checkbox derives its state from the
+options rather than from a field, so a server added in the editor next to it shows up ticked. Two
+further places are custom because nothing equivalent exists elsewhere:
+
+- On a **first run** the agents step wipes the shipped placeholder agents and walks the user through
+  creating one of their own field by field, each with its own explanation, an endpoint reachability
+  check (`TestEndpointCommand`, the same `GetModelsAsync` call the model picker makes) and a choice
+  between a literal token and an environment-variable reference. On a later run it is the ordinary
+  multi-agent list editor instead.
+- The **actions step** cross-checks every action's `AgentName` against the agents that now exist
+  (`WizardValidator.ValidateActionAgentBindings`) and shows the strays in red, since renaming or
+  deleting an agent silently strands the actions naming it. `UseDefaultActionsCommand` rebuilds the
+  list from `SupportCollectionJson`'s shipped defaults bound to the first agent. The step also
+  carries the `IsImplicitWholeLineCompletionEnabled` switch, which lives here rather than among the
+  other settings because it is what makes the `WholeLineCompletion` action live or dormant: while it
+  is off that action is neither bound by the defaults button nor reported by the validator (the
+  `wholeLineCompletionEnabled` argument of `ValidateActionAgentBindings`), because nothing invokes
+  it. Turning it on both binds it and starts warning when it has no agent — which is what the
+  feature needs, since it fires on every keystroke and `ProposalSource` refuses to run without one.
+
+Nothing in the wizard is allowed to throw into WPF's dispatcher: `SetupWizardViewModel.Guarded` /
+`GuardedAsync` wrap every command body, and `OpenSetupWizardCommand.ShowAsync`, `Window_Loaded`,
+`SetupWizardInfoBarService.OnActionItemClicked` and `ShowSetupWizardInfoBarIfNeeded` each catch,
+log to the activity log, and report. A modal dialog runs inside `devenv`, so an unhandled exception
+there ends Visual Studio rather than the wizard.
 
 ## Building
 

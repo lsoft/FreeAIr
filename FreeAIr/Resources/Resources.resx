@@ -1206,4 +1206,320 @@ Post-processing is the processing of a recognized prompt via an LLM call. For ex
     <value>Low</value>
     <comment>Used in FreeAIr\UI\ViewModels document</comment>
   </data>
+  <data name="Wizard_title" xml:space="preserve">
+    <value>FreeAIr setup wizard</value>
+    <comment>Used in the FreeAIr setup wizard.</comment>
+  </data>
+  <data name="Wizard_back" xml:space="preserve">
+    <value>Back</value>
+    <comment>Used in the FreeAIr setup wizard.</comment>
+  </data>
+  <data name="Wizard_next" xml:space="preserve">
+    <value>Next</value>
+    <comment>Used in the FreeAIr setup wizard.</comment>
+  </data>
+  <data name="Wizard_finish" xml:space="preserve">
+    <value>Finish</value>
+    <comment>Used in the FreeAIr setup wizard.</comment>
+  </data>
+  <data name="Wizard_cancel_confirm" xml:space="preserve">
+    <value>This closes the setup wizard without saving anything. Continue?</value>
+    <comment>Used in the FreeAIr setup wizard.</comment>
+  </data>
+  <data name="Wizard_step_welcome_title" xml:space="preserve">
+    <value>Welcome to the FreeAIr setup wizard</value>
+    <comment>Used in the FreeAIr setup wizard.</comment>
+  </data>
+  <data name="Wizard_step_welcome_description" xml:space="preserve">
+    <value>This wizard replaces FreeAIr's current configuration with one you build yourself, step by step. Nothing is written until you reach the last page and press Finish - you can cancel at any point before that and nothing changes.</value>
+    <comment>Used in the FreeAIr setup wizard.</comment>
+  </data>
+  <data name="Wizard_step_startingpoint_title" xml:space="preserve">
+    <value>Starting point</value>
+    <comment>Used in the FreeAIr setup wizard.</comment>
+  </data>
+  <data name="Wizard_step_startingpoint_description" xml:space="preserve">
+    <value>Choose what to start editing from: the built-in sample configuration (placeholder agents and the shipped prompt library), a completely blank configuration, or this install's current configuration.</value>
+    <comment>Used in the FreeAIr setup wizard.</comment>
+  </data>
+  <data name="Wizard_step_agents_title" xml:space="preserve">
+    <value>Agents</value>
+    <comment>Used in the FreeAIr setup wizard.</comment>
+  </data>
+  <data name="Wizard_step_agents_description" xml:space="preserve">
+    <value>An agent is one LLM you can talk to: where to reach it (its endpoint), how to authenticate (its token), which model to ask for, and the system prompt it answers under. Chats and actions pick an agent by name. Pick a known local or cloud endpoint from the list or type your own; a token can be stored directly or, better for anything you might commit, as a reference to an environment variable.</value>
+    <comment>Used in the FreeAIr setup wizard.</comment>
+  </data>
+  <data name="Wizard_step_mcpservers_title" xml:space="preserve">
+    <value>MCP servers</value>
+    <comment>Used in the FreeAIr setup wizard.</comment>
+  </data>
+  <data name="Wizard_step_mcpservers_description" xml:space="preserve">
+    <value>MCP servers give your agents extra tools - reading a repository, searching documentation, and so on. Configure them the same way you would from the Control Center, including searching Docker Hub for ready-made servers.</value>
+    <comment>Used in the FreeAIr setup wizard.</comment>
+  </data>
+  <data name="Wizard_step_actions_title" xml:space="preserve">
+    <value>Actions</value>
+    <comment>Used in the FreeAIr setup wizard.</comment>
+  </data>
+  <data name="Wizard_step_actions_description" xml:space="preserve">
+    <value>Actions are the prompts FreeAIr offers in its menus. Each one names the agent that answers it, so an action pointing at an agent you did not create cannot run.</value>
+    <comment>Used in the FreeAIr setup wizard.</comment>
+  </data>
+  <data name="Wizard_step_miscsettings_title" xml:space="preserve">
+    <value>Other settings</value>
+    <comment>Used in the FreeAIr setup wizard.</comment>
+  </data>
+  <data name="Wizard_step_miscsettings_description" xml:space="preserve">
+    <value>A few settings that have not earned a page of their own: output length, answer language, the unit test framework used for generation, and the built-in GitHub MCP server.</value>
+    <comment>Used in the FreeAIr setup wizard.</comment>
+  </data>
+  <data name="Wizard_step_summary_title" xml:space="preserve">
+    <value>Summary</value>
+    <comment>Used in the FreeAIr setup wizard.</comment>
+  </data>
+  <data name="Wizard_step_summary_description" xml:space="preserve">
+    <value>Everything below is what will be written when you press Finish.</value>
+    <comment>Used in the FreeAIr setup wizard.</comment>
+  </data>
+  <data name="Wizard_welcome_overwrite_warning" xml:space="preserve">
+    <value>This will replace the agents, MCP servers, actions and other settings currently configured for FreeAIr.</value>
+    <comment>Used in the FreeAIr setup wizard.</comment>
+  </data>
+  <data name="Wizard_welcome_destination_header" xml:space="preserve">
+    <value>The configuration will be written to:</value>
+    <comment>Used in the FreeAIr setup wizard.</comment>
+  </data>
+  <data name="Wizard_welcome_destination_vs_store" xml:space="preserve">
+    <value>Visual Studio's internal option store (no solution is open, so there is no .freeair folder to write into).</value>
+    <comment>Used in the FreeAIr setup wizard.</comment>
+  </data>
+  <data name="Wizard_startingpoint_defaults" xml:space="preserve">
+    <value>Built-in sample configuration</value>
+    <comment>Used in the FreeAIr setup wizard.</comment>
+  </data>
+  <data name="Wizard_startingpoint_blank" xml:space="preserve">
+    <value>Blank - start from nothing</value>
+    <comment>Used in the FreeAIr setup wizard.</comment>
+  </data>
+  <data name="Wizard_startingpoint_existing" xml:space="preserve">
+    <value>This install's current configuration</value>
+    <comment>Used in the FreeAIr setup wizard.</comment>
+  </data>
+  <data name="Wizard_agent_guided_intro" xml:space="preserve">
+    <value>FreeAIr's placeholder sample agents have been removed. Fill in one agent of your own below - you can add more later from the Control Center.</value>
+    <comment>Used in the FreeAIr setup wizard.</comment>
+  </data>
+  <data name="Wizard_agent_name_hint" xml:space="preserve">
+    <value>A short label of your choosing. Chats and actions pick an agent to talk to by this name.</value>
+    <comment>Used in the FreeAIr setup wizard.</comment>
+  </data>
+  <data name="Wizard_agent_endpoint_hint" xml:space="preserve">
+    <value>The OpenAI-compatible base URL of the server that runs the model - a local one such as LM Studio, or a cloud provider. Pick a known address from the list, type your own, or press the test button to check it is reachable before moving on.</value>
+    <comment>Used in the FreeAIr setup wizard.</comment>
+  </data>
+  <data name="Wizard_agent_token_hint" xml:space="preserve">
+    <value>A local server such as LM Studio usually needs no token - leave this empty. A cloud provider needs an API key: either paste it directly, or check the box and give the name of an environment variable that already holds it, so the token itself never ends up in a committed settings file.</value>
+    <comment>Used in the FreeAIr setup wizard.</comment>
+  </data>
+  <data name="Wizard_agent_model_hint" xml:space="preserve">
+    <value>The model id this agent asks the endpoint for, e.g. the name shown by the server's own model list.</value>
+    <comment>Used in the FreeAIr setup wizard.</comment>
+  </data>
+  <data name="Wizard_agent_contextsize_hint" xml:space="preserve">
+    <value>The model's context window in tokens - how much conversation and code FreeAIr may send in one request. Check the model's own documentation if unsure.</value>
+    <comment>Used in the FreeAIr setup wizard.</comment>
+  </data>
+  <data name="Wizard_agent_systemprompt_hint" xml:space="preserve">
+    <value>What this agent is told before every conversation - its persona and ground rules. Leave it as-is if unsure; it can be edited later.</value>
+    <comment>Used in the FreeAIr setup wizard.</comment>
+  </data>
+  <data name="Wizard_agent_known_endpoint_tooltip" xml:space="preserve">
+    <value>Pick a known endpoint</value>
+    <comment>Used in the FreeAIr setup wizard.</comment>
+  </data>
+  <data name="Wizard_agent_use_env_variable" xml:space="preserve">
+    <value>use an environment variable</value>
+    <comment>Used in the FreeAIr setup wizard.</comment>
+  </data>
+  <data name="Wizard_agent_test_connection" xml:space="preserve">
+    <value>Test connection</value>
+    <comment>Used in the FreeAIr setup wizard.</comment>
+  </data>
+  <data name="Wizard_agent_test_checking" xml:space="preserve">
+    <value>Checking...</value>
+    <comment>Used in the FreeAIr setup wizard.</comment>
+  </data>
+  <data name="Wizard_agent_test_invalid_uri" xml:space="preserve">
+    <value>Not a valid URL - it must include a protocol, e.g. http://localhost:1234/v1.</value>
+    <comment>Used in the FreeAIr setup wizard.</comment>
+  </data>
+  <data name="Wizard_agent_test_reachable" xml:space="preserve">
+    <value>Reachable - {0} model(s) reported.</value>
+    <comment>Used in the FreeAIr setup wizard.</comment>
+  </data>
+  <data name="Wizard_agent_test_failed" xml:space="preserve">
+    <value>Could not reach this endpoint: {0}</value>
+    <comment>Used in the FreeAIr setup wizard.</comment>
+  </data>
+  <data name="Wizard_agent_problem_missing_name" xml:space="preserve">
+    <value>The agent needs a name.</value>
+    <comment>Used in the FreeAIr setup wizard.</comment>
+  </data>
+  <data name="Wizard_agent_problem_invalid_endpoint" xml:space="preserve">
+    <value>The endpoint must be a valid absolute URI, e.g. http://localhost:1234/v1.</value>
+    <comment>Used in the FreeAIr setup wizard.</comment>
+  </data>
+  <data name="Wizard_agent_problem_invalid_token" xml:space="preserve">
+    <value>The token must be empty, a literal value, or an environment-variable reference in the {{$VAR_NAME}} form.</value>
+    <comment>Used in the FreeAIr setup wizard.</comment>
+  </data>
+  <data name="Wizard_agent_problem_context_size" xml:space="preserve">
+    <value>The context size must be greater than zero.</value>
+    <comment>Used in the FreeAIr setup wizard.</comment>
+  </data>
+  <data name="Wizard_agent_unnamed" xml:space="preserve">
+    <value>(unnamed agent)</value>
+    <comment>Used in the FreeAIr setup wizard.</comment>
+  </data>
+  <data name="Wizard_mcp_count" xml:space="preserve">
+    <value>{0} MCP server(s) currently configured.</value>
+    <comment>Used in the FreeAIr setup wizard.</comment>
+  </data>
+  <data name="Wizard_mcp_configure" xml:space="preserve">
+    <value>Configure MCP servers...</value>
+    <comment>Used in the FreeAIr setup wizard.</comment>
+  </data>
+  <data name="Wizard_mcp_msdn_optin" xml:space="preserve">
+    <value>Install the Microsoft Learn documentation MCP server</value>
+    <comment>Used in the FreeAIr setup wizard.</comment>
+  </data>
+  <data name="Wizard_mcp_msdn_optin_hint" xml:space="preserve">
+    <value>Lets the model look answers up in the official Microsoft documentation instead of relying on what it remembers about .NET and Visual Studio. It is a public HTTP endpoint at learn.microsoft.com, so nothing is downloaded or installed on your machine and no token is needed - ticking the box only writes the server into your settings. Unticking it removes it again.</value>
+    <comment>Used in the FreeAIr setup wizard.</comment>
+  </data>
+  <data name="Wizard_actions_count" xml:space="preserve">
+    <value>{0} action(s) currently configured.</value>
+    <comment>Used in the FreeAIr setup wizard.</comment>
+  </data>
+  <data name="Wizard_actions_configure" xml:space="preserve">
+    <value>Configure actions...</value>
+    <comment>Used in the FreeAIr setup wizard.</comment>
+  </data>
+  <data name="Wizard_actions_what_is_it" xml:space="preserve">
+    <value>An action is a named prompt FreeAIr offers in a menu: it says which agent answers it, what to ask, and where it appears - the context menu of a code selection, the solution tree, the build error window, the commit message box.</value>
+    <comment>Used in the FreeAIr setup wizard.</comment>
+  </data>
+  <data name="Wizard_actions_examples" xml:space="preserve">
+    <value>For example: "Explain code" on a selected block, "Add XML comments" on a file, "Generate unit tests" in the solution tree, "Fix build error" in the error list, "Build commit message" from a git diff.</value>
+    <comment>Used in the FreeAIr setup wizard.</comment>
+  </data>
+  <data name="Wizard_actions_use_defaults" xml:space="preserve">
+    <value>Use default values</value>
+    <comment>Used in the FreeAIr setup wizard.</comment>
+  </data>
+  <data name="Wizard_actions_use_defaults_hint" xml:space="preserve">
+    <value>Rebuilds the action list from the ones FreeAIr ships with and binds every one of them to your first agent. Whole line completion is bound only when the checkbox above is ticked - it runs on every keystroke, so it must be enabled deliberately.</value>
+    <comment>Used in the FreeAIr setup wizard.</comment>
+  </data>
+  <data name="Wizard_actions_wholeline" xml:space="preserve">
+    <value>Run whole line completion automatically as you type</value>
+    <comment>Used in the FreeAIr setup wizard.</comment>
+  </data>
+  <data name="Wizard_actions_wholeline_hint" xml:space="preserve">
+    <value>With this on, FreeAIr asks the model for the rest of the line after every pause in typing and shows the answer as the grey suggestion ahead of the caret - that is one request per pause. With it off the whole line completion action is dormant: the button below does not bind it to an agent, and it is not reported as a problem. Either way you can ask for a suggestion explicitly with Alt+A.</value>
+    <comment>Used in the FreeAIr setup wizard.</comment>
+  </data>
+  <data name="Wizard_actions_defaults_need_an_agent" xml:space="preserve">
+    <value>Create an agent first: the default actions are bound to your first agent.</value>
+    <comment>Used in the FreeAIr setup wizard.</comment>
+  </data>
+  <data name="Wizard_actions_defaults_applied" xml:space="preserve">
+    <value>{0} default action(s) restored and bound to the agent "{1}".</value>
+    <comment>Used in the FreeAIr setup wizard.</comment>
+  </data>
+  <data name="Wizard_actions_problems_header" xml:space="preserve">
+    <value>These actions cannot run as configured:</value>
+    <comment>Used in the FreeAIr setup wizard.</comment>
+  </data>
+  <data name="Wizard_actions_problem_no_agent" xml:space="preserve">
+    <value>"{0}" names no agent, so FreeAIr will ask which one to use every time it is invoked.</value>
+    <comment>Used in the FreeAIr setup wizard.</comment>
+  </data>
+  <data name="Wizard_actions_problem_unknown_agent" xml:space="preserve">
+    <value>"{0}" is bound to the agent "{1}", which does not exist in this configuration.</value>
+    <comment>Used in the FreeAIr setup wizard.</comment>
+  </data>
+  <data name="Wizard_misc_maxoutputtokens_label" xml:space="preserve">
+    <value>Max output tokens</value>
+    <comment>Used in the FreeAIr setup wizard.</comment>
+  </data>
+  <data name="Wizard_misc_maxoutputtokens_hint" xml:space="preserve">
+    <value>The maximum number of tokens an agent's answer may run to.</value>
+    <comment>Used in the FreeAIr setup wizard.</comment>
+  </data>
+  <data name="Wizard_misc_culture_label" xml:space="preserve">
+    <value>Answer culture override (e.g. ru-RU)</value>
+    <comment>Used in the FreeAIr setup wizard.</comment>
+  </data>
+  <data name="Wizard_misc_culture_hint" xml:space="preserve">
+    <value>Forces answers into a specific language or culture regardless of your Visual Studio UI language. Leave empty to let the agent decide.</value>
+    <comment>Used in the FreeAIr setup wizard.</comment>
+  </data>
+  <data name="Wizard_misc_unittestframework_label" xml:space="preserve">
+    <value>Preferred unit test framework</value>
+    <comment>Used in the FreeAIr setup wizard.</comment>
+  </data>
+  <data name="Wizard_misc_unittestframework_hint" xml:space="preserve">
+    <value>Named in the prompt used by the "generate unit tests" action, e.g. xunit, nunit or mstest.</value>
+    <comment>Used in the FreeAIr setup wizard.</comment>
+  </data>
+  <data name="Wizard_misc_searchtimeout_label" xml:space="preserve">
+    <value>Context-item search timeout (msec)</value>
+    <comment>Used in the FreeAIr setup wizard.</comment>
+  </data>
+  <data name="Wizard_misc_searchtimeout_hint" xml:space="preserve">
+    <value>How long FreeAIr searches the solution for related files and symbols to attach to a request before giving up.</value>
+    <comment>Used in the FreeAIr setup wizard.</comment>
+  </data>
+  <data name="Wizard_misc_github_optin" xml:space="preserve">
+    <value>Install and use the built-in GitHub MCP server</value>
+    <comment>Used in the FreeAIr setup wizard.</comment>
+  </data>
+  <data name="Wizard_misc_github_optin_hint" xml:space="preserve">
+    <value>Lets agents read repositories, issues and pull requests on github.com through a downloaded MCP server. Nothing GitHub-related is set up unless this is checked; the server itself still needs installing afterwards from the Control Center.</value>
+    <comment>Used in the FreeAIr setup wizard.</comment>
+  </data>
+  <data name="Wizard_misc_github_token_label" xml:space="preserve">
+    <value>GitHub MCP server token</value>
+    <comment>Used in the FreeAIr setup wizard.</comment>
+  </data>
+  <data name="Wizard_misc_github_token_hint" xml:space="preserve">
+    <value>A github.com personal access token. Either paste it directly, or write it as {{$MY_VAR}} to read it from the MY_VAR environment variable instead (restart Visual Studio after setting it).</value>
+    <comment>Used in the FreeAIr setup wizard.</comment>
+  </data>
+  <data name="Wizard_summary_agents" xml:space="preserve">
+    <value>Agents: {0}</value>
+    <comment>Used in the FreeAIr setup wizard.</comment>
+  </data>
+  <data name="Wizard_summary_mcpservers" xml:space="preserve">
+    <value>MCP servers: {0}</value>
+    <comment>Used in the FreeAIr setup wizard.</comment>
+  </data>
+  <data name="Wizard_summary_actions" xml:space="preserve">
+    <value>Actions: {0}</value>
+    <comment>Used in the FreeAIr setup wizard.</comment>
+  </data>
+  <data name="Wizard_summary_press_finish" xml:space="preserve">
+    <value>Press Finish to write this configuration.</value>
+    <comment>Used in the FreeAIr setup wizard.</comment>
+  </data>
+  <data name="Wizard_infobar_message" xml:space="preserve">
+    <value>FreeAIr ships with a sample configuration meant for editing, not for daily use.</value>
+    <comment>Used in the FreeAIr setup wizard.</comment>
+  </data>
+  <data name="Wizard_infobar_open" xml:space="preserve">
+    <value>Open release notes and the setup wizard</value>
+    <comment>Used in the FreeAIr setup wizard.</comment>
+  </data>
 </root>

@@ -1,4 +1,5 @@
 ﻿using FreeAIr.Helper;
+using FreeAIr.SetupWizard.Helper;
 using System.ComponentModel;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
@@ -150,7 +151,7 @@ namespace FreeAIr.Options2.Agent
         /// </summary>
         public AgentTechnical()
         {
-            Endpoint = "http://localhost:5001/v1";
+            Endpoint = FreeAIr.SetupWizard.Catalog.KnownEndpointCatalog.KoboldCppEndpoint;
             Token = string.Empty;
             ChosenModel = string.Empty;
             ContextSize = 8192;

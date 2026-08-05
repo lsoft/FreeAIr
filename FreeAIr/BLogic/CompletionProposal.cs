@@ -94,7 +94,8 @@ namespace FreeAIr.BLogic
                 var caretPosition = caret.Position.Position;
 
                 return await CreateProposalSourceAsync(
-                    caretPosition
+                    caretPosition,
+                    invokedExplicitly: false
                     );
             }
             catch (OperationCanceledException)
@@ -117,7 +118,8 @@ namespace FreeAIr.BLogic
         /// exception here would interrupt the user rather than help them.
         /// </summary>
         public async Task<ProposalCollectionBase?> CreateProposalSourceAsync(
-            int caretPosition
+            int caretPosition,
+            bool invokedExplicitly = false
             )
         {
             try
@@ -125,7 +127,8 @@ namespace FreeAIr.BLogic
                 var options = await FreeAIrOptions.DeserializeAsync();
 
                 //the feature needs an action wired to a named agent; without one there is nothing
-                //to ask, and the complaint is worth showing only if the user believes it is enabled
+                //to ask, and the complaint is only shown when the user asked for a suggestion and
+                //is waiting for it (see ReportNotConfiguredAsync)
                 var support = await FreeAIrOptions.DeserializeSupportCollectionAsync();
                 var action = support.Actions.FirstOrDefault(
                     a =>
@@ -134,19 +137,18 @@ namespace FreeAIr.BLogic
                         );
                 if (action is null)
                 {
-                    if (!options.Unsorted.IsImplicitWholeLineCompletionEnabled)
-                    {
-                        await VS.MessageBox.ShowErrorAsync(
-                            $"No support action for {SupportScopeEnum.WholeLineCompletion} and with non empty agent name was defined."
-                            );
-                    }
+                    await ReportNotConfiguredAsync(
+                        $"No support action for {SupportScopeEnum.WholeLineCompletion} and with non empty agent name was defined.",
+                        invokedExplicitly
+                        );
                     return null;
                 }
                 var chosenAgent = options.AgentCollection.Agents.FirstOrDefault(a => a.Name == action.AgentName);
                 if (chosenAgent is null)
                 {
-                    await VS.MessageBox.ShowErrorAsync(
-                        $"No agent with name {action.AgentName} was found. Check the whole line completion action."
+                    await ReportNotConfiguredAsync(
+                        $"No agent with name {action.AgentName} was found. Check the whole line completion action.",
+                        invokedExplicitly
                         );
                     return null;
                 }
@@ -240,6 +242,31 @@ namespace FreeAIr.BLogic
             }
 
             return ProposalFactory.CreateEmptyCollection();
+        }
+
+        /// <summary>
+        /// Reports that whole line completion is not wired up — no action carries the scope, or the
+        /// action names an agent which does not exist.
+        ///
+        /// A modal dialog is only shown when the user pressed the keyboard shortcut and is waiting
+        /// for a suggestion. On the implicit path this method is reached after every pause in
+        /// typing, so a dialog there would reappear over and over and block whatever the user is
+        /// doing next — including the setup wizard, which is where the shipped
+        /// `agent_name_must_be_set` placeholder used to interrupt a brand new install. The Activity
+        /// Log gets it either way, and the wizard and the control center both show the same broken
+        /// binding in red where the user can actually fix it.
+        /// </summary>
+        private static async Task ReportNotConfiguredAsync(
+            string message,
+            bool invokedExplicitly
+            )
+        {
+            ActivityLogHelper.ActivityLogWarning(message);
+
+            if (invokedExplicitly)
+            {
+                await VS.MessageBox.ShowErrorAsync(message);
+            }
         }
     }
 

@@ -48,8 +48,11 @@ namespace FreeAIr.Commands
 
             var caretPosition = textView.Caret.Position.BufferPosition;
 
+            //the user asked for a suggestion and is waiting for it, so a misconfigured whole line
+            //completion is worth an error dialog here - unlike on the implicit typing path
             var proposalCollection = await proposalSource.CreateProposalSourceAsync(
-                caretPosition
+                caretPosition,
+                invokedExplicitly: true
                 );
 
             await SuggestionHijackHelper.ShowAutocompleteAsync(

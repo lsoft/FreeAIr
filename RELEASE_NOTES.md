@@ -25,6 +25,25 @@ My others extensions lives [here](https://marketplace.visualstudio.com/publisher
 
 ## 4.3.0
 
+- A first-run setup wizard replaces the trial-and-error of hand-editing the settings file: it walks
+  through agents, MCP servers, actions and the remaining settings, explains what each of them is
+  for, and writes nothing until the last page. Open it any time from
+  `Extensions > FreeAIr > Open setup wizard...`. On a brand new install, an info bar offers it
+  alongside the release notes the first time FreeAIr runs. It is fully localized, like the rest of
+  the product.
+  - On a first run it removes the shipped placeholder agents and guides you through creating one of
+    your own field by field, with an explanation under each, a "test connection" check for the
+    endpoint, and a choice between pasting a token and pointing at an environment variable that
+    holds it.
+  - The actions page explains what an action is, gives examples, and warns in red about any action
+    bound to an agent that does not exist - which is what happens after renaming or deleting one. A
+    `Use default values` button restores the shipped prompt library bound to your first agent.
+  - The `run whole line completion as you type` switch sits on that same page, because it is what
+    decides whether the whole line completion action is live or dormant: while it is off the action
+    is neither bound by the defaults button nor reported as a problem, and ticking it does both.
+  - The Microsoft Learn documentation MCP server is one checkbox away on the MCP servers page - it
+    is a public HTTP endpoint, so nothing is downloaded and no token is needed.
+  - The GitHub MCP server is opt-in: nothing asks for a GitHub token until you tick the box.
 - The `Use RAG` checkbox of the natural language search is implemented. The search now takes the
   files whose outlines are the closest to the query and asks the LLM about those only, instead of
   reading through the whole solution.
@@ -41,6 +60,10 @@ My others extensions lives [here](https://marketplace.visualstudio.com/publisher
   shared between the tool and the search instead of being loaded twice.
 - Fixed an agent with no token being unusable for embeddings, which is how a local embedding server
   is normally configured.
+- Whole line completion no longer opens an error dialog on every pause in typing when its action is
+  not wired to an existing agent. The complaint now goes to the Activity Log, and is shown as a
+  dialog only when you asked for a suggestion yourself with the keyboard shortcut. The broken
+  binding is still reported in red by the setup wizard, where it can be fixed.
 - The `Use RAG` search no longer has a similarity threshold to guess. Every index build now measures
   what a query with no answer scores on your model and your solution, and the new `Sensitivity`
   setting says how far above that measured level a file has to stand — one value which keeps its
