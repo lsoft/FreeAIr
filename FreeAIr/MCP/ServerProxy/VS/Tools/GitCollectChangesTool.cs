@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 
 namespace FreeAIr.MCP.McpServerProxy.VS.Tools
 {
+    /// <summary>The `GitCollectChanges` MCP tool: hands the model the current uncommitted diff, e.g. so it can write a commit message before calling <see cref="GitCommitTool"/>.</summary>
     public sealed class GitCollectChangesTool : VisualStudioMcpServerTool
     {
         public static readonly GitCollectChangesTool Instance = new();
@@ -21,6 +22,7 @@ namespace FreeAIr.MCP.McpServerProxy.VS.Tools
         {
         }
 
+        /// <summary>Collects the uncommitted diff via <see cref="GitDiffCollector.CollectDiffAsync"/>.</summary>
         public override async Task<McpServerProxyToolCallResult?> CallToolAsync(
             string toolName,
             IReadOnlyDictionary<string, object?>? arguments = null,

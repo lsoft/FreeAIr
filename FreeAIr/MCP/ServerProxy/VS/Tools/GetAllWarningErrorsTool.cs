@@ -7,6 +7,11 @@ using System.Threading.Tasks;
 
 namespace FreeAIr.MCP.McpServerProxy.VS.Tools
 {
+    /// <summary>
+    /// The `GetAllWarningErrors` MCP tool: reports the solution's current build errors and warnings
+    /// as JSON without triggering a build, unlike <see cref="BuildAndReturnBuildResultsTool"/> -
+    /// cheap to call repeatedly while a model is iterating on a fix.
+    /// </summary>
     public sealed class GetAllWarningErrorsTool : VisualStudioMcpServerTool
     {
         public static readonly GetAllWarningErrorsTool Instance = new();
@@ -23,6 +28,7 @@ namespace FreeAIr.MCP.McpServerProxy.VS.Tools
         {
         }
 
+        /// <summary>Serializes the build items <see cref="BuildResultProvider"/> already has cached, without rebuilding.</summary>
         public override async Task<McpServerProxyToolCallResult?> CallToolAsync(
             string toolName,
             IReadOnlyDictionary<string, object?>? arguments = null,
@@ -53,6 +59,7 @@ namespace FreeAIr.MCP.McpServerProxy.VS.Tools
             return McpServerProxyToolCallResult.CreateSuccess(result);
         }
 
+        /// <summary>The tool's JSON result: the flat list of build items for the whole solution.</summary>
         private sealed class BuildInformationsJson
         {
             public BuildInformationJson[] SolutionItems
@@ -62,6 +69,7 @@ namespace FreeAIr.MCP.McpServerProxy.VS.Tools
             }
         }
 
+        /// <summary>One build error or warning: its kind, message and source location.</summary>
         private sealed class BuildInformationJson
         {
             public string Description

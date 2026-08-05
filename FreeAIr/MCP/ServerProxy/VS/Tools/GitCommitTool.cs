@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace FreeAIr.MCP.McpServerProxy.VS.Tools
 {
+    /// <summary>The `GitCommit` MCP tool: commits the solution's current changes with a model-supplied message, through <see cref="GitRunner"/>.</summary>
     public sealed class GitCommitTool : VisualStudioMcpServerTool
     {
         public static readonly GitCommitTool Instance = new();
@@ -34,6 +35,7 @@ namespace FreeAIr.MCP.McpServerProxy.VS.Tools
         {
         }
 
+        /// <summary>Runs `git commit` with the requested message via <see cref="GitRunner.CommitAsync"/>.</summary>
         public override async Task<McpServerProxyToolCallResult?> CallToolAsync(
             string toolName,
             IReadOnlyDictionary<string, object?>? arguments = null,

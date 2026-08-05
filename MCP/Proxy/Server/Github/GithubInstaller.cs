@@ -4,6 +4,11 @@ using System.Net.Http.Json;
 
 namespace Proxy.Server.Github
 {
+    /// <summary>
+    /// Downloads and unpacks the official `github-mcp-server` executable from its GitHub Releases
+    /// page the first time the GitHub MCP server is used, so the user never has to install it by
+    /// hand.
+    /// </summary>
     public static class GithubInstaller
     {
         public const string AssetsUrl = "https://api.github.com/repos/github/github-mcp-server/releases/latest";
@@ -12,6 +17,7 @@ namespace Proxy.Server.Github
         public const string ExeFolderName = "github-mcp-server";
         public const string ExeFileName = "github-mcp-server.exe";
 
+        /// <summary>Whether the executable is already unpacked at <paramref name="mcpServerFolderPath"/>.</summary>
         public static bool IsInstalled(string mcpServerFolderPath)
         {
             if (!Directory.Exists(mcpServerFolderPath))
@@ -27,6 +33,7 @@ namespace Proxy.Server.Github
             return true;
         }
 
+        /// <summary>Fetches the latest release from <see cref="AssetsUrl"/>, downloads the Windows x64 asset and extracts it to <paramref name="mcpServerFolderPath"/>; a no-op if it is already installed.</summary>
         public static async Task<bool> InstallAsync(
             string mcpServerFolderPath
             )
@@ -106,6 +113,7 @@ namespace Proxy.Server.Github
         }
 
 
+        /// <summary>The path to the executable inside the server's install folder.</summary>
         public static string GetMCPServerFilePath(string mcpServerFolderPath)
         {
             return Path.Combine(

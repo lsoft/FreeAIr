@@ -5,10 +5,16 @@ using System.IO;
 
 namespace FreeAIr.MCP.McpServerProxy.Github
 {
+    /// <summary>
+    /// Builds the four requests <see cref="GithubMcpServerProxy"/> sends to the GitHub server, all
+    /// stamped with the same per-call parameters: the folder the executable lives (or will be
+    /// installed) in, and the user's GitHub token pulled fresh from options on every call.
+    /// </summary>
     public static class GithubRequestFactory
     {
         public const string MCPServerFolderName = @"MCP\Server";
 
+        /// <summary>Builds an <see cref="IsInstalledRequest"/> for the GitHub server.</summary>
         public static async System.Threading.Tasks.Task<IsInstalledRequest> IsInstalledRequestAsync(
             )
         {
@@ -18,6 +24,7 @@ namespace FreeAIr.MCP.McpServerProxy.Github
                 );
         }
 
+        /// <summary>Builds an <see cref="InstallRequest"/> for the GitHub server.</summary>
         public static async System.Threading.Tasks.Task<InstallRequest> InstallRequestAsync(
             )
         {
@@ -27,6 +34,7 @@ namespace FreeAIr.MCP.McpServerProxy.Github
                 );
         }
 
+        /// <summary>Builds a <see cref="GetToolsRequest"/> for the GitHub server.</summary>
         public static async System.Threading.Tasks.Task<GetToolsRequest> GetToolsRequestAsync(
             )
         {
@@ -36,6 +44,7 @@ namespace FreeAIr.MCP.McpServerProxy.Github
                 );
         }
 
+        /// <summary>Builds a <see cref="CallToolRequest"/> for one tool call on the GitHub server.</summary>
         public static async System.Threading.Tasks.Task<CallToolRequest> CallToolRequestAsync(
             string toolName,
             Dictionary<string, object?>? arguments
@@ -54,6 +63,7 @@ namespace FreeAIr.MCP.McpServerProxy.Github
                 );
         }
 
+        /// <summary>The folder the GitHub server executable is installed into (or would be), under the VSIX's working folder.</summary>
         public static string MCPServerFolderPath
         {
             get
@@ -65,6 +75,7 @@ namespace FreeAIr.MCP.McpServerProxy.Github
             }
         }
 
+        /// <summary>The parameters every GitHub server call needs: its folder path and a freshly read GitHub token.</summary>
         private static async System.Threading.Tasks.Task<Dictionary<string, string>> GetMcpServerSpecificArgumentsAsync()
         {
             return new Dictionary<string, string>

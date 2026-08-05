@@ -4,6 +4,10 @@ using System.Text.Json.Serialization;
 
 namespace Proxy.BLogic
 {
+    /// <summary>
+    /// One release as GitHub's Releases API returns it - the shape the update checker and the
+    /// installer parse to find the latest FreeAIr VSIX and its download link.
+    /// </summary>
     public class Release
     {
         public string url
@@ -18,6 +22,7 @@ namespace Proxy.BLogic
         {
             get; set;
         }
+        /// <summary>The page a human would open on github.com to read this release.</summary>
         public string html_url
         {
             get; set;
@@ -34,6 +39,7 @@ namespace Proxy.BLogic
         {
             get; set;
         }
+        /// <summary>The version tag, e.g. `v1.2.3` - what a caller compares against the running build.</summary>
         public string tag_name
         {
             get; set;
@@ -62,6 +68,7 @@ namespace Proxy.BLogic
         {
             get; set;
         }
+        /// <summary>The uploaded files, including the VSIX itself.</summary>
         public Asset[] assets
         {
             get; set;
@@ -74,6 +81,7 @@ namespace Proxy.BLogic
         {
             get; set;
         }
+        /// <summary>The release notes, in Markdown, as written on github.com.</summary>
         public string body
         {
             get; set;
@@ -88,6 +96,7 @@ namespace Proxy.BLogic
         }
     }
 
+    /// <summary>The GitHub account that published a <see cref="Release"/>.</summary>
     public class Author
     {
         public string login
@@ -168,6 +177,7 @@ namespace Proxy.BLogic
         }
     }
 
+    /// <summary>The emoji reaction counts GitHub attaches to a <see cref="Release"/>; unused by FreeAIr but present in the API response.</summary>
     public class Reactions
     {
         public string url
@@ -214,6 +224,10 @@ namespace Proxy.BLogic
         }
     }
 
+    /// <summary>
+    /// One file attached to a <see cref="Release"/> - what the FreeAIr update flow downloads
+    /// the VSIX from, via <see cref="browser_download_url"/>.
+    /// </summary>
     public class Asset
     {
         public string url
@@ -228,6 +242,7 @@ namespace Proxy.BLogic
         {
             get; set;
         }
+        /// <summary>The file name as uploaded, e.g. `FreeAIr.vsix`.</summary>
         public string name
         {
             get; set;
@@ -264,12 +279,14 @@ namespace Proxy.BLogic
         {
             get; set;
         }
+        /// <summary>The direct URL to fetch this asset's bytes from.</summary>
         public string browser_download_url
         {
             get; set;
         }
     }
 
+    /// <summary>The GitHub account that uploaded an <see cref="Asset"/>.</summary>
     public class Uploader
     {
         public string login

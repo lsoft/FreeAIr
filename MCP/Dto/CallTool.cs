@@ -1,5 +1,6 @@
 ﻿namespace Dto
 {
+    /// <summary>Invokes one tool of one MCP server with a specific set of arguments - the actual tool call, as opposed to <see cref="GetToolsRequest"/> which only lists what is callable.</summary>
     public sealed class CallToolRequest : BaseRequest
     {
 
@@ -9,6 +10,7 @@
             set;
         }
 
+        /// <summary>The tool's arguments, keyed by parameter name, matching its JSON Schema from <see cref="GetToolReply.Parameters"/>.</summary>
         public Dictionary<string, object?>? Arguments
         {
             get;
@@ -36,8 +38,10 @@
         }
     }
 
+    /// <summary>The result of a <see cref="CallToolRequest"/> - the tool's output content, or an error flagged through <see cref="IsError"/> rather than an exception.</summary>
     public sealed class CallToolReply : BaseReply
     {
+        /// <summary>True when the MCP server itself reported the call as failed - distinct from a transport-level failure, which surfaces through <see cref="BaseReply.ErrorMessage"/> instead.</summary>
         public bool IsError
         {
             get;

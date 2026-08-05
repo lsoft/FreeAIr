@@ -2,6 +2,11 @@
 
 namespace Dto
 {
+    /// <summary>
+    /// Base of every request the VS side sends across the MCP proxy pipe: which server it targets
+    /// plus a free-form parameter pool (case-insensitive by key) that a concrete request indexes
+    /// through <see cref="IParameterProvider"/>.
+    /// </summary>
     public abstract class BaseRequest : IParameterProvider
     {
         [JsonInclude]

@@ -4,6 +4,11 @@ using Proxy.Server.Github;
 
 namespace Proxy.Server.External
 {
+    /// <summary>
+    /// A user-configured MCP server imported from an external tool's config (see
+    /// <see cref="Dto.McpServers"/>): builds a stdio or SSE/HTTP <see cref="IMcpClient"/> depending
+    /// on <see cref="Dto.McpServerType"/>, then behaves like any other <see cref="BaseServer2{T}"/>.
+    /// </summary>
     public class ExternalServer : BaseServer2<GithubServer>
     {
         private readonly McpServer _server;
@@ -25,6 +30,7 @@ namespace Proxy.Server.External
             _server = server;
         }
 
+        /// <summary>Builds the stdio or HTTP transport described by this server's stored configuration and connects an <see cref="IMcpClient"/> over it.</summary>
         protected override async Task<IMcpClient?> CreateMcpClientAsync(
             IParameterProvider parameterProvider
             )

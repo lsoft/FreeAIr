@@ -5,6 +5,11 @@ using System.Text.Json.Serialization;
 
 namespace Dto
 {
+    /// <summary>
+    /// The `mcpServers` object as it appears in an external tool's own config file (Claude Desktop,
+    /// VS Code, etc.) - the format FreeAIr reads when importing an externally configured server and
+    /// writes when exporting one of its own.
+    /// </summary>
     public class McpServers : ICloneable
     {
         [JsonPropertyName("mcpServers")]
@@ -34,6 +39,11 @@ namespace Dto
         }
     }
 
+    /// <summary>
+    /// One configured MCP server, stored generically: the connection kind plus its raw JSON
+    /// configuration, which <see cref="HttpMcpServerParameters"/> or
+    /// <see cref="StdioMcpServerParameters"/> then decode depending on <see cref="Type"/>.
+    /// </summary>
     public class McpServer : ICloneable
     {
         [JsonPropertyName("Type")]
@@ -64,6 +74,7 @@ namespace Dto
             JsonConfiguration = jsonConfiguration;
         }
 
+        /// <summary>Whether this server talks HTTP and its endpoint matches <paramref name="endpoint"/> - used to detect a duplicate before adding a new one.</summary>
         public bool IsHttpAndHasEndpoint(string endpoint)
         {
             if (Type != McpServerType.Http)
@@ -85,6 +96,7 @@ namespace Dto
         }
     }
 
+    /// <summary>The decoded `JsonConfiguration` of an HTTP-transport <see cref="McpServer"/>: just an endpoint URL.</summary>
     public sealed class HttpMcpServerParameters
     {
         [JsonPropertyName("url")]
@@ -98,6 +110,7 @@ namespace Dto
             Endpoint = string.Empty;
         }
 
+        /// <summary>Parses an HTTP server's <see cref="McpServer.JsonConfiguration"/>; throws if <paramref name="server"/> is not <see cref="McpServerType.Http"/>.</summary>
         public static HttpMcpServerParameters DeserializeStdio(
             McpServer server
             )
@@ -113,6 +126,10 @@ namespace Dto
         }
     }
 
+    /// <summary>
+    /// The decoded `JsonConfiguration` of a stdio-transport <see cref="McpServer"/>: the process to
+    /// launch, its command-line arguments and the environment variables to set for it.
+    /// </summary>
     public sealed class StdioMcpServerParameters
     {
         [JsonPropertyName("command")]
@@ -140,16 +157,19 @@ namespace Dto
             Env = [];
         }
 
+        /// <summary><see cref="Args"/> re-serialized to JSON, for display in the server-configuration UI.</summary>
         public string GetArgStringRepresentation()
         {
             return JsonSerializer.Serialize(Args ?? []);
         }
 
+        /// <summary><see cref="Env"/> re-serialized to JSON, for display in the server-configuration UI.</summary>
         public string GetEnvStringRepresentation()
         {
             return JsonSerializer.Serialize(Env ?? new Dictionary<string, string>());
         }
 
+        /// <summary>Parses a stdio server's <see cref="McpServer.JsonConfiguration"/>; throws if <paramref name="server"/> is not <see cref="McpServerType.Stdio"/>.</summary>
         public static StdioMcpServerParameters DeserializeStdio(
             McpServer server
             )
@@ -165,6 +185,7 @@ namespace Dto
         }
     }
 
+    /// <summary>How an MCP server is reached: a spawned local process, or an HTTP endpoint.</summary>
     public enum McpServerType
     {
         Stdio = 0,

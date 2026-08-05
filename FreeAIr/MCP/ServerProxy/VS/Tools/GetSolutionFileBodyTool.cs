@@ -6,6 +6,11 @@ using System.Threading.Tasks;
 
 namespace FreeAIr.MCP.McpServerProxy.VS.Tools
 {
+    /// <summary>
+    /// The `GetSolutionFileBody` MCP tool: given a file name or full path, finds the matching item in
+    /// the open solution and returns its current text content - the model's way to read a file
+    /// through Visual Studio rather than the raw filesystem, so unsaved editor changes are included.
+    /// </summary>
     public sealed class GetSolutionFileBodyTool : VisualStudioMcpServerTool
     {
         private const string FileNamePathParameterName = "file_name_or_full_path";
@@ -35,6 +40,7 @@ namespace FreeAIr.MCP.McpServerProxy.VS.Tools
         {
         }
 
+        /// <summary>Resolves the requested file via <see cref="SolutionHelper.FindItemByNameOrFilePathAsync"/> and reads its actual (editor-aware) body.</summary>
         public override async Task<McpServerProxyToolCallResult?> CallToolAsync(
             string toolName,
             IReadOnlyDictionary<string, object?>? arguments = null,
@@ -81,6 +87,7 @@ namespace FreeAIr.MCP.McpServerProxy.VS.Tools
         }
 
 
+        /// <summary>The tool's JSON result envelope, kept a one-element array for parity with the multi-file shape other MCP tools use.</summary>
         private sealed class SolutionItemBodiesJson
         {
             public SolutionItemBodyJson[] SolutionItemBodies
@@ -90,6 +97,7 @@ namespace FreeAIr.MCP.McpServerProxy.VS.Tools
             }
         }
 
+        /// <summary>One solution item's name, path, kind and full text content.</summary>
         private sealed class SolutionItemBodyJson
         {
             public string ItemName

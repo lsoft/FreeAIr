@@ -5,6 +5,11 @@ using Serilog;
 
 namespace Proxy.Server
 {
+    /// <summary>
+    /// A <see cref="BaseServer{T}"/> for MCP servers reached through a real MCP client - tool
+    /// listing and calling are delegated to that client, and installation is meaningless (there is
+    /// nothing to check or install), so both report "Not applicable".
+    /// </summary>
     public abstract class BaseServer2<T> : BaseServer<T>
         where T : IServer
     {
@@ -77,11 +82,18 @@ namespace Proxy.Server
     }
 
 
+    /// <summary>
+    /// Shared plumbing for every server kind the proxy hosts (VS, GitHub, external): opens an
+    /// <see cref="IMcpClient"/> through <see cref="CreateMcpClientAsync"/> for each call, turns a
+    /// failure to connect into an error reply instead of an exception, and leaves the kind-specific
+    /// work to the `*InternalAsync` methods a subclass overrides.
+    /// </summary>
     public abstract class BaseServer<T> : IServer
         where T : IServer
     {
         protected readonly ILogger _log = SerilogLogger.Logger.ForContext<T>();
 
+        /// <summary>Round-trips a ping through the server's MCP client, to confirm the connection is alive.</summary>
         public async Task PingAsync(
             IParameterProvider parameterProvider
             )
@@ -163,6 +175,7 @@ namespace Proxy.Server
 
 
 
+        /// <summary>Connects to this server kind (spawns a process, opens an HTTP session, ...), returning null when the connection cannot be established.</summary>
         protected abstract Task<IMcpClient?> CreateMcpClientAsync(
             IParameterProvider parameterProvider
             );

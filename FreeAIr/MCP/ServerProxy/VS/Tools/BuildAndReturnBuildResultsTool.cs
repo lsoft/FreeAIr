@@ -7,6 +7,11 @@ using System.Threading.Tasks;
 
 namespace FreeAIr.MCP.McpServerProxy.VS.Tools
 {
+    /// <summary>
+    /// The `BuildAndReturnBuildResults` MCP tool: builds the current solution and hands the model
+    /// back its errors and warnings as JSON, so it can fix a build without a human relaying compiler
+    /// output.
+    /// </summary>
     public sealed class BuildAndReturnBuildResultsTool : VisualStudioMcpServerTool
     {
         public static readonly BuildAndReturnBuildResultsTool Instance = new();
@@ -23,6 +28,7 @@ namespace FreeAIr.MCP.McpServerProxy.VS.Tools
         {
         }
 
+        /// <summary>Builds the solution on the main thread, then serializes the errors and warnings <see cref="BuildResultProvider"/> collected into the tool's result.</summary>
         public override async Task<McpServerProxyToolCallResult?> CallToolAsync(
             string toolName,
             IReadOnlyDictionary<string, object?>? arguments = null,
@@ -55,6 +61,7 @@ namespace FreeAIr.MCP.McpServerProxy.VS.Tools
             return McpServerProxyToolCallResult.CreateSuccess(result);
         }
 
+        /// <summary>The tool's JSON result: the flat list of build items for the whole solution.</summary>
         private sealed class BuildInformationsJson
         {
             public BuildInformationJson[] SolutionItems
@@ -64,6 +71,7 @@ namespace FreeAIr.MCP.McpServerProxy.VS.Tools
             }
         }
 
+        /// <summary>One build error or warning: its kind, message and source location.</summary>
         private sealed class BuildInformationJson
         {
             public string Description

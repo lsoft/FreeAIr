@@ -6,6 +6,12 @@ using System.Threading.Tasks;
 
 namespace FreeAIr.MCP.McpServerProxy.Github
 {
+    /// <summary>
+    /// The VSIX side's handle to the built-in `github.com` server: every call is forwarded across
+    /// the pipe with its request assembled by <see cref="GithubRequestFactory"/>, which supplies the
+    /// server folder path and the user's PAT that <see cref="Proxy.Server.Github.GithubServer"/>
+    /// needs on the other side.
+    /// </summary>
     public sealed class GithubMcpServerProxy : IMcpServerProxy
     {
         public const string PublicMCPServerName = "github.com";
@@ -19,6 +25,7 @@ namespace FreeAIr.MCP.McpServerProxy.Github
         {
         }
 
+        /// <summary>Asks the proxy whether the `github-mcp-server` executable is already unpacked.</summary>
         public async Task<bool> IsInstalledAsync()
         {
             if (!McpServerProxyApplication.Started)
@@ -34,6 +41,7 @@ namespace FreeAIr.MCP.McpServerProxy.Github
             return reply.IsInstalled;
         }
 
+        /// <summary>Has the proxy download and unpack the `github-mcp-server` executable.</summary>
         public async Task InstallAsync()
         {
             if (!McpServerProxyApplication.Started)
@@ -51,6 +59,7 @@ namespace FreeAIr.MCP.McpServerProxy.Github
             }
         }
 
+        /// <summary>Asks the proxy for the GitHub server's tool list.</summary>
         public async Task<McpServerTools> GetToolsAsync()
         {
             if (!McpServerProxyApplication.Started)
@@ -72,6 +81,7 @@ namespace FreeAIr.MCP.McpServerProxy.Github
                 );
         }
 
+        /// <summary>Forwards a tool call to the GitHub server, converting a transport failure or a reported tool error into a failed <see cref="McpServerProxyToolCallResult"/> instead of throwing.</summary>
         public async Task<McpServerProxyToolCallResult> CallToolAsync(
             string toolName,
             Dictionary<string, object?>? arguments = null,

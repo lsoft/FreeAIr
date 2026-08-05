@@ -3,10 +3,12 @@ using FreeAIr.UI.Windows;
 
 namespace FreeAIr.MCP.McpServerProxy.Github
 {
+    /// <summary>Runs <see cref="GithubMcpServerProxy.InstallAsync"/> off the UI thread with the standard progress-bar treatment, so downloading the GitHub server executable does not freeze Visual Studio.</summary>
     public sealed class GithubMCPInstallBackgroundTask : BackgroundTask
     {
         public override string TaskDescription => "Installing GitHub.com MCP server...";
 
+        /// <summary>Whether the install finished without throwing.</summary>
         public bool SuccessfullyInstalled
         {
             get;
@@ -19,6 +21,7 @@ namespace FreeAIr.MCP.McpServerProxy.Github
             StartAsyncTask();
         }
 
+        /// <summary>Installs the server and records whether it succeeded; rethrows so the background-task infrastructure still surfaces the failure.</summary>
         protected override async Task RunWorkingTaskAsync()
         {
             try

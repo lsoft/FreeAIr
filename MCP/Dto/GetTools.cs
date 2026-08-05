@@ -1,5 +1,6 @@
 ﻿namespace Dto
 {
+    /// <summary>Asks the proxy for the tool list of one MCP server - what populates the tool picker in the UI.</summary>
     public sealed class GetToolsRequest : BaseRequest
     {
         public GetToolsRequest()
@@ -15,6 +16,7 @@
         }
     }
 
+    /// <summary>The tools <see cref="GetToolsRequest"/> asked for, each still carrying its raw JSON schema so the caller can build the parameters for a later <see cref="CallToolRequest"/>.</summary>
     public sealed class GetToolsReply : BaseReply
     {
         public GetToolReply[] Tools
@@ -41,6 +43,7 @@
 
     }
 
+    /// <summary>One tool as its MCP server describes it - name, human-readable description and its JSON Schema for parameters, all still opaque strings at this layer.</summary>
     public sealed class GetToolReply
     {
         public string Name
@@ -55,6 +58,7 @@
             set;
         }
 
+        /// <summary>The tool's input JSON Schema, as raw JSON text.</summary>
         public string Parameters
         {
             get;
