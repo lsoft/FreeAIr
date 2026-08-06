@@ -27,13 +27,15 @@ namespace FreeAIr.Find
         } = 15;
 
         /// <summary>
-        /// How far above the noise of this index a file has to stand to be shown, as a share of the
-        /// room between that noise and a perfect match: 0.1 is generous, 0.2 is the default, 0.35 is
-        /// strict. See <see cref="EmbeddingCalibration.ComputeThreshold"/> for why the setting is
-        /// not a cosine — a cosine means something different on every model, this does not.
+        /// How far above the noise a file has to stand to be shown: 0.1 is generous, 0.2 is the
+        /// default, 0.35 is strict. Not a cosine — a cosine means something different on every
+        /// model, this does not.
         ///
-        /// It has no effect on an index which has not been calibrated: there is nothing to measure
-        /// the share against, and inventing a number would only bring back the constant it replaced.
+        /// The one number is read by both halves of the threshold, each in its own units: as a
+        /// share of the room between noise and a perfect match by
+        /// <see cref="EmbeddingCalibration.ComputeThreshold"/>, and as a distance from the median of
+        /// this query's own scores by <see cref="ScoreDistribution.ComputeThreshold"/>. The second
+        /// half needs no calibration and works on a freshly built index.
         /// </summary>
         public double Sensitivity
         {
@@ -117,14 +119,25 @@ namespace FreeAIr.Find
         }
 
         /// <summary>
-        /// The cosine a file had to reach to be listed, derived from the calibration of the index.
-        /// Zero when the index carries none, i.e. when nothing has been cut off by score.
+        /// The cosine a file had to reach to be listed: the higher of what the calibration of the
+        /// index asks for and what this query's own <see cref="ScoreDistribution"/> asks for. Zero
+        /// when neither of them had anything to say, i.e. when nothing has been cut off by score.
         ///
         /// In a probe (see <see cref="RagShortlist.ProbeAsync"/>) nothing has been cut off at all
         /// and this is the threshold an ordinary search would have used, which is exactly what the
         /// calibration window has to show next to the scores.
         /// </summary>
         public float AppliedMinScore
+        {
+            get;
+        }
+
+        /// <summary>
+        /// Where the scores of this query landed across the whole index. Half of
+        /// <see cref="AppliedMinScore"/> comes from here; the other half is the stored calibration.
+        /// Null when nothing could be scored — a mismatched model, or an empty index.
+        /// </summary>
+        public ScoreDistribution? Distribution
         {
             get;
         }
@@ -164,7 +177,8 @@ namespace FreeAIr.Find
             int queryDimensions,
             int indexDimensions,
             float appliedMinScore = 0f,
-            float? spaceSimilarity = null
+            float? spaceSimilarity = null,
+            ScoreDistribution? distribution = null
             )
         {
             Candidates = candidates;
@@ -173,6 +187,7 @@ namespace FreeAIr.Find
             IndexDimensions = indexDimensions;
             AppliedMinScore = appliedMinScore;
             SpaceSimilarity = spaceSimilarity;
+            Distribution = distribution;
         }
     }
 
@@ -315,13 +330,19 @@ namespace FreeAIr.Find
                 }
             }
 
-            var minScore = index.Calibration?.ComputeThreshold(options.Sensitivity) ?? 0f;
-
             var found = index.Search(
                 queryVector,
                 Math.Max(1, options.TopOutlineCount),
+                out var distribution,
                 cancellationToken
                 );
+
+            //the calibration knows the corpus and the distribution knows the query; a file has to
+            //clear both, because each of them sees a kind of noise the other one cannot
+            var calibrated = index.Calibration?.ComputeThreshold(options.Sensitivity) ?? 0f;
+            var standsOut = distribution?.ComputeThreshold(options.Sensitivity) ?? 0f;
+
+            var minScore = Math.Max(calibrated, standsOut);
 
             var candidates = Aggregate(
                 found,
@@ -335,7 +356,8 @@ namespace FreeAIr.Find
                 queryVector.Length,
                 index.Dimensions,
                 minScore,
-                spaceSimilarity
+                spaceSimilarity,
+                distribution
                 );
         }
 

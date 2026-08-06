@@ -10,9 +10,10 @@ namespace FreeAIr.Options2.Rag
     /// There is deliberately no cosine threshold here. A cosine means something different on every
     /// embedding model — the same query on the same solution scores 0.94 on one model and 0.70 on
     /// another, while the noise of both sits just below — so a number written into a settings file
-    /// is right for exactly one model and silently wrong for the next one. Instead the index
-    /// measures its own scale when it is built (see the `Calibration` node below) and
-    /// <see cref="Sensitivity"/> says how far above that measured noise a file has to stand.
+    /// is right for exactly one model and silently wrong for the next one. Instead the noise is
+    /// measured — by the index when it is built (see the `Calibration` node below) and by every
+    /// search on its own scores — and <see cref="Sensitivity"/> says how far above that measured
+    /// noise a file has to stand.
     /// </summary>
     [JsonConverter(typeof(JsonDescriptionCommentConverter<RagJson>))]
     public sealed class RagJson : ICloneable
@@ -33,8 +34,8 @@ namespace FreeAIr.Options2.Rag
             set;
         } = 15;
 
-        /// <summary>How far above the measured noise of the index a file has to stand to be taken — see the class summary for why this is not a cosine threshold.</summary>
-        [Description("'Use RAG' search: how far above the noise of your index a file has to stand to be taken. 0.1 is generous, 0.2 is the default, 0.35 is strict. This is NOT a cosine similarity: it is a share of the room between the noise measured at index build time and a perfect match, which is what makes one value work on different embedding models. Has no effect until the index has been calibrated.")]
+        /// <summary>How far above the measured noise a file has to stand to be taken — see the class summary for why this is not a cosine threshold.</summary>
+        [Description("'Use RAG' search: how far above the noise a file has to stand to be taken. 0.1 is generous, 0.2 is the default, 0.35 is strict. This is NOT a cosine similarity, which is what makes one value work on different embedding models: it is read both as a share of the room between the noise measured at index build time and a perfect match, and as a distance from the median score of the query being searched. The second one needs no calibration.")]
         public double Sensitivity
         {
             get;

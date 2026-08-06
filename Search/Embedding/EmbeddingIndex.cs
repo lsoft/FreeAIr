@@ -299,6 +299,26 @@ namespace FreeAIr.Embedding
             CancellationToken cancellationToken = default
             )
         {
+            return Search(queryVector, topK, out _, cancellationToken);
+        }
+
+        /// <summary>
+        /// The same search, plus the shape of the scores it threw away. The scan touches every entry
+        /// anyway, so the background level of this particular query comes out of it for free — see
+        /// <see cref="ScoreDistribution"/> for what the shortlist does with it.
+        ///
+        /// <paramref name="distribution"/> is null when nothing could be scored at all: an empty
+        /// index, a query of the wrong length, or a vector which cannot be normalized.
+        /// </summary>
+        public List<(EmbeddingIndexEntry Entry, float Score)> Search(
+            float[] queryVector,
+            int topK,
+            out ScoreDistribution? distribution,
+            CancellationToken cancellationToken = default
+            )
+        {
+            distribution = null;
+
             if (queryVector is null)
             {
                 throw new ArgumentNullException(nameof(queryVector));
@@ -354,6 +374,10 @@ namespace FreeAIr.Embedding
                     return a.Entry.Id.CompareTo(b.Entry.Id);
                 }
                 );
+
+            //measured before the head is cut off: the tail is the sample, and after the cut it is
+            //gone
+            distribution = ScoreDistribution.Measure(result);
 
             if (result.Count > topK)
             {

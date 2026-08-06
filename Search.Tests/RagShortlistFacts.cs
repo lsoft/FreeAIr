@@ -391,6 +391,118 @@ namespace FreeAIr.Search.Tests
             Assert.Equal(_query, Assert.Single(Assert.Single(vectorizer.Requests)));
         }
 
+        [Fact]
+        public async Task A_query_which_stands_out_of_the_background_passes_without_any_calibration()
+        {
+            //the scan scores every outline anyway, so the level this query sits at against an
+            //arbitrary piece of the corpus costs nothing to measure - and an index which has never
+            //been calibrated still gets a threshold out of it
+            var index = TestIndex.Build(
+                TestIndex.Background(400)
+                    .Append(new TestIndex.Node("A\\Answer.cs", "Answer", "the answer", TestIndex.OfScore(0.9f)))
+                    .ToArray()
+                );
+
+            var result = await RagShortlist.BuildAsync(
+                index,
+                Vectorizer(new[] { 1f, 0f }),
+                _query,
+                new RagShortlistOptions(),
+                default
+                );
+
+            Assert.NotNull(result.Distribution);
+            Assert.Equal(
+                result.Distribution!.ComputeThreshold(0.2d),
+                result.AppliedMinScore,
+                4
+                );
+
+            Assert.True(result.AppliedMinScore > 0.40f, "the background has to be cut off");
+            Assert.Equal("A\\Answer.cs", Assert.Single(result.Candidates).RelativePath);
+        }
+
+        [Fact]
+        public async Task A_query_the_corpus_cannot_answer_finds_nothing()
+        {
+            //nothing stands out of the background, and the honest answer to that is an empty
+            //shortlist rather than the fifteen files which happened to be least far away
+            var index = TestIndex.Build(TestIndex.Background(400));
+
+            var result = await RagShortlist.BuildAsync(
+                index,
+                Vectorizer(new[] { 1f, 0f }),
+                _query,
+                new RagShortlistOptions(),
+                default
+                );
+
+            Assert.True(result.Distribution!.BestDeviations < 2f);
+            Assert.Empty(result.Candidates);
+        }
+
+        [Fact]
+        public async Task A_file_has_to_clear_both_the_calibration_and_the_query()
+        {
+            //each of the two sees a kind of noise the other one cannot: the calibration knows how
+            //high nonsense climbs on this corpus, the distribution knows how close this particular
+            //query is to everything
+            var nodes = TestIndex.Background(400)
+                .Append(new TestIndex.Node("A\\Answer.cs", "Answer", "the answer", TestIndex.OfScore(0.9f)))
+                .ToArray();
+
+            var options = new RagShortlistOptions { Sensitivity = 0d };
+
+            var byTheQuery = await RagShortlist.BuildAsync(
+                TestIndex.Build(new EmbeddingCalibration(0.1f, 0f, 5, 0, 0), null, nodes),
+                Vectorizer(new[] { 1f, 0f }),
+                _query,
+                options,
+                default
+                );
+
+            //the calibration is the lower of the two and the query's own background decides
+            Assert.Equal(byTheQuery.Distribution!.ComputeThreshold(0d), byTheQuery.AppliedMinScore, 4);
+            Assert.Equal("A\\Answer.cs", Assert.Single(byTheQuery.Candidates).RelativePath);
+
+            var byTheCalibration = await RagShortlist.BuildAsync(
+                TestIndex.Build(new EmbeddingCalibration(0.95f, 0f, 5, 0, 0), null, nodes),
+                Vectorizer(new[] { 1f, 0f }),
+                _query,
+                options,
+                default
+                );
+
+            //a model whose nonsense reaches 0.95 makes even this hit unconvincing, and the measured
+            //number wins over the one the query alone would have picked
+            Assert.Equal(0.95f, byTheCalibration.AppliedMinScore, 4);
+            Assert.Empty(byTheCalibration.Candidates);
+        }
+
+        [Fact]
+        public async Task A_probe_shows_the_rows_the_per_query_threshold_cut_off()
+        {
+            var index = TestIndex.Build(
+                TestIndex.Background(400)
+                    .Append(new TestIndex.Node("A\\Answer.cs", "Answer", "the answer", TestIndex.OfScore(0.9f)))
+                    .ToArray()
+                );
+
+            var probed = await RagShortlist.ProbeAsync(
+                index,
+                Vectorizer(new[] { 1f, 0f }),
+                _query,
+                new RagShortlistOptions(),
+                default
+                );
+
+            //nothing cut off, and the threshold a real search would have used is reported next to
+            //the scores for the calibration window to paint
+            Assert.True(probed.Candidates.Count > 1);
+            Assert.Equal("A\\Answer.cs", probed.Candidates[0].RelativePath);
+            Assert.True(probed.Candidates[1].Score < probed.AppliedMinScore);
+        }
+
         private static IEmbeddingVectorizer Vectorizer(
             float[] queryVector
             )
@@ -413,49 +525,13 @@ namespace FreeAIr.Search.Tests
             (string RelativePath, string Target, string OutlineText, float[] Vector)[]? nodes = null
             )
         {
-            nodes ??= Array.Empty<(string, string, string, float[])>();
-
-            var outlines = new List<OutlineItselfJsonObject>();
-            var vectors = new List<EmbeddingItselfJsonObject>();
-
-            foreach (var node in nodes)
-            {
-                var id = OutlineNode.GenerateGuid(
-                    OutlineKindEnum.ClassOrSimilarEntity,
-                    node.Target,
-                    node.RelativePath
-                    );
-
-                outlines.Add(
-                    new OutlineItselfJsonObject
-                    {
-                        Id = id,
-                        Kind = OutlineKindEnum.ClassOrSimilarEntity,
-                        RelativePath = node.RelativePath,
-                        Target = node.Target,
-                        OutlineText = node.OutlineText
-                    }
-                    );
-
-                var vector = (float[])node.Vector.Clone();
-                VectorCodec.NormalizeInPlace(vector);
-
-                vectors.Add(new EmbeddingItselfJsonObject(id, vector));
-            }
-
-            return EmbeddingIndex.Build(
-                new EmbeddingIndexMetadata(
-                    "index.json",
-                    new DateTime(2026, 1, 1),
-                    "the-agent",
-                    "the-model",
-                    0,
-                    "the-model-as-the-server-calls-it",
-                    fingerprint,
-                    calibration
-                    ),
-                outlines,
-                vectors
+            return TestIndex.Build(
+                calibration,
+                fingerprint,
+                Array.ConvertAll(
+                    nodes ?? Array.Empty<(string, string, string, float[])>(),
+                    n => new TestIndex.Node(n.RelativePath, n.Target, n.OutlineText, n.Vector)
+                    )
                 );
         }
     }
