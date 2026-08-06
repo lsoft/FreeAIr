@@ -836,14 +836,24 @@ namespace FreeAIr.UI.ViewModels
                             checkedPaths: checkedPaths,
                             oldOutlineRoot: existingOutlineRoot
                             ),
-                        cancellationToken: _cancellationTokenSource.Token
+                        cancellationToken: _cancellationTokenSource.Token,
+                        onProgress: (processed, total) =>
+                        {
+                            SetNewStatus(
+                                $"{FreeAIr.Resources.Resources.Start_NLO_extraction} ({processed}/{total})"
+                                );
+                        }
                         );
                     if (outlineRoot is null)
                     {
                         return;
                     }
 
-                    await ShowMessageAsync(outputPanel, FreeAIr.Resources.Resources.Start_embedding_generation);
+                    var nodesToEmbedCount = OutlineEmbedder.SelectNodesToEmbed(outlineRoot).Count;
+                    await ShowMessageAsync(
+                        outputPanel,
+                        $"{FreeAIr.Resources.Resources.Start_embedding_generation} (0/{nodesToEmbedCount})"
+                        );
 
                     //one vectorizer for the whole build: the calibration below asks it which model
                     //the server said it was, and that is only known after the first request
@@ -855,6 +865,11 @@ namespace FreeAIr.UI.ViewModels
                     await eg.GenerateEmbeddingsAsync(
                         outlineRoot,
                         _cancellationTokenSource.Token
+                        );
+
+                    await ShowMessageAsync(
+                        outputPanel,
+                        $"{FreeAIr.Resources.Resources.Start_embedding_generation} ({nodesToEmbedCount}/{nodesToEmbedCount})"
                         );
 
                     var jsonObject = new EmbeddingOutlineJsonObject(

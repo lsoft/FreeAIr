@@ -62,14 +62,16 @@ namespace FreeAIr.NLOutline.Tree.Builder.File
 
         /// <summary>
         /// Scans <paramref name="items"/> and appends the resulting outline nodes as children of
-        /// <paramref name="root"/>.
+        /// <paramref name="root"/>, calling <paramref name="onFileProcessed"/> once per item so the
+        /// caller can report progress through a long-running batch.
         /// </summary>
         Task BuildAsync(
             SupportActionJson action,
             AgentJson agent,
             string rootPath,
             List<SolutionItem> items,
-            OutlineNode root
+            OutlineNode root,
+            Action? onFileProcessed = null
             );
     }
 
@@ -121,7 +123,8 @@ namespace FreeAIr.NLOutline.Tree.Builder.File
             AgentJson agent,
             string rootPath,
             List<SolutionItem> items,
-            OutlineNode root
+            OutlineNode root,
+            Action? onFileProcessed = null
             )
         {
             await BuildInternalAsync(
@@ -129,7 +132,8 @@ namespace FreeAIr.NLOutline.Tree.Builder.File
                 agent,
                 rootPath,
                 items,
-                root
+                root,
+                onFileProcessed
                 );
         }
 
@@ -144,7 +148,8 @@ namespace FreeAIr.NLOutline.Tree.Builder.File
             AgentJson agent,
             string rootPath,
             List<SolutionItem> items,
-            OutlineNode root
+            OutlineNode root,
+            Action? onFileProcessed
             )
         {
             if (action is null)
@@ -211,6 +216,8 @@ namespace FreeAIr.NLOutline.Tree.Builder.File
 
                 chat.ChatContext.RemoveItem(contextItem);
                 chat.ArchiveAllPrompts();
+
+                onFileProcessed?.Invoke();
             }
         }
 
@@ -272,7 +279,8 @@ namespace FreeAIr.NLOutline.Tree.Builder.File
             AgentJson agent,
             string rootPath,
             List<SolutionItem> items,
-            OutlineNode root
+            OutlineNode root,
+            Action? onFileProcessed = null
             )
         {
             if (action is null)
@@ -312,6 +320,7 @@ namespace FreeAIr.NLOutline.Tree.Builder.File
                 var document = workspace.GetDocument(item.FullPath);
                 if (document is null)
                 {
+                    onFileProcessed?.Invoke();
                     continue;
                 }
 
@@ -321,6 +330,8 @@ namespace FreeAIr.NLOutline.Tree.Builder.File
                     );
                 var fileRoot = await tb.CreateOutlineTreeAsync();
                 root.AddChild(fileRoot);
+
+                onFileProcessed?.Invoke();
             }
         }
 
@@ -798,12 +809,13 @@ namespace FreeAIr.NLOutline.Tree.Builder.File
         }
 
 
-        /// <summary>Splits <paramref name="fileItems"/> across the registered scanners by extension, reuses each unchecked file's old outline node from <paramref name="parameters"/> where available, and runs the remaining files through their scanner, adding every result under <paramref name="newOutlineRoot"/>.</summary>
+        /// <summary>Splits <paramref name="fileItems"/> across the registered scanners by extension, reuses each unchecked file's old outline node from <paramref name="parameters"/> where available, and runs the remaining files through their scanner, adding every result under <paramref name="newOutlineRoot"/>. <paramref name="onFileProcessed"/> is called once per file, reused or freshly scanned, so the caller can report progress.</summary>
         public async Task CreateFileTreesAsync(
             TreeBuilderParameters parameters,
             string rootPath,
             OutlineNode newOutlineRoot,
-            List<SolutionItem> fileItems
+            List<SolutionItem> fileItems,
+            Action? onFileProcessed = null
             )
         {
             if (parameters is null)
@@ -845,6 +857,7 @@ namespace FreeAIr.NLOutline.Tree.Builder.File
                                 oldOutlineNode
                                 );
                             solutionItems.RemoveAt(i);
+                            onFileProcessed?.Invoke();
                         }
                     }
                 }
@@ -856,7 +869,8 @@ namespace FreeAIr.NLOutline.Tree.Builder.File
                         parameters.Agent,
                         rootPath,
                         solutionItems,
-                        newOutlineRoot
+                        newOutlineRoot,
+                        onFileProcessed
                         );
                 }
             }

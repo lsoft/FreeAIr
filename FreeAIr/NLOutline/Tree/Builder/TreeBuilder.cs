@@ -26,7 +26,8 @@ namespace FreeAIr.NLOutline.Tree.Builder
         /// </summary>
         public static async Task<OutlineNode?> BuildAsync(
             TreeBuilderParameters parameters,
-            CancellationToken cancellationToken
+            CancellationToken cancellationToken,
+            Action<int, int>? onProgress = null
             )
         {
             if (parameters is null)
@@ -58,18 +59,15 @@ namespace FreeAIr.NLOutline.Tree.Builder
                     cancellationToken
                     );
 
+            //gathered up front so the total file count is known before any file is processed,
+            //which is what lets the progress callback report "processed/total" instead of a
+            //running count with no denominator
+            var projectFileLists = new List<(SolutionItem Project, List<SolutionItem> Files)>();
             foreach (var foundProject in projects
                 .OrderBy(i => i.SolutionItem.FullPath.MakeRelativeAgainst(solution.FullPath))
                 )
             {
                 var project = foundProject.SolutionItem;
-
-                var projectRoot = root.AddChild(
-                    OutlineKindEnum.Project,
-                    project.FullPath.MakeRelativeAgainst(rootPath),
-                    project.Name,
-                    string.Empty
-                    );
 
                 var files = await project.ProcessDownRecursivelyForAsync(
                     item =>
@@ -83,17 +81,40 @@ namespace FreeAIr.NLOutline.Tree.Builder
                     cancellationToken
                     );
 
-                var componentModel = (IComponentModel)await FreeAIrPackage.Instance.GetServiceAsync(typeof(SComponentModel));
-                var treeProcessor = componentModel.GetService<FileOutlineTreeProcessor>();
+                projectFileLists.Add(
+                    (project,
+                    files
+                        .OrderBy(i => i.SolutionItem.FullPath.MakeRelativeAgainst(solution.FullPath))
+                        .Select(i => i.SolutionItem)
+                        .ToList())
+                    );
+            }
+
+            var totalFileCount = projectFileLists.Sum(pf => pf.Files.Count);
+            var processedFileCount = 0;
+
+            var componentModel = (IComponentModel)await FreeAIrPackage.Instance.GetServiceAsync(typeof(SComponentModel));
+            var treeProcessor = componentModel.GetService<FileOutlineTreeProcessor>();
+
+            foreach (var (project, files) in projectFileLists)
+            {
+                var projectRoot = root.AddChild(
+                    OutlineKindEnum.Project,
+                    project.FullPath.MakeRelativeAgainst(rootPath),
+                    project.Name,
+                    string.Empty
+                    );
 
                 await treeProcessor.CreateFileTreesAsync(
                     parameters,
                     rootPath,
                     projectRoot,
-                    files
-                        .OrderBy(i => i.SolutionItem.FullPath.MakeRelativeAgainst(solution.FullPath))
-                        .Select(i => i.SolutionItem)
-                        .ToList()
+                    files,
+                    () =>
+                    {
+                        processedFileCount++;
+                        onProgress?.Invoke(processedFileCount, totalFileCount);
+                    }
                     );
             }
 
