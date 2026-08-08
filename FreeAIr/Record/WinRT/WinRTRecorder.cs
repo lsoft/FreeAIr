@@ -7,17 +7,28 @@ using FreeAIr.BLogic;
 
 namespace FreeAIr.Record.WinRT
 {
+    /// <summary>
+    /// Speech-to-text using the Windows Runtime <see cref="SpeechRecognizer"/> (`Windows.Media.SpeechRecognition`)
+    /// in dictation mode. Distinct from <see cref="Speech.SpeechRecorder"/>, which uses the older
+    /// `System.Speech` API; this one prompts the user to enable Windows speech recognition privacy
+    /// settings if they are turned off.
+    /// </summary>
     public sealed class WinRTRecorder : IRecorder
     {
+        /// <summary>Backing field for <see cref="Status"/>.</summary>
         private RecorderStatusEnum _status = RecorderStatusEnum.Idle;
-        
+
+        /// <summary>The WinRT speech recognizer driving continuous dictation, built and compiled in <see cref="InitAsync"/>.</summary>
         private SpeechRecognizer? _recognizer;
 
+        /// <inheritdoc/>
         public string Name => WinRTRecorderFactory.RecorderName;
 
+        /// <inheritdoc/>
         public event RecorderStatusChangedDelegate RecorderStatusChangedSignal;
 
 
+        /// <inheritdoc/>
         public RecorderStatusEnum Status
         {
             get => _status;
@@ -30,6 +41,7 @@ namespace FreeAIr.Record.WinRT
         }
 
 
+        /// <summary>Builds the recognizer with a dictation constraint and compiles it, prompting for the speech privacy setting if it is off.</summary>
         public async Task InitAsync()
         {
             var dictation = new SpeechRecognitionTopicConstraint(
@@ -47,6 +59,7 @@ namespace FreeAIr.Record.WinRT
                 );
         }
 
+        /// <summary>Records via the WinRT continuous recognition session until cancelled, returning the last recognized phrase.</summary>
         public async Task<RecordTranscribeResult> RecordAndTranscribeAsync(
             CancellationToken recordingCancellationToken
             )
@@ -75,11 +88,16 @@ namespace FreeAIr.Record.WinRT
             }
         }
 
+        /// <inheritdoc/>
         public async ValueTask DisposeAsync()
         {
             _recognizer?.Dispose();
         }
 
+        /// <summary>
+        /// Runs a WinRT speech call, and when it fails because the Windows speech privacy setting is
+        /// off, offers to open the settings page for it before rethrowing.
+        /// </summary>
         private static async Task RunPayloadWithAccessProtectionAsync(
             Func<Task> payload
             )
@@ -108,13 +126,22 @@ namespace FreeAIr.Record.WinRT
         }
 
 
+        /// <summary>
+        /// Bridges the WinRT continuous recognition session's event-driven API to an awaitable call:
+        /// starts the session, waits for the cancellation token, then stops it and returns the last
+        /// recognized phrase.
+        /// </summary>
         private sealed class WinRTRecordStopCallAwaiter : CallAwaiter<string>
         {
+            /// <summary>The recorder whose recognition session this awaiter starts, drives, and stops.</summary>
             private readonly WinRTRecorder _recorder;
+            /// <summary>Signals when the continuous recognition session should stop.</summary>
             private readonly CancellationToken _recordingCancellationToken;
-            
+
+            /// <summary>The most recent successfully recognized phrase, updated as recognition results arrive.</summary>
             private string? _recognizedText;
 
+            /// <summary>Wraps the recorder whose recognition session is driven and the token that signals when to stop.</summary>
             public WinRTRecordStopCallAwaiter(
                 WinRTRecorder recorder,
                 CancellationToken recordingCancellationToken
@@ -129,6 +156,7 @@ namespace FreeAIr.Record.WinRT
                 _recordingCancellationToken = recordingCancellationToken;
             }
 
+            /// <summary>Starts the continuous recognition session, waits for the cancellation token, then stops it.</summary>
             protected override async Task PrepareAsync()
             {
                 _recorder._recognizer.ContinuousRecognitionSession.ResultGenerated += ResultGenerated;
@@ -145,6 +173,7 @@ namespace FreeAIr.Record.WinRT
                 await _recorder._recognizer.ContinuousRecognitionSession.StopAsync().AsTask();
             }
 
+            /// <summary>The last successfully recognized phrase before the session was stopped.</summary>
             protected override Task<string> GetResultAsync()
             {
                 return Task.FromResult(
@@ -152,13 +181,15 @@ namespace FreeAIr.Record.WinRT
                     );
             }
 
+            /// <summary>Detaches the result-generated event handler.</summary>
             protected override Task CleanupAsync()
             {
                 _recorder._recognizer.ContinuousRecognitionSession.ResultGenerated -= ResultGenerated;
-                
+
                 return Task.CompletedTask;
             }
 
+            /// <summary>Captures each successful recognition result as it comes in, during the continuous session.</summary>
             private void ResultGenerated(
                 SpeechContinuousRecognitionSession sender,
                 SpeechContinuousRecognitionResultGeneratedEventArgs args

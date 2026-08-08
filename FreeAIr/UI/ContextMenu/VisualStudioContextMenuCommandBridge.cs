@@ -7,25 +7,49 @@ using System.Windows;
 
 namespace FreeAIr.UI.ContextMenu
 {
+    /// <summary>
+    /// The MEF-registered service that drives every dynamic Visual Studio context menu in FreeAIr
+    /// (agent, model, support action and recorder pickers). It owns the current menu item list and
+    /// the user's choice, and hands both to <see cref="VisualStudioContextMenu_DynamicCommand"/>,
+    /// which is the OLE command that Visual Studio actually renders and invokes.
+    /// </summary>
     public sealed class VisualStudioContextMenuCommandBridge
     {
+        /// <summary>
+        /// The <c>IVsUIShell.ShowContextMenu</c> placement flags used for every FreeAIr context
+        /// menu: anchored below and right-aligned to the invocation point.
+        /// </summary>
         private const uint _showOptions = (uint)(
             __VSSHOWCONTEXTMENUOPTS2.VSCTXMENU_PLACEBOTTOM
             | __VSSHOWCONTEXTMENUOPTS2.VSCTXMENU_RIGHTALIGN
             );
 
+        /// <summary>
+        /// The menu item the user picked from the last shown context menu, set by
+        /// <see cref="VisualStudioContextMenu_DynamicCommand.Execute"/> when a command is invoked.
+        /// </summary>
         public VisualStudioContextMenuItem? ChosenItem
         {
             get;
             set;
         }
 
+        /// <summary>
+        /// The items of the context menu currently being shown, read by
+        /// <see cref="VisualStudioContextMenu_DynamicCommand.GetItems"/> to populate the dynamic
+        /// command list; null when no menu is open.
+        /// </summary>
         public List<VisualStudioContextMenuItem> MenuItems
         {
             get;
             private set;
         }
 
+        /// <summary>
+        /// Publishes <paramref name="menuItems"/> and asks Visual Studio's shell to pop up the
+        /// FreeAIr dynamic context menu at the given screen coordinates, waiting for the user's pick.
+        /// Skips the shell call entirely when there is nothing, or only one thing, to choose from.
+        /// </summary>
         private async Task<VisualStudioContextMenuItem?> ShowAsync(
             List<VisualStudioContextMenuItem> menuItems,
             int x,
@@ -75,6 +99,10 @@ namespace FreeAIr.UI.ContextMenu
             return ChosenItem;
         }
 
+        /// <summary>
+        /// Convenience overload of the context menu picker for callers that have no notion of a
+        /// "checked" state for their items; every item is shown unchecked.
+        /// </summary>
         public static Task<TResult?> ShowAsync<TResult>(
             string title,
             List<(string, object)> items,
@@ -88,7 +116,12 @@ namespace FreeAIr.UI.ContextMenu
                 control
                 );
         }
-        
+
+        /// <summary>
+        /// The general-purpose entry point used by the agent, model, support and recorder pickers:
+        /// builds a single-section menu with a title and the given (label, checked, tag) items,
+        /// shows it, and returns the tag of whichever item the user chose.
+        /// </summary>
         public static async Task<TResult?> ShowAsync<TResult>(
             string title,
             List<(string, bool, object)> items,
@@ -115,21 +148,26 @@ namespace FreeAIr.UI.ContextMenu
             return null;
         }
 
+        /// <summary>Starts a fluent builder for a multi-section or otherwise custom context menu, as an alternative to the single-section <see cref="ShowAsync{TResult}(string, List{(string, bool, object)}, System.Windows.Media.Visual)"/> overload.</summary>
         public static MenuItemsBuilder BuildMenuItems()
         {
             return new MenuItemsBuilder();
         }
 
+        /// <summary>Fluent builder that accumulates a title and item groups before showing them as one FreeAIr context menu.</summary>
         public sealed class MenuItemsBuilder
         {
+            /// <summary>The menu items accumulated so far, in display order.</summary>
             private readonly List<VisualStudioContextMenuItem> _menuItems = new();
 
+            /// <summary>Adds a non-selectable title entry at the current position in the menu.</summary>
             public MenuItemsBuilder AddTitle(string title)
             {
                 _menuItems.Add(new VisualStudioContextMenuItem(title));
                 return this;
             }
 
+            /// <summary>Appends a group of (label, checked, tag) selectable items to the menu.</summary>
             public MenuItemsBuilder AddItems(
                 List<(string, bool, object)> items
                 )
@@ -146,6 +184,7 @@ namespace FreeAIr.UI.ContextMenu
                 return this;
             }
 
+            /// <summary>Shows the accumulated menu near <paramref name="control"/> (or the cursor if none given) and returns the tag of the chosen item.</summary>
             public async Task<TResult?> ShowAsync<TResult>(
                 System.Windows.Media.Visual? control = null
                 ) where TResult : class
@@ -169,6 +208,7 @@ namespace FreeAIr.UI.ContextMenu
                 return null;
             }
 
+            /// <summary>Resolves the shared <see cref="VisualStudioContextMenuCommandBridge"/> MEF service and asks it to pop up the given menu items at the control's (or cursor's) screen position, temporarily allowing in-situ chat input suppression to be lifted so the popup can receive input.</summary>
             private static async Task<TResult?> ShowMenuItemsAsync<TResult>(
                 List<VisualStudioContextMenuItem> menuItems,
                 System.Windows.Media.Visual? control = null

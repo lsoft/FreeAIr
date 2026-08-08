@@ -8,15 +8,25 @@ using System.Threading.Tasks;
 
 namespace FreeAIr.MCP.McpServerProxy.VS.Tools
 {
+    /// <summary>
+    /// The `ReplaceFileBody` MCP tool: writes a new body for a solution file, but only after showing
+    /// the user an inline diff (<see cref="DifferenceShower"/>) between the old and new content and
+    /// letting them adjust or reject it - the model never edits a file unseen.
+    /// </summary>
     public sealed class ReplaceFileBodyTool : VisualStudioMcpServerTool
     {
+        /// <summary>Shared singleton instance registered with the MCP tool catalog.</summary>
         public static readonly ReplaceFileBodyTool Instance = new();
 
+        /// <summary>The MCP tool name exposed to the model.</summary>
         public const string VisualStudioToolName = "ReplaceFileBody";
 
+        /// <summary>JSON schema property name for the target file's name or path.</summary>
         public const string FileNamePathParameterName = "file_name_or_full_path";
+        /// <summary>JSON schema property name for the proposed new file body.</summary>
         public const string NewFileBodyParameterName = "new_file_body";
 
+        /// <summary>Registers the tool under <see cref="VisualStudioToolName"/> with its JSON input schema for the target file and new body.</summary>
         public ReplaceFileBodyTool(
             ) : base(
                 VisualStudioMcpServerProxy.VisualStudioProxyName,
@@ -42,6 +52,11 @@ namespace FreeAIr.MCP.McpServerProxy.VS.Tools
         {
         }
 
+        /// <summary>
+        /// Resolves the target file, opens the inline-diff view against the proposed body, and applies
+        /// the (possibly user-edited) result only if it differs from the original; otherwise reports
+        /// the call as postponed rather than failed, since a user-driven rejection is not an error.
+        /// </summary>
         public override async Task<McpServerProxyToolCallResult?> CallToolAsync(
             string toolName,
             IReadOnlyDictionary<string, object?>? arguments = null,
@@ -129,6 +144,7 @@ namespace FreeAIr.MCP.McpServerProxy.VS.Tools
             return McpServerProxyToolCallResult.CreatePostponed();
         }
 
+        /// <summary>Re-splits the model's proposed body and rejoins it with the target file's actual line-ending style, so a model that always writes `\n` does not flip a CRLF file to LF.</summary>
         private static string ComposeItemNewBody(
             SolutionHelper.FoundSolutionItem item,
             string draftBodyOfNewItem
@@ -144,6 +160,7 @@ namespace FreeAIr.MCP.McpServerProxy.VS.Tools
             return newBody;
         }
 
+        /// <summary>Writes the new body into the file's already-open editor buffer if there is one, so undo and unsaved markers behave normally; falls back to a plain file write otherwise.</summary>
         public static async Task UpdateItemBodyAsync(
             string fullPath,
             string body
@@ -166,8 +183,10 @@ namespace FreeAIr.MCP.McpServerProxy.VS.Tools
             System.IO.File.WriteAllText(fullPath, body);
         }
 
+        /// <summary>The tool's success result: a one-line confirmation that the document was updated.</summary>
         private sealed class UpdateBodyResultJson
         {
+            /// <summary>The confirmation text returned to the model, e.g. "The document successfully updated".</summary>
             public string ResultMessage
             {
                 get;

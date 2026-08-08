@@ -23,6 +23,12 @@ using System.Windows;
 
 namespace FreeAIr
 {
+    /// <summary>
+    /// The extension entry point.
+    ///
+    /// The package auto-loads both with and without a solution, because parts of FreeAIr (the chat
+    /// list, the control center, the MCP proxy) must be usable before any solution is opened.
+    /// </summary>
     [PackageRegistration(UseManagedResourcesOnly = true, AllowsBackgroundLoading = true)]
     [InstalledProductRegistration(Vsix.Name, Vsix.Description, Vsix.Version)]
     [ProvideMenuResource("Menus.ctmenu", 1)]
@@ -38,15 +44,15 @@ namespace FreeAIr
     [ProvideToolWindow(typeof(NaturalLanguageResultsToolWindow.Pane), Style = VsDockStyle.Tabbed, Window = WindowGuids.DocumentWell)]
     [ProvideToolWindow(typeof(NaturalLanguageOutlinesToolWindow.Pane), Style = VsDockStyle.Tabbed, Window = WindowGuids.DocumentWell)]
     [ProvideToolWindow(typeof(BuildNaturalLanguageOutlinesJsonFileToolWindow.Pane), Style = VsDockStyle.Tabbed, Window = WindowGuids.DocumentWell)]
+    [ProvideToolWindow(typeof(RagCalibrationToolWindow.Pane), Style = VsDockStyle.Tabbed, Window = WindowGuids.DocumentWell)]
     [ProvideService(typeof(VisualStudioContextMenuCommandBridge), IsAsyncQueryable = true)]
-    /// <summary>
-    /// The extension entry point.
-    ///
-    /// The package auto-loads both with and without a solution, because parts of FreeAIr (the chat
-    /// list, the control center, the MCP proxy) must be usable before any solution is opened.
-    /// </summary>
     public sealed class FreeAIrPackage : ToolkitPackage
     {
+        /// <summary>
+        /// The single running instance of the package, set as soon as the constructor runs so
+        /// static helpers throughout FreeAIr can reach package services (e.g. `GetServiceAsync`)
+        /// without needing it passed down explicitly.
+        /// </summary>
         public static FreeAIrPackage Instance = null;
 
         /// <summary>
@@ -65,6 +71,10 @@ namespace FreeAIr
         /// <inheritdoc cref="WindowOpened"/>
         public static event Action<Window>? WindowClosed;
 
+        /// <summary>
+        /// Resolves <see cref="WorkingFolder"/> from the executing assembly's location once,
+        /// before any package instance exists.
+        /// </summary>
         static FreeAIrPackage()
         {
             var eal = Assembly.GetExecutingAssembly().Location;
@@ -72,6 +82,10 @@ namespace FreeAIr
             WorkingFolder = exeFolderPath;
         }
 
+        /// <summary>
+        /// Records this package as the running <see cref="Instance"/>; Visual Studio constructs
+        /// exactly one of these.
+        /// </summary>
         public FreeAIrPackage(
             )
         {
@@ -133,7 +147,10 @@ namespace FreeAIr
 
                 await ChosenRecorder.InitAsync();
 
-                ShowReleaseNotesInfoBarIfNeeded();
+                if (!ShowSetupWizardInfoBarIfNeeded())
+                {
+                    ShowReleaseNotesInfoBarIfNeeded();
+                }
 
                 EmbeddedResourceHelper.LoadXamlEmbeddedResource(
                     "FreeAIr.UI.ClickableText.ClickableTextResource.xaml"
@@ -152,6 +169,11 @@ namespace FreeAIr
 
         #region window actions
 
+        /// <summary>
+        /// Raises <see cref="WindowOpened"/> for every WPF window loaded anywhere in devenv, and
+        /// (re)subscribes to that window's Closed event so it is reported exactly once even
+        /// though Loaded can fire multiple times for the same window.
+        /// </summary>
         private void OnAnyWindowLoaded(object sender, RoutedEventArgs e)
         {
             if (sender is not Window w)
@@ -165,10 +187,17 @@ namespace FreeAIr
             // Or, if "Loaded" is good enough:
             WindowOpened?.Invoke(w);
 
-            // track close
+            // track close. Loaded fires again every time the window is re-attached to the visual
+            // tree, so the handler has to be dropped first — otherwise a single Closed would be
+            // reported as many times as the window has been loaded
+            w.Closed -= AnyWindowClosed;
             w.Closed += AnyWindowClosed;
         }
 
+        /// <summary>
+        /// Raises <see cref="WindowClosed"/> for the given window and unsubscribes itself so the
+        /// handler does not fire again if the window is reused.
+        /// </summary>
         private void AnyWindowClosed(object sender, EventArgs e)
         {
             if (sender is not Window w)
@@ -188,6 +217,11 @@ namespace FreeAIr
 
         #endregion
 
+        /// <summary>
+        /// Explicitly loads the given DLLs from <see cref="WorkingFolder"/> into the app domain,
+        /// working around dependencies (Xceed WPF Toolkit, System.ClientModel) that the normal
+        /// assembly resolution does not pick up automatically inside devenv.
+        /// </summary>
         private static void LoadDlls(
             string[] dllNames
             )
@@ -199,6 +233,11 @@ namespace FreeAIr
             }
         }
 
+        /// <summary>
+        /// Shows the release-notes info bar once per new FreeAIr version: compares the running
+        /// VSIX version against the last version recorded in <see cref="InternalPage"/> and
+        /// displays the bar only when they differ.
+        /// </summary>
         private static void ShowReleaseNotesInfoBarIfNeeded()
         {
             if (Vsix.Version != InternalPage.Instance.FreeAIrLastVersion)
@@ -210,6 +249,41 @@ namespace FreeAIr
             }
         }
 
+        /// <summary>
+        /// Shows the first-run info bar (offering release notes plus the setup wizard) exactly
+        /// once per install, before <see cref="InternalPage.SetupWizardIntroduced"/> is set: it
+        /// supersedes the plain release-notes bar on this run, since its own action already opens
+        /// the release notes too. Returns whether it was shown, so the caller can fall back to the
+        /// ordinary "new version installed" bar otherwise.
+        /// </summary>
+        private static bool ShowSetupWizardInfoBarIfNeeded()
+        {
+            if (InternalPage.Instance.SetupWizardIntroduced)
+            {
+                return false;
+            }
+
+            //this runs during package initialization: failing to show a bar is worth logging, but
+            //never worth failing the load of the whole extension over
+            try
+            {
+                var dte = AsyncPackage.GetGlobalService(typeof(EnvDTE.DTE)) as DTE2;
+                var sp = new ServiceProvider((Microsoft.VisualStudio.OLE.Interop.IServiceProvider)dte);
+                SetupWizardInfoBarService.Initialize(sp);
+                SetupWizardInfoBarService.Instance.ShowInfoBar();
+                return true;
+            }
+            catch (Exception excp)
+            {
+                excp.ActivityLogException();
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Starts the package's background MEF services (the git window modifier and the UI
+        /// informer) and wires the informer's double-click event to open the chat list.
+        /// </summary>
         private static void StartServices(
             IComponentModel componentModel
             )
@@ -225,6 +299,9 @@ namespace FreeAIr
             uii.DoubleClickEvent += UIDoubleClickEvent;
         }
 
+        /// <summary>
+        /// Opens the chat list tool window when the user double-clicks the FreeAIr status/info UI.
+        /// </summary>
         private static async void UIDoubleClickEvent(object sender, EventArgs e)
         {
             try

@@ -2,15 +2,34 @@
 
 namespace FreeAIr.Helper
 {
+    /// <summary>
+    /// Cleans up raw chat model output before it is shown or used: normalizes line endings and
+    /// strips the quoting, `&lt;think&gt;` blocks and code fences a model tends to wrap a short
+    /// answer in (e.g. a generated commit message).
+    /// </summary>
     public static class AnswerHelper
     {
+        /// <summary>
+        /// Matches a markdown code fence opener, e.g. ` ```csharp `, so it can be stripped from an
+        /// answer.
+        /// </summary>
         private static readonly Regex _removeCodeBlockRegex = new Regex(
             @"```\S*"
             );
 
+        /// <summary>
+        /// The opening tag of a reasoning model's `&lt;think&gt;` block.
+        /// </summary>
         private const string ThinkStart = "<think>";
+        /// <summary>
+        /// The closing tag of a reasoning model's `&lt;think&gt;` block.
+        /// </summary>
         private const string ThinkEnd = "</think>";
 
+        /// <summary>
+        /// Rewrites every line break in the answer to the given line ending, regardless of what mix
+        /// of CR, LF or CRLF the model produced.
+        /// </summary>
         public static string WithLineEnding(
             this string answer,
             string lineEnding
@@ -23,6 +42,12 @@ namespace FreeAIr.Helper
             return result;
         }
 
+        /// <summary>
+        /// Strips a leading `&lt;think&gt;...&lt;/think&gt;` reasoning block, then repeatedly trims
+        /// surrounding quotes, stray line breaks and code fences until nothing more can be removed.
+        /// Used to turn a chat model's raw answer into the bare text it was actually asked for, e.g.
+        /// a commit message.
+        /// </summary>
         public static string CleanupFromQuotesAndThinks(
             this string answer,
             string lineEnding

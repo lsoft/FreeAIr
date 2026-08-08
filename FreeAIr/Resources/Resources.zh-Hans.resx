@@ -891,4 +891,472 @@
   <data name="No_active_agents_found__Make_sure" xml:space="preserve">
     <value>未找到活跃代理。请确保至少有一个代理的令牌不为空。本地 LLM 允许使用伪造令牌。</value>
   </data>
+  <data name="RAG__loading_the_index__0___1_MB" xml:space="preserve">
+    <value>正在加载 NLO 索引... {0}/{1} MB</value>
+  </data>
+  <data name="RAG__preparing_the_index" xml:space="preserve">
+    <value>正在准备 NLO 索引...</value>
+  </data>
+  <data name="RAG__vectorizing_the_query" xml:space="preserve">
+    <value>正在向量化查询...</value>
+  </data>
+  <data name="RAG__ranking__0__outlines" xml:space="preserve">
+    <value>正在对 {0} 条 outline 排序...</value>
+  </data>
+  <data name="RAG__selected__0__files_of__1_" xml:space="preserve">
+    <value>已从 {1} 个文件中选出 {0} 个</value>
+  </data>
+  <data name="RAG__there_is_no_index" xml:space="preserve">
+    <value>此解决方案没有 NLO 嵌入索引。请使用 'Build natural language outlines' 命令构建它，或取消勾选 'Use RAG' 后再搜索。</value>
+  </data>
+  <data name="RAG__nothing_matched_the_query" xml:space="preserve">
+    <value>索引中没有与查询足够接近的文件。请降低选项 json 中 'Rag' 节点的 'Sensitivity'，或取消勾选 'Use RAG' 后再搜索。</value>
+  </data>
+  <data name="RAG__the_agent_does_not_match" xml:space="preserve">
+    <value>所选代理生成长度为 {0} 的向量，而索引中存储的向量长度为 {1}。这是不同的模型，无法比较：请选择构建该索引所用的代理。</value>
+  </data>
+  <data name="RAG__choose_the_embedding_agent" xml:space="preserve">
+    <value>请选择其嵌入模型构建了 NLO 索引的代理:</value>
+  </data>
+  <data name="RAG___0__files_are_out_of_the_index" xml:space="preserve">
+    <value>{0} 个文件不在索引中</value>
+  </data>
+  <data name="RAG__these_files_are_not_covered" xml:space="preserve">
+    <value>这些文件不在 NLO 索引中，因此搜索不会查看它们。请重建索引以包含它们:</value>
+  </data>
+  <data name="RAG__index_of__0___model__1_" xml:space="preserve">
+    <value>NLO 索引，生成于 {0}，模型 {1}</value>
+  </data>
+  <data name="RAG__narrows_the_search_down" xml:space="preserve">
+    <value>将搜索范围缩小到自然语言 outline 与查询最接近的文件，而不是就解决方案的每个文件询问 LLM。更便宜也更快，但不在索引中的文件永远不会被找到。</value>
+  </data>
+  <data name="RAG__the_index_has_been_built__0_" xml:space="preserve">
+    <value>索引构建于 {0}。</value>
+  </data>
+  <data name="RAG__there_is_no_index_short" xml:space="preserve">
+    <value>此解决方案没有 NLO 嵌入索引：请使用 'Build natural language outlines' 命令构建它以启用此复选框。</value>
+  </data>
+  <data name="Found__0__items_" xml:space="preserve">
+    <value>找到 {0} 项:</value>
+  </data>
+  <data name="RAG__calibrating_the_index" xml:space="preserve">
+    <value>正在校准索引...</value>
+  </data>
+  <data name="RAG__calibrated__noise__0___threshold__1_" xml:space="preserve">
+    <value>索引已校准：在此模型上无关查询可达 {0}，因此搜索采用 {1} 以上的文件。</value>
+  </data>
+  <data name="RAG__calibration__0__of__1__probes_missed" xml:space="preserve">
+    <value>{0}/{1} 个已知答案的查询未找到其指定的文件。</value>
+  </data>
+  <data name="RAG__calibration_model_does_not_separate" xml:space="preserve">
+    <value>此嵌入模型无法区分您的代码：已知答案的查询得分为 {0}，而无意义的查询可达 {1}。调整阈值无济于事 - 请更换嵌入模型。</value>
+  </data>
+  <data name="RAG__calibration_failed__0_" xml:space="preserve">
+    <value>索引已建立，但校准失败：{0}。搜索将不对其应用阈值。</value>
+  </data>
+  <data name="RAG__another_model_built_the_index__0_" xml:space="preserve">
+    <value>该索引由其他嵌入模型建立：校验语句的相似度仅为 {0}。请重建索引，或使用建立索引时所用的代理进行搜索。</value>
+  </data>
+  <data name="RAG_calibration__window_title" xml:space="preserve">
+    <value>FreeAIr RAG 校准</value>
+  </data>
+  <data name="RAG_calibration__index_summary" xml:space="preserve">
+    <value>索引建于 {0}，模型 {1}，服务器称其为 {2}。共 {3} 条描述，每条 {4} 个数字。</value>
+  </data>
+  <data name="RAG_calibration__not_calibrated" xml:space="preserve">
+    <value>该索引尚未校准：搜索不对其应用阈值，会传递它排序出的所有文件。</value>
+  </data>
+  <data name="RAG_calibration__summary" xml:space="preserve">
+    <value>噪声 {0}，灵敏度 {2} 时阈值为 {1}。基于 {3} 个无解查询和 {4} 个已知答案查询测得。</value>
+  </data>
+  <data name="RAG_calibration__probe" xml:space="preserve">
+    <value>查询</value>
+  </data>
+  <data name="RAG_calibration__probe_hint" xml:space="preserve">
+    <value>请标记能回答该查询的文件，或说明此处没有答案。两者都用于校准阈值，而后者作用更大。</value>
+  </data>
+  <data name="RAG_calibration__mark_as_answer" xml:space="preserve">
+    <value>这就是答案</value>
+  </data>
+  <data name="RAG_calibration__mark_as_hopeless" xml:space="preserve">
+    <value>此处无答案</value>
+  </data>
+  <data name="RAG_calibration__queries_header" xml:space="preserve">
+    <value>用于测量阈值的查询</value>
+  </data>
+  <data name="RAG_calibration__expected_path_hint" xml:space="preserve">
+    <value>文件为空表示该解决方案根本无法回答此查询。路径相对于解决方案文件夹。</value>
+  </data>
+  <data name="RAG_calibration__sensitivity" xml:space="preserve">
+    <value>灵敏度</value>
+  </data>
+  <data name="RAG_calibration__recalculate" xml:space="preserve">
+    <value>重新计算</value>
+  </data>
+  <data name="RAG_calibration__save" xml:space="preserve">
+    <value>保存</value>
+  </data>
+  <data name="RAG_calibration__reload" xml:space="preserve">
+    <value>重新加载</value>
+  </data>
+  <data name="RAG_calibration__remove" xml:space="preserve">
+    <value>删除</value>
+  </data>
+  <data name="RAG_calibration__kind_answered" xml:space="preserve">
+    <value>有答案</value>
+  </data>
+  <data name="RAG_calibration__kind_hopeless" xml:space="preserve">
+    <value>无答案</value>
+  </data>
+  <data name="RAG_calibration__passes" xml:space="preserve">
+    <value>通过</value>
+  </data>
+  <data name="RAG_calibration__cut_off" xml:space="preserve">
+    <value>被截断</value>
+  </data>
+  <data name="RAG_calibration__probed__0__files" xml:space="preserve">
+    <value>找到 {0} 个文件，该索引的阈值为 {1}。</value>
+  </data>
+  <data name="RAG_calibration__nothing_found" xml:space="preserve">
+    <value>索引中没有与此查询相关的任何内容。</value>
+  </data>
+  <data name="RAG_calibration__recalculating" xml:space="preserve">
+    <value>正在基于索引测量这些查询...</value>
+  </data>
+  <data name="RAG_calibration__recalculated" xml:space="preserve">
+    <value>测量完成。尚未保存任何内容。</value>
+  </data>
+  <data name="RAG_calibration__nothing_to_measure" xml:space="preserve">
+    <value>无内容可测量：索引为空，或所有查询均为空。</value>
+  </data>
+  <data name="RAG_calibration__saving" xml:space="preserve">
+    <value>正在保存...</value>
+  </data>
+  <data name="RAG_calibration__saved__0_" xml:space="preserve">
+    <value>查询已保存至 {0}，测得的数值已写入索引。搜索将立即使用它们。</value>
+  </data>
+  <data name="RAG_calibration__saved_settings_only__0_" xml:space="preserve">
+    <value>查询已保存至 {0}。索引未作改动：请先点击“重新计算”再将数值写入其中。</value>
+  </data>
+  <data name="RAG_calibration__query_added" xml:space="preserve">
+    <value>该查询已添加到下方列表中，后续每次建立索引都会复用它。</value>
+  </data>
+  <data name="RAG_calibration__query_replaced" xml:space="preserve">
+    <value>该查询已在列表中，其答案已被替换。</value>
+  </data>
+  <data name="RAG_calibration__no_agent" xml:space="preserve">
+    <value>没有可用于向量化查询的代理，因此无法进行测量。</value>
+  </data>
+  <data name="RAG_calibration__change_agent" xml:space="preserve">
+    <value>代理...</value>
+  </data>
+  <data name="RAG_calibration__agent__0___1___2_" xml:space="preserve">
+    <value>正在询问代理 '{0}'：模型 {1}，地址 {2}。</value>
+  </data>
+  <data name="RAG_calibration__agent_not_found__0_" xml:space="preserve">
+    <value>该索引由代理 '{0}' 建立，但设置中已不存在该代理。请点击“代理...”另选一个。</value>
+  </data>
+  <data name="RAG_calibration__agent_unknown" xml:space="preserve">
+    <value>该索引未记录建立它的代理。请点击“代理...”选择一个。</value>
+  </data>
+  <data name="RAG_calibration__help_10" xml:space="preserve">
+    <value>本窗口用于测量 `Use RAG` 搜索的相似度阈值，而不是让您去猜。所有计算都基于磁盘上已有的索引，向量绝不会被重新生成。</value>
+  </data>
+  <data name="RAG_calibration__help_20" xml:space="preserve">
+    <value>上方蓝色文字标明每次请求所经过的代理。它必须是建立该索引的那个模型；换用其他模型会被拒绝而非测量，因为其数值毫无意义。点击“代理...”可另选一个。</value>
+  </data>
+  <data name="RAG_calibration__help_30" xml:space="preserve">
+    <value>请像在自然语言搜索中那样输入问题，然后点击“查询”或按 Enter。索引给出的文件会连同其分值一并列出，包括当前阈值会截断的那些——判断阈值的依据正是它丢弃了什么。</value>
+  </data>
+  <data name="RAG_calibration__help_40" xml:space="preserve">
+    <value>请在真正能回答该问题的文件旁点击“这就是答案”；若解决方案根本无法回答，则点击“此处无答案”。两类都需要：无解的查询显示纯噪声在您的模型上能爬多高，有答案的查询则防止阈值高过您确知正确的文件。</value>
+  </data>
+  <data name="RAG_calibration__help_50" xml:space="preserve">
+    <value>查询会进入下方列表，该列表即为测量的全部输入。您可以在那里手工编辑：左侧是问题，右侧是回答它的文件（相对于解决方案文件夹的路径）。文件留空表示无人能回答该问题。按 Enter 提交所编辑的字段。</value>
+  </data>
+  <data name="RAG_calibration__help_60" xml:space="preserve">
+    <value>“灵敏度”表示文件需高出实测噪声多少，以噪声到完全匹配之间距离的比例计：0.1 宽松，0.2 为默认值，0.35 严格。修改它只是以另一角度重读同一次测量，不会再询问模型。</value>
+  </data>
+  <data name="RAG_calibration__help_70" xml:space="preserve">
+    <value>“重新计算”会基于索引测量这些查询，并显示由此得出的噪声与阈值。它不写入任何地方，因此可随意多次点击。</value>
+  </data>
+  <data name="RAG_calibration__help_80" xml:space="preserve">
+    <value>“保存”会把查询写入设置文件，供之后每次建立索引复用，并把测得的数值写入索引本身——只重写其很小的元数据文件。“重新加载”会重新读取索引与设置，“取消”会中止当前正在运行的操作。</value>
+  </data>
+  <data name="Help_header_what_this_window_is" xml:space="preserve">
+    <value>本窗口的用途及使用方法</value>
+  </data>
+  <data name="RAG_calibration__cancel" xml:space="preserve">
+    <value>取消</value>
+  </data>
+  <data name="RAG_calibration__help_15" xml:space="preserve">
+    <value>校准是抽样而非目录：五到十个查询就够了，无需把您今后会问的每个问题都加进来。阈值对整个索引只是一个数字，少量诚实的查询与上百个同样能把它定准。搜索即使完全不校准也能工作——只是不应用阈值，会传递它排序出的所有文件。</value>
+  </data>
+  <data name="FreeAIr_natural_language_search" xml:space="preserve">
+    <value>FreeAIr 自然语言搜索</value>
+  </data>
+  <data name="Search__no_action_is_configured" xml:space="preserve">
+    <value>没有配置作用域为 NaturalLanguageSearch 的操作，因此没有可用于询问模型的提示词。请在 FreeAIr 控制中心添加一个。</value>
+  </data>
+  <data name="Search__no_agent_with_a_token" xml:space="preserve">
+    <value>未找到带令牌的智能体，而搜索需要通过它访问模型。请在 FreeAIr 控制中心为要使用的智能体设置令牌。</value>
+  </data>
+  <data name="Search__there_is_nothing_to_search_in" xml:space="preserve">
+    <value>没有可搜索的内容：或者未打开解决方案，或者范围为当前项目而当前没有活动项目。</value>
+  </data>
+  <data name="Search__the_chat_has_not_started" xml:space="preserve">
+    <value>无法与该智能体建立会话，搜索未执行。</value>
+  </data>
+  <data name="Search__agent__0___1___2_" xml:space="preserve">
+    <value>回答查询：{0}（{1}，模型 {2}）</value>
+  </data>
+  <data name="Search__embedding_agent__0___1_" xml:space="preserve">
+    <value>向量化查询：{0}（{1}）</value>
+  </data>
+  <data name="Confidence__high" xml:space="preserve">
+    <value>高</value>
+  </data>
+  <data name="Confidence__medium" xml:space="preserve">
+    <value>中等</value>
+  </data>
+  <data name="Confidence__low" xml:space="preserve">
+    <value>低</value>
+  </data>
+  <data name="Wizard_title" xml:space="preserve">
+    <value>FreeAIr 设置向导</value>
+  </data>
+  <data name="Wizard_back" xml:space="preserve">
+    <value>上一步</value>
+  </data>
+  <data name="Wizard_next" xml:space="preserve">
+    <value>下一步</value>
+  </data>
+  <data name="Wizard_finish" xml:space="preserve">
+    <value>完成</value>
+  </data>
+  <data name="Wizard_cancel_confirm" xml:space="preserve">
+    <value>这将关闭设置向导且不保存任何内容。是否继续？</value>
+  </data>
+  <data name="Wizard_step_welcome_title" xml:space="preserve">
+    <value>欢迎使用 FreeAIr 设置向导</value>
+  </data>
+  <data name="Wizard_step_welcome_description" xml:space="preserve">
+    <value>本向导将逐步把 FreeAIr 的当前配置替换为您自己构建的配置。在到达最后一页并按“完成”之前不会写入任何内容——在此之前取消不会改变任何东西。</value>
+  </data>
+  <data name="Wizard_step_startingpoint_title" xml:space="preserve">
+    <value>起始配置</value>
+  </data>
+  <data name="Wizard_step_startingpoint_description" xml:space="preserve">
+    <value>请选择从什么开始编辑：内置示例配置（占位代理和随附的提示词库）、完全空白的配置，或本次安装的当前配置。</value>
+  </data>
+  <data name="Wizard_step_agents_title" xml:space="preserve">
+    <value>代理</value>
+  </data>
+  <data name="Wizard_step_agents_description" xml:space="preserve">
+    <value>代理就是您可以对话的一个大语言模型：在哪里访问它（端点）、如何认证（令牌）、请求哪个模型，以及它据以回答的系统提示词。聊天和操作按名称选择代理。从列表中选择已知的本地或云端端点，或输入您自己的；令牌可以直接保存，或者更适合可能提交到仓库的文件的做法——保存为对环境变量的引用。</value>
+  </data>
+  <data name="Wizard_step_mcpservers_title" xml:space="preserve">
+    <value>MCP 服务器</value>
+  </data>
+  <data name="Wizard_step_mcpservers_description" xml:space="preserve">
+    <value>MCP 服务器为您的代理提供额外工具——读取仓库、搜索文档等等。配置方式与从控制中心相同，包括在 Docker Hub 中搜索现成的服务器。</value>
+  </data>
+  <data name="Wizard_step_actions_title" xml:space="preserve">
+    <value>操作</value>
+  </data>
+  <data name="Wizard_step_actions_description" xml:space="preserve">
+    <value>操作是 FreeAIr 在菜单中提供的提示词。每个操作都指定回答它的代理，因此指向不存在代理的操作无法运行。</value>
+  </data>
+  <data name="Wizard_step_miscsettings_title" xml:space="preserve">
+    <value>其他设置</value>
+  </data>
+  <data name="Wizard_step_miscsettings_description" xml:space="preserve">
+    <value>一些没有单独页面的设置：输出长度、回答语言、生成时使用的单元测试框架，以及内置的 GitHub MCP 服务器。</value>
+  </data>
+  <data name="Wizard_step_summary_title" xml:space="preserve">
+    <value>摘要</value>
+  </data>
+  <data name="Wizard_step_summary_description" xml:space="preserve">
+    <value>以下是按“完成”后将写入的内容。</value>
+  </data>
+  <data name="Wizard_welcome_overwrite_warning" xml:space="preserve">
+    <value>这将替换 FreeAIr 当前配置的代理、MCP 服务器、操作和其他设置。</value>
+  </data>
+  <data name="Wizard_welcome_destination_header" xml:space="preserve">
+    <value>配置将写入：</value>
+  </data>
+  <data name="Wizard_welcome_destination_vs_store" xml:space="preserve">
+    <value>Visual Studio 的内部选项存储（未打开解决方案，因此没有可写入的 .freeair 文件夹）。</value>
+  </data>
+  <data name="Wizard_startingpoint_defaults" xml:space="preserve">
+    <value>内置示例配置</value>
+  </data>
+  <data name="Wizard_startingpoint_blank" xml:space="preserve">
+    <value>空白——从零开始</value>
+  </data>
+  <data name="Wizard_startingpoint_existing" xml:space="preserve">
+    <value>本次安装的当前配置</value>
+  </data>
+  <data name="Wizard_agent_guided_intro" xml:space="preserve">
+    <value>FreeAIr 的占位示例代理已被移除。请在下方填写您自己的一个代理——之后可以从控制中心添加更多。</value>
+  </data>
+  <data name="Wizard_agent_name_hint" xml:space="preserve">
+    <value>您自己选择的简短名称。聊天和操作按这个名称选择要对话的代理。</value>
+  </data>
+  <data name="Wizard_agent_endpoint_hint" xml:space="preserve">
+    <value>运行该模型的服务器的 OpenAI 兼容基础 URL——可以是 LM Studio 之类的本地服务器，也可以是云服务商。请从列表中选择已知地址、输入您自己的地址，或按测试按钮确认可达后再继续。</value>
+  </data>
+  <data name="Wizard_agent_token_hint" xml:space="preserve">
+    <value>LM Studio 之类的本地服务器通常不需要令牌——请留空。云服务商需要 API 密钥：可以直接粘贴，或勾选复选框并给出已保存该密钥的环境变量名称，这样令牌本身就永远不会进入提交到版本库的设置文件。</value>
+  </data>
+  <data name="Wizard_agent_model_hint" xml:space="preserve">
+    <value>该代理向端点请求的模型 id，例如服务器自身模型列表中显示的名称。</value>
+  </data>
+  <data name="Wizard_agent_contextsize_hint" xml:space="preserve">
+    <value>模型的上下文窗口大小（以令牌计）——FreeAIr 在一次请求中可以发送多少对话和代码。不确定时请查阅该模型的文档。</value>
+  </data>
+  <data name="Wizard_agent_systemprompt_hint" xml:space="preserve">
+    <value>每次对话前告知该代理的内容——它的角色与基本规则。不确定就保持原样；之后可以编辑。</value>
+  </data>
+  <data name="Wizard_agent_known_endpoint_tooltip" xml:space="preserve">
+    <value>选择一个已知端点</value>
+  </data>
+  <data name="Wizard_agent_use_env_variable" xml:space="preserve">
+    <value>使用环境变量</value>
+  </data>
+  <data name="Wizard_agent_test_connection" xml:space="preserve">
+    <value>测试连接</value>
+  </data>
+  <data name="Wizard_agent_test_checking" xml:space="preserve">
+    <value>正在检查...</value>
+  </data>
+  <data name="Wizard_agent_test_invalid_uri" xml:space="preserve">
+    <value>URL 无效——必须包含协议，例如 http://localhost:1234/v1。</value>
+  </data>
+  <data name="Wizard_agent_test_reachable" xml:space="preserve">
+    <value>可访问——报告了 {0} 个模型。</value>
+  </data>
+  <data name="Wizard_agent_test_failed" xml:space="preserve">
+    <value>无法访问该端点：{0}</value>
+  </data>
+  <data name="Wizard_agent_problem_missing_name" xml:space="preserve">
+    <value>代理必须有名称。</value>
+  </data>
+  <data name="Wizard_agent_problem_invalid_endpoint" xml:space="preserve">
+    <value>端点必须是有效的绝对 URI，例如 http://localhost:1234/v1。</value>
+  </data>
+  <data name="Wizard_agent_problem_invalid_token" xml:space="preserve">
+    <value>令牌必须为空、为字面值，或为 {{$VAR_NAME}} 形式的环境变量引用。</value>
+  </data>
+  <data name="Wizard_agent_problem_context_size" xml:space="preserve">
+    <value>上下文大小必须大于零。</value>
+  </data>
+  <data name="Wizard_agent_unnamed" xml:space="preserve">
+    <value>（未命名的代理）</value>
+  </data>
+  <data name="Wizard_mcp_count" xml:space="preserve">
+    <value>当前已配置 {0} 个 MCP 服务器。</value>
+  </data>
+  <data name="Wizard_mcp_configure" xml:space="preserve">
+    <value>配置 MCP 服务器...</value>
+  </data>
+  <data name="Wizard_mcp_msdn_optin" xml:space="preserve">
+    <value>安装 Microsoft Learn 文档 MCP 服务器</value>
+  </data>
+  <data name="Wizard_mcp_msdn_optin_hint" xml:space="preserve">
+    <value>让模型在 Microsoft 官方文档中查找答案，而不是依赖它对 .NET 和 Visual Studio 的记忆。它是 learn.microsoft.com 上的公开 HTTP 端点：不会向您的计算机下载或安装任何东西，也不需要令牌——勾选只是把该服务器写入设置。取消勾选则会将其移除。</value>
+  </data>
+  <data name="Wizard_actions_count" xml:space="preserve">
+    <value>当前已配置 {0} 个操作。</value>
+  </data>
+  <data name="Wizard_actions_configure" xml:space="preserve">
+    <value>配置操作...</value>
+  </data>
+  <data name="Wizard_actions_what_is_it" xml:space="preserve">
+    <value>操作是 FreeAIr 在菜单中提供的一个具名提示词：它指明由哪个代理回答、要问什么，以及出现在哪里——选中代码的上下文菜单、解决方案树、生成错误窗口、提交信息输入框。</value>
+  </data>
+  <data name="Wizard_actions_examples" xml:space="preserve">
+    <value>例如：对选中代码块的“Explain code”、对文件的“Add XML comments”、解决方案树中的“Generate unit tests”、错误列表中的“Fix build error”、根据 git diff 的“Build commit message”。</value>
+  </data>
+  <data name="Wizard_actions_use_defaults" xml:space="preserve">
+    <value>使用默认值</value>
+  </data>
+  <data name="Wizard_actions_use_defaults_hint" xml:space="preserve">
+    <value>用 FreeAIr 随附的默认操作重建操作列表，并把每一个都绑定到您的第一个代理。只有勾选上面的复选框后，整行补全才会被绑定——它在每次按键时都会触发，因此必须由您主动启用。</value>
+  </data>
+  <data name="Wizard_actions_wholeline" xml:space="preserve">
+    <value>键入时自动运行整行补全</value>
+  </data>
+  <data name="Wizard_actions_wholeline_hint" xml:space="preserve">
+    <value>启用后，FreeAIr 会在每次键入停顿后向模型请求本行的其余内容，并在光标前以灰色建议显示，也就是每次停顿都会发出一次请求。关闭后，整行补全操作处于休眠状态：下面的按钮不会把它绑定到代理，也不会把它报告为问题。无论哪种情况，都可以用 Alt+A 显式请求建议。</value>
+  </data>
+  <data name="Wizard_actions_defaults_need_an_agent" xml:space="preserve">
+    <value>请先创建代理：默认操作会绑定到您的第一个代理。</value>
+  </data>
+  <data name="Wizard_actions_defaults_applied" xml:space="preserve">
+    <value>已恢复 {0} 个默认操作，并全部绑定到代理“{1}”。</value>
+  </data>
+  <data name="Wizard_actions_problems_header" xml:space="preserve">
+    <value>以下操作按当前配置无法运行：</value>
+  </data>
+  <data name="Wizard_actions_problem_no_agent" xml:space="preserve">
+    <value>“{0}”未指定代理，因此每次调用时 FreeAIr 都会询问使用哪一个。</value>
+  </data>
+  <data name="Wizard_actions_problem_unknown_agent" xml:space="preserve">
+    <value>“{0}”绑定到代理“{1}”，但该代理不在此配置中。</value>
+  </data>
+  <data name="Wizard_misc_maxoutputtokens_label" xml:space="preserve">
+    <value>最大输出令牌数</value>
+  </data>
+  <data name="Wizard_misc_maxoutputtokens_hint" xml:space="preserve">
+    <value>代理回答最多可以达到的令牌数。</value>
+  </data>
+  <data name="Wizard_misc_culture_label" xml:space="preserve">
+    <value>强制回答语言（例如 ru-RU）</value>
+  </data>
+  <data name="Wizard_misc_culture_hint" xml:space="preserve">
+    <value>无论 Visual Studio 界面语言如何，都强制使用指定语言或区域回答。留空则由代理自行决定。</value>
+  </data>
+  <data name="Wizard_misc_unittestframework_label" xml:space="preserve">
+    <value>首选单元测试框架</value>
+  </data>
+  <data name="Wizard_misc_unittestframework_hint" xml:space="preserve">
+    <value>会写入“generate unit tests”操作所用的提示词，例如 xunit、nunit 或 mstest。</value>
+  </data>
+  <data name="Wizard_misc_searchtimeout_label" xml:space="preserve">
+    <value>上下文项搜索超时（毫秒）</value>
+  </data>
+  <data name="Wizard_misc_searchtimeout_hint" xml:space="preserve">
+    <value>FreeAIr 在放弃之前，为一次请求在解决方案中搜索相关文件和符号的时长。</value>
+  </data>
+  <data name="Wizard_misc_github_optin" xml:space="preserve">
+    <value>安装并使用内置的 GitHub MCP 服务器</value>
+  </data>
+  <data name="Wizard_misc_github_optin_hint" xml:space="preserve">
+    <value>让代理通过下载的 MCP 服务器读取 github.com 上的仓库、问题和拉取请求。未勾选时不会设置任何与 GitHub 相关的内容；勾选后仍需从控制中心安装该服务器。</value>
+  </data>
+  <data name="Wizard_misc_github_token_label" xml:space="preserve">
+    <value>GitHub MCP 服务器令牌</value>
+  </data>
+  <data name="Wizard_misc_github_token_hint" xml:space="preserve">
+    <value>github.com 个人访问令牌。可以直接粘贴，也可以写成 {{$MY_VAR}} 以改为从 MY_VAR 环境变量读取（设置后请重启 Visual Studio）。</value>
+  </data>
+  <data name="Wizard_summary_agents" xml:space="preserve">
+    <value>代理：{0}</value>
+  </data>
+  <data name="Wizard_summary_mcpservers" xml:space="preserve">
+    <value>MCP 服务器：{0}</value>
+  </data>
+  <data name="Wizard_summary_actions" xml:space="preserve">
+    <value>操作：{0}</value>
+  </data>
+  <data name="Wizard_summary_press_finish" xml:space="preserve">
+    <value>按“完成”写入此配置。</value>
+  </data>
+  <data name="Wizard_infobar_message" xml:space="preserve">
+    <value>FreeAIr 随附的示例配置用于编辑，而非日常使用。</value>
+  </data>
+  <data name="Wizard_infobar_open" xml:space="preserve">
+    <value>打开发行说明和设置向导</value>
+  </data>
 </root>

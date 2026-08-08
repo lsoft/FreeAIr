@@ -1890,5 +1890,1409 @@ namespace FreeAIr.Resources {
                 return ResourceManager.GetString("You_can_dictate_prompts", resourceCulture);
             }
         }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Loading the NLO index... {0}/{1} MB.
+        /// </summary>
+        public static string RAG__loading_the_index__0___1_MB {
+            get {
+                return ResourceManager.GetString("RAG__loading_the_index__0___1_MB", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Preparing the NLO index....
+        /// </summary>
+        public static string RAG__preparing_the_index {
+            get {
+                return ResourceManager.GetString("RAG__preparing_the_index", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Vectorizing the query....
+        /// </summary>
+        public static string RAG__vectorizing_the_query {
+            get {
+                return ResourceManager.GetString("RAG__vectorizing_the_query", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Ranking {0} outlines....
+        /// </summary>
+        public static string RAG__ranking__0__outlines {
+            get {
+                return ResourceManager.GetString("RAG__ranking__0__outlines", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Selected {0} files of {1}.
+        /// </summary>
+        public static string RAG__selected__0__files_of__1_ {
+            get {
+                return ResourceManager.GetString("RAG__selected__0__files_of__1_", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to There is no NLO embedding index for this solution. Build it with the &apos;Build natural language outlines&apos; command, or search with the &apos;Use RAG&apos; checkbox off..
+        /// </summary>
+        public static string RAG__there_is_no_index {
+            get {
+                return ResourceManager.GetString("RAG__there_is_no_index", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to No file of the index is close enough to the query. Lower &apos;Sensitivity&apos; in the &apos;Rag&apos; node of the options json, or search with the &apos;Use RAG&apos; checkbox off..
+        /// </summary>
+        public static string RAG__nothing_matched_the_query {
+            get {
+                return ResourceManager.GetString("RAG__nothing_matched_the_query", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to The chosen agent produces vectors of {0} numbers, while the index stores vectors of {1}. These are different models and cannot be compared: choose the agent the index has been built with..
+        /// </summary>
+        public static string RAG__the_agent_does_not_match {
+            get {
+                return ResourceManager.GetString("RAG__the_agent_does_not_match", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Choose the agent whose embedding model has built the NLO index:.
+        /// </summary>
+        public static string RAG__choose_the_embedding_agent {
+            get {
+                return ResourceManager.GetString("RAG__choose_the_embedding_agent", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to {0} file(s) out of the index.
+        /// </summary>
+        public static string RAG___0__files_are_out_of_the_index {
+            get {
+                return ResourceManager.GetString("RAG___0__files_are_out_of_the_index", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to These files are not covered by the NLO index, so the search does not look into them. Rebuild the index to include them:.
+        /// </summary>
+        public static string RAG__these_files_are_not_covered {
+            get {
+                return ResourceManager.GetString("RAG__these_files_are_not_covered", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to NLO index of {0}, model {1}.
+        /// </summary>
+        public static string RAG__index_of__0___model__1_ {
+            get {
+                return ResourceManager.GetString("RAG__index_of__0___model__1_", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Narrows the search down to the files whose natural language outlines are the closest to the query, instead of asking the LLM about every file of the solution. Much cheaper and faster, but a file which is not in the index is never found..
+        /// </summary>
+        public static string RAG__narrows_the_search_down {
+            get {
+                return ResourceManager.GetString("RAG__narrows_the_search_down", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to The index has been built {0}..
+        /// </summary>
+        public static string RAG__the_index_has_been_built__0_ {
+            get {
+                return ResourceManager.GetString("RAG__the_index_has_been_built__0_", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to There is no NLO embedding index for this solution: build it with the &apos;Build natural language outlines&apos; command to enable this checkbox..
+        /// </summary>
+        public static string RAG__there_is_no_index_short {
+            get {
+                return ResourceManager.GetString("RAG__there_is_no_index_short", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Found {0} items:.
+        /// </summary>
+        public static string Found__0__items_ {
+            get {
+                return ResourceManager.GetString("Found__0__items_", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Calibrating the index....
+        /// </summary>
+        public static string RAG__calibrating_the_index {
+            get {
+                return ResourceManager.GetString("RAG__calibrating_the_index", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to The index has been calibrated: nonsense reaches {0} on this model, so the search takes a file from {1}..
+        /// </summary>
+        public static string RAG__calibrated__noise__0___threshold__1_ {
+            get {
+                return ResourceManager.GetString("RAG__calibrated__noise__0___threshold__1_", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to {0} of {1} queries with a known answer did not find the file they name..
+        /// </summary>
+        public static string RAG__calibration__0__of__1__probes_missed {
+            get {
+                return ResourceManager.GetString("RAG__calibration__0__of__1__probes_missed", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to This embedding model does not tell your solution apart: a query with a known answer scores {0}, while a query about nothing reaches {1}. No threshold helps here - try another embedding model..
+        /// </summary>
+        public static string RAG__calibration_model_does_not_separate {
+            get {
+                return ResourceManager.GetString("RAG__calibration_model_does_not_separate", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to The index has been built, but could not be calibrated: {0}. The search will apply no threshold to it..
+        /// </summary>
+        public static string RAG__calibration_failed__0_ {
+            get {
+                return ResourceManager.GetString("RAG__calibration_failed__0_", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to The index has been built by a different embedding model: the check sentences agree only by {0}. Rebuild the index, or search with the agent it has been built with..
+        /// </summary>
+        public static string RAG__another_model_built_the_index__0_ {
+            get {
+                return ResourceManager.GetString("RAG__another_model_built_the_index__0_", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to FreeAIr RAG calibration.
+        /// </summary>
+        public static string RAG_calibration__window_title {
+            get {
+                return ResourceManager.GetString("RAG_calibration__window_title", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Index of {0}, model {1}, the server calls it {2}. {3} outlines of {4} numbers each..
+        /// </summary>
+        public static string RAG_calibration__index_summary {
+            get {
+                return ResourceManager.GetString("RAG_calibration__index_summary", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to This index has never been calibrated: the search applies no threshold to it and passes every file it ranks..
+        /// </summary>
+        public static string RAG_calibration__not_calibrated {
+            get {
+                return ResourceManager.GetString("RAG_calibration__not_calibrated", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Noise {0}, threshold {1} at sensitivity {2}. Measured on {3} unanswerable and {4} answered queries..
+        /// </summary>
+        public static string RAG_calibration__summary {
+            get {
+                return ResourceManager.GetString("RAG_calibration__summary", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Ask.
+        /// </summary>
+        public static string RAG_calibration__probe {
+            get {
+                return ResourceManager.GetString("RAG_calibration__probe", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Mark the file which answers the query, or say that nothing here does. Both teach the threshold, and the second one teaches it more..
+        /// </summary>
+        public static string RAG_calibration__probe_hint {
+            get {
+                return ResourceManager.GetString("RAG_calibration__probe_hint", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to this answers it.
+        /// </summary>
+        public static string RAG_calibration__mark_as_answer {
+            get {
+                return ResourceManager.GetString("RAG_calibration__mark_as_answer", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to nothing answers this.
+        /// </summary>
+        public static string RAG_calibration__mark_as_hopeless {
+            get {
+                return ResourceManager.GetString("RAG_calibration__mark_as_hopeless", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Queries the threshold is measured with.
+        /// </summary>
+        public static string RAG_calibration__queries_header {
+            get {
+                return ResourceManager.GetString("RAG_calibration__queries_header", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to An empty file means the solution cannot answer this query at all. A path is taken relative to the solution folder..
+        /// </summary>
+        public static string RAG_calibration__expected_path_hint {
+            get {
+                return ResourceManager.GetString("RAG_calibration__expected_path_hint", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Sensitivity.
+        /// </summary>
+        public static string RAG_calibration__sensitivity {
+            get {
+                return ResourceManager.GetString("RAG_calibration__sensitivity", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Recalculate.
+        /// </summary>
+        public static string RAG_calibration__recalculate {
+            get {
+                return ResourceManager.GetString("RAG_calibration__recalculate", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Save.
+        /// </summary>
+        public static string RAG_calibration__save {
+            get {
+                return ResourceManager.GetString("RAG_calibration__save", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Reload.
+        /// </summary>
+        public static string RAG_calibration__reload {
+            get {
+                return ResourceManager.GetString("RAG_calibration__reload", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to remove.
+        /// </summary>
+        public static string RAG_calibration__remove {
+            get {
+                return ResourceManager.GetString("RAG_calibration__remove", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to answered.
+        /// </summary>
+        public static string RAG_calibration__kind_answered {
+            get {
+                return ResourceManager.GetString("RAG_calibration__kind_answered", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to no answer.
+        /// </summary>
+        public static string RAG_calibration__kind_hopeless {
+            get {
+                return ResourceManager.GetString("RAG_calibration__kind_hopeless", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to passes.
+        /// </summary>
+        public static string RAG_calibration__passes {
+            get {
+                return ResourceManager.GetString("RAG_calibration__passes", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to cut off.
+        /// </summary>
+        public static string RAG_calibration__cut_off {
+            get {
+                return ResourceManager.GetString("RAG_calibration__cut_off", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to {0} file(s) found, the threshold of this index is {1}..
+        /// </summary>
+        public static string RAG_calibration__probed__0__files {
+            get {
+                return ResourceManager.GetString("RAG_calibration__probed__0__files", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to The index has nothing at all for this query..
+        /// </summary>
+        public static string RAG_calibration__nothing_found {
+            get {
+                return ResourceManager.GetString("RAG_calibration__nothing_found", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Measuring the queries against the index....
+        /// </summary>
+        public static string RAG_calibration__recalculating {
+            get {
+                return ResourceManager.GetString("RAG_calibration__recalculating", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Measured. Nothing has been saved yet..
+        /// </summary>
+        public static string RAG_calibration__recalculated {
+            get {
+                return ResourceManager.GetString("RAG_calibration__recalculated", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to There is nothing to measure: the index is empty, or every query has been left blank..
+        /// </summary>
+        public static string RAG_calibration__nothing_to_measure {
+            get {
+                return ResourceManager.GetString("RAG_calibration__nothing_to_measure", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Saving....
+        /// </summary>
+        public static string RAG_calibration__saving {
+            get {
+                return ResourceManager.GetString("RAG_calibration__saving", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to The queries went into {0}, the measured numbers into the index. The search uses them from now on..
+        /// </summary>
+        public static string RAG_calibration__saved__0_ {
+            get {
+                return ResourceManager.GetString("RAG_calibration__saved__0_", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to The queries went into {0}. The index has been left alone: press &apos;Recalculate&apos; first to store the numbers in it..
+        /// </summary>
+        public static string RAG_calibration__saved_settings_only__0_ {
+            get {
+                return ResourceManager.GetString("RAG_calibration__saved_settings_only__0_", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to The query has been added to the list below. It will be reused by every later index build..
+        /// </summary>
+        public static string RAG_calibration__query_added {
+            get {
+                return ResourceManager.GetString("RAG_calibration__query_added", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to This query was already in the list; its answer has been replaced..
+        /// </summary>
+        public static string RAG_calibration__query_replaced {
+            get {
+                return ResourceManager.GetString("RAG_calibration__query_replaced", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to No agent to vectorize the query with, so nothing can be measured..
+        /// </summary>
+        public static string RAG_calibration__no_agent {
+            get {
+                return ResourceManager.GetString("RAG_calibration__no_agent", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Agent....
+        /// </summary>
+        public static string RAG_calibration__change_agent {
+            get {
+                return ResourceManager.GetString("RAG_calibration__change_agent", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Asking agent &apos;{0}&apos;: model {1} at {2}..
+        /// </summary>
+        public static string RAG_calibration__agent__0___1___2_ {
+            get {
+                return ResourceManager.GetString("RAG_calibration__agent__0___1___2_", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to The index was built by agent &apos;{0}&apos;, which the settings no longer have. Press &apos;Agent...&apos; to pick another one..
+        /// </summary>
+        public static string RAG_calibration__agent_not_found__0_ {
+            get {
+                return ResourceManager.GetString("RAG_calibration__agent_not_found__0_", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to The index does not say which agent built it. Press &apos;Agent...&apos; to pick one..
+        /// </summary>
+        public static string RAG_calibration__agent_unknown {
+            get {
+                return ResourceManager.GetString("RAG_calibration__agent_unknown", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to This window measures the similarity threshold of the `Use RAG` search instead of leaving you to guess it. Everything happens against the index which is already on disk, and the vectors are never rebuilt..
+        /// </summary>
+        public static string RAG_calibration__help_10 {
+            get {
+                return ResourceManager.GetString("RAG_calibration__help_10", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to The blue line above names the agent every request goes through. It has to be the model which built the index; a different one is refused rather than measured, because its numbers would mean nothing. `Agent...` picks another one..
+        /// </summary>
+        public static string RAG_calibration__help_20 {
+            get {
+                return ResourceManager.GetString("RAG_calibration__help_20", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Type a question the way you would type it into the natural language search and press `Ask` or Enter. The files the index offers are listed with their score, including the ones the current threshold would cut off - a threshold can only be judged by what it throws away..
+        /// </summary>
+        public static string RAG_calibration__help_30 {
+            get {
+                return ResourceManager.GetString("RAG_calibration__help_30", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Press `this answers it` next to the file which really answers the question, or `nothing answers this` when the solution cannot answer it at all. Both kinds are needed: the unanswerable ones show how high pure noise climbs on your model, the answered ones stop the threshold from climbing over a file you know is right..
+        /// </summary>
+        public static string RAG_calibration__help_40 {
+            get {
+                return ResourceManager.GetString("RAG_calibration__help_40", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to The query lands in the list at the bottom, which is the whole input of the measurement. You can edit it by hand there: the left field is the question, the right one is the file which answers it, relative to the solution folder. Leave the file empty to say that nothing answers the question. Enter commits an edited field..
+        /// </summary>
+        public static string RAG_calibration__help_50 {
+            get {
+                return ResourceManager.GetString("RAG_calibration__help_50", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to `Sensitivity` is how far above the measured noise a file has to stand, as a share of the room between that noise and a perfect match: 0.1 is generous, 0.2 is the default, 0.35 is strict. Changing it re-reads the same measurement and asks the model nothing..
+        /// </summary>
+        public static string RAG_calibration__help_60 {
+            get {
+                return ResourceManager.GetString("RAG_calibration__help_60", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to `Recalculate` measures the queries against the index and shows the noise and the threshold they give. It writes nothing anywhere, so press it as often as you like..
+        /// </summary>
+        public static string RAG_calibration__help_70 {
+            get {
+                return ResourceManager.GetString("RAG_calibration__help_70", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to `Save` puts the queries into the settings file, where every later index build reuses them, and the measured numbers into the index itself - only its small metadata file is rewritten. `Reload` rereads the index and the settings, `Cancel` stops whatever is running..
+        /// </summary>
+        public static string RAG_calibration__help_80 {
+            get {
+                return ResourceManager.GetString("RAG_calibration__help_80", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to What this window is and how to use it.
+        /// </summary>
+        public static string Help_header_what_this_window_is {
+            get {
+                return ResourceManager.GetString("Help_header_what_this_window_is", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Cancel.
+        /// </summary>
+        public static string RAG_calibration__cancel {
+            get {
+                return ResourceManager.GetString("RAG_calibration__cancel", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Calibration is a sample, not a catalogue: five or ten queries are enough, and there is no need to add every question you are ever going to ask. The threshold is one number for the whole index, and a handful of honest queries pins it down as well as a hundred would. The search works without any calibration at all - it then applies no threshold and passes every file it ranked..
+        /// </summary>
+        public static string RAG_calibration__help_15 {
+            get {
+                return ResourceManager.GetString("RAG_calibration__help_15", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to FreeAIr natural language search.
+        /// </summary>
+        public static string FreeAIr_natural_language_search {
+            get {
+                return ResourceManager.GetString("FreeAIr_natural_language_search", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to No action with the NaturalLanguageSearch scope is configured, so there is no prompt to ask the model with. Add one in the FreeAIr control center..
+        /// </summary>
+        public static string Search__no_action_is_configured {
+            get {
+                return ResourceManager.GetString("Search__no_action_is_configured", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to No agent with a token has been found, and the search needs one to talk to a model. Set a token for the agent you want to search with in the FreeAIr control center..
+        /// </summary>
+        public static string Search__no_agent_with_a_token {
+            get {
+                return ResourceManager.GetString("Search__no_agent_with_a_token", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to There is nothing to search in: either no solution is open, or the scope is the current project and there is no active one..
+        /// </summary>
+        public static string Search__there_is_nothing_to_search_in {
+            get {
+                return ResourceManager.GetString("Search__there_is_nothing_to_search_in", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to The chat with the agent could not be started, so the search has not run..
+        /// </summary>
+        public static string Search__the_chat_has_not_started {
+            get {
+                return ResourceManager.GetString("Search__the_chat_has_not_started", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Answers the query: {0} ({1}, model {2}).
+        /// </summary>
+        public static string Search__agent__0___1___2_ {
+            get {
+                return ResourceManager.GetString("Search__agent__0___1___2_", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Vectorizes the query: {0} ({1}).
+        /// </summary>
+        public static string Search__embedding_agent__0___1_ {
+            get {
+                return ResourceManager.GetString("Search__embedding_agent__0___1_", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to High.
+        /// </summary>
+        public static string Confidence__high {
+            get {
+                return ResourceManager.GetString("Confidence__high", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Medium.
+        /// </summary>
+        public static string Confidence__medium {
+            get {
+                return ResourceManager.GetString("Confidence__medium", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Low.
+        /// </summary>
+        public static string Confidence__low {
+            get {
+                return ResourceManager.GetString("Confidence__low", resourceCulture);
+            }
+        }
+        /// <summary>
+        ///   Looks up a localized string similar to FreeAIr setup wizard.
+        /// </summary>
+        public static string Wizard_title {
+            get {
+                return ResourceManager.GetString("Wizard_title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Back.
+        /// </summary>
+        public static string Wizard_back {
+            get {
+                return ResourceManager.GetString("Wizard_back", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Next.
+        /// </summary>
+        public static string Wizard_next {
+            get {
+                return ResourceManager.GetString("Wizard_next", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Finish.
+        /// </summary>
+        public static string Wizard_finish {
+            get {
+                return ResourceManager.GetString("Wizard_finish", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This closes the setup wizard without saving anything. Continue?.
+        /// </summary>
+        public static string Wizard_cancel_confirm {
+            get {
+                return ResourceManager.GetString("Wizard_cancel_confirm", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Welcome to the FreeAIr setup wizard.
+        /// </summary>
+        public static string Wizard_step_welcome_title {
+            get {
+                return ResourceManager.GetString("Wizard_step_welcome_title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This wizard replaces FreeAIr's current configuration with one you build yourself, step by  [rest of string was truncated]&amp;quot;.
+        /// </summary>
+        public static string Wizard_step_welcome_description {
+            get {
+                return ResourceManager.GetString("Wizard_step_welcome_description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Starting point.
+        /// </summary>
+        public static string Wizard_step_startingpoint_title {
+            get {
+                return ResourceManager.GetString("Wizard_step_startingpoint_title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Choose what to start editing from: the built-in sample configuration (placeholder agents a [rest of string was truncated]&amp;quot;.
+        /// </summary>
+        public static string Wizard_step_startingpoint_description {
+            get {
+                return ResourceManager.GetString("Wizard_step_startingpoint_description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Agents.
+        /// </summary>
+        public static string Wizard_step_agents_title {
+            get {
+                return ResourceManager.GetString("Wizard_step_agents_title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to An agent is one LLM you can talk to: where to reach it (its endpoint), how to authenticate [rest of string was truncated]&amp;quot;.
+        /// </summary>
+        public static string Wizard_step_agents_description {
+            get {
+                return ResourceManager.GetString("Wizard_step_agents_description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to MCP servers.
+        /// </summary>
+        public static string Wizard_step_mcpservers_title {
+            get {
+                return ResourceManager.GetString("Wizard_step_mcpservers_title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to MCP servers give your agents extra tools - reading a repository, searching documentation,  [rest of string was truncated]&amp;quot;.
+        /// </summary>
+        public static string Wizard_step_mcpservers_description {
+            get {
+                return ResourceManager.GetString("Wizard_step_mcpservers_description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Actions.
+        /// </summary>
+        public static string Wizard_step_actions_title {
+            get {
+                return ResourceManager.GetString("Wizard_step_actions_title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Actions are the prompts FreeAIr offers in its menus. Each one names the agent that answers [rest of string was truncated]&amp;quot;.
+        /// </summary>
+        public static string Wizard_step_actions_description {
+            get {
+                return ResourceManager.GetString("Wizard_step_actions_description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Other settings.
+        /// </summary>
+        public static string Wizard_step_miscsettings_title {
+            get {
+                return ResourceManager.GetString("Wizard_step_miscsettings_title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A few settings that have not earned a page of their own: output length, answer language, t [rest of string was truncated]&amp;quot;.
+        /// </summary>
+        public static string Wizard_step_miscsettings_description {
+            get {
+                return ResourceManager.GetString("Wizard_step_miscsettings_description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Summary.
+        /// </summary>
+        public static string Wizard_step_summary_title {
+            get {
+                return ResourceManager.GetString("Wizard_step_summary_title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Everything below is what will be written when you press Finish..
+        /// </summary>
+        public static string Wizard_step_summary_description {
+            get {
+                return ResourceManager.GetString("Wizard_step_summary_description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This will replace the agents, MCP servers, actions and other settings currently configured [rest of string was truncated]&amp;quot;.
+        /// </summary>
+        public static string Wizard_welcome_overwrite_warning {
+            get {
+                return ResourceManager.GetString("Wizard_welcome_overwrite_warning", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The configuration will be written to:.
+        /// </summary>
+        public static string Wizard_welcome_destination_header {
+            get {
+                return ResourceManager.GetString("Wizard_welcome_destination_header", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Visual Studio's internal option store (no solution is open, so there is no .freeair folder [rest of string was truncated]&amp;quot;.
+        /// </summary>
+        public static string Wizard_welcome_destination_vs_store {
+            get {
+                return ResourceManager.GetString("Wizard_welcome_destination_vs_store", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Built-in sample configuration.
+        /// </summary>
+        public static string Wizard_startingpoint_defaults {
+            get {
+                return ResourceManager.GetString("Wizard_startingpoint_defaults", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Blank - start from nothing.
+        /// </summary>
+        public static string Wizard_startingpoint_blank {
+            get {
+                return ResourceManager.GetString("Wizard_startingpoint_blank", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This install's current configuration.
+        /// </summary>
+        public static string Wizard_startingpoint_existing {
+            get {
+                return ResourceManager.GetString("Wizard_startingpoint_existing", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to FreeAIr's placeholder sample agents have been removed. Fill in one agent of your own below [rest of string was truncated]&amp;quot;.
+        /// </summary>
+        public static string Wizard_agent_guided_intro {
+            get {
+                return ResourceManager.GetString("Wizard_agent_guided_intro", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A short label of your choosing. Chats and actions pick an agent to talk to by this name..
+        /// </summary>
+        public static string Wizard_agent_name_hint {
+            get {
+                return ResourceManager.GetString("Wizard_agent_name_hint", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The OpenAI-compatible base URL of the server that runs the model - a local one such as LM  [rest of string was truncated]&amp;quot;.
+        /// </summary>
+        public static string Wizard_agent_endpoint_hint {
+            get {
+                return ResourceManager.GetString("Wizard_agent_endpoint_hint", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A local server such as LM Studio usually needs no token - leave this empty. A cloud provid [rest of string was truncated]&amp;quot;.
+        /// </summary>
+        public static string Wizard_agent_token_hint {
+            get {
+                return ResourceManager.GetString("Wizard_agent_token_hint", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The model id this agent asks the endpoint for, e.g. the name shown by the server's own mod [rest of string was truncated]&amp;quot;.
+        /// </summary>
+        public static string Wizard_agent_model_hint {
+            get {
+                return ResourceManager.GetString("Wizard_agent_model_hint", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The model's context window in tokens - how much conversation and code FreeAIr may send in  [rest of string was truncated]&amp;quot;.
+        /// </summary>
+        public static string Wizard_agent_contextsize_hint {
+            get {
+                return ResourceManager.GetString("Wizard_agent_contextsize_hint", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to What this agent is told before every conversation - its persona and ground rules. Leave it [rest of string was truncated]&amp;quot;.
+        /// </summary>
+        public static string Wizard_agent_systemprompt_hint {
+            get {
+                return ResourceManager.GetString("Wizard_agent_systemprompt_hint", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Pick a known endpoint.
+        /// </summary>
+        public static string Wizard_agent_known_endpoint_tooltip {
+            get {
+                return ResourceManager.GetString("Wizard_agent_known_endpoint_tooltip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to use an environment variable.
+        /// </summary>
+        public static string Wizard_agent_use_env_variable {
+            get {
+                return ResourceManager.GetString("Wizard_agent_use_env_variable", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Test connection.
+        /// </summary>
+        public static string Wizard_agent_test_connection {
+            get {
+                return ResourceManager.GetString("Wizard_agent_test_connection", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Checking....
+        /// </summary>
+        public static string Wizard_agent_test_checking {
+            get {
+                return ResourceManager.GetString("Wizard_agent_test_checking", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Not a valid URL - it must include a protocol, e.g. http://localhost:1234/v1..
+        /// </summary>
+        public static string Wizard_agent_test_invalid_uri {
+            get {
+                return ResourceManager.GetString("Wizard_agent_test_invalid_uri", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Reachable - {0} model(s) reported..
+        /// </summary>
+        public static string Wizard_agent_test_reachable {
+            get {
+                return ResourceManager.GetString("Wizard_agent_test_reachable", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Could not reach this endpoint: {0}.
+        /// </summary>
+        public static string Wizard_agent_test_failed {
+            get {
+                return ResourceManager.GetString("Wizard_agent_test_failed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The agent needs a name..
+        /// </summary>
+        public static string Wizard_agent_problem_missing_name {
+            get {
+                return ResourceManager.GetString("Wizard_agent_problem_missing_name", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The endpoint must be a valid absolute URI, e.g. http://localhost:1234/v1..
+        /// </summary>
+        public static string Wizard_agent_problem_invalid_endpoint {
+            get {
+                return ResourceManager.GetString("Wizard_agent_problem_invalid_endpoint", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The token must be empty, a literal value, or an environment-variable reference in the {{$V [rest of string was truncated]&amp;quot;.
+        /// </summary>
+        public static string Wizard_agent_problem_invalid_token {
+            get {
+                return ResourceManager.GetString("Wizard_agent_problem_invalid_token", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The context size must be greater than zero..
+        /// </summary>
+        public static string Wizard_agent_problem_context_size {
+            get {
+                return ResourceManager.GetString("Wizard_agent_problem_context_size", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to (unnamed agent).
+        /// </summary>
+        public static string Wizard_agent_unnamed {
+            get {
+                return ResourceManager.GetString("Wizard_agent_unnamed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} MCP server(s) currently configured..
+        /// </summary>
+        public static string Wizard_mcp_count {
+            get {
+                return ResourceManager.GetString("Wizard_mcp_count", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Configure MCP servers....
+        /// </summary>
+        public static string Wizard_mcp_configure {
+            get {
+                return ResourceManager.GetString("Wizard_mcp_configure", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Install the Microsoft Learn documentation MCP server.
+        /// </summary>
+        public static string Wizard_mcp_msdn_optin {
+            get {
+                return ResourceManager.GetString("Wizard_mcp_msdn_optin", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Lets the model look answers up in the official Microsoft documentation instead of relying [rest of string was truncated]&amp;quot;.
+        /// </summary>
+        public static string Wizard_mcp_msdn_optin_hint {
+            get {
+                return ResourceManager.GetString("Wizard_mcp_msdn_optin_hint", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to {0} action(s) currently configured..
+        /// </summary>
+        public static string Wizard_actions_count {
+            get {
+                return ResourceManager.GetString("Wizard_actions_count", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Configure actions....
+        /// </summary>
+        public static string Wizard_actions_configure {
+            get {
+                return ResourceManager.GetString("Wizard_actions_configure", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to An action is a named prompt FreeAIr offers in a menu: it says which agent answers it, what [rest of string was truncated]&amp;quot;.
+        /// </summary>
+        public static string Wizard_actions_what_is_it {
+            get {
+                return ResourceManager.GetString("Wizard_actions_what_is_it", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to For example: "Explain code" on a selected block, "Add XML comments" on a file, "Generate u [rest of string was truncated]&amp;quot;.
+        /// </summary>
+        public static string Wizard_actions_examples {
+            get {
+                return ResourceManager.GetString("Wizard_actions_examples", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Use default values.
+        /// </summary>
+        public static string Wizard_actions_use_defaults {
+            get {
+                return ResourceManager.GetString("Wizard_actions_use_defaults", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Rebuilds the action list from the ones FreeAIr ships with and binds every one of them to y [rest of string was truncated]&amp;quot;.
+        /// </summary>
+        public static string Wizard_actions_use_defaults_hint {
+            get {
+                return ResourceManager.GetString("Wizard_actions_use_defaults_hint", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Run whole line completion automatically as you type.
+        /// </summary>
+        public static string Wizard_actions_wholeline {
+            get {
+                return ResourceManager.GetString("Wizard_actions_wholeline", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to With this on, FreeAIr asks the model for the rest of the line after every pause in typing a [rest of string was truncated]&amp;quot;.
+        /// </summary>
+        public static string Wizard_actions_wholeline_hint {
+            get {
+                return ResourceManager.GetString("Wizard_actions_wholeline_hint", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Create an agent first: the default actions are bound to your first agent..
+        /// </summary>
+        public static string Wizard_actions_defaults_need_an_agent {
+            get {
+                return ResourceManager.GetString("Wizard_actions_defaults_need_an_agent", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} default action(s) restored and bound to the agent "{1}"..
+        /// </summary>
+        public static string Wizard_actions_defaults_applied {
+            get {
+                return ResourceManager.GetString("Wizard_actions_defaults_applied", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to These actions cannot run as configured:.
+        /// </summary>
+        public static string Wizard_actions_problems_header {
+            get {
+                return ResourceManager.GetString("Wizard_actions_problems_header", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to "{0}" names no agent, so FreeAIr will ask which one to use every time it is invoked..
+        /// </summary>
+        public static string Wizard_actions_problem_no_agent {
+            get {
+                return ResourceManager.GetString("Wizard_actions_problem_no_agent", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to "{0}" is bound to the agent "{1}", which does not exist in this configuration..
+        /// </summary>
+        public static string Wizard_actions_problem_unknown_agent {
+            get {
+                return ResourceManager.GetString("Wizard_actions_problem_unknown_agent", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Max output tokens.
+        /// </summary>
+        public static string Wizard_misc_maxoutputtokens_label {
+            get {
+                return ResourceManager.GetString("Wizard_misc_maxoutputtokens_label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The maximum number of tokens an agent's answer may run to..
+        /// </summary>
+        public static string Wizard_misc_maxoutputtokens_hint {
+            get {
+                return ResourceManager.GetString("Wizard_misc_maxoutputtokens_hint", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Answer culture override (e.g. ru-RU).
+        /// </summary>
+        public static string Wizard_misc_culture_label {
+            get {
+                return ResourceManager.GetString("Wizard_misc_culture_label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Forces answers into a specific language or culture regardless of your Visual Studio UI lan [rest of string was truncated]&amp;quot;.
+        /// </summary>
+        public static string Wizard_misc_culture_hint {
+            get {
+                return ResourceManager.GetString("Wizard_misc_culture_hint", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Preferred unit test framework.
+        /// </summary>
+        public static string Wizard_misc_unittestframework_label {
+            get {
+                return ResourceManager.GetString("Wizard_misc_unittestframework_label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Named in the prompt used by the "generate unit tests" action, e.g. xunit, nunit or mstest..
+        /// </summary>
+        public static string Wizard_misc_unittestframework_hint {
+            get {
+                return ResourceManager.GetString("Wizard_misc_unittestframework_hint", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Context-item search timeout (msec).
+        /// </summary>
+        public static string Wizard_misc_searchtimeout_label {
+            get {
+                return ResourceManager.GetString("Wizard_misc_searchtimeout_label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to How long FreeAIr searches the solution for related files and symbols to attach to a reques [rest of string was truncated]&amp;quot;.
+        /// </summary>
+        public static string Wizard_misc_searchtimeout_hint {
+            get {
+                return ResourceManager.GetString("Wizard_misc_searchtimeout_hint", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Install and use the built-in GitHub MCP server.
+        /// </summary>
+        public static string Wizard_misc_github_optin {
+            get {
+                return ResourceManager.GetString("Wizard_misc_github_optin", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Lets agents read repositories, issues and pull requests on github.com through a downloaded [rest of string was truncated]&amp;quot;.
+        /// </summary>
+        public static string Wizard_misc_github_optin_hint {
+            get {
+                return ResourceManager.GetString("Wizard_misc_github_optin_hint", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to GitHub MCP server token.
+        /// </summary>
+        public static string Wizard_misc_github_token_label {
+            get {
+                return ResourceManager.GetString("Wizard_misc_github_token_label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A github.com personal access token. Either paste it directly, or write it as {{$MY_VAR}} t [rest of string was truncated]&amp;quot;.
+        /// </summary>
+        public static string Wizard_misc_github_token_hint {
+            get {
+                return ResourceManager.GetString("Wizard_misc_github_token_hint", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Agents: {0}.
+        /// </summary>
+        public static string Wizard_summary_agents {
+            get {
+                return ResourceManager.GetString("Wizard_summary_agents", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to MCP servers: {0}.
+        /// </summary>
+        public static string Wizard_summary_mcpservers {
+            get {
+                return ResourceManager.GetString("Wizard_summary_mcpservers", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Actions: {0}.
+        /// </summary>
+        public static string Wizard_summary_actions {
+            get {
+                return ResourceManager.GetString("Wizard_summary_actions", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Press Finish to write this configuration..
+        /// </summary>
+        public static string Wizard_summary_press_finish {
+            get {
+                return ResourceManager.GetString("Wizard_summary_press_finish", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to FreeAIr ships with a sample configuration meant for editing, not for daily use..
+        /// </summary>
+        public static string Wizard_infobar_message {
+            get {
+                return ResourceManager.GetString("Wizard_infobar_message", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Open release notes and the setup wizard.
+        /// </summary>
+        public static string Wizard_infobar_open {
+            get {
+                return ResourceManager.GetString("Wizard_infobar_open", resourceCulture);
+            }
+        }
+        
     }
 }

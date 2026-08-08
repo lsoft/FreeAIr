@@ -6,8 +6,17 @@ using FreeAIr.BLogic;
 
 namespace FreeAIr.UI.Windows
 {
+    /// <summary>
+    /// Small popup window that hosts a voice-recorder configuration control near the point the
+    /// user invoked it from, closing itself (and signalling the caller) on Escape, deactivation,
+    /// or an explicit close action.
+    /// </summary>
     public partial class RecorderSetupWindow : Window
     {
+        /// <summary>
+        /// Creates the window hosting the given configuration control and invokes
+        /// <paramref name="closeAction"/> once the window closes.
+        /// </summary>
         public RecorderSetupWindow(
             UserControl recorderConfigurationControl,
             Action closeAction
@@ -30,6 +39,10 @@ namespace FreeAIr.UI.Windows
             Closed += (sender, e) => closeAction();
         }
 
+        /// <summary>
+        /// Shows the recorder configuration control in a popup positioned at the given screen
+        /// point (clamped to stay on-screen), and awaits until the user closes it.
+        /// </summary>
         public static async Task ShowAsync(
             UserControl recorderConfigurationControl,
             System.Windows.Point position
@@ -47,6 +60,11 @@ namespace FreeAIr.UI.Windows
             await semaphore.WaitAsync();
         }
 
+        /// <summary>
+        /// Converts the given device-pixel screen point to DIPs for the window's monitor and
+        /// positions the window there, then nudges it back on-screen if it would otherwise hang
+        /// off an edge.
+        /// </summary>
         private static void PositionWindowAtScreenPointWithBoundsCheck(
             Window window,
             System.Windows.Point screenPoint
@@ -67,6 +85,9 @@ namespace FreeAIr.UI.Windows
             window.CorrectWindowPosition();
         }
 
+        /// <summary>
+        /// Closes the popup when the user presses Escape.
+        /// </summary>
         private void Window_PreviewKeyUp(object sender, System.Windows.Input.KeyEventArgs e)
         {
             if (e.Key == System.Windows.Input.Key.Escape)
@@ -76,6 +97,9 @@ namespace FreeAIr.UI.Windows
             }
         }
 
+        /// <summary>
+        /// Closes the popup as soon as it loses focus, so it behaves like a transient flyout.
+        /// </summary>
         private void Window_Deactivated(object sender, EventArgs e)
         {
             this.Close();

@@ -17,11 +17,16 @@
     Name="NaturaLanguageResultsName"
     >
     <UserControl.Resources>
-        <DoubleCollection x:Key="Proportions">3,14,2,1</DoubleCollection>
+        <!-- the confidence column carries a word and a number now, so it needs more room than the
+             bare number it used to show -->
+        <DoubleCollection x:Key="Proportions">3,13,3,1</DoubleCollection>
     </UserControl.Resources>
 
     <Grid>
         <Grid.RowDefinitions>
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
             <RowDefinition Height="auto" />
             <RowDefinition />
         </Grid.RowDefinitions>
@@ -64,9 +69,114 @@
                 />
 
         </Grid>
-        
-        <ScrollViewer
+
+        <!-- who has answered, and - for a RAG search - who has vectorized the query. Two agents
+             chosen in two different ways, and the results cannot be judged without them -->
+        <TextBlock
             Grid.Row="1"
+            Margin="5,2,5,2"
+            FontFamily="Cascadia Code"
+            TextWrapping="Wrap"
+            Foreground="Gray"
+            Text="{Binding AgentsDescription}"
+            Visibility="{Binding AgentsVisibility}"
+            />
+
+        <!-- Mode=OneWay on Value is not decoration: RangeBase.Value binds two way by default, and a
+             two way binding onto the read only property of the view model throws while the window
+             is being built, which takes the whole window down with it -->
+        <ProgressBar
+            Grid.Row="2"
+            Height="4"
+            Margin="5,0,5,2"
+            Minimum="0"
+            Maximum="{Binding ProgressMaximum, Mode=OneWay}"
+            Value="{Binding ProgressValue, Mode=OneWay}"
+            IsIndeterminate="{Binding IsProgressIndeterminate}"
+            Visibility="{Binding ProgressVisibility}"
+            toolkit:Themes.UseVsTheme="True"
+            />
+
+        <!-- shown for a RAG search only: which index has been used, which files it has picked,
+             and which files it does not know about at all -->
+        <StackPanel
+            Grid.Row="3"
+            Margin="5,0,5,0"
+            Visibility="{Binding RagPanelVisibility}"
+            >
+            <TextBlock
+                Text="{Binding RagIndexDescription}"
+                TextWrapping="Wrap"
+                Foreground="Gray"
+                />
+
+            <Expander
+                Margin="0,2,0,0"
+                Header="{Binding CandidatesHeader}"
+                Foreground="{Binding ElementName=StyleButtonName, Path=Foreground}"
+                toolkit:Themes.UseVsTheme="True"
+                >
+                <ScrollViewer
+                    MaxHeight="150"
+                    VerticalScrollBarVisibility="Auto"
+                    >
+                    <ItemsControl
+                        ItemsSource="{Binding Candidates}"
+                        >
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Grid Margin="0,1,0,1">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="50" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+
+                                    <TextBlock
+                                        Grid.Column="0"
+                                        Text="{Binding Score, StringFormat={}{0:F3}}"
+                                        Foreground="Gray"
+                                        />
+
+                                    <StackPanel
+                                        Grid.Column="1"
+                                        >
+                                        <TextBlock
+                                            Text="{Binding RelativePath}"
+                                            TextWrapping="Wrap"
+                                            Foreground="#569CD6"
+                                            />
+                                        <TextBlock
+                                            Text="{Binding BestOutlineText}"
+                                            TextWrapping="Wrap"
+                                            Foreground="Gray"
+                                            />
+                                    </StackPanel>
+                                </Grid>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </ScrollViewer>
+            </Expander>
+
+            <TextBlock
+                Margin="0,2,0,2"
+                Text="{Binding UncoveredText}"
+                Visibility="{Binding UncoveredVisibility}"
+                TextWrapping="Wrap"
+                Foreground="#569CD6"
+                Cursor="Hand"
+                >
+                <TextBlock.InputBindings>
+                    <MouseBinding
+                        Command="{Binding ElementName=NaturaLanguageResultsName, Path=DataContext.ShowUncoveredFilesCommand}"
+                        MouseAction="LeftClick"
+                        />
+                </TextBlock.InputBindings>
+            </TextBlock>
+        </StackPanel>
+
+        <ScrollViewer
+            Grid.Row="4"
             VerticalScrollBarVisibility="Auto"
             >
             <ListView
@@ -215,7 +325,7 @@
                                 <DataTemplate>
                                     <Label
                                         HorizontalAlignment="Center"
-                                        Content="{Binding ConfidenceLevel}"
+                                        Content="{Binding ConfidenceText}"
                                         Background="Transparent"
                                         Foreground="White"
                                         />

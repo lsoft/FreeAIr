@@ -5,23 +5,31 @@ using System.Reflection;
 
 namespace WpfHelpers
 {
+    /// <summary>
+    /// <see cref="ObservableCollection{T}"/> extended with bulk operations (<see cref="AddRange"/>,
+    /// <see cref="ReverseInsertAt0"/>) that raise one Count/Item[] change plus one Add notification
+    /// per item, instead of forcing callers to add items one at a time.
+    /// </summary>
     [Serializable]
     public sealed class ObservableCollection2<T> : ObservableCollection<T>
     {
         private readonly IList<T> _items;
 
+        /// <summary>Reaches into the base <see cref="Collection{T}"/> via reflection to get direct list access, since the base class exposes no protected list accessor usable here.</summary>
         public ObservableCollection2()
         {
             var itemsField = typeof(Collection<T>).GetField("items", BindingFlags.Instance | BindingFlags.NonPublic);
             _items = (IList<T>)(itemsField.GetValue(this));
         }
 
+        /// <summary>Creates the collection pre-populated with <paramref name="items"/>.</summary>
         public ObservableCollection2(IEnumerable<T> items)
             : this()
         {
             AddRange(items);
         }
 
+        /// <summary>Inserts <paramref name="items"/> at the front, preserving their order, with a single Count/Item[] notification.</summary>
         public void ReverseInsertAt0(
             IEnumerable<T> items
             )
@@ -59,6 +67,7 @@ namespace WpfHelpers
             }
         }
 
+        /// <summary>Appends <paramref name="items"/> to the end, with a single Count/Item[] notification plus one Add notification per item.</summary>
         public void AddRange(
             IEnumerable<T> items
             )

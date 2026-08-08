@@ -11,9 +11,19 @@ using FreeAIr.Chat.Context.Item;
 
 namespace FreeAIr.Commands.BuildError
 {
+    /// <summary>
+    /// The menu command in the Build Error window that starts a chat to fix the currently
+    /// selected build error: it opens the affected file, lets the user choose a support action
+    /// and agent, and seeds the chat with the file context and error details.
+    /// </summary>
     [Command(PackageIds.BuildErrorWindowFixErrorCommandId)]
     public sealed class BuildErrorWindowFixErrorCommand : BaseCommand<BuildErrorWindowFixErrorCommand>
     {
+        /// <summary>
+        /// Runs when the user invokes "fix error" from the Build Error window; resolves the
+        /// selected error, gathers context from its file, and opens a chat pre-loaded with a
+        /// fix prompt.
+        /// </summary>
         protected override async Task ExecuteAsync(OleMenuCmdEventArgs e)
         {
             await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();

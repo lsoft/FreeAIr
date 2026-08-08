@@ -10,13 +10,16 @@ namespace WpfHelpers
     /// </summary>
     public sealed class CommandReference : Freezable, ICommand
     {
+        /// <summary>Default constructor required by <see cref="Freezable"/>; no extra setup needed.</summary>
         public CommandReference()
         {
             // Blank
         }
 
+        /// <summary>Dependency property backing <see cref="Command"/>; changes are routed through <see cref="OnCommandChanged"/> to re-subscribe <see cref="CanExecuteChanged"/>.</summary>
         public static readonly DependencyProperty CommandProperty = DependencyProperty.Register("Command", typeof(ICommand), typeof(CommandReference), new PropertyMetadata(new PropertyChangedCallback(OnCommandChanged)));
 
+        /// <summary>The wrapped command, set via XAML data binding.</summary>
         public ICommand Command
         {
             get { return (ICommand)GetValue(CommandProperty); }
@@ -25,6 +28,7 @@ namespace WpfHelpers
 
         #region ICommand Members
 
+        /// <summary>Delegates to <see cref="Command"/>; false if none is bound.</summary>
         public bool CanExecute(object parameter)
         {
             if (Command != null)
@@ -32,13 +36,16 @@ namespace WpfHelpers
             return false;
         }
 
+        /// <summary>Delegates to <see cref="Command"/>.</summary>
         public void Execute(object parameter)
         {
             Command.Execute(parameter);
         }
 
+        /// <summary>Raised when the bound <see cref="Command"/>'s own can-execute state changes.</summary>
         public event EventHandler CanExecuteChanged;
 
+        /// <summary>Re-wires <see cref="CanExecuteChanged"/> from the old bound command to the new one whenever <see cref="CommandProperty"/> changes.</summary>
         private static void OnCommandChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             var commandReference = d as CommandReference;
@@ -59,6 +66,7 @@ namespace WpfHelpers
 
         #region Freezable
 
+        /// <summary>Unused required <see cref="Freezable"/> override — this type is never actually frozen/cloned, only used for its dependency-property binding support.</summary>
         protected override Freezable CreateInstanceCore()
         {
             throw new NotImplementedException();

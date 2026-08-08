@@ -4,15 +4,21 @@ using System.Windows.Documents;
 
 namespace MarkdownParser.Antlr.Answer.Parts
 {
+    /// <summary>Plain-text part supporting `**bold**` runs; repeated <see cref="Append"/> calls accumulate into one part instead of fragmenting the paragraph.</summary>
     public sealed class TextPart : IPart
     {
+        /// <summary>Raw text fragments accumulated by successive <see cref="Append"/> calls; joined on demand to form <see cref="Text"/>.</summary>
         private List<string> _text;
+        /// <summary>Supplies the font size used when rendering the part's runs.</summary>
         private readonly IFontSizeProvider _fontSizeProvider;
 
+        /// <summary>Identifies this part as plain text for part-type dispatch.</summary>
         public PartTypeEnum Type => PartTypeEnum.Text;
 
+        /// <summary>The full accumulated text, including any `**bold**` markers, as parsed so far.</summary>
         public string Text => string.Join("", _text);
 
+        /// <summary>Creates a text part starting with the given raw text.</summary>
         public TextPart(
             IFontSizeProvider fontSizeProvider,
             string text
@@ -32,6 +38,7 @@ namespace MarkdownParser.Antlr.Answer.Parts
             _fontSizeProvider = fontSizeProvider;
         }
 
+        /// <summary>Appends more raw text to this part without creating a new one.</summary>
         public void Append(string text)
         {
             if (text is null)
@@ -42,11 +49,13 @@ namespace MarkdownParser.Antlr.Answer.Parts
             _text.Add(text);
         }
 
+        /// <summary>The parameter passed to an <see cref="AdditionalCommand"/> button for this part — the full accumulated text.</summary>
         public object GetContextForAdditionalCommand()
         {
             return Text;
         }
 
+        /// <summary>Splits the text on `**` markers and yields alternating regular/bold <see cref="Run"/>s.</summary>
         public IEnumerable<Inline> GetInlines(bool isInProgress)
         {
             const string boldAnchor = "**";

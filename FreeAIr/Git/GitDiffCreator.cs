@@ -5,8 +5,18 @@ using System.Windows;
 
 namespace FreeAIr.Git
 {
+    /// <summary>
+    /// Turns the pending changes of the current git repository into a parsed <see cref="GitDiff"/>,
+    /// combining the raw diff collected by <see cref="GitCollectBackgroundTask"/> with the
+    /// repository folder resolved by <see cref="GitRepositoryProvider"/>.
+    /// </summary>
     public static class GitDiffCreator
     {
+        /// <summary>
+        /// Collects the pending diff in a wait dialog and parses it into a <see cref="GitDiff"/>.
+        /// Shows an error and returns null when there is nothing to diff or the repository folder
+        /// cannot be determined.
+        /// </summary>
         public static async System.Threading.Tasks.Task<GitDiff> BuildGitDiffAsync(
             )
         {
@@ -40,6 +50,9 @@ namespace FreeAIr.Git
             return diff;
         }
 
+        /// <summary>
+        /// Shows a modal error message box with the given text.
+        /// </summary>
         private static async Task ShowErrorAsync(
             string error
             )

@@ -4,8 +4,17 @@ using System.Threading.Tasks;
 
 namespace FreeAIr.UI.ContextMenu
 {
+    /// <summary>
+    /// Shows the Visual Studio context menu used to pick a configured support action (a
+    /// user-defined prompt/command) applicable to a given scope, such as code review or record
+    /// post-processing.
+    /// </summary>
     public static class SupportContextMenu
     {
+        /// <summary>
+        /// Lists the support actions configured for <paramref name="scope"/> and shows the picker
+        /// menu, auto-selecting when only one action matches.
+        /// </summary>
         public static async Task<SupportActionJson?> ChooseSupportAsync(
             string title,
             SupportScopeEnum scope

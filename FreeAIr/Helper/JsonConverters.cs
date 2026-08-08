@@ -13,8 +13,10 @@ namespace FreeAIr.Helper
     /// </summary>
     public sealed class PseudoX16BlobJsonConverter : JsonConverter<float[]>
     {
+        /// <summary>Alphabet base for the pseudo-hex encoding: nibble 0 maps to 'A', 1 to 'B', and so on.</summary>
         private const int _byteA = 'A';
 
+        /// <summary>Decodes a pseudo-hex string (alphabet 0=A,1=B,...) back into a float array.</summary>
         public override float[] Read(
             ref Utf8JsonReader reader,
             Type typeToConvert,
@@ -57,6 +59,7 @@ namespace FreeAIr.Helper
             return result;
         }
 
+        /// <summary>Combines two pseudo-hex character codes into the byte they encode.</summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static byte ParseHexByte(
             byte high,
@@ -70,6 +73,7 @@ namespace FreeAIr.Helper
             return result;
         }
 
+        /// <summary>Converts one pseudo-hex character code back to its 0-15 nibble value, relative to <see cref="_byteA"/>.</summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static int CharToHex(byte c)
         {
@@ -77,6 +81,7 @@ namespace FreeAIr.Helper
             return result;
         }
 
+        /// <summary>Encodes a float array as a pseudo-hex string (alphabet 0=A,1=B,...).</summary>
         public override void Write(
             Utf8JsonWriter writer,
             float[] value,
@@ -111,8 +116,10 @@ namespace FreeAIr.Helper
     /// </summary>
     public sealed class X16BlobJsonConverter : JsonConverter<float[]>
     {
+        /// <summary>Standard hex digit alphabet used to render bytes as text in <see cref="Write"/>.</summary>
         private static readonly char[] _hexDigits = "0123456789ABCDEF".ToCharArray();
 
+        /// <summary>Decodes a standard hex string (e.g. `A0B33FFF00EE`) back into a float array.</summary>
         public override float[] Read(
             ref Utf8JsonReader reader,
             Type typeToConvert,
@@ -165,6 +172,7 @@ namespace FreeAIr.Helper
             }
         }
 
+        /// <summary>Combines two standard hex digit characters into the byte they encode; returns false if either is not a valid hex digit.</summary>
         private static bool TryParseHexByte(char high, char low, out byte value)
         {
             int h = CharToHex(high);
@@ -180,6 +188,7 @@ namespace FreeAIr.Helper
             return true;
         }
 
+        /// <summary>Converts one standard hex digit character (case-insensitive) to its 0-15 value, or -1 if it isn't a hex digit.</summary>
         private static int CharToHex(char c)
         {
             if ((uint)(c - '0') <= 9)
@@ -194,6 +203,7 @@ namespace FreeAIr.Helper
             return -1;
         }
 
+        /// <summary>Encodes a float array as a standard hex string (e.g. `A0B33FFF00EE`).</summary>
         public override void Write(
             Utf8JsonWriter writer,
             float[] value,
@@ -227,6 +237,7 @@ namespace FreeAIr.Helper
     /// </summary>
     public sealed class Base64BlobJsonConverter : JsonConverter<float[]>
     {
+        /// <summary>Decodes a Base64-encoded byte blob back into a float array.</summary>
         public override float[] Read(
             ref Utf8JsonReader reader,
             Type typeToConvert,
@@ -260,6 +271,7 @@ namespace FreeAIr.Helper
             return floatSpan.ToArray();
         }
 
+        /// <summary>Encodes a float array as a Base64 string.</summary>
         public override void Write(
             Utf8JsonWriter writer,
             float[] value,
@@ -277,8 +289,10 @@ namespace FreeAIr.Helper
         }
     }
 
+    /// <summary>Wraps a value's normal JSON serialization but forces the writer to emit it without indentation, regardless of the outer serializer's formatting settings.</summary>
     public sealed class CompactJsonConverter<T> : JsonConverter<T>
     {
+        /// <summary>Reads the JSON value/object and deserializes it into <typeparamref name="T"/> using the standard converters.</summary>
         public override T Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
             // Проверяем, что текущий токен — это объект или значение, которое можно десериализовать
@@ -295,6 +309,7 @@ namespace FreeAIr.Helper
             }
         }
 
+        /// <summary>Serializes <paramref name="value"/> and writes it as a single compact (non-indented) JSON value, regardless of the outer options' formatting.</summary>
         public override void Write(Utf8JsonWriter writer, T value, JsonSerializerOptions options)
         {
             // Сериализуем значение без отступов (компактный формат)

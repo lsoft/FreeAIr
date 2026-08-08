@@ -11,7 +11,9 @@ namespace FreeAIr.BLogic.Reader
     /// </summary>
     public static class LLMReaderPool
     {
+        /// <summary>Guards access to <see cref="_readers"/> across concurrent chat operations.</summary>
         private static readonly object _locker = new();
+        /// <summary>The one live reader per chat, keyed by chat instance.</summary>
         private static readonly Dictionary<FreeAIr.Chat.Chat, LLMReader> _readers = new();
 
         /// <summary>

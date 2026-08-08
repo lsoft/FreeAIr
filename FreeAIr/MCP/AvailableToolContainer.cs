@@ -20,6 +20,7 @@ namespace FreeAIr.MCP.McpServerProxy
     /// </summary>
     public sealed class AvailableToolContainer
     {
+        /// <summary>The per-server, per-tool enabled/disabled flags this container wraps.</summary>
         private readonly AvailableMcpServersJson _servers;
 
         /// <summary>
@@ -57,6 +58,10 @@ namespace FreeAIr.MCP.McpServerProxy
             _servers = servers;
         }
 
+        /// <summary>
+        /// Reports whether the named tool of the named MCP server is enabled; a server or tool
+        /// not present in the container counts as disabled.
+        /// </summary>
         public bool GetToolStatus(
             string serverName,
             string toolName
@@ -78,11 +83,18 @@ namespace FreeAIr.MCP.McpServerProxy
         }
 
 
+        /// <summary>
+        /// Registers a new MCP server in the container with no tools yet, e.g. right after it was
+        /// added in the settings UI, before its tool list has been discovered.
+        /// </summary>
         public void AddServer(string serverName)
         {
             _servers.Servers.Add(new AvailableMcpServerJson(serverName, []));
         }
 
+        /// <summary>
+        /// Removes a server and all of its stored tool flags from the container.
+        /// </summary>
         public void DeleteServer(string serverName)
         {
             _servers.Servers.RemoveAll(a => a.Name == serverName);
@@ -116,6 +128,11 @@ namespace FreeAIr.MCP.McpServerProxy
             server.AddToolsIfNotExists(toolNames);
         }
 
+        /// <summary>
+        /// Removes every stored tool flag for each of the given MCP server proxy names, e.g. when
+        /// those proxies are removed or being reset before a fresh tool discovery. Returns whether
+        /// anything was actually deleted.
+        /// </summary>
         public bool DeleteAllToolsForMcpServerProxies(
             IEnumerable<string> serverNames
             )
@@ -137,6 +154,10 @@ namespace FreeAIr.MCP.McpServerProxy
             return deleted;
         }
 
+        /// <summary>
+        /// Sets a specific tool's enabled flag for a known server, adding the tool entry if it
+        /// was not already recorded. Does nothing if the server itself is not in the container.
+        /// </summary>
         public void AddTool(
             string serverName,
             string toolName,
@@ -159,6 +180,10 @@ namespace FreeAIr.MCP.McpServerProxy
             tool.Enabled = enabled;
         }
 
+        /// <summary>
+        /// Persists this container's tool flags back into the active FreeAIr settings, making the
+        /// change global rather than scoped to a single chat.
+        /// </summary>
         public async Task SaveToSystemAsync()
         {
             await FreeAIrOptions.SaveExternalMCPToolsAsync(
@@ -166,6 +191,11 @@ namespace FreeAIr.MCP.McpServerProxy
                 );
         }
 
+        /// <summary>
+        /// Writes this container's tool flags into an in-memory settings document (rather than
+        /// the saved settings), returning the updated JSON. Used by the Control Center to stage
+        /// edits before the user saves.
+        /// </summary>
         public string SaveTo(
             string optionsJson
             )

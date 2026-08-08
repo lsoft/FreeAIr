@@ -6,9 +6,17 @@ using System.Windows.Forms;
 
 namespace FreeAIr.Commands
 {
+    /// <summary>
+    /// Base for menu commands that either reuse the most recently used chat (when the user holds
+    /// Ctrl while invoking the command) or start a new one after prompting for an agent to use.
+    /// </summary>
     public abstract class CreateOrReuseChatCommand<T> : BaseCommand<T>
         where T: BaseCommand<T>, new()
     {
+        /// <summary>
+        /// Returns the last-used chat if Ctrl is held down when the command runs; otherwise lets
+        /// the user pick an agent and starts a fresh chat with it.
+        /// </summary>
         protected async Task<Chat.Chat?> CreateOrReuseChatAsync(
             )
         {

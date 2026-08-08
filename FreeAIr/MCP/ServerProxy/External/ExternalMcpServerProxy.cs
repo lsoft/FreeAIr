@@ -7,15 +7,23 @@ using System.Threading.Tasks;
 
 namespace FreeAIr.MCP.McpServerProxy.External
 {
+    /// <summary>
+    /// The VSIX side's handle to a user-configured external MCP server: every call is forwarded
+    /// across the pipe to <see cref="McpServerProxyApplication.ProxyInterface"/> by
+    /// <see cref="Name"/>, which the proxy resolves through its own <c>Servers</c> registry.
+    /// </summary>
     public sealed class ExternalMcpServerProxy : IMcpServerProxy
     {
+        /// <summary>Unused; the server's configuration is looked up on the proxy side by <see cref="Name"/> instead of being held here.</summary>
         private readonly McpServer _server;
 
+        /// <summary>The configured external server's name, used by the proxy to look up its registered configuration.</summary>
         public string Name
         {
             get;
         }
 
+        /// <summary>Creates a proxy handle for the external server registered under the given name.</summary>
         public ExternalMcpServerProxy(
             string name
             )
@@ -28,6 +36,7 @@ namespace FreeAIr.MCP.McpServerProxy.External
             Name = name;
         }
 
+        /// <summary>An external server needs no separate install step - this only checks that the proxy process itself is running.</summary>
         public async Task<bool> IsInstalledAsync()
         {
             if (!McpServerProxyApplication.Started)
@@ -38,6 +47,7 @@ namespace FreeAIr.MCP.McpServerProxy.External
             return true;
         }
 
+        /// <summary>A no-op beyond requiring the proxy to be running, since an external server has nothing of its own to install.</summary>
         public Task InstallAsync()
         {
             if (!McpServerProxyApplication.Started)
@@ -48,6 +58,7 @@ namespace FreeAIr.MCP.McpServerProxy.External
             return Task.CompletedTask;
         }
 
+        /// <summary>Asks the proxy for this server's tool list across the pipe.</summary>
         public async Task<McpServerTools> GetToolsAsync()
         {
             if (!McpServerProxyApplication.Started)
@@ -71,6 +82,7 @@ namespace FreeAIr.MCP.McpServerProxy.External
                 );
         }
 
+        /// <summary>Forwards a tool call across the pipe, converting a transport failure or a reported tool error into a failed <see cref="McpServerProxyToolCallResult"/> instead of throwing.</summary>
         public async Task<McpServerProxyToolCallResult> CallToolAsync(
             string toolName,
             Dictionary<string, object?>? arguments = null,
@@ -118,6 +130,7 @@ namespace FreeAIr.MCP.McpServerProxy.External
 
         }
 
+        /// <summary>The parameters every call to this server needs regardless of tool - currently just the proxy's working folder.</summary>
         private Dictionary<string, string> GetMcpServerSpecificArguments()
         {
             return new Dictionary<string, string>

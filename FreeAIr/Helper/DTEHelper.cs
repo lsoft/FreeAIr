@@ -3,8 +3,16 @@ using EnvDTE80;
 
 namespace FreeAIr.Helper
 {
+    /// <summary>
+    /// Small helpers over EnvDTE for reading the state of Visual Studio's Solution Explorer, used to
+    /// decide whether a command applies to the whole solution or to a specific project.
+    /// </summary>
     public static class DTEHelper
     {
+        /// <summary>
+        /// Whether Solution Explorer has exactly one item selected and it is the solution node
+        /// itself, as opposed to a project or file.
+        /// </summary>
         public static bool CheckIfOnlySolutionSelected(
             )
         {
@@ -30,6 +38,10 @@ namespace FreeAIr.Helper
             return true;
         }
 
+        /// <summary>
+        /// Looks up a top-level project of the solution by name (case-insensitive), or null when no
+        /// project matches.
+        /// </summary>
         public static EnvDTE.Project? TryFindProject(
             this EnvDTE.DTE dte,
             string projectName

@@ -26,8 +26,10 @@ namespace FreeAIr.Record
     {
         private static IRecorder? _currentRecorder;
 
+        /// <summary>Fires whenever the active recorder's idle/recording/transcribing state changes, so the UI can update its icon.</summary>
         public static event RecorderStatusChangedDelegate RecorderStatusChangedSignal;
 
+        /// <summary>Creates the recorder named in <see cref="RecordingPage"/>, falling back to <see cref="FakeRecorder"/> if that fails. Called once during package startup.</summary>
         public static async Task InitAsync()
         {
             try
@@ -42,13 +44,16 @@ namespace FreeAIr.Record
             }
         }
 
+        /// <summary>Whether a recorder has already been created, without triggering creation as a side effect.</summary>
         public static bool IsReady() => _currentRecorder is not null;
 
+        /// <summary>The active recorder's display name, or null before one has been created.</summary>
         public static string? GetRecorderName()
         {
             return _currentRecorder?.Name;
         }
 
+        /// <summary>The active recorder, creating the default one first if none exists yet. Falls back to <see cref="FakeRecorder"/> on any failure so callers never get null.</summary>
         public static async Task<IRecorder> GetRecorderAsync()
         {
             try
@@ -117,6 +122,7 @@ namespace FreeAIr.Record
             }
         }
 
+        /// <summary>Builds the recorder named in <see cref="RecordingPage"/>, or the first known factory's recorder when the saved name no longer matches any.</summary>
         private static async Task SetNewRecorderAsync()
         {
             var recorderFactories = await RecorderContextMenu.ObtainRecorderFactoriesAsync();
@@ -128,6 +134,7 @@ namespace FreeAIr.Record
             await ReplaceRecorderWithAsync(defaultRecorder);
         }
 
+        /// <summary>Shows the chosen backend's configuration window (if it has one) and switches to a recorder built from the answers.</summary>
         private static async Task ProcessNewRecorderAsync(
             IRecorderFactory chosenRecorderFactory
             )
@@ -167,6 +174,7 @@ namespace FreeAIr.Record
             }
         }
 
+        /// <summary>Relays a recorder's own status event out as <see cref="RecorderStatusChangedSignal"/>.</summary>
         private static void FireRecorderStatusChangedSignal(
             IRecorder recorder,
             RecorderStatusEnum status

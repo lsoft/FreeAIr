@@ -1,0 +1,46 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    The part of the searching which does not need Visual Studio: the index file format, the vector
+    codec, the outline tree and the ranking of the natural language search, and the text matching
+    of `Grep/`. It is a separate assembly so that all of it can be exercised by an ordinary test
+    runner - the VSIX project itself cannot be loaded by one.
+
+    netstandard2.0 on purpose: it has to be consumable both by FreeAIr (net48) and by the test
+    projects (net8.0).
+  -->
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <LangVersion>Latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <RootNamespace>FreeAIr</RootNamespace>
+    <AssemblyName>FreeAIr.Search</AssemblyName>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- the aggregation of the shortlist and the wording of a failed embedding request are steps
+         inside a public operation; they are worth a test of their own without being worth a place
+         in the API of the assembly -->
+    <InternalsVisibleTo Include="FreeAIr.Search.Tests" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.Text.Json" />
+    <PackageReference Include="System.ClientModel" />
+    <!-- on netstandard2.0 System.ClientModel drags in Logging.Abstractions, which wants a newer
+         Microsoft.Bcl.AsyncInterfaces than the version the solution pins for the VSIX -->
+    <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" VersionOverride="9.0.7" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- the same locally built OpenAI client the VSIX uses, so that the vectorizer under test is
+         the vectorizer which ships -->
+    <Reference Include="OpenAI, Version=2.1.0.0, Culture=neutral, PublicKeyToken=b4187f3e65366280, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\.bin\OpenAI\OpenAI.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+</Project>

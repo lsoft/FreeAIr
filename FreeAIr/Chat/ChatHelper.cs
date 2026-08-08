@@ -5,8 +5,18 @@ using FreeAIr.Chat.Content;
 
 namespace FreeAIr.Chat
 {
+    /// <summary>
+    /// Extension helpers for driving a <see cref="Chat"/> from code (rather than from the chat
+    /// window UI) and reading back a ready-to-use answer.
+    /// </summary>
     public static class ChatHelper
     {
+        /// <summary>
+        /// Sends a prompt and waits for the chat to settle, then returns the last LLM answer with
+        /// markdown quoting and reasoning ("think") blocks stripped out. Used by the automatic
+        /// chats (commit message, dictation clean-up, ...) that need plain text rather than a chat
+        /// transcript. Returns null if the turn failed or produced no usable answer.
+        /// </summary>
         public static async Task<string?> WaitForPromptCleanAnswerAsync(
             this Chat chat,
             string lineEnding

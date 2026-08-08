@@ -24,19 +24,27 @@ namespace FreeAIr.BLogic
     /// </summary>
     public sealed class RecorderTranscriberPostProcessor
     {
+        /// <summary>The rendezvous between the caller requesting a recording cycle and the background worker that runs it.</summary>
         private readonly AsyncAwaitProductionCycle<RecordTranscribeResult> _productionCycle = new();
 
+        /// <summary>The background loop task started by the constructor; runs for the lifetime of this processor.</summary>
         private readonly Task _task;
 
+        /// <summary>Cancellation source for the recording currently in progress; refreshed at the start of every cycle.</summary>
         private CancellationTokenSource? _recordingCancellation;
+        /// <summary>Backing field for <see cref="RecordingProcessStatus"/>.</summary>
         private RecordingProcessStatusEnum _recordingProcessStatus = RecordingProcessStatusEnum.Idle;
 
+        /// <summary>Where the pipeline is right now — idle, recording, transcribing or post-processing. Drives the UI's recording indicator.</summary>
         public RecordingProcessStatusEnum RecordingProcessStatus => _recordingProcessStatus;
 
+        /// <summary>Raised whenever <see cref="RecordingProcessStatus"/> changes, so the chat control can update its indicator without polling.</summary>
         public event RecordingStatusChangedDelegate RecordingStatusChangedSignal;
 
+        /// <summary>True while a cycle is in flight. Used to reject a second recording request instead of queueing it.</summary>
         public bool IsWorking => RecordingProcessStatus.NotIn(RecordingProcessStatusEnum.Idle);
 
+        /// <summary>Starts the background loop that will service every future recording request for this chat.</summary>
         public RecorderTranscriberPostProcessor(
             )
         {
@@ -60,6 +68,7 @@ namespace FreeAIr.BLogic
             return result;
         }
 
+        /// <summary>Cancels the recording currently in progress; a no-op when nothing is running.</summary>
         public Task StopRecordingAsync()
         {
             if (!IsWorking)
@@ -72,6 +81,11 @@ namespace FreeAIr.BLogic
             return Task.CompletedTask;
         }
 
+        /// <summary>
+        /// The background loop: wait for a cycle to be requested, produce one result, go back to
+        /// idle. Runs for the whole lifetime of the chat, which is why the recorder's status event
+        /// is subscribed once here rather than per request.
+        /// </summary>
         private async Task WorkAsync()
         {
             await TaskScheduler.Default;
@@ -106,6 +120,7 @@ namespace FreeAIr.BLogic
             }
         }
 
+        /// <summary>Records, transcribes, and post-processes one cycle's worth of speech; null when nothing was said and nothing failed.</summary>
         private async Task<RecordTranscribeResult> ProduceProductAsync(
             )
         {
@@ -132,6 +147,7 @@ namespace FreeAIr.BLogic
             return null;
         }
 
+        /// <summary>Replaces the cancellation token for a new cycle, disposing whatever was left from the previous one.</summary>
         private void RefreshCancellation()
         {
             if (_recordingCancellation is not null)
@@ -141,6 +157,7 @@ namespace FreeAIr.BLogic
             _recordingCancellation = new();
         }
 
+        /// <summary>Maps the recorder's own status onto <see cref="RecordingProcessStatusEnum"/>; Idle is left alone since it is set by the loop itself between cycles.</summary>
         private void RecorderStatusChangedSignal(
             IRecorder sender,
             RecorderStatusEnum newStatus
@@ -244,6 +261,7 @@ namespace FreeAIr.BLogic
             return postProcessedText;
         }
 
+        /// <summary>Sets the status and raises <see cref="RecordingStatusChangedSignal"/>.</summary>
         private void UpdateRecordingProcessStatus(
             RecordingProcessStatusEnum status
             )
@@ -255,16 +273,22 @@ namespace FreeAIr.BLogic
 
     }
 
+    /// <summary>Signature for <see cref="RecorderTranscriberPostProcessor.RecordingStatusChangedSignal"/>.</summary>
     public delegate void RecordingStatusChangedDelegate(
         RecorderTranscriberPostProcessor sender,
         RecordingProcessStatusEnum newStatus
         );
 
+    /// <summary>Where the record → transcribe → post-process pipeline is at any given moment.</summary>
     public enum RecordingProcessStatusEnum
     {
+        /// <summary>No recording cycle is in progress.</summary>
         Idle,
+        /// <summary>Audio is currently being captured from the microphone.</summary>
         Recording,
+        /// <summary>The captured audio is being turned into text.</summary>
         Transcribing,
+        /// <summary>The transcribed text is being cleaned up by the chosen `RecordPostProcess` support action.</summary>
         PostProcessing
     }
 

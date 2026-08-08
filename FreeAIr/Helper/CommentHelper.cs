@@ -3,6 +3,11 @@ using System.Linq;
 
 namespace FreeAIr.Helper
 {
+    /// <summary>
+    /// Maps a file extension to the single-line comment syntax used by that language or format
+    /// (`//`, `#`, `--`, `'`, `REM`, or XML's `&lt;!-- --&gt;`). Used wherever generated text needs
+    /// to be inserted as a comment appropriate to the target file's language.
+    /// </summary>
     public static class CommentHelper
     {
         /// <summary>
@@ -78,6 +83,9 @@ namespace FreeAIr.Helper
             { "scss", "// * {0}" }
         };
 
+        /// <summary>
+        /// Every file extension this class knows a comment syntax for.
+        /// </summary>
         public static List<string> GetTextFileExtensions()
         {
             return _commentTemplateMap.Keys.ToList();

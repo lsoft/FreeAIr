@@ -6,14 +6,27 @@ using System.Threading.Tasks;
 
 namespace FreeAIr.MCP.McpServerProxy.VS.Tools
 {
+    /// <summary>The `GitCommit` MCP tool: commits the solution's current changes with a model-supplied message, through <see cref="GitRunner"/>.</summary>
     public sealed class GitCommitTool : VisualStudioMcpServerTool
     {
+        /// <summary>
+        /// The single shared instance of this tool, registered by <see cref="VisualStudioMcpServerProxy"/>.
+        /// </summary>
         public static readonly GitCommitTool Instance = new();
 
+        /// <summary>
+        /// The tool name advertised to the chat model for the git commit operation.
+        /// </summary>
         public const string VisualStudioToolName = "GitCommit";
 
+        /// <summary>
+        /// JSON schema key for the commit message to use.
+        /// </summary>
         private const string CommitMessageParameterName = "commit_message";
 
+        /// <summary>
+        /// Declares the tool's name and JSON schema describing the required commit_message parameter.
+        /// </summary>
         public GitCommitTool(
             ) : base(
                 VisualStudioMcpServerProxy.VisualStudioProxyName,
@@ -34,6 +47,7 @@ namespace FreeAIr.MCP.McpServerProxy.VS.Tools
         {
         }
 
+        /// <summary>Runs `git commit` with the requested message via <see cref="GitRunner.CommitAsync"/>.</summary>
         public override async Task<McpServerProxyToolCallResult?> CallToolAsync(
             string toolName,
             IReadOnlyDictionary<string, object?>? arguments = null,

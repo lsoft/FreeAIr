@@ -16,6 +16,11 @@ namespace FreeAIr.Chat.Context.Composer
     /// </summary>
     public class CSharpContextComposer
     {
+        /// <summary>
+        /// Builds a <see cref="ContextComposeResult"/> for the whole file at <paramref name="filePath"/>
+        /// by walking its syntax tree for referenced C# types, so those related types can be offered
+        /// as additional chat context.
+        /// </summary>
         public static async Task<ContextComposeResult> ComposeFromFilePathAsync(
             string filePath,
             TimeSpan? ntimeout = null
@@ -102,6 +107,11 @@ namespace FreeAIr.Chat.Context.Composer
             return context;
         }
 
+        /// <summary>
+        /// Builds a <see cref="ContextComposeResult"/> from the current selection in the active
+        /// editor document, walking the enclosing method or type for referenced C# types so the
+        /// user's selection can pull in the code it depends on.
+        /// </summary>
         public static async Task<ContextComposeResult> ComposeFromActiveDocumentAsync(
             TimeSpan? ntimeout = null
             )
@@ -256,6 +266,11 @@ namespace FreeAIr.Chat.Context.Composer
             return context;
         }
 
+        /// <summary>
+        /// Runs the <see cref="TypeReferenceWalker"/> over <paramref name="startNode"/> and records
+        /// every referenced type, along with the file paths that declare them, into
+        /// <paramref name="contextResult"/>.
+        /// </summary>
         private static async Task ScanForContextAsync(
             ContextComposeResult contextResult,
             Microsoft.CodeAnalysis.Document document,

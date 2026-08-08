@@ -6,12 +6,20 @@ using System.Reflection;
 
 namespace Proxy
 {
+    /// <summary>
+    /// Entry point of the out-of-process MCP proxy the VSIX spawns: exposes
+    /// <see cref="McpProxyInterface"/> over JSON-RPC on stdin/stdout and exits once its parent VS
+    /// process (found via <see cref="GetParentProcessId"/> and watched by
+    /// <see cref="ParentProcessWatcher"/>) disappears, so no orphaned proxy is left running.
+    /// </summary>
     internal class Program
     {
         private static readonly ILogger _log = SerilogLogger.Logger.ForContext<Program>();
 
+        /// <summary>The registry of configured MCP servers this proxy process forwards calls to.</summary>
         public static Servers Servers = new();
 
+        /// <summary>Wires up logging, starts watching the parent VS process, then serves RPC calls over stdio until the process is killed.</summary>
         static async Task<int> Main(string[] args)
         {
             var parentProcessId = GetParentProcessId();
@@ -48,9 +56,7 @@ namespace Proxy
             }
         }
 
-        /// <summary>
-        /// Получение ID родительского процесса через WMI
-        /// </summary>
+        /// <summary>Finds the process id of the VS instance that launched this proxy, via a WMI query, so <see cref="ParentProcessWatcher"/> can watch it.</summary>
         private static int? GetParentProcessId()
         {
             using (var process = Process.GetCurrentProcess())

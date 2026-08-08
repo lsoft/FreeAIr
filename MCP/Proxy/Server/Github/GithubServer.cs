@@ -3,14 +3,22 @@ using ModelContextProtocol.Client;
 
 namespace Proxy.Server.Github
 {
+    /// <summary>
+    /// The one MCP server the proxy always registers itself: the official `github-mcp-server`,
+    /// self-installed via <see cref="GithubInstaller"/> and launched as a stdio process with the
+    /// user's PAT injected as its `GITHUB_PERSONAL_ACCESS_TOKEN` environment variable.
+    /// </summary>
     public class GithubServer : BaseServer2<GithubServer>
     {
+        /// <summary>Registry name of the built-in GitHub server, used to look it up in <see cref="Servers"/> and as its stdio transport's client name.</summary>
         public const string PublicMCPServerName = "github.com";
 
+        /// <summary>Creates the built-in GitHub server entry.</summary>
         public GithubServer()
         {
         }
 
+        /// <summary>Whether the executable is already unpacked at the folder path the caller supplies as a parameter.</summary>
         protected override Task<IsInstalledReply> IsInstalledInternalAsync(
             IParameterProvider parameterProvider
             )
@@ -24,6 +32,7 @@ namespace Proxy.Server.Github
                 );
         }
 
+        /// <summary>Downloads and unpacks the executable via <see cref="GithubInstaller"/>.</summary>
         protected override async Task<InstallReply> InstallInternalAsync(
             IParameterProvider parameterProvider
             )
@@ -42,6 +51,7 @@ namespace Proxy.Server.Github
             return new InstallReply();
         }
 
+        /// <summary>Launches the installed executable as a stdio MCP server, passing the caller's GitHub token through its environment; returns null if the executable is not installed yet.</summary>
         protected override async Task<IMcpClient?> CreateMcpClientAsync(
             IParameterProvider parameterProvider
             )

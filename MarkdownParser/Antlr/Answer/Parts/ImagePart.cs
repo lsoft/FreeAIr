@@ -4,32 +4,44 @@ using System.Windows.Media.Imaging;
 
 namespace MarkdownParser.Antlr.Answer.Parts
 {
+    /// <summary>
+    /// A `![desc](link "title")` image part. While the answer is still streaming
+    /// (<paramref name="isInProgress"/> in <see cref="GetInlines"/>) it renders as placeholder text
+    /// instead of loading the image, since the link may still be incomplete.
+    /// </summary>
     public sealed class ImagePart : IPart
     {
+        /// <summary>Supplies the font size used for the streaming placeholder text.</summary>
         private readonly IFontSizeProvider _fontSizeProvider;
 
+        /// <summary>Identifies this part as an image for part-type dispatch.</summary>
         public PartTypeEnum Type => PartTypeEnum.Image;
 
+        /// <summary>The raw matched markdown text for this image, shown as a placeholder while streaming.</summary>
         public string Text
         {
             get;
         }
 
+        /// <summary>The image's alt/description text from `![description](...)`.</summary>
         public string Description
         {
             get;
         }
 
+        /// <summary>The image source, either a local `/`-rooted path or a web URL.</summary>
         public string Link
         {
             get;
         }
 
+        /// <summary>The optional tooltip title from `![desc](link "title")`.</summary>
         public string Title
         {
             get;
         }
 
+        /// <summary>Creates an image part from its parsed markdown pieces.</summary>
         public ImagePart(
             IFontSizeProvider fontSizeProvider,
             string text,
@@ -50,6 +62,7 @@ namespace MarkdownParser.Antlr.Answer.Parts
             Title = title;
         }
 
+        /// <summary>The parameter passed to an <see cref="AdditionalCommand"/> button for this part — the loaded image bitmap.</summary>
         public object GetContextForAdditionalCommand()
         {
             var link = GetLink();
@@ -58,6 +71,7 @@ namespace MarkdownParser.Antlr.Answer.Parts
 
         }
 
+        /// <summary>While streaming, yields placeholder text; otherwise loads the image (async for 1x1 web-placeholder bitmaps) or, on failure, yields nothing.</summary>
         public IEnumerable<Inline> GetInlines(bool isInProgress)
         {
             if (isInProgress)
@@ -109,6 +123,7 @@ namespace MarkdownParser.Antlr.Answer.Parts
             return [];
         }
 
+        /// <summary>Resolves a `/`-rooted link relative to the current directory; leaves absolute/web links untouched.</summary>
         private string GetLink()
         {
             string link;

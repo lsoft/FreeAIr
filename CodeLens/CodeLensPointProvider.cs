@@ -17,13 +17,17 @@ namespace FreeAIr.CodeLens
     [ContentType("CSharp")]
     [LocalizedName(typeof(Resources), "FreeAIrCodeLensProvider")]
     [Priority(300)]
+    /// <summary>MEF-exported CodeLens provider for C# files: decides which code elements get the FreeAIr indicator and creates the <see cref="CodeLensDataPoint"/> for each.</summary>
     public class CodeLensPointProvider : IAsyncCodeLensDataPointProvider
     {
+        /// <summary>The MEF contract name under which this CodeLens provider is registered, matching the name Visual Studio uses to enable/disable it.</summary>
         internal const string Id = "FreeAIrCodeLensProviderName";
 
+        /// <summary>Lazily resolved channel back to the Visual Studio process, used to check settings and to wire up each created <see cref="CodeLensDataPoint"/>.</summary>
         private readonly Lazy<ICodeLensCallbackService> _callbackService;
 
 
+        /// <summary>Creates the provider with the MEF-supplied callback service used to talk back to Visual Studio.</summary>
         [ImportingConstructor]
         public CodeLensPointProvider(
             Lazy<ICodeLensCallbackService> callbackService
@@ -37,6 +41,7 @@ namespace FreeAIr.CodeLens
             _callbackService = callbackService;
         }
 
+        /// <summary>True when the indicator is enabled in settings and the element is a real code member (not a namespace/container/package).</summary>
         public async Task<bool> CanCreateDataPointAsync(CodeLensDescriptor descriptor, CodeLensDescriptorContext context, CancellationToken token)
         {
             if (!await IsEnabled())
@@ -61,6 +66,7 @@ namespace FreeAIr.CodeLens
             return result;
         }
 
+        /// <summary>Asks the Visual Studio side, via <see cref="ICodeLensListener.IsEnabled"/>, whether the FreeAIr CodeLens indicator is turned on.</summary>
         public async Task<bool> IsEnabled()
         {
             try
@@ -79,6 +85,7 @@ namespace FreeAIr.CodeLens
 
         }
 
+        /// <summary>Creates a <see cref="CodeLensDataPoint"/> for the descriptor and connects it to the owning Visual Studio process.</summary>
         public async Task<IAsyncCodeLensDataPoint> CreateDataPointAsync(CodeLensDescriptor descriptor, CodeLensDescriptorContext context, CancellationToken token)
         {
             try

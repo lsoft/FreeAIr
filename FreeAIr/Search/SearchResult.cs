@@ -30,6 +30,9 @@
             get;
         }
 
+        /// <summary>
+        /// Оборачивает один пункт выдачи поисковой системы: заголовок, описание и ссылку.
+        /// </summary>
         public SearchResult(string title, string details, string link)
         {
             Title = title;

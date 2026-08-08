@@ -8,6 +8,10 @@ looking for the user manual, read the [README](README.md) instead.
 | Project | Target | Purpose |
 | --- | --- | --- |
 | `FreeAIr` | .NET Framework 4.8 (VSIX) | The extension itself: package, commands, tool windows, chats, options, MCP client side. |
+| `FreeAIr.Search` | netstandard2.0 | The searching machinery that does not need Visual Studio: index format, vector codec, outline tree, ranking, and the `Grep/` text matching behind the SearchFileContent MCP tool. |
+| `FreeAIr.Search.Tests` | .NET 8 (xunit) | Unit tests of `FreeAIr.Search`. Not shipped. |
+| `SetupWizard` (`FreeAIr.SetupWizard`) | netstandard2.0 | The first-run setup wizard's logic that does not need Visual Studio or WPF: step navigation/skipping, the agent-field validator, the known-endpoint catalog. |
+| `SetupWizard.Tests` (`FreeAIr.SetupWizard.Tests`) | .NET 8 (xunit) | Unit tests of `FreeAIr.SetupWizard`. Not shipped. |
 | `MCP/Proxy` | .NET 9 (exe) | Out-of-process host for MCP servers. Shipped inside the VSIX as `.art/Proxy.zip` and unpacked on first run. |
 | `MCP/Dto` | netstandard | Request/reply contracts of the JSON-RPC channel between `FreeAIr` and `Proxy.exe`. |
 | `CodeLens` | .NET Framework 4.8 | CodeLens data point provider. Runs in the separate Visual Studio CodeLens process. |
@@ -102,8 +106,11 @@ internal). These are intentionally *not* part of the JSON settings.
   reconciles the configured server list against the running one, refreshes the tool catalogue and
   dispatches `CallToolAsync` to the owning server.
 - `MCP/ServerProxy/VS` — the built-in Visual Studio MCP server. Its tools (build, git commit,
-  nuget install, read/replace document body, solution tree, error list, web search) run **inside**
-  devenv and therefore have direct access to DTE/Roslyn.
+  nuget install, read/replace document body, solution tree, error list, text search, web search)
+  run **inside** devenv and therefore have direct access to DTE/Roslyn.
+  `Tools/SearchFileContentTool.cs` is the grep of the solution: the matching itself is `Search/Grep`
+  and nothing is installed or spawned, while running inside devenv is what lets it search the
+  editor buffers which have not been saved yet.
 - `MCP/ServerProxy/Github` and `MCP/ServerProxy/External` — the github.com server and any
   user-configured server, both hosted by `Proxy.exe`.
 - `MCP/AvailableToolContainer.cs` — enabled/disabled state of individual tools, globally and
@@ -113,13 +120,75 @@ internal). These are intentionally *not* part of the JSON settings.
 
 - `Find/FindWindowModifier.cs` injects FreeAIr's controls into the standard Find window;
   `Find/DoSearch.cs` collects the search parameters and opens the results tool window.
+- `Find/SearchTrace.cs` is the log of a search, written into an output pane of its own. The search
+  passes through three pickers, a tool window and a chat, and every one of them is entitled to
+  decide there is nothing to do; each such decision used to be a bare `return`, which is
+  indistinguishable from a broken button. Steps report themselves, and the ones which end the search
+  early state the reason and repeat it into the activity log.
 - `NLOutline/` generates and stores natural-language outlines — LLM-written comments embedded in
   the source, following [arxiv 2408.04820](https://arxiv.org/html/2408.04820v4).
-- `Embedding/` builds the embedding JSON files (`<solution name>_embeddings.json`) from those
-  outlines.
+Everything below `Embedding/` and `Find/RagShortlist.cs` lives in the **`FreeAIr.Search`** project, not
+in the VSIX. That split is what makes the feature testable: the VSIX assembly cannot be loaded by a
+test runner, while `FreeAIr.Search` knows nothing about the IDE and is covered by `FreeAIr.Search.Tests`.
 
-Note that the `Use RAG` flag reaches `NaturalLanguageSearchParameters` but is not consumed by the
-search yet — see the warning in the README.
+- `Embedding/Json/Objects.cs` writes and reads the index files. `Embedding/VectorCodec.cs` is the
+  storage format of a vector: int8 quantization in base64, normalized on the way back in, so a
+  cosine similarity is a plain dot product.
+- `Embedding/OutlineEmbedder.cs` decides which nodes are worth a vector and fills them in through
+  `IEmbeddingVectorizer` — the single seam where the pipeline talks to a server, implemented by
+  `OpenAIEmbeddingVectorizer`.
+- `Embedding/EmbeddingIndexReader.cs` reads the files with progress and full cancellation;
+  `EmbeddingIndex` is the searchable view of them.
+- `Find/RagShortlist.cs` turns a query into a handful of files: vectorize, rank the outlines,
+  aggregate them per file by the best score, cut by threshold and count.
+- `Find/RagCalibration.cs` is where that threshold comes from. A cosine is not comparable between
+  models — measured on one solution, the same query scores 0.94, 0.84 and 0.70 on three models while
+  their noise sits at 0.89, 0.53 and 0.53 — so no constant can be shipped. At the end of every index
+  build the fresh index is asked a few questions it cannot answer, and the level they reach is
+  stored in the metadata as `EmbeddingCalibration`. The user's `Sensitivity` then says how far above
+  that level a file has to stand. Questions with a known answer may be added too: they clamp the
+  threshold from above and turn "this model does not understand my code" into a number.
+- `UI/ViewModels/RagCalibrationViewModel.cs` is the window that produces those questions. It asks
+  the index through `RagShortlist.ProbeAsync` — the ordinary ranking with the threshold reported
+  instead of enforced, because the rows the threshold cuts are the ones worth looking at — and the
+  user labels each query with the file which answers it, or with nothing. Saving writes the queries
+  into the settings and the numbers into the index through
+  `EmbeddingOutlineJsonObject.SerializeMetadataAsync`, which touches the metadata file alone: the
+  calibration belongs to the queries, not to the vectors, and rebuilding megabytes of identical
+  vectors to store five floats would be the wrong trade. The window names the agent it asks, and
+  resolves it through `DoSearch.DetermineEmbeddingAgentAsync`, the same code the search uses — what
+  it measures is only meaningful when measured with the model which built the index.
+- Agents for embeddings are looked up without the `has a token` filter the chat pickers apply
+  (`FreeAIrOptions.DeserializeAgentByNameAsync`, `AgentContextMenu.ChooseAnyAgentAsync`). An
+  embedding model is normally served by a local process which wants no token, so that filter hid
+  exactly the agents this path needs and substituted a cloud chat agent, which answers a request for
+  embeddings with HTTP 400.
+- `Embedding/EmbeddingSpaceFingerprint.cs` stores the vectors of three fixed sentences in the index
+  and compares them with the current model before a search. Neither the model name nor the vector
+  length can do this job: a local server reports whatever name it likes (koboldcpp says `inactive`
+  for every model it loads), and two unrelated models of the same length produce an index which
+  reads perfectly and matches nothing. The sentinels travel in the same request as the query, so the
+  check costs no round trip.
+- `FreeAIr/Embedding/EmbeddingIndexContainer.cs` is where that machinery meets Visual Studio: a MEF
+  singleton which resolves the paths from the solution, loads off the UI thread and caches the
+  parsed files, keyed by their write time. Both the search and the `GetAllSolutionFiles` MCP tool go
+  through it, so the megabytes are read once and the tool never pays for the vectors it does not
+  need.
+- `NLOutline/Tree/OutlineTreeAssembler.cs` rebuilds the node tree from the flat outline list. The
+  shape used to be a fourth file; it is not stored any more, because every node already carries its
+  kind and the path of its file, and a file which only repeats what another one says is one more
+  thing to merge.
+
+The three index files are linked by `Id = MD5(Kind + ":" + Target + ":" + RelativePath)`. They are
+meant to be committed, which drives two decisions: nothing that changes by itself is stored in them
+(no timestamps, no absolute paths, no counters — the file system knows all of it), and everything
+in them is ordered by content rather than by traversal, so that a rebuild produces the same bytes.
+
+The `Use RAG` flag travels from `FindWindowModifier` through `NaturalLanguageSearchParameters` into
+`NaturalLanguageResultsViewModel`, which replaces the scope of the search with the shortlist. The
+agent that vectorizes the query is resolved in `DoSearch` — from the index metadata when it names
+one, from the user otherwise — because a wrong model gives no matches at all and the question has
+to be asked before the search starts, not in the middle of it.
 
 ### Voice input
 
@@ -148,6 +217,55 @@ prompt template before it is sent.
 - `UI/ClickableText` — renders parsed markdown blocks with the per-block action buttons.
 - `ViewElementFactory.cs` — converts `CodeLensUnitInfo` coming from the CodeLens process into a
   WPF control.
+
+### Setup wizard
+
+`UI/Wizard/SetupWizardWindow` + `UI/ViewModels/SetupWizardViewModel` are the first-run wizard that
+replaces `FreeAIrOptions` with one the user builds step by step, opened by
+`Commands/Other/OpenSetupWizardCommand` and, on a first run, by the info bar
+`InfoBar/SetupWizardInfoBarService` wires up (gated on `InternalPage.SetupWizardIntroduced`).
+
+Its step sequencing (`WizardNavigator`, skipping the "starting point" step on a first run), its
+agent-field validation and its known-endpoint catalog live in the separate `SetupWizard` project
+instead of `FreeAIr` itself, for the same reason `FreeAIr.Search` is split out: `FreeAIr` is a
+legacy net48 VSIX project with no test runner attached, so anything worth unit testing has to live
+somewhere an ordinary `dotnet test` can reach (see `SetupWizard.Tests`). That project carries no
+resources, so `WizardValidator` reports its findings as enum codes (`AgentFieldProblem`,
+`ActionBindingProblem`) which `SetupWizardViewModel.Describe` turns into the localized sentences the
+user reads — every string the window shows comes from `FreeAIr\Resources\Resources.resx` and its
+`.ru`/`.zh-Hans` satellites, like the rest of the product.
+
+The wizard does not reimplement editors that already exist: its MCP servers and actions steps open
+`McpServerConfigureWindow`/`ActionConfigureWindow` directly (against a clone of the relevant
+`FreeAIrOptions` node, so a cancelled sub-dialog leaves the wizard untouched). The MCP servers step
+adds one checkbox of its own for the Microsoft Learn documentation server, which is a plain HTTP
+endpoint and therefore needs no download: `WantsMsdnMcpServer` writes and removes the same entry the
+control center's install command writes, both reading its name and endpoint from
+`KnownMcpServerCatalog` in the `SetupWizard` project. The checkbox derives its state from the
+options rather than from a field, so a server added in the editor next to it shows up ticked. Two
+further places are custom because nothing equivalent exists elsewhere:
+
+- On a **first run** the agents step wipes the shipped placeholder agents and walks the user through
+  creating one of their own field by field, each with its own explanation, an endpoint reachability
+  check (`TestEndpointCommand`, the same `GetModelsAsync` call the model picker makes) and a choice
+  between a literal token and an environment-variable reference. On a later run it is the ordinary
+  multi-agent list editor instead.
+- The **actions step** cross-checks every action's `AgentName` against the agents that now exist
+  (`WizardValidator.ValidateActionAgentBindings`) and shows the strays in red, since renaming or
+  deleting an agent silently strands the actions naming it. `UseDefaultActionsCommand` rebuilds the
+  list from `SupportCollectionJson`'s shipped defaults bound to the first agent. The step also
+  carries the `IsImplicitWholeLineCompletionEnabled` switch, which lives here rather than among the
+  other settings because it is what makes the `WholeLineCompletion` action live or dormant: while it
+  is off that action is neither bound by the defaults button nor reported by the validator (the
+  `wholeLineCompletionEnabled` argument of `ValidateActionAgentBindings`), because nothing invokes
+  it. Turning it on both binds it and starts warning when it has no agent — which is what the
+  feature needs, since it fires on every keystroke and `ProposalSource` refuses to run without one.
+
+Nothing in the wizard is allowed to throw into WPF's dispatcher: `SetupWizardViewModel.Guarded` /
+`GuardedAsync` wrap every command body, and `OpenSetupWizardCommand.ShowAsync`, `Window_Loaded`,
+`SetupWizardInfoBarService.OnActionItemClicked` and `ShowSetupWizardInfoBarIfNeeded` each catch,
+log to the activity log, and report. A modal dialog runs inside `devenv`, so an unhandled exception
+there ends Visual Studio rather than the wizard.
 
 ## Building
 

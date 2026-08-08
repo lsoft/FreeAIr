@@ -230,64 +230,78 @@
                 Style="{DynamicResource TextBlockLikeButtonStyle}"
                 />
 
-            <StackPanel
+            <!-- the same block the calibration window carries: one header to fold it away once it
+                 has been read, and the paragraphs spaced so that they read as paragraphs -->
+            <Expander
                 Grid.Row="5"
                 Grid.Column="0"
                 Grid.ColumnSpan="2"
                 Margin="2,20,2,2"
+                IsExpanded="True"
+                FontFamily="Cascadia Code"
+                Header="{x:Static resources:Resources.Help_header_what_this_window_is}"
                 >
+                <StackPanel
+                    Margin="4,4,4,0"
+                    >
 
-                <TextBlock
-                    HorizontalAlignment="Stretch"
-                    Background="Transparent"
-                    FontFamily="Cascadia Code"
-                    TextWrapping="Wrap"
-                    Padding="0"
-                    Margin="0"
-                    Text="{x:Static resources:Resources.NLOG_Tooltip10}"
-                    />
+                    <TextBlock
+                        HorizontalAlignment="Stretch"
+                        Background="Transparent"
+                        FontFamily="Cascadia Code"
+                        TextWrapping="Wrap"
+                        Foreground="Gray"
+                        Padding="0"
+                        Margin="0,0,0,6"
+                        Text="{x:Static resources:Resources.NLOG_Tooltip10}"
+                        />
 
-                <TextBlock
-                    HorizontalAlignment="Stretch"
-                    Background="Transparent"
-                    FontFamily="Cascadia Code"
-                    TextWrapping="Wrap"
-                    Padding="0"
-                    Margin="0"
-                    Text="{x:Static resources:Resources.NLOG_Tooltip20}"
-                    />
+                    <TextBlock
+                        HorizontalAlignment="Stretch"
+                        Background="Transparent"
+                        FontFamily="Cascadia Code"
+                        TextWrapping="Wrap"
+                        Foreground="Gray"
+                        Padding="0"
+                        Margin="0,0,0,6"
+                        Text="{x:Static resources:Resources.NLOG_Tooltip20}"
+                        />
 
-                <TextBlock
-                    HorizontalAlignment="Stretch"
-                    Background="Transparent"
-                    FontFamily="Cascadia Code"
-                    TextWrapping="Wrap"
-                    Padding="0"
-                    Margin="0"
-                    Text="{x:Static resources:Resources.NLOG_Tooltip30}"
-                    />
+                    <TextBlock
+                        HorizontalAlignment="Stretch"
+                        Background="Transparent"
+                        FontFamily="Cascadia Code"
+                        TextWrapping="Wrap"
+                        Foreground="Gray"
+                        Padding="0"
+                        Margin="0,0,0,6"
+                        Text="{x:Static resources:Resources.NLOG_Tooltip30}"
+                        />
 
-                <TextBlock
-                    HorizontalAlignment="Stretch"
-                    Background="Transparent"
-                    FontFamily="Cascadia Code"
-                    TextWrapping="Wrap"
-                    Padding="0"
-                    Margin="0"
-                    Text="{x:Static resources:Resources.NLOG_Tooltip40}"
-                    />
+                    <TextBlock
+                        HorizontalAlignment="Stretch"
+                        Background="Transparent"
+                        FontFamily="Cascadia Code"
+                        TextWrapping="Wrap"
+                        Foreground="Gray"
+                        Padding="0"
+                        Margin="0,0,0,6"
+                        Text="{x:Static resources:Resources.NLOG_Tooltip40}"
+                        />
 
-                <TextBlock
-                    HorizontalAlignment="Stretch"
-                    Background="Transparent"
-                    FontFamily="Cascadia Code"
-                    TextWrapping="Wrap"
-                    Padding="0"
-                    Margin="0"
-                    Text="{x:Static resources:Resources.NLOG_Tooltip50}"
-                    />
+                    <TextBlock
+                        HorizontalAlignment="Stretch"
+                        Background="Transparent"
+                        FontFamily="Cascadia Code"
+                        TextWrapping="Wrap"
+                        Foreground="Gray"
+                        Padding="0"
+                        Margin="0,0,0,6"
+                        Text="{x:Static resources:Resources.NLOG_Tooltip50}"
+                        />
 
-            </StackPanel>
+                </StackPanel>
+            </Expander>
             
 
 

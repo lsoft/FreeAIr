@@ -8,8 +8,14 @@ using System.Windows.Media;
 
 namespace FreeAIr.UI.Windows
 {
+    /// <summary>
+    /// The floating, borderless "in-situ" chat popup shown next to the editor caret. Tracks focus and
+    /// visibility against other FreeAIr windows via <see cref="FreeAIrPackage.WindowOpened"/>/<see cref="FreeAIrPackage.WindowClosed"/>,
+    /// and supports manual dragging and edge-resizing since it has no standard window chrome.
+    /// </summary>
     public partial class InSituChatWindow : Window
     {
+        /// <summary>Creates the popup bound to a new <see cref="InSituChatViewModel"/> for the given chat, and wires up activation, sizing and window-lifecycle handlers.</summary>
         public InSituChatWindow(
             FreeAIr.Chat.Chat chat
             )
@@ -69,6 +75,7 @@ namespace FreeAIr.UI.Windows
             };
         }
 
+        /// <summary>Restores topmost when a different FreeAIr window closes, so this popup stays visible again.</summary>
         private void OtherWindowClosed(Window window)
         {
             if (ReferenceEquals(this, window))
@@ -79,6 +86,7 @@ namespace FreeAIr.UI.Windows
             this.Topmost = true;
         }
 
+        /// <summary>Drops topmost when a different FreeAIr window opens, so it does not cover the new window.</summary>
         private void OtherWindowOpened(Window window)
         {
             if (ReferenceEquals(this, window))
@@ -89,6 +97,7 @@ namespace FreeAIr.UI.Windows
             this.Topmost = false;
         }
 
+        /// <summary>Creates and shows an in-situ chat popup for <paramref name="chat"/>, positioned at the given screen point with bounds checking.</summary>
         public static async Task ShowAsync(
             FreeAIr.Chat.Chat chat,
             Point position
@@ -104,6 +113,7 @@ namespace FreeAIr.UI.Windows
             window.Show();
         }
 
+        /// <summary>Converts the device-pixel screen point to DPI-independent units, sizes the window from the saved in-situ dimensions, and nudges it back on-screen if it would fall outside the monitor bounds.</summary>
         private static void PositionWindowAtScreenPointWithBoundsCheck(
             Window window,
             System.Windows.Point screenPoint
@@ -126,6 +136,7 @@ namespace FreeAIr.UI.Windows
             window.CorrectWindowPosition();
         }
 
+        /// <summary>Closes the popup when the user presses Escape.</summary>
         private void Window_PreviewKeyUp(object sender, System.Windows.Input.KeyEventArgs e)
         {
             if (e.Key == System.Windows.Input.Key.Escape)
@@ -135,6 +146,7 @@ namespace FreeAIr.UI.Windows
             }
         }
 
+        /// <summary>Persists the popup's current size to settings so the next in-situ window opens at the same dimensions.</summary>
         private void Window_SizeChanged(object sender, SizeChangedEventArgs e)
         {
             UIPage.Instance.SetInSituSize(
@@ -143,6 +155,7 @@ namespace FreeAIr.UI.Windows
                 );
         }
 
+        /// <summary>Lets the user drag the borderless popup by its content, since it has no title bar.</summary>
         private void Window_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
             DragMove();
@@ -151,9 +164,12 @@ namespace FreeAIr.UI.Windows
 
         #region resize window
 
+        /// <summary>True while the user is dragging the resize handle.</summary>
         private bool _isResizing = false;
+        /// <summary>The screen cursor position at the last resize-move event, used to compute the delta for the next one.</summary>
         private System.Drawing.Point _lastPos; // Храним позицию относительно экрана
 
+        /// <summary>Begins a resize drag, capturing the mouse and recording the starting cursor position.</summary>
         private void Resize_MouseDown(object sender, MouseButtonEventArgs e)
         {
             if (e.LeftButton != MouseButtonState.Pressed)
@@ -170,6 +186,7 @@ namespace FreeAIr.UI.Windows
             e.Handled = true;
         }
 
+        /// <summary>While resizing, grows or shrinks the window by half the cursor delta since the last move, with a 50-pixel minimum.</summary>
         private void Resize_MouseMove(object sender, MouseEventArgs e)
         {
             if (!_isResizing)
@@ -203,6 +220,7 @@ namespace FreeAIr.UI.Windows
             e.Handled = true;
         }
 
+        /// <summary>Ends the resize drag and releases mouse capture.</summary>
         private void Resize_MouseUp(object sender, MouseButtonEventArgs e)
         {
             _isResizing = false;

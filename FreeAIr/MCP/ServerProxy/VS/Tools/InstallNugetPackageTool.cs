@@ -9,16 +9,43 @@ using System.Threading.Tasks;
 
 namespace FreeAIr.MCP.McpServerProxy.VS.Tools
 {
+    /// <summary>
+    /// MCP tool that lets the chat model install a NuGet package into a chosen project of the
+    /// currently open solution, using Visual Studio's own <see cref="IVsPackageInstaller2"/> service
+    /// so the result is identical to using the NuGet Package Manager UI.
+    /// </summary>
     public sealed class InstallNugetPackageTool : VisualStudioMcpServerTool
     {
+        /// <summary>
+        /// The single shared instance of this tool, registered by <see cref="VisualStudioMcpServerProxy"/>.
+        /// </summary>
         public static readonly InstallNugetPackageTool Instance = new();
 
+        /// <summary>
+        /// The tool name advertised to the chat model for the NuGet install operation.
+        /// </summary>
         public const string VisualStudioToolName = "InstallNugetPackage";
 
+        /// <summary>
+        /// JSON schema key for the NuGet package id to install.
+        /// </summary>
         private const string NugetPackageNameParameterName = "nuget_package_name";
+
+        /// <summary>
+        /// JSON schema key for the package version to install; omitted or "latest" installs the
+        /// newest available version.
+        /// </summary>
         private const string NugetPackageVersionParameterName = "nuget_package_version";
+
+        /// <summary>
+        /// JSON schema key for the name of the solution project the package should be installed into.
+        /// </summary>
         private const string TargetProjectNameParameterName = "target_project_name";
 
+        /// <summary>
+        /// Declares the tool's name and JSON schema describing the package name, optional version
+        /// and target project parameters expected in a tool call.
+        /// </summary>
         public InstallNugetPackageTool(
             ) : base(
                 VisualStudioMcpServerProxy.VisualStudioProxyName,
@@ -48,6 +75,10 @@ namespace FreeAIr.MCP.McpServerProxy.VS.Tools
         {
         }
 
+        /// <summary>
+        /// Resolves the target project by name, then installs the requested NuGet package (latest
+        /// or a specific version) into it via the Visual Studio package installer service.
+        /// </summary>
         public override async Task<McpServerProxyToolCallResult?> CallToolAsync(
             string toolName,
             IReadOnlyDictionary<string, object?>? arguments = null,

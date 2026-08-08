@@ -737,4 +737,472 @@
   <data name="No_active_agents_found__Make_sure" xml:space="preserve">
     <value>Активных агентов не найдено. Убедитесь, что хотя бы у одного агента есть непустой токен. Использование поддельных токенов разрешено для локального LLM.</value>
   </data>
+  <data name="RAG__loading_the_index__0___1_MB" xml:space="preserve">
+    <value>Загрузка NLO-индекса... {0}/{1} МБ</value>
+  </data>
+  <data name="RAG__preparing_the_index" xml:space="preserve">
+    <value>Подготовка NLO-индекса...</value>
+  </data>
+  <data name="RAG__vectorizing_the_query" xml:space="preserve">
+    <value>Векторизация запроса...</value>
+  </data>
+  <data name="RAG__ranking__0__outlines" xml:space="preserve">
+    <value>Ранжирование {0} outline...</value>
+  </data>
+  <data name="RAG__selected__0__files_of__1_" xml:space="preserve">
+    <value>Отобрано {0} файлов из {1}</value>
+  </data>
+  <data name="RAG__there_is_no_index" xml:space="preserve">
+    <value>Для этого солюшена нет NLO-индекса. Постройте его командой 'Build natural language outlines' или ищите со снятой галкой 'Use RAG'.</value>
+  </data>
+  <data name="RAG__nothing_matched_the_query" xml:space="preserve">
+    <value>Ни один файл индекса недостаточно близок к запросу. Уменьшите 'Sensitivity' в узле 'Rag' файла настроек или ищите со снятой галкой 'Use RAG'.</value>
+  </data>
+  <data name="RAG__the_agent_does_not_match" xml:space="preserve">
+    <value>Выбранный агент выдаёт векторы длиной {0}, а в индексе лежат векторы длиной {1}. Это разные модели, сравнивать их нельзя: выберите агента, которым построен индекс.</value>
+  </data>
+  <data name="RAG__choose_the_embedding_agent" xml:space="preserve">
+    <value>Выберите агента, чьей моделью эмбеддинга построен NLO-индекс:</value>
+  </data>
+  <data name="RAG___0__files_are_out_of_the_index" xml:space="preserve">
+    <value>Файлов вне индекса: {0}</value>
+  </data>
+  <data name="RAG__these_files_are_not_covered" xml:space="preserve">
+    <value>Эти файлы не покрыты NLO-индексом, поэтому поиск в них не заходит. Чтобы включить их, перестройте индекс:</value>
+  </data>
+  <data name="RAG__index_of__0___model__1_" xml:space="preserve">
+    <value>NLO-индекс от {0}, модель {1}</value>
+  </data>
+  <data name="RAG__narrows_the_search_down" xml:space="preserve">
+    <value>Сужает поиск до файлов, чьи natural language outline ближе всего к запросу, вместо того чтобы спрашивать LLM про каждый файл солюшена. Намного дешевле и быстрее, но файл, которого нет в индексе, не будет найден никогда.</value>
+  </data>
+  <data name="RAG__the_index_has_been_built__0_" xml:space="preserve">
+    <value>Индекс построен {0}.</value>
+  </data>
+  <data name="RAG__there_is_no_index_short" xml:space="preserve">
+    <value>Для этого солюшена нет NLO-индекса: постройте его командой 'Build natural language outlines', чтобы галка стала доступна.</value>
+  </data>
+  <data name="Found__0__items_" xml:space="preserve">
+    <value>Найдено совпадений: {0}</value>
+  </data>
+  <data name="RAG__calibrating_the_index" xml:space="preserve">
+    <value>Калибровка индекса...</value>
+  </data>
+  <data name="RAG__calibrated__noise__0___threshold__1_" xml:space="preserve">
+    <value>Индекс откалиброван: бессмысленный запрос набирает на этой модели {0}, поэтому поиск берёт файлы от {1}.</value>
+  </data>
+  <data name="RAG__calibration__0__of__1__probes_missed" xml:space="preserve">
+    <value>{0} из {1} запросов с известным ответом не нашли указанный в них файл.</value>
+  </data>
+  <data name="RAG__calibration_model_does_not_separate" xml:space="preserve">
+    <value>Эта embedding-модель не различает ваш код: запрос с известным ответом набирает {0}, а запрос ни о чём доходит до {1}. Порог тут не поможет - попробуйте другую embedding-модель.</value>
+  </data>
+  <data name="RAG__calibration_failed__0_" xml:space="preserve">
+    <value>Индекс построен, но откалибровать его не удалось: {0}. Поиск будет работать по нему без порога.</value>
+  </data>
+  <data name="RAG__another_model_built_the_index__0_" xml:space="preserve">
+    <value>Индекс построен другой embedding-моделью: контрольные фразы совпадают лишь на {0}. Пересоберите индекс или ищите тем агентом, которым он собран.</value>
+  </data>
+  <data name="RAG_calibration__window_title" xml:space="preserve">
+    <value>FreeAIr: калибровка RAG</value>
+  </data>
+  <data name="RAG_calibration__index_summary" xml:space="preserve">
+    <value>Индекс от {0}, модель {1}, сервер называет её {2}. Строк описаний: {3}, чисел в векторе: {4}.</value>
+  </data>
+  <data name="RAG_calibration__not_calibrated" xml:space="preserve">
+    <value>Этот индекс не калиброван: поиск работает по нему без порога и отдаёт все файлы, которые ранжировал.</value>
+  </data>
+  <data name="RAG_calibration__summary" xml:space="preserve">
+    <value>Шум {0}, порог {1} при чувствительности {2}. Измерено по {3} безответным и {4} отвеченным запросам.</value>
+  </data>
+  <data name="RAG_calibration__probe" xml:space="preserve">
+    <value>Спросить</value>
+  </data>
+  <data name="RAG_calibration__probe_hint" xml:space="preserve">
+    <value>Отметьте файл, который отвечает на запрос, либо скажите, что ответа здесь нет. Порог учится и на том, и на другом, а на втором - сильнее.</value>
+  </data>
+  <data name="RAG_calibration__mark_as_answer" xml:space="preserve">
+    <value>это ответ</value>
+  </data>
+  <data name="RAG_calibration__mark_as_hopeless" xml:space="preserve">
+    <value>ответа здесь нет</value>
+  </data>
+  <data name="RAG_calibration__queries_header" xml:space="preserve">
+    <value>Запросы, по которым измеряется порог</value>
+  </data>
+  <data name="RAG_calibration__expected_path_hint" xml:space="preserve">
+    <value>Пустой файл означает, что решение не может ответить на этот запрос вовсе. Путь указывается относительно папки решения.</value>
+  </data>
+  <data name="RAG_calibration__sensitivity" xml:space="preserve">
+    <value>Чувствительность</value>
+  </data>
+  <data name="RAG_calibration__recalculate" xml:space="preserve">
+    <value>Пересчитать</value>
+  </data>
+  <data name="RAG_calibration__save" xml:space="preserve">
+    <value>Сохранить</value>
+  </data>
+  <data name="RAG_calibration__reload" xml:space="preserve">
+    <value>Перечитать</value>
+  </data>
+  <data name="RAG_calibration__remove" xml:space="preserve">
+    <value>убрать</value>
+  </data>
+  <data name="RAG_calibration__kind_answered" xml:space="preserve">
+    <value>с ответом</value>
+  </data>
+  <data name="RAG_calibration__kind_hopeless" xml:space="preserve">
+    <value>без ответа</value>
+  </data>
+  <data name="RAG_calibration__passes" xml:space="preserve">
+    <value>проходит</value>
+  </data>
+  <data name="RAG_calibration__cut_off" xml:space="preserve">
+    <value>отсечён</value>
+  </data>
+  <data name="RAG_calibration__probed__0__files" xml:space="preserve">
+    <value>Найдено файлов: {0}, порог этого индекса - {1}.</value>
+  </data>
+  <data name="RAG_calibration__nothing_found" xml:space="preserve">
+    <value>На этот запрос в индексе нет вообще ничего.</value>
+  </data>
+  <data name="RAG_calibration__recalculating" xml:space="preserve">
+    <value>Измеряю запросы по индексу...</value>
+  </data>
+  <data name="RAG_calibration__recalculated" xml:space="preserve">
+    <value>Измерено. Пока ничего не сохранено.</value>
+  </data>
+  <data name="RAG_calibration__nothing_to_measure" xml:space="preserve">
+    <value>Измерять нечего: индекс пуст либо все запросы пустые.</value>
+  </data>
+  <data name="RAG_calibration__saving" xml:space="preserve">
+    <value>Сохраняю...</value>
+  </data>
+  <data name="RAG_calibration__saved__0_" xml:space="preserve">
+    <value>Запросы сохранены в {0}, измеренные числа - в индекс. Поиск использует их с этого момента.</value>
+  </data>
+  <data name="RAG_calibration__saved_settings_only__0_" xml:space="preserve">
+    <value>Запросы сохранены в {0}. Индекс не тронут: чтобы записать числа в него, сначала нажмите 'Пересчитать'.</value>
+  </data>
+  <data name="RAG_calibration__query_added" xml:space="preserve">
+    <value>Запрос добавлен в список ниже. Он будет использован при каждой следующей сборке индекса.</value>
+  </data>
+  <data name="RAG_calibration__query_replaced" xml:space="preserve">
+    <value>Такой запрос уже был в списке, его ответ заменён.</value>
+  </data>
+  <data name="RAG_calibration__no_agent" xml:space="preserve">
+    <value>Нет агента, которым можно векторизовать запрос, поэтому измерить ничего нельзя.</value>
+  </data>
+  <data name="RAG_calibration__change_agent" xml:space="preserve">
+    <value>Агент...</value>
+  </data>
+  <data name="RAG_calibration__agent__0___1___2_" xml:space="preserve">
+    <value>Спрашиваем агента '{0}': модель {1} на {2}.</value>
+  </data>
+  <data name="RAG_calibration__agent_not_found__0_" xml:space="preserve">
+    <value>Индекс построен агентом '{0}', которого в настройках больше нет. Нажмите 'Агент...', чтобы выбрать другого.</value>
+  </data>
+  <data name="RAG_calibration__agent_unknown" xml:space="preserve">
+    <value>Индекс не сообщает, каким агентом он построен. Нажмите 'Агент...', чтобы выбрать его.</value>
+  </data>
+  <data name="RAG_calibration__help_10" xml:space="preserve">
+    <value>Это окно измеряет порог близости для поиска с галкой `Use RAG` - вместо того, чтобы вы угадывали его. Всё считается по индексу, который уже лежит на диске; векторы при этом никогда не пересобираются.</value>
+  </data>
+  <data name="RAG_calibration__help_20" xml:space="preserve">
+    <value>Синяя строка выше называет агента, через которого идёт каждый запрос. Это должна быть та модель, которой построен индекс: другую окно отвергает, а не измеряет, потому что её числа ничего не значат. Кнопка 'Агент...' выбирает другого.</value>
+  </data>
+  <data name="RAG_calibration__help_30" xml:space="preserve">
+    <value>Введите вопрос так, как ввели бы его в поиск на естественном языке, и нажмите 'Спросить' или Enter. Файлы, которые предложил индекс, показываются со своими оценками, включая те, которые текущий порог отсекает: о пороге судят по тому, что он выбрасывает.</value>
+  </data>
+  <data name="RAG_calibration__help_40" xml:space="preserve">
+    <value>Нажмите 'это ответ' у файла, который действительно отвечает на вопрос, либо 'ответа здесь нет', если решение не может ответить вовсе. Нужны оба вида: безответные показывают, как высоко забирается чистый шум на вашей модели, а отвеченные не дают порогу залезть выше файла, про который вы точно знаете, что он верный.</value>
+  </data>
+  <data name="RAG_calibration__help_50" xml:space="preserve">
+    <value>Запрос попадает в список внизу - это и есть все исходные данные измерения. Там его можно править руками: слева вопрос, справа файл, который на него отвечает, относительно папки решения. Пустой файл означает, что ответа нет вовсе. Enter фиксирует отредактированное поле.</value>
+  </data>
+  <data name="RAG_calibration__help_60" xml:space="preserve">
+    <value>'Чувствительность' - это насколько выше измеренного шума должен стоять файл, в долях расстояния от шума до идеального совпадения: 0.1 - щедро, 0.2 - по умолчанию, 0.35 - строго. Её изменение перечитывает то же самое измерение и ничего не спрашивает у модели.</value>
+  </data>
+  <data name="RAG_calibration__help_70" xml:space="preserve">
+    <value>'Пересчитать' измеряет запросы по индексу и показывает, какой шум и какой порог из них получается. Никуда ничего не пишется, так что нажимайте сколько угодно.</value>
+  </data>
+  <data name="RAG_calibration__help_80" xml:space="preserve">
+    <value>'Сохранить' кладёт запросы в файл настроек, откуда их возьмёт каждая следующая сборка индекса, а измеренные числа - в сам индекс, переписывая только его маленький файл метаданных. 'Перечитать' заново читает индекс и настройки, 'Отмена' прерывает то, что сейчас работает.</value>
+  </data>
+  <data name="Help_header_what_this_window_is" xml:space="preserve">
+    <value>Что это за окно и как им пользоваться</value>
+  </data>
+  <data name="RAG_calibration__cancel" xml:space="preserve">
+    <value>Отмена</value>
+  </data>
+  <data name="RAG_calibration__help_15" xml:space="preserve">
+    <value>Калибровка - это выборка, а не каталог: пяти-десяти запросов достаточно, и добавлять каждый вопрос, который вы когда-нибудь зададите, не нужно. Порог - одно число на весь индекс, и горсть честных запросов задаёт его не хуже сотни. Поиск работает и вовсе без калибровки - просто без порога, отдавая все файлы, которые он отранжировал.</value>
+  </data>
+  <data name="FreeAIr_natural_language_search" xml:space="preserve">
+    <value>FreeAIr: поиск на естественном языке</value>
+  </data>
+  <data name="Search__no_action_is_configured" xml:space="preserve">
+    <value>Не настроено ни одного действия с областью NaturalLanguageSearch, поэтому нечем спросить модель. Добавьте его в Центре управления FreeAIr.</value>
+  </data>
+  <data name="Search__no_agent_with_a_token" xml:space="preserve">
+    <value>Не найдено ни одного агента с токеном, а поиску нужен агент, чтобы обратиться к модели. Задайте токен нужному агенту в Центре управления FreeAIr.</value>
+  </data>
+  <data name="Search__there_is_nothing_to_search_in" xml:space="preserve">
+    <value>Искать не в чем: либо не открыто решение, либо выбрана область «текущий проект», а активного проекта нет.</value>
+  </data>
+  <data name="Search__the_chat_has_not_started" xml:space="preserve">
+    <value>Не удалось создать чат с агентом, поиск не выполнялся.</value>
+  </data>
+  <data name="Search__agent__0___1___2_" xml:space="preserve">
+    <value>Отвечает на запрос: {0} ({1}, модель {2})</value>
+  </data>
+  <data name="Search__embedding_agent__0___1_" xml:space="preserve">
+    <value>Векторизует запрос: {0} ({1})</value>
+  </data>
+  <data name="Confidence__high" xml:space="preserve">
+    <value>Высокая</value>
+  </data>
+  <data name="Confidence__medium" xml:space="preserve">
+    <value>Средняя</value>
+  </data>
+  <data name="Confidence__low" xml:space="preserve">
+    <value>Низкая</value>
+  </data>
+  <data name="Wizard_title" xml:space="preserve">
+    <value>Мастер настройки FreeAIr</value>
+  </data>
+  <data name="Wizard_back" xml:space="preserve">
+    <value>Назад</value>
+  </data>
+  <data name="Wizard_next" xml:space="preserve">
+    <value>Далее</value>
+  </data>
+  <data name="Wizard_finish" xml:space="preserve">
+    <value>Готово</value>
+  </data>
+  <data name="Wizard_cancel_confirm" xml:space="preserve">
+    <value>Мастер настройки будет закрыт без сохранения. Продолжить?</value>
+  </data>
+  <data name="Wizard_step_welcome_title" xml:space="preserve">
+    <value>Добро пожаловать в мастер настройки FreeAIr</value>
+  </data>
+  <data name="Wizard_step_welcome_description" xml:space="preserve">
+    <value>Мастер шаг за шагом заменит текущую конфигурацию FreeAIr на ту, которую вы соберёте сами. Ничего не записывается, пока вы не дойдёте до последней страницы и не нажмёте «Готово», — до этого момента отмена не меняет ничего.</value>
+  </data>
+  <data name="Wizard_step_startingpoint_title" xml:space="preserve">
+    <value>Начальное состояние</value>
+  </data>
+  <data name="Wizard_step_startingpoint_description" xml:space="preserve">
+    <value>Выберите, с чего начать редактирование: встроенная демонстрационная конфигурация (агенты-заглушки и поставляемая библиотека промптов), полностью пустая конфигурация или текущая конфигурация этой установки.</value>
+  </data>
+  <data name="Wizard_step_agents_title" xml:space="preserve">
+    <value>Агенты</value>
+  </data>
+  <data name="Wizard_step_agents_description" xml:space="preserve">
+    <value>Агент — это одна языковая модель, с которой вы разговариваете: где она доступна (endpoint), как к ней аутентифицироваться (токен), какую модель запрашивать и с каким системным промптом она отвечает. Чаты и действия выбирают агента по имени. Выберите известный локальный или облачный endpoint из списка либо введите свой; токен можно хранить прямо здесь или, что надёжнее для файла, попадающего в репозиторий, как ссылку на переменную окружения.</value>
+  </data>
+  <data name="Wizard_step_mcpservers_title" xml:space="preserve">
+    <value>MCP-серверы</value>
+  </data>
+  <data name="Wizard_step_mcpservers_description" xml:space="preserve">
+    <value>MCP-серверы дают агентам дополнительные инструменты — чтение репозитория, поиск по документации и так далее. Настраиваются так же, как из центра управления, включая поиск готовых серверов в Docker Hub.</value>
+  </data>
+  <data name="Wizard_step_actions_title" xml:space="preserve">
+    <value>Действия</value>
+  </data>
+  <data name="Wizard_step_actions_description" xml:space="preserve">
+    <value>Действия — это промпты, которые FreeAIr предлагает в своих меню. Каждое из них указывает агента, который на него отвечает, поэтому действие, привязанное к несуществующему агенту, работать не сможет.</value>
+  </data>
+  <data name="Wizard_step_miscsettings_title" xml:space="preserve">
+    <value>Прочие настройки</value>
+  </data>
+  <data name="Wizard_step_miscsettings_description" xml:space="preserve">
+    <value>Несколько настроек, которым не досталось отдельной страницы: длина ответа, язык ответа, фреймворк модульных тестов для генерации и встроенный MCP-сервер GitHub.</value>
+  </data>
+  <data name="Wizard_step_summary_title" xml:space="preserve">
+    <value>Итог</value>
+  </data>
+  <data name="Wizard_step_summary_description" xml:space="preserve">
+    <value>Ниже перечислено то, что будет записано при нажатии «Готово».</value>
+  </data>
+  <data name="Wizard_welcome_overwrite_warning" xml:space="preserve">
+    <value>Текущие агенты, MCP-серверы, действия и прочие настройки FreeAIr будут заменены.</value>
+  </data>
+  <data name="Wizard_welcome_destination_header" xml:space="preserve">
+    <value>Конфигурация будет записана в:</value>
+  </data>
+  <data name="Wizard_welcome_destination_vs_store" xml:space="preserve">
+    <value>внутреннее хранилище настроек Visual Studio (решение не открыто, поэтому нет папки .freeair, куда можно было бы писать).</value>
+  </data>
+  <data name="Wizard_startingpoint_defaults" xml:space="preserve">
+    <value>Встроенная демонстрационная конфигурация</value>
+  </data>
+  <data name="Wizard_startingpoint_blank" xml:space="preserve">
+    <value>Пустая — начать с нуля</value>
+  </data>
+  <data name="Wizard_startingpoint_existing" xml:space="preserve">
+    <value>Текущая конфигурация этой установки</value>
+  </data>
+  <data name="Wizard_agent_guided_intro" xml:space="preserve">
+    <value>Демонстрационные агенты-заглушки FreeAIr удалены. Заполните ниже данные своего агента — остальных можно добавить позже из центра управления.</value>
+  </data>
+  <data name="Wizard_agent_name_hint" xml:space="preserve">
+    <value>Короткое имя на ваш выбор. Именно по нему чаты и действия выбирают агента.</value>
+  </data>
+  <data name="Wizard_agent_endpoint_hint" xml:space="preserve">
+    <value>Базовый URL OpenAI-совместимого сервера, на котором работает модель, — локального (например, LM Studio) или облачного. Выберите известный адрес из списка, введите свой или нажмите кнопку проверки, чтобы убедиться в доступности перед переходом дальше.</value>
+  </data>
+  <data name="Wizard_agent_token_hint" xml:space="preserve">
+    <value>Локальному серверу вроде LM Studio токен обычно не нужен — оставьте поле пустым. Облачному провайдеру нужен API-ключ: вставьте его прямо сюда либо отметьте флажок и укажите имя переменной окружения, в которой ключ уже лежит, — тогда сам токен никогда не попадёт в файл настроек под контролем версий.</value>
+  </data>
+  <data name="Wizard_agent_model_hint" xml:space="preserve">
+    <value>Идентификатор модели, который агент запрашивает у endpoint'а, — например, имя из списка моделей самого сервера.</value>
+  </data>
+  <data name="Wizard_agent_contextsize_hint" xml:space="preserve">
+    <value>Размер контекстного окна модели в токенах — сколько переписки и кода FreeAIr может отправить в одном запросе. Если не уверены, посмотрите документацию модели.</value>
+  </data>
+  <data name="Wizard_agent_systemprompt_hint" xml:space="preserve">
+    <value>То, что сообщается агенту перед каждым разговором, — его роль и правила. Если не уверены, оставьте как есть: это можно отредактировать позже.</value>
+  </data>
+  <data name="Wizard_agent_known_endpoint_tooltip" xml:space="preserve">
+    <value>Выбрать известный endpoint</value>
+  </data>
+  <data name="Wizard_agent_use_env_variable" xml:space="preserve">
+    <value>использовать переменную окружения</value>
+  </data>
+  <data name="Wizard_agent_test_connection" xml:space="preserve">
+    <value>Проверить соединение</value>
+  </data>
+  <data name="Wizard_agent_test_checking" xml:space="preserve">
+    <value>Проверяем...</value>
+  </data>
+  <data name="Wizard_agent_test_invalid_uri" xml:space="preserve">
+    <value>Некорректный URL — он должен содержать протокол, например http://localhost:1234/v1.</value>
+  </data>
+  <data name="Wizard_agent_test_reachable" xml:space="preserve">
+    <value>Доступен — сервер сообщил о моделях: {0}.</value>
+  </data>
+  <data name="Wizard_agent_test_failed" xml:space="preserve">
+    <value>Не удалось обратиться к этому endpoint'у: {0}</value>
+  </data>
+  <data name="Wizard_agent_problem_missing_name" xml:space="preserve">
+    <value>У агента должно быть имя.</value>
+  </data>
+  <data name="Wizard_agent_problem_invalid_endpoint" xml:space="preserve">
+    <value>Endpoint должен быть корректным абсолютным URI, например http://localhost:1234/v1.</value>
+  </data>
+  <data name="Wizard_agent_problem_invalid_token" xml:space="preserve">
+    <value>Токен должен быть пустым, литеральным значением или ссылкой на переменную окружения в форме {{$VAR_NAME}}.</value>
+  </data>
+  <data name="Wizard_agent_problem_context_size" xml:space="preserve">
+    <value>Размер контекста должен быть больше нуля.</value>
+  </data>
+  <data name="Wizard_agent_unnamed" xml:space="preserve">
+    <value>(агент без имени)</value>
+  </data>
+  <data name="Wizard_mcp_count" xml:space="preserve">
+    <value>Сейчас настроено MCP-серверов: {0}.</value>
+  </data>
+  <data name="Wizard_mcp_configure" xml:space="preserve">
+    <value>Настроить MCP-серверы...</value>
+  </data>
+  <data name="Wizard_mcp_msdn_optin" xml:space="preserve">
+    <value>Установить MCP-сервер документации Microsoft Learn</value>
+  </data>
+  <data name="Wizard_mcp_msdn_optin_hint" xml:space="preserve">
+    <value>Позволяет модели искать ответы в официальной документации Microsoft, а не полагаться на то, что она помнит о .NET и Visual Studio. Это публичный HTTP-эндпойнт на learn.microsoft.com: на ваш компьютер ничего не скачивается и не устанавливается, токен не нужен — галочка просто прописывает сервер в настройки. Если снять галочку, он оттуда удаляется.</value>
+  </data>
+  <data name="Wizard_actions_count" xml:space="preserve">
+    <value>Сейчас настроено действий: {0}.</value>
+  </data>
+  <data name="Wizard_actions_configure" xml:space="preserve">
+    <value>Настроить действия...</value>
+  </data>
+  <data name="Wizard_actions_what_is_it" xml:space="preserve">
+    <value>Действие — это именованный промпт, который FreeAIr предлагает в меню: в нём указано, какой агент отвечает, что именно спросить и где это появляется — в контекстном меню выделенного кода, в дереве решения, в окне ошибок сборки, в поле сообщения коммита.</value>
+  </data>
+  <data name="Wizard_actions_examples" xml:space="preserve">
+    <value>Например: «Explain code» для выделенного блока, «Add XML comments» для файла, «Generate unit tests» в дереве решения, «Fix build error» в списке ошибок, «Build commit message» по git diff.</value>
+  </data>
+  <data name="Wizard_actions_use_defaults" xml:space="preserve">
+    <value>Использовать значения по умолчанию</value>
+  </data>
+  <data name="Wizard_actions_use_defaults_hint" xml:space="preserve">
+    <value>Пересоздаёт список действий из поставляемых с FreeAIr и привязывает каждое из них к вашему первому агенту. Дополнение строки целиком привязывается, только если стоит галочка выше, — оно срабатывает на каждое нажатие клавиши, поэтому включать его нужно осознанно.</value>
+  </data>
+  <data name="Wizard_actions_wholeline" xml:space="preserve">
+    <value>Дополнять строку целиком автоматически по мере набора</value>
+  </data>
+  <data name="Wizard_actions_wholeline_hint" xml:space="preserve">
+    <value>Когда включено, FreeAIr после каждой паузы в наборе спрашивает у модели окончание строки и показывает ответ серой подсказкой перед курсором, то есть делает запрос на каждую паузу. Когда выключено, действие дополнения строки целиком неактивно: кнопка ниже не привязывает его к агенту и в списке проблем оно не появляется. Вызвать подсказку явно по Alt+A можно в любом случае.</value>
+  </data>
+  <data name="Wizard_actions_defaults_need_an_agent" xml:space="preserve">
+    <value>Сначала создайте агента: действия по умолчанию привязываются к первому агенту.</value>
+  </data>
+  <data name="Wizard_actions_defaults_applied" xml:space="preserve">
+    <value>Восстановлено действий по умолчанию: {0}; все они привязаны к агенту «{1}».</value>
+  </data>
+  <data name="Wizard_actions_problems_header" xml:space="preserve">
+    <value>Эти действия не смогут работать с текущими настройками:</value>
+  </data>
+  <data name="Wizard_actions_problem_no_agent" xml:space="preserve">
+    <value>«{0}» не указывает агента, поэтому FreeAIr будет спрашивать, какого использовать, при каждом вызове.</value>
+  </data>
+  <data name="Wizard_actions_problem_unknown_agent" xml:space="preserve">
+    <value>«{0}» привязано к агенту «{1}», которого нет в этой конфигурации.</value>
+  </data>
+  <data name="Wizard_misc_maxoutputtokens_label" xml:space="preserve">
+    <value>Максимум токенов в ответе</value>
+  </data>
+  <data name="Wizard_misc_maxoutputtokens_hint" xml:space="preserve">
+    <value>Максимальное число токенов, до которого может дойти ответ агента.</value>
+  </data>
+  <data name="Wizard_misc_culture_label" xml:space="preserve">
+    <value>Принудительный язык ответа (например, ru-RU)</value>
+  </data>
+  <data name="Wizard_misc_culture_hint" xml:space="preserve">
+    <value>Заставляет отвечать на конкретном языке независимо от языка интерфейса Visual Studio. Оставьте пустым, чтобы агент решал сам.</value>
+  </data>
+  <data name="Wizard_misc_unittestframework_label" xml:space="preserve">
+    <value>Предпочитаемый фреймворк модульных тестов</value>
+  </data>
+  <data name="Wizard_misc_unittestframework_hint" xml:space="preserve">
+    <value>Подставляется в промпт действия «generate unit tests», например xunit, nunit или mstest.</value>
+  </data>
+  <data name="Wizard_misc_searchtimeout_label" xml:space="preserve">
+    <value>Таймаут поиска элементов контекста (мс)</value>
+  </data>
+  <data name="Wizard_misc_searchtimeout_hint" xml:space="preserve">
+    <value>Сколько времени FreeAIr ищет в решении связанные файлы и символы для приложения к запросу, прежде чем прекратить.</value>
+  </data>
+  <data name="Wizard_misc_github_optin" xml:space="preserve">
+    <value>Установить и использовать встроенный MCP-сервер GitHub</value>
+  </data>
+  <data name="Wizard_misc_github_optin_hint" xml:space="preserve">
+    <value>Позволяет агентам читать репозитории, задачи и pull request'ы на github.com через загружаемый MCP-сервер. Пока флажок не отмечен, ничего связанного с GitHub не настраивается; сам сервер после этого всё равно нужно установить из центра управления.</value>
+  </data>
+  <data name="Wizard_misc_github_token_label" xml:space="preserve">
+    <value>Токен MCP-сервера GitHub</value>
+  </data>
+  <data name="Wizard_misc_github_token_hint" xml:space="preserve">
+    <value>Персональный токен доступа github.com. Вставьте его прямо сюда либо запишите как {{$MY_VAR}}, чтобы читать его из переменной окружения MY_VAR (после её установки перезапустите Visual Studio).</value>
+  </data>
+  <data name="Wizard_summary_agents" xml:space="preserve">
+    <value>Агентов: {0}</value>
+  </data>
+  <data name="Wizard_summary_mcpservers" xml:space="preserve">
+    <value>MCP-серверов: {0}</value>
+  </data>
+  <data name="Wizard_summary_actions" xml:space="preserve">
+    <value>Действий: {0}</value>
+  </data>
+  <data name="Wizard_summary_press_finish" xml:space="preserve">
+    <value>Нажмите «Готово», чтобы записать эту конфигурацию.</value>
+  </data>
+  <data name="Wizard_infobar_message" xml:space="preserve">
+    <value>FreeAIr поставляется с демонстрационной конфигурацией, предназначенной для редактирования, а не для повседневной работы.</value>
+  </data>
+  <data name="Wizard_infobar_open" xml:space="preserve">
+    <value>Открыть список изменений и мастер настройки</value>
+  </data>
 </root>

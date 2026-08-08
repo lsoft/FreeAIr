@@ -16,16 +16,27 @@ namespace FreeAIr.Helper
     /// </summary>
     public static class SuggestionHijackHelper
     {
+        /// <summary>Reflected IntelliCode method that displays a suggestion session for a completion.</summary>
         private static readonly MethodInfo _tryDisplaySuggestionAsyncMethod;
+        /// <summary>Reflected IntelliCode method that caches the accepted proposal on the completions instance.</summary>
         private static readonly MethodInfo _cacheProposalMethod;
 
+        /// <summary>Reflected field holding IntelliCode's suggestion manager instance.</summary>
         private static readonly FieldInfo _suggestionManagerField;
+        /// <summary>Reflected field holding the current IntelliCode suggestion session.</summary>
         private static readonly FieldInfo _sessionField;
 
+        /// <summary>IntelliCode's internal <c>GenerateResult</c> type, located via reflection.</summary>
         private static readonly Type _generateResultType;
+        /// <summary>IntelliCode's internal <c>InlineCompletionsInstance</c> type, located via reflection.</summary>
         private static readonly Type _inlineCompletionsType;
+        /// <summary>IntelliCode's internal <c>InlineCompletionSuggestion</c> type, located via reflection.</summary>
         private static readonly Type _inlineCompletionSuggestion;
 
+        /// <summary>
+        /// Locates the private IntelliCode types and members needed to hijack its inline
+        /// suggestion UI, via reflection over the <c>Microsoft.VisualStudio.IntelliCode</c> assembly.
+        /// </summary>
         static SuggestionHijackHelper()
         {
             var assembly = Assembly.Load("Microsoft.VisualStudio.IntelliCode");
@@ -62,6 +73,11 @@ namespace FreeAIr.Helper
             }
         }
 
+        /// <summary>
+        /// Displays a FreeAIr-generated completion in the editor by piggy-backing on IntelliCode's
+        /// inline suggestion UI (ghost text), dismissing any existing session first. This is how
+        /// FreeAIr shows AI-generated code completions without shipping its own suggestion adorner.
+        /// </summary>
         public static async Task ShowAutocompleteAsync(
             ITextView textView,
             ProposalCollectionBase proposalCollection

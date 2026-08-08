@@ -1,0 +1,30 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    The part of the first-run setup wizard which does not need Visual Studio or WPF: step
+    navigation/skipping, the agent-field validator and the known-endpoint catalog behind the
+    wizard's agent editing step. MCP servers and actions are edited by reusing the existing
+    McpServerConfigureWindow/ActionConfigureWindow directly (see FreeAIr\UI\Wizard), so this
+    project holds no DTOs for them - there is nothing here worth being a second copy of.
+
+    It is a separate assembly so this logic can be exercised by an ordinary test runner, the same
+    reason FreeAIr.Search is split out.
+
+    netstandard2.0 on purpose: it has to be consumable both by FreeAIr (net48) and by the test
+    project (net8.0).
+  -->
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <LangVersion>Latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <RootNamespace>FreeAIr.SetupWizard</RootNamespace>
+    <AssemblyName>FreeAIr.SetupWizard</AssemblyName>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="FreeAIr.SetupWizard.Tests" />
+  </ItemGroup>
+
+</Project>

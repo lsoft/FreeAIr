@@ -5,17 +5,29 @@ using System.Windows.Media;
 
 namespace MarkdownParser.Antlr.Answer.Blocks
 {
+    /// <summary>
+    /// A markdown pipe table, accumulated row by row as <see cref="AnswerMarkdownListener.EnterTable_row"/>
+    /// fires and rendered as a bordered WPF <see cref="Table"/>. The row whose cells are all dashes
+    /// (the header/body separator) is detected in <see cref="AddRow"/> and consumed instead of stored,
+    /// marking the row before it as the header.
+    /// </summary>
     public sealed class TableBlock : IBlock
     {
+        /// <summary>Background brush used for header cells, a light gray at low opacity.</summary>
         private static readonly Brush _semiTransparentGray = new SolidColorBrush(Color.FromArgb(0x40, 0x80, 0x80, 0x80));
-        
+
+        /// <summary>Supplies the font sizes used for header and body cells, kept in sync with the rest of the answer rendering.</summary>
         private readonly IFontSizeProvider _fontSizeProvider;
-        
+
+        /// <summary>True once the dash-only header/body separator row has been seen, marking the row before it as the header.</summary>
         private bool _headerRowAdded = false;
+        /// <summary>The accumulated table rows, each a list of cell texts, in the order <see cref="AddRow"/> received them.</summary>
         private List<List<string>> _rows;
 
+        /// <summary>Identifies this block as a table for block-type dispatch.</summary>
         public BlockTypeEnum Type => BlockTypeEnum.Table;
 
+        /// <summary>Creates an empty table block that accumulates rows via <see cref="AddRow"/>.</summary>
         public TableBlock(
             IFontSizeProvider fontSizeProvider
             )
@@ -29,6 +41,7 @@ namespace MarkdownParser.Antlr.Answer.Blocks
             _fontSizeProvider = fontSizeProvider;
         }
 
+        /// <summary>Parses one `|`-delimited row; the dash-only separator row is consumed to mark the preceding row as the header instead of being stored as data.</summary>
         public void AddRow(
             string row
             )
@@ -49,6 +62,7 @@ namespace MarkdownParser.Antlr.Answer.Blocks
             _rows.Add(columns);
         }
 
+        /// <summary>Builds the WPF <see cref="Table"/> from the accumulated rows, or null if none were added.</summary>
         public Block? CreateBlock(
             AdditionalCommandContainer? acc,
             bool isInProgress
@@ -131,6 +145,7 @@ namespace MarkdownParser.Antlr.Answer.Blocks
         }
 
 
+        /// <summary>Border thickness for a cell, drawing the outer table edge only on the first column and last row (interior cells share one border on each other side).</summary>
         public Thickness GetBorderThickness(
             int rowCount,
             int columnCount,
@@ -155,6 +170,7 @@ namespace MarkdownParser.Antlr.Answer.Blocks
             return new Thickness(left, top, right, bottom);
         }
 
+        /// <summary>Builds one WPF <see cref="TableCell"/> containing the given text, font size, border and optional background.</summary>
         private TableCell CreateTableCell(
             string cellText,
             double fontSize,

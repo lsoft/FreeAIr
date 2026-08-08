@@ -20,15 +20,42 @@ using FreeAIr.Chat.Context.Item;
 
 namespace FreeAIr.UI.ViewModels
 {
+    /// <summary>
+    /// View model behind the Natural Language Outlines tool window: drives an LLM chat that
+    /// generates NLO summary comments for the chosen solution items, lets the user review
+    /// and selectively apply them, and shows a diff before writing them into the source files.
+    /// </summary>
     [Export(typeof(NaturalLanguageOutlinesViewModel))]
     public sealed class NaturalLanguageOutlinesViewModel : BaseViewModel
     {
+        /// <summary>
+        /// The chat session used to ask the LLM for NLO comments; started per invocation of
+        /// the tool window and stopped/replaced when a new run begins.
+        /// </summary>
         private FreeAIr.Chat.Chat? _chat;
+
+        /// <summary>
+        /// Human-readable progress text shown in the tool window while comments are being
+        /// generated.
+        /// </summary>
         private string _status = FreeAIr.Resources.Resources.Idle;
 
+        /// <summary>
+        /// Token source used to cancel the in-progress comment generation when the user
+        /// invokes <see cref="CancelChatCommand"/>.
+        /// </summary>
         private CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
+
+        /// <summary>
+        /// The currently running <see cref="ProcessSolutionDocumentsAsync"/> task, tracked so
+        /// it can be awaited and cancelled from the UI.
+        /// </summary>
         private Task? _processingTask;
 
+        /// <summary>
+        /// Progress/status text bound to the tool window, reporting how many solution items
+        /// have been processed, or the terminal outcome (generated, cancelled, error).
+        /// </summary>
         public string Status
         {
             get => _status;
@@ -39,11 +66,20 @@ namespace FreeAIr.UI.ViewModels
             }
         }
 
+        /// <summary>
+        /// The NLO comments the LLM proposed for the chosen solution items, each with an
+        /// `Apply` flag the user toggles before writing them into the source files.
+        /// </summary>
         public ObservableCollection2<FoundCommentItem> GeneratedComments
         {
             get;
         }
 
+        /// <summary>
+        /// Command that previews a single generated comment: writes a temp copy of its file with
+        /// the applied comments inserted and opens the Visual Studio diff viewer against the
+        /// original file.
+        /// </summary>
         public ICommand GotoCommand
         {
             get
@@ -104,6 +140,10 @@ namespace FreeAIr.UI.ViewModels
             }
         }
 
+        /// <summary>
+        /// Command that writes every comment marked `Apply` into its source file, grouped and
+        /// processed per file, then clears the generated comments list.
+        /// </summary>
         public ICommand ApplyCommand
         {
             get
@@ -168,6 +208,10 @@ namespace FreeAIr.UI.ViewModels
             }
         }
 
+        /// <summary>
+        /// Command that cancels the in-progress comment generation, signalling the cancellation
+        /// token and awaiting the processing task to actually stop.
+        /// </summary>
         public ICommand CancelChatCommand
         {
             get
@@ -215,11 +259,19 @@ namespace FreeAIr.UI.ViewModels
             }
         }
 
+        /// <summary>
+        /// Creates the view model with an empty generated-comments list.
+        /// </summary>
         public NaturalLanguageOutlinesViewModel()
         {
             GeneratedComments = new();
         }
 
+        /// <summary>
+        /// Stops any previous chat, starts a fresh no-tool LLM chat for the given agent, and
+        /// kicks off <see cref="ProcessSolutionDocumentsAsync"/> in the background to generate
+        /// NLO comments for the chosen solution items.
+        /// </summary>
         public async Task SetNewChatAsync(
             SupportActionJson action,
             AgentJson defaultAgent,
@@ -279,6 +331,12 @@ namespace FreeAIr.UI.ViewModels
                 );
         }
 
+        /// <summary>
+        /// Drives the NLO generation loop: splits the chosen solution items into
+        /// context-size-limited batches, prompts the LLM with the support action's prompt for
+        /// each batch, parses the returned natural-language-outline comments, and populates
+        /// <see cref="GeneratedComments"/> with the resulting insertable comment lines.
+        /// </summary>
         public async Task ProcessSolutionDocumentsAsync(
             SupportActionJson action,
             AgentJson defaultAgent,
@@ -440,6 +498,11 @@ namespace FreeAIr.UI.ViewModels
             OnPropertyChanged();
         }
 
+        /// <summary>
+        /// Rewrites a file's lines with the given comment items inserted at their target lines,
+        /// removing any pre-existing single-line comment immediately above, on, or below the
+        /// target line first so re-applying does not duplicate comments.
+        /// </summary>
         private static List<string> ApplyCommentsForFile(
             string filePath,
             IEnumerable<FoundCommentItem> appliedComments
@@ -498,6 +561,10 @@ namespace FreeAIr.UI.ViewModels
             return bodyLines;
         }
 
+        /// <summary>
+        /// Opens Visual Studio's built-in file diff tool comparing the original file against the
+        /// temp file containing the previewed comment insertion.
+        /// </summary>
         private static void ShowDiff(FoundCommentItem commentItem, string tempFilePath)
         {
             ThreadHelper.ThrowIfNotOnUIThread();
@@ -511,6 +578,10 @@ namespace FreeAIr.UI.ViewModels
         }
 
 
+        /// <summary>
+        /// Opens the Natural Language Outlines tool window and starts generating NLO comments
+        /// for the chosen solution items using the given support action and agent.
+        /// </summary>
         public static async Task ShowPanelAsync(
             SupportActionJson action,
             AgentJson agent,
@@ -530,10 +601,20 @@ namespace FreeAIr.UI.ViewModels
 
     }
 
+    /// <summary>
+    /// A single LLM-proposed NLO comment for one line of one file, shown in the Natural Language
+    /// Outlines tool window with a checkbox letting the user include or exclude it before applying.
+    /// </summary>
     public sealed class FoundCommentItem : BaseViewModel
     {
+        /// <summary>
+        /// Backing field for <see cref="Apply"/>.
+        /// </summary>
         private bool _apply;
 
+        /// <summary>
+        /// Whether this comment should be written into the file when the apply/goto commands run.
+        /// </summary>
         public bool Apply
         {
             get => _apply;
@@ -544,36 +625,59 @@ namespace FreeAIr.UI.ViewModels
             }
         }
 
+        /// <summary>
+        /// Full path of the source file this comment targets.
+        /// </summary>
         public string FilePath
         {
             get;
         }
 
+        /// <summary>
+        /// File name (without directory) of the source file, used for display and temp-file naming.
+        /// </summary>
         public string FileName
         {
             get;
         }
 
+        /// <summary>
+        /// The trimmed source line the comment was generated for, shown for context.
+        /// </summary>
         public string CommentedLine
         {
             get;
         }
 
+        /// <summary>
+        /// The plain-text comment body the LLM proposed.
+        /// </summary>
         public string Comment
         {
             get;
         }
 
+        /// <summary>
+        /// The fully formatted comment line (language-appropriate comment syntax plus the
+        /// original indentation) ready to be inserted into the file.
+        /// </summary>
         public string CompleteComment
         {
             get;
         }
 
+        /// <summary>
+        /// Zero-based line index in the file where the comment should be inserted.
+        /// </summary>
         public int LineIndex
         {
             get;
         }
 
+        /// <summary>
+        /// Creates a comment item for the given file, capturing the original line, the LLM's
+        /// comment text, the formatted comment to insert, and the target line index.
+        /// </summary>
         public FoundCommentItem(
             FileInfo fileInfo,
             string commentedLine,

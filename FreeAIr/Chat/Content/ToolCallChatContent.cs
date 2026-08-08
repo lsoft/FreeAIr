@@ -20,33 +20,43 @@ namespace FreeAIr.Chat.Content
         /// </summary>
         private readonly Action _checkForRequestAnswer;
 
+        /// <summary>Always <see cref="ChatContentTypeEnum.ToolCall"/>.</summary>
         public ChatContentTypeEnum Type => ChatContentTypeEnum.ToolCall;
 
+        /// <summary>
+        /// Whether this tool call has been dropped from the history sent to the model while
+        /// staying visible in the chat window.
+        /// </summary>
         public bool IsArchived
         {
             get;
             private set;
         }
 
+        /// <summary>Where this call is in its Asking → Executing → terminal-state lifecycle.</summary>
         public ToolCallStatusEnum Status
         {
             get;
             private set;
         }
 
+        /// <summary>The raw tool invocation as streamed from the model (name and arguments).</summary>
         public StreamingChatToolCallUpdate ToolCall
         {
             get;
         }
 
+        /// <summary>The name of the tool the model asked to run.</summary>
         public string Name => ToolCall.FunctionName;
 
+        /// <summary>The tool's output once the call has finished, or null while it is still pending.</summary>
         public string? Result
         {
             get;
             private set;
         }
 
+        /// <summary>Wraps a streamed tool call request in the Asking state, pending user permission.</summary>
         public ToolCallChatContent(
             StreamingChatToolCallUpdate toolCall,
             Action checkForRequestAnswer
@@ -67,11 +77,13 @@ namespace FreeAIr.Chat.Content
             _checkForRequestAnswer = checkForRequestAnswer;
         }
 
+        /// <summary>Drops this tool call out of the history sent to the model.</summary>
         public void Archive()
         {
             IsArchived = true;
         }
 
+        /// <summary>Moves this call to a new, non-terminal lifecycle state (e.g. Executing).</summary>
         public void SetStatus(
             ToolCallStatusEnum status
             )
@@ -94,6 +106,10 @@ namespace FreeAIr.Chat.Content
             _checkForRequestAnswer();
         }
 
+        /// <summary>
+        /// Renders this call as the assistant message announcing it, followed by the tool result
+        /// message once one is available.
+        /// </summary>
         public IReadOnlyList<ChatMessage> CreateChatMessages()
         {
             var result = new List<ChatMessage>();
@@ -116,6 +132,7 @@ namespace FreeAIr.Chat.Content
         }
     }
 
+    /// <summary>Lifecycle states a <see cref="ToolCallChatContent"/> moves through.</summary>
     public enum ToolCallStatusEnum
     {
         /// <summary>
@@ -123,8 +140,10 @@ namespace FreeAIr.Chat.Content
         /// </summary>
         Asking,
 
+        /// <summary>The tool is currently running.</summary>
         Executing,
 
+        /// <summary>The tool ran and returned a result.</summary>
         Succeeded,
 
         /// <summary>

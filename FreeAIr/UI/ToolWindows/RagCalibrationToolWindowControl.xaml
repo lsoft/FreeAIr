@@ -1,0 +1,464 @@
+<UserControl
+    x:Class="FreeAIr.UI.ToolWindows.RagCalibrationToolWindowControl"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:toolkit="clr-namespace:Community.VisualStudio.Toolkit;assembly=Community.VisualStudio.Toolkit"
+    xmlns:resources="clr-namespace:FreeAIr.Resources"
+    toolkit:Themes.UseVsTheme="True"
+    mc:Ignorable="d"
+    d:DesignHeight="500"
+    d:DesignWidth="500"
+    Name="RagCalibrationName"
+    PreviewKeyDown="OnPreviewKeyDown"
+    >
+    <Grid Margin="5">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="2*" MinHeight="80" />
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="3*" MinHeight="80" />
+        </Grid.RowDefinitions>
+
+        <!-- the button is never shown: it is here only to hand its themed foreground over to the
+             labels, exactly as the other FreeAIr tool windows do -->
+        <Button
+            Grid.Row="0"
+            Width="0"
+            Visibility="Collapsed"
+            x:Name="StyleButtonName"
+            Content="{x:Static resources:Resources.Cancel_chat}"
+            toolkit:Themes.UseVsTheme="True"
+            />
+
+        <!-- what the index is, which model is being asked, what it has been calibrated to, and
+             what is wrong with it -->
+        <Grid
+            Grid.Row="0"
+            >
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition />
+                <ColumnDefinition Width="auto" />
+            </Grid.ColumnDefinitions>
+
+            <StackPanel
+                Grid.Column="0"
+                >
+                <TextBlock
+                    FontFamily="Cascadia Code"
+                    Text="{Binding IndexDescription}"
+                    TextWrapping="Wrap"
+                    Foreground="Gray"
+                    />
+                <TextBlock
+                    Margin="0,2,0,0"
+                    FontFamily="Cascadia Code"
+                    Text="{Binding AgentDescription}"
+                    TextWrapping="Wrap"
+                    Foreground="#569CD6"
+                    />
+                <TextBlock
+                    Margin="0,2,0,0"
+                    FontFamily="Cascadia Code"
+                    Text="{Binding CalibrationDescription}"
+                    TextWrapping="Wrap"
+                    Foreground="{Binding ElementName=StyleButtonName, Path=Foreground}"
+                    />
+                <TextBlock
+                    Margin="0,2,0,0"
+                    FontFamily="Cascadia Code"
+                    Text="{Binding Warning}"
+                    Visibility="{Binding WarningVisibility}"
+                    TextWrapping="Wrap"
+                    Foreground="#D69D45"
+                    />
+                <TextBlock
+                    Margin="0,2,0,0"
+                    FontFamily="Cascadia Code"
+                    Text="{Binding Status}"
+                    TextWrapping="Wrap"
+                    Foreground="Gray"
+                    />
+            </StackPanel>
+
+            <StackPanel
+                Grid.Column="1"
+                Orientation="Horizontal"
+                VerticalAlignment="Top"
+                >
+                <Button
+                    Margin="15,0,0,0"
+                    FontFamily="Cascadia Code"
+                    Content="{x:Static resources:Resources.RAG_calibration__change_agent}"
+                    Command="{Binding ChangeAgentCommand}"
+                    Style="{DynamicResource TextBlockLikeButtonStyle}"
+                    />
+                <Button
+                    Margin="15,0,0,0"
+                    FontFamily="Cascadia Code"
+                    Content="{x:Static resources:Resources.RAG_calibration__reload}"
+                    Command="{Binding ReloadCommand}"
+                    Style="{DynamicResource TextBlockLikeButtonStyle}"
+                    />
+                <Button
+                    Margin="15,0,0,0"
+                    FontFamily="Cascadia Code"
+                    Content="{x:Static resources:Resources.RAG_calibration__cancel}"
+                    Command="{Binding CancelCommand}"
+                    Style="{DynamicResource TextBlockLikeButtonStyle}"
+                    />
+            </StackPanel>
+        </Grid>
+
+        <!-- what the window is for and what every control on it does. Open on the first visit,
+             because nothing else here explains itself, and collapsible, because the two lists
+             below are what the window is actually used through -->
+        <Expander
+            Grid.Row="1"
+            Margin="0,6,0,0"
+            IsExpanded="True"
+            FontFamily="Cascadia Code"
+            Header="{x:Static resources:Resources.Help_header_what_this_window_is}"
+            Foreground="{Binding ElementName=StyleButtonName, Path=Foreground}"
+            >
+            <ScrollViewer
+                MaxHeight="220"
+                VerticalScrollBarVisibility="Auto"
+                >
+                <StackPanel
+                    Margin="4,4,4,0"
+                    >
+                    <TextBlock
+                        Margin="0,0,0,6"
+                        FontFamily="Cascadia Code"
+                        TextWrapping="Wrap"
+                        Foreground="Gray"
+                        Text="{x:Static resources:Resources.RAG_calibration__help_10}"
+                        />
+                    <TextBlock
+                        Margin="0,0,0,6"
+                        FontFamily="Cascadia Code"
+                        TextWrapping="Wrap"
+                        Foreground="Gray"
+                        Text="{x:Static resources:Resources.RAG_calibration__help_15}"
+                        />
+                    <TextBlock
+                        Margin="0,0,0,6"
+                        FontFamily="Cascadia Code"
+                        TextWrapping="Wrap"
+                        Foreground="Gray"
+                        Text="{x:Static resources:Resources.RAG_calibration__help_20}"
+                        />
+                    <TextBlock
+                        Margin="0,0,0,6"
+                        FontFamily="Cascadia Code"
+                        TextWrapping="Wrap"
+                        Foreground="Gray"
+                        Text="{x:Static resources:Resources.RAG_calibration__help_30}"
+                        />
+                    <TextBlock
+                        Margin="0,0,0,6"
+                        FontFamily="Cascadia Code"
+                        TextWrapping="Wrap"
+                        Foreground="Gray"
+                        Text="{x:Static resources:Resources.RAG_calibration__help_40}"
+                        />
+                    <TextBlock
+                        Margin="0,0,0,6"
+                        FontFamily="Cascadia Code"
+                        TextWrapping="Wrap"
+                        Foreground="Gray"
+                        Text="{x:Static resources:Resources.RAG_calibration__help_50}"
+                        />
+                    <TextBlock
+                        Margin="0,0,0,6"
+                        FontFamily="Cascadia Code"
+                        TextWrapping="Wrap"
+                        Foreground="Gray"
+                        Text="{x:Static resources:Resources.RAG_calibration__help_60}"
+                        />
+                    <TextBlock
+                        Margin="0,0,0,6"
+                        FontFamily="Cascadia Code"
+                        TextWrapping="Wrap"
+                        Foreground="Gray"
+                        Text="{x:Static resources:Resources.RAG_calibration__help_70}"
+                        />
+                    <TextBlock
+                        Margin="0,0,0,6"
+                        FontFamily="Cascadia Code"
+                        TextWrapping="Wrap"
+                        Foreground="Gray"
+                        Text="{x:Static resources:Resources.RAG_calibration__help_80}"
+                        />
+                </StackPanel>
+            </ScrollViewer>
+        </Expander>
+
+        <ProgressBar
+            Grid.Row="2"
+            Height="4"
+            Margin="0,4,0,4"
+            IsIndeterminate="True"
+            Visibility="{Binding ProgressVisibility}"
+            toolkit:Themes.UseVsTheme="True"
+            />
+
+        <!-- the query, asked exactly as the search would ask it -->
+        <Grid
+            Grid.Row="3"
+            Margin="0,4,0,0"
+            >
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition />
+                <ColumnDefinition Width="auto" />
+                <ColumnDefinition Width="auto" />
+            </Grid.ColumnDefinitions>
+
+            <TextBox
+                Grid.Column="0"
+                VerticalAlignment="Center"
+                FontFamily="Cascadia Code"
+                Text="{Binding Query, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                toolkit:Themes.UseVsTheme="True"
+                >
+                <TextBox.InputBindings>
+                    <KeyBinding
+                        Key="Return"
+                        Command="{Binding ProbeCommand}"
+                        />
+                </TextBox.InputBindings>
+            </TextBox>
+
+            <Button
+                Grid.Column="1"
+                Margin="15,0,0,0"
+                VerticalAlignment="Center"
+                FontFamily="Cascadia Code"
+                Content="{x:Static resources:Resources.RAG_calibration__probe}"
+                Command="{Binding ProbeCommand}"
+                Style="{DynamicResource TextBlockLikeButtonStyle}"
+                />
+
+            <Button
+                Grid.Column="2"
+                Margin="15,0,0,0"
+                VerticalAlignment="Center"
+                FontFamily="Cascadia Code"
+                Content="{x:Static resources:Resources.RAG_calibration__mark_as_hopeless}"
+                Command="{Binding MarkAsHopelessCommand}"
+                Style="{DynamicResource TextBlockLikeButtonStyle}"
+                />
+        </Grid>
+
+        <TextBlock
+            Grid.Row="4"
+            Margin="0,4,0,2"
+            FontFamily="Cascadia Code"
+            Text="{x:Static resources:Resources.RAG_calibration__probe_hint}"
+            TextWrapping="Wrap"
+            Foreground="Gray"
+            />
+
+        <!-- everything the query found, including what the threshold cuts off: a threshold is only
+             judged by what it throws away -->
+        <ScrollViewer
+            Grid.Row="5"
+            VerticalScrollBarVisibility="Auto"
+            >
+            <ItemsControl
+                ItemsSource="{Binding Results}"
+                >
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Grid Margin="0,2,0,2">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="50" />
+                                <ColumnDefinition Width="80" />
+                                <ColumnDefinition />
+                                <ColumnDefinition Width="auto" />
+                            </Grid.ColumnDefinitions>
+
+                            <TextBlock
+                                Grid.Column="0"
+                                FontFamily="Cascadia Code"
+                                Text="{Binding Score, StringFormat={}{0:F3}}"
+                                Foreground="Gray"
+                                />
+
+                            <TextBlock
+                                Grid.Column="1"
+                                FontFamily="Cascadia Code"
+                                Text="{Binding VerdictDescription}"
+                                Foreground="Gray"
+                                />
+
+                            <StackPanel
+                                Grid.Column="2"
+                                >
+                                <TextBlock
+                                    FontFamily="Cascadia Code"
+                                    Text="{Binding RelativePath}"
+                                    TextWrapping="Wrap"
+                                    Foreground="#569CD6"
+                                    />
+                                <TextBlock
+                                    FontFamily="Cascadia Code"
+                                    Text="{Binding BestOutlineText}"
+                                    TextWrapping="Wrap"
+                                    Foreground="Gray"
+                                    />
+                            </StackPanel>
+
+                            <Button
+                                Grid.Column="3"
+                                VerticalAlignment="Top"
+                                Margin="15,0,0,0"
+                                FontFamily="Cascadia Code"
+                                Content="{x:Static resources:Resources.RAG_calibration__mark_as_answer}"
+                                Command="{Binding RelativeSource={RelativeSource AncestorType={x:Type UserControl}}, Path=DataContext.MarkAsAnswerCommand}"
+                                CommandParameter="{Binding}"
+                                Style="{DynamicResource TextBlockLikeButtonStyle}"
+                                />
+                        </Grid>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
+
+        <!-- the queries themselves, which outlive every rebuild of the index -->
+        <Grid
+            Grid.Row="6"
+            Margin="0,6,0,2"
+            >
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition />
+                <ColumnDefinition Width="auto" />
+                <ColumnDefinition Width="auto" />
+                <ColumnDefinition Width="auto" />
+                <ColumnDefinition Width="auto" />
+            </Grid.ColumnDefinitions>
+
+            <TextBlock
+                Grid.Column="0"
+                VerticalAlignment="Center"
+                FontFamily="Cascadia Code"
+                Text="{x:Static resources:Resources.RAG_calibration__queries_header}"
+                TextWrapping="Wrap"
+                Foreground="{Binding ElementName=StyleButtonName, Path=Foreground}"
+                />
+
+            <TextBlock
+                Grid.Column="1"
+                VerticalAlignment="Center"
+                Margin="15,0,5,0"
+                FontFamily="Cascadia Code"
+                Text="{x:Static resources:Resources.RAG_calibration__sensitivity}"
+                Foreground="{Binding ElementName=StyleButtonName, Path=Foreground}"
+                />
+
+            <TextBox
+                Grid.Column="2"
+                Width="50"
+                VerticalAlignment="Center"
+                FontFamily="Cascadia Code"
+                Text="{Binding Sensitivity, Mode=TwoWay, UpdateSourceTrigger=LostFocus, StringFormat={}{0:F2}}"
+                toolkit:Themes.UseVsTheme="True"
+                />
+
+            <Button
+                Grid.Column="3"
+                Margin="15,0,0,0"
+                VerticalAlignment="Center"
+                FontFamily="Cascadia Code"
+                Content="{x:Static resources:Resources.RAG_calibration__recalculate}"
+                Command="{Binding RecalculateCommand}"
+                Style="{DynamicResource TextBlockLikeButtonStyle}"
+                />
+
+            <Button
+                Grid.Column="4"
+                Margin="15,0,0,0"
+                VerticalAlignment="Center"
+                FontFamily="Cascadia Code"
+                Content="{x:Static resources:Resources.RAG_calibration__save}"
+                Command="{Binding SaveCommand}"
+                Style="{DynamicResource TextBlockLikeButtonStyle}"
+                />
+        </Grid>
+
+        <TextBlock
+            Grid.Row="7"
+            Margin="0,0,0,2"
+            FontFamily="Cascadia Code"
+            Text="{x:Static resources:Resources.RAG_calibration__expected_path_hint}"
+            TextWrapping="Wrap"
+            Foreground="Gray"
+            />
+
+        <ScrollViewer
+            Grid.Row="8"
+            VerticalScrollBarVisibility="Auto"
+            >
+            <ItemsControl
+                ItemsSource="{Binding Probes}"
+                >
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Grid Margin="0,2,0,2">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="80" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="auto" />
+                            </Grid.ColumnDefinitions>
+
+                            <TextBlock
+                                Grid.Column="0"
+                                VerticalAlignment="Center"
+                                FontFamily="Cascadia Code"
+                                Text="{Binding KindDescription}"
+                                Foreground="Gray"
+                                />
+
+                            <TextBox
+                                Grid.Column="1"
+                                Margin="0,0,3,0"
+                                VerticalAlignment="Center"
+                                FontFamily="Cascadia Code"
+                                Text="{Binding Query, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                                toolkit:Themes.UseVsTheme="True"
+                                />
+
+                            <TextBox
+                                Grid.Column="2"
+                                Margin="0,0,3,0"
+                                VerticalAlignment="Center"
+                                FontFamily="Cascadia Code"
+                                Text="{Binding ExpectedPath, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                                toolkit:Themes.UseVsTheme="True"
+                                />
+
+                            <Button
+                                Grid.Column="3"
+                                Margin="15,0,0,0"
+                                VerticalAlignment="Center"
+                                FontFamily="Cascadia Code"
+                                Content="{x:Static resources:Resources.RAG_calibration__remove}"
+                                Command="{Binding RelativeSource={RelativeSource AncestorType={x:Type UserControl}}, Path=DataContext.RemoveProbeCommand}"
+                                CommandParameter="{Binding}"
+                                Style="{DynamicResource TextBlockLikeButtonStyle}"
+                                />
+                        </Grid>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
+    </Grid>
+</UserControl>

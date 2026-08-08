@@ -3,6 +3,7 @@ using System.Windows.Controls.Primitives;
 
 namespace WpfHelpers
 {
+    /// <summary>WPF <see cref="TreeView"/> helpers for programmatically expanding and selecting nodes — operations the control has no built-in API for.</summary>
     public static class TreeViewHelper
     {
         /// <summary>

@@ -11,25 +11,44 @@ using WpfHelpers;
 
 namespace FreeAIr.UI.ViewModels
 {
+    /// <summary>
+    /// Backs the Choose Model picker used to assign an OpenRouter model to an OpenRouter agent:
+    /// it fetches the live model catalog from openrouter.ai and lets the user pick one for the
+    /// currently selected agent.
+    /// </summary>
     [Export(typeof(ChooseModelViewModel))]
     public sealed class ChooseModelViewModel : BaseViewModel
     {
+        /// <summary>HTTP client used to fetch the OpenRouter model catalog.</summary>
         private readonly HttpClient _httpClient = new HttpClient();
 
+        /// <summary>Backing field for <see cref="LoadFreeModels"/>.</summary>
         private bool _loadFreeModels;
 
+        /// <summary>
+        /// The OpenRouter agents available to have a model assigned.
+        /// </summary>
         public ObservableCollection2<AgentJson> AgentList
         {
             get;
         }
 
+        /// <summary>
+        /// The agent whose model is being chosen.
+        /// </summary>
         public AgentJson? ChosenAgent { get; set; }
 
+        /// <summary>
+        /// The models fetched from the OpenRouter catalog, offered for selection.
+        /// </summary>
         public ObservableCollection2<ModelWrapper> ModelList
         {
             get;
         }
 
+        /// <summary>
+        /// Status text shown while the model list is loading, or an error if the fetch failed.
+        /// </summary>
         public string Message
         {
             get;
@@ -41,6 +60,9 @@ namespace FreeAIr.UI.ViewModels
             }
         }
 
+        /// <summary>
+        /// The model currently highlighted in the list, about to be assigned to the chosen agent.
+        /// </summary>
         public ModelWrapper SelectedModel
         {
             get;
@@ -52,6 +74,10 @@ namespace FreeAIr.UI.ViewModels
             }
         }
 
+        /// <summary>
+        /// Whether the model list should be filtered down to OpenRouter's free-tier models only;
+        /// changing it reloads the catalog.
+        /// </summary>
         public bool LoadFreeModels
         {
             get => _loadFreeModels;
@@ -71,6 +97,10 @@ namespace FreeAIr.UI.ViewModels
             }
         }
 
+        /// <summary>
+        /// Assigns the selected OpenRouter model to the chosen agent and persists the agent
+        /// collection to FreeAIr settings.
+        /// </summary>
         public ICommand ChooseCommand
         {
             get
@@ -106,6 +136,9 @@ namespace FreeAIr.UI.ViewModels
             }
         }
 
+        /// <summary>
+        /// Reloads the OpenRouter model catalog from scratch.
+        /// </summary>
         public ICommand UpdatePageCommand
         {
             get
@@ -127,6 +160,10 @@ namespace FreeAIr.UI.ViewModels
         
 
 
+        /// <summary>
+        /// Creates the Choose Model view model and kicks off the initial fetch of the OpenRouter
+        /// model catalog.
+        /// </summary>
         [ImportingConstructor]
         public ChooseModelViewModel(
             )
@@ -139,6 +176,7 @@ namespace FreeAIr.UI.ViewModels
                 .FileAndForget(nameof(LoadModelListAsync));
         }
 
+        /// <summary>Refreshes the OpenRouter agent list, fetches the current model catalog from openrouter.ai, applies the free-tier filter if enabled, and updates <see cref="Message"/> with progress/errors.</summary>
         private async Task LoadModelListAsync()
         {
             try
@@ -184,22 +222,28 @@ namespace FreeAIr.UI.ViewModels
             }
         }
 
+        /// <summary>Display adapter for one OpenRouter model entry in <see cref="ModelList"/>, tracking whether it is the agent's currently assigned model.</summary>
         public sealed class ModelWrapper : BaseViewModel
         {
+            /// <summary>Backing field for <see cref="IsSelected"/>.</summary>
             private bool _isSelected;
 
+            /// <summary>The OpenRouter model id, e.g. as sent in API requests.</summary>
             public string ModelId
             {
                 get;
             }
 
+            /// <summary>The model's display name from the OpenRouter catalog.</summary>
             public string ModelName
             {
                 get;
             }
 
+            /// <summary>Localized "chosen" marker shown next to the model when it is the agent's current model.</summary>
             public string SelectedMark => _isSelected ? FreeAIr.Resources.Resources.chosen : string.Empty;
 
+            /// <summary>Whether this model is the one currently assigned to the chosen agent.</summary>
             public bool IsSelected
             {
                 get => _isSelected;
@@ -211,6 +255,7 @@ namespace FreeAIr.UI.ViewModels
                 }
             }
 
+            /// <summary>Wraps one OpenRouter model catalog entry for display.</summary>
             public ModelWrapper(
                 string modelId,
                 string modelName,

@@ -12,13 +12,20 @@ using Microsoft.VisualStudio.Threading;
 namespace FreeAIr.CodeLens
 {
 
+    /// <summary>
+    /// One CodeLens indicator instance for a single method. Runs in the CodeLens data-point process,
+    /// separate from the main Visual Studio process, and talks back to it over the named pipe set up
+    /// by <see cref="RemoteCodeLensConnectionHandler"/> to fetch <see cref="Shared.Dto.UnitInfo"/>.
+    /// </summary>
     public class CodeLensDataPoint : IAsyncCodeLensDataPoint, IDisposable
     {
+        /// <summary>Details-pane command that opens the "add XML comment" support action; the id and guid must stay in sync with the VSCT command definition.</summary>
         public static readonly CodeLensDetailEntryCommand AddXmlCommentCommand = new CodeLensDetailEntryCommand
         {
             CommandId = 0x1036, //must match with the command id from vsct file
             CommandSet = new Guid("faec8da8-74ca-4afa-8b7d-64be3914fbac") //must match with the command group guid from vsct file
         };
+        /// <summary>Details-pane command that opens the "generate unit tests" support action; the id and guid must stay in sync with the VSCT command definition.</summary>
         public static readonly CodeLensDetailEntryCommand GenerateUnitTestsCommand = new CodeLensDetailEntryCommand
         {
             CommandId = 0x1037, //must match with the command id from vsct file
@@ -27,23 +34,32 @@ namespace FreeAIr.CodeLens
 
 
 
+        /// <summary>Callback channel used to invoke methods on the owning Visual Studio process, such as <see cref="ICodeLensListener.GetUnitInformationAsync"/>.</summary>
         private readonly ICodeLensCallbackService _callbackService;
+        /// <summary>Identifies which code element (project, file, method) this data point represents.</summary>
         private readonly CodeLensDescriptor _descriptor;
 
+        /// <summary>The named-pipe connection back to Visual Studio, opened once via <see cref="ConnectToVisualStudioAsync"/>.</summary>
         private RemoteCodeLensConnectionHandler? _visualStudioConnection;
+        /// <summary>Signaled once <see cref="_codeLensUnitInfo"/> has been fetched, so a concurrent <see cref="GetDetailsAsync"/> call knows whether to wait or re-fetch.</summary>
         private readonly ManualResetEventSlim _dataHasLoaded = new ManualResetEventSlim(initialState: false);
 
+        /// <summary>The most recently fetched unit info for this code element, cached between <see cref="GetDataAsync"/> and <see cref="GetDetailsAsync"/>.</summary>
         private CodeLensUnitInfo? _codeLensUnitInfo;
 
+        /// <summary>Raised to tell Visual Studio this data point's indicator needs to be re-queried.</summary>
         public event AsyncEventHandler? InvalidatedAsync;
 
+        /// <summary>The code element (project, file, method) this data point represents.</summary>
         public CodeLensDescriptor Descriptor => this._descriptor;
 
+        /// <summary>Identifier this data point registers itself under with the Visual Studio side, so a targeted refresh can find it again.</summary>
         public Guid UniqueIdentifier
         {
             get;
         } = Guid.NewGuid();
 
+        /// <summary>Creates the data point; the pipe to Visual Studio is opened separately via <see cref="ConnectToVisualStudioAsync"/>.</summary>
         public CodeLensDataPoint(
             ICodeLensCallbackService callbackService,
             CodeLensDescriptor descriptor
@@ -65,6 +81,7 @@ namespace FreeAIr.CodeLens
 
         #region network related code
 
+        /// <summary>Opens the named pipe to the owning Visual Studio process, identified by its PID.</summary>
         internal async Task ConnectToVisualStudioAsync(
             int vspid
             )
@@ -76,11 +93,13 @@ namespace FreeAIr.CodeLens
         }
 
         // Called from VS via JSON RPC.
+        /// <summary>Called remotely by Visual Studio to tell this data point its underlying data changed.</summary>
         public void Refresh()
         {
             Invalidate();
         }
 
+        /// <summary>Closes the connection to Visual Studio and releases the wait handle.</summary>
         public void Dispose()
         {
             _visualStudioConnection?.Dispose();
@@ -89,6 +108,7 @@ namespace FreeAIr.CodeLens
 
         #endregion
 
+        /// <summary>Builds the short text VS shows inline above the method (the CodeLens indicator's collapsed state).</summary>
         public async Task<CodeLensDataPointDescriptor> GetDataAsync(CodeLensDescriptorContext context, CancellationToken token)
         {
             try
@@ -114,6 +134,7 @@ namespace FreeAIr.CodeLens
         }
 
 
+        /// <summary>Builds the expanded details pane content shown when the user clicks the indicator.</summary>
         public async Task<CodeLensDetailsDescriptor> GetDetailsAsync(CodeLensDescriptorContext context, CancellationToken token)
         {
             try
@@ -160,6 +181,7 @@ namespace FreeAIr.CodeLens
         }
 
 
+        /// <summary>Builds a <see cref="CodeLensTarget"/> from the descriptor/context and calls back into Visual Studio via <see cref="ICodeLensListener.GetUnitInformationAsync"/> to resolve it.</summary>
         private async Task<CodeLensUnitInfo?> GetUnitInfoAsync(
             CodeLensDescriptorContext context,
             CancellationToken token
@@ -210,6 +232,7 @@ namespace FreeAIr.CodeLens
             return result;
         }
 
+        /// <summary>Icon id shown next to the CodeLens indicator text.</summary>
         private static ImageId GetExtensionIcon()
         {
             return new ImageId(
@@ -219,11 +242,13 @@ namespace FreeAIr.CodeLens
         }
 
 
+        /// <summary>Row entries for the details pane; currently none — the pane is populated via <see cref="CodeLensDetailsDescriptor.CustomData"/> instead.</summary>
         private static IEnumerable<CodeLensDetailEntryDescriptor> CreateEntries()
         {
             yield break;
         }
 
+        /// <summary>Column headers for the details pane; currently none, kept for a future tabular layout.</summary>
         private static List<CodeLensDetailHeaderDescriptor> CreateHeaders()
         {
             return new List<CodeLensDetailHeaderDescriptor>()

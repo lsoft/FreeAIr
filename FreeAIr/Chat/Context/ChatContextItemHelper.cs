@@ -4,8 +4,16 @@ using FreeAIr.Chat.Context.Item;
 
 namespace FreeAIr.Chat.Context
 {
+    /// <summary>
+    /// Splits lists of solution-item context items into byte-size-bounded portions, so a batch of
+    /// files handed to the LLM as context does not blow past the request size limit.
+    /// </summary>
     public static class ChatContextItemHelper
     {
+        /// <summary>
+        /// Groups the given context items into portions whose combined file content stays under
+        /// <paramref name="maxPortionLength"/> characters, skipping items whose file no longer exists.
+        /// </summary>
         public static IEnumerable<IReadOnlyList<SolutionItemChatContextItem>> SplitByItemsSize(
             this IReadOnlyList<SolutionItemChatContextItem> contextItems,
             int maxPortionLength
@@ -45,6 +53,11 @@ namespace FreeAIr.Chat.Context
             }
         }
 
+        /// <summary>
+        /// Groups the given solution search results into portions whose combined file content
+        /// stays under <paramref name="maxPortionLength"/> characters, skipping items whose file
+        /// no longer exists.
+        /// </summary>
         public static IEnumerable<IReadOnlyList<FoundSolutionItem>> SplitByItemsSize(
             this IReadOnlyList<FoundSolutionItem> contextItems,
             int maxPortionLength

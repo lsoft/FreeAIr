@@ -5,19 +5,34 @@ using System.Text.Json.Serialization;
 
 namespace FreeAIr.Options2.Support
 {
+    /// <summary>
+    /// Every prompt the extension can run, as the user's settings file holds them.
+    ///
+    /// This is what a "support action" is: a named prompt, the agent that should answer it, an icon
+    /// for the menu, and the scopes saying where it may be offered — the context menu of a
+    /// selection, the solution tree, the build error window, the commit message box. Everything the
+    /// product does with an LLM, other than a free-form chat, comes from an entry in this list, and
+    /// all of it is editable by the user.
+    ///
+    /// The defaults below are what ships. They are used only when the settings file does not exist
+    /// yet, so editing them changes the experience of a new installation and nothing else.
+    /// </summary>
     public sealed class SupportCollectionJson : ICloneable
     {
+        /// <summary>The actions, in the order they will be offered in the menus.</summary>
         public List<SupportActionJson> Actions
         {
             get;
             set;
         }
 
+        /// <summary>Starts out with the shipped default actions, which is what a fresh installation offers in its menus.</summary>
         public SupportCollectionJson()
         {
             Actions = GetDefaultActions();
         }
 
+        /// <summary>Deep copy of the action list.</summary>
         public object Clone()
         {
             return new SupportCollectionJson
@@ -26,6 +41,17 @@ namespace FreeAIr.Options2.Support
             };
         }
 
+        /// <summary>
+        /// The prompts a fresh installation starts with.
+        ///
+        /// Their agent is left null on purpose: there is no way to know which model the user has,
+        /// so an action stays unbound until they pick one. The exception is whole line completion,
+        /// whose placeholder name is deliberately invalid — that feature runs on every keystroke,
+        /// and it must not start working by accident.
+        ///
+        /// The anchors inside the prompt texts are substituted later by
+        /// <see cref="SupportContext.ApplyVariablesToPrompt"/>.
+        /// </summary>
         private static List<SupportActionJson> GetDefaultActions() =>
             [
                 new SupportActionJson
@@ -144,33 +170,56 @@ namespace FreeAIr.Options2.Support
 
     }
 
+    /// <summary>
+    /// One prompt the user can invoke: what it is called, where it is offered, which agent answers
+    /// it and what it actually asks.
+    ///
+    /// Serialized through <see cref="JsonDescriptionCommentConverter{T}"/>, which writes the
+    /// `Description` attributes into the settings file as comments, so the file explains itself to
+    /// whoever opens it in an editor.
+    /// </summary>
     [JsonConverter(typeof(JsonDescriptionCommentConverter<SupportActionJson>))]
     public sealed class SupportActionJson : ICloneable
     {
+        /// <summary>
+        /// The places this action shows up: a code selection, the solution tree, the build error
+        /// list, the commit message box, and so on. Several scopes mean the same prompt appears in
+        /// several menus.
+        /// </summary>
         public HashSet<SupportScopeEnum> Scopes
         {
             get;
             set;
         }
 
+        /// <summary>The menu caption. Not an identifier — two actions may share it in different scopes.</summary>
         public string Name
         {
             get;
             set;
         }
 
+        /// <summary>
+        /// Which agent answers this prompt, by name. Null means the user is asked to choose one
+        /// each time, which is how every shipped action starts out.
+        /// </summary>
         public string? AgentName
         {
             get;
             set;
         }
 
+        /// <summary>
+        /// The text sent to the model, with anchors such as the context item name or the build
+        /// error message still in it. They are replaced just before the request goes out.
+        /// </summary>
         public string Prompt
         {
             get;
             set;
         }
 
+        /// <summary>Name of the Visual Studio image moniker shown next to this action in its menus, e.g. `SQLServerObjectExplorer`.</summary>
         [Description("Install KnownMonikers Explorer Visual Studio extension to choose correct image moniker.")]
         public string? KnownMoniker
         {
@@ -178,6 +227,7 @@ namespace FreeAIr.Options2.Support
             set;
         }
 
+        /// <summary>Empty action bound to no scope and no agent, for the json deserializer and the `add action` button.</summary>
         public SupportActionJson()
         {
             Scopes = new();
@@ -187,6 +237,7 @@ namespace FreeAIr.Options2.Support
             KnownMoniker = null;
         }
 
+        /// <summary>Deep copy of this action's scopes, name, agent, prompt and icon.</summary>
         public object Clone()
         {
             return new SupportActionJson

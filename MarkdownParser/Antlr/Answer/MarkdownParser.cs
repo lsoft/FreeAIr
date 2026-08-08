@@ -5,22 +5,33 @@ using System.ComponentModel.Composition;
 
 namespace MarkdownParser.Antlr.Answer
 {
+    /// <summary>Turns raw markdown text (typically a chat answer) into a <see cref="ParsedMarkdown"/> ready to render into a WPF flow document.</summary>
     public interface IMarkdownParser
     {
+        /// <summary>Parses markdown text into blocks and parts.</summary>
         ParsedMarkdown Parse(string text);
     }
 
+    /// <summary>
+    /// MEF-exported <see cref="IMarkdownParser"/> that memoizes the last parse: re-rendering the same
+    /// still-streaming answer text repeatedly does not re-run the ANTLR grammar each time.
+    /// </summary>
     [Export(typeof(IMarkdownParser))]
     [Export(typeof(CachedMarkdownParser))]
     public sealed class CachedMarkdownParser : IMarkdownParser
     {
+        /// <summary>Guards <see cref="_previousText"/>/<see cref="_previousMarkdown"/> against concurrent parse calls.</summary>
         private readonly object _locker = new();
 
+        /// <summary>The actual ANTLR-based parser invoked on a cache miss.</summary>
         private readonly DirectMarkdownParser _parser;
 
+        /// <summary>The text of the most recent <see cref="Parse"/> call, compared against new calls to detect a cache hit.</summary>
         private string? _previousText;
+        /// <summary>The parsed result cached from the most recent <see cref="Parse"/> call.</summary>
         private ParsedMarkdown? _previousMarkdown;
 
+        /// <summary>Creates the caching wrapper around the given ANTLR-based parser.</summary>
         [ImportingConstructor]
         public CachedMarkdownParser(
             DirectMarkdownParser parser
@@ -34,6 +45,7 @@ namespace MarkdownParser.Antlr.Answer
             _parser = parser;
         }
 
+        /// <summary>Returns the cached result if <paramref name="text"/> matches the last call, otherwise re-parses via <see cref="DirectMarkdownParser"/>.</summary>
         public ParsedMarkdown Parse(string text)
         {
             lock (_locker)
@@ -49,11 +61,19 @@ namespace MarkdownParser.Antlr.Answer
         }
     }
 
+    /// <summary>
+    /// Runs the generated ANTLR lexer/parser/listener pipeline (<see cref="AnswerMarkdownLexer"/>,
+    /// <see cref="AnswerMarkdownParser"/>, <see cref="AnswerMarkdownListener"/>) over one markdown
+    /// string. Falls back to a single plain-text paragraph on any grammar failure, so a malformed or
+    /// partially-streamed answer never crashes the chat UI.
+    /// </summary>
     [Export(typeof(DirectMarkdownParser))]
     public sealed class DirectMarkdownParser : IMarkdownParser
     {
+        /// <summary>Supplies the font sizes handed to the resulting <see cref="ParsedMarkdown"/> for its blocks and parts.</summary>
         private readonly IFontSizeProvider _fontSizeProvider;
 
+        /// <summary>Creates the ANTLR-based parser with the font sizes to use when building the result.</summary>
         [ImportingConstructor]
         public DirectMarkdownParser(
             IFontSizeProvider fontSizeProvider
@@ -67,6 +87,7 @@ namespace MarkdownParser.Antlr.Answer
             _fontSizeProvider = fontSizeProvider;
         }
 
+        /// <summary>Parses <paramref name="text"/> through the ANTLR grammar, falling back to plain text if parsing throws.</summary>
         public ParsedMarkdown Parse(string text)
         {
             if (text is null)
@@ -86,6 +107,7 @@ namespace MarkdownParser.Antlr.Answer
             return md;
         }
 
+        /// <summary>Wraps the raw text in a single paragraph, used when grammar-based parsing fails.</summary>
         private static void GetFallbackRepresentation(
             ParsedMarkdown md,
             string text
@@ -105,6 +127,7 @@ namespace MarkdownParser.Antlr.Answer
             md.AddText(text);
         }
 
+        /// <summary>Lexes, parses and walks <paramref name="text"/> into <paramref name="md"/>; returns false (rather than throwing) on any grammar error.</summary>
         private static bool GetMarkdownRepresentationSafely(
             ParsedMarkdown md,
             string text
@@ -149,6 +172,7 @@ namespace MarkdownParser.Antlr.Answer
             return false;
         }
 
+        /// <summary>Wires up a fresh lexer/parser pair over the given text.</summary>
         private static (AnswerMarkdownLexer, AnswerMarkdownParser) CreateComponents(string answer)
         {
             var ais = new AntlrInputStream(answer);

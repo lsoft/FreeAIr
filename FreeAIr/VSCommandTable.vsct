@@ -130,6 +130,14 @@
           <ButtonText>Open building NLO JSON file window...</ButtonText>
         </Strings>
       </Button>
+      <Button guid="FreeAIr" id="OpenRagCalibrationWindowCommandId" priority="0x0102" type="Button">
+        <Parent guid="FreeAIr" id="SubExtensionMenuGroup2" />
+        <Icon guid="ImageCatalogGuid" id="MeasureCalculate" />
+        <CommandFlag>IconIsMoniker</CommandFlag>
+        <Strings>
+          <ButtonText>Open RAG search calibration window...</ButtonText>
+        </Strings>
+      </Button>
       <Button guid="FreeAIr" id="ShowReleaseNotesCommandId" priority="0x0103" type="Button">
         <Parent guid="FreeAIr" id="SubExtensionMenuGroup1" />
         <Icon guid="ImageCatalogGuid" id="MarkdownFile" />
@@ -144,6 +152,14 @@
         <CommandFlag>IconIsMoniker</CommandFlag>
         <Strings>
           <ButtonText>Open Control Center...</ButtonText>
+        </Strings>
+      </Button>
+      <Button guid="FreeAIr" id="OpenSetupWizardCommandId" priority="0x0106" type="Button">
+        <Parent guid="FreeAIr" id="SubExtensionMenuGroup3" />
+        <Icon guid="ImageCatalogGuid" id="CodeReviewWizard" />
+        <CommandFlag>IconIsMoniker</CommandFlag>
+        <Strings>
+          <ButtonText>Open setup wizard...</ButtonText>
         </Strings>
       </Button>
       <Button guid="FreeAIr" id="OpenPropertiesCommandId" priority="0x0105" type="Button">
@@ -316,6 +332,7 @@
       <IDSymbol name="OpenNaturalSearchToolWindowCommandId" value="0x1041" />
       <IDSymbol name="ShowReleaseNotesCommandId" value="0x1042" />
       <IDSymbol name="OpenControlCenterCommandId" value="0x1043" />
+      <IDSymbol name="OpenSetupWizardCommandId" value="0x1061" />
 
       <!-- natural language outlines -->
       <IDSymbol name="AddNaturalLanguageOutlinesCommandId" value="0x1052"/>
@@ -330,6 +347,8 @@
       <IDSymbol name="ShowInSituChatCommandId" value="0x1058" />
 
       <IDSymbol name="ResetMCPToolsCommandId" value="0x1059" />
+
+      <IDSymbol name="OpenRagCalibrationWindowCommandId" value="0x1060" />
 
       <!-- context menu -->
       <IDSymbol name="VisualStudioContextMenu" value="0x8000"/>

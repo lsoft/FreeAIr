@@ -9,14 +9,17 @@ namespace FreeAIr.Chat
     /// </summary>
     public sealed class UserPrompt : IChatContent
     {
+        /// <summary>Marks this content as a user prompt, as opposed to an assistant answer or a tool reaction.</summary>
         public ChatContentTypeEnum Type => ChatContentTypeEnum.Prompt;
 
+        /// <summary>The text the user typed into the prompt box.</summary>
         /// <inheritdoc />
         public string PromptBody
         {
             get;
         }
 
+        /// <summary>True once <see cref="Archive"/> has been called, marking this prompt as no longer editable.</summary>
         public bool IsArchived
         {
             get;
@@ -35,6 +38,7 @@ namespace FreeAIr.Chat
             PromptBody = promptBody;
         }
 
+        /// <summary>Wraps the prompt text into a single user chat message ready for the request.</summary>
         public IReadOnlyList<ChatMessage> CreateChatMessages()
         {
             return
@@ -45,6 +49,7 @@ namespace FreeAIr.Chat
                 ];
         }
 
+        /// <summary>Marks this prompt as archived, once it has been sent and superseded by the assistant's answer.</summary>
         public void Archive()
         {
             IsArchived = true;

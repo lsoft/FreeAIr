@@ -3,8 +3,17 @@ using FreeAIr.Chat;
 
 namespace FreeAIr.Helper
 {
+    /// <summary>
+    /// Builds an <see cref="IOriginalTextDescriptor"/> from the currently active editor document,
+    /// capturing the selected text span and line ending style so chat context and edits can
+    /// target the right part of the file.
+    /// </summary>
     public static class TextDescriptorHelper
     {
+        /// <summary>
+        /// Captures the active editor document, its current selection (if any) and its line
+        /// ending, or <c>null</c> when no text editor is currently active.
+        /// </summary>
         public static async Task<IOriginalTextDescriptor?> GetSelectedTextAsync()
         {
             var docView = await VS.Documents.GetActiveDocumentViewAsync();

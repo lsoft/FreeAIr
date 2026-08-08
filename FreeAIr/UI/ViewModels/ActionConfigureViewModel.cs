@@ -11,16 +11,29 @@ using WpfHelpers;
 
 namespace FreeAIr.UI.ViewModels
 {
+    /// <summary>
+    /// Backs the Action Configure window, where a support action (a custom command shown in the
+    /// Actions menu, bound to an agent, a prompt and a set of scopes) is created, edited, reordered
+    /// or cloned.
+    /// </summary>
     public sealed class ActionConfigureViewModel : BaseViewModel
     {
         private SupportActionJson _selectedAction;
 
+        /// <summary>
+        /// Callback invoked to close the Action Configure window, passing whether the changes
+        /// should be treated as applied.
+        /// </summary>
         public Action<bool>? CloseWindow
         {
             get;
             set;
         }
 
+        /// <summary>
+        /// The full set of scope checkboxes (one per <see cref="SupportScopeEnum"/> value) shown
+        /// for the currently selected action.
+        /// </summary>
         public ObservableCollection2<ScopeViewModel> ScopeList
         {
             get;
@@ -28,23 +41,34 @@ namespace FreeAIr.UI.ViewModels
 
         private readonly AgentCollectionJson _agentCollection;
 
+        /// <summary>
+        /// The persisted collection of support actions being edited by this window.
+        /// </summary>
         public SupportCollectionJson ActionCollection
         {
             get;
             private set;
         }
 
+        /// <summary>
+        /// The actions listed in the window's list box, kept in sync with <see cref="ActionCollection"/>.
+        /// </summary>
         public ObservableCollection2<SupportActionJson> AvailableActions
         {
             get;
         }
 
+        /// <summary>
+        /// Stored in <see cref="_selectedAction"/> rather than in the backing field of the property:
+        /// the rest of the class reads that one, and a `field = value` here left it null for ever,
+        /// which hid the whole editing panel and disabled every command of the window.
+        /// </summary>
         public SupportActionJson SelectedAction
         {
-            get;
+            get => _selectedAction;
             set
             {
-                field = value;
+                _selectedAction = value;
 
                 RefillScopes();
                 UpdateSelectedMoniker();
@@ -55,6 +79,9 @@ namespace FreeAIr.UI.ViewModels
         }
 
 
+        /// <summary>
+        /// Whether the editing panel should be shown; hidden until an action is selected.
+        /// </summary>
         public Visibility ShowActionPanel
         {
             get
@@ -69,6 +96,10 @@ namespace FreeAIr.UI.ViewModels
         }
 
 
+        /// <summary>
+        /// Creates a new support action, timestamped as its default name, and adds it to both the
+        /// persisted collection and the list box.
+        /// </summary>
         public ICommand AddNewActionCommand
         {
             get
@@ -93,6 +124,9 @@ namespace FreeAIr.UI.ViewModels
             }
         }
 
+        /// <summary>
+        /// Removes the currently selected action from the collection and the list box.
+        /// </summary>
         public ICommand DeleteActionCommand
         {
             get
@@ -120,6 +154,9 @@ namespace FreeAIr.UI.ViewModels
             }
         }
 
+        /// <summary>
+        /// Moves the currently selected action one position earlier in the ordered action list.
+        /// </summary>
         public ICommand UpActionCommand
         {
             get
@@ -161,6 +198,9 @@ namespace FreeAIr.UI.ViewModels
             }
         }
 
+        /// <summary>
+        /// Moves the currently selected action one position later in the ordered action list.
+        /// </summary>
         public ICommand DownActionCommand
         {
             get
@@ -202,6 +242,10 @@ namespace FreeAIr.UI.ViewModels
             }
         }
 
+        /// <summary>
+        /// Duplicates the currently selected action, appending "(cloned)" to its name, and adds
+        /// the copy to the collection and the list box.
+        /// </summary>
         public ICommand CloneActionCommand
         {
             get
@@ -233,6 +277,9 @@ namespace FreeAIr.UI.ViewModels
             }
         }
 
+        /// <summary>
+        /// Closes the Action Configure window, keeping the edits made to the action collection.
+        /// </summary>
         public ICommand ApplyAndCloseCommand
         {
             get
@@ -253,6 +300,9 @@ namespace FreeAIr.UI.ViewModels
             }
         }
 
+        /// <summary>
+        /// The name of the agent that the currently selected action invokes.
+        /// </summary>
         public string AgentName
         {
             get
@@ -268,6 +318,10 @@ namespace FreeAIr.UI.ViewModels
             }
         }
 
+        /// <summary>
+        /// Highlights the agent name field in red when it does not match any agent in
+        /// <see cref="_agentCollection"/>, flagging a broken or stale reference.
+        /// </summary>
         public Brush AgentNameBorder
         {
             get
@@ -291,11 +345,18 @@ namespace FreeAIr.UI.ViewModels
             }
         }
 
+        /// <summary>
+        /// The names of every known Visual Studio image moniker, offered as icon choices for an action.
+        /// </summary>
         public ObservableCollection2<string> MonikerList
         {
             get;
         }
 
+        /// <summary>
+        /// The name of the icon (Visual Studio <c>KnownMonikers</c> member) assigned to the currently
+        /// selected action.
+        /// </summary>
         public string SelectedMoniker
         {
             get
@@ -316,6 +377,10 @@ namespace FreeAIr.UI.ViewModels
             }
         }
 
+        /// <summary>
+        /// The resolved <see cref="ImageMoniker"/> for <see cref="SelectedMoniker"/>, used to render
+        /// the action's icon in the UI.
+        /// </summary>
         public ImageMoniker SelectedImageMoniker
         {
             get
@@ -329,11 +394,18 @@ namespace FreeAIr.UI.ViewModels
             }
         }
 
+        /// <summary>
+        /// The context-variable anchors (e.g. current selection, file path) that can be inserted
+        /// into an action's prompt text.
+        /// </summary>
         public ObservableCollection2<AnchorViewModel> AnchorList
         {
             get;
         }
 
+        /// <summary>
+        /// Appends the chosen anchor's placeholder text to the selected action's prompt.
+        /// </summary>
         public ICommand AppendAnchorCommand
         {
             get
@@ -364,6 +436,10 @@ namespace FreeAIr.UI.ViewModels
         }
 
 
+        /// <summary>
+        /// Builds the view model for the Action Configure window from the agent collection (used
+        /// to validate agent references) and the action collection being edited.
+        /// </summary>
         public ActionConfigureViewModel(
             AgentCollectionJson agentCollection,
             SupportCollectionJson actionCollection
@@ -396,6 +472,10 @@ namespace FreeAIr.UI.ViewModels
             AvailableActions = new ObservableCollection2<SupportActionJson>(actionCollection.Actions);
         }
 
+        /// <summary>
+        /// Refreshes <see cref="SelectedMoniker"/> from the currently selected action, defaulting
+        /// to a question-mark icon when nothing is selected.
+        /// </summary>
         private void UpdateSelectedMoniker()
         {
             if (_selectedAction is null)
@@ -407,6 +487,10 @@ namespace FreeAIr.UI.ViewModels
             SelectedMoniker = _selectedAction.KnownMoniker;
         }
 
+        /// <summary>
+        /// Rebuilds <see cref="ScopeList"/> with one checkbox per <see cref="SupportScopeEnum"/>
+        /// value, reflecting which scopes the currently selected action applies to.
+        /// </summary>
         private void RefillScopes()
         {
             ScopeList.Clear();
@@ -425,6 +509,10 @@ namespace FreeAIr.UI.ViewModels
             }
         }
 
+        /// <summary>
+        /// Rebuilds <see cref="AnchorList"/> with one entry per <see cref="SupportContextVariableEnum"/>
+        /// value, offering every prompt anchor available to the currently selected action.
+        /// </summary>
         private void RefillAnchors()
         {
             AnchorList.Clear();
@@ -444,20 +532,36 @@ namespace FreeAIr.UI.ViewModels
         }
     }
 
+    /// <summary>
+    /// Represents one context-variable placeholder (e.g. current file, selection) that can be
+    /// inserted into a support action's prompt text via <see cref="ActionConfigureViewModel.AppendAnchorCommand"/>.
+    /// </summary>
     public sealed class AnchorViewModel : BaseViewModel
     {
+        /// <summary>
+        /// The action whose prompt this anchor can be appended to.
+        /// </summary>
         public SupportActionJson SelectedAction
         {
             get;
         }
 
+        /// <summary>
+        /// The context variable this anchor represents.
+        /// </summary>
         public SupportContextVariableEnum Variable
         {
             get;
         }
 
+        /// <summary>
+        /// The placeholder text inserted into the prompt when this anchor is chosen.
+        /// </summary>
         public string AnchorName => SupportContextVariableHelper.GetAnchor(Variable);
 
+        /// <summary>
+        /// Wraps a context variable together with the action whose prompt it can be appended to.
+        /// </summary>
         public AnchorViewModel(
             SupportActionJson? selectedAction,
             SupportContextVariableEnum variable
@@ -469,22 +573,39 @@ namespace FreeAIr.UI.ViewModels
 
     }
 
+    /// <summary>
+    /// Represents one scope checkbox (e.g. applies to a file, a selection, a project) shown for a
+    /// support action, and keeps the action's <c>Scopes</c> set in sync with the checkbox state.
+    /// </summary>
     public sealed class ScopeViewModel : BaseViewModel
     {
         private bool _scopeChecked;
 
+        /// <summary>
+        /// The action whose scope set this checkbox edits.
+        /// </summary>
         public SupportActionJson SelectedAction
         {
             get;
         }
 
+        /// <summary>
+        /// The scope value this checkbox represents.
+        /// </summary>
         public SupportScopeEnum Scope
         {
             get;
         }
 
+        /// <summary>
+        /// The display name of <see cref="Scope"/>.
+        /// </summary>
         public string ScopeName => Enum.GetName(typeof(SupportScopeEnum), Scope);
 
+        /// <summary>
+        /// Whether this scope is enabled for the selected action; toggling it adds or removes the
+        /// scope from the action's scope set.
+        /// </summary>
         public bool ScopeChecked
         {
             get => _scopeChecked;
@@ -507,6 +628,10 @@ namespace FreeAIr.UI.ViewModels
             }
         }
 
+        /// <summary>
+        /// Wraps a scope value together with the action it belongs to, initializing the checkbox
+        /// state from whether the action already includes this scope.
+        /// </summary>
         public ScopeViewModel(
             SupportActionJson? selectedAction,
             SupportScopeEnum scope

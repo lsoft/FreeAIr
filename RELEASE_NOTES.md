@@ -23,6 +23,164 @@ My others extensions lives [here](https://marketplace.visualstudio.com/publisher
 
 # FreeAIr Release Notes
 
+## 4.3.0
+
+- A first-run setup wizard replaces the trial-and-error of hand-editing the settings file: it walks
+  through agents, MCP servers, actions and the remaining settings, explains what each of them is
+  for, and writes nothing until the last page. Open it any time from
+  `Extensions > FreeAIr > Open setup wizard...`. On a brand new install, an info bar offers it
+  alongside the release notes the first time FreeAIr runs. It is fully localized, like the rest of
+  the product.
+  - On a first run it removes the shipped placeholder agents and guides you through creating one of
+    your own field by field, with an explanation under each, a "test connection" check for the
+    endpoint, and a choice between pasting a token and pointing at an environment variable that
+    holds it.
+  - The actions page explains what an action is, gives examples, and warns in red about any action
+    bound to an agent that does not exist - which is what happens after renaming or deleting one. A
+    `Use default values` button restores the shipped prompt library bound to your first agent.
+  - The `run whole line completion as you type` switch sits on that same page, because it is what
+    decides whether the whole line completion action is live or dormant: while it is off the action
+    is neither bound by the defaults button nor reported as a problem, and ticking it does both.
+  - The Microsoft Learn documentation MCP server is one checkbox away on the MCP servers page - it
+    is a public HTTP endpoint, so nothing is downloaded and no token is needed.
+  - The GitHub MCP server is opt-in: nothing asks for a GitHub token until you tick the box.
+- The `Use RAG` checkbox of the natural language search is implemented. The search now takes the
+  files whose outlines are the closest to the query and asks the LLM about those only, instead of
+  reading through the whole solution.
+- The embedding json files have a new, much smaller format: vectors are quantized and stored one per
+  line, and outlines which are nothing but the name of the member they describe are not embedded at
+  all. On the test solution that is 18 times less disk space. The files are also written in an order
+  which does not depend on the machine which built them, so two people regenerating them in two
+  branches no longer get a git conflict out of it.
+- There are three index files instead of four: the tree of the outlines is not stored any more, it
+  is derived from the outlines themselves. One file less to merge.
+- The natural language search can now be cancelled at every step, including while the index is being
+  read.
+- The GetAllSolutionFiles MCP tool no longer reads the embeddings on every call, and the index is
+  shared between the tool and the search instead of being loaded twice.
+- Fixed an agent with no token being unusable for embeddings, which is how a local embedding server
+  is normally configured.
+- Whole line completion no longer opens an error dialog on every pause in typing when its action is
+  not wired to an existing agent. The complaint now goes to the Activity Log, and is shown as a
+  dialog only when you asked for a suggestion yourself with the keyboard shortcut. The broken
+  binding is still reported in red by the setup wizard, where it can be fixed.
+- The `Use RAG` search no longer has a similarity threshold to guess. Every index build now measures
+  what a query with no answer scores on your model and your solution, and the new `Sensitivity`
+  setting says how far above that measured level a file has to stand — one value which keeps its
+  meaning when you change the embedding model. You can add your own questions, including ones whose
+  answer you know, in the `Calibration` node; a query which fails to find its own file is reported
+  at the end of the build, because that means the model does not understand your code.
+- There is a window for that measurement: `Extensions` / `FreeAIr` / `Open RAG search calibration
+  window...`. Ask it the questions you would ask the search, mark the file which answers each one —
+  or say that nothing here does — and it shows what the threshold lets through and what it cuts.
+  Saving stores the questions in the settings and the numbers in the index without rebuilding the
+  vectors, so a threshold can be fixed in a minute instead of in an hour of embedding. The window
+  names the agent it is asking and lets you change it, and it describes itself in a block at the
+  top. The `Создание NLO Json файла` window now carries its own description in that same block.
+- Fixed an agent without a token being invisible to everything which looks an agent up by name. An
+  embedding server run locally wants no token, so the agent which had built the index was never
+  found and a cloud chat agent was silently used to vectorize the query instead — which answers a
+  request for embeddings with HTTP 400. The natural language search was affected as well.
+- The natural language search no longer gives up in silence. It used to walk through the scope, the
+  action and the agent pickers, and a `return` at any of them left the button looking broken: no
+  window, no message, nothing in the log. Every one of those steps now says why it stopped — the
+  most likely reason being that no agent has a token, which is how the agents of a local server are
+  normally configured. An empty file mask in `Find in Files` means every file now, instead of
+  killing the search with an exception nobody saw.
+- Every step of the natural language search writes itself into a `FreeAIr natural language search`
+  pane of the Output window: which agent it asks, how many files the mask matched, what the RAG
+  shortlist kept, how big the prompt and the answer were, and how many matches of the answer were
+  usable. An answer which carries no `matches` is reported as such instead of being counted as
+  `Found 0 items`.
+- Fixed the search results window failing to open at all: its progress bar was bound two way onto a
+  read only property, which throws while the window is being built.
+- The results window names the agents behind the answers: the one which was asked, and — with
+  `Use RAG` — the one which turned the query into a vector. The second one is normally chosen for
+  you, from the index, and until now there was no way to see which one it was.
+- The `Confidence` column reads `High (85)` instead of `85`. The number is a guess of the model, not
+  a measurement, and the word says how much of the list is worth opening. The boundaries are 70 and
+  40.
+- Fixed the `Edit actions` window: clicking an action did nothing. Its `SelectedAction` was writing
+  into the backing field of the property while the whole rest of the window kept reading a separate
+  field, which therefore stayed empty — the editing panel was hidden and every command disabled.
+- An embedding server which refuses a request is now quoted. `HTTP 400` on its own says nothing
+  about which model, which endpoint or which parameter it did not like, and the server had already
+  explained all of it in an answer that was being thrown away.
+- The index remembers which embedding model built it, by storing the vectors of a few fixed
+  sentences. A search with a different model is now refused instead of silently returning nonsense —
+  the vector length alone did not catch it, since different models often share it. The model name
+  the server itself reports is recorded too, which is the only name that changes when a local server
+  is given a different model to load.
+- The `RagTopOutlineCount`, `RagMaxFileCount` and `RagMinScore` options moved from the unsorted
+  settings into a `Rag` node of their own, and `RagMinScore` is gone: it is replaced by `Sensitivity`
+  above.
+- The MCP proxy is restarted properly now. `ProcessMonitor` did restart a proxy which had died, but
+  the JSON-RPC channel stayed bound to the streams of the dead process, so every MCP call after the
+  first crash was lost. The channel is re-attached to the streams of the new process, and the
+  configuration is pushed into it again — a freshly started proxy hosts no MCP servers until it is
+  told about them.
+- A server which is reconfigured while it runs no longer has its tools offered to the model twice,
+  three times and so on: the wrapper of the running server is reused instead of a second one being
+  appended, and the wrapper of a server which failed to start is dropped along with its tools.
+- A proxy which fails to start is retried after a pause instead of ending the monitoring for the
+  rest of the session, and is given up on only after several failures in a row.
+- `Proxy.zip` decides that it is already unpacked by a marker file written after the last entry. The
+  folder used to be created before the first one, so an unpacking which was interrupted left behind
+  a truncated folder which was never repaired.
+- Installing the MSDN MCP server overwrites its entry instead of adding a second one under a name
+  which may be taken already.
+- Asking the options for a place explicitly and finding nothing there no longer returns the null its
+  callers dereference, and saving solution related options with no solution opened reports what has
+  happened instead of throwing `ArgumentNullException`.
+- A set of concurrency defects is fixed: the list of chats used to be handed out live and read
+  without its lock, while chats are added from the UI thread and their statuses change on the
+  threads which stream the answers; a read started right after a stop could be given the cancelled
+  token source of the previous one; and the file cache updated its value and its signature around an
+  await without any synchronization.
+- The built-in Visual Studio MCP server has a new tool, `VisualStudio.SearchFileContent`: the model
+  can ask where a text occurs and gets the matching lines back — each with its file and its line
+  number — instead of reading whole files one by one until it finds them. Nothing is installed and
+  no process is started, the matching is done by the extension itself.
+- The pattern is literal by default and a .NET regular expression on request, both through the same
+  code path. `case_sensitive` and `whole_word` are the other two switches, and `invert_match`
+  reports the lines which do not match, the way `grep -v` does.
+- `search_scope` chooses between the files of the projects — the default — and every file in the
+  solution folder. The walk skips `bin`, `obj`, `.git`, `node_modules` and the like either way, so
+  a search does not answer with build output.
+- `file_mask` is a list like `*.cs;*.xaml`, and a mask which starts with `!` subtracts:
+  `*.cs;!*.Designer.cs` is what keeps generated code from eating the context budget.
+- The answer is capped — 100 matching lines by default, 500 at most — and says whether the cap was
+  reached. A truncated list which does not admit to being one is read by the model as the whole
+  truth.
+- A document which is open and edited but not saved yet is searched as you see it on the screen
+  rather than as it is on the disk. Those buffers are collected on the main thread and the scan
+  itself runs off it, so a solution of thousands of files does not freeze the IDE.
+- The pattern is written by a model, so a regular expression is given a five second timeout: the
+  file which makes it misbehave is reported and the rest of the search survives.
+- Fixed a chat against LM Studio dying with `Service request failed. Status: 400 (Bad Request)`
+  before the model was ever asked anything. Four of the built-in Visual Studio tools take no
+  arguments and said so with an empty `{}` schema, which LM Studio validates and rejects — and it
+  rejects the whole request, so a single such tool took every other tool and the conversation down
+  with it. Every tool schema is now brought to the shape the endpoints ask for on its way to the
+  model, which also covers the tools of third party MCP servers: their schemas reach FreeAIr unseen
+  and are just as free to declare no arguments that way.
+- Fixed the same 400 in the natural language search and in the generation of the outlines, from the
+  other end: they asked for the answer in the `json_object` response format, which LM Studio does not
+  implement at all. The json is asked for in the prompt now, as it already was, and the answer goes
+  through the same cleanup that strips the markdown fences and the reasoning blocks before it is
+  parsed.
+- Tool calls are reassembled from the whole stream rather than from its first chunk. An endpoint may
+  send the name of a tool in one chunk and its arguments in the chunks that follow, and only the
+  first was being read: the tool then ran with no arguments at all, and the half-read call was sent
+  back to the server with the next request, which ended the conversation with an Internal Server
+  Error.
+- **The new format is not backward compatible: an index built by FreeAIr 4.2.11 or earlier has to be
+  rebuilt.**
+
+## 4.2.12
+
+- Fixed bug, thanks to nrmncr for [reporting it](https://github.com/lsoft/FreeAIr/issues/61).
+
 ## 4.2.11
 
 - Thanks to [ish-1313](https://github.com/ish-1313) for his\her first contribution to FreeAIr project:

@@ -7,12 +7,25 @@ using System.Collections.Generic;
 
 namespace FreeAIr.Antlr.Context
 {
+    /// <summary>
+    /// Parses the markdown used to compose chat context (the text built from mentions such as
+    /// files, code selections and other context items) into a sequence of answer parts, resolving
+    /// each mention through the registered <see cref="MentionVisualLineGenerator"/> factories.
+    /// </summary>
     public sealed class ContextParser : IParser
     {
         private readonly List<MentionVisualLineGenerator> _generators = new();
 
+        /// <summary>
+        /// The mention generators this parser recognizes, one per kind of context mention (file,
+        /// selection, and so on) that can appear in the markdown being parsed.
+        /// </summary>
         public IReadOnlyList<MentionVisualLineGenerator> Generators => _generators;
 
+        /// <summary>
+        /// Builds the generator list from the supplied factories, one generator instance per
+        /// mention kind the context markdown can contain.
+        /// </summary>
         public ContextParser(
             params IMentionVisualLineGeneratorFactory[] generatorFactories
             )
@@ -29,6 +42,11 @@ namespace FreeAIr.Antlr.Context
             }
         }
 
+        /// <summary>
+        /// Runs the ANTLR-generated context markdown lexer and parser over <paramref name="answer"/>
+        /// and walks the resulting tree with a <see cref="MarkdownListener"/> to produce the parsed
+        /// answer parts. Returns null if the markdown fails to lex or parse.
+        /// </summary>
         public Parsed? Parse(string answer)
         {
             if (answer is null)
@@ -64,6 +82,10 @@ namespace FreeAIr.Antlr.Context
             return parsed;
         }
 
+        /// <summary>
+        /// Wires up the generated context markdown lexer and parser (from the ANTLR grammar) over
+        /// the given text so <see cref="Parse"/> can walk the resulting parse tree.
+        /// </summary>
         private (ContextMarkdownLexer, ContextMarkdownParser) CreateComponents(string answer)
         {
             var ais = new AntlrInputStream(answer);

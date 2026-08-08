@@ -8,8 +8,13 @@ using WpfHelpers;
 
 namespace FreeAIr.UI.NestedCheckBox
 {
+    /// <summary>
+    /// A checkable tree node that behaves like a radio group: checking one child unchecks all of its
+    /// siblings, instead of the default tri-state parent/child propagation of <see cref="CheckableItem"/>.
+    /// </summary>
     public sealed class SingleCheckedCheckableItem : CheckableItem
     {
+        /// <summary>Creates a leaf single-checked item.</summary>
         public SingleCheckedCheckableItem(
             string name,
             string description,
@@ -21,6 +26,7 @@ namespace FreeAIr.UI.NestedCheckBox
         {
         }
 
+        /// <summary>Creates a single-checked item with children, deriving its own checked state from them.</summary>
         public SingleCheckedCheckableItem(
             string name,
             string description,
@@ -32,6 +38,7 @@ namespace FreeAIr.UI.NestedCheckBox
         {
         }
 
+        /// <summary>Enforces the radio-button behavior: unchecks every other child, then checks the one that just changed.</summary>
         protected override void Child_OnCheckedChanged(object sender, EventArgs e)
         {
             Children.ForEach(c => c.SetChecked(false));
@@ -40,21 +47,31 @@ namespace FreeAIr.UI.NestedCheckBox
         }
     }
 
+    /// <summary>
+    /// View model for one node of a nested checkbox tree (e.g. the file/context picker), supporting
+    /// tri-state checking where a parent's state is derived from its children and toggling a parent
+    /// propagates down to all of them.
+    /// </summary>
     public class CheckableItem : BaseViewModel
     {
+        /// <summary>Backing field for <see cref="IsChecked"/>.</summary>
         private bool? _isChecked;
+        /// <summary>Visual style (colors, decoration, enabled state) applied to this item.</summary>
         private readonly CheckableItemStyle _style;
 
+        /// <summary>Display name of this item.</summary>
         public string Name
         {
             get;
         }
 
+        /// <summary>Longer description shown as a tooltip or secondary text for this item.</summary>
         public string Description
         {
             get;
         }
 
+        /// <summary>Foreground brush for this item, switching between the style's checked and unchecked colors.</summary>
         public Brush? Foreground
         {
             get
@@ -68,22 +85,31 @@ namespace FreeAIr.UI.NestedCheckBox
             }
         }
 
+        /// <summary>Text decoration (e.g. strikethrough) applied to this item's label, from its style.</summary>
         public TextDecorationCollection TextDecoration => _style.TextDecoration;
 
+        /// <summary>Whether the checkbox for this item can be interacted with.</summary>
         public bool IsEnabled => _style.IsEnabled;
 
+        /// <summary>Caller-supplied value identifying what this item represents (e.g. a file or context entry).</summary>
         public object? Tag
         {
             get;
         }
 
+        /// <summary>Child nodes nested under this item in the tree.</summary>
         public ObservableCollection<CheckableItem> Children
         {
             get;
         }
 
+        /// <summary>Raised whenever this item's <see cref="IsChecked"/> state changes, so a parent can recompute its own state.</summary>
         public event EventHandler? OnCheckedChangedEvent;
 
+        /// <summary>
+        /// Tri-state checked flag: true/false when fully checked/unchecked, null when children are in a
+        /// mixed state. Setting it propagates the new value down to every child.
+        /// </summary>
         public bool? IsChecked
         {
             get => _isChecked;
@@ -105,6 +131,7 @@ namespace FreeAIr.UI.NestedCheckBox
             }
         }
 
+        /// <summary>Creates a leaf item (no children) with an explicit initial checked state.</summary>
         public CheckableItem(
             string name,
             string description,
@@ -121,6 +148,7 @@ namespace FreeAIr.UI.NestedCheckBox
             Children = new ObservableCollection<CheckableItem>();
         }
 
+        /// <summary>Creates a parent item over an existing set of children, deriving its own checked state from theirs and subscribing to their change events.</summary>
         public CheckableItem(
             string name,
             string description,
@@ -142,6 +170,7 @@ namespace FreeAIr.UI.NestedCheckBox
             }
         }
 
+        /// <summary>Appends a child item to this node, subscribes to its check-changed event, and recomputes this node's own checked state.</summary>
         public void AddChild(
             CheckableItem child
             )
@@ -156,6 +185,7 @@ namespace FreeAIr.UI.NestedCheckBox
             UpdateCheckedStatusFromChildren();
         }
 
+        /// <summary>Sets this item's checked state and propagates the same value down to every child, without re-raising <see cref="OnCheckedChangedEvent"/>.</summary>
         public void SetChecked(bool? isChecked)
         {
             if (_isChecked == isChecked)
@@ -173,11 +203,13 @@ namespace FreeAIr.UI.NestedCheckBox
             OnPropertyChanged();
         }
 
+        /// <summary>Default reaction to a child's checked state changing: recomputes this item's own tri-state value from all children.</summary>
         protected virtual void Child_OnCheckedChanged(object? sender, EventArgs e)
         {
             UpdateCheckedStatusFromChildren();
         }
 
+        /// <summary>Recomputes and applies this item's checked state from its children's current states, firing the changed event if it differs.</summary>
         private void UpdateCheckedStatusFromChildren()
         {
             // Если все дети выбраны — родитель выбран
@@ -198,6 +230,7 @@ namespace FreeAIr.UI.NestedCheckBox
             OnPropertyChanged();
         }
 
+        /// <summary>Derives a tri-state checked value from a set of children: true if all checked, false if none, null if mixed or empty of a definite state.</summary>
         private static bool? GetIsCheckedFromChildren(
             IReadOnlyList<CheckableItem> children
             )
@@ -227,21 +260,29 @@ namespace FreeAIr.UI.NestedCheckBox
             return isChecked;
         }
 
+        /// <summary>Raises <see cref="OnCheckedChangedEvent"/> for this item.</summary>
         private void FireCheckedChanged()
         {
             OnCheckedChangedEvent?.Invoke(this, EventArgs.Empty);
         }
     }
 
+    /// <summary>Immutable visual styling (colors, enabled state, text decoration) applied to a <see cref="CheckableItem"/>.</summary>
     public readonly struct CheckableItemStyle
     {
+        /// <summary>A default enabled style with no explicit colors and no text decoration.</summary>
         public static readonly CheckableItemStyle Empty = new CheckableItemStyle(null, null, true, new TextDecorationCollection());
 
+        /// <summary>Foreground used while the item is checked (or always, if <see cref="UncheckedForeground"/> is null).</summary>
         public readonly Brush? Foreground;
+        /// <summary>Foreground used while the item is unchecked, if different from <see cref="Foreground"/>.</summary>
         public readonly Brush? UncheckedForeground;
+        /// <summary>Whether the item's checkbox is interactable.</summary>
         public readonly bool IsEnabled;
+        /// <summary>Text decoration (e.g. strikethrough) applied to the item's label.</summary>
         public readonly TextDecorationCollection TextDecoration;
 
+        /// <summary>Creates a style with no text decoration.</summary>
         public CheckableItemStyle(
             Brush foreground,
             Brush uncheckedForeground,
@@ -254,6 +295,7 @@ namespace FreeAIr.UI.NestedCheckBox
             TextDecoration = new TextDecorationCollection();
         }
 
+        /// <summary>Creates a style with explicit colors, enabled state and text decoration.</summary>
         public CheckableItemStyle(
             Brush foreground,
             Brush uncheckedForeground,

@@ -4,12 +4,20 @@ using Serilog;
 
 namespace Proxy
 {
+    /// <summary>
+    /// The proxy process's implementation of the RPC surface: looks up the target server in
+    /// <see cref="Servers"/> by name and forwards to it, turning any exception into a
+    /// <see cref="BaseReply.ErrorMessage"/> instead of letting it cross the pipe.
+    /// </summary>
     public sealed class McpProxyInterface : IMcpProxyInterface
     {
+        /// <summary>Serilog logger scoped to this class, used to record request failures before they are turned into an <see cref="BaseReply.ErrorMessage"/>.</summary>
         private static readonly ILogger _log = SerilogLogger.Logger.ForContext<McpProxyInterface>();
 
+        /// <summary>Registry of MCP servers the proxy currently knows about, used to resolve a request's target server by name.</summary>
         private readonly Servers _servers;
 
+        /// <summary>Creates the proxy's RPC surface backed by the given server registry.</summary>
         public McpProxyInterface(
             Servers servers
             )
@@ -18,6 +26,7 @@ namespace Proxy
             _servers = servers;
         }
 
+        /// <summary>Replaces the whole set of externally configured servers with <paramref name="request"/>'s, dropping the old ones first.</summary>
         public async Task<UpdateExternalServersReply> UpdateExternalServersAsync(
             UpdateExternalServersRequest request
             )
@@ -45,6 +54,7 @@ namespace Proxy
             }
         }
 
+        /// <summary>Looks up the named server and asks it whether its dependency is already installed.</summary>
         public async Task<IsInstalledReply> IsInstalledAsync(
             IsInstalledRequest request
             )
@@ -76,6 +86,7 @@ namespace Proxy
             }
         }
 
+        /// <summary>Looks up the named server and installs its dependency.</summary>
         public async Task<InstallReply> InstallAsync(
             InstallRequest request
             )
@@ -105,6 +116,7 @@ namespace Proxy
             }
         }
 
+        /// <summary>Looks up the named server and returns its tool list.</summary>
         public async Task<GetToolsReply> GetToolsAsync(
             GetToolsRequest request
             )
@@ -134,6 +146,7 @@ namespace Proxy
             }
         }
 
+        /// <summary>Looks up the named server and invokes one of its tools.</summary>
         public async Task<CallToolReply> CallToolAsync(
             CallToolRequest request,
             CancellationToken cancellationToken
