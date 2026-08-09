@@ -44,7 +44,9 @@ namespace FreeAIr.InfoBar
         /// <summary>
         /// Opens the release notes and the setup wizard together when the user asks for them, or
         /// just records the bar as seen when dismissed. Either way <see cref="InternalPage.SetupWizardIntroduced"/>
-        /// is set, so this bar shows only once - the wizard stays reachable from the menu regardless.
+        /// and <see cref="InternalPage.FreeAIrLastVersion"/> are set, so this bar shows only once and
+        /// <see cref="ReleaseNotesInfoBarService"/> does not take its place on the next start - the
+        /// wizard stays reachable from the menu regardless.
         /// </summary>
         public override void OnActionItemClicked(IVsInfoBarUIElement infoBarUIElement, IVsInfoBarActionItem actionItem)
         {
@@ -57,6 +59,10 @@ namespace FreeAIr.InfoBar
                 var choose = (int)actionItem.ActionContext;
 
                 InternalPage.Instance.SetupWizardIntroduced = true;
+                //this bar links to the release notes itself, so the running version counts as
+                //seen: without this the plain "new version installed" bar would greet the user on
+                //the very next start of a brand new install
+                InternalPage.Instance.FreeAIrLastVersion = Vsix.Version;
                 InternalPage.Instance.Save();
 
                 if (choose == 1)

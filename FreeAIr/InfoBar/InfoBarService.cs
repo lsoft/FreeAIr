@@ -1,4 +1,5 @@
-﻿using Microsoft.VisualStudio.Shell.Interop;
+﻿using FreeAIr.Helper;
+using Microsoft.VisualStudio.Shell.Interop;
 
 namespace FreeAIr.InfoBar
 {
@@ -44,24 +45,82 @@ namespace FreeAIr.InfoBar
         {
             ThreadHelper.ThrowIfNotOnUIThread();
 
-            var shell = (IVsShell)_serviceProvider.GetService(typeof(SVsShell));
-            if (shell != null)
+            if (TryAddInfoBar())
             {
-                shell.GetProperty((int)__VSSPROPID7.VSSPROPID_MainWindowInfoBarHost, out var obj);
-                var host = (IVsInfoBarHost)obj;
+                return;
+            }
 
-                if (host == null)
+            //devenv started without a solution has no main window info bar host when the package is
+            //autoloaded on the NoSolution context, and still none when the shell reports itself
+            //initialized - the start window is up and the main window does not exist yet. Waiting
+            //for ShellInitializedContext is therefore not enough; keep looking for the host in the
+            //background rather than dropping the bar.
+            ActivityLogHelper.ActivityLogInformation(
+                $"{GetType().Name}: no info bar host yet, waiting for the main window."
+                );
+
+            WaitForInfoBarHostAsync()
+                .FileAndForget(nameof(InfoBarService))
+                ;
+        }
+
+        /// <summary>
+        /// Retries adding the info bar once a second until the main window exists, giving up after
+        /// a minute so a devenv that never shows one does not keep a timer alive forever.
+        /// </summary>
+        private async Task WaitForInfoBarHostAsync()
+        {
+            for (var attempt = 0; attempt < 60; attempt++)
+            {
+                await Task.Delay(TimeSpan.FromSeconds(1));
+
+                await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+
+                if (TryAddInfoBar())
                 {
                     return;
                 }
-
-                var infoBarModel = GetModel();
-
-                var factory = (IVsInfoBarUIFactory)_serviceProvider.GetService(typeof(SVsInfoBarUIFactory));
-                var element = factory.CreateInfoBar(infoBarModel);
-                element.Advise(this, out _cookie);
-                host.AddInfoBar(element);
             }
+
+            ActivityLogHelper.ActivityLogWarning(
+                $"{GetType().Name}: no info bar host appeared within a minute, the bar is lost."
+                );
+        }
+
+        /// <summary>
+        /// Adds the info bar to the main window right now, reporting whether the host was there to
+        /// take it.
+        /// </summary>
+        private bool TryAddInfoBar()
+        {
+            ThreadHelper.ThrowIfNotOnUIThread();
+
+            var shell = (IVsShell)_serviceProvider.GetService(typeof(SVsShell));
+            if (shell == null)
+            {
+                return false;
+            }
+
+            shell.GetProperty((int)__VSSPROPID7.VSSPROPID_MainWindowInfoBarHost, out var obj);
+            var host = obj as IVsInfoBarHost;
+
+            if (host == null)
+            {
+                return false;
+            }
+
+            var infoBarModel = GetModel();
+
+            var factory = (IVsInfoBarUIFactory)_serviceProvider.GetService(typeof(SVsInfoBarUIFactory));
+            var element = factory.CreateInfoBar(infoBarModel);
+            element.Advise(this, out _cookie);
+            host.AddInfoBar(element);
+
+            ActivityLogHelper.ActivityLogInformation(
+                $"{GetType().Name}: info bar shown."
+                );
+
+            return true;
         }
 
         /// <summary>

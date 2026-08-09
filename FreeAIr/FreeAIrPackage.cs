@@ -240,6 +240,10 @@ namespace FreeAIr
         /// </summary>
         private static void ShowReleaseNotesInfoBarIfNeeded()
         {
+            ActivityLogHelper.ActivityLogInformation(
+                $"Release notes info bar: running {Vsix.Version}, last seen {InternalPage.Instance.FreeAIrLastVersion ?? "<none>"}."
+                );
+
             if (Vsix.Version != InternalPage.Instance.FreeAIrLastVersion)
             {
                 var dte = AsyncPackage.GetGlobalService(typeof(EnvDTE.DTE)) as DTE2;
@@ -258,6 +262,10 @@ namespace FreeAIr
         /// </summary>
         private static bool ShowSetupWizardInfoBarIfNeeded()
         {
+            ActivityLogHelper.ActivityLogInformation(
+                $"Setup wizard info bar: already introduced = {InternalPage.Instance.SetupWizardIntroduced}."
+                );
+
             if (InternalPage.Instance.SetupWizardIntroduced)
             {
                 return false;
