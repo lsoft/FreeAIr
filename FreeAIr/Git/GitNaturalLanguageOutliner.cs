@@ -1,8 +1,9 @@
 ﻿using FreeAIr.Helper;
+using FreeAIr.Interaction;
 using FreeAIr.Options2.Support;
-using FreeAIr.UI.ContextMenu;
 using FreeAIr.UI.Embedillo.Answer.Parser;
 using FreeAIr.UI.ViewModels;
+using Microsoft.VisualStudio.ComponentModelHost;
 using System.Collections.Generic;
 using FreeAIr.Chat;
 using FreeAIr.Chat.Context.Item;
@@ -27,7 +28,10 @@ namespace FreeAIr.Git
             {
                 await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
 
-                var chosenSupportAction = await SupportContextMenu.ChooseSupportAsync(
+                var componentModel = (IComponentModel)await FreeAIrPackage.Instance.GetServiceAsync(typeof(SComponentModel));
+                var chooser = componentModel.GetService<IUserChooser>();
+
+                var chosenSupportAction = await chooser.ChooseSupportActionAsync(
                     Resources.Resources.Choose_support_action,
                     SupportScopeEnum.GenerateNaturalLanguageOutlines
                     );
@@ -36,7 +40,7 @@ namespace FreeAIr.Git
                     return;
                 }
 
-                var chosenAgent = await AgentContextMenu.ChooseAgentWithTokenAsync(
+                var chosenAgent = await chooser.ChooseAgentWithTokenAsync(
                     FreeAIr.Resources.Resources.Choose_agent_to_add_NL_outlines_to,
                     chosenSupportAction.AgentName
                     );

@@ -1,11 +1,8 @@
 using FreeAIr.Helper;
+using FreeAIr.Interaction;
 using FreeAIr.Options2.Agent;
 using FreeAIr.Options2.Support;
-using FreeAIr.UI.ContextMenu;
-using FreeAIr.UI.ToolWindows;
-using FreeAIr.UI.Windows;
 using Microsoft.VisualStudio.ComponentModelHost;
-using System.Windows;
 using FreeAIr.Chat;
 
 namespace FreeAIr.BLogic
@@ -27,7 +24,10 @@ namespace FreeAIr.BLogic
             {
                 await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
 
-                var chosenSupportAction = await SupportContextMenu.ChooseSupportAsync(
+                var componentModel = (IComponentModel)await FreeAIrPackage.Instance.GetServiceAsync(typeof(SComponentModel));
+                var chooser = componentModel.GetService<IUserChooser>();
+
+                var chosenSupportAction = await chooser.ChooseSupportActionAsync(
                     Resources.Resources.Choose_support_action,
                     SupportScopeEnum.CommitMessageBuilding
                     );
@@ -36,7 +36,7 @@ namespace FreeAIr.BLogic
                     return;
                 }
 
-                var chosenAgent = await AgentContextMenu.ChooseAgentWithTokenAsync(
+                var chosenAgent = await chooser.ChooseAgentWithTokenAsync(
                     FreeAIr.Resources.Resources.Choose_agent_for_commit_message_generation,
                     chosenSupportAction.AgentName
                     );
@@ -71,14 +71,13 @@ namespace FreeAIr.BLogic
 
             var componentModel = (IComponentModel)await FreeAIrPackage.Instance.GetServiceAsync(typeof(SComponentModel));
 
-            var gitWindowModifier = componentModel.GetService<GitWindowModifier>();
+            var commitMessageBox = componentModel.GetService<IGitCommitMessageBox>();
 
             var backgroundTask = new GitCollectBackgroundTask(
                 );
-            var w = new WaitForTaskWindow(
+            await componentModel.GetService<IBackgroundTaskShower>().ShowAsync(
                 backgroundTask
                 );
-            await w.ShowDialogAsync();
 
             var gitDiff = backgroundTask.Result;
             if (string.IsNullOrEmpty(gitDiff))
@@ -112,14 +111,14 @@ namespace FreeAIr.BLogic
                     );
                 if (!string.IsNullOrEmpty(commitMessage))
                 {
-                    gitWindowModifier.CommitMessageTextBox.Text = commitMessage;
+                    commitMessageBox.SetText(commitMessage);
                     return;
                 }
             }
             ShowErrorAsync(FreeAIr.Resources.Resources.Cannot_receive_AI_answer__Please)
                 .FileAndForget(nameof(ShowErrorAsync));
 
-            await ChatWindowShower.ShowChatWindowAsync(chat);
+            await componentModel.GetService<IChatWindowShower>().ShowChatWindowAsync(chat);
         }
 
         /// <summary>

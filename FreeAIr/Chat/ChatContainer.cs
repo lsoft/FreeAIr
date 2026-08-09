@@ -2,7 +2,7 @@
 using EnvDTE80;
 using FreeAIr.Options2.Agent;
 using FreeAIr.Shared.Helper;
-using FreeAIr.UI.Informer;
+using FreeAIr.Interaction;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Linq;
@@ -17,7 +17,7 @@ namespace FreeAIr.Chat
     ///
     /// This is a MEF singleton: obtain it via `IComponentModel.GetService&lt;ChatContainer&gt;()`,
     /// never construct it. Besides keeping the collection, it aggregates the status of all chats
-    /// into a single indicator shown by <see cref="UIInformer"/>, and disposes everything when
+    /// into a single indicator shown by <see cref="IChatStatusIndicator"/>, and disposes everything when
     /// Visual Studio shuts down.
     /// </summary>
     [Export(typeof(ChatContainer))]
@@ -37,7 +37,7 @@ namespace FreeAIr.Chat
         private readonly object _locker = new();
 
         /// <summary>The status bar indicator this container reports the aggregate chat status into.</summary>
-        private readonly UIInformer _uIInformer;
+        private readonly IChatStatusIndicator _statusIndicator;
         /// <summary>The live chats owned by this container.</summary>
         private readonly List<Chat> _chats = new();
 
@@ -75,19 +75,19 @@ namespace FreeAIr.Chat
         /// </summary>
         [ImportingConstructor]
         public ChatContainer(
-            UIInformer uiInformer
+            IChatStatusIndicator statusIndicator
             )
         {
-            if (uiInformer is null)
+            if (statusIndicator is null)
             {
-                throw new ArgumentNullException(nameof(uiInformer));
+                throw new ArgumentNullException(nameof(statusIndicator));
             }
 
-            //DTE is not free-threaded; the imported UIInformer asserts the same thing in its own
+            //DTE is not free-threaded; the imported status indicator asserts the same thing in its own
             //constructor, so this only makes the requirement of this class explicit as well
             ThreadHelper.ThrowIfNotOnUIThread();
 
-            _uIInformer = uiInformer;
+            _statusIndicator = statusIndicator;
 
             var dte = AsyncPackage.GetGlobalService(typeof(EnvDTE.DTE)) as DTE2;
             if (dte is null)
@@ -298,11 +298,11 @@ namespace FreeAIr.Chat
 
             if (anyIsInProgress)
             {
-                _uIInformer.UpdateUIStatusAsync(ChatsStatusEnum.Working);
+                _statusIndicator.UpdateStatus(ChatsStatusEnum.Working);
             }
             else
             {
-                _uIInformer.UpdateUIStatusAsync(ChatsStatusEnum.Idle);
+                _statusIndicator.UpdateStatus(ChatsStatusEnum.Idle);
             }
 
             FireChatStatusChanged(ea);

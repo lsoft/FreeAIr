@@ -1,5 +1,6 @@
 ﻿using EnvDTE;
 using EnvDTE80;
+using FreeAIr.Interaction;
 using System.ComponentModel.Composition;
 using System.Reflection;
 using System.Threading;
@@ -16,7 +17,9 @@ namespace FreeAIr.UI.Informer
     /// state and the double-click gesture used to jump to the activity log.
     /// </summary>
     [Export(typeof(UIInformer))]
-    public sealed class UIInformer
+    [Export(typeof(IChatStatusIndicator))]
+    [PartCreationPolicy(CreationPolicy.Shared)]
+    public sealed class UIInformer : IChatStatusIndicator
     {
         /// <summary>
         /// The Visual Studio main window, used to locate the status bar panel the indicator is attached to.
@@ -66,6 +69,14 @@ namespace FreeAIr.UI.Informer
             var dte = AsyncPackage.GetGlobalService(typeof(EnvDTE.DTE)) as DTE2;
             _dteEvents = ((Events2)dte.Events).DTEEvents;
             _dteEvents.OnBeginShutdown += DTEEvents_OnBeginShutdown;
+        }
+
+        /// <inheritdoc/>
+        public void UpdateStatus(
+            ChatsStatusEnum status
+            )
+        {
+            UpdateUIStatusAsync(status);
         }
 
         /// <summary>
@@ -292,22 +303,6 @@ namespace FreeAIr.UI.Informer
 
     }
 
-
-    /// <summary>
-    /// The chat activity state shown by the status bar indicator.
-    /// </summary>
-    public enum ChatsStatusEnum
-    {
-        /// <summary>
-        /// At least one chat has a request in progress.
-        /// </summary>
-        Working,
-
-        /// <summary>
-        /// No chat currently has a request in progress.
-        /// </summary>
-        Idle
-    }
 
     /// <summary>
     /// Signature for the event raised when the user double-clicks the status bar indicator.

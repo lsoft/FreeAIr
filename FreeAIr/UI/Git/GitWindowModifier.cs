@@ -2,6 +2,7 @@ using EnvDTE;
 using EnvDTE80;
 using FreeAIr.Git;
 using FreeAIr.Helper;
+using FreeAIr.Interaction;
 using FreeAIr.UI;
 using Microsoft.VisualStudio.Imaging;
 using System.ComponentModel.Composition;
@@ -20,7 +21,9 @@ namespace FreeAIr.BLogic
     /// so this class keeps rescanning and re-inserting its buttons for as long as Visual Studio runs.
     /// </summary>
     [Export(typeof(GitWindowModifier))]
-    public sealed class GitWindowModifier
+    [Export(typeof(IGitCommitMessageBox))]
+    [PartCreationPolicy(CreationPolicy.Shared)]
+    public sealed class GitWindowModifier : IGitCommitMessageBox
     {
         /// <summary>
         /// Put into <see cref="FrameworkElement.Tag"/> of the buttons this class inserts, so that a
@@ -94,6 +97,23 @@ namespace FreeAIr.BLogic
             CommitMessageTextBox is not null
             && BuildCommitMessageButton is not null
             ;
+
+        /// <inheritdoc/>
+        bool IGitCommitMessageBox.IsAvailable => CommitMessageTextBox is not null;
+
+        /// <inheritdoc/>
+        void IGitCommitMessageBox.SetText(string text)
+        {
+            ThreadHelper.ThrowIfNotOnUIThread();
+
+            var textBox = CommitMessageTextBox;
+            if (textBox is null)
+            {
+                return;
+            }
+
+            textBox.Text = text;
+        }
 
         [ImportingConstructor]
         public GitWindowModifier()

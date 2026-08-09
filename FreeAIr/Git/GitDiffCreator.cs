@@ -1,7 +1,7 @@
 ﻿using FreeAIr.BLogic;
 using FreeAIr.Git.Parser;
-using FreeAIr.UI.Windows;
-using System.Windows;
+using FreeAIr.Interaction;
+using Microsoft.VisualStudio.ComponentModelHost;
 
 namespace FreeAIr.Git
 {
@@ -22,12 +22,13 @@ namespace FreeAIr.Git
         {
             await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
 
+            var componentModel = (IComponentModel)await FreeAIrPackage.Instance.GetServiceAsync(typeof(SComponentModel));
+
             var backgroundTask = new GitCollectBackgroundTask(
                 );
-            var w = new WaitForTaskWindow(
+            await componentModel.GetService<IBackgroundTaskShower>().ShowAsync(
                 backgroundTask
                 );
-            await w.ShowDialogAsync();
 
             var gitDiffString = backgroundTask.Result;
             if (string.IsNullOrEmpty(gitDiffString))
