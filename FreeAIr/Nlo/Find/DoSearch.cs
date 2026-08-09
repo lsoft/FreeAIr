@@ -1,10 +1,11 @@
 ﻿using FreeAIr.Embedding;
 using FreeAIr.Helper;
+using FreeAIr.Interaction;
 using FreeAIr.Options2;
 using FreeAIr.Options2.Agent;
 using FreeAIr.Options2.Support;
-using FreeAIr.UI.ContextMenu;
 using FreeAIr.UI.ViewModels;
+using Microsoft.VisualStudio.ComponentModelHost;
 //`Task<T>` needs this: FreeAIrPackage.cs declares a global `Task` alias which shadows the generic one
 using System.Threading.Tasks;
 
@@ -54,7 +55,10 @@ namespace FreeAIr.Find
                     return;
                 }
 
-                var chosenScope = await VisualStudioContextMenuCommandBridge.ShowAsync<NaturalSearchScope>(
+                var componentModel = (IComponentModel)await FreeAIrPackage.Instance.GetServiceAsync(typeof(SComponentModel));
+                var chooser = componentModel.GetService<IUserChooser>();
+
+                var chosenScope = await chooser.ChooseOneOfAsync<NaturalSearchScope>(
                     FreeAIr.Resources.Resources.Choose_searching_scope,
                     [
                         (FreeAIr.Resources.Resources.Whole_solution, new NaturalSearchScope(NaturalSearchScopeEnum.WholeSolution)),
@@ -69,7 +73,7 @@ namespace FreeAIr.Find
 
                 SearchTrace.Step($"Scope: {chosenScope.Scope}.");
 
-                var chosenSupportAction = await SupportContextMenu.ChooseSupportAsync(
+                var chosenSupportAction = await chooser.ChooseSupportActionAsync(
                     FreeAIr.Resources.Resources.Choose_support_action,
                     SupportScopeEnum.NaturalLanguageSearch
                     );
@@ -84,7 +88,7 @@ namespace FreeAIr.Find
 
                 SearchTrace.Step($"Action: {chosenSupportAction.Name}.");
 
-                var chosenAgent = await AgentContextMenu.ChooseAgentWithTokenAsync(
+                var chosenAgent = await chooser.ChooseAgentWithTokenAsync(
                     FreeAIr.Resources.Resources.Choose_agent_for_natural_language,
                     chosenSupportAction.AgentName
                     );
@@ -214,7 +218,9 @@ namespace FreeAIr.Find
             //all, or the agent has been renamed or removed since. Every agent is offered, not only
             //the ones with a token: an embedding model normally runs on a local server which wants
             //none, and it is the agent to pick here far more often than a cloud one
-            return await AgentContextMenu.ChooseAnyAgentAsync(
+            var componentModel = (IComponentModel)await FreeAIrPackage.Instance.GetServiceAsync(typeof(SComponentModel));
+
+            return await componentModel.GetService<IUserChooser>().ChooseAnyAgentAsync(
                 FreeAIr.Resources.Resources.RAG__choose_the_embedding_agent,
                 metadata.EmbeddingAgentName
                 );

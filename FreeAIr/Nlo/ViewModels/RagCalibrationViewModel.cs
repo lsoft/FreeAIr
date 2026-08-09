@@ -2,10 +2,10 @@
 using FreeAIr.Embedding.Json;
 using FreeAIr.Find;
 using FreeAIr.Helper;
+using FreeAIr.Interaction;
 using FreeAIr.Options2;
 using FreeAIr.Options2.Agent;
 using FreeAIr.Options2.Rag;
-using FreeAIr.UI.ContextMenu;
 using Microsoft.VisualStudio.ComponentModelHost;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
@@ -1142,7 +1142,9 @@ namespace FreeAIr.UI.ViewModels
 
             //no preferred name: the user pressed the button precisely to be asked, and a preference
             //is what the picker skips itself for
-            var chosen = await AgentContextMenu.ChooseAnyAgentAsync(
+            var componentModel = (IComponentModel)await FreeAIrPackage.Instance.GetServiceAsync(typeof(SComponentModel));
+
+            var chosen = await componentModel.GetService<IUserChooser>().ChooseAnyAgentAsync(
                 FreeAIr.Resources.Resources.RAG__choose_the_embedding_agent
                 );
             if (chosen is null)

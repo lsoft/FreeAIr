@@ -5,10 +5,13 @@ using FreeAIr.Find;
 using FreeAIr.Git;
 using FreeAIr.Git.Parser;
 using FreeAIr.Helper;
+using FreeAIr.Interaction;
 using FreeAIr.NLOutline.Tree;
 using FreeAIr.NLOutline.Tree.Builder;
 using FreeAIr.Shared.Helper;
 using FreeAIr.UI.NestedCheckBox;
+//BackgroundTask, which GenerateEmbeddingOutlineFilesBackgroundTask below derives from, still
+//carries the namespace of the window it used to live in; the window itself is gone from here
 using FreeAIr.UI.Windows;
 using Microsoft.VisualStudio.ComponentModelHost;
 using System.Collections.Generic;
@@ -275,10 +278,10 @@ namespace FreeAIr.UI.ViewModels
                                     JsonFilePath,
                                     Groups
                                     );
-                                var w = new WaitForTaskWindow(
+                                var componentModel = (IComponentModel)await FreeAIrPackage.Instance.GetServiceAsync(typeof(SComponentModel));
+                                await componentModel.GetService<IBackgroundTaskShower>().ShowAsync(
                                     backgroundTask
                                     );
-                                await w.ShowDialogAsync();
                             }
                             catch (Exception excp)
                             {

@@ -1,5 +1,6 @@
 ﻿using FreeAIr.Options2.Agent;
 using FreeAIr.Options2.Support;
+using System.Collections.Generic;
 
 namespace FreeAIr.Interaction
 {
@@ -29,5 +30,26 @@ namespace FreeAIr.Interaction
             string title,
             string? preferredAgentName = null
             );
+
+        /// <summary>
+        /// Offers every configured agent, whether it carries a token or not. This is the picker for
+        /// an embedding model: those normally run on a local server which wants no token, so the
+        /// token-filtered list above would hide exactly the agent wanted here.
+        /// </summary>
+        System.Threading.Tasks.Task<AgentJson?> ChooseAnyAgentAsync(
+            string title,
+            string? preferredAgentName = null
+            );
+
+        /// <summary>
+        /// Offers an arbitrary list of labelled values - the scope of a natural language search,
+        /// and whatever else a caller outside the UI has to ask about. Returns null when the user
+        /// dismissed the menu.
+        /// </summary>
+        System.Threading.Tasks.Task<T?> ChooseOneOfAsync<T>(
+            string title,
+            List<(string Title, T Value)> variants
+            )
+            where T : class;
     }
 }

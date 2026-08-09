@@ -125,7 +125,7 @@ Judge a build by the error count, not the warning count.
 ## Writing comments the NLO index can use
 
 FreeAIr indexes its own source through `CSharpFileScanner`
-(`FreeAIr\NLOutline\Tree\Builder\File\FileScanner.cs`), and the comments are the *only* thing that
+(`FreeAIr\Nlo\NLOutline\Tree\Builder\File\FileScanner.cs`), and the comments are the *only* thing that
 ends up in the embedding index — no code is ever vectorized. A node whose outline text equals its
 own identifier is dropped by `OutlineEmbedder.SelectNodesToEmbed`, so **an uncommented member is
 absent from the RAG search entirely**. Comments here are a searchable artifact, not decoration.

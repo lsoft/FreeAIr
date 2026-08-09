@@ -2,7 +2,6 @@
 using FreeAIr.Interaction;
 using FreeAIr.Options2.Support;
 using FreeAIr.UI.Embedillo.Answer.Parser;
-using FreeAIr.UI.ViewModels;
 using Microsoft.VisualStudio.ComponentModelHost;
 using System.Collections.Generic;
 using FreeAIr.Chat;
@@ -51,7 +50,7 @@ namespace FreeAIr.Git
 
                 var chosenSolutionItems = await CreateChosenSolutionItemsAsync();
 
-                await NaturalLanguageOutlinesViewModel.ShowPanelAsync(
+                await componentModel.GetService<INaturalLanguageOutlinesPanel>().ShowAsync(
                     chosenSupportAction,
                     chosenAgent,
                     chosenSolutionItems

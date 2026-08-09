@@ -2,6 +2,7 @@
 using FreeAIr.Options2.Agent;
 using FreeAIr.Options2.Support;
 using FreeAIr.UI.ContextMenu;
+using System.Collections.Generic;
 using System.ComponentModel.Composition;
 
 namespace FreeAIr.UI.Interaction
@@ -36,6 +37,33 @@ namespace FreeAIr.UI.Interaction
             return await AgentContextMenu.ChooseAgentWithTokenAsync(
                 title,
                 preferredAgentName
+                );
+        }
+
+        /// <inheritdoc/>
+        public async System.Threading.Tasks.Task<AgentJson?> ChooseAnyAgentAsync(
+            string title,
+            string? preferredAgentName = null
+            )
+        {
+            return await AgentContextMenu.ChooseAnyAgentAsync(
+                title,
+                preferredAgentName
+                );
+        }
+
+        /// <inheritdoc/>
+        public async System.Threading.Tasks.Task<T?> ChooseOneOfAsync<T>(
+            string title,
+            List<(string Title, T Value)> variants
+            )
+            where T : class
+        {
+            //the bridge takes the value as object and casts it back, so the labelled pairs are
+            //flattened here and nowhere else
+            return await VisualStudioContextMenuCommandBridge.ShowAsync<T>(
+                title,
+                variants.ConvertAll(v => (v.Title, (object)v.Value))
                 );
         }
     }

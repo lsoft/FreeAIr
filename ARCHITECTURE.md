@@ -119,6 +119,10 @@ internal). These are intentionally *not* part of the JSON settings.
 
 ### Natural language search / outlines
 
+The whole feature lives under `FreeAIr/Nlo/` — the tree builder, the embedding index, the search,
+and its four view models and tool windows — because nothing outside it uses any of that. Paths in
+this section are relative to that folder unless they name a project.
+
 - `Find/FindWindowModifier.cs` injects FreeAIr's controls into the standard Find window;
   `Find/DoSearch.cs` collects the search parameters and opens the results tool window.
 - `Find/SearchTrace.cs` is the log of a search, written into an output pane of its own. The search
@@ -128,9 +132,11 @@ internal). These are intentionally *not* part of the JSON settings.
   early state the reason and repeat it into the activity log.
 - `NLOutline/` generates and stores natural-language outlines — LLM-written comments embedded in
   the source, following [arxiv 2408.04820](https://arxiv.org/html/2408.04820v4).
-Everything below `Embedding/` and `Find/RagShortlist.cs` lives in the **`FreeAIr.Search`** project, not
-in the VSIX. That split is what makes the feature testable: the VSIX assembly cannot be loaded by a
-test runner, while `FreeAIr.Search` knows nothing about the IDE and is covered by `FreeAIr.Search.Tests`.
+The next items — everything below `Embedding/` except `EmbeddingIndexContainer.cs`, plus
+`Find/RagShortlist.cs` and `Find/RagCalibration.cs` — live in the **`FreeAIr.Search`** project, not in
+the VSIX, and their paths are relative to it. That split is what makes the feature testable: the
+VSIX assembly cannot be loaded by a test runner, while `FreeAIr.Search` knows nothing about the IDE
+and is covered by `FreeAIr.Search.Tests`.
 
 - `Embedding/Json/Objects.cs` writes and reads the index files. `Embedding/VectorCodec.cs` is the
   storage format of a vector: int8 quantization in base64, normalized on the way back in, so a
@@ -149,7 +155,7 @@ test runner, while `FreeAIr.Search` knows nothing about the IDE and is covered b
   stored in the metadata as `EmbeddingCalibration`. The user's `Sensitivity` then says how far above
   that level a file has to stand. Questions with a known answer may be added too: they clamp the
   threshold from above and turn "this model does not understand my code" into a number.
-- `UI/ViewModels/RagCalibrationViewModel.cs` is the window that produces those questions. It asks
+- `ViewModels/RagCalibrationViewModel.cs` is the window that produces those questions. It asks
   the index through `RagShortlist.ProbeAsync` — the ordinary ranking with the threshold reported
   instead of enforced, because the rows the threshold cuts are the ones worth looking at — and the
   user labels each query with the file which answers it, or with nothing. Saving writes the queries
@@ -160,7 +166,7 @@ test runner, while `FreeAIr.Search` knows nothing about the IDE and is covered b
   resolves it through `DoSearch.DetermineEmbeddingAgentAsync`, the same code the search uses — what
   it measures is only meaningful when measured with the model which built the index.
 - Agents for embeddings are looked up without the `has a token` filter the chat pickers apply
-  (`FreeAIrOptions.DeserializeAgentByNameAsync`, `AgentContextMenu.ChooseAnyAgentAsync`). An
+  (`FreeAIrOptions.DeserializeAgentByNameAsync`, `IUserChooser.ChooseAnyAgentAsync`). An
   embedding model is normally served by a local process which wants no token, so that filter hid
   exactly the agents this path needs and substituted a cloud chat agent, which answers a request for
   embeddings with HTTP 400.
@@ -170,7 +176,7 @@ test runner, while `FreeAIr.Search` knows nothing about the IDE and is covered b
   for every model it loads), and two unrelated models of the same length produce an index which
   reads perfectly and matches nothing. The sentinels travel in the same request as the query, so the
   check costs no round trip.
-- `FreeAIr/Embedding/EmbeddingIndexContainer.cs` is where that machinery meets Visual Studio: a MEF
+- `Embedding/EmbeddingIndexContainer.cs`, back in the VSIX, is where that machinery meets Visual Studio: a MEF
   singleton which resolves the paths from the solution, loads off the UI thread and caches the
   parsed files, keyed by their write time. Both the search and the `GetAllSolutionFiles` MCP tool go
   through it, so the megabytes are read once and the tool never pays for the vectors it does not
@@ -224,6 +230,14 @@ prompt template before it is sent.
 - `UI/ClickableText` — renders parsed markdown blocks with the per-block action buttons.
 - `ViewElementFactory.cs` — converts `CodeLensUnitInfo` coming from the CodeLens process into a
   WPF control.
+
+`Interaction/` is how the code which is *not* UI reaches it: one interface per question a feature
+has to ask the user, implemented in `UI/Interaction/` (and, for the outlines panel, in
+`Nlo/Interaction/`) and resolved through MEF. `IUserChooser` picks a support action, an agent or one
+of a list of labelled values; `IBackgroundTaskShower` puts up the wait dialog; `IGitCommitMessageBox`
+is the Git Changes commit box; `IChatWindowShower` and `INaturalLanguageOutlinesPanel` open their
+windows; `IChatStatusIndicator` takes the aggregate chat status. Without them `Git/`, `MCP/`, `Chat/`
+and `Nlo/` would each have to name a window.
 
 ### Setup wizard
 
