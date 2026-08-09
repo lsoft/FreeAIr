@@ -6,10 +6,14 @@ using FreeAIr.Interaction;
 using FreeAIr.UI;
 using Microsoft.VisualStudio.Imaging;
 using System.ComponentModel.Composition;
+using System.Reflection;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Markup;
 using System.Windows.Media;
+using System.Xaml;
 using WpfHelpers;
 
 namespace FreeAIr.BLogic
@@ -170,7 +174,8 @@ namespace FreeAIr.BLogic
                                 continue;
                             }
 
-                            var cTextBox = w.GetRecursiveByName<TextBox>("textBox");
+                            var cTextBox = w.GetRecursiveByName<TextBox>("textBox")
+                                ?? w.GetRecursiveByName<TextBox>("commentTextBox");
                             if (cTextBox is null)
                             {
                                 continue;
@@ -191,56 +196,47 @@ namespace FreeAIr.BLogic
                                 return;
                             }
 
-                            var buildCommitMessageButton = new Button
+                            var buildCommitMessageButton = CreateButtonFrom(dcButton);
+                            buildCommitMessageButton.Content = new PseudoCrispImage
                             {
-                                Content = new PseudoCrispImage
-                                {
-                                    Moniker = KnownMonikers.GitRepository
-                                },
-                                HorizontalAlignment = HorizontalAlignment.Center,
-                                HorizontalContentAlignment = HorizontalAlignment.Center,
-                                Margin = new System.Windows.Thickness(0),
-                                Style = dcButton.Style,
-                                Tag = CommitMessageButtonTag,
-                                ToolTip = FreeAIr.Resources.Resources.FreeAIr_support__generate_commit
+                                Moniker = KnownMonikers.GitRepository
                             };
+                            buildCommitMessageButton.Tag = CommitMessageButtonTag;
+                            buildCommitMessageButton.ToolTip = FreeAIr.Resources.Resources.FreeAIr_support__generate_commit;
+
                             buildCommitMessageButton.Click += BuildCommitMessageButton_Click;
                             vsPanel.Children.Insert(0, buildCommitMessageButton);
                             BuildCommitMessageButton = buildCommitMessageButton;
 
-                            var addNaturalLanguageOutlinesButton = new Button
+
+
+                            var addNaturalLanguageOutlinesButton = CreateButtonFrom(dcButton);
+                            addNaturalLanguageOutlinesButton.Content = new PseudoCrispImage
                             {
-                                Content = new PseudoCrispImage
-                                {
-                                    Moniker = KnownMonikers.DocumentOutline
-                                },
-                                HorizontalAlignment = HorizontalAlignment.Center,
-                                HorizontalContentAlignment = HorizontalAlignment.Center,
-                                Margin = new System.Windows.Thickness(0),
-                                Style = dcButton.Style,
-                                Tag = OutlinesButtonTag,
-                                ToolTip = FreeAIr.Resources.Resources.FreeAIr_support__generate_and_add
+                                Moniker = KnownMonikers.DocumentOutline
                             };
+                            addNaturalLanguageOutlinesButton.Tag = OutlinesButtonTag;
+                            addNaturalLanguageOutlinesButton.ToolTip = FreeAIr.Resources.Resources.FreeAIr_support__generate_and_add;
+
                             addNaturalLanguageOutlinesButton.Click += AddNaturalLanguageOutlinesButton_Click;
                             vsPanel.Children.Insert(0, addNaturalLanguageOutlinesButton);
                             AddNaturalLanguageOutlinesButton = addNaturalLanguageOutlinesButton;
 
-                            var buildNLOJsonFileButton = new Button
+
+
+                            var buildNLOJsonFileButton = CreateButtonFrom(dcButton);
+                            buildNLOJsonFileButton.Content = new PseudoCrispImage
                             {
-                                Content = new PseudoCrispImage
-                                {
-                                    Moniker = KnownMonikers.ValidationSummary
-                                },
-                                HorizontalAlignment = HorizontalAlignment.Center,
-                                HorizontalContentAlignment = HorizontalAlignment.Center,
-                                Margin = new System.Windows.Thickness(0),
-                                Style = dcButton.Style,
-                                Tag = NLOJsonFileButtonTag,
-                                ToolTip = FreeAIr.Resources.Resources.FreeAIr_support__build_natural_language
+                                Moniker = KnownMonikers.ValidationSummary
                             };
+                            buildNLOJsonFileButton.Tag = NLOJsonFileButtonTag;
+                            buildNLOJsonFileButton.ToolTip = FreeAIr.Resources.Resources.FreeAIr_support__build_natural_language;
+
                             buildNLOJsonFileButton.Click += BuildNLOJsonFileButton_Click;
                             vsPanel.Children.Insert(0, buildNLOJsonFileButton);
                             BuildNLOJsonFileButton = buildNLOJsonFileButton;
+
+
 
                             WatchForPanelTeardown(buildCommitMessageButton);
                             return;
@@ -265,6 +261,41 @@ namespace FreeAIr.BLogic
             {
                 //todo
             }
+        }
+
+        /// <summary>
+        /// Создает кнопку, похожу на входящую кнопку Visual Studio.
+        /// </summary>
+        private static Button CreateButtonFrom(Button vsButton)
+        {
+            var vsButtonType = vsButton.GetType();
+
+            var result = (Button)Activator.CreateInstance(vsButtonType);
+
+            // Копируем скрытое Attached/Dependency свойство "Kind"
+            // Ищем статическое поле KindProperty в типе кнопки VS
+            FieldInfo kindPropertyField = vsButtonType.GetField("KindProperty",
+                BindingFlags.Public | BindingFlags.Static | BindingFlags.FlattenHierarchy);
+
+            if (kindPropertyField != null)
+            {
+                // Получаем сам объект DependencyProperty
+                if (kindPropertyField.GetValue(null) is DependencyProperty kindProperty)
+                {
+                    // Читаем значение (например, "Subtle") из оригинала
+                    object originalKindValue = vsButton.GetValue(kindProperty);
+
+                    // Записываем его в нашу новую динамически созданную кнопку
+                    result.SetValue(kindProperty, originalKindValue);
+                }
+            }
+
+            result.HorizontalAlignment = HorizontalAlignment.Center;
+            result.HorizontalContentAlignment = HorizontalAlignment.Center;
+            result.Margin = new System.Windows.Thickness(0);
+            result.Style = vsButton.Style;
+
+            return result;
         }
 
         /// <summary>
