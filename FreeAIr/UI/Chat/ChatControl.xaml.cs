@@ -6,6 +6,7 @@ using FreeAIr.Options2.Agent;
 using FreeAIr.Record;
 using FreeAIr.Shared.Helper;
 using FreeAIr.UI.ContextMenu;
+using FreeAIr.UI.Embedillo;
 using FreeAIr.UI.Embedillo.Answer.Parser;
 using FreeAIr.UI.Embedillo.VisualLine.Command;
 using FreeAIr.UI.Embedillo.VisualLine.SolutionItem;
@@ -1144,10 +1145,16 @@ namespace FreeAIr.UI.Chat
         /// </summary>
         private void SetupAddToContextControl()
         {
+            //one generator instance serves both roles: the parser sees it as a mention recognizer,
+            //the editor as the thing that renders that mention
+            var generators = new MentionVisualLineGenerator[]
+            {
+                new SolutionItemVisualLineGeneratorFactory().Create()
+            };
+
             AddToContextControl.Setup(
-                new ContextParser(
-                    new SolutionItemVisualLineGeneratorFactory()
-                    )
+                new ContextParser(generators),
+                generators
                 );
         }
 
@@ -1157,11 +1164,15 @@ namespace FreeAIr.UI.Chat
         /// </summary>
         private void SetupPromptControl()
         {
+            var generators = new MentionVisualLineGenerator[]
+            {
+                new SolutionItemVisualLineGeneratorFactory().Create(),
+                new CommandVisualLineGeneratorFactory().Create()
+            };
+
             PromptControl.Setup(
-                new PromptParser(
-                    new SolutionItemVisualLineGeneratorFactory(),
-                    new CommandVisualLineGeneratorFactory()
-                    )
+                new PromptParser(generators),
+                generators
                 );
         }
 

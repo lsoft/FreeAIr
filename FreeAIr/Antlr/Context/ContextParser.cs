@@ -1,6 +1,5 @@
 ﻿using Antlr4.Runtime;
 using Antlr4.Runtime.Tree;
-using FreeAIr.UI.Embedillo;
 using FreeAIr.UI.Embedillo.Answer.Parser;
 using MarkdownParser.Antlr;
 using System.Collections.Generic;
@@ -10,36 +9,31 @@ namespace FreeAIr.Antlr.Context
     /// <summary>
     /// Parses the markdown used to compose chat context (the text built from mentions such as
     /// files, code selections and other context items) into a sequence of answer parts, resolving
-    /// each mention through the registered <see cref="MentionVisualLineGenerator"/> factories.
+    /// each mention through the <see cref="IMentionRecognizer"/> instances it was built with.
     /// </summary>
     public sealed class ContextParser : IParser
     {
-        private readonly List<MentionVisualLineGenerator> _generators = new();
-
         /// <summary>
-        /// The mention generators this parser recognizes, one per kind of context mention (file,
+        /// The mention recognizers this parser knows, one per kind of context mention (file,
         /// selection, and so on) that can appear in the markdown being parsed.
         /// </summary>
-        public IReadOnlyList<MentionVisualLineGenerator> Generators => _generators;
+        private readonly IReadOnlyList<IMentionRecognizer> _recognizers;
 
         /// <summary>
-        /// Builds the generator list from the supplied factories, one generator instance per
-        /// mention kind the context markdown can contain.
+        /// Takes the recognizers for the mention kinds the context markdown can contain; the caller
+        /// owns them, because in the chat window the very same objects also render the mentions in
+        /// the editor.
         /// </summary>
         public ContextParser(
-            params IMentionVisualLineGeneratorFactory[] generatorFactories
+            params IMentionRecognizer[] recognizers
             )
         {
-            if (generatorFactories is null)
+            if (recognizers is null)
             {
-                throw new ArgumentNullException(nameof(generatorFactories));
+                throw new ArgumentNullException(nameof(recognizers));
             }
 
-            foreach (var generatorFactory in generatorFactories)
-            {
-                var generator = generatorFactory.Create();
-                _generators.Add(generator);
-            }
+            _recognizers = recognizers;
         }
 
         /// <summary>
@@ -73,7 +67,7 @@ namespace FreeAIr.Antlr.Context
 
             var walker = new ParseTreeWalker();
             var listener = new MarkdownListener(
-                _generators
+                _recognizers
                 );
             walker.Walk(listener, tree);
 

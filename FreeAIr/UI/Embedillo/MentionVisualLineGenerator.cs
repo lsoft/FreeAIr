@@ -28,9 +28,10 @@ namespace FreeAIr.UI.Embedillo
     /// Base AvalonEdit <see cref="VisualLineElementGenerator"/> that recognizes "@mention"/"#file"-style
     /// anchors (file references, code identifiers, etc.) typed in the chat editor and replaces the matched
     /// text with an inline suggestion control, while ignoring anchors that appear inside fenced or inline
-    /// code blocks.
+    /// code blocks. Its <see cref="IMentionRecognizer"/> half is the only part the ANTLR parsers see, so
+    /// they never take a dependency on the editor.
     /// </summary>
-    public abstract class MentionVisualLineGenerator : VisualLineElementGenerator
+    public abstract class MentionVisualLineGenerator : VisualLineElementGenerator, IMentionRecognizer
     {
         /// <summary>
         /// Regex built from <see cref="AnchorSymbol"/> that matches an anchor character followed by the

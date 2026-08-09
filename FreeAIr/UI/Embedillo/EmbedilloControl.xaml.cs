@@ -19,14 +19,14 @@ namespace FreeAIr.UI.Embedillo
     public partial class EmbedilloControl : UserControl
     {
         /// <summary>
-        /// The mention completion generators registered by <see cref="Setup(IParser)"/>, one per
+        /// The mention completion generators registered by <see cref="Setup"/>, one per
         /// anchor symbol (e.g. '@' for files, '/' for commands), used to trigger completion popups
         /// as the user types.
         /// </summary>
         private readonly List<MentionVisualLineGenerator> _generators = new();
         /// <summary>
         /// The parser that turns the raw editor text into a <see cref="Parsed"/> prompt once the
-        /// user submits; set by <see cref="Setup(IParser)"/>.
+        /// user submits; set by <see cref="Setup"/>.
         /// </summary>
         private IParser? _parser;
 
@@ -235,22 +235,29 @@ namespace FreeAIr.UI.Embedillo
         }
 
         /// <summary>
-        /// Attaches the prompt parser that <see cref="Parse"/> will use and registers each of its
-        /// <see cref="MentionVisualLineGenerator"/> so their mention symbols (e.g. '@', '/') trigger
-        /// completion popups in the editor. Must be called before the control is used.
+        /// Attaches the prompt parser that <see cref="Parse"/> will use, together with the
+        /// <see cref="MentionVisualLineGenerator"/> instances that render its mentions and make
+        /// their symbols (e.g. '@', '/') trigger completion popups. The generators are passed in
+        /// rather than taken from the parser, which knows them only as recognizers and has no
+        /// business handing out editor objects. Must be called before the control is used.
         /// </summary>
         public void Setup(
-            IParser parser
+            IParser parser,
+            params MentionVisualLineGenerator[] generators
             )
         {
             if (parser is null)
             {
                 throw new ArgumentNullException(nameof(parser));
             }
+            if (generators is null)
+            {
+                throw new ArgumentNullException(nameof(generators));
+            }
 
             _parser = parser;
 
-            foreach (var generator in parser.Generators)
+            foreach (var generator in generators)
             {
                 _generators.Add(generator);
                 AvalonTextEditor.TextArea.TextView.ElementGenerators.Add(generator);
