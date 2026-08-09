@@ -5,9 +5,10 @@ for the user manual read [README.md](README.md).
 
 ## Building the solution
 
-`FreeAIr.sln` is a **legacy-format** solution: `ToolsVersion="15.0"`, `TargetFrameworkVersion v4.8`,
-VSIX `ProjectTypeGuids`. It needs full MSBuild plus the VSSDK targets, so it can only be built by
-Visual Studio's MSBuild — not by the .NET SDK.
+`FreeAIr.sln` still holds legacy-format projects (`Shared`, `CodeLens`: `ToolsVersion="15.0"`,
+`TargetFrameworkVersion v4.8`), and `FreeAIr.csproj` — although SDK-style — is a VSIX that needs
+the VSSDK targets. So the solution can only be built by Visual Studio's MSBuild, not by the .NET
+SDK.
 
 Restore first, then build:
 
@@ -105,7 +106,7 @@ under `Program Files\Microsoft Visual Studio` rather than trusting `vswhere`.
 | --- | --- |
 | `FreeAIr\bin\<Config>\FreeAIr.vsix` | The extension. ~29 MB in Debug, ~13 MB in Release. |
 | `.art\Proxy.zip` | `MCP/Proxy`'s output directory, zipped by the `PostBuild` target in `Proxy.csproj`. Embedded into the VSIX. |
-| `.art\WhisperNet.Runtime.zip` | Whisper native runtimes, zipped by the `PostBuildEvent` in `FreeAIr.csproj` via `.CreateZipArchive.ps1`. |
+| `.art\WhisperNet.Runtime.zip` | Whisper native runtimes, zipped by the `ZipWhisperRuntimes` target in `Voice\FreeAIr.Voice.csproj` via `.CreateZipArchive.ps1`. |
 
 Both `.art` zips are regenerated on every build. If they are missing or stale the VSIX still builds,
 but the MCP proxy or voice recording will fail at runtime.
@@ -166,13 +167,31 @@ The baseline when this section was written was 918 of 4299 nodes (21%).
 
 ## Odds and ends
 
-- **A new `.cs` file in `FreeAIr\` has to be added to `FreeAIr.csproj` by hand.** The project is
-  legacy format and lists every file in a `<Compile Include="..." />` item; a file which is not
-  listed is silently not compiled, and the build still reports 0 errors. Nothing fails, the code
-  is simply not there at runtime — which for something found by reflection (an MCP tool, a MEF
-  export) looks like the feature not working rather than like a build problem. `Search\`, `Shared\`
-  and the other SDK style projects need nothing of the sort.
-- `FreeAIr\FreeAIr_4kvisczc_wpftmp.csproj` is a transient project the WPF build generates. It is not
+- **A new `.cs` file in `Shared\` or `CodeLens\` has to be added to the `.csproj` by hand.** Those
+  two are still legacy format and list every file in a `<Compile Include="..." />` item; a file
+  which is not listed is silently not compiled, and the build still reports 0 errors. Nothing
+  fails, the code is simply not there at runtime — which for something found by reflection looks
+  like the feature not working rather than like a build problem. `FreeAIr\`, `Voice\`, `Search\`
+  and the other SDK style projects glob their sources and need nothing of the sort.
+- **A new assembly has to be wired into the VSIX in three places**, and forgetting any of them
+  builds clean and fails at run time: an `<IncludeOutputGroupsInVSIX/>` on the `ProjectReference`
+  in `FreeAIr.csproj` (or the dll is not in the package), a `MefComponent` asset in
+  `source.extension.vsixmanifest` if it exports MEF parts (or the exports vanish), and
+  `SatelliteDllsProjectOutputGroup` if it is localized. `FreeAIr.Voice` is the worked example.
+- **Do not use a `PostBuildEvent` property in an SDK-style project here.** Property values are
+  expanded during evaluation, before the SDK targets define `$(TargetDir)`, so the command runs
+  with an empty path. Use a `<Target AfterTargets="Build">` with `<Exec/>` instead — see
+  `ZipWhisperRuntimes` in `Voice\FreeAIr.Voice.csproj`.
+- **F5 is configured through `AdditionalArguments`, and `StartArguments` does nothing.** Now that
+  the VSIX project is SDK-style there is no VSIX project flavor (`ProjectTypeGuids`) owning the
+  Debug page; the launch comes from Visual Studio's own extensibility project system
+  (`Common7\IDE\Extensions\VSSDK\ProjectSystem`, rule `VsixDebugger`), which starts
+  `devenv /rootSuffix Exp` on its own and reads only that rule's properties -
+  `AdditionalArguments`, `VSSDKTargetPlatformRegRootSuffix`, `DeployTargetInstanceId`. They are
+  `Persistence="UserFile"`, so they live unconditioned in `FreeAIr.csproj.user`. Anything set in
+  `StartAction`/`StartProgram`/`StartArguments` evaluates fine on the command line and is ignored
+  by the IDE, which makes it a good way to waste an afternoon.
+- `FreeAIr\FreeAIr_*_wpftmp.csproj` is a transient project the WPF build generates. It is not
   part of the solution; ignore it and never edit it.
 - `TestSubject\` is a sample solution for manual testing and is not part of the product. Its files
   are often dirty in `git status`; leave them alone unless asked.

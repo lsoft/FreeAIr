@@ -1,21 +1,36 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="15.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+﻿<Project>
+
+  <!--
+    SDK-style VSIX project. The Sdk.props/Sdk.targets imports are written out by hand instead of
+    using the Sdk="..." attribute, because Microsoft.VsSDK.targets has to be imported *after* the
+    C# targets - exactly the order the legacy project file used - and the attribute form appends
+    Sdk.targets at the very end of the file.
+
+    Microsoft.VSSDK.BuildTools points $(VSToolsPath) at its own tools directory from its .props,
+    so the import below resolves to the package copy of the VSSDK targets, not to one installed
+    with Visual Studio.
+  -->
+
+  <Import Project="Sdk.props" Sdk="Microsoft.NET.Sdk" />
+
   <PropertyGroup>
-    <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
+    <TargetFramework>net48</TargetFramework>
     <LangVersion>Preview</LangVersion>
-  </PropertyGroup>
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
-  <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <SchemaVersion>2.0</SchemaVersion>
-    <ProjectTypeGuids>{82b43b9b-a64c-4715-b499-d71e9ca2bd60};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
-    <ProjectGuid>{24D4A8F4-E878-4174-BE99-FA4132A5DD00}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>FreeAIr</RootNamespace>
     <AssemblyName>FreeAIr</AssemblyName>
-    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <OutputType>Library</OutputType>
+    <UseWPF>true</UseWPF>
+
+    <!-- Properties\AssemblyInfo.cs is hand written and takes its values from source.extension.cs. -->
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <!-- Keep the legacy resource naming: manifest names come from the folder, not from a sibling .Designer.cs. -->
+    <EmbeddedResourceUseDependentUponConvention>false</EmbeddedResourceUseDependentUponConvention>
+    <!-- Everything that is not code is listed explicitly below; a default None glob would double up on it. -->
+    <EnableDefaultNoneItems>false</EnableDefaultNoneItems>
+    <!-- bin\Release\, not bin\Release\net48\ - the VSIX path is referenced by docs and scripts. -->
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+
     <GeneratePkgDefFile>true</GeneratePkgDefFile>
     <UseCodebase>true</UseCodebase>
     <IncludeAssemblyInVSIXContainer>true</IncludeAssemblyInVSIXContainer>
@@ -23,383 +38,98 @@
     <IncludeDebugSymbolsInLocalVSIXDeployment>false</IncludeDebugSymbolsInLocalVSIXDeployment>
     <CopyBuildOutputToOutputDirectory>true</CopyBuildOutputToOutputDirectory>
     <CopyOutputSymbolsToOutputDirectory>true</CopyOutputSymbolsToOutputDirectory>
-    <StartAction>Program</StartAction>
-    <StartProgram Condition="'$(DevEnvDir)' != ''">$(DevEnvDir)devenv.exe</StartProgram>
-    <StartArguments>/rootsuffix Exp</StartArguments>
+
+    <!--
+      There is deliberately no StartAction/StartProgram/StartArguments here. Now that the project
+      is SDK-style, F5 is owned by Visual Studio's own extensibility project system
+      (Microsoft.VisualStudio.Sdk.ProjectSystem, rule "VsixDebugger"), which starts
+      devenv /rootSuffix Exp by itself and ignores those three properties entirely. What it does
+      read is AdditionalArguments - a per-user setting, so it belongs in FreeAIr.csproj.user, or
+      in Project Properties > Debug. Put the solution the experimental instance should open there.
+    -->
+
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
+
+  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
     <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+
+  <!-- Generated files, listed only so the IDE nests them under what generates them. -->
   <ItemGroup>
-    <Compile Include="Antlr\Prompt\PromptParser.cs" />
-    <Compile Include="Chat\AddLineNumbersMode.cs" />
-    <Compile Include="Chat\Content\AnswerChatContent.cs" />
-    <Compile Include="Chat\Content\ChatContentTypeEnum.cs" />
-    <Compile Include="Chat\ChatOptions.cs" />
-    <Compile Include="Chat\Content\ToolCallChatContent.cs" />
-    <Compile Include="Chat\Context\Item\SimpleTextChatContextItem.cs" />
-    <Compile Include="Chat\Content\IChatContent.cs" />
-    <Compile Include="BLogic\Reader\LLMReaderPool.cs" />
-    <Compile Include="BLogic\RecorderTranscriberPostProcessor.cs" />
-    <Compile Include="Commands\ApplySupportCommand.cs" />
-    <Compile Include="Commands\CreateOrReuseChatCommand.cs" />
-    <Compile Include="Commands\File\AddFilesToContextCommand.cs" />
-    <Compile Include="Commands\File\ApplyFileSupportCommand.cs" />
-    <Compile Include="Commands\Other\OpenPropertiesCommand.cs" />
-    <Compile Include="Commands\Other\OpenActivityLogCommand.cs" />
-    <Compile Include="Commands\Other\OpenProxyLogCommand.cs" />
-    <Compile Include="Commands\Other\OpenRagCalibrationWindowCommand.cs" />
-    <Compile Include="Commands\Other\ResetMCPToolsCommand.cs" />
-    <Compile Include="Commands\ShowInSituChatCommand.cs" />
-    <Compile Include="Helper\ActivityLogHelper.cs" />
-    <Compile Include="BLogic\AsyncAwaitProduct.cs" />
-    <Compile Include="BLogic\AsyncAwaitProductionCycle.cs" />
-    <Compile Include="BLogic\CallAwaiter.cs" />
-    <Compile Include="Helper\ChatToolHelper.cs" />
-    <Compile Include="Helper\DisposeHelper.cs" />
-    <Compile Include="Helper\KnownMonikersHelper.cs" />
-    <Compile Include="BLogic\NonDisposableSemaphoreSlim.cs" />
-    <Compile Include="BLogic\TempFile.cs" />
-    <Compile Include="BLogic\TimeoutEventProxy.cs" />
-    <Compile Include="Helper\UriHelper.cs" />
-    <Compile Include="Helper\WindowHelper.cs" />
-    <Compile Include="Options2\Agent\AgentJson.cs" />
-    <Compile Include="Options2\Agent\AgentCollectionJson.cs" />
-    <Compile Include="Antlr\Context\ContextParser.cs" />
-    <Compile Include="Antlr\IParser.cs" />
-    <Compile Include="Antlr\MarkdownListener.cs" />
-    <Compile Include="Chat\Chat.cs" />
-    <Compile Include="Chat\ChatContainer.cs" />
-    <Compile Include="Chat\ChatDescription.cs" />
-    <Compile Include="Chat\ChatHelper.cs" />
-    <Compile Include="Chat\ChatStatusEnum.cs" />
-    <Compile Include="Commands\Other\OpenBuildingNaturalLanguageOutlinesWindowCommand.cs" />
-    <Compile Include="Embedding\AgentEmbedding.cs" />
-    <Compile Include="Embedding\EmbeddingIndexContainer.cs" />
-    <Compile Include="Find\DoSearch.cs" />
-    <Compile Include="Git\CommitMessageBuilder.cs" />
-    <Compile Include="BLogic\CompletionProposal.cs" />
-    <Compile Include="Chat\Context\ChatContext.cs" />
-    <Compile Include="Chat\Context\ChatContextEventArgs.cs" />
-    <Compile Include="Chat\Context\ChatContextItemHelper.cs" />
-    <Compile Include="Chat\Context\Composer\CSharpContextComposer.cs" />
-    <Compile Include="Chat\Context\Composer\ContextComposeResult.cs" />
-    <Compile Include="Chat\Context\Composer\ContextSelectedIdentifier.cs" />
-    <Compile Include="Chat\Context\Composer\TypeReferenceWalker.cs" />
-    <Compile Include="Chat\Context\IChatContextItem.cs" />
-    <Compile Include="Chat\Context\Item\CustomFileChatContextItem.cs" />
-    <Compile Include="Chat\Context\Item\SolutionItemChatContextItem.cs" />
-    <Compile Include="BuildErrors\BuildResultProvider.cs" />
-    <Compile Include="Commands\BuildError\BuildErrorWindowFixErrorCommand.cs" />
-    <Compile Include="BuildErrors\BuildResultInformation.cs" />
-    <Compile Include="Commands\File\AddNaturalLanguageOutlinesCommand.cs" />
-    <Compile Include="Commands\Other\OpenControlCenterCommand.cs" />
-    <Compile Include="Commands\Other\OpenSetupWizardCommand.cs" />
-    <Compile Include="Commands\Other\ShowReleaseNotesCommand.cs" />
-    <Compile Include="Commands\Other\OpenNaturalSearchToolWindowCommand.cs" />
-    <Compile Include="Find\FileTypeFilter.cs" />
-    <Compile Include="Find\FileTypesFilter.cs" />
-    <Compile Include="Find\FindWindowModifier.cs" />
-    <Compile Include="Find\SearchTrace.cs" />
-    <Compile Include="Git\GitCollectBackgroundTask.cs" />
-    <Compile Include="Git\GitDiffCollector.cs" />
-    <Compile Include="Git\GitDiffCreator.cs" />
-    <Compile Include="Git\GitNaturalLanguageOutliner.cs" />
-    <Compile Include="Git\GitRepositoryProvider.cs" />
-    <Compile Include="Git\GitRunner.cs" />
-    <Compile Include="Git\GitWindowModifier.cs" />
-    <Compile Include="Git\Parser\GitDiff.cs" />
-    <Compile Include="Git\Parser\GitDiffChunk.cs" />
-    <Compile Include="Git\Parser\GitDiffFile.cs" />
-    <Compile Include="Helper\CommentHelper.cs" />
-    <Compile Include="Helper\JsonConverters.cs" />
-    <Compile Include="Helper\DTEHelper.cs" />
-    <Compile Include="Helper\EmbeddedResourceHelper.cs" />
-    <Compile Include="Helper\ExtensionPath.cs" />
-    <Compile Include="Helper\FileTypeHelper.cs" />
-    <Compile Include="Helper\JsonElementDeserializer.cs" />
-    <Compile Include="Helper\NaturalLanguageHelper.cs" />
-    <Compile Include="Helper\OpenAIHelper.cs" />
-    <Compile Include="Helper\ProcessHelper.cs" />
-    <Compile Include="Chat\TextDescriptor.cs" />
-    <Compile Include="CodeLens\CodeLensConnectionHandler.cs" />
-    <Compile Include="CodeLens\CodeLensListener.cs" />
-    <Compile Include="Commands\Other\ChooseModelCommand.cs" />
-    <Compile Include="Commands\GenerateWholeLineSuggestionCommand.cs" />
-    <Compile Include="Commands\Other\OpenChatListToolWindowCommand.cs" />
-    <Compile Include="Commands\StartDiscussionCommand.cs" />
-    <Compile Include="Dto\OpenRouter\Model.cs" />
-    <Compile Include="Helper\AnswerHelper.cs" />
-    <Compile Include="Helper\CollectionHelper.cs" />
-    <Compile Include="Helper\KeyboardHelper.cs" />
-    <Compile Include="Helper\PathHelper.cs" />
-    <Compile Include="Helper\RegExHelper.cs" />
-    <Compile Include="Helper\ResourceHelper.cs" />
-    <Compile Include="Helper\RoslynHelper.cs" />
-    <Compile Include="Helper\SolutionHelper.cs" />
-    <Compile Include="Helper\StringHelper.cs" />
-    <Compile Include="Helper\TextDescriptorHelper.cs" />
-    <Compile Include="Helper\EnumHelper.cs" />
-    <Compile Include="Helper\LanguageHelper.cs" />
-    <Compile Include="Helper\LineEndingHelper.cs" />
-    <Compile Include="Chat\UserPrompt.cs" />
-    <Compile Include="Helper\RoslynDocumentHelper.cs" />
-    <Compile Include="Helper\SuggestionHijackHelper.cs" />
-    <Compile Include="Helper\WorkspaceHelper.cs" />
-    <Compile Include="ImageMonikers.cs" />
-    <Compile Include="InfoBar\InfoBarService.cs" />
-    <Compile Include="InfoBar\ReleaseNotesInfoBarService.cs" />
-    <Compile Include="InfoBar\SetupWizardInfoBarService.cs" />
-    <Compile Include="MCP\ServerProxy\McpServerProxyCollection.cs" />
-    <Compile Include="MCP\ServerProxy\McpServerProxyApplication.cs" />
-    <Compile Include="MCP\ServerProxy\External\ExternalMcpServerProxy.cs" />
-    <Compile Include="MCP\Tools.cs" />
-    <Compile Include="MCP\ServerProxy\Github\GithubMcpServerProxy.cs" />
-    <Compile Include="MCP\ServerProxy\Github\GithubMCPInstallBackgroundTask.cs" />
-    <Compile Include="MCP\ServerProxy\Github\GithubRequestFactory.cs" />
-    <Compile Include="MCP\ServerProxy\IMcpServerProxy.cs" />
-    <Compile Include="MCP\ServerProxy\ProcessMonitor.cs" />
-    <Compile Include="MCP\ServerProxy\VS\Tools\GitCollectChangesTool.cs" />
-    <Compile Include="MCP\ServerProxy\VS\Tools\WebSearchTool.cs" />
-    <Compile Include="MCP\ServerProxy\VS\Tools\GitCommitTool.cs" />
-    <Compile Include="MCP\ServerProxy\VS\Tools\InstallNugetPackageTool.cs" />
-    <Compile Include="MCP\ServerProxy\VS\Tools\ReplaceFileBodyTool.cs" />
-    <Compile Include="MCP\ServerProxy\VS\Tools\GetAllSolutionFilesTool.cs" />
-    <Compile Include="MCP\ServerProxy\VS\Tools\BuildAndReturnBuildResultsTool.cs" />
-    <Compile Include="MCP\ServerProxy\VS\Tools\GetSolutionFileBodyTool.cs" />
-    <Compile Include="MCP\ServerProxy\VS\Tools\GetAllWarningErrorsTool.cs" />
-    <Compile Include="MCP\ServerProxy\VS\Tools\SearchFileContentTool.cs" />
-    <Compile Include="MCP\ServerProxy\VS\Tools\VisualStudioMcpServerTool.cs" />
-    <Compile Include="MCP\ServerProxy\VS\VisualStudioMcpServerProxy.cs" />
-    <Compile Include="MCP\AvailableToolContainer.cs" />
-    <Compile Include="NLOutline\NaturalLanguageOutline.cs" />
-    <Compile Include="NLOutline\NaturalLanguageOutlineCollection.cs" />
-    <Compile Include="NLOutline\Tree\Builder\File\FileScanner.cs" />
-    <Compile Include="NLOutline\Tree\Builder\TreeBuilder.cs" />
-    <Compile Include="Options2\FreeAIrOptions.cs" />
-    <Compile Include="Options2\Mcp\McpServersJson.cs" />
-    <Compile Include="BLogic\DataPieceCache.cs" />
-    <Compile Include="Options2\Support\Context.cs" />
-    <Compile Include="Options2\Support\StringEnumConverter.cs" />
-    <Compile Include="Options2\Support\SupportCollectionJson.cs" />
-    <Compile Include="Options2\Support\SupportScopeEnum.cs" />
-    <Compile Include="Options2\Rag\RagJson.cs" />
-    <Compile Include="Options2\Unsorted\UnsortedJson.cs" />
-    <Compile Include="Options\FontSizePage.cs" />
-    <Compile Include="Options\FontSizeProxy.cs" />
-    <Compile Include="Options\InternalPage.cs" />
-    <Compile Include="Options2\JsonDescriptionCommentConverter.cs" />
-    <Compile Include="Options\MCPToolsExecutionStatus.cs" />
-    <Compile Include="Options\OptionsProvider.cs" />
-    <Compile Include="Options\RecordingPage.cs" />
-    <Compile Include="Options\UIPage.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="FreeAIrPackage.cs" />
-    <Compile Include="Record\ChosenRecorder.cs" />
-    <Compile Include="Record\Fake\FakeRecorder.cs" />
-    <Compile Include="Record\IRecorder.cs" />
-    <Compile Include="Record\IRecorderFactory.cs" />
-    <Compile Include="Record\MicrophoneRecorder.cs" />
-    <Compile Include="Record\RecordTranscribeResult.cs" />
-    <Compile Include="Record\WhisperNet\WhisperNetRecorder.cs" />
-    <Compile Include="Record\WhisperNet\WhisperNetRecorderFactory.cs" />
-    <Compile Include="Record\WhisperNet\WhisperNetUserControl.xaml.cs">
-      <DependentUpon>WhisperNetUserControl.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Record\WhisperOpenAI\WhisperOAIUserControl.xaml.cs">
-      <DependentUpon>WhisperOAIUserControl.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Record\WhisperOpenAI\WhisperOAIRecorderFactory.cs" />
-    <Compile Include="Record\WhisperOpenAI\WhisperOAIRecorder.cs" />
-    <Compile Include="Record\Speech\SpeechRecorder.cs" />
-    <Compile Include="Record\Speech\SpeechRecorderFactory.cs" />
-    <Compile Include="Record\WinRT\WinRTRecorderFactory.cs" />
-    <Compile Include="Record\WinRT\WinRTRecorder.cs" />
-    <Compile Include="Resources\Resources1.Designer.cs">
+    <Compile Update="Resources\Resources1.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="Search\GoogleSearcher.cs" />
-    <Compile Include="Search\SearchResult.cs" />
-    <Compile Include="source.extension.cs">
+    <Compile Update="source.extension.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>source.extension.vsixmanifest</DependentUpon>
     </Compile>
-    <Compile Include="UI\BindingProxy.cs" />
-    <Compile Include="UI\Chat\ChatControl.xaml.cs">
-      <DependentUpon>ChatControl.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UI\ContextMenu\ModelFilterer.cs" />
-    <Compile Include="UI\ContextMenu\RecorderContextMenu.cs" />
-    <Compile Include="UI\ContextMenu\AgentContextMenu.cs" />
-    <Compile Include="UI\ContextMenu\ModelContextMenu.cs" />
-    <Compile Include="UI\ContextMenu\SupportContextMenu.cs" />
-    <Compile Include="UI\ContextMenu\VisualStudioContextMenuItem.cs" />
-    <Compile Include="UI\ContextMenu\VisualStudioContextMenuCommandBridge.cs" />
-    <Compile Include="UI\ContextMenu\VisualStudioContextMenu_DynamicCommand.cs" />
-    <Compile Include="UI\CodeLens\CodeLenseUserControl.xaml.cs">
-      <DependentUpon>CodeLenseUserControl.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UI\CodeLens\CodeLenseUserControlViewModel.cs" />
-    <Compile Include="UI\CodeLens\ViewElementFactory.cs" />
-    <Compile Include="UI\CombinedParameterConverter.cs" />
-    <Compile Include="UI\Converters.cs" />
-    <Compile Include="UI\Dialog\Content\PromptDialogContent.cs" />
-    <Compile Include="UI\Dialog\DialogContent.cs" />
-    <Compile Include="UI\Dialog\DialogControl.xaml.cs">
-      <DependentUpon>DialogControl.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UI\Dialog\DialogTemplateSelector.cs" />
-    <Compile Include="BLogic\Reader\LLMReader.cs" />
-    <Compile Include="UI\Dialog\Content\AnswerDialogContent.cs" />
-    <Compile Include="UI\Dialog\Content\ToolCallDialogContent.cs" />
-    <Compile Include="UI\Difference\DifferenceShower.cs" />
-    <Compile Include="UI\Embedillo\Answer\Parser\CommandAnswerPart.cs" />
-    <Compile Include="UI\Embedillo\Answer\Parser\IParsedPart.cs" />
-    <Compile Include="UI\Embedillo\Answer\Parser\Parsed.cs" />
-    <Compile Include="UI\Embedillo\Answer\Parser\SelectedSpan.cs" />
-    <Compile Include="UI\Embedillo\Answer\Parser\SolutionItemAnswerPart.cs" />
-    <Compile Include="UI\Embedillo\Answer\Parser\StringAnswerPart.cs" />
-    <Compile Include="UI\Embedillo\CompletionData.cs" />
-    <Compile Include="UI\Embedillo\EmbedilloControl.xaml.cs">
-      <DependentUpon>EmbedilloControl.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UI\Embedillo\EnterKeyBehavior.cs" />
-    <Compile Include="UI\Embedillo\MentionVisualLineGenerator.cs" />
-    <Compile Include="UI\Embedillo\TextChangeModeEnum.cs" />
-    <Compile Include="UI\Embedillo\VisualLine\Command\CommandSuggestion.cs" />
-    <Compile Include="UI\Embedillo\VisualLine\Command\CommandVisualLineGeneratorFactory.cs" />
-    <Compile Include="UI\Embedillo\VisualLine\SolutionItem\SolutionItemSuggestion.cs" />
-    <Compile Include="UI\Embedillo\VisualLine\SolutionItem\SolutionItemVisualLineGeneratorFactory.cs" />
-    <Compile Include="UI\InSitu\InSituChatInputCommandFilter.cs" />
-    <Compile Include="UI\InSitu\InSituChatInputFilterProvider.cs" />
-    <Compile Include="UI\NullToUnsetValueConverter.cs" />
-    <Compile Include="UI\OpenContextMenuOnLeftClickBehavior.cs" />
-    <Compile Include="UI\PseudoCrispImage.cs" />
-    <Compile Include="UI\Theme.cs" />
-    <Compile Include="UI\ToolWindows\ChatWindowShower.cs" />
-    <Compile Include="UI\ToolWindows\ChooseModelToolWindow.cs" />
-    <Compile Include="UI\ToolWindows\ChooseModelToolWindowControl.xaml.cs">
-      <DependentUpon>ChooseModelToolWindowControl.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UI\ToolWindows\ChatListToolWindow.cs" />
-    <Compile Include="UI\ToolWindows\ChatListToolWindowControl.xaml.cs">
-      <DependentUpon>ChatListToolWindowControl.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UI\Informer\DefaultUIParameters.cs" />
-    <Compile Include="UI\Informer\StatusPopup.xaml.cs">
-      <DependentUpon>StatusPopup.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UI\Informer\UIInformer.cs" />
-    <Compile Include="UI\NestedCheckBox\NestedCheckBoxList.xaml.cs">
-      <DependentUpon>NestedCheckBoxList.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UI\NestedCheckBox\CheckableItem.cs" />
-    <Compile Include="UI\ToolWindows\BuildNaturalLanguageOutlinesJsonFileToolWindow.cs" />
-    <Compile Include="UI\ToolWindows\BuildNaturalLanguageOutlinesTreeToolWindowControl.xaml.cs">
-      <DependentUpon>BuildNaturalLanguageOutlinesTreeToolWindowControl.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UI\ToolWindows\NaturalLanguageOutlinesToolWindow.cs" />
-    <Compile Include="UI\ToolWindows\NaturalLanguageOutlinesToolWindowControl.xaml.cs">
-      <DependentUpon>NaturalLanguageOutlinesToolWindowControl.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UI\ToolWindows\NaturalLanguageResultsToolWindow.cs" />
-    <Compile Include="UI\ToolWindows\NaturalLanguageResultsToolWindowControl.xaml.cs">
-      <DependentUpon>NaturalLanguageResultsToolWindowControl.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UI\ToolWindows\RagCalibrationToolWindow.cs" />
-    <Compile Include="UI\ToolWindows\RagCalibrationToolWindowControl.xaml.cs">
-      <DependentUpon>RagCalibrationToolWindowControl.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UI\ToolWindows\RelativeMaxHeightConverter.cs" />
-    <Compile Include="UI\ViewModels\ActionConfigureViewModel.cs" />
-    <Compile Include="UI\ViewModels\AddRelatedItemsToContextBackgroundTask.cs" />
-    <Compile Include="UI\ViewModels\ChatContextItemViewModel.cs" />
-    <Compile Include="UI\ViewModels\InSituChatViewModel.cs" />
-    <Compile Include="UI\ViewModels\McpServerConfigureViewModel.cs" />
-    <Compile Include="UI\ViewModels\AgentConfigureViewModel.cs" />
-    <Compile Include="UI\ViewModels\ControlCenterViewModel.cs" />
-    <Compile Include="UI\ViewModels\DialogViewModel.cs" />
-    <Compile Include="UI\ViewModels\BuildNaturalLanguageOutlinesJsonFileToolViewModel.cs" />
-    <Compile Include="UI\ViewModels\NaturalLanguageOutlinesViewModel.cs" />
-    <Compile Include="UI\ViewModels\NaturalLanguageResultsViewModel.cs" />
-    <Compile Include="UI\ViewModels\RagCalibrationViewModel.cs" />
-    <Compile Include="UI\ViewModels\OutlineEmbeddingOutputPanel.cs" />
-    <Compile Include="UI\ViewModels\RenameChatViewModel.cs" />
-    <Compile Include="UI\ViewModels\SearchForDockerMcpServerViewModel.cs" />
-    <Compile Include="UI\ViewModels\SetupWizardViewModel.cs" />
-    <Compile Include="UI\Wizard\SetupWizardWindow.xaml.cs">
-      <DependentUpon>SetupWizardWindow.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UI\Windows\RecorderSetupWindow.xaml.cs">
-      <DependentUpon>RecorderSetupWindow.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UI\Windows\InSituChatWindow.xaml.cs">
-      <DependentUpon>InSituChatWindow.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UI\Windows\ActionConfigureWindow.xaml.cs">
-      <DependentUpon>ActionConfigureWindow.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UI\Windows\McpServerConfigureWindow.xaml.cs">
-      <DependentUpon>McpServerConfigureWindow.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UI\Windows\AgentConfigureWindow.xaml.cs">
-      <DependentUpon>AgentConfigureWindow.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UI\Windows\NestedCheckBoxWindow.xaml.cs">
-      <DependentUpon>NestedCheckBoxWindow.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UI\ViewModels\ChooseModelViewModel.cs" />
-    <Compile Include="UI\ViewModels\ChatListViewModel.cs" />
-    <Compile Include="UI\ViewModels\AvailableToolsViewModel.cs" />
-    <Compile Include="UI\Windows\ControlCenterWindow.xaml.cs">
-      <DependentUpon>ControlCenterWindow.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UI\Windows\RenameChatWindow.xaml.cs">
-      <DependentUpon>RenameChatWindow.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UI\Windows\SearchForDockerMcpServerWindow.xaml.cs">
-      <DependentUpon>SearchForDockerMcpServerWindow.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UI\Windows\WaitForTaskWindow.xaml.cs">
-      <DependentUpon>WaitForTaskWindow.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="ViewElementFactory.cs" />
-    <Compile Include="VSCommandTable.cs">
+    <Compile Update="VSCommandTable.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>VSCommandTable.vsct</DependentUpon>
     </Compile>
   </ItemGroup>
+
+  <!--
+    ClickableTextResource.xaml is not a Page: it is loaded by manifest name at runtime
+    (EmbeddedResourceHelper.LoadXamlEmbeddedResource in FreeAIrPackage), so it must stay out of
+    the XAML compiler and keep the folder-derived resource name.
+  -->
   <ItemGroup>
+    <Page Remove="UI\ClickableText\ClickableTextResource.xaml" />
+    <EmbeddedResource Include="UI\ClickableText\ClickableTextResource.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="Resources\Resources.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <SubType>Designer</SubType>
+      <LastGenOutput>Resources1.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Resources\Resources.ru.resx">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="source.extension.vsixmanifest">
+      <SubType>Designer</SubType>
+      <Generator>VsixManifestGenerator</Generator>
+      <LastGenOutput>source.extension.cs</LastGenOutput>
+    </None>
     <Resource Include="Resources\Icon16.png" />
     <Resource Include="Resources\Icon32.png" />
+    <Content Include="Resources\Icon.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
     <Content Include="..\LICENSE.txt">
       <Link>LICENSE.txt</Link>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
+    <Content Include="..\RELEASE_NOTES.md">
+      <Link>RELEASE_NOTES.md</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
     <Content Include="Monikers.imagemanifest">
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
+  </ItemGroup>
+
+  <ItemGroup>
     <Antlr4 Include="Antlr\Prompt\PromptMarkdown.g4">
       <Listener>true</Listener>
       <Visitor>true</Visitor>
@@ -410,20 +140,8 @@
     <Antlr4 Include="Antlr\Context\ContextMarkdown.g4">
       <Generator>MSBuild:Compile</Generator>
     </Antlr4>
-    <Content Include="..\RELEASE_NOTES.md">
-      <Link>RELEASE_NOTES.md</Link>
-      <IncludeInVSIX>true</IncludeInVSIX>
-    </Content>
-    <None Include="source.extension.vsixmanifest">
-      <SubType>Designer</SubType>
-      <Generator>VsixManifestGenerator</Generator>
-      <LastGenOutput>source.extension.cs</LastGenOutput>
-    </None>
-    <Content Include="Resources\Icon.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <IncludeInVSIX>true</IncludeInVSIX>
-    </Content>
   </ItemGroup>
+
   <ItemGroup>
     <VSCTCompile Include="VSCommandTable.vsct">
       <ResourceName>Menus.ctmenu</ResourceName>
@@ -431,21 +149,17 @@
       <LastGenOutput>VSCommandTable.cs</LastGenOutput>
     </VSCTCompile>
   </ItemGroup>
+
   <ItemGroup>
     <Reference Include="OpenAI, Version=2.1.0.0, Culture=neutral, PublicKeyToken=b4187f3e65366280, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\.bin\OpenAI\OpenAI.dll</HintPath>
     </Reference>
-    <Reference Include="PresentationCore" />
-    <Reference Include="PresentationFramework" />
-    <Reference Include="System" />
-    <Reference Include="System.Design" />
     <Reference Include="System.ComponentModel.Composition" />
-    <Reference Include="System.Drawing" />
-    <Reference Include="System.Xaml" />
-    <Reference Include="System.Xml" />
-    <Reference Include="WindowsBase" />
+    <Reference Include="System.Design" />
+    <Reference Include="System.Windows.Forms" />
   </ItemGroup>
+
   <ItemGroup>
     <PackageReference Include="Antlr4.Runtime.Standard" />
     <PackageReference Include="Antlr4BuildTasks" />
@@ -477,172 +191,52 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.Windows.SDK.Contracts" />
     <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" />
     <PackageReference Include="NuGet.VisualStudio" />
-    <PackageReference Include="NAudio" />
     <PackageReference Include="PuppeteerSharp" />
     <PackageReference Include="RunProcessAsTask" />
     <PackageReference Include="System.ClientModel" />
     <PackageReference Include="System.Net.Http.Json" />
     <PackageReference Include="System.Net.ServerSentEvents" />
-    <PackageReference Include="System.Speech" />
-    <PackageReference Include="Whisper.net" />
-    <PackageReference Include="Whisper.net.Runtime" />
-    <PackageReference Include="Whisper.net.Runtime.Vulkan" />
   </ItemGroup>
+
+  <!--
+    The two projects the vsixmanifest names in a d:ProjectName attribute need explicit <Name/>
+    metadata: that is what DetokenizeVsixManifestFile matches the manifest against, and the SDK
+    does not fill it in on its own.
+  -->
   <ItemGroup>
     <ProjectReference Include="..\CodeLens\FreeAIr.CodeLens.csproj">
-      <Project>{12fb1b96-34e8-7f37-782d-4e07363c95d9}</Project>
       <Name>FreeAIr.CodeLens</Name>
     </ProjectReference>
     <ProjectReference Include="..\MarkdownParser\MarkdownParser.csproj">
-      <Project>{4a1cbebc-86ac-43c4-9704-4f339b9ab910}</Project>
       <Name>MarkdownParser</Name>
       <IncludeOutputGroupsInVSIX>BuiltProjectOutputGroup%3bBuiltProjectOutputGroupDependencies%3bGetCopyToOutputDirectoryItems%3bSatelliteDllsProjectOutputGroup%3b</IncludeOutputGroupsInVSIX>
       <IncludeOutputGroupsInVSIXLocalOnly>DebugSymbolsProjectOutputGroup%3b</IncludeOutputGroupsInVSIXLocalOnly>
     </ProjectReference>
-    <ProjectReference Include="..\MCP\Dto\Dto.csproj">
-      <Project>{2F2E14EA-0DB3-1CC8-B8A2-D6C94D74026B}</Project>
-      <Name>Dto</Name>
+    <ProjectReference Include="..\MCP\Dto\Dto.csproj" />
+    <ProjectReference Include="..\Search\FreeAIr.Search.csproj" />
+    <ProjectReference Include="..\SetupWizard\FreeAIr.SetupWizard.csproj" />
+    <ProjectReference Include="..\Shared\FreeAIr.Shared.csproj" />
+    <!--
+      Only the assembly itself, unlike MarkdownParser above. GetCopyToOutputDirectoryItems would
+      drag Whisper.net.Runtime's native libraries for every platform into the VSIX loose, on top of
+      the win-x64 zip the extension actually unpacks; BuiltProjectOutputGroupDependencies would add
+      the WinRT projection facades, which belong to the framework. Everything this assembly needs
+      at run time is already copy-local here through the reference chain.
+    -->
+    <ProjectReference Include="..\Voice\FreeAIr.Voice.csproj">
+      <Name>FreeAIr.Voice</Name>
+      <IncludeOutputGroupsInVSIX>BuiltProjectOutputGroup%3bSatelliteDllsProjectOutputGroup%3b</IncludeOutputGroupsInVSIX>
+      <IncludeOutputGroupsInVSIXLocalOnly>DebugSymbolsProjectOutputGroup%3b</IncludeOutputGroupsInVSIXLocalOnly>
     </ProjectReference>
-    <ProjectReference Include="..\Search\FreeAIr.Search.csproj">
-      <Project>{7B4E0C1F-9A2D-4C63-9E31-6D5F0B84A2E7}</Project>
-      <Name>FreeAIr.Search</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\SetupWizard\FreeAIr.SetupWizard.csproj">
-      <Project>{95C940A1-F08A-437A-83E7-996903DA7611}</Project>
-      <Name>FreeAIr.SetupWizard</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Shared\FreeAIr.Shared.csproj">
-      <Project>{e2646cf6-c92f-94ee-f875-5a7c18451b93}</Project>
-      <Name>FreeAIr.Shared</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\WpfHelpers\WpfHelpers.csproj">
-      <Project>{ce2249a8-82a0-426f-9211-7cb0065f1a93}</Project>
-      <Name>WpfHelpers</Name>
-    </ProjectReference>
+    <ProjectReference Include="..\WpfHelpers\WpfHelpers.csproj" />
   </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Resources\Resources.zh-Hans.resx" />
-    <EmbeddedResource Include="UI\ClickableText\ClickableTextResource.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <Page Include="Record\WhisperNet\WhisperNetUserControl.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Record\WhisperOpenAI\WhisperOAIUserControl.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="UI\Chat\ChatControl.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="UI\CodeLens\CodeLenseUserControl.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="UI\Dialog\DialogControl.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="UI\Embedillo\EmbedilloControl.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="UI\ToolWindows\ChooseModelToolWindowControl.xaml">
-      <SubType>Designer</SubType>
-      <Generator>XamlIntelliSenseFileGenerator</Generator>
-    </Page>
-    <Page Include="UI\ToolWindows\ChatListToolWindowControl.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="UI\Informer\StatusPopup.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="UI\NestedCheckBox\NestedCheckBoxList.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="UI\ToolWindows\BuildNaturalLanguageOutlinesTreeToolWindowControl.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="UI\ToolWindows\NaturalLanguageOutlinesToolWindowControl.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="UI\ToolWindows\RagCalibrationToolWindowControl.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="UI\ToolWindows\NaturalLanguageResultsToolWindowControl.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="UI\Windows\RecorderSetupWindow.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="UI\Windows\InSituChatWindow.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="UI\Windows\ActionConfigureWindow.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="UI\Wizard\SetupWizardWindow.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="UI\Windows\McpServerConfigureWindow.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="UI\Windows\AgentConfigureWindow.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="UI\Windows\NestedCheckBoxWindow.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="UI\Windows\ControlCenterWindow.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="UI\Windows\RenameChatWindow.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="UI\Windows\SearchForDockerMcpServerWindow.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="UI\Windows\WaitForTaskWindow.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Resources\Resources.resx">
-      <Generator>PublicResXFileCodeGenerator</Generator>
-      <SubType>Designer</SubType>
-      <LastGenOutput>Resources1.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Resources\Resources.ru.resx">
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-  </ItemGroup>
-  <ItemGroup />
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+
+  <Import Project="Sdk.targets" Sdk="Microsoft.NET.Sdk" />
   <Import Project="$(VSToolsPath)\VSSDK\Microsoft.VsSDK.targets" Condition="'$(VSToolsPath)' != ''" />
+
+  <!-- The proxy and the Whisper natives are zipped by the build and ride along inside the VSIX. -->
   <Target Name="IncludeNuGetPackageReferences" AfterTargets="GetVsixSourceItems">
     <ItemGroup>
       <VSIXSourceItem Include="$(SolutionDir).art\Proxy.zip" TargetPath="MCP\Proxy\Archive\Proxy.zip" />
@@ -652,10 +246,4 @@
       <VSIXSourceItem Include="@(ReferenceCopyLocalPaths)" Condition="'%(ReferenceCopyLocalPaths.NuGetPackageId)' == 'Microsoft.Bcl.AsyncInterfaces'" />
     </ItemGroup>
   </Target>
-  <PropertyGroup>
-    <PostBuildEvent>set "DIRS_TO_ZIP=win-x64 vulkan\win-x64"
-set "ZIP_NAME=$(SolutionDir).art\WhisperNet.Runtime.zip"
-PowerShell.exe -ExecutionPolicy Bypass -File "$(SolutionDir).\.CreateZipArchive.ps1" -DirsToZip "%25DIRS_TO_ZIP%25" -ZipName "%25ZIP_NAME%25" -RootDir "$(TargetDir)runtimes"
-</PostBuildEvent>
-  </PropertyGroup>
 </Project>

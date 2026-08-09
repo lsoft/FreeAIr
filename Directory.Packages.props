@@ -32,6 +32,7 @@
     <PackageVersion Include="Microsoft.VisualStudio.Language.Intellisense" Version="17.14.249" />
     <PackageVersion Include="Microsoft.VisualStudio.LanguageServices" Version="4.14.0" />
     <PackageVersion Include="Microsoft.VisualStudio.SDK.Analyzers" Version="17.7.79" />
+    <PackageVersion Include="Microsoft.VisualStudio.Shell.15.0" Version="17.0.31902.203" />
     <PackageVersion Include="Microsoft.VisualStudio.TeamFoundation.Git.Extensibility" Version="17.0.32322.3" />
     <PackageVersion Include="Microsoft.VisualStudio.Text.Logic" Version="17.14.249" />
     <PackageVersion Include="Microsoft.VSSDK.BuildTools" Version="17.14.2094" />

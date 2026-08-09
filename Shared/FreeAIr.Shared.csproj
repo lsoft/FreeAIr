@@ -49,8 +49,19 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <!--
+      Reference-only: these assemblies live in the Visual Studio install, so nothing from this
+      package ends up in the VSIX or in the CodeLens process' output.
+    -->
+    <PackageReference Include="Microsoft.VisualStudio.Shell.15.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="BLogic\CallAwaiter.cs" />
+    <Compile Include="BLogic\NonDisposableSemaphoreSlim.cs" />
+    <Compile Include="BLogic\TempFile.cs" />
     <Compile Include="Dto\UnitInfo.cs" />
     <Compile Include="Dto\CodeLensTarget.cs" />
+    <Compile Include="Helper\ActivityLogHelper.cs" />
     <Compile Include="Helper\ListHelper.cs" />
     <Compile Include="ICodeLensListener.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

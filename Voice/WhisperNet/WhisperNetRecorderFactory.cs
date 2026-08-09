@@ -2,6 +2,7 @@
 using System.ComponentModel.Composition;
 using System.IO;
 using System.IO.Compression;
+using System.Reflection;
 using System.Threading.Tasks;
 using System.Windows.Controls;
 
@@ -29,7 +30,11 @@ namespace FreeAIr.Record.WhisperNet
         /// <summary>Locates the runtimes folder under the working directory and extracts the native libraries into it if they are not there yet.</summary>
         static WhisperNetRecorderFactory()
         {
-            _runtimeFolderPath = Path.Combine(FreeAIrPackage.WorkingFolder, @"runtimes");
+            // This assembly is deployed next to FreeAIr.dll, so its own folder is the extension's
+            // working folder - the same one FreeAIrPackage.WorkingFolder resolves to.
+            var workingFolder = new FileInfo(Assembly.GetExecutingAssembly().Location).Directory.FullName;
+
+            _runtimeFolderPath = Path.Combine(workingFolder, @"runtimes");
 
             Unpack();
         }
@@ -72,7 +77,6 @@ namespace FreeAIr.Record.WhisperNet
                 }
 
                 var zipFilePath = Path.Combine(
-                    FreeAIrPackage.WorkingFolder,
                     _runtimeFolderPath,
                     RuntimeZipFileName
                     );

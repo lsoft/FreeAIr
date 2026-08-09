@@ -1,0 +1,82 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    Speech to text: the recorder contracts (IRecorder / IRecorderFactory), the four backends that
+    implement them - Microsoft Speech API, WinRT, local whisper.net, Whisper over an
+    OpenAI-compatible endpoint - their configuration controls, and the Tools > Options page that
+    holds their settings.
+
+    A separate assembly because the voice feature is what pulls NAudio, System.Speech, the WinRT
+    contracts and the three Whisper.net packages into the build, and none of that has anything to
+    do with the rest of the extension.
+
+    The factories are MEF parts, so the VSIX manifest needs a MefComponent asset naming this
+    project - without it the recorder picker silently comes up empty.
+
+    ChosenRecorder stays in the VSIX project on purpose: it is the glue between these backends and
+    the Visual Studio UI (the recorder context menu and the setup window), and moving it here would
+    make this project depend on FreeAIr's UI.
+  -->
+
+  <PropertyGroup>
+    <TargetFramework>net48</TargetFramework>
+    <LangVersion>Preview</LangVersion>
+    <UseWPF>true</UseWPF>
+    <RootNamespace>FreeAIr.Record</RootNamespace>
+    <AssemblyName>FreeAIr.Voice</AssemblyName>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Reference Include="OpenAI, Version=2.1.0.0, Culture=neutral, PublicKeyToken=b4187f3e65366280, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\.bin\OpenAI\OpenAI.dll</HintPath>
+    </Reference>
+    <Reference Include="System.ComponentModel.Composition" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!--
+      build assets are excluded as well as runtime ones: the toolkit's .props adds its own dll as
+      an IncludeInVSIX content item, and the VSIX already gets that copy from the FreeAIr project.
+    -->
+    <PackageReference Include="Community.VisualStudio.Toolkit.17" ExcludeAssets="Runtime;build" />
+    <!--
+      Referenced directly, at the same version FreeAIr pins, so both assemblies compile against one
+      Microsoft.Bcl.AsyncInterfaces - the graph would otherwise pull 9.0.7 in here and 9.0.0 there.
+    -->
+    <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" PrivateAssets="all" />
+    <!--
+      Reference-only. The WinRT projection facades this package carries are already part of .NET
+      Framework 4.8; letting them go copy-local would ship them inside the VSIX, which the legacy
+      build never did.
+    -->
+    <PackageReference Include="Microsoft.Windows.SDK.Contracts" ExcludeAssets="runtime" />
+    <PackageReference Include="NAudio" />
+    <PackageReference Include="System.ClientModel" />
+    <PackageReference Include="System.Speech" />
+    <PackageReference Include="Whisper.net" />
+    <PackageReference Include="Whisper.net.Runtime" />
+    <PackageReference Include="Whisper.net.Runtime.Vulkan" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Shared\FreeAIr.Shared.csproj" />
+    <ProjectReference Include="..\SetupWizard\FreeAIr.SetupWizard.csproj" />
+  </ItemGroup>
+
+  <!--
+    The Whisper natives arrive here now that this project is the one referencing
+    Whisper.net.Runtime; they ride into the VSIX as .art\WhisperNet.Runtime.zip, which the FreeAIr
+    project picks up as a VSIXSourceItem and the extension unpacks on first run.
+  -->
+  <!--
+    A target rather than a PostBuildEvent property: in an SDK-style project the property is
+    expanded before the SDK targets run, so $(TargetDir) would still be empty there and the archive
+    would end up with every entry named after a path relative to nothing.
+  -->
+  <Target Name="ZipWhisperRuntimes" AfterTargets="Build">
+    <Exec Command="PowerShell.exe -ExecutionPolicy Bypass -File &quot;$(MSBuildThisFileDirectory)..\.CreateZipArchive.ps1&quot; -DirsToZip &quot;win-x64 vulkan\win-x64&quot; -ZipName &quot;$(MSBuildThisFileDirectory)..\.art\WhisperNet.Runtime.zip&quot; -RootDir &quot;$(TargetDir)runtimes&quot;" />
+  </Target>
+
+</Project>

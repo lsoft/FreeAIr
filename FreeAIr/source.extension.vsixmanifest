@@ -29,5 +29,6 @@
         <Asset Type="Microsoft.VisualStudio.MefComponent" d:Source="Project" d:ProjectName="%CurrentProject%" Path="|%CurrentProject%|" />
         <Asset Type="Microsoft.VisualStudio.CodeLensComponent" d:Source="Project" d:ProjectName="FreeAIr.CodeLens" Path="|FreeAIr.CodeLens|" />
         <Asset Type="Microsoft.VisualStudio.MefComponent" d:Source="Project" d:ProjectName="MarkdownParser" Path="|MarkdownParser|" />
+        <Asset Type="Microsoft.VisualStudio.MefComponent" d:Source="Project" d:ProjectName="FreeAIr.Voice" Path="|FreeAIr.Voice|" />
     </Assets>
 </PackageManifest>

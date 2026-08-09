@@ -15,7 +15,8 @@ looking for the user manual, read the [README](README.md) instead.
 | `MCP/Proxy` | .NET 9 (exe) | Out-of-process host for MCP servers. Shipped inside the VSIX as `.art/Proxy.zip` and unpacked on first run. |
 | `MCP/Dto` | netstandard | Request/reply contracts of the JSON-RPC channel between `FreeAIr` and `Proxy.exe`. |
 | `CodeLens` | .NET Framework 4.8 | CodeLens data point provider. Runs in the separate Visual Studio CodeLens process. |
-| `Shared` | netstandard | Types shared between the VSIX and the CodeLens process (pipe name, `UnitInfo` DTOs). |
+| `Voice` (`FreeAIr.Voice`) | .NET Framework 4.8 | Speech to text: the `IRecorder`/`IRecorderFactory` contracts, the four backends, their configuration controls and the recording options page. A MEF component of its own, so the VSIX manifest names it. |
+| `Shared` | .NET Framework 4.8 | Types shared between assemblies: the CodeLens pipe name and `UnitInfo` DTOs, plus leaf helpers (`TempFile`, `CallAwaiter`, `ActivityLogHelper`) that both the VSIX and `FreeAIr.Voice` use. |
 | `MarkdownParser` | netstandard | ANTLR-based markdown parser used to render LLM answers. |
 | `MarkdownParserTester` | WPF app | Scratch harness for the markdown parser; not shipped. |
 | `WpfHelpers` | netstandard | View-model / command / collection helpers used by the WPF UI. |
@@ -192,9 +193,15 @@ to be asked before the search starts, not in the middle of it.
 
 ### Voice input
 
-`Record/` implements dictation. `ChosenRecorder` is the façade: it picks a recorder factory by the
-name stored in the recording option page and swaps implementations at runtime. Four backends ship:
-Microsoft Speech API, WinRT, Whisper.Net (local, Vulkan/CPU) and Whisper over the OpenAI API.
+The `Voice` project implements dictation. Four backends ship: Microsoft Speech API, WinRT,
+Whisper.Net (local, Vulkan/CPU) and Whisper over the OpenAI API; each is a MEF-exported
+`IRecorderFactory`, which is why `source.extension.vsixmanifest` carries a `MefComponent` asset for
+`FreeAIr.Voice` — without it the recorder picker comes up empty.
+
+`FreeAIr\Record\ChosenRecorder.cs` is the façade and stays in the VSIX project: it picks a factory
+by the name stored in the recording option page, shows the picker menu and the backend's setup
+window, and swaps implementations at run time. It is the only part of the feature that talks to
+Visual Studio's UI, and keeping it here is what lets `FreeAIr.Voice` know nothing about `FreeAIr`.
 `BLogic/RecorderTranscriberPostProcessor.cs` drives record → transcribe → optional LLM
 post-processing, where post-processing is an ordinary support action with the
 `RecordPostProcess` scope.
@@ -228,7 +235,7 @@ replaces `FreeAIrOptions` with one the user builds step by step, opened by
 Its step sequencing (`WizardNavigator`, skipping the "starting point" step on a first run), its
 agent-field validation and its known-endpoint catalog live in the separate `SetupWizard` project
 instead of `FreeAIr` itself, for the same reason `FreeAIr.Search` is split out: `FreeAIr` is a
-legacy net48 VSIX project with no test runner attached, so anything worth unit testing has to live
+net48 VSIX project with no test runner attached, so anything worth unit testing has to live
 somewhere an ordinary `dotnet test` can reach (see `SetupWizard.Tests`). That project carries no
 resources, so `WizardValidator` reports its findings as enum codes (`AgentFieldProblem`,
 `ActionBindingProblem`) which `SetupWizardViewModel.Describe` turns into the localized sentences the
@@ -272,7 +279,7 @@ there ends Visual Studio rather than the wizard.
 Open `FreeAIr.sln` in Visual Studio 2022 (17.14+) or 2026 and build. Two post-build steps matter:
 
 - `MCP/Proxy` zips its output into `.art/Proxy.zip`;
-- the Whisper.Net runtime is zipped into `.art/WhisperNet.Runtime.zip`.
+- `Voice` zips the Whisper.Net runtime into `.art/WhisperNet.Runtime.zip`.
 
 Both archives are embedded into the VSIX and unpacked into the extension folder at run time, so a
 stale `.art` archive means you are debugging an old proxy. Debugging launches
