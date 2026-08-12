@@ -17,10 +17,10 @@ looking for the user manual, read the [README](README.md) instead.
 | `MCP/Dto` | netstandard | Request/reply contracts of the JSON-RPC channel between `FreeAIr` and `Proxy.exe`. |
 | `CodeLens` | .NET Framework 4.8 | CodeLens data point provider. Runs in the separate Visual Studio CodeLens process. |
 | `Voice` (`FreeAIr.Voice`) | .NET Framework 4.8 | Speech to text: the `IRecorder`/`IRecorderFactory` contracts, the four backends, their configuration controls and the recording options page. A MEF component of its own, so the VSIX manifest names it. |
-| `Shared` | .NET Framework 4.8 | Types shared between assemblies: the CodeLens pipe name and `UnitInfo` DTOs, plus leaf helpers (`TempFile`, `CallAwaiter`, `ActivityLogHelper`) that both the VSIX and `FreeAIr.Voice` use. |
+| `Shared` | .NET Framework 4.8 | The leaf everything may depend on: the CodeLens pipe name and `UnitInfo` DTOs, `SelectedSpan`, the `BackgroundTask` base class, and helpers (`TempFile`, `CallAwaiter`, `ActivityLogHelper`, `MefHelper`) used across the VSIX, `FreeAIr.Voice` and `WpfHelpers`. |
 | `MarkdownParser` | netstandard | ANTLR-based markdown parser used to render LLM answers. |
 | `MarkdownParserTester` | WPF app | Scratch harness for the markdown parser; not shipped. |
-| `WpfHelpers` | netstandard | View-model / command / collection helpers used by the WPF UI. |
+| `WpfHelpers` | netstandard | View-model / command / collection helpers used by the WPF UI, plus `NestedCheckBox` — the tree-of-checkboxes control the outlines panel, the tool list and the control center all show. |
 | `TestSubject` | — | A sample solution used to try FreeAIr out manually. Not part of the product. |
 
 Two of these projects run **outside** the Visual Studio process, and that is the main thing to
@@ -94,11 +94,17 @@ actions, plus unsorted knobs). It can live in either of two places, see `Options
 - `<solution folder>\.freeair\<solution name>_options.json` — team-wide, meant to be committed;
 - Visual Studio's own option store (`InternalPage`) — when a file is undesirable.
 
-Reads go through `BLogic/DataPieceCache.cs`, which re-parses only when the file timestamp (or the
+Reads go through `Options2/DataPieceCache.cs`, which re-parses only when the file timestamp (or the
 stored string) changes.
 
-`Options/*Page.cs` are the per-user Visual Studio option pages (UI, font sizes, recording,
-internal). These are intentionally *not* part of the JSON settings.
+`Options/*Page.cs` are the per-user Visual Studio option pages a user can actually see (UI, font
+sizes, recording). These are intentionally *not* part of the JSON settings.
+`Options2/InternalPage.cs` is a page too, but a hidden one: it is where the settings string and the
+rest of FreeAIr's persisted internal state live, which is why it sits with the settings.
+
+Nothing under `Options2/` names another feature folder — the model of what is configured does not
+know the runtime that acts on it. `McpServerProxyApplication.ApplyServerNodeAsync` is where the
+configured MCP servers are actually started and the failures reported.
 
 ### MCP
 
