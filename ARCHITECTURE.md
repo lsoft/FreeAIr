@@ -107,7 +107,7 @@ internal). These are intentionally *not* part of the JSON settings.
   reconciles the configured server list against the running one, refreshes the tool catalogue and
   dispatches `CallToolAsync` to the owning server.
 - `MCP/ServerProxy/VS` — the built-in Visual Studio MCP server. Its tools (build, git commit,
-  nuget install, read/replace document body, solution tree, error list, text search, web search)
+  nuget install, read/replace document body, solution tree, error list, text search)
   run **inside** devenv and therefore have direct access to DTE/Roslyn.
   `Tools/SearchFileContentTool.cs` is the grep of the solution: the matching itself is `Search/Grep`
   and nothing is installed or spawned, while running inside devenv is what lets it search the

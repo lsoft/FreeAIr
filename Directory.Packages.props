@@ -14,7 +14,6 @@
     <PackageVersion Include="editorconfig" Version="0.15.0" />
     <PackageVersion Include="Extended.Wpf.Toolkit" Version="4.7.25104.5739" />
     <PackageVersion Include="FuzzySharp" Version="2.0.2" />
-    <PackageVersion Include="HtmlAgilityPack" Version="1.12.2" />
     <PackageVersion Include="JsonPath.Net" Version="2.1.1" />
     <PackageVersion Include="MessagePack" Version="3.1.4" />
     <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.11.1" />
@@ -41,7 +40,6 @@
     <PackageVersion Include="ModelContextProtocol" Version="0.3.0-preview.3" />
     <PackageVersion Include="NAudio" Version="2.2.1" />
     <PackageVersion Include="NuGet.VisualStudio" Version="17.14.0" />
-    <PackageVersion Include="PuppeteerSharp" Version="20.2.2" />
     <PackageVersion Include="RunProcessAsTask" Version="1.2.4" />
     <PackageVersion Include="Serilog" Version="4.3.0" />
     <PackageVersion Include="Serilog.Sinks.Console" Version="6.0.0" />

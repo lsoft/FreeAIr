@@ -172,7 +172,6 @@
     <PackageReference Include="editorconfig" />
     <PackageReference Include="Extended.Wpf.Toolkit" />
     <PackageReference Include="FuzzySharp" />
-    <PackageReference Include="HtmlAgilityPack" />
     <PackageReference Include="MessagePack" />
     <PackageReference Include="Microsoft.AspNetCore.WebUtilities" />
     <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" PrivateAssets="all" />
@@ -193,7 +192,6 @@
     </PackageReference>
     <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" />
     <PackageReference Include="NuGet.VisualStudio" />
-    <PackageReference Include="PuppeteerSharp" />
     <PackageReference Include="RunProcessAsTask" />
     <PackageReference Include="System.ClientModel" />
     <PackageReference Include="System.Net.Http.Json" />
