@@ -4,7 +4,6 @@ using FreeAIr.Options2.Support;
 using FreeAIr.UI.ContextMenu;
 using FreeAIr.UI.Embedillo.Answer.Parser;
 using FreeAIr.UI.ToolWindows;
-using Microsoft.VisualStudio.ComponentModelHost;
 using FreeAIr.Chat;
 using FreeAIr.Chat.Context.Composer;
 using FreeAIr.Chat.Context.Item;
@@ -56,7 +55,7 @@ namespace FreeAIr.Commands.BuildError
                 return;
             }
 
-            var componentModel = (IComponentModel)await FreeAIrPackage.Instance.GetServiceAsync(typeof(SComponentModel));
+            var componentModel = await MefHelper.GetComponentModelAsync();
             var chatContainer = componentModel.GetService<ChatContainer>();
 
             var lineEnding = LineEndingHelper.Actual.OpenDocumentAndGetLineEnding(

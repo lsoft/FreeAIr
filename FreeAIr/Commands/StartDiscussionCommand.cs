@@ -3,7 +3,6 @@ using FreeAIr.Chat;
 using FreeAIr.Chat.Context.Item;
 using FreeAIr.Helper;
 using FreeAIr.UI.ToolWindows;
-using Microsoft.VisualStudio.ComponentModelHost;
 using System.Diagnostics;
 
 namespace FreeAIr.Commands
@@ -31,7 +30,7 @@ namespace FreeAIr.Commands
         {
             await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
 
-            var componentModel = (IComponentModel)await FreeAIrPackage.Instance.GetServiceAsync(typeof(SComponentModel));
+            var componentModel = await MefHelper.GetComponentModelAsync();
             var chatContainer = componentModel.GetService<ChatContainer>();
 
             var std = await TextDescriptorHelper.GetSelectedTextAsync();

@@ -1,6 +1,6 @@
 ﻿using FreeAIr.Chat;
+using FreeAIr.Helper;
 using FreeAIr.UI.ContextMenu;
-using Microsoft.VisualStudio.ComponentModelHost;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -20,7 +20,7 @@ namespace FreeAIr.Commands
         protected async Task<Chat.Chat?> CreateOrReuseChatAsync(
             )
         {
-            var componentModel = (IComponentModel)await FreeAIrPackage.Instance.GetServiceAsync(typeof(SComponentModel));
+            var componentModel = await MefHelper.GetComponentModelAsync();
             var chatContainer = componentModel.GetService<ChatContainer>();
 
             var ctrlPressed = (Control.ModifierKeys & Keys.Control) == Keys.Control;

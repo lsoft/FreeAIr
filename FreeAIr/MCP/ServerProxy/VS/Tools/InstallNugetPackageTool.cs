@@ -1,7 +1,6 @@
 ﻿using EnvDTE;
 using EnvDTE80;
 using FreeAIr.Helper;
-using Microsoft.VisualStudio.ComponentModelHost;
 using NuGet.VisualStudio;
 using System.Collections.Generic;
 using System.Threading;
@@ -107,7 +106,7 @@ namespace FreeAIr.MCP.McpServerProxy.VS.Tools
 
 
 
-            var dte = await FreeAIrPackage.Instance.GetServiceAsync(typeof(DTE)) as DTE2;
+            var dte = await AsyncServiceProvider.GlobalProvider.GetServiceAsync(typeof(DTE)) as DTE2;
             if (dte == null)
             {
                 //todo log
@@ -121,7 +120,7 @@ namespace FreeAIr.MCP.McpServerProxy.VS.Tools
                 return McpServerProxyToolCallResult.CreateFailed($"Cannot find project `{targetProjectName}` in current solution.");
             }
 
-            var componentModel = await FreeAIrPackage.Instance.GetServiceAsync(typeof(SComponentModel)) as IComponentModel;
+            var componentModel = await MefHelper.GetComponentModelAsync();
 
             var packageInstaller = componentModel.GetService<IVsPackageInstaller2>();
 

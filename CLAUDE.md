@@ -5,7 +5,7 @@ for the user manual read [README.md](README.md).
 
 ## Building the solution
 
-`FreeAIr.sln` still holds legacy-format projects (`Shared`, `CodeLens`: `ToolsVersion="15.0"`,
+`FreeAIr.sln` still holds one legacy-format project (`CodeLens`: `ToolsVersion="15.0"`,
 `TargetFrameworkVersion v4.8`), and `FreeAIr.csproj` — although SDK-style — is a VSIX that needs
 the VSSDK targets. So the solution can only be built by Visual Studio's MSBuild, not by the .NET
 SDK.
@@ -167,12 +167,12 @@ The baseline when this section was written was 918 of 4299 nodes (21%).
 
 ## Odds and ends
 
-- **A new `.cs` file in `Shared\` or `CodeLens\` has to be added to the `.csproj` by hand.** Those
-  two are still legacy format and list every file in a `<Compile Include="..." />` item; a file
-  which is not listed is silently not compiled, and the build still reports 0 errors. Nothing
-  fails, the code is simply not there at runtime — which for something found by reflection looks
-  like the feature not working rather than like a build problem. `FreeAIr\`, `Voice\`, `Search\`
-  and the other SDK style projects glob their sources and need nothing of the sort.
+- **A new `.cs` file in `CodeLens\` has to be added to the `.csproj` by hand.** It is still legacy
+  format and lists every file in a `<Compile Include="..." />` item; a file which is not listed is
+  silently not compiled, and the build still reports 0 errors. Nothing fails, the code is simply
+  not there at runtime — which for something found by reflection looks like the feature not
+  working rather than like a build problem. Every other project globs its sources and needs
+  nothing of the sort (`Shared\` did too until it was converted to SDK format).
 - **A new assembly has to be wired into the VSIX in three places**, and forgetting any of them
   builds clean and fails at run time: an `<IncludeOutputGroupsInVSIX/>` on the `ProjectReference`
   in `FreeAIr.csproj` (or the dll is not in the package), a `MefComponent` asset in

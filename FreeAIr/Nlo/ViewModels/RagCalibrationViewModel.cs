@@ -6,7 +6,6 @@ using FreeAIr.Interaction;
 using FreeAIr.Options2;
 using FreeAIr.Options2.Agent;
 using FreeAIr.Options2.Rag;
-using Microsoft.VisualStudio.ComponentModelHost;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Globalization;
@@ -549,7 +548,7 @@ namespace FreeAIr.UI.ViewModels
                 FreeAIr.Resources.Resources.RAG__preparing_the_index,
                 async cancellationToken =>
                 {
-                    var componentModel = (IComponentModel)await FreeAIrPackage.Instance.GetServiceAsync(typeof(SComponentModel));
+                    var componentModel = await MefHelper.GetComponentModelAsync();
                     var container = componentModel.GetService<EmbeddingIndexContainer>();
 
                     var index = await container.GetAsync(null, cancellationToken);
@@ -810,7 +809,7 @@ namespace FreeAIr.UI.ViewModels
                 cancellationToken
                 );
 
-            var componentModel = (IComponentModel)await FreeAIrPackage.Instance.GetServiceAsync(typeof(SComponentModel));
+            var componentModel = await MefHelper.GetComponentModelAsync();
             componentModel.GetService<EmbeddingIndexContainer>().Invalidate();
 
             //the index in this window is now the stale one
@@ -1062,7 +1061,7 @@ namespace FreeAIr.UI.ViewModels
                 return _index;
             }
 
-            var componentModel = (IComponentModel)await FreeAIrPackage.Instance.GetServiceAsync(typeof(SComponentModel));
+            var componentModel = await MefHelper.GetComponentModelAsync();
             var container = componentModel.GetService<EmbeddingIndexContainer>();
 
             var index = await container.GetAsync(null, cancellationToken);
@@ -1142,7 +1141,7 @@ namespace FreeAIr.UI.ViewModels
 
             //no preferred name: the user pressed the button precisely to be asked, and a preference
             //is what the picker skips itself for
-            var componentModel = (IComponentModel)await FreeAIrPackage.Instance.GetServiceAsync(typeof(SComponentModel));
+            var componentModel = await MefHelper.GetComponentModelAsync();
 
             var chosen = await componentModel.GetService<IUserChooser>().ChooseAnyAgentAsync(
                 FreeAIr.Resources.Resources.RAG__choose_the_embedding_agent

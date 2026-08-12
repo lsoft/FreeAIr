@@ -1,7 +1,6 @@
 ﻿using FreeAIr.Options2.Agent;
 using FreeAIr.Helper;
 using FreeAIr.NLOutline.Tree.Builder.File;
-using Microsoft.VisualStudio.ComponentModelHost;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -93,7 +92,7 @@ namespace FreeAIr.NLOutline.Tree.Builder
             var totalFileCount = projectFileLists.Sum(pf => pf.Files.Count);
             var processedFileCount = 0;
 
-            var componentModel = (IComponentModel)await FreeAIrPackage.Instance.GetServiceAsync(typeof(SComponentModel));
+            var componentModel = await MefHelper.GetComponentModelAsync();
             var treeProcessor = componentModel.GetService<FileOutlineTreeProcessor>();
 
             foreach (var (project, files) in projectFileLists)

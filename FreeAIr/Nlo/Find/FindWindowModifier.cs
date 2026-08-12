@@ -54,7 +54,7 @@ namespace FreeAIr.Find
 
             try
             {
-                var dte = await FreeAIrPackage.Instance.GetServiceAsync(typeof(EnvDTE.DTE)) as DTE2;
+                var dte = await AsyncServiceProvider.GlobalProvider.GetServiceAsync(typeof(EnvDTE.DTE)) as DTE2;
 
                 while (true)
                 {

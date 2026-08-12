@@ -3,7 +3,6 @@ using FreeAIr.Options2;
 using FreeAIr.UI.Embedillo.Answer.Parser;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Microsoft.VisualStudio.ComponentModelHost;
 using Microsoft.VisualStudio.LanguageServices;
 using System.Linq;
 using System.Threading;
@@ -44,7 +43,7 @@ namespace FreeAIr.Chat.Context.Composer
                 var cancellationToken = cancellationTokenSource.Token;
 
 
-                var componentModel = (IComponentModel)await FreeAIrPackage.Instance.GetServiceAsync(typeof(SComponentModel));
+                var componentModel = await MefHelper.GetComponentModelAsync();
                 var workspace = (Workspace)componentModel.GetService<VisualStudioWorkspace>();
                 if (cancellationToken.IsCancellationRequested)
                 {
@@ -129,7 +128,7 @@ namespace FreeAIr.Chat.Context.Composer
                 var cancellationToken = cancellationTokenSource.Token;
 
 
-                var componentModel = (IComponentModel)await FreeAIrPackage.Instance.GetServiceAsync(typeof(SComponentModel));
+                var componentModel = await MefHelper.GetComponentModelAsync();
                 var workspace = (Workspace)componentModel.GetService<VisualStudioWorkspace>();
                 if (cancellationToken.IsCancellationRequested)
                 {

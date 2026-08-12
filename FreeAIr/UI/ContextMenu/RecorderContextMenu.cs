@@ -1,7 +1,7 @@
-﻿using FreeAIr.Options2;
+﻿using FreeAIr.Helper;
+using FreeAIr.Options2;
 using FreeAIr.Options2.Support;
 using FreeAIr.Record;
-using Microsoft.VisualStudio.ComponentModelHost;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -88,7 +88,7 @@ namespace FreeAIr.UI.ContextMenu
         /// </summary>
         public static async Task<List<IRecorderFactory>> ObtainRecorderFactoriesAsync()
         {
-            var componentModel = (IComponentModel)await FreeAIrPackage.Instance.GetServiceAsync(typeof(SComponentModel));
+            var componentModel = await MefHelper.GetComponentModelAsync();
             var recorderFactories = componentModel.DefaultExportProvider.GetExports<IRecorderFactory>()
                 .Select(l => l.Value)
                 .ToList()

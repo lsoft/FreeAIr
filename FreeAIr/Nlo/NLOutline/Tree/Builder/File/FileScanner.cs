@@ -5,7 +5,6 @@ using FreeAIr.UI.Embedillo.Answer.Parser;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Microsoft.VisualStudio.ComponentModelHost;
 using Microsoft.VisualStudio.LanguageServices;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
@@ -172,7 +171,7 @@ namespace FreeAIr.NLOutline.Tree.Builder.File
                 throw new ArgumentNullException(nameof(root));
             }
 
-            var componentModel = (IComponentModel)await FreeAIrPackage.Instance.GetServiceAsync(typeof(SComponentModel));
+            var componentModel = await MefHelper.GetComponentModelAsync();
 
             var chatContainer = componentModel.GetService<ChatContainer>();
 
@@ -303,7 +302,7 @@ namespace FreeAIr.NLOutline.Tree.Builder.File
                 throw new ArgumentNullException(nameof(root));
             }
 
-            var componentModel = (IComponentModel)(await FreeAIrPackage.Instance.GetServiceAsync(typeof(SComponentModel)))!;
+            var componentModel = await MefHelper.GetComponentModelAsync();
             if (componentModel == null)
             {
                 throw new InvalidOperationException("Can't create a component model");

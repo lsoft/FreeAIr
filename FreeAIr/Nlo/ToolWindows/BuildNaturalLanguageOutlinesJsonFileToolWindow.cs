@@ -1,6 +1,6 @@
-﻿using FreeAIr.UI.ToolWindows;
+﻿using FreeAIr.Helper;
+using FreeAIr.UI.ToolWindows;
 using FreeAIr.UI.ViewModels;
-using Microsoft.VisualStudio.ComponentModelHost;
 using Microsoft.VisualStudio.Imaging;
 using System.Runtime.InteropServices;
 using System.Threading;
@@ -34,7 +34,7 @@ namespace FreeAIr.UI
             CancellationToken cancellationToken
             )
         {
-            var componentModel = (IComponentModel)await FreeAIrPackage.Instance.GetServiceAsync(typeof(SComponentModel));
+            var componentModel = await MefHelper.GetComponentModelAsync();
 
             var viewModel = componentModel.GetService<BuildNaturalLanguageOutlinesJsonFileToolViewModel>();
 

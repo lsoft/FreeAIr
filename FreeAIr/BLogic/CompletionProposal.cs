@@ -1,7 +1,6 @@
 ﻿using FreeAIr.Helper;
 using FreeAIr.Options2;
 using FreeAIr.Options2.Support;
-using Microsoft.VisualStudio.ComponentModelHost;
 using Microsoft.VisualStudio.Language.Intellisense;
 using Microsoft.VisualStudio.Language.Intellisense.AsyncCompletion;
 using Microsoft.VisualStudio.Language.Proposals;
@@ -153,7 +152,7 @@ namespace FreeAIr.BLogic
                     return null;
                 }
 
-                var componentModel = (IComponentModel)await FreeAIrPackage.Instance.GetServiceAsync(typeof(SComponentModel));
+                var componentModel = await MefHelper.GetComponentModelAsync();
 
                 await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
 

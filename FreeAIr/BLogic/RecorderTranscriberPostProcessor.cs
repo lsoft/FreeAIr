@@ -1,8 +1,8 @@
-﻿using FreeAIr.Options2;
+﻿using FreeAIr.Helper;
+using FreeAIr.Options2;
 using FreeAIr.Options2.Support;
 using FreeAIr.Record;
 using FreeAIr.Shared.Helper;
-using Microsoft.VisualStudio.ComponentModelHost;
 using Microsoft.VisualStudio.Threading;
 using System.Threading;
 using System.Threading.Tasks;
@@ -217,7 +217,7 @@ namespace FreeAIr.BLogic
                 return text;
             }
 
-            var componentModel = (IComponentModel)await FreeAIrPackage.Instance.GetServiceAsync(typeof(SComponentModel));
+            var componentModel = await MefHelper.GetComponentModelAsync();
             var chatContainer = componentModel.GetService<ChatContainer>();
 
             var chat = await chatContainer.StartChatAsync(

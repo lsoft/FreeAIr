@@ -5,7 +5,6 @@ using FreeAIr.Options2.Agent;
 using FreeAIr.Options2.Support;
 using FreeAIr.Shared.Helper;
 using FreeAIr.UI.ToolWindows;
-using Microsoft.VisualStudio.ComponentModelHost;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.IO;
@@ -300,7 +299,7 @@ namespace FreeAIr.UI.ViewModels
             }
             _cancellationTokenSource?.Dispose();
 
-            var componentModel = (IComponentModel)await FreeAIrPackage.Instance.GetServiceAsync(typeof(SComponentModel));
+            var componentModel = await MefHelper.GetComponentModelAsync();
             var chatContainer = componentModel.GetService<ChatContainer>();
 
 

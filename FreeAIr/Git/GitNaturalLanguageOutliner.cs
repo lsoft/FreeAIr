@@ -2,7 +2,6 @@
 using FreeAIr.Interaction;
 using FreeAIr.Options2.Support;
 using FreeAIr.UI.Embedillo.Answer.Parser;
-using Microsoft.VisualStudio.ComponentModelHost;
 using System.Collections.Generic;
 using FreeAIr.Chat;
 using FreeAIr.Chat.Context.Item;
@@ -27,7 +26,7 @@ namespace FreeAIr.Git
             {
                 await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
 
-                var componentModel = (IComponentModel)await FreeAIrPackage.Instance.GetServiceAsync(typeof(SComponentModel));
+                var componentModel = await MefHelper.GetComponentModelAsync();
                 var chooser = componentModel.GetService<IUserChooser>();
 
                 var chosenSupportAction = await chooser.ChooseSupportActionAsync(

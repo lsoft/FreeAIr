@@ -13,7 +13,6 @@ using FreeAIr.UI.NestedCheckBox;
 //BackgroundTask, which GenerateEmbeddingOutlineFilesBackgroundTask below derives from, still
 //carries the namespace of the window it used to live in; the window itself is gone from here
 using FreeAIr.UI.Windows;
-using Microsoft.VisualStudio.ComponentModelHost;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Diagnostics;
@@ -278,7 +277,7 @@ namespace FreeAIr.UI.ViewModels
                                     JsonFilePath,
                                     Groups
                                     );
-                                var componentModel = (IComponentModel)await FreeAIrPackage.Instance.GetServiceAsync(typeof(SComponentModel));
+                                var componentModel = await MefHelper.GetComponentModelAsync();
                                 await componentModel.GetService<IBackgroundTaskShower>().ShowAsync(
                                     backgroundTask
                                     );
@@ -1091,7 +1090,7 @@ namespace FreeAIr.UI.ViewModels
         private static async Task<EmbeddingIndexContainer> GetIndexContainerAsync(
             )
         {
-            var componentModel = (IComponentModel)await FreeAIrPackage.Instance.GetServiceAsync(typeof(SComponentModel));
+            var componentModel = await MefHelper.GetComponentModelAsync();
             return componentModel.GetService<EmbeddingIndexContainer>();
         }
     }

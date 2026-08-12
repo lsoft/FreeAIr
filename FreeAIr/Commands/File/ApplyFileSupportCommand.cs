@@ -4,7 +4,6 @@ using FreeAIr.Options2.Support;
 using FreeAIr.UI.ContextMenu;
 using FreeAIr.UI.Embedillo.Answer.Parser;
 using FreeAIr.UI.ToolWindows;
-using Microsoft.VisualStudio.ComponentModelHost;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -39,7 +38,7 @@ namespace FreeAIr.Commands.File
         {
             await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
 
-            var componentModel = (IComponentModel)await FreeAIrPackage.Instance.GetServiceAsync(typeof(SComponentModel));
+            var componentModel = await MefHelper.GetComponentModelAsync();
             var chatContainer = componentModel.GetService<ChatContainer>();
 
             var allSelectedFiles = await GetSelectedFilesAsync();

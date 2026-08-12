@@ -9,7 +9,6 @@ using FreeAIr.UI.ToolWindows;
 using FuzzySharp;
 using FuzzySharp.PreProcess;
 using Microsoft.VisualStudio;
-using Microsoft.VisualStudio.ComponentModelHost;
 using Microsoft.VisualStudio.TextManager.Interop;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
@@ -536,7 +535,7 @@ namespace FreeAIr.UI.ViewModels
                     .ConvertAll(f => new FileTypeFilter(f))
                 );
 
-            var componentModel = (IComponentModel)await FreeAIrPackage.Instance.GetServiceAsync(typeof(SComponentModel));
+            var componentModel = await MefHelper.GetComponentModelAsync();
             var chatContainer = componentModel.GetService<ChatContainer>();
 
             var chat = await chatContainer.StartChatAsync(
@@ -835,7 +834,7 @@ namespace FreeAIr.UI.ViewModels
                 return null;
             }
 
-            var componentModel = (IComponentModel)await FreeAIrPackage.Instance.GetServiceAsync(typeof(SComponentModel));
+            var componentModel = await MefHelper.GetComponentModelAsync();
             var indexContainer = componentModel.GetService<EmbeddingIndexContainer>();
 
             Status = Resources.Resources.RAG__preparing_the_index;

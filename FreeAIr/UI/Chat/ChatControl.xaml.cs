@@ -13,7 +13,6 @@ using FreeAIr.UI.Embedillo.VisualLine.SolutionItem;
 using FreeAIr.UI.ToolWindows;
 using FreeAIr.UI.ViewModels;
 using FreeAIr.UI.Windows;
-using Microsoft.VisualStudio.ComponentModelHost;
 using Microsoft.VisualStudio.Imaging;
 using Microsoft.VisualStudio.Imaging.Interop;
 using Microsoft.VisualStudio.Shell.Interop;
@@ -681,7 +680,7 @@ namespace FreeAIr.UI.Chat
                     field = new AsyncRelayCommand(
                         async a =>
                         {
-                            var componentModel = (IComponentModel)await FreeAIrPackage.Instance.GetServiceAsync(typeof(SComponentModel));
+                            var componentModel = await MefHelper.GetComponentModelAsync();
                             var chatContainer = componentModel.GetService<ChatContainer>();
 
                             chatContainer.StopChatAsync(_chat)

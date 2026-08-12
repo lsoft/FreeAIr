@@ -5,7 +5,6 @@ using FreeAIr.Options2;
 using FreeAIr.Options2.Agent;
 using FreeAIr.Options2.Support;
 using FreeAIr.UI.ViewModels;
-using Microsoft.VisualStudio.ComponentModelHost;
 //`Task<T>` needs this: FreeAIrPackage.cs declares a global `Task` alias which shadows the generic one
 using System.Threading.Tasks;
 
@@ -55,7 +54,7 @@ namespace FreeAIr.Find
                     return;
                 }
 
-                var componentModel = (IComponentModel)await FreeAIrPackage.Instance.GetServiceAsync(typeof(SComponentModel));
+                var componentModel = await MefHelper.GetComponentModelAsync();
                 var chooser = componentModel.GetService<IUserChooser>();
 
                 var chosenScope = await chooser.ChooseOneOfAsync<NaturalSearchScope>(
@@ -218,7 +217,7 @@ namespace FreeAIr.Find
             //all, or the agent has been renamed or removed since. Every agent is offered, not only
             //the ones with a token: an embedding model normally runs on a local server which wants
             //none, and it is the agent to pick here far more often than a cloud one
-            var componentModel = (IComponentModel)await FreeAIrPackage.Instance.GetServiceAsync(typeof(SComponentModel));
+            var componentModel = await MefHelper.GetComponentModelAsync();
 
             return await componentModel.GetService<IUserChooser>().ChooseAnyAgentAsync(
                 FreeAIr.Resources.Resources.RAG__choose_the_embedding_agent,
