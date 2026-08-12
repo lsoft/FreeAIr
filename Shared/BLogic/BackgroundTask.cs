@@ -1,5 +1,7 @@
 using FreeAIr.Helper;
+using System;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace FreeAIr.UI.Windows
 {
@@ -39,12 +41,12 @@ namespace FreeAIr.UI.Windows
         {
             get;
             private set;
-        }
+        } = string.Empty;
 
         /// <summary>
         /// Raised whenever the task's status text changes, so the wait window can update its display.
         /// </summary>
-        public event ShowStatusDelegate ShowStatusEvent;
+        public event ShowStatusDelegate? ShowStatusEvent;
 
         /// <summary>
         /// Creates the task and its cancellation token source.
@@ -102,7 +104,8 @@ namespace FreeAIr.UI.Windows
         /// </summary>
         public async Task StopAsync()
         {
-            _cancellationTokenSource.Cancel();
+            //the constructor always creates one, and nothing but this method disposes it
+            _cancellationTokenSource!.Cancel();
 
             await WaitForCompleteAsync();
 

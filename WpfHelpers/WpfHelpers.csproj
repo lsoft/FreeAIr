@@ -8,4 +8,9 @@
     <UseWPF>true</UseWPF>
   </PropertyGroup>
 
+  <ItemGroup>
+    <!-- NestedCheckBox\CheckableItem.cs walks its children through ListHelper.ForEach. -->
+    <ProjectReference Include="..\Shared\FreeAIr.Shared.csproj" />
+  </ItemGroup>
+
 </Project>
