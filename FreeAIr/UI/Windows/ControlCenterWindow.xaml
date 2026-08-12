@@ -12,7 +12,7 @@
     ui:VsTheme.UseVsTheme="True"
     ShowInTaskbar="False"
     Title="{x:Static resources:Resources.FreeAIr_Control_Center}"
-    xmlns:resources="clr-namespace:FreeAIr.Resources"
+    xmlns:resources="clr-namespace:FreeAIr.Resources;assembly=FreeAIr.Resources"
     >
     <ScrollViewer
         HorizontalAlignment="Stretch"

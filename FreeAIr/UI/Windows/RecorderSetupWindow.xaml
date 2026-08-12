@@ -12,7 +12,7 @@
     mc:Ignorable="d" 
     d:DesignHeight="300" d:DesignWidth="600"
     ui:VsTheme.UseVsTheme="True"
-    xmlns:resources="clr-namespace:FreeAIr.Resources"
+    xmlns:resources="clr-namespace:FreeAIr.Resources;assembly=FreeAIr.Resources"
     xmlns:chat="clr-namespace:FreeAIr.UI.Chat"
     WindowStartupLocation="Manual"
     AllowsTransparency="True"

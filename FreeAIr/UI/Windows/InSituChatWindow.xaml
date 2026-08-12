@@ -13,7 +13,7 @@
     d:DesignHeight="300" d:DesignWidth="600"
     Height="350" Width="700"
     ui:VsTheme.UseVsTheme="True"
-    xmlns:resources="clr-namespace:FreeAIr.Resources"
+    xmlns:resources="clr-namespace:FreeAIr.Resources;assembly=FreeAIr.Resources"
     xmlns:chat="clr-namespace:FreeAIr.UI.Chat"
     WindowStartupLocation="Manual"
     ShowInTaskbar="True"

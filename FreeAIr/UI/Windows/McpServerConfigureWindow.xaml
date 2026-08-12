@@ -17,7 +17,7 @@
     ShowInTaskbar="False"
     Title="{x:Static resources:Resources.FreeAIr_MCP_Servers_Configuration}"
     Loaded="Window_Loaded"
-    xmlns:resources="clr-namespace:FreeAIr.Resources" 
+    xmlns:resources="clr-namespace:FreeAIr.Resources;assembly=FreeAIr.Resources" 
     >
     <Grid
         IsEnabled="{Binding FormEnabled}"

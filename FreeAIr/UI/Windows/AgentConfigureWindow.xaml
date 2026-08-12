@@ -16,7 +16,7 @@
     ShowInTaskbar="False"
     Title="{x:Static resources:Resources.FreeAIr_Agent_Configuration_Window}"
     Loaded="Window_Loaded"
-    xmlns:resources="clr-namespace:FreeAIr.Resources"
+    xmlns:resources="clr-namespace:FreeAIr.Resources;assembly=FreeAIr.Resources"
     xmlns:vm="clr-namespace:FreeAIr.UI.ViewModels"
     d:DataContext="{d:DesignInstance Type=vm:AgentConfigureViewModel, IsDesignTimeCreatable=False}"
     >

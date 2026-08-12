@@ -13,7 +13,7 @@
     mc:Ignorable="d"
     d:DesignHeight="500"
     d:DesignWidth="800"
-    xmlns:nestedcheckbox="clr-namespace:FreeAIr.UI.NestedCheckBox" xmlns:resources="clr-namespace:FreeAIr.Resources"
+    xmlns:nestedcheckbox="clr-namespace:FreeAIr.UI.NestedCheckBox" xmlns:resources="clr-namespace:FreeAIr.Resources;assembly=FreeAIr.Resources"
     Name="GenerateNaturalLanguageOutlineToolWindow"
     >
     <Grid

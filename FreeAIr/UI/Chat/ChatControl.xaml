@@ -10,7 +10,7 @@
     xmlns:util="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Utilities"
     xmlns:catalog="clr-namespace:Microsoft.VisualStudio.Imaging;assembly=Microsoft.VisualStudio.ImageCatalog"
     xmlns:toolkit="clr-namespace:Community.VisualStudio.Toolkit;assembly=Community.VisualStudio.Toolkit"
-    xmlns:resources="clr-namespace:FreeAIr.Resources"
+    xmlns:resources="clr-namespace:FreeAIr.Resources;assembly=FreeAIr.Resources"
     xmlns:mdxaml="https://github.com/whistyun/MdXaml"
     xmlns:embedillo="clr-namespace:FreeAIr.UI.Embedillo"
     xmlns:viewmodels="clr-namespace:FreeAIr.UI.ViewModels"

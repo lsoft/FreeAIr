@@ -14,7 +14,7 @@
     mc:Ignorable="d"
     d:DesignHeight="300"
     d:DesignWidth="300"
-    Name="NaturalLanguageCommentsName" xmlns:resources="clr-namespace:FreeAIr.Resources" 
+    Name="NaturalLanguageCommentsName" xmlns:resources="clr-namespace:FreeAIr.Resources;assembly=FreeAIr.Resources" 
     >
     <UserControl.Resources>
         <DoubleCollection x:Key="Proportions">2,5,10,14,2</DoubleCollection>

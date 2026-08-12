@@ -16,7 +16,7 @@
     ShowInTaskbar="False"
     Title="{x:Static resources:Resources.FreeAIr_Support_Action_Configuration}"
     Name="ActionConfigurationWindowName"
-    Loaded="Window_Loaded" xmlns:resources="clr-namespace:FreeAIr.Resources"
+    Loaded="Window_Loaded" xmlns:resources="clr-namespace:FreeAIr.Resources;assembly=FreeAIr.Resources"
     >
     <Grid>
         <Grid.RowDefinitions>

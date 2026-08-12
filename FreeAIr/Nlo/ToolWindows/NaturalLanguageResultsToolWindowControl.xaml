@@ -10,7 +10,7 @@
     xmlns:catalog="clr-namespace:Microsoft.VisualStudio.Imaging;assembly=Microsoft.VisualStudio.ImageCatalog"
     xmlns:toolkit="clr-namespace:Community.VisualStudio.Toolkit;assembly=Community.VisualStudio.Toolkit"
     xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
-    xmlns:toolwindows="clr-namespace:FreeAIr.UI.ToolWindows" xmlns:resources="clr-namespace:FreeAIr.Resources"
+    xmlns:toolwindows="clr-namespace:FreeAIr.UI.ToolWindows" xmlns:resources="clr-namespace:FreeAIr.Resources;assembly=FreeAIr.Resources"
     mc:Ignorable="d"
     d:DesignHeight="300"
     d:DesignWidth="300"

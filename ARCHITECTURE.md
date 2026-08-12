@@ -8,6 +8,7 @@ looking for the user manual, read the [README](README.md) instead.
 | Project | Target | Purpose |
 | --- | --- | --- |
 | `FreeAIr` | .NET Framework 4.8 (VSIX) | The extension itself: package, commands, tool windows, chats, options, MCP client side. |
+| `Resources` (`FreeAIr.Resources`) | .NET Framework 4.8 | Every localized string of the product — `Resources.resx` plus the `ru` and `zh-Hans` translations — and the generated `FreeAIr.Resources.Resources` class. Its own assembly because nearly every feature needs it, so leaving it in the VSIX would force anything extracted from there to reference the VSIX back. |
 | `FreeAIr.Search` | netstandard2.0 | The searching machinery that does not need Visual Studio: index format, vector codec, outline tree, ranking, and the `Grep/` text matching behind the SearchFileContent MCP tool. |
 | `FreeAIr.Search.Tests` | .NET 8 (xunit) | Unit tests of `FreeAIr.Search`. Not shipped. |
 | `SetupWizard` (`FreeAIr.SetupWizard`) | netstandard2.0 | The first-run setup wizard's logic that does not need Visual Studio or WPF: step navigation/skipping, the agent-field validator, the known-endpoint catalog. |
@@ -253,7 +254,7 @@ net48 VSIX project with no test runner attached, so anything worth unit testing 
 somewhere an ordinary `dotnet test` can reach (see `SetupWizard.Tests`). That project carries no
 resources, so `WizardValidator` reports its findings as enum codes (`AgentFieldProblem`,
 `ActionBindingProblem`) which `SetupWizardViewModel.Describe` turns into the localized sentences the
-user reads — every string the window shows comes from `FreeAIr\Resources\Resources.resx` and its
+user reads — every string the window shows comes from `Resources\Resources.resx` and its
 `.ru`/`.zh-Hans` satellites, like the rest of the product.
 
 The wizard does not reimplement editors that already exist: its MCP servers and actions steps open

@@ -24,7 +24,11 @@
 
     <!-- Properties\AssemblyInfo.cs is hand written and takes its values from source.extension.cs. -->
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-    <!-- Keep the legacy resource naming: manifest names come from the folder, not from a sibling .Designer.cs. -->
+    <!--
+      Keep the legacy resource naming: manifest names come from the folder, not from a sibling
+      .Designer.cs. The localized strings themselves live in FreeAIr.Resources now, but
+      UI\ClickableText\ClickableTextResource.xaml below is still loaded by manifest name.
+    -->
     <EmbeddedResourceUseDependentUponConvention>false</EmbeddedResourceUseDependentUponConvention>
     <!-- Everything that is not code is listed explicitly below; a default None glob would double up on it. -->
     <EnableDefaultNoneItems>false</EnableDefaultNoneItems>
@@ -62,11 +66,6 @@
 
   <!-- Generated files, listed only so the IDE nests them under what generates them. -->
   <ItemGroup>
-    <Compile Update="Resources\Resources1.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Resources.resx</DependentUpon>
-    </Compile>
     <Compile Update="source.extension.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -92,17 +91,7 @@
     </EmbeddedResource>
   </ItemGroup>
 
-  <ItemGroup>
-    <EmbeddedResource Update="Resources\Resources.resx">
-      <Generator>PublicResXFileCodeGenerator</Generator>
-      <SubType>Designer</SubType>
-      <LastGenOutput>Resources1.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
-    <EmbeddedResource Update="Resources\Resources.ru.resx">
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-  </ItemGroup>
-
+  <!-- Resources\ holds only the three icons now; the .resx files are in ..\Resources. -->
   <ItemGroup>
     <None Include="source.extension.vsixmanifest">
       <SubType>Designer</SubType>
@@ -213,6 +202,12 @@
       <IncludeOutputGroupsInVSIXLocalOnly>DebugSymbolsProjectOutputGroup%3b</IncludeOutputGroupsInVSIXLocalOnly>
     </ProjectReference>
     <ProjectReference Include="..\MCP\Dto\Dto.csproj" />
+    <!--
+      The localized strings. No IncludeOutputGroupsInVSIX is needed: the copy-local chain already
+      puts the assembly and its ru\ and zh-Hans\ satellites into the package - see
+      RemoveFlattenedSatellites at the bottom of this file for what it puts there twice.
+    -->
+    <ProjectReference Include="..\Resources\FreeAIr.Resources.csproj" />
     <ProjectReference Include="..\Search\FreeAIr.Search.csproj" />
     <ProjectReference Include="..\SetupWizard\FreeAIr.SetupWizard.csproj" />
     <ProjectReference Include="..\Shared\FreeAIr.Shared.csproj" />
@@ -242,6 +237,28 @@
       <VSIXSourceItem Include="@(ReferenceCopyLocalPaths)" Condition="'%(ReferenceCopyLocalPaths.NuGetPackageId)' == 'System.IO.Pipelines'" />
       <VSIXSourceItem Include="@(ReferenceCopyLocalPaths)" Condition="'%(ReferenceCopyLocalPaths.NuGetPackageId)' == 'System.Text.Json'" />
       <VSIXSourceItem Include="@(ReferenceCopyLocalPaths)" Condition="'%(ReferenceCopyLocalPaths.NuGetPackageId)' == 'Microsoft.Bcl.AsyncInterfaces'" />
+    </ItemGroup>
+  </Target>
+
+  <!--
+    A satellite assembly of a referenced project reaches the packer twice: once from that project's
+    obj\ with TargetPath="ru\...", which is the one we want, and once from its bin\ with no
+    TargetPath at all. The second copy would be written to the root of the .vsix, where the runtime
+    never probes for satellites - and since every culture flattens to the same file name there, the
+    packer keeps whichever came first and drops the rest as duplicates.
+
+    An empty TargetPath is normal for the loose assemblies added above, so it is the combination
+    with the .resources.dll suffix that identifies the stray. FreeAIr.Resources.dll itself is not
+    caught: project output carries a TargetPath.
+  -->
+  <Target Name="RemoveFlattenedSatellites" AfterTargets="GetVsixSourceItems">
+    <ItemGroup>
+      <!-- narrowed by well-known metadata first: TargetPath is not defined on every source item,
+           and batching the whole list on it fails with MSB4096 -->
+      <_SatelliteVsixItem Include="@(VSIXSourceItem)"
+                          Condition="$([System.String]::Copy('%(Filename)%(Extension)').ToLowerInvariant().EndsWith('.resources.dll'))" />
+      <_FlattenedSatellite Include="@(_SatelliteVsixItem)" Condition="'%(_SatelliteVsixItem.TargetPath)' == ''" />
+      <VSIXSourceItem Remove="@(_FlattenedSatellite)" />
     </ItemGroup>
   </Target>
 </Project>

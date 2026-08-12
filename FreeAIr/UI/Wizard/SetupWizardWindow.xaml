@@ -6,7 +6,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:ui="clr-namespace:FreeAIr.UI"
     xmlns:vm="clr-namespace:FreeAIr.UI.ViewModels"
-    xmlns:resources="clr-namespace:FreeAIr.Resources"
+    xmlns:resources="clr-namespace:FreeAIr.Resources;assembly=FreeAIr.Resources"
     mc:Ignorable="d"
     d:DesignHeight="750" d:DesignWidth="1050"
     Height="750" Width="1050"

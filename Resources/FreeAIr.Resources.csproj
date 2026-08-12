@@ -1,0 +1,53 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    The localized strings of the whole product - the three .resx files and the generated
+    `FreeAIr.Resources.Resources` class - and nothing else.
+
+    They live in their own assembly because almost every feature folder of the VSIX needs them:
+    while they sat inside FreeAIr.dll, anything worth pulling out into an assembly of its own
+    would have had to reference the VSIX back. This is the leaf everything else may depend on.
+
+    net48, like the VSIX which is the only thing that consumes it.
+  -->
+
+  <PropertyGroup>
+    <TargetFramework>net48</TargetFramework>
+    <LangVersion>Latest</LangVersion>
+    <!--
+      The manifest name of the embedded resources has to stay `FreeAIr.Resources.Resources`: that
+      is the base name the generated ResourceManager asks for, and it is what the satellite
+      assemblies are keyed on. RootNamespace plus a .resx at the project root produces exactly it.
+    -->
+    <RootNamespace>FreeAIr.Resources</RootNamespace>
+    <AssemblyName>FreeAIr.Resources</AssemblyName>
+    <!--
+      Off for the same reason as in FreeAIr.csproj: with the convention on, the manifest name
+      would be taken from a sibling `Resources.Designer.cs`. Ours is called Resources1.Designer.cs,
+      so the convention would silently fall back to something else the day it is renamed.
+    -->
+    <EmbeddedResourceUseDependentUponConvention>false</EmbeddedResourceUseDependentUponConvention>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+  </PropertyGroup>
+
+  <!-- Listed only so the IDE nests the generated class under the .resx and keeps regenerating it. -->
+  <ItemGroup>
+    <Compile Update="Resources1.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <EmbeddedResource Update="Resources.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <SubType>Designer</SubType>
+      <LastGenOutput>Resources1.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Resources.ru.resx">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Resources.zh-Hans.resx">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+  </ItemGroup>
+
+</Project>

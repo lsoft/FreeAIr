@@ -178,6 +178,16 @@ The baseline when this section was written was 918 of 4299 nodes (21%).
   in `FreeAIr.csproj` (or the dll is not in the package), a `MefComponent` asset in
   `source.extension.vsixmanifest` if it exports MEF parts (or the exports vanish), and
   `SatelliteDllsProjectOutputGroup` if it is localized. `FreeAIr.Voice` is the worked example.
+- **`clr-namespace:` in XAML means the current assembly unless `;assembly=` says otherwise.** Moving
+  a type that XAML names into another assembly compiles the C# fine and then fails the markup
+  compiler with `MC3050: cannot find type`. Every `xmlns:resources="clr-namespace:FreeAIr.Resources"`
+  needed `;assembly=FreeAIr.Resources` appended when the strings moved out.
+- **Satellite assemblies of a referenced project reach the VSIX packer twice** — from the project's
+  `obj\` with the culture folder in `TargetPath`, and from its `bin\` with no `TargetPath` at all.
+  The second copy lands in the root of the `.vsix`, where nothing probes for it, and since every
+  culture flattens to one name there the packer silently drops all but the first. The
+  `RemoveFlattenedSatellites` target in `FreeAIr.csproj` throws those away. Check for a stray
+  `*.resources.dll` in the root of the package if you add another localized assembly.
 - **Do not use a `PostBuildEvent` property in an SDK-style project here.** Property values are
   expanded during evaluation, before the SDK targets define `$(TargetDir)`, so the command runs
   with an empty path. Use a `<Target AfterTargets="Build">` with `<Exec/>` instead — see
