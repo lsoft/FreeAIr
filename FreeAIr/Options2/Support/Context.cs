@@ -302,12 +302,12 @@ namespace FreeAIr.Options2.Support
         /// index, so nothing that matters may live in this summary alone.
         /// </summary>
         public static async Task<SupportContext> WithContextItemAsync(
-            IReadOnlyList<SolutionItemChatContextItem> contextItems
+            IReadOnlyList<string> filePaths
             )
         {
-            if (contextItems is null)
+            if (filePaths is null)
             {
-                throw new ArgumentNullException(nameof(contextItems));
+                throw new ArgumentNullException(nameof(filePaths));
             }
 
             var unsorted = await FreeAIrOptions.DeserializeUnsortedAsync();
@@ -316,7 +316,7 @@ namespace FreeAIr.Options2.Support
 
             result.AddContextVariable(
                 SupportContextVariableEnum.ContextItemName,
-                string.Join(", ", contextItems.Select(s => $"`{s.SelectedIdentifier.FilePath}`"))
+                string.Join(", ", filePaths.Select(p => $"`{p}`"))
                 );
             result.AddContextVariable(
                 SupportContextVariableEnum.UnitTestFramework,
@@ -389,12 +389,15 @@ namespace FreeAIr.Options2.Support
         /// column the compiler complained about.
         /// </summary>
         public static async Task<SupportContext> WithErrorInformationAsync(
-            BuildResultInformation errorInformation
+            string filePath,
+            string errorDescription,
+            int line,
+            int column
             )
         {
-            if (errorInformation is null)
+            if (filePath is null)
             {
-                throw new ArgumentNullException(nameof(errorInformation));
+                throw new ArgumentNullException(nameof(filePath));
             }
 
             var unsorted = await FreeAIrOptions.DeserializeUnsortedAsync();
@@ -403,19 +406,19 @@ namespace FreeAIr.Options2.Support
 
             result.AddContextVariable(
                 SupportContextVariableEnum.ContextItemName,
-                "`" + errorInformation.FilePath + "`"
+                "`" + filePath + "`"
                 );
             result.AddContextVariable(
                 SupportContextVariableEnum.BuildErrorMessage,
-                errorInformation.ErrorDescription
+                errorDescription
                 );
             result.AddContextVariable(
                 SupportContextVariableEnum.BuildErrorLine,
-                errorInformation.Line.ToString()
+                line.ToString()
                 );
             result.AddContextVariable(
                 SupportContextVariableEnum.BuildErrorColumn,
-                errorInformation.Column.ToString()
+                column.ToString()
                 );
             result.AddContextVariable(
                 SupportContextVariableEnum.UnitTestFramework,

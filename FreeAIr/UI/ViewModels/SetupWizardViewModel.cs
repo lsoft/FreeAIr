@@ -1,3 +1,4 @@
+﻿using FreeAIr.MCP.McpServerProxy;
 using Dto;
 using FreeAIr.Helper;
 using FreeAIr.Options2;
@@ -530,7 +531,7 @@ namespace FreeAIr.UI.ViewModels
                 {
                     field = new AsyncRelayCommand(async _ => await GuardedAsync(async () =>
                     {
-                        if (!await FreeAIrOptions.ApplyMcpServerNodeAsync(Options.AvailableMcpServers))
+                        if (!await McpServerProxyApplication.ApplyServerNodeAsync(Options.AvailableMcpServers))
                         {
                             return;
                         }

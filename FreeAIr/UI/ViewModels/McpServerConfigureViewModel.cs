@@ -1,4 +1,5 @@
-﻿using Dto;
+﻿using FreeAIr.MCP.McpServerProxy;
+using Dto;
 using FreeAIr.Helper;
 using FreeAIr.Options2;
 using FreeAIr.UI.ContextMenu;
@@ -388,7 +389,7 @@ namespace FreeAIr.UI.ViewModels
 
         /// <summary>
         /// Command that pings the selected server by applying the current server dictionary
-        /// through <see cref="FreeAIrOptions.ApplyMcpServerNodeAsync"/> and reports success
+        /// through <see cref="McpServerProxyApplication.ApplyServerNodeAsync"/> and reports success
         /// via a message box, so the user can verify a server is reachable before saving.
         /// </summary>
         public ICommand CheckForConnectionCommand
@@ -408,7 +409,7 @@ namespace FreeAIr.UI.ViewModels
 
                                 var dict = BuildServerDictionary();
 
-                                if (await FreeAIrOptions.ApplyMcpServerNodeAsync(
+                                if (await McpServerProxyApplication.ApplyServerNodeAsync(
                                     new McpServers
                                     {
                                         Servers = dict

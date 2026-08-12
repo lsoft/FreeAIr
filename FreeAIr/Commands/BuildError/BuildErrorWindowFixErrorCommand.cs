@@ -43,7 +43,10 @@ namespace FreeAIr.Commands.BuildError
             }
 
             var supportContext = await SupportContext.WithErrorInformationAsync(
-                errorInformation
+                errorInformation.FilePath,
+                errorInformation.ErrorDescription,
+                errorInformation.Line,
+                errorInformation.Column
                 );
 
             var chosenAgent = await AgentContextMenu.ChooseAgentWithTokenAsync(

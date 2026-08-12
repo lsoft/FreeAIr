@@ -441,69 +441,6 @@ namespace FreeAIr.Options2
 
         #endregion
 
-        /// <summary>
-        /// Validates the MCP servers subnode by actually starting the servers it describes.
-        /// Returns true only when every configured server came up; otherwise the user is told
-        /// which ones failed and the caller is expected to abandon the save.
-        /// </summary>
-        public static async Task<bool> ApplyMcpServerNodeAsync(
-            McpServers servers
-            )
-        {
-            if (servers is null)
-            {
-                throw new ArgumentNullException(nameof(servers));
-            }
-
-            try
-            {
-                var setupResult = await McpServerProxyApplication.UpdateExternalServersAsync(
-                    servers
-                    );
-                if (setupResult is null)
-                {
-                    await VS.MessageBox.ShowErrorAsync(
-                        Resources.Resources.Error,
-                        $"Invalid MCP servers json subnode. Fix json and try again."
-                        );
-                    return false;
-                }
-
-                var failedServerNames = new List<string>();
-                foreach (var mcpServer in servers.Servers)
-                {
-                    if (setupResult.SuccessStartedMcpServers.All(a => a.Name != mcpServer.Key))
-                    {
-                        //этот сервер не был инициализирован по какой-то причине
-                        failedServerNames.Add(mcpServer.Key);
-                    }
-                }
-                if (failedServerNames.Count > 0)
-                {
-                    await VS.MessageBox.ShowErrorAsync(
-                        Resources.Resources.Error,
-                        $"Some MCP servers failed to start: {string.Join(",", failedServerNames)}. Changes did not saved."
-                        );
-                    return false;
-                }
-
-                return true;
-            }
-            catch (Exception excp)
-            {
-                excp.ActivityLogException();
-
-                await VS.MessageBox.ShowErrorAsync(
-                    Resources.Resources.Error,
-                    excp.Message
-                    + Environment.NewLine
-                    + excp.StackTrace
-                    );
-            }
-
-            return false;
-        }
-
         /// <summary>Path of the settings file, `.freeair\&lt;solution name&gt;_options.json`.</summary>
         public static Task<string?> ComposeOptionsFilePathAsync(
             )

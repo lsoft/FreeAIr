@@ -734,7 +734,7 @@ namespace FreeAIr.UI.ViewModels
                 {
                     _viewModel.PageEnabled = false;
 
-                    if (!await FreeAIrOptions.ApplyMcpServerNodeAsync(
+                    if (!await McpServerProxyApplication.ApplyServerNodeAsync(
                         options.AvailableMcpServers
                         ))
                     {

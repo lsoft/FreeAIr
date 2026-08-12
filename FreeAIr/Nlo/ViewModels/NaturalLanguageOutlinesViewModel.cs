@@ -394,7 +394,7 @@ namespace FreeAIr.UI.ViewModels
                     _chat.ChatContext.AddItems(textContextualItems);
 
                     var supportContext = await SupportContext.WithContextItemAsync(
-                        portionSolutionItems
+                        portionSolutionItems.ConvertAll(i => i.SelectedIdentifier.FilePath)
                         );
 
                     var promptText = supportContext.ApplyVariablesToPrompt(
