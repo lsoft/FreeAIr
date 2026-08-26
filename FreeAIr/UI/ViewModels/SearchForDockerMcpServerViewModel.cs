@@ -17,7 +17,7 @@ namespace FreeAIr.UI.ViewModels
     /// <summary>
     /// View model for the "search Docker MCP servers" dialog: lists MCP server images published
     /// on Docker Hub under the `mcp` namespace, lets the user filter them by name/description,
-    /// and installs the selected one via `docker mcp server enable`, extracting its
+    /// and installs the selected one via `docker mcp profile server add`, extracting its
     /// <see cref="McpServer"/> configuration from the image's description page.
     /// </summary>
     public sealed class SearchForDockerMcpServerViewModel : BaseViewModel
@@ -138,7 +138,14 @@ namespace FreeAIr.UI.ViewModels
         }
 
         /// <summary>
-        /// Enables the named MCP server via the `docker mcp server enable` CLI, then fetches its
+        /// Docker Hub image name of the official MCP catalog backing <see cref="ConstructServerAsync"/>;
+        /// its entries share their names with the `mcp/&lt;name&gt;` images this dialog lists, unlike the
+        /// unrelated `mcp/community-registry` catalog.
+        /// </summary>
+        private const string DockerMcpCatalogName = "mcp/docker-mcp-catalog";
+
+        /// <summary>
+        /// Enables the named MCP server via `docker mcp profile server add`, then fetches its
         /// Docker Hub description and parses the JSON MCP configuration out of the
         /// "Use this MCP Server" section, returning the server's name and <see cref="McpServer"/>
         /// configuration (or nulls, with a warning/error dialog, if any step fails).
@@ -149,10 +156,29 @@ namespace FreeAIr.UI.ViewModels
         {
             try
             {
+                // The old `docker mcp server enable` command is obsolete; the replacement needs the
+                // catalog that maps `mcp/<name>` image names to server definitions pulled locally first.
+                var pullResult = await ProcessHelper.RunSilentlyAsync(
+                    Directory.GetCurrentDirectory(),
+                    "docker",
+                    $"mcp catalog pull {DockerMcpCatalogName}:latest",
+                    CancellationToken.None
+                    );
+                if (pullResult.ExitCode != 0)
+                {
+                    await VS.MessageBox.ShowErrorAsync(
+                        string.Join(
+                            Environment.NewLine,
+                            pullResult.StandardError
+                            )
+                        );
+                    return (null, null);
+                }
+
                 var installResult = await ProcessHelper.RunSilentlyAsync(
                     Directory.GetCurrentDirectory(),
                     "docker",
-                    $"mcp server enable {serverName}",
+                    $"mcp profile server add default --server catalog://{DockerMcpCatalogName}/{serverName}",
                     CancellationToken.None
                     );
                 if (installResult.ExitCode != 0)
