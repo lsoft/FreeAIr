@@ -5,11 +5,15 @@ using OpenAI;
 using OpenAI.Chat;
 using System.ClientModel;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using FreeAIr.Chat.Content;
 using FreeAIr.Chat.Context;
+using FreeAIr.Chat.Persistence;
 using FreeAIr.BLogic.Reader;
+using FreeAIr.Helper;
 
 namespace FreeAIr.Chat
 {
@@ -20,6 +24,10 @@ namespace FreeAIr.Chat
     /// (prompts, answers, tool calls), the chat context (documents and other material given to the
     /// model), the chat-scoped MCP tool switches and the chosen agent.
     ///
+    /// User-started chats are written to `.freeair\chats` when that folder can be resolved, so they
+    /// survive a restart of Visual Studio. Automatic chats, and chats created with no solution open,
+    /// stay in memory only.
+    ///
     /// The chat itself does not talk to the model. It only signals, via <see cref="LLMReaderPool"/>,
     /// that there is something new to send; the actual streaming is done by <see cref="LLMReader"/>.
     ///
@@ -28,11 +36,19 @@ namespace FreeAIr.Chat
     public sealed class Chat : IAsyncDisposable
     {
         /// <summary>
-        /// Identifies the chat for the lifetime of the Visual Studio session. Not persisted — it is
-        /// how the tool windows and <see cref="ChatContainer.LastCreatedChatId"/> refer to a chat
-        /// without holding it alive.
+        /// Identifies the chat across the Visual Studio session and, for a persisted chat, across
+        /// restarts: it is the name of the json file under `.freeair\chats`.
         /// </summary>
-        public Guid Id { get; } = Guid.NewGuid();
+        public Guid Id { get; }
+
+        /// <summary>
+        /// Absolute path of the json file this chat is saved to, or null when the chat is not
+        /// persistent — it is an automatic chat, or no solution was open when it was created.
+        /// </summary>
+        private string? _persistenceFilePath;
+
+        /// <summary>Guards overlapping writes of the same chat file from status and content events.</summary>
+        private readonly object _persistLock = new();
 
         /// <summary>
         /// The whole dialogue in chronological order. See <see cref="GetMessageListAsync"/>
@@ -96,6 +112,12 @@ namespace FreeAIr.Chat
             get;
         }
 
+        /// <summary>
+        /// True when this chat is written to `.freeair\chats`. Automatic chats never are; a user
+        /// chat is only when the solution folder was known at creation time.
+        /// </summary>
+        public bool IsPersistent => _persistenceFilePath is not null;
+
         /// <summary>When the chat was created. Shown in the chat list to tell several of them apart.</summary>
         public DateTime? Started
         {
@@ -121,13 +143,16 @@ namespace FreeAIr.Chat
 
         /// <summary>
         /// Private on purpose: a chat has to be registered with <see cref="ChatContainer"/> to be
-        /// stopped, disposed and shown, so it is built by <see cref="CreateChatAsync"/> only.
+        /// stopped, disposed and shown, so it is built by <see cref="CreateChatAsync"/> or
+        /// <see cref="CreateFromPersistedAsync"/> only.
         /// </summary>
         private Chat(
             ChatContext chatContext,
             ChatDescription description,
             ChatOptions options,
-            AvailableToolContainer chatTools
+            AvailableToolContainer chatTools,
+            Guid? id = null,
+            DateTime? started = null
             )
         {
             if (chatContext is null)
@@ -145,15 +170,17 @@ namespace FreeAIr.Chat
                 throw new ArgumentNullException(nameof(options));
             }
 
+            Id = id ?? Guid.NewGuid();
             ChatContext = chatContext;
             Description = description;
             Options = options;
             ChatTools = chatTools;
             _status = ChatStatusEnum.NotStarted;
 
-            Started = DateTime.Now;
+            Started = started ?? DateTime.Now;
 
             ChatContext.ChatContextChangedEvent += ChatContextChangedRaised;
+            Description.PropertyChanged += DescriptionPropertyChanged;
         }
 
         /// <summary>
@@ -176,6 +203,204 @@ namespace FreeAIr.Chat
                 );
 
             return result;
+        }
+
+        /// <summary>
+        /// Rebuilds a user chat from a json file under `.freeair\chats`. Returns null when the file
+        /// cannot be parsed or there is no agent left to attach. Does not start a reader: the
+        /// transcript is already complete.
+        /// </summary>
+        public static async Task<Chat?> CreateFromPersistedAsync(
+            PersistedChatJson payload,
+            string filePath
+            )
+        {
+            if (payload is null)
+            {
+                throw new ArgumentNullException(nameof(payload));
+            }
+
+            if (filePath is null)
+            {
+                throw new ArgumentNullException(nameof(filePath));
+            }
+
+            var agent = await FreeAIrOptions.DeserializeAgentByNameAsync(payload.AgentName);
+            if (agent is null)
+            {
+                var agents = await FreeAIrOptions.DeserializeAgentCollectionAsync();
+                agent = agents.Agents.FirstOrDefault();
+            }
+
+            if (agent is null)
+            {
+                return null;
+            }
+
+            var options = await ChatOptions.GetDefaultAsync(agent);
+            var chatTools = payload.Tools is not null
+                ? AvailableToolContainer.Create(payload.Tools)
+                : await AvailableToolContainer.ReadSystemAsync();
+
+            IOriginalTextDescriptor? selected = null;
+            if (!string.IsNullOrEmpty(payload.SelectedFilePath) && File.Exists(payload.SelectedFilePath))
+            {
+                selected = new WholeFileTextDescriptor(
+                    payload.SelectedFilePath,
+                    LineEndingHelper.Actual.GetDocumentLineEnding(payload.SelectedFilePath)
+                    );
+            }
+
+            var description = new ChatDescription(selected)
+            {
+                Title = string.IsNullOrEmpty(payload.Title) ? "Untitled" : payload.Title,
+            };
+
+            var chatContext = ChatContext.CreateEmpty();
+            var chat = new Chat(
+                chatContext,
+                description,
+                options,
+                chatTools,
+                payload.Id,
+                payload.Started
+                );
+
+            foreach (var contextRow in payload.Context)
+            {
+                var item = contextRow.ToItem();
+                if (item is not null)
+                {
+                    chatContext.AddItem(item);
+                }
+            }
+
+            foreach (var contentRow in payload.Contents)
+            {
+                var content = chat.RestoreContent(contentRow);
+                if (content is not null)
+                {
+                    chat._contents.Add(content);
+                }
+            }
+
+            var restoredStatus = payload.Status;
+            if (restoredStatus == ChatStatusEnum.WaitingForAnswer || restoredStatus == ChatStatusEnum.ReadingAnswer)
+            {
+                restoredStatus = ChatStatusEnum.Ready;
+            }
+
+            if (chat._contents.Count == 0)
+            {
+                restoredStatus = ChatStatusEnum.NotStarted;
+            }
+            else if (restoredStatus == ChatStatusEnum.NotStarted)
+            {
+                restoredStatus = ChatStatusEnum.Ready;
+            }
+
+            chat._status = restoredStatus;
+            chat.EnablePersistence(filePath);
+            return chat;
+        }
+
+        /// <summary>
+        /// Marks this chat as written to <paramref name="filePath"/>. Called once, either at
+        /// creation when the `.freeair\chats` folder can be resolved, or when the chat is loaded
+        /// back from that folder.
+        /// </summary>
+        public void EnablePersistence(string filePath)
+        {
+            if (filePath is null)
+            {
+                throw new ArgumentNullException(nameof(filePath));
+            }
+
+            _persistenceFilePath = filePath;
+        }
+
+        /// <summary>
+        /// Writes the whole chat to its json file. No-op when the chat is not persistent. Safe to
+        /// call from the UI thread or from a reader thread: the write is short and the file is
+        /// replaced atomically.
+        /// </summary>
+        public void PersistNow()
+        {
+            var filePath = _persistenceFilePath;
+            if (filePath is null)
+            {
+                return;
+            }
+
+            lock (_persistLock)
+            {
+                try
+                {
+                    ChatPersistence.Save(filePath, PersistedChatJson.FromChat(this));
+                }
+                catch (Exception excp)
+                {
+                    excp.ActivityLogException();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Removes the json file because the user closed the chat. Visual Studio shutting down does
+        /// not call this, so the transcript is still there next time the solution opens.
+        /// </summary>
+        public void DeletePersistentFile()
+        {
+            var filePath = _persistenceFilePath;
+            if (filePath is null)
+            {
+                return;
+            }
+
+            ChatPersistence.Delete(filePath);
+            _persistenceFilePath = null;
+        }
+
+        /// <summary>
+        /// Rebuilds one transcript entry from the saved json without starting a reader or notifying
+        /// the window. The window reads <see cref="Contents"/> when it binds.
+        /// </summary>
+        private IChatContent? RestoreContent(
+            PersistedContentJson row
+            )
+        {
+            switch (row.Type)
+            {
+                case ChatContentTypeEnum.Prompt:
+                    var prompt = UserPrompt.CreateTextBasedPrompt(row.Body ?? string.Empty);
+                    if (row.IsArchived)
+                    {
+                        prompt.Archive();
+                    }
+
+                    return prompt;
+
+                case ChatContentTypeEnum.LLMAnswer:
+                    return AnswerChatContent.CreateCompleted(
+                        row.Body ?? string.Empty,
+                        row.IsArchived
+                        );
+
+                case ChatContentTypeEnum.ToolCall:
+                    return ToolCallChatContent.Restore(
+                        row.ToolCallId,
+                        row.Name,
+                        row.Arguments,
+                        row.Index,
+                        row.Status ?? ToolCallStatusEnum.Failed,
+                        row.Result,
+                        row.IsArchived,
+                        ContinueTurnIfAllToolsHaveResult
+                        );
+
+                default:
+                    return null;
+            }
         }
 
         /// <summary>
@@ -226,32 +451,40 @@ namespace FreeAIr.Chat
         {
             var content = new ToolCallChatContent(
                 toolCall,
-                () =>
-                {
-                    var lastPromptIndex = _contents.FindLastIndex(c => c.Type == ChatContentTypeEnum.Prompt);
-                    if (lastPromptIndex == -1)
-                    {
-                        return;
-                    }
-
-                    var lastTools = _contents
-                        .Skip(lastPromptIndex)
-                        .Where(c => c.Type == ChatContentTypeEnum.ToolCall)
-                        .Cast<ToolCallChatContent>()
-                        .ToList()
-                        ;
-                    var allToolsHaveResult = lastTools.All(t => t.Status.In(ToolCallStatusEnum.Succeeded, ToolCallStatusEnum.Failed, ToolCallStatusEnum.Blocked));
-                    if (allToolsHaveResult)
-                    {
-                        LLMReaderPool.StartReaderFor(this);
-                    }
-                }
+                ContinueTurnIfAllToolsHaveResult
                 );
             _contents.Add(content);
 
             RaiseContentAdded(content);
 
             return content;
+        }
+
+        /// <summary>
+        /// When every tool call of the current turn has finished, starts the reader again so the
+        /// model can consume the results. Shared by a live stream and by a restored call the user
+        /// is still being asked about.
+        /// </summary>
+        private void ContinueTurnIfAllToolsHaveResult()
+        {
+            var lastPromptIndex = _contents.FindLastIndex(c => c.Type == ChatContentTypeEnum.Prompt);
+            if (lastPromptIndex == -1)
+            {
+                return;
+            }
+
+            var lastTools = _contents
+                .Skip(lastPromptIndex)
+                .Where(c => c.Type == ChatContentTypeEnum.ToolCall)
+                .Cast<ToolCallChatContent>()
+                .ToList()
+                ;
+            var allToolsHaveResult = lastTools.All(t => t.Status.In(ToolCallStatusEnum.Succeeded, ToolCallStatusEnum.Failed, ToolCallStatusEnum.Blocked));
+            if (allToolsHaveResult)
+            {
+                PersistNow();
+                LLMReaderPool.StartReaderFor(this);
+            }
         }
 
         /// <summary>
@@ -284,6 +517,8 @@ namespace FreeAIr.Chat
             {
                 p.Archive();
             });
+
+            PersistNow();
         }
 
         /// <summary>
@@ -293,6 +528,9 @@ namespace FreeAIr.Chat
         /// </summary>
         public async ValueTask DisposeAsync()
         {
+            Description.PropertyChanged -= DescriptionPropertyChanged;
+            ChatContext.ChatContextChangedEvent -= ChatContextChangedRaised;
+
             Description.Dispose();
 
             foreach (var content in Contents)
@@ -367,10 +605,22 @@ namespace FreeAIr.Chat
         /// <summary>
         /// Reports a context edit as a status change. The two are separate things, but every
         /// subscriber redraws on either, and one event spares them a second subscription.
+        /// A persistent chat is saved here too: attaching a file is a real change, and it is not
+        /// the per-token flood of a streaming answer.
         /// </summary>
         private void ChatContextChangedRaised(object sender, ChatContextEventArgs e)
         {
             StatusChanged();
+            PersistNow();
+        }
+
+        /// <summary>Saves after the user renamed the chat in the list.</summary>
+        private void DescriptionPropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (string.IsNullOrEmpty(e.PropertyName) || e.PropertyName == nameof(ChatDescription.Title))
+            {
+                PersistNow();
+            }
         }
 
         private void RaiseContentAdded(
@@ -381,6 +631,13 @@ namespace FreeAIr.Chat
                 this,
                 new ChatContentAddedEventArgs(this, content)
                 );
+
+            //an answer is empty when it is created and then grows token by token; wait until the
+            //turn settles (Ready / Failed) rather than writing the file on every chunk
+            if (content.Type != ChatContentTypeEnum.LLMAnswer)
+            {
+                PersistNow();
+            }
         }
 
         private void StatusChanged()
@@ -389,6 +646,11 @@ namespace FreeAIr.Chat
             if (e is not null)
             {
                 e(this, new ChatEventArgs(this));
+            }
+
+            if (Status == ChatStatusEnum.Ready || Status == ChatStatusEnum.Failed)
+            {
+                PersistNow();
             }
         }
 

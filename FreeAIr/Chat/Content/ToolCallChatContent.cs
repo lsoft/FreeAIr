@@ -1,6 +1,7 @@
 ﻿using FreeAIr.Helper;
 using OpenAI.Chat;
 using System.Collections.Generic;
+using System.Text;
 
 namespace FreeAIr.Chat.Content
 {
@@ -54,6 +55,59 @@ namespace FreeAIr.Chat.Content
         {
             get;
             private set;
+        }
+
+        /// <summary>
+        /// Rebuilds a tool call from a saved chat file. A call that was still running when Visual
+        /// Studio closed cannot be resumed, so it lands as failed; one that was waiting for
+        /// permission stays asking, and the user can allow or block it again.
+        /// </summary>
+        public static ToolCallChatContent Restore(
+            string? toolCallId,
+            string? functionName,
+            string? arguments,
+            int index,
+            ToolCallStatusEnum status,
+            string? result,
+            bool isArchived,
+            Action checkForRequestAnswer
+            )
+        {
+            if (checkForRequestAnswer is null)
+            {
+                throw new ArgumentNullException(nameof(checkForRequestAnswer));
+            }
+
+            var restoredStatus = status;
+            var restoredResult = result;
+            if (restoredStatus == ToolCallStatusEnum.Executing)
+            {
+                restoredStatus = ToolCallStatusEnum.Failed;
+                restoredResult = "Interrupted when Visual Studio closed.";
+            }
+
+            var toolCall = OpenAIChatModelFactory.StreamingChatToolCallUpdate(
+                index: index,
+                toolCallId: toolCallId ?? string.Empty,
+                kind: ChatToolCallKind.Function,
+                functionName: functionName ?? string.Empty,
+                functionArgumentsUpdate: BinaryData.FromString(
+                    string.IsNullOrEmpty(arguments) ? "{}" : arguments
+                    )
+                );
+
+            var content = new ToolCallChatContent(toolCall, checkForRequestAnswer)
+            {
+                Status = restoredStatus,
+                Result = restoredResult,
+            };
+
+            if (isArchived)
+            {
+                content.Archive();
+            }
+
+            return content;
         }
 
         /// <summary>Wraps a streamed tool call request in the Asking state, pending user permission.</summary>

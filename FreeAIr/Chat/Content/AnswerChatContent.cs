@@ -43,6 +43,27 @@ namespace FreeAIr.Chat.Content
         public string AnswerBody => _answerBody.ToString();
 
         /// <summary>
+        /// Rebuilds a finished answer from a saved chat file. The body is complete, so the chat
+        /// window has nothing to stream; the change proxy is still created because dispose expects it.
+        /// </summary>
+        public static AnswerChatContent CreateCompleted(string body, bool isArchived)
+        {
+            if (body is null)
+            {
+                throw new ArgumentNullException(nameof(body));
+            }
+
+            var content = new AnswerChatContent();
+            content._answerBody.Append(body);
+            if (isArchived)
+            {
+                content.Archive();
+            }
+
+            return content;
+        }
+
+        /// <summary>
         /// Creates an empty, growing answer and sets up the coalesced change notification.
         /// </summary>
         public AnswerChatContent()

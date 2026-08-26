@@ -247,6 +247,14 @@ If your project is written in C#, you can add all files dependent on the already
 
 Every chat has a name which is shown in the chat list. FreeAIr suggests a name automatically, and you can rename any chat by clicking on its name.
 
+### Persistent chats
+
+Chats you start yourself (not the automatic ones FreeAIr opens for commit messages, whole line completion, and the like) are saved next to the solution in `.freeair\chats`, one json file per chat. They come back when you reopen the solution. Closing a chat in the list deletes its file; shutting Visual Studio down does not.
+
+If no solution is open when the chat is created, there is nowhere to put the file and the chat stays in memory only.
+
+The json is written when a whole message is added (a prompt, a finished answer, a tool call) and when you rename the chat, change its agent or its tools, or attach context — not on every token of a streaming answer. Russian (and any other non-ASCII) is stored as letters, not `\uXXXX` escapes.
+
 ## In situ chat
 
 Besides the chat tool window, FreeAIr can open a small floating chat window right at the caret, without taking you away from the code you are editing. Press `Alt+Z` (or use `FreeAIr start chat here` in the editor context menu) and the window will appear at the current position. Hold `Ctrl` while invoking the command to continue the previous chat instead of starting a new one.

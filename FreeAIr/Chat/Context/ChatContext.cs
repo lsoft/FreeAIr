@@ -44,6 +44,16 @@ namespace FreeAIr.Chat.Context
         }
 
         /// <summary>
+        /// An empty context with nothing attached, used when a chat is rebuilt from disk: the saved
+        /// chips are added afterwards, and Copilot instructions must not be re-attached on top of
+        /// whatever the file already recorded.
+        /// </summary>
+        public static ChatContext CreateEmpty()
+        {
+            return new ChatContext();
+        }
+
+        /// <summary>
         /// A context for a new chat, already carrying the project's Copilot instructions when there
         /// are any. Attached as auto-found, so a user who does not want them can clear them along
         /// with the rest of the automatic context.

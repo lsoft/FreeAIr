@@ -19,7 +19,11 @@ namespace FreeAIr.Chat
         public string Title
         {
             get;
-            set;
+            set
+            {
+                field = value;
+                OnPropertyChanged();
+            }
         }
 
         /// <summary>

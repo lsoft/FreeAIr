@@ -22,6 +22,9 @@ namespace FreeAIr.Chat.Context.Item
         /// <summary>The full path of the attached file, outside of any solution.</summary>
         private readonly string _filePath;
 
+        /// <summary>The full path of the attached file. Same value the chip shows, and what a restored chat uses to rebuild this item.</summary>
+        public string FilePath => _filePath;
+
         /// <summary>The label shown on the context chip in the chat window: the file's own path.</summary>
         public string ContextUIDescription => _filePath;
 

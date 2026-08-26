@@ -25,6 +25,9 @@ My others extensions lives [here](https://marketplace.visualstudio.com/publisher
 
 ## 4.3.0
 
+- User-started chats are persisted next to the solution in `.freeair\chats` and restored when the
+  solution opens. Automatic chats are not. A chat created with no solution open stays in memory
+  only. Closing a chat deletes its file; shutting Visual Studio down does not.
 - A first-run setup wizard replaces the trial-and-error of hand-editing the settings file: it walks
   through agents, MCP servers, actions and the remaining settings, explains what each of them is
   for, and writes nothing until the last page. Open it any time from

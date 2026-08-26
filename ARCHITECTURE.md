@@ -72,7 +72,10 @@ touching that class launches the child process.
 ### Chats
 
 - `Chat/ChatContainer.cs` — MEF-exported singleton owning every live chat. Creates and removes
-  chats and aggregates their status for the status-bar informer.
+  chats and aggregates their status for the status-bar informer. User chats (not the automatic
+  ones) are written to `.freeair\chats\{id}.json` when the solution folder is known, restored when
+  the solution opens, and deleted from disk only when the user closes the chat.
+- `Chat/Persistence` — the json shape and the folder lookup. Non-ASCII is written as itself.
 - `Chat/Chat.cs` — one dialogue. Holds an ordered list of `IChatContent` (prompts, answers, tool
   calls), the `ChatContext`, the chat-scoped MCP tool switches (`AvailableToolContainer`) and the
   `ChatOptions` (chosen agent, response format, tool choice).

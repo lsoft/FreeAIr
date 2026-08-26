@@ -45,6 +45,9 @@ namespace FreeAIr.Chat.Context.Item
             get;
         }
 
+        /// <summary>How line numbers are prefixed onto this file when it is sent to the model. Kept so a restored chat sends the same numbering it did before the restart.</summary>
+        public AddLineNumbersMode LineNumberMode => _addLineNumberMode;
+
         /// <summary>Creates a context item for a solution file or fragment, with the given line-numbering mode.</summary>
         public SolutionItemChatContextItem(
             SelectedIdentifier selectedIdentifier,

@@ -46,6 +46,23 @@ namespace FreeAIr.MCP.McpServerProxy
             return c;
         }
 
+        /// <summary>
+        /// Wraps an already built server list, used when a chat is restored from disk so it keeps
+        /// the tool switches it had rather than picking up whatever the settings say now.
+        /// </summary>
+        public static AvailableToolContainer Create(
+            AvailableMcpServersJson servers
+            )
+        {
+            return new AvailableToolContainer(servers);
+        }
+
+        /// <summary>A deep copy of the switches, for writing a chat file without sharing the live list.</summary>
+        public AvailableMcpServersJson CloneServers()
+        {
+            return (AvailableMcpServersJson)_servers.Clone();
+        }
+
         private AvailableToolContainer(
             AvailableMcpServersJson servers
             )

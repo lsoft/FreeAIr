@@ -138,6 +138,7 @@ namespace FreeAIr.UI.Chat
                             _chat.Options.ChangeChosenAgent(
                                 chosenAgent
                                 );
+                            _chat.PersistNow();
 
                             OnPropertyChanged();
                         },
@@ -180,6 +181,8 @@ namespace FreeAIr.UI.Chat
                                 _chat.ChatTools
                                 );
                             await ShowDialogAsync(w);
+
+                            _chat.PersistNow();
 
                             OnPropertyChanged();
                         },

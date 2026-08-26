@@ -33,6 +33,12 @@ namespace FreeAIr.Chat
         /// <summary>Number every line of the fragment that goes into the prompt.</summary>
         public static readonly AddLineNumbersMode RequiredAllInScope = new AddLineNumbersMode(AddLineNumbersModeEnum.AllInScope);
 
+        /// <summary>Which of the three numbering shapes this instance represents, for persistence.</summary>
+        public AddLineNumbersModeEnum Mode => _mode;
+
+        /// <summary>The numbered ranges when this is <see cref="AddLineNumbersModeEnum.SpecificScopes"/>.</summary>
+        public IReadOnlyList<(int StartLine, int LineCount)> Scopes => _scopes;
+
         /// <summary>True unless this is the <see cref="NotRequired"/> (disabled) mode.</summary>
         public bool Enabled => _mode != AddLineNumbersModeEnum.Disabled;
 

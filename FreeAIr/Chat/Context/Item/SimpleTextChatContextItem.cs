@@ -17,6 +17,9 @@ namespace FreeAIr.Chat.Context.Item
         /// <summary>The generated or captured text this item carries, held in memory as a snapshot.</summary>
         private string _body;
 
+        /// <summary>The held text, as a restored chat needs it to rebuild this item.</summary>
+        public string Body => _body;
+
         /// <summary>
         /// The label shown on the context chip in the chat window. The body may be tens of
         /// kilobytes of diff, so something has to name it in one line.

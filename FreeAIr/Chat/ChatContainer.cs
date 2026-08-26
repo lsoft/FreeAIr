@@ -3,6 +3,9 @@ using EnvDTE80;
 using FreeAIr.Options2.Agent;
 using FreeAIr.Shared.Helper;
 using FreeAIr.Interaction;
+using FreeAIr.Chat.Persistence;
+using FreeAIr.Helper;
+using Microsoft.VisualStudio.Threading;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Linq;
@@ -43,6 +46,18 @@ namespace FreeAIr.Chat
 
         /// <summary>DTE shutdown events, subscribed to so chats are stopped before the shell tears down.</summary>
         private readonly DTEEvents _dteEvents;
+
+        /// <summary>
+        /// Solution open/close, so persisted chats are loaded when a solution appears and dropped
+        /// from memory (not from disk) when it goes away.
+        /// </summary>
+        private readonly Community.VisualStudio.Toolkit.SolutionEvents _solutionEvents;
+
+        /// <summary>
+        /// The `.freeair\chats` folder currently loaded into <see cref="_chats"/>, or null when
+        /// nothing has been loaded. Stops a second open of the same solution from duplicating rows.
+        /// </summary>
+        private string? _loadedChatsFolder;
 
         /// <summary>
         /// A snapshot of the live chats, not a view over the collection: chats are added and
@@ -97,6 +112,16 @@ namespace FreeAIr.Chat
 
             _dteEvents = ((Events2)dte.Events).DTEEvents;
             _dteEvents.OnBeginShutdown += DTEEvents_OnBeginShutdown;
+
+            _solutionEvents = VS.Events.SolutionEvents;
+            _solutionEvents.OnAfterOpenSolution += SolutionEvents_OnAfterOpenSolution;
+            _solutionEvents.OnAfterCloseSolution += SolutionEvents_OnAfterCloseSolution;
+
+            if (VS.Solutions.GetCurrentSolution() is not null)
+            {
+                LoadPersistedChatsAsync()
+                    .FileAndForget(nameof(LoadPersistedChatsAsync));
+            }
         }
 
         /// <summary>
@@ -160,6 +185,12 @@ namespace FreeAIr.Chat
 
             LastCreatedChatId = chat.Id;
 
+            if (!options.AutomaticallyProcessed)
+            {
+                await TryEnablePersistenceAsync(chat);
+                chat.PersistNow();
+            }
+
             //последним, чтобы к моменту старта чтения чат уже был и в коллекции, и в LastCreatedChatId
             if (prompt is not null)
             {
@@ -173,9 +204,14 @@ namespace FreeAIr.Chat
         /// Closes a chat for good: stops the reader, unsubscribes, drops it from the collection and
         /// disposes it. Doing nothing for a chat which is not in the collection makes this safe to
         /// call twice, which the shutdown path and the close button both rely on.
+        ///
+        /// <paramref name="deletePersistentFile"/> is true when the user closed the chat and false
+        /// when Visual Studio is shutting down or the solution is closing — in those cases the
+        /// json stays so the transcript comes back next time.
         /// </summary>
         public async Task RemoveChatAsync(
-            Chat chat
+            Chat chat,
+            bool deletePersistentFile = true
             )
         {
             if (chat is null)
@@ -198,6 +234,11 @@ namespace FreeAIr.Chat
             }
 
             FireChatCollectionChanged();
+
+            if (deletePersistentFile)
+            {
+                chat.DeletePersistentFile();
+            }
 
             await chat.DisposeAsync();
         }
@@ -229,7 +270,7 @@ namespace FreeAIr.Chat
                             chat = _chats[0];
                         }
 
-                        await RemoveChatAsync(chat);
+                        await RemoveChatAsync(chat, deletePersistentFile: false);
                     }
                 }).FileAndForget(nameof(RemoveAllChats));
         }
@@ -331,11 +372,159 @@ namespace FreeAIr.Chat
         /// <summary>
         /// Visual Studio is closing: cancel every request in flight. Without this the readers keep
         /// streaming into objects the shell is tearing down, which surfaces as an exception in the
-        /// activity log on every exit.
+        /// activity log on every exit. Persisted chats keep their files.
         /// </summary>
         private void DTEEvents_OnBeginShutdown()
         {
             RemoveAllChats();
+        }
+
+        /// <summary>A solution has appeared: load the user chats that were saved next to it.</summary>
+        private void SolutionEvents_OnAfterOpenSolution(Community.VisualStudio.Toolkit.Solution solution)
+        {
+            LoadPersistedChatsAsync()
+                .FileAndForget(nameof(LoadPersistedChatsAsync));
+        }
+
+        /// <summary>
+        /// The solution is gone: drop its persisted chats from memory so they are not mixed with
+        /// the next solution's, and so opening the same solution again does not duplicate them.
+        /// The json files stay.
+        /// </summary>
+        private void SolutionEvents_OnAfterCloseSolution()
+        {
+            UnloadPersistedChatsAsync()
+                .FileAndForget(nameof(UnloadPersistedChatsAsync));
+        }
+
+        /// <summary>
+        /// If `.freeair\chats` can be resolved, marks <paramref name="chat"/> persistent. A missing
+        /// solution (or any other failure to see the folder) leaves the chat in memory only.
+        /// </summary>
+        private static async Task TryEnablePersistenceAsync(Chat chat)
+        {
+            var folder = await ChatPersistence.TryGetChatsFolderPathAsync();
+            if (string.IsNullOrEmpty(folder))
+            {
+                return;
+            }
+
+            chat.EnablePersistence(
+                ChatPersistence.GetChatFilePath(folder, chat.Id)
+                );
+        }
+
+        /// <summary>
+        /// Reads every chat json next to the current solution and puts them in the collection.
+        /// Skips a folder that is already loaded, so the constructor and the solution-opened
+        /// event do not both add the same files.
+        /// </summary>
+        private async Task LoadPersistedChatsAsync()
+        {
+            try
+            {
+                await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+
+                var folder = await ChatPersistence.TryGetChatsFolderPathAsync();
+                if (string.Equals(folder, _loadedChatsFolder, StringComparison.OrdinalIgnoreCase))
+                {
+                    return;
+                }
+
+                await UnloadPersistedChatsCoreAsync();
+
+                _loadedChatsFolder = folder;
+                if (string.IsNullOrEmpty(folder))
+                {
+                    return;
+                }
+
+                var restored = new List<Chat>();
+                foreach (var filePath in ChatPersistence.ListChatFiles(folder))
+                {
+                    var payload = ChatPersistence.TryLoad(filePath);
+                    if (payload is null)
+                    {
+                        continue;
+                    }
+
+                    try
+                    {
+                        var chat = await Chat.CreateFromPersistedAsync(payload, filePath);
+                        if (chat is not null)
+                        {
+                            restored.Add(chat);
+                        }
+                    }
+                    catch (Exception excp)
+                    {
+                        excp.ActivityLogException();
+                    }
+                }
+
+                foreach (var chat in restored.OrderBy(c => c.Started))
+                {
+                    chat.ChatStatusChangedEvent += ChatStatusChanged;
+                    lock (_locker)
+                    {
+                        _chats.Add(chat);
+                    }
+                }
+
+                var last = restored
+                    .OrderByDescending(c => c.Started)
+                    .FirstOrDefault();
+                if (last is not null)
+                {
+                    LastCreatedChatId = last.Id;
+                }
+
+                if (restored.Count > 0)
+                {
+                    FireChatCollectionChanged();
+                }
+            }
+            catch (Exception excp)
+            {
+                excp.ActivityLogException();
+            }
+        }
+
+        /// <summary>Drops persisted chats from memory because the solution closed.</summary>
+        private async Task UnloadPersistedChatsAsync()
+        {
+            try
+            {
+                await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+                await UnloadPersistedChatsCoreAsync();
+                _loadedChatsFolder = null;
+            }
+            catch (Exception excp)
+            {
+                excp.ActivityLogException();
+            }
+        }
+
+        /// <summary>
+        /// Removes every persistent chat from the collection without deleting their files.
+        /// Automatic and non-persistent user chats are left alone.
+        /// </summary>
+        private async Task UnloadPersistedChatsCoreAsync()
+        {
+            while (true)
+            {
+                Chat? chat;
+                lock (_locker)
+                {
+                    chat = _chats.FirstOrDefault(c => c.IsPersistent);
+                    if (chat is null)
+                    {
+                        break;
+                    }
+                }
+
+                await RemoveChatAsync(chat, deletePersistentFile: false);
+            }
         }
 
     }
