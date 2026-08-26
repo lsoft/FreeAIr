@@ -23,6 +23,11 @@ My others extensions lives [here](https://marketplace.visualstudio.com/publisher
 
 # FreeAIr Release Notes
 
+## 4.3.1
+
+- Fixed few bugs.
+- User chats are now persistent (.freeair/chats) if the chat is started with a solution open.
+
 ## 4.3.0
 
 - User-started chats are persisted next to the solution in `.freeair\chats` and restored when the
