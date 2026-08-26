@@ -1,4 +1,4 @@
-﻿<Project>
+﻿<Project TreatAsLocalProperty="VSToolsPath">
 
   <!--
     SDK-style VSIX project. The Sdk.props/Sdk.targets imports are written out by hand instead of
@@ -6,9 +6,10 @@
     C# targets - exactly the order the legacy project file used - and the attribute form appends
     Sdk.targets at the very end of the file.
 
-    Microsoft.VSSDK.BuildTools points $(VSToolsPath) at its own tools directory from its .props,
-    so the import below resolves to the package copy of the VSSDK targets, not to one installed
-    with Visual Studio.
+    Microsoft.VSSDK.BuildTools points $(VSToolsPath) at its own tools directory from its .props.
+    TreatAsLocalProperty is required because Visual Studio / MSBuild.exe.Config pass VSToolsPath
+    as a global property (the legacy Program Files (x86) tree), which would otherwise win over
+    the package and make the VsSDK.targets import fail with MSB4226 on VS 2022.
   -->
 
   <Import Project="Sdk.props" Sdk="Microsoft.NET.Sdk" />
@@ -37,6 +38,9 @@
 
     <GeneratePkgDefFile>true</GeneratePkgDefFile>
     <UseCodebase>true</UseCodebase>
+    <CreateVsixContainer>true</CreateVsixContainer>
+    <DeployExtension>true</DeployExtension>
+    <VsixDeployOnDebug>true</VsixDeployOnDebug>
     <IncludeAssemblyInVSIXContainer>true</IncludeAssemblyInVSIXContainer>
     <IncludeDebugSymbolsInVSIXContainer>true</IncludeDebugSymbolsInVSIXContainer>
     <IncludeDebugSymbolsInLocalVSIXDeployment>false</IncludeDebugSymbolsInLocalVSIXDeployment>
@@ -44,17 +48,25 @@
     <CopyOutputSymbolsToOutputDirectory>true</CopyOutputSymbolsToOutputDirectory>
 
     <!--
-      There is deliberately no StartAction/StartProgram/StartArguments here. Now that the project
-      is SDK-style, F5 is owned by Visual Studio's own extensibility project system
-      (Microsoft.VisualStudio.Sdk.ProjectSystem, rule "VsixDebugger"), which starts
-      devenv /rootSuffix Exp by itself and ignores those three properties entirely. What it does
-      read is AdditionalArguments - a per-user setting, so it belongs in FreeAIr.csproj.user, or
-      in Project Properties > Debug. Put the solution the experimental instance should open there.
+      CreateVsixContainer on the project (not only from VsSDK.targets) is what the VsixDebugger
+      launch provider looks for. Without that capability VS treats this as a class library and
+      F5 shows "cannot be started directly".
+
+      StartAction is the VS 2022 fallback when VsixDebugger does not take over: it launches
+      devenv /rootSuffix Exp via the regular C# debugger. VS 18's VsixDebugger ignores these
+      three properties and uses AdditionalArguments from FreeAIr.csproj.user instead.
     -->
+    <StartAction>Program</StartAction>
+    <StartProgram>$(DevEnvDir)devenv.exe</StartProgram>
+    <StartArguments>/rootSuffix Exp</StartArguments>
 
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
   </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectCapability Include="CreateVsixContainer" />
+  </ItemGroup>
 
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DebugType>full</DebugType>
@@ -175,7 +187,7 @@
     <PackageReference Include="Microsoft.VisualStudio.LanguageServices" />
     <PackageReference Include="Microsoft.VisualStudio.TeamFoundation.Git.Extensibility" />
     <PackageReference Include="Microsoft.VisualStudio.Text.Logic" />
-    <PackageReference Include="Microsoft.VSSDK.BuildTools">
+    <PackageReference Include="Microsoft.VSSDK.BuildTools" GeneratePathProperty="true">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
@@ -227,7 +239,19 @@
   </ItemGroup>
 
   <Import Project="Sdk.targets" Sdk="Microsoft.NET.Sdk" />
-  <Import Project="$(VSToolsPath)\VSSDK\Microsoft.VsSDK.targets" Condition="'$(VSToolsPath)' != ''" />
+
+  <!--
+    Redirect VSToolsPath to a directory that actually contains Microsoft.VsSDK.targets.
+    The NuGet package is preferred; the current VS MSBuild tree is the fallback when
+    packages have not been restored yet. Exists() keeps evaluation from failing with
+    MSB4226 before restore has run (which is what previously left the package out of
+    project.assets.json entirely).
+  -->
+  <PropertyGroup>
+    <VSToolsPath Condition="'$(PkgMicrosoft_VSSDK_BuildTools)' != ''">$(PkgMicrosoft_VSSDK_BuildTools)\tools</VSToolsPath>
+    <VSToolsPath Condition="!Exists('$(VSToolsPath)\VSSDK\Microsoft.VsSDK.targets') AND Exists('$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\VSSDK\Microsoft.VsSDK.targets')">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
+  </PropertyGroup>
+  <Import Project="$(VSToolsPath)\VSSDK\Microsoft.VsSDK.targets" Condition="Exists('$(VSToolsPath)\VSSDK\Microsoft.VsSDK.targets')" />
 
   <!-- The proxy and the Whisper natives are zipped by the build and ride along inside the VSIX. -->
   <Target Name="IncludeNuGetPackageReferences" AfterTargets="GetVsixSourceItems">
