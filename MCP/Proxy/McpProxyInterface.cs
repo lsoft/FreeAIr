@@ -166,7 +166,7 @@ namespace Proxy
                 var result = await server.CallToolAsync(
                     request,
                     request.ToolName,
-                    request.Arguments?.ToDictionary(d => d.Key, d => (object?)d.Value),
+                    ToolArguments.Deserialize(request.ArgumentsJson),
                     cancellationToken
                     );
 

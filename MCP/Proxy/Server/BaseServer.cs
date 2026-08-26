@@ -2,6 +2,7 @@
 using ModelContextProtocol.Client;
 using ModelContextProtocol.Protocol;
 using Serilog;
+using System.Text.Json;
 
 namespace Proxy.Server
 {
@@ -52,13 +53,15 @@ namespace Proxy.Server
         protected override async Task<CallToolReply> CallToolInternalAsync(
             IMcpClient mcpClient,
             string toolName,
-            IReadOnlyDictionary<string, object?>? arguments,
+            IReadOnlyDictionary<string, JsonElement>? arguments,
             CancellationToken cancellationToken
             )
         {
+            //the SDK takes the arguments weakly typed and serializes each of them itself; a
+            //JsonElement is the one shape it can copy into the request without reinterpreting it
             var innerResult = await mcpClient.CallToolAsync(
                 toolName,
-                arguments?.ToDictionary(d => d.Key, d => d.Value),
+                arguments?.ToDictionary(d => d.Key, d => (object?)d.Value),
                 cancellationToken: cancellationToken
                 );
 
@@ -120,7 +123,7 @@ namespace Proxy.Server
         public async Task<CallToolReply> CallToolAsync(
             IParameterProvider parameterProvider,
             string toolName,
-            IReadOnlyDictionary<string, object?>? arguments,
+            IReadOnlyDictionary<string, JsonElement>? arguments,
             CancellationToken cancellationToken
             )
         {
@@ -207,7 +210,7 @@ namespace Proxy.Server
         protected abstract Task<CallToolReply> CallToolInternalAsync(
             IMcpClient mcpClient,
             string toolName,
-            IReadOnlyDictionary<string, object?>? arguments,
+            IReadOnlyDictionary<string, JsonElement>? arguments,
             CancellationToken cancellationToken
             );
 

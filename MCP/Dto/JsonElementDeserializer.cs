@@ -3,8 +3,15 @@ using System.Text.Json;
 
 namespace FreeAIr.Helper
 {
+    /// <summary>
+    /// Turns a parsed JSON value into plain dictionaries, lists and primitives. It is how the
+    /// arguments of a model's tool call stop being a <see cref="JsonDocument"/> the caller has to
+    /// keep alive, so a Visual Studio tool can read them by name and
+    /// <see cref="Dto.ToolArguments"/> can write them back out for an external MCP server.
+    /// </summary>
     public static class JsonElementDeserializer
     {
+        /// <summary>Rebuilds <paramref name="element"/> as a Dictionary/List/primitive tree, recursing through objects and arrays.</summary>
         public static object? DeserializeToObject(
             this JsonElement element
             )

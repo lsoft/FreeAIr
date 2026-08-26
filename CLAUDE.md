@@ -34,6 +34,12 @@ plus the `Grep\` text matching behind the SearchFileContent MCP tool.
 `SetupWizard\FreeAIr.SetupWizard.csproj` the same way — the first-run setup wizard's step
 navigation, agent-field validation and known-endpoint catalog.
 
+`MCP\Tests\FreeAIr.Mcp.Tests.csproj` (**net9.0**, xunit) covers the hop to the MCP servers: the
+argument conversions in `MCP\Dto`, the JSON-RPC channel to `Proxy.exe`, and `Proxy`'s own
+`BaseServer2` speaking `tools/list` and `tools/call`. Both ends are real — a live `JsonRpc` pair and
+a live MCP server on an in-process duplex stream — so nothing is spawned and the whole file runs in
+under a second. It is net9.0 rather than net8.0 because it references `MCP\Proxy`, which is net9.0.
+
 Use the script; it builds with MSBuild and only then hands over to the SDK:
 
 ```bash
@@ -44,12 +50,13 @@ Anything you add to the command line goes on to `dotnet test`, e.g.
 `run-tests.bat --filter FullyQualifiedName~VectorCodec`. `FREEAIR_CONFIG` picks the configuration
 (`Release` by default), `FREEAIR_MSBUILD` overrides the compiler path.
 
-Only the two test projects and what they reference (`FreeAIr.Search`, `FreeAIr.SetupWizard`, `Dto`)
-are built by the script — all SDK style, so it takes a couple of seconds and does not go near the
-VSIX. Build the solution yourself when you need the VSIX too; the script will then find everything
-up to date.
+Only the three test projects and what they reference (`FreeAIr.Search`, `FreeAIr.SetupWizard`,
+`Dto`, `Proxy`) are built by the script — all SDK style, so it takes a couple of seconds and does
+not go near the VSIX. Build the solution yourself when you need the VSIX too; the script will then
+find everything up to date.
 
-By hand it is the same two steps, and the second one must **not** let the .NET SDK build anything:
+By hand it is the same two steps per project, and the second one must **not** let the .NET SDK build
+anything:
 
 ```bash
 dotnet test Search.Tests/FreeAIr.Search.Tests.csproj --no-build -c Release --nologo
@@ -178,6 +185,14 @@ The baseline when this section was written was 918 of 4299 nodes (21%).
   in `FreeAIr.csproj` (or the dll is not in the package), a `MefComponent` asset in
   `source.extension.vsixmanifest` if it exports MEF parts (or the exports vanish), and
   `SatelliteDllsProjectOutputGroup` if it is localized. `FreeAIr.Voice` is the worked example.
+- **Nothing weakly typed may cross the JSON-RPC channel to `Proxy.exe`.** `JsonRpc.Attach` without
+  a formatter uses the Newtonsoft one, which revives an `object` member as a `JObject`/`JArray` for
+  everything that is not a primitive. Handing that to System.Text.Json — which is what the MCP SDK
+  serializes `tools/call` with — writes out the token's *children* rather than its value, because
+  every `JToken` implements `IEnumerable<JToken>`: a `JValue` becomes `[]`, an object becomes an
+  array of its properties. Nothing throws, the call succeeds, and the server silently receives
+  nested empty arrays (issue #70). Carry such payloads as raw JSON text — `ToolArguments` and
+  `GetToolReply.Parameters` both do — and pin it with a test in `MCP\Tests`.
 - **`clr-namespace:` in XAML means the current assembly unless `;assembly=` says otherwise.** Moving
   a type that XAML names into another assembly compiles the C# fine and then fails the markup
   compiler with `MC3050: cannot find type`. Every `xmlns:resources="clr-namespace:FreeAIr.Resources"`

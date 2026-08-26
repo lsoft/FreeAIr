@@ -14,7 +14,8 @@ looking for the user manual, read the [README](README.md) instead.
 | `SetupWizard` (`FreeAIr.SetupWizard`) | netstandard2.0 | The first-run setup wizard's logic that does not need Visual Studio or WPF: step navigation/skipping, the agent-field validator, the known-endpoint catalog. |
 | `SetupWizard.Tests` (`FreeAIr.SetupWizard.Tests`) | .NET 8 (xunit) | Unit tests of `FreeAIr.SetupWizard`. Not shipped. |
 | `MCP/Proxy` | .NET 9 (exe) | Out-of-process host for MCP servers. Shipped inside the VSIX as `.art/Proxy.zip` and unpacked on first run. |
-| `MCP/Dto` | netstandard | Request/reply contracts of the JSON-RPC channel between `FreeAIr` and `Proxy.exe`. |
+| `MCP/Dto` | netstandard | Request/reply contracts of the JSON-RPC channel between `FreeAIr` and `Proxy.exe`, plus the two conversions that carry a tool call's arguments across it. |
+| `MCP/Tests` (`FreeAIr.Mcp.Tests`) | .NET 9 (xunit) | Conformance tests of the MCP hop: a live JSON-RPC channel and a live MCP server, both in process. Not shipped. |
 | `CodeLens` | .NET Framework 4.8 | CodeLens data point provider. Runs in the separate Visual Studio CodeLens process. |
 | `Voice` (`FreeAIr.Voice`) | .NET Framework 4.8 | Speech to text: the `IRecorder`/`IRecorderFactory` contracts, the four backends, their configuration controls and the recording options page. A MEF component of its own, so the VSIX manifest names it. |
 | `Shared` | .NET Framework 4.8 | The leaf everything may depend on: the CodeLens pipe name and `UnitInfo` DTOs, `SelectedSpan`, the `BackgroundTask` base class, and helpers (`TempFile`, `CallAwaiter`, `ActivityLogHelper`, `MefHelper`) used across the VSIX, `FreeAIr.Voice` and `WpfHelpers`. |
@@ -126,6 +127,15 @@ configured MCP servers are actually started and the failures reported.
   user-configured server, both hosted by `Proxy.exe`.
 - `MCP/AvailableToolContainer.cs` — enabled/disabled state of individual tools, globally and
   per chat.
+
+A tool call's arguments cross the channel as **raw JSON text**, not as a dictionary of objects:
+`ToolArguments` in `MCP/Dto` writes them on the VS side and reads them back as `JsonElement` on the
+proxy side, and the tool schema travels the other way as text too (`GetToolReply.Parameters`). The
+channel's formatter is a Newtonsoft one and a weakly typed member survives it only as a `JToken`,
+which System.Text.Json — the serializer the MCP SDK builds `tools/call` with — then writes out as
+the token's children instead of its value, so every nested object and array in the arguments reached
+the server as nested empty arrays. `MCP/Tests` pins both halves against the real channel and a real
+MCP server.
 
 ### Natural language search / outlines
 

@@ -1,4 +1,5 @@
 ﻿using Dto;
+using System.Text.Json;
 
 namespace Proxy.Server
 {
@@ -25,11 +26,11 @@ namespace Proxy.Server
             IParameterProvider parameterProvider
             );
 
-        /// <summary>Invokes one of this server's tools.</summary>
+        /// <summary>Invokes one of this server's tools, the arguments still being the JSON values they arrived as.</summary>
         Task<CallToolReply> CallToolAsync(
             IParameterProvider parameterProvider,
             string toolName,
-            IReadOnlyDictionary<string, object?>? arguments,
+            IReadOnlyDictionary<string, JsonElement>? arguments,
             CancellationToken cancellationToken
             );
     }

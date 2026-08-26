@@ -18,7 +18,12 @@
   <ItemGroup>
     <ProjectReference Include="..\Dto\Dto.csproj" />
   </ItemGroup>
-  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+  <!--
+    Zips the proxy for embedding into the VSIX. Skipped when the project is built on its own rather
+    than through the solution - $(SolutionDir) is then "*Undefined*" and the Exec would fail. The
+    only build that does that is the test project's, which has no use for the zip.
+  -->
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition="'$(SolutionDir)' != '' And '$(SolutionDir)' != '*Undefined*'">
     <Exec Command="if exist $(SolutionDir).art\Proxy.zip del /F /Q $(SolutionDir).art\Proxy.zip&#xD;&#xA;PowerShell.exe -Command &quot;Add-Type -A 'System.IO.Compression.FileSystem'; [IO.Compression.ZipFile]::CreateFromDirectory('$(SolutionDir)MCP\Proxy\$(OutDir)', '$(SolutionDir).art\Proxy.zip')&quot;" />
   </Target>
 </Project>

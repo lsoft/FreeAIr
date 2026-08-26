@@ -1,0 +1,44 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    Conformance tests for the MCP hop: the VSIX builds a tool call, sends it over StreamJsonRpc to
+    the out-of-process proxy, and the proxy replays it as a `tools/call` through the MCP SDK. The
+    tests run both halves for real - a live JSON-RPC channel and a live MCP server on an in-process
+    duplex pair - because that is where the arguments used to be lost (issue #70) and neither half
+    can be caught by inspecting the DTOs alone.
+
+    net9.0, not net8.0 like the other test projects: it references the proxy, which is net9.0.
+  -->
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <LangVersion>Latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <IsPackable>false</IsPackable>
+    <RootNamespace>FreeAIr.Mcp.Tests</RootNamespace>
+    <AssemblyName>FreeAIr.Mcp.Tests</AssemblyName>
+    <NoWarn>$(NoWarn);CS1591</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" />
+    <PackageReference Include="xunit" />
+    <PackageReference Include="xunit.runner.visualstudio" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- an MCP server to call, and the transports to reach it without spawning a process -->
+    <PackageReference Include="ModelContextProtocol" />
+    <PackageReference Include="System.Net.ServerSentEvents" VersionOverride="10.0.0-preview.3.25171.5" />
+    <!-- the channel the proxy is actually reached over, with the formatter it actually uses -->
+    <PackageReference Include="StreamJsonRpc" />
+    <PackageReference Include="Nerdbank.Streams" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Dto\Dto.csproj" />
+    <ProjectReference Include="..\Proxy\Proxy.csproj" />
+  </ItemGroup>
+
+</Project>

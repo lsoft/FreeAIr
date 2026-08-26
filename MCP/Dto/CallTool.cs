@@ -11,8 +11,13 @@
             set;
         }
 
-        /// <summary>The tool's arguments, keyed by parameter name, matching its JSON Schema from <see cref="GetToolReply.Parameters"/>.</summary>
-        public Dictionary<string, object?>? Arguments
+        /// <summary>
+        /// The tool's arguments as raw JSON object text, its members matching the tool's JSON
+        /// Schema from <see cref="GetToolReply.Parameters"/>; null when the tool takes none.
+        /// Read it back with <see cref="ToolArguments.Deserialize"/> - see there for why this is
+        /// text and not a dictionary of objects.
+        /// </summary>
+        public string? ArgumentsJson
         {
             get;
             set;
@@ -37,7 +42,7 @@
             }
 
             ToolName = toolName;
-            Arguments = arguments;
+            ArgumentsJson = ToolArguments.Serialize(arguments);
         }
     }
 
