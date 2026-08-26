@@ -1,8 +1,10 @@
 ﻿using FreeAIr.Helper;
 using Microsoft.VisualStudio.Threading;
 using OpenAI.Chat;
+using System.ClientModel;
 using System.Collections.Generic;
 using System.Text;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using FreeAIr.Chat;
@@ -38,6 +40,12 @@ namespace FreeAIr.BLogic.Reader
         /// The read in flight, or null when the reader is idle. Guarded by <see cref="_taskLocker"/>.
         /// </summary>
         private Task? _task;
+
+        /// <summary>
+        /// How much of a non-JSON error page is kept in the chat. The useful sentence is at the
+        /// front; the rest of a gateway HTML dump only buries it.
+        /// </summary>
+        private const int MaxReportedBodyLength = 4000;
 
         /// <summary>Creates a reader bound to the given chat; obtain one through <see cref="LLMReaderPool"/> instead of calling this directly.</summary>
         public LLMReader(
@@ -419,7 +427,12 @@ namespace FreeAIr.BLogic.Reader
             }
         }
 
-        /// <summary>Formats an exception as answer text and appends it to the chat, creating the answer content if this is the first piece.</summary>
+        /// <summary>
+        /// Formats an exception as answer text and appends it to the chat, creating the answer
+        /// content if this is the first piece. OpenAI.dll's message is only the HTTP status —
+        /// vLLM names the actual fault (`max_completion_tokens`, the context window) in the
+        /// body, so that body is shown too when it can still be read.
+        /// </summary>
         private async Task<AnswerChatContent> CreateOrAppendAnswerPartAsync(
             AnswerChatContent? chatAnswer,
             Exception excp
@@ -430,14 +443,110 @@ namespace FreeAIr.BLogic.Reader
                 throw new ArgumentNullException(nameof(excp));
             }
 
-            var answerPart =
-                Environment.NewLine
-                + excp.Message
-                + Environment.NewLine
-                + excp.StackTrace
-                ;
+            var answerPart = new StringBuilder();
+            answerPart.AppendLine();
+            answerPart.AppendLine(excp.Message);
 
-            return await CreateOrAppendAnswerPartAsync(chatAnswer, answerPart);
+            var serverMessage = TryReadServerErrorMessage(excp);
+            if (!string.IsNullOrWhiteSpace(serverMessage)
+                && !string.Equals(serverMessage, excp.Message, StringComparison.Ordinal))
+            {
+                answerPart.AppendLine();
+                answerPart.AppendLine(serverMessage);
+            }
+
+            answerPart.AppendLine();
+            answerPart.Append(excp.StackTrace);
+
+            return await CreateOrAppendAnswerPartAsync(chatAnswer, answerPart.ToString());
+        }
+
+        /// <summary>
+        /// The complaint the endpoint actually sent. `ClientResultException.Message` is
+        /// `Service request failed. Status: 400`; the JSON underneath it is the only place
+        /// that names the parameter the server did not like.
+        /// </summary>
+        private static string? TryReadServerErrorMessage(
+            Exception excp
+            )
+        {
+            for (var current = excp; current is not null; current = current.InnerException)
+            {
+                if (current is not ClientResultException clientException)
+                {
+                    continue;
+                }
+
+                string? body;
+                try
+                {
+                    body = clientException.GetRawResponse()?.Content?.ToString();
+                }
+                catch (Exception)
+                {
+                    //a response which has already been consumed keeps nothing to read
+                    continue;
+                }
+
+                if (string.IsNullOrWhiteSpace(body))
+                {
+                    continue;
+                }
+
+                var trimmed = body.Trim();
+                var fromJson = TryReadJsonErrorMessage(trimmed);
+                if (!string.IsNullOrWhiteSpace(fromJson))
+                {
+                    return fromJson;
+                }
+
+                if (trimmed.Length > MaxReportedBodyLength)
+                {
+                    return trimmed.Substring(0, MaxReportedBodyLength) + "...";
+                }
+
+                return trimmed;
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Pulls `error.message` (OpenAI / vLLM) or a top-level `message` out of the response
+        /// body so the chat shows the sentence the user can act on, not the whole JSON envelope.
+        /// </summary>
+        private static string? TryReadJsonErrorMessage(
+            string body
+            )
+        {
+            try
+            {
+                using var json = JsonDocument.Parse(body);
+                if (json.RootElement.ValueKind != JsonValueKind.Object)
+                {
+                    return null;
+                }
+
+                if (json.RootElement.TryGetProperty("error", out var error)
+                    && error.ValueKind == JsonValueKind.Object
+                    && error.TryGetProperty("message", out var nested)
+                    && nested.ValueKind == JsonValueKind.String)
+                {
+                    return nested.GetString();
+                }
+
+                if (json.RootElement.TryGetProperty("message", out var message)
+                    && message.ValueKind == JsonValueKind.String)
+                {
+                    return message.GetString();
+                }
+
+                return null;
+            }
+            catch (Exception)
+            {
+                return null;
+            }
         }
 
 
