@@ -1,6 +1,8 @@
 ﻿using FreeAIr.Options2.Agent;
+using FreeAIr.Llm;
 using FreeAIr.Options2.Support;
 using FreeAIr.UI.ContextMenu;
+using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
 using System.Windows.Input;
@@ -51,6 +53,13 @@ namespace FreeAIr.UI.ViewModels
         {
             get;
         }
+
+        /// <summary>
+        /// The wire protocols an agent may be set to, for the picker next to its endpoint. Built
+        /// from the enum rather than listed here, so a third protocol needs nothing in the UI.
+        /// </summary>
+        public IReadOnlyList<LlmProtocol> AvailableProtocols { get; } =
+            (LlmProtocol[])Enum.GetValues(typeof(LlmProtocol));
 
         /// <summary>
         /// The agent profile currently selected in the agents list; drives which agent's settings the
@@ -355,6 +364,7 @@ namespace FreeAIr.UI.ViewModels
                             var chosenModelId = await ModelContextMenu.ChooseModelFromProviderAsync(
                                 token: SelectedAgent.Technical.GetToken(),
                                 endpoint: SelectedAgent.Technical.Endpoint,
+                                protocol: SelectedAgent.Technical.ApiProtocol,
                                 title: FreeAIr.Resources.Resources.Choose_model_from_this_api_endpoint,
                                 filterer: new ModelFilterer(
                                     ModelFilter,

@@ -51,6 +51,18 @@ public sealed class CannedHttpHandler : HttpMessageHandler
             });
     }
 
+    /// <summary>Answers with a plain JSON document, the way a model list comes back.</summary>
+    public static CannedHttpHandler Json(
+        string body
+        )
+    {
+        return new CannedHttpHandler(
+            _ => new HttpResponseMessage(HttpStatusCode.OK)
+            {
+                Content = new StringContent(body, Encoding.UTF8, "application/json"),
+            });
+    }
+
     /// <summary>Answers with a failure and the body the provider would have put its complaint in.</summary>
     public static CannedHttpHandler Failure(
         HttpStatusCode statusCode,

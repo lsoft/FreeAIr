@@ -198,14 +198,46 @@
                 Content="{x:Static resources:Resources.Endpoint}"
                 />
 
-            <TextBox
+            <!--
+                The protocol sits next to the endpoint rather than on a row of its own: it is a
+                property of that URL, not a separate setting, and the rows of this grid are numbered
+                by hand.
+            -->
+            <Grid
                 Grid.Row="1"
                 Grid.Column="1"
                 HorizontalAlignment="Stretch"
                 VerticalAlignment="Center"
-                FontFamily="Cascadia Code"
-                Text="{Binding SelectedAgent.Technical.Endpoint, UpdateSourceTrigger=PropertyChanged}"
-                />
+                >
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition />
+                    <ColumnDefinition Width="auto"/>
+                    <ColumnDefinition Width="auto"/>
+                </Grid.ColumnDefinitions>
+
+                <TextBox
+                    Grid.Column="0"
+                    HorizontalAlignment="Stretch"
+                    VerticalAlignment="Center"
+                    FontFamily="Cascadia Code"
+                    Text="{Binding SelectedAgent.Technical.Endpoint, UpdateSourceTrigger=PropertyChanged}"
+                    />
+
+                <Label
+                    Grid.Column="1"
+                    Margin="5,0,2,0"
+                    VerticalAlignment="Center"
+                    Content="{x:Static resources:Resources.Api_protocol}"
+                    />
+
+                <ComboBox
+                    Grid.Column="2"
+                    MinWidth="100"
+                    VerticalAlignment="Center"
+                    ItemsSource="{Binding AvailableProtocols}"
+                    SelectedItem="{Binding SelectedAgent.Technical.ApiProtocol}"
+                    />
+            </Grid>
 
             <Label
                 Grid.Row="2"

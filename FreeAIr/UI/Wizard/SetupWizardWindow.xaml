@@ -178,6 +178,14 @@
                                 DisplayMemberPath="DisplayName"
                                 SelectedItem="{Binding GuidedKnownEndpoint}"
                                 />
+                            <ComboBox
+                                Width="110"
+                                Margin="10,0,0,0"
+                                FontFamily="Cascadia Code"
+                                ToolTip="{x:Static resources:Resources.Api_protocol}"
+                                ItemsSource="{Binding AvailableProtocols}"
+                                SelectedItem="{Binding GuidedAgent.Technical.ApiProtocol}"
+                                />
                             <Button
                                 Content="{x:Static resources:Resources.Wizard_agent_test_connection}"
                                 Margin="10,0,0,0"
@@ -368,6 +376,14 @@
                                 ItemsSource="{Binding KnownEndpoints}"
                                 DisplayMemberPath="DisplayName"
                                 SelectedItem="{Binding SelectedKnownEndpoint}"
+                                />
+                            <ComboBox
+                                Width="110"
+                                Margin="10,0,0,0"
+                                FontFamily="Cascadia Code"
+                                ToolTip="{x:Static resources:Resources.Api_protocol}"
+                                ItemsSource="{Binding AvailableProtocols}"
+                                SelectedItem="{Binding SelectedAgent.Technical.ApiProtocol}"
                                 />
                         </StackPanel>
 

@@ -632,6 +632,10 @@
     <value>Endpoint:</value>
     <comment>Used in FreeAIr\UI\Windows\AgentConfigureWindow.xaml document</comment>
   </data>
+  <data name="Api_protocol" xml:space="preserve">
+    <value>Protocol:</value>
+    <comment>Used in FreeAIr\UI\Windows\AgentConfigureWindow.xaml document</comment>
+  </data>
   <data name="Token" xml:space="preserve">
     <value>Token:</value>
     <comment>Used in FreeAIr\UI\Windows\AgentConfigureWindow.xaml document</comment>

@@ -1,4 +1,5 @@
 using FreeAIr.Find;
+using FreeAIr.Llm;
 using FreeAIr.Options2.Agent;
 using FreeAIr.Options2.Rag;
 using System.Collections.Generic;
@@ -13,7 +14,10 @@ namespace FreeAIr.Embedding
     public static class AgentEmbedding
     {
         /// <summary>
-        /// The agent must point at an embedding model, not at a chat one.
+        /// The agent must point at an embedding model, not at a chat one, and at an OpenAI
+        /// compatible endpoint: the Anthropic API has no embeddings at all, so an agent set to that
+        /// protocol is refused here by name rather than left to answer a vectorize request with a
+        /// 404 in the middle of an index build.
         /// </summary>
         public static IEmbeddingVectorizer CreateVectorizer(
             AgentJson agent
@@ -22,6 +26,14 @@ namespace FreeAIr.Embedding
             if (agent is null)
             {
                 throw new ArgumentNullException(nameof(agent));
+            }
+
+            if (agent.Technical.ApiProtocol != LlmProtocol.OpenAi)
+            {
+                throw new InvalidOperationException(
+                    $"Agent '{agent.Name}' speaks the {agent.Technical.ApiProtocol} protocol, which has no embeddings API. "
+                    + "Choose an agent pointing at an OpenAI compatible embedding model instead."
+                    );
             }
 
             return new OpenAIEmbeddingVectorizer(

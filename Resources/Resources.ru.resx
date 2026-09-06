@@ -534,6 +534,9 @@
   <data name="Endpoint" xml:space="preserve">
     <value>Endpoint:</value>
   </data>
+  <data name="Api_protocol" xml:space="preserve">
+    <value>Протокол:</value>
+  </data>
   <data name="Token" xml:space="preserve">
     <value>Токен:</value>
   </data>

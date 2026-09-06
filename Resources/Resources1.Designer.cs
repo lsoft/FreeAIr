@@ -707,6 +707,15 @@ namespace FreeAIr.Resources {
                 return ResourceManager.GetString("Endpoint", resourceCulture);
             }
         }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Protocol:.
+        /// </summary>
+        public static string Api_protocol {
+            get {
+                return ResourceManager.GetString("Api_protocol", resourceCulture);
+            }
+        }
         
         /// <summary>
         ///   Looks up a localized string similar to Enter your prompt here. Press / to open commands. Press # to choose solution item. Press Ctrl + Enter to send your prompt..

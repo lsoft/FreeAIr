@@ -1,6 +1,8 @@
 ﻿using FreeAIr.MCP.McpServerProxy;
 using Dto;
 using FreeAIr.Helper;
+using FreeAIr.Llm;
+using FreeAIr.Llm.Models;
 using FreeAIr.Options2;
 using FreeAIr.Options2.Agent;
 using FreeAIr.Options2.Support;
@@ -9,10 +11,7 @@ using FreeAIr.SetupWizard.Helper;
 using FreeAIr.SetupWizard.Navigation;
 using FreeAIr.SetupWizard.Validation;
 using FreeAIr.UI.Windows;
-using OpenAI;
-using OpenAI.Models;
 using System;
-using System.ClientModel;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -140,6 +139,13 @@ namespace FreeAIr.UI.ViewModels
         public ObservableCollection2<KnownEndpoint> KnownEndpoints { get; } = new(KnownEndpointCatalog.All);
 
         /// <summary>
+        /// The wire protocols an agent may be set to. Picking a known endpoint sets this too, so the
+        /// box is here for the user who types an endpoint of their own.
+        /// </summary>
+        public IReadOnlyList<LlmProtocol> AvailableProtocols { get; } =
+            (LlmProtocol[])Enum.GetValues(typeof(LlmProtocol));
+
+        /// <summary>
         /// Not a persisted selection - picking an entry here copies its URL into
         /// <see cref="SelectedAgent"/>'s endpoint, which stays freely editable in its own textbox.
         /// </summary>
@@ -161,6 +167,13 @@ namespace FreeAIr.UI.ViewModels
             if (value is not null && agent is not null)
             {
                 agent.Technical.Endpoint = value.Endpoint;
+                //the protocol follows the endpoint that was just picked: leaving an agent pointed at
+                //Anthropic while it still speaks the other protocol answers with a 404 that reads
+                //like a broken installation. The box next to it stays editable, so this is an offer
+                //rather than a decision.
+                agent.Technical.ApiProtocol = KnownEndpointCatalog.IsAnthropicEndpoint(value.Endpoint)
+                    ? LlmProtocol.Anthropic
+                    : LlmProtocol.OpenAi;
                 OnPropertyChanged();
             }
         }
@@ -619,15 +632,13 @@ namespace FreeAIr.UI.ViewModels
                         //wizard: it is reported in the status line rather than as an error dialog
                         try
                         {
-                            var modelClient = new OpenAIModelClient(
-                                new ApiKeyCredential(GuidedAgent.Technical.GetToken() ?? string.Empty),
-                                new OpenAIClientOptions
-                                {
-                                    NetworkTimeout = TimeSpan.FromSeconds(15),
-                                    Endpoint = uri,
-                                }
+                            var catalog = LlmModelCatalogFactory.Create(
+                                GuidedAgent.Technical.ApiProtocol,
+                                uri,
+                                GuidedAgent.Technical.GetToken(),
+                                TimeSpan.FromSeconds(15)
                                 );
-                            var models = (await modelClient.GetModelsAsync()).Value;
+                            var models = await catalog.GetModelsAsync();
                             EndpointTestStatus = string.Format(Resources.Resources.Wizard_agent_test_reachable, models.Count);
                         }
                         catch (Exception excp)
