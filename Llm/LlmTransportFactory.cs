@@ -1,3 +1,4 @@
+using FreeAIr.Llm.Anthropic;
 using FreeAIr.Llm.OpenAi;
 
 namespace FreeAIr.Llm
@@ -25,6 +26,9 @@ namespace FreeAIr.Llm
 
             switch (protocol)
             {
+                case LlmProtocol.Anthropic:
+                    return new AnthropicMessagesTransport(endpoint, token);
+
                 case LlmProtocol.OpenAi:
                 default:
                     return new OpenAiChatTransport(endpoint, token);

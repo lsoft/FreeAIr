@@ -567,7 +567,10 @@ namespace FreeAIr.Chat
                 messages: await GetMessageListAsync(),
                 tools: tools,
                 toolChoice: Options.ToolChoice,
-                maxOutputTokens: unsorted.MaxOutputTokenCount
+                //a zero in the settings means "unset", not "answer with nothing"
+                maxOutputTokens: unsorted.MaxOutputTokenCount > 0
+                    ? unsorted.MaxOutputTokenCount
+                    : (int?)null
                 );
         }
 
