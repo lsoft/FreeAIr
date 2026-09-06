@@ -34,6 +34,11 @@ plus the `Grep\` text matching behind the SearchFileContent MCP tool.
 `SetupWizard\FreeAIr.SetupWizard.csproj` the same way — the first-run setup wizard's step
 navigation, agent-field validation and known-endpoint catalog.
 
+`Llm.Tests\FreeAIr.Llm.Tests.csproj` (net8.0, xunit) covers `Llm\FreeAIr.Llm.csproj` — the two wire
+protocols FreeAIr speaks. Nothing reaches a server: a request is asserted as the JSON it becomes and
+an answer is fed in as the bytes a server would have sent, through a fake `HttpMessageHandler`
+(`Fakes\CannedHttpHandler.cs`). Add a case here before touching either transport.
+
 `MCP\Tests\FreeAIr.Mcp.Tests.csproj` (**net9.0**, xunit) covers the hop to the MCP servers: the
 argument conversions in `MCP\Dto`, the JSON-RPC channel to `Proxy.exe`, and `Proxy`'s own
 `BaseServer2` speaking `tools/list` and `tools/call`. Both ends are real — a live `JsonRpc` pair and
@@ -50,8 +55,8 @@ Anything you add to the command line goes on to `dotnet test`, e.g.
 `run-tests.bat --filter FullyQualifiedName~VectorCodec`. `FREEAIR_CONFIG` picks the configuration
 (`Release` by default), `FREEAIR_MSBUILD` overrides the compiler path.
 
-Only the three test projects and what they reference (`FreeAIr.Search`, `FreeAIr.SetupWizard`,
-`Dto`, `Proxy`) are built by the script — all SDK style, so it takes a couple of seconds and does
+Only the four test projects and what they reference (`FreeAIr.Search`, `FreeAIr.SetupWizard`,
+`FreeAIr.Llm`, `Dto`, `Proxy`) are built by the script — all SDK style, so it takes a couple of seconds and does
 not go near the VSIX. Build the solution yourself when you need the VSIX too; the script will then
 find everything up to date.
 
@@ -193,6 +198,21 @@ The baseline when this section was written was 918 of 4299 nodes (21%).
   array of its properties. Nothing throws, the call succeeds, and the server silently receives
   nested empty arrays (issue #70). Carry such payloads as raw JSON text — `ToolArguments` and
   `GetToolReply.Parameters` both do — and pin it with a test in `MCP\Tests`.
+- **Nothing above `ILlmTransport` may name a wire protocol.** Two are spoken and they disagree
+  about more than names: Anthropic has no system role (the prompt is a field of the request), no
+  tool role (a result is a block inside a *user* message), requires `max_tokens`, calls a schema
+  `input_schema`, and wants every tool call of a turn in one assistant message rather than paired
+  with its result. A chat content which built request messages itself could therefore only ever
+  serve one of them. Add to `FreeAIr.Llm`'s neutral model and let the transports differ — and add
+  the case to `Llm.Tests` first, since neither endpoint is reachable from a test run.
+- **`Microsoft.Bcl.AsyncInterfaces` is pinned at the version the VSIX ships, and `FreeAIr.Llm` must
+  not override it.** `FreeAIr.Search` does override it (System.ClientModel wants a newer one on
+  netstandard2.0) and gets away with it because that version never reaches its public API;
+  `FreeAIr.Llm` returns `IAsyncEnumerable`, so a higher version there fails the VSIX build with
+  `CS1705` rather than warning. Referencing `FreeAIr.Llm` from a project which inherits the central
+  pin — the setup wizard's logic assembly, say — fails the *restore* with `NU1109` instead, which is
+  why `KnownEndpointCatalog` recognises the Anthropic endpoint with a string comparison rather than
+  by holding an `LlmProtocol`.
 - **`clr-namespace:` in XAML means the current assembly unless `;assembly=` says otherwise.** Moving
   a type that XAML names into another assembly compiles the C# fine and then fails the markup
   compiler with `MC3050: cannot find type`. Every `xmlns:resources="clr-namespace:FreeAIr.Resources"`

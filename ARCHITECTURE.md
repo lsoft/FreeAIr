@@ -11,6 +11,8 @@ looking for the user manual, read the [README](README.md) instead.
 | `Resources` (`FreeAIr.Resources`) | .NET Framework 4.8 | Every localized string of the product — `Resources.resx` plus the `ru` and `zh-Hans` translations — and the generated `FreeAIr.Resources.Resources` class. Its own assembly because nearly every feature needs it, so leaving it in the VSIX would force anything extracted from there to reference the VSIX back. |
 | `FreeAIr.Search` | netstandard2.0 | The searching machinery that does not need Visual Studio: index format, vector codec, outline tree, ranking, and the `Grep/` text matching behind the SearchFileContent MCP tool. |
 | `FreeAIr.Search.Tests` | .NET 8 (xunit) | Unit tests of `FreeAIr.Search`. Not shipped. |
+| `Llm` (`FreeAIr.Llm`) | netstandard2.0 | Everything FreeAIr knows about talking to a model: the protocol-neutral request and stream model, one transport per wire protocol (OpenAI chat completions, Anthropic messages) and the matching model-list catalogs. |
+| `Llm.Tests` (`FreeAIr.Llm.Tests`) | .NET 8 (xunit) | Unit tests of `FreeAIr.Llm` against canned server bytes. Not shipped. |
 | `SetupWizard` (`FreeAIr.SetupWizard`) | netstandard2.0 | The first-run setup wizard's logic that does not need Visual Studio or WPF: step navigation/skipping, the agent-field validator, the known-endpoint catalog. |
 | `SetupWizard.Tests` (`FreeAIr.SetupWizard.Tests`) | .NET 8 (xunit) | Unit tests of `FreeAIr.SetupWizard`. Not shipped. |
 | `MCP/Proxy` | .NET 9 (exe) | Out-of-process host for MCP servers. Shipped inside the VSIX as `.art/Proxy.zip` and unpacked on first run. |
@@ -31,7 +33,7 @@ keep in mind when reading the code:
                     +------------------------------------------------+
                     |             devenv.exe (VS 2022/2026)          |
                     |                                                |
-    OpenAI API      |   +-------------+        +-----------------+   |
+  OpenAI/Anthropic  |   +-------------+        +-----------------+   |
   <---------------------+  LLMReader  |        | FreeAIrPackage  |   |
       (HTTPS)       |   +------+------+        +--------+--------+   |
                     |          |                        |            |
@@ -82,9 +84,11 @@ touching that class launches the child process.
   `ChatOptions` (chosen agent, response format, tool choice).
 - `Chat/Context/ChatContext.cs` — extra material handed to the LLM: solution documents, selections,
   external files. `copilot-instructions.md` is picked up automatically when present.
-- `BLogic/Reader/LLMReader.cs` — the worker that actually talks to the model. It streams the
-  completion, appends text to an `AnswerChatContent` as it arrives (this is what makes the UI
-  update live) and materializes `ToolCallChatContent` for every tool the model asks for.
+- `BLogic/Reader/LLMReader.cs` — the worker that actually talks to the model. It asks the chat for
+  an `ILlmTransport` and an `LlmRequest`, consumes the stream of `LlmStreamEvent`s, appends text to
+  an `AnswerChatContent` as it arrives (this is what makes the UI update live) and materializes
+  `ToolCallChatContent` for every tool the model asks for. It knows nothing about either wire
+  protocol — see the `FreeAIr.Llm` section below.
 - `BLogic/Reader/LLMReaderPool.cs` — one reader per chat, keyed by the chat instance.
 
 The loop is deliberately re-entrant: when the last outstanding tool call of a turn finishes,
@@ -109,6 +113,47 @@ rest of FreeAIr's persisted internal state live, which is why it sits with the s
 Nothing under `Options2/` names another feature folder — the model of what is configured does not
 know the runtime that acts on it. `McpServerProxyApplication.ApplyServerNodeAsync` is where the
 configured MCP servers are actually started and the failures reported.
+
+### Talking to a model
+
+Two wire protocols are spoken, and everything about either of them lives in the **`FreeAIr.Llm`**
+project. Paths in this section are relative to it.
+
+- `Model/` is the vocabulary the chat is written in: `LlmRequest`, `LlmMessage`, `LlmToolCall`,
+  `LlmToolResult`, `LlmToolDefinition` and the `LlmStreamEvent`s an answer arrives as. `IChatContent`
+  and `IChatContextItem` produce these; nothing above `ILlmTransport` knows which protocol carries
+  them.
+- The system prompt is a **field of the request**, not the first message. Anthropic has no system
+  role at all, and on the OpenAI side appending it to a `List<ChatMessage>` as a bare string goes
+  through an implicit conversion which builds a *user* message — which is what used to happen.
+- `OpenAi/OpenAiChatTransport.cs` speaks chat completions through the OpenAI SDK. It is the default
+  and what every local server and most gateways implement, so `LlmProtocol.OpenAi` is what an
+  agent's `ApiProtocol` defaults to and what every settings file written before it existed reads as.
+- `Anthropic/AnthropicMessagesTransport.cs` speaks `POST /v1/messages`, hand written over
+  `HttpClient` and `System.Net.ServerSentEvents` because no Anthropic SDK targets .NET Framework 4.8.
+- `Anthropic/AnthropicTranscript.cs` is the part which is not a rename. The chat records a tool call
+  and its answer as a pair, so two tools of one turn give assistant/result/assistant/result; this
+  protocol wants every `tool_use` of a turn in one assistant message and every `tool_result` in the
+  one user message answering it. There is no tool role — a result is a block inside a user message —
+  the conversation must open with the user, and the run of user messages every request carries (the
+  context documents) is sent as one message of several blocks. Getting this wrong does not degrade
+  an answer, it fails the request, which is why it is a class with tests rather than a loop in the
+  writer.
+- `Streaming/ToolCallAccumulator.cs` rebuilds a tool call from the fragments both protocols stream
+  it in; `Wire/ToolSchemaNormalizer.cs` repairs the `{}` schemas that LM Studio answers 400 to, and
+  both protocols apply it because it is a rule of the wire rather than of MCP.
+- `Models/` is the same split for the model list, which the picker and the wizard's `test
+  connection` button need: `GET /models` behind a bearer token against `{data:[{id, owned_by}]}` on
+  one side, `GET /v1/models` behind `x-api-key` against `{data:[{id, display_name}]}` on the other.
+
+`FreeAIr.Llm.Tests` drives both transports against canned server bytes — the request is asserted as
+the JSON it becomes and the answer is fed in as the bytes a server would have sent — so no model and
+no network are involved. That is the reason the assembly is split out at all: the VSIX cannot be
+loaded by a test runner, and a wire protocol spoken only from inside it can never be asserted.
+
+**Embeddings are the exception.** The Anthropic API has none, so `AgentEmbedding.CreateVectorizer`
+refuses an agent set to that protocol by name rather than letting it answer a vectorize request with
+a 404 halfway through an index build.
 
 ### MCP
 

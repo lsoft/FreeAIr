@@ -25,6 +25,12 @@ My others extensions lives [here](https://marketplace.visualstudio.com/publisher
 
 ## 4.3.1
 
+- Anthropic's own API is now spoken natively, alongside the OpenAI compatible one. An agent carries
+  a `Protocol` next to its endpoint (`OpenAi` by default, so nothing you have configured changes);
+  set it to `Anthropic` — or pick `Anthropic` in the endpoint list, which sets it for you — and
+  Claude models served by api.anthropic.com work with tools, streaming and the model picker like any
+  other agent. Note that this API has no embeddings, so the natural language index still needs an
+  OpenAI compatible agent.
 - Fixed few bugs.
 - User chats are now persistent (.freeair/chats) if the chat is started with a solution open.
 

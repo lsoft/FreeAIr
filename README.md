@@ -8,7 +8,7 @@ Access to AI for free for anyone who is using Visual Studio 2022\2026.
 
 ![logo](https://raw.githubusercontent.com/lsoft/FreeAIr/main/logo.png)
 
-FreeAIr is a Visual Studio extension which allows you to interact with any LLM which have OpenAI-compatible API. Even with local LLM! No artificial || political barrier injected in FreeAIr code.
+FreeAIr is a Visual Studio extension which allows you to interact with any LLM which have OpenAI-compatible API, or Anthropic's own API. Even with local LLM! No artificial || political barrier injected in FreeAIr code.
 
 [Download VSIX](https://marketplace.visualstudio.com/items?itemName=lsoft.FreeAIr)
 
@@ -35,7 +35,7 @@ A: No problem! You can use local LLM, for example via KoboldCpp. Local LLM sends
 
 Main functions:
 
-- Chat with any OpenAI-compatible LLM, in a tool window or in a small floating window right at the caret (`in situ` chat)
+- Chat with any OpenAI-compatible LLM, or with Claude through Anthropic's own API, in a tool window or in a small floating window right at the caret (`in situ` chat)
 - Voice prompting: dictate your prompt instead of typing it (4 speech-to-text backends, including a fully local one)
 - Searching with natural language (with RAG support)
 - Explain the code
@@ -192,6 +192,15 @@ These settings contain:
 An agent is a specific combination of `endpoint`, `token`, model name and its system prompt. The same LLM can act in different roles, the role is determined by its system prompt (e.g. `You are an experienced programmer...`, `You are a database programmer...`). In this case, you will have two agents with the same `endpoint`, `token` and model name, but different system prompts.
 
 You can edit existing agents or add your own. If an agent does not have a token, the agent is considered inactive.
+
+### Protocol
+
+Next to the endpoint an agent carries the `Protocol` its endpoint speaks:
+
+- `OpenAi` — chat completions. This is the default and what almost everything implements: OpenRouter, Yandex, and every local server (LM Studio, KoboldCpp, Ollama, text-generation-webui). If you have never heard of this setting, it is the one you want.
+- `Anthropic` — the messages API of `api.anthropic.com`, which Claude models served by Anthropic itself speak and which is not a dialect of the other one. Picking `Anthropic` in the endpoint list sets this for you; a proxy of your own may serve either, so the box stays editable.
+
+Everything else works the same way in both: streaming, tool calls, the model picker and the `test connection` check. The one exception is embeddings — the Anthropic API has none, so the [natural language index](#natural-language-search) needs an agent pointing at an OpenAI compatible embedding model.
 
 ## Chat
 
