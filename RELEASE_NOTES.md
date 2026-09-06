@@ -23,7 +23,7 @@ My others extensions lives [here](https://marketplace.visualstudio.com/publisher
 
 # FreeAIr Release Notes
 
-## 4.3.1
+## 4.4.0
 
 - Anthropic's own API is now spoken natively, alongside the OpenAI compatible one. An agent carries
   a `Protocol` next to its endpoint (`OpenAi` by default, so nothing you have configured changes);
@@ -31,6 +31,11 @@ My others extensions lives [here](https://marketplace.visualstudio.com/publisher
   Claude models served by api.anthropic.com work with tools, streaming and the model picker like any
   other agent. Note that this API has no embeddings, so the natural language index still needs an
   OpenAI compatible agent.
+- The agent's system prompt is now sent as a system message. It used to travel as something the
+  user had said, which made models treat it as one more request rather than as their instructions.
+
+## 4.3.1
+
 - Fixed few bugs.
 - User chats are now persistent (.freeair/chats) if the chat is started with a solution open.
 
