@@ -1,4 +1,5 @@
 ﻿using FreeAIr.Helper;
+using FreeAIr.Llm;
 using FreeAIr.SetupWizard.Helper;
 using System.ComponentModel;
 using System.Text.Json.Serialization;
@@ -89,11 +90,11 @@ namespace FreeAIr.Options2.Agent
     }
 
     /// <summary>
-    /// How to reach an agent: endpoint, token, model and context size.
+    /// How to reach an agent: endpoint, wire protocol, token, model and context size.
     ///
-    /// Everything here is OpenAI compatible, which is the only requirement the product places on a
-    /// provider — Yandex, OpenRouter, a local KoboldCpp and anything else speaking that protocol are
-    /// configured identically.
+    /// Most providers — Yandex, OpenRouter, a local KoboldCpp and anything else speaking the OpenAI
+    /// protocol — are configured identically and need nothing but an endpoint. Anthropic's own API
+    /// speaks a protocol of its own, which is what <see cref="ApiProtocol"/> is for.
     /// </summary>
     [JsonConverter(typeof(JsonDescriptionCommentConverter<AgentTechnical>))]
     public sealed class AgentTechnical : ICloneable
@@ -102,6 +103,22 @@ namespace FreeAIr.Options2.Agent
         /// An endpoint of LLM API provider.
         /// </summary>
         public string Endpoint
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// Which wire protocol the endpoint speaks. Defaults to
+        /// <see cref="LlmProtocol.OpenAi"/>, so a settings file written before this existed keeps
+        /// working unchanged; set it to <see cref="LlmProtocol.Anthropic"/> for api.anthropic.com
+        /// and anything else serving the Anthropic messages API.
+        ///
+        /// It cannot be derived from the endpoint reliably - a gateway on any host may serve either
+        /// - and guessing wrong shows up as a 404 that reads like a broken installation.
+        /// </summary>
+        [Description("The wire protocol of this endpoint: OpenAi (the default, understood by nearly every provider and every local server) or Anthropic (api.anthropic.com and other servers exposing the /v1/messages API).")]
+        public LlmProtocol ApiProtocol
         {
             get;
             set;
@@ -152,6 +169,7 @@ namespace FreeAIr.Options2.Agent
         public AgentTechnical()
         {
             Endpoint = FreeAIr.SetupWizard.Catalog.KnownEndpointCatalog.KoboldCppEndpoint;
+            ApiProtocol = LlmProtocol.OpenAi;
             Token = string.Empty;
             ChosenModel = string.Empty;
             ContextSize = 8192;
@@ -162,6 +180,7 @@ namespace FreeAIr.Options2.Agent
             return new AgentTechnical
             {
                 Endpoint = Endpoint,
+                ApiProtocol = ApiProtocol,
                 Token = Token,
                 ChosenModel = ChosenModel,
                 ContextSize = ContextSize

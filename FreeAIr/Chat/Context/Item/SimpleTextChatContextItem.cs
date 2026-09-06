@@ -1,4 +1,4 @@
-﻿using OpenAI.Chat;
+﻿using FreeAIr.Llm;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -64,12 +64,10 @@ namespace FreeAIr.Chat.Context.Item
         }
 
         /// <summary>Wraps the held body text into a chat message ready for the request.</summary>
-        public async Task<UserChatMessage> CreateChatMessageAsync()
+        public async Task<LlmMessage> CreateChatMessageAsync()
         {
-            return new UserChatMessage(
-                ChatMessageContentPart.CreateTextPart(
-                    _body
-                    )
+            return LlmMessage.CreateUserMessage(
+                _body
                 );
         }
 

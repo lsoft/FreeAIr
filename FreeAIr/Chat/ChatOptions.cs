@@ -1,6 +1,6 @@
-﻿using FreeAIr.Options2;
+﻿using FreeAIr.Llm;
+using FreeAIr.Options2;
 using FreeAIr.Options2.Agent;
-using OpenAI.Chat;
 using System.Threading.Tasks;
 
 namespace FreeAIr.Chat
@@ -19,10 +19,9 @@ namespace FreeAIr.Chat
         /// </summary>
         public static async Task<ChatOptions> GetDefaultAsync(AgentJson? chosenAgent) =>
             new ChatOptions(
-                ChatToolChoice.CreateAutoChoice(),
+                LlmToolChoice.Auto,
                 await FreeAIrOptions.DeserializeAgentCollectionAsync(),
                 chosenAgent,
-                OpenAI.Chat.ChatResponseFormat.CreateTextFormat(),
                 false
                 );
 
@@ -38,10 +37,9 @@ namespace FreeAIr.Chat
             var agentCollection = await FreeAIrOptions.DeserializeAgentCollectionAsync();
 
             return new ChatOptions(
-                ChatToolChoice.CreateNoneChoice(),
+                LlmToolChoice.None,
                 agentCollection,
                 chosenAgent,
-                OpenAI.Chat.ChatResponseFormat.CreateTextFormat(),
                 true
                 );
         }
@@ -65,16 +63,15 @@ namespace FreeAIr.Chat
             var agentCollection = await FreeAIrOptions.DeserializeAgentCollectionAsync();
 
             return new ChatOptions(
-                ChatToolChoice.CreateNoneChoice(),
+                LlmToolChoice.None,
                 agentCollection,
                 chosenAgent,
-                OpenAI.Chat.ChatResponseFormat.CreateTextFormat(),
                 true
                 );
         }
 
         /// <summary>Whether and how the model may call tools while answering in this chat.</summary>
-        public ChatToolChoice ToolChoice
+        public LlmToolChoice ToolChoice
         {
             get;
         }
@@ -92,12 +89,6 @@ namespace FreeAIr.Chat
             private set;
         }
 
-        /// <summary>The response shape requested from the model: plain text or JSON.</summary>
-        public OpenAI.Chat.ChatResponseFormat ResponseFormat
-        {
-            get;
-        }
-
         /// <summary>
         /// True for chats FreeAIr started on its own. Such chats are dimmed in the chat list,
         /// hidden when "show only user chats" is on, and the user cannot type into them.
@@ -112,32 +103,20 @@ namespace FreeAIr.Chat
         /// calling this directly.
         /// </summary>
         private ChatOptions(
-            ChatToolChoice toolChoice,
+            LlmToolChoice toolChoice,
             AgentCollectionJson chatAgents,
             AgentJson? chosenAgent,
-            OpenAI.Chat.ChatResponseFormat responseFormat,
             bool automaticallyProcessed
             )
         {
-            if (toolChoice is null)
-            {
-                throw new ArgumentNullException(nameof(toolChoice));
-            }
-
             if (chatAgents is null)
             {
                 throw new ArgumentNullException(nameof(chatAgents));
             }
 
-            if (responseFormat is null)
-            {
-                throw new ArgumentNullException(nameof(responseFormat));
-            }
-
             ToolChoice = toolChoice;
             ChatAgents = chatAgents;
             ChosenAgent = chosenAgent ?? chatAgents.Agents[0];
-            ResponseFormat = responseFormat;
             AutomaticallyProcessed = automaticallyProcessed;
         }
 

@@ -219,6 +219,7 @@
       puts the assembly and its ru\ and zh-Hans\ satellites into the package - see
       RemoveFlattenedSatellites at the bottom of this file for what it puts there twice.
     -->
+    <ProjectReference Include="..\Llm\FreeAIr.Llm.csproj" />
     <ProjectReference Include="..\Resources\FreeAIr.Resources.csproj" />
     <ProjectReference Include="..\Search\FreeAIr.Search.csproj" />
     <ProjectReference Include="..\SetupWizard\FreeAIr.SetupWizard.csproj" />

@@ -1,6 +1,6 @@
 @echo off
 rem ---------------------------------------------------------------------------------------------
-rem  Runs the FreeAIr.Search, FreeAIr.SetupWizard and FreeAIr.Mcp unit tests.
+rem  Runs the FreeAIr.Search, FreeAIr.SetupWizard, FreeAIr.Mcp and FreeAIr.Llm unit tests.
 rem
 rem  The two rules this script exists to enforce (see CLAUDE.md):
 rem
@@ -48,10 +48,10 @@ echo Configuration: %FREEAIR_CONFIG%
 echo.
 
 rem --- build ------------------------------------------------------------------------------------
-rem Only the test projects and what they reference (FreeAIr.Search, FreeAIr.SetupWizard, Dto,
-rem Proxy) are built. All of them are SDK style and none pulls the VSIX in, so this is a few seconds
-rem rather than a full solution build. To test against a freshly built solution, build the solution
-rem yourself first -- this step will then find everything up to date.
+rem Only the test projects and what they reference (FreeAIr.Search, FreeAIr.SetupWizard, FreeAIr.Llm,
+rem Dto, Proxy) are built. All of them are SDK style and none pulls the VSIX in, so this is a few
+rem seconds rather than a full solution build. To test against a freshly built solution, build the
+rem solution yourself first -- this step will then find everything up to date.
 
 "!FREEAIR_MSBUILD!" "Search.Tests\FreeAIr.Search.Tests.csproj" -t:Restore -nologo -v:minimal
 if errorlevel 1 goto :failed
@@ -71,6 +71,12 @@ if errorlevel 1 goto :failed
 "!FREEAIR_MSBUILD!" "MCP\Tests\FreeAIr.Mcp.Tests.csproj" -t:Build -p:Configuration=%FREEAIR_CONFIG% -nologo -v:minimal -m
 if errorlevel 1 goto :failed
 
+"!FREEAIR_MSBUILD!" "Llm.Tests\FreeAIr.Llm.Tests.csproj" -t:Restore -nologo -v:minimal
+if errorlevel 1 goto :failed
+
+"!FREEAIR_MSBUILD!" "Llm.Tests\FreeAIr.Llm.Tests.csproj" -t:Build -p:Configuration=%FREEAIR_CONFIG% -nologo -v:minimal -m
+if errorlevel 1 goto :failed
+
 rem --- run --------------------------------------------------------------------------------------
 
 echo.
@@ -81,6 +87,9 @@ dotnet test "SetupWizard.Tests\FreeAIr.SetupWizard.Tests.csproj" --no-build -c %
 if errorlevel 1 goto :failed
 
 dotnet test "MCP\Tests\FreeAIr.Mcp.Tests.csproj" --no-build -c %FREEAIR_CONFIG% --nologo %*
+if errorlevel 1 goto :failed
+
+dotnet test "Llm.Tests\FreeAIr.Llm.Tests.csproj" --no-build -c %FREEAIR_CONFIG% --nologo %*
 if errorlevel 1 goto :failed
 
 popd

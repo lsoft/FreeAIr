@@ -377,13 +377,6 @@ namespace FreeAIr.Chat.Persistence
             set;
         }
 
-        /// <summary>Streaming index of the tool call inside its completion.</summary>
-        public int Index
-        {
-            get;
-            set;
-        }
-
         /// <summary>Where the tool call was in its lifecycle when the file was written.</summary>
         public ToolCallStatusEnum? Status
         {
@@ -429,9 +422,8 @@ namespace FreeAIr.Chat.Persistence
                     {
                         Type = ChatContentTypeEnum.ToolCall,
                         Name = toolCall.Name,
-                        ToolCallId = toolCall.ToolCall.ToolCallId,
-                        Arguments = toolCall.ToolCall.FunctionArgumentsUpdate?.ToString() ?? "{}",
-                        Index = toolCall.ToolCall.Index,
+                        ToolCallId = toolCall.ToolCall.Id,
+                        Arguments = toolCall.ToolCall.ArgumentsJson,
                         Status = toolCall.Status,
                         Result = toolCall.Result,
                         IsArchived = toolCall.IsArchived,

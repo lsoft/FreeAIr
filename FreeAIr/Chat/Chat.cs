@@ -1,9 +1,7 @@
-﻿using FreeAIr.MCP.McpServerProxy;
+﻿using FreeAIr.Llm;
+using FreeAIr.MCP.McpServerProxy;
 using FreeAIr.Options2;
 using FreeAIr.Shared.Helper;
-using OpenAI;
-using OpenAI.Chat;
-using System.ClientModel;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
@@ -391,7 +389,6 @@ namespace FreeAIr.Chat
                         row.ToolCallId,
                         row.Name,
                         row.Arguments,
-                        row.Index,
                         row.Status ?? ToolCallStatusEnum.Failed,
                         row.Result,
                         row.IsArchived,
@@ -446,7 +443,7 @@ namespace FreeAIr.Chat
         /// results — this is what makes the tool-calling loop go round.
         /// </summary>
         public ToolCallChatContent CreateToolCall(
-            StreamingChatToolCallUpdate toolCall
+            LlmToolCall toolCall
             )
         {
             var content = new ToolCallChatContent(
@@ -547,54 +544,55 @@ namespace FreeAIr.Chat
         }
 
         /// <summary>
-        /// Builds the completion options for the next request. Only the tools which are enabled in
-        /// <see cref="ChatTools"/> are offered to the model; if there are none, tool choice is
-        /// forced to `none` because some providers reject an empty tool list.
+        /// Builds the whole next request: the agent's system prompt, the transcript, and the tools
+        /// which are enabled in <see cref="ChatTools"/>. Nothing here is protocol specific - which
+        /// wire format this becomes is settled by <see cref="CreateTransport"/>.
         /// </summary>
-        public async Task<ChatCompletionOptions> CreateChatCompletionOptionsAsync()
+        public async Task<LlmRequest> BuildRequestAsync()
         {
             var toolCollection = McpServerProxyCollection.GetTools(ChatTools);
             var activeTools = toolCollection.GetActiveToolList();
 
-            var cco = new ChatCompletionOptions
-            {
-                ToolChoice =
-                    activeTools.Count > 0
-                    ? Options.ToolChoice
-                    : ChatToolChoice.CreateNoneChoice(),
-                ResponseFormat = Options.ResponseFormat,
-                MaxOutputTokenCount = (await FreeAIrOptions.DeserializeUnsortedAsync()).MaxOutputTokenCount,
-            };
-
+            var tools = new List<LlmToolDefinition>(activeTools.Count);
             foreach (var tool in activeTools)
             {
-                cco.Tools.Add(
-                    tool.CreateChatTool()
-                    );
+                tools.Add(tool.CreateToolDefinition());
             }
 
-            return cco;
+            var unsorted = await FreeAIrOptions.DeserializeUnsortedAsync();
+
+            return new LlmRequest(
+                model: Options.ChosenAgent.Technical.ChosenModel,
+                systemPrompt: await Options.ChosenAgent.GetFormattedSystemPromptAsync(),
+                messages: await GetMessageListAsync(),
+                tools: tools,
+                toolChoice: Options.ToolChoice,
+                maxOutputTokens: unsorted.MaxOutputTokenCount
+                );
         }
 
         /// <summary>
-        /// Creates an OpenAI client configured for the agent chosen for this chat. The network
-        /// timeout is deliberately huge: a local LLM on a slow machine can think for a long time.
+        /// The transport for the agent chosen for this chat, picked by the protocol its endpoint
+        /// speaks. A transport is cheap and holds nothing worth keeping between turns, and the
+        /// agent - therefore possibly the protocol - can change from one turn to the next.
         /// </summary>
-        public ChatClient CreateChatClient()
+        public ILlmTransport CreateTransport()
         {
-            var chosenAgent = this.Options.ChosenAgent;
-            var chatClient = new ChatClient(
-                model: chosenAgent.Technical.ChosenModel,
-                new ApiKeyCredential(
-                    chosenAgent.Technical.GetToken()
-                    ),
-                new OpenAIClientOptions
-                {
-                    NetworkTimeout = TimeSpan.FromHours(1),
-                    Endpoint = chosenAgent.Technical.TryBuildEndpointUri(),
-                }
+            var technical = Options.ChosenAgent.Technical;
+
+            var endpoint = technical.TryBuildEndpointUri();
+            if (endpoint is null)
+            {
+                throw new InvalidOperationException(
+                    $"Agent '{Options.ChosenAgent.Name}' has an endpoint which is not a valid uri: '{technical.Endpoint}'."
+                    );
+            }
+
+            return LlmTransportFactory.Create(
+                technical.ApiProtocol,
+                endpoint,
+                technical.GetToken()
                 );
-            return chatClient;
         }
 
         private async Task WaitForTaskAsync()
@@ -655,20 +653,19 @@ namespace FreeAIr.Chat
         }
 
         /// <summary>
-        /// Flattens the chat into the message list to be sent to the model:
-        /// system prompt, then everything before the last prompt, then the chat context items,
-        /// then the last prompt and everything after it.
+        /// Flattens the chat into the message list to be sent to the model: everything before the
+        /// last prompt, then the chat context items, then the last prompt and everything after it.
         ///
         /// The context is injected right before the last prompt on purpose: models pay much more
         /// attention to what stands close to the instruction they are asked to follow.
         /// Archived contents are skipped entirely.
+        ///
+        /// The system prompt is not part of this list. It is a field of <see cref="LlmRequest"/>,
+        /// because one of the two protocols has no system role at all.
         /// </summary>
-        public async Task<IReadOnlyList<OpenAI.Chat.ChatMessage>> GetMessageListAsync()
+        public async Task<IReadOnlyList<LlmMessage>> GetMessageListAsync()
         {
-            var result = new List<OpenAI.Chat.ChatMessage>();
-
-            var formattedSystemPrompt = await Options.ChosenAgent.GetFormattedSystemPromptAsync();
-            result.Add(formattedSystemPrompt);
+            var result = new List<LlmMessage>();
 
             var nonArchivedContents = Contents.FindAll(p => !p.IsArchived);
 
@@ -699,7 +696,7 @@ namespace FreeAIr.Chat
         /// </summary>
         private static void FillMessageList(
             IChatContent content,
-            List<OpenAI.Chat.ChatMessage> result
+            List<LlmMessage> result
             )
         {
             if (result is null)

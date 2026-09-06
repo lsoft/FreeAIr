@@ -1,4 +1,4 @@
-﻿using OpenAI.Chat;
+﻿using FreeAIr.Llm;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
@@ -114,11 +114,11 @@ namespace FreeAIr.Chat.Content
         /// This answer as history for the next request: a single assistant message holding the whole
         /// body.
         /// </summary>
-        public IReadOnlyList<ChatMessage> CreateChatMessages()
+        public IReadOnlyList<LlmMessage> CreateChatMessages()
         {
             return
                 [
-                    new AssistantChatMessage(AnswerBody)
+                    LlmMessage.CreateAssistantMessage(AnswerBody)
                 ];
         }
 
