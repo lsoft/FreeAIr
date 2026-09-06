@@ -155,6 +155,31 @@ loaded by a test runner, and a wire protocol spoken only from inside it can neve
 refuses an agent set to that protocol by name rather than letting it answer a vectorize request with
 a 404 halfway through an index build.
 
+### Diagnostics
+
+Failures go to Visual Studio's Activity Log under the source `FreeAIr`, through
+`ActivityLogHelper` in `Shared`. Two things follow from that helper living in a net48 assembly:
+
+- The netstandard2.0 assemblies cannot call it. `FreeAIr.Llm` and `WpfHelpers` each expose a static
+  hook instead — `LlmDiagnostics.Sink` and `CommandDiagnostics.Sink` — which
+  `FreeAIrPackage.AttachDiagnosticSinks` points at the log during `InitializeAsync`, before anything
+  else runs. Unattached, both are no-ops, which is what the tests run under.
+- What they report is what would otherwise be invisible. `LlmDiagnostics` carries the *recoveries*:
+  a tool schema which had to be replaced, arguments which would not parse and were sent as `{}`, a
+  tool result dropped because nothing asks for that call, a stream fragment which is not what the
+  protocol promises. None of these throw and none reach the chat, and every one of them is a
+  plausible cause of "the tool ran with nothing in it". `CommandDiagnostics` carries the exceptions
+  the WPF commands already show in a message box, which is a dialog the tester has since closed.
+
+Two rules keep a failed request diagnosable from the log alone. A refused request names the
+protocol, the endpoint and the model (`Wire/TransportFailure.cs`) — that triple being wrong for
+itself is the likeliest cause, and none of it is in an HTTP status. And a failed turn is logged
+with the agent it was answering under (`LLMReader.DescribeTurn`), including the case where the turn
+fails without an exception at all, which is what an `LlmProtocolFaultEvent` is.
+
+The Activity Log is only written when Visual Studio was started with `/log` — worth saying to
+anyone asked to reproduce a problem. See `README.md`.
+
 ### MCP
 
 - `MCP/ServerProxy/McpServerProxyApplication.cs` — owns `Proxy.exe`: unpacks it, monitors it

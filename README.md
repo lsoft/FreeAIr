@@ -545,6 +545,18 @@ FreeAIr itself has no restrictions, you are able to switch another OpenAI compat
 
 If you are banned from any remote LLM then run LLM locally, which is very easy, for example with KoboldCpp: run KoboldCpp, choose the model, wait for KoboldCpp starts (it opens browser), and then use correct OpenAI compatible endpoint like `http://localhost:5001/v1`.
 
+# Reporting a problem
+
+FreeAIr writes its failures into Visual Studio's own Activity Log, under the source `FreeAIr`. That log is only written when Visual Studio was started with the `/log` switch, so to capture a problem:
+
+1. Close Visual Studio.
+2. Start it again as `devenv /log`, and reproduce what went wrong.
+3. Close Visual Studio and attach `%AppData%\Microsoft\VisualStudio\<version>\ActivityLog.xml` to the issue. Entries whose `source` is `FreeAIr` are the ones that matter.
+
+What lands there is not only exceptions. A chat that stops with no explanation, a tool that runs as if it had been given no arguments, an endpoint answering something that is not a completion at all — all of these are logged with the agent, the protocol, the endpoint and the model of the request, which is normally enough to tell a misconfigured agent from a broken one.
+
+**The log may contain fragments of what you sent and received**, including file contents that were attached as chat context and the sentence an endpoint answered with. Nothing writes your token there on purpose — it travels in a request header, and only endpoints, model names and agent names are logged — but read through the file before attaching it to a public issue.
+
 # Thanks
 
 - [openrouter.ai](openrouter.ai) for free access.

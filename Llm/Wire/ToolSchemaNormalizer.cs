@@ -53,6 +53,12 @@ namespace FreeAIr.Llm.Wire
                 var root = document.RootElement;
                 if (root.ValueKind != JsonValueKind.Object)
                 {
+                    //the tool is still offered, but with no arguments at all - which shows up later
+                    //as a model that never fills anything in
+                    LlmDiagnostics.Report(
+                        $"A tool schema was replaced by an empty one: it is a {root.ValueKind} rather than an object schema."
+                        );
+
                     return NoParameters;
                 }
 
@@ -103,9 +109,13 @@ namespace FreeAIr.Llm.Wire
 
                 return Encoding.UTF8.GetString(stream.ToArray());
             }
-            catch (JsonException)
+            catch (JsonException excp)
             {
                 //a schema which is not even json cannot be repaired, only replaced
+                LlmDiagnostics.Report(
+                    "A tool schema was replaced by an empty one: it does not parse as json.",
+                    excp
+                    );
             }
 
             return NoParameters;

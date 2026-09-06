@@ -221,7 +221,13 @@ namespace FreeAIr.BLogic.Reader
                         case LlmProtocolFaultEvent fault:
                             //the endpoint answered with something which is not a completion at all;
                             //there is nothing to read further and the chat has to fail rather than
-                            //sit waiting
+                            //sit waiting. It never becomes an exception, so this is the only place
+                            //it can reach the log - and a chat which "just stopped" is exactly the
+                            //report this has to be diagnosable from
+                            ActivityLogHelper.ActivityLogWarning(
+                                DescribeTurn() + " failed while streaming: " + fault.Message
+                                );
+
                             chatAnswer = await CreateOrAppendAnswerPartAsync(chatAnswer, fault.Message);
                             _chat.Status = ChatStatusEnum.Failed;
                             return;
@@ -251,7 +257,40 @@ namespace FreeAIr.BLogic.Reader
 
                 _chat.Status = ChatStatusEnum.Failed;
 
-                excp.ActivityLogException();
+                //the exception alone does not say which agent was answering, and a report of "the
+                //chat stopped working" is otherwise indistinguishable between agents
+                excp.ActivityLogException(DescribeTurn() + " failed.");
+
+                //the sentence naming what to fix is a property of the transport's exception rather
+                //than part of its message, so ActivityLogException would not print it
+                var serverMessage = TryReadServerErrorMessage(excp);
+                if (!string.IsNullOrWhiteSpace(serverMessage))
+                {
+                    ActivityLogHelper.ActivityLogError("The endpoint said: " + serverMessage);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Names the agent, the protocol, the endpoint and the model of the turn, for the log line
+        /// that accompanies a failure. This triple being wrong for itself - an agent pointed at
+        /// Anthropic while still set to speak the OpenAI protocol, above all - is the likeliest
+        /// cause of a request being refused, and none of it appears in an HTTP status.
+        /// </summary>
+        private string DescribeTurn()
+        {
+            try
+            {
+                var agent = _chat.Options.ChosenAgent;
+
+                return
+                    $"Chat {_chat.Id}, agent '{agent.Name}' ({agent.Technical.ApiProtocol} at "
+                    + $"{agent.Technical.Endpoint}, model '{agent.Technical.ChosenModel}')";
+            }
+            catch (Exception)
+            {
+                //a description is not worth an exception of its own, least of all inside a catch
+                return $"Chat {_chat.Id}";
             }
         }
 

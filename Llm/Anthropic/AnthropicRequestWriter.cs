@@ -76,7 +76,11 @@ namespace FreeAIr.Llm.Anthropic
                 writer.WriteString("description", tool.Description);
 
                 writer.WritePropertyName("input_schema");
-                WriteRawJson(writer, ToolSchemaNormalizer.Normalize(tool.ParametersJson));
+                WriteRawJson(
+                    writer,
+                    ToolSchemaNormalizer.Normalize(tool.ParametersJson),
+                    $"the input schema of tool {tool.Name}"
+                    );
 
                 writer.WriteEndObject();
             }
@@ -135,7 +139,11 @@ namespace FreeAIr.Llm.Anthropic
                     //the arguments are the real object here, not the JSON *string* the other
                     //protocol carries - passing the text through would send a quoted blob
                     writer.WritePropertyName("input");
-                    WriteRawJson(writer, block.ArgumentsJson);
+                    WriteRawJson(
+                        writer,
+                        block.ArgumentsJson,
+                        $"the arguments of tool call {block.ToolCallId} ({block.ToolName})"
+                        );
                     break;
 
                 case AnthropicTranscript.BlockKind.ToolResult:
@@ -160,7 +168,8 @@ namespace FreeAIr.Llm.Anthropic
         /// </summary>
         private static void WriteRawJson(
             Utf8JsonWriter writer,
-            string? json
+            string? json,
+            string what
             )
         {
             if (!string.IsNullOrWhiteSpace(json))
@@ -173,10 +182,20 @@ namespace FreeAIr.Llm.Anthropic
                         document.RootElement.WriteTo(writer);
                         return;
                     }
+
+                    //a tool which is offered with no arguments, or invoked with none, is a
+                    //plausible report of "the tool did nothing" and invisible without this line
+                    LlmDiagnostics.Report(
+                        $"An empty object was sent in place of {what}: the json is a "
+                        + $"{document.RootElement.ValueKind} rather than an object."
+                        );
                 }
-                catch (JsonException)
+                catch (JsonException excp)
                 {
-                    //fall through to the empty object
+                    LlmDiagnostics.Report(
+                        $"An empty object was sent in place of {what}: the json does not parse.",
+                        excp
+                        );
                 }
             }
 

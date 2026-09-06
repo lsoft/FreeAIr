@@ -198,6 +198,13 @@ The baseline when this section was written was 918 of 4299 nodes (21%).
   array of its properties. Nothing throws, the call succeeds, and the server silently receives
   nested empty arrays (issue #70). Carry such payloads as raw JSON text — `ToolArguments` and
   `GetToolReply.Parameters` both do — and pin it with a test in `MCP\Tests`.
+- **A netstandard2.0 assembly reports through a hook, not to the activity log.** `ActivityLogHelper`
+  lives in `Shared`, which is net48. `FreeAIr.Llm` and `WpfHelpers` expose `LlmDiagnostics.Sink` and
+  `CommandDiagnostics.Sink`, attached by `FreeAIrPackage.AttachDiagnosticSinks`. Use them for the
+  things which are recovered from rather than thrown — a replaced tool schema, arguments sent as
+  `{}`, a dropped tool result — because those never reach the chat and are exactly what a bug report
+  of "the tool did nothing" turns out to be. And remember the log is only written under `devenv
+  /log`.
 - **Nothing above `ILlmTransport` may name a wire protocol.** Two are spoken and they disagree
   about more than names: Anthropic has no system role (the prompt is a field of the request), no
   tool role (a result is a block inside a *user* message), requires `max_tokens`, calls a schema

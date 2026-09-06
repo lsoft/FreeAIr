@@ -159,6 +159,12 @@ namespace FreeAIr.Llm.Anthropic
                 {
                     //a result whose call is not in the transcript any more answers nothing; sending
                     //it names a tool_use_id the model never issued and fails the whole request
+                    LlmDiagnostics.Report(
+                        $"The result of tool call {message.ToolResult?.ToolCallId} was dropped from the request: "
+                        + "no assistant message in the transcript asks for that call. "
+                        + "The model will not see what the tool answered."
+                        );
+
                     index++;
                     continue;
                 }

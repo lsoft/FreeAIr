@@ -82,7 +82,7 @@ namespace FreeAIr.Llm.Anthropic
             {
                 if (!response.IsSuccessStatusCode)
                 {
-                    throw await ReadFailureAsync(response);
+                    throw await ReadFailureAsync(response, request.Model);
                 }
 
 #if NET
@@ -130,10 +130,17 @@ namespace FreeAIr.Llm.Anthropic
             {
                 document = JsonDocument.Parse(data);
             }
-            catch (JsonException)
+            catch (JsonException excp)
             {
                 //a fragment which is not json at all is not something this protocol ever sends;
-                //skipping it is better than failing a turn which may still be readable
+                //skipping it is better than failing a turn which may still be readable, but it is
+                //also what a proxy rewriting the stream looks like, so it goes in the log
+                LlmDiagnostics.Report(
+                    "An Anthropic stream event was not valid json and has been skipped: "
+                    + Excerpt(data),
+                    excp
+                    );
+
                 return Array.Empty<LlmStreamEvent>();
             }
 
@@ -317,8 +324,9 @@ namespace FreeAIr.Llm.Anthropic
         }
 
         /// <summary>Turns a non-success response into the neutral failure, keeping the body it came with.</summary>
-        private static async Task<LlmTransportException> ReadFailureAsync(
-            HttpResponseMessage response
+        private async Task<LlmTransportException> ReadFailureAsync(
+            HttpResponseMessage response,
+            string model
             )
         {
             string? body = null;
@@ -326,15 +334,23 @@ namespace FreeAIr.Llm.Anthropic
             {
                 body = await response.Content.ReadAsStringAsync();
             }
-            catch (Exception)
+            catch (Exception excp)
             {
-                //a response whose body cannot be read still has a status worth reporting
+                //a response whose body cannot be read still has a status worth reporting, but the
+                //sentence naming what to fix is gone - say so rather than look like a server which
+                //explained nothing
+                LlmDiagnostics.Report(
+                    $"The body of the failed request to {_endpoint} could not be read.",
+                    excp
+                    );
             }
 
-            return new LlmTransportException(
-                $"Service request failed. Status: {(int)response.StatusCode}",
-                ServerErrorMessageReader.Read(body),
-                (int)response.StatusCode
+            return TransportFailure.Create(
+                LlmProtocol.Anthropic,
+                _endpoint,
+                model,
+                (int)response.StatusCode,
+                body
                 );
         }
 
@@ -367,6 +383,26 @@ namespace FreeAIr.Llm.Anthropic
             return root.TryGetProperty("index", out var index) && index.TryGetInt32(out var value)
                 ? value
                 : 0;
+        }
+
+        /// <summary>
+        /// The head of a payload, for a log line. A whole stream event can be a page of json and
+        /// the activity log is read by eye.
+        /// </summary>
+        private static string Excerpt(
+            string? data
+            )
+        {
+            const int MaxLength = 200;
+
+            if (string.IsNullOrEmpty(data))
+            {
+                return "<empty>";
+            }
+
+            return data!.Length <= MaxLength
+                ? data
+                : data.Substring(0, MaxLength) + "...";
         }
 
         /// <summary>A string member, or an empty string when it is absent or of another kind.</summary>

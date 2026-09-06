@@ -87,7 +87,7 @@ namespace FreeAIr.Llm.OpenAi
                     {
                         //the SDK reports every non-success status this way, and its own message is
                         //only the status line - the body is where the provider says what is wrong
-                        throw ToTransportException(excp);
+                        throw ToTransportException(excp, request.Model);
                     }
 
                     //a chunk without a completion id means the endpoint replied with something
@@ -95,6 +95,11 @@ namespace FreeAIr.Llm.OpenAi
                     //there is nothing to read further
                     if (update.CompletionId is null)
                     {
+                        LlmDiagnostics.Report(
+                            $"The OpenAi endpoint {_endpoint} answered model '{request.Model}' with a chunk carrying no completion id, "
+                            + "which means the reply is not a completion at all - an error page, a quota message, or an endpoint speaking another protocol."
+                            );
+
                         yield return new LlmProtocolFaultEvent("Server returns error.");
                         yield break;
                     }
@@ -176,8 +181,9 @@ namespace FreeAIr.Llm.OpenAi
         }
 
         /// <summary>Translates the SDK's failure into the neutral one, keeping the body the provider sent.</summary>
-        private static LlmTransportException ToTransportException(
-            ClientResultException excp
+        private LlmTransportException ToTransportException(
+            ClientResultException excp,
+            string model
             )
         {
             string? body = null;
@@ -185,15 +191,23 @@ namespace FreeAIr.Llm.OpenAi
             {
                 body = excp.GetRawResponse()?.Content?.ToString();
             }
-            catch (Exception)
+            catch (Exception readExcp)
             {
-                //a response which has already been consumed keeps nothing to read
+                //a response which has already been consumed keeps nothing to read, and then the
+                //status is all the user gets - worth saying so rather than looking like a server
+                //which explained nothing
+                LlmDiagnostics.Report(
+                    $"The body of the failed request to {_endpoint} could not be read.",
+                    readExcp
+                    );
             }
 
-            return new LlmTransportException(
-                excp.Message,
-                ServerErrorMessageReader.Read(body),
+            return TransportFailure.Create(
+                LlmProtocol.OpenAi,
+                _endpoint,
+                model,
                 excp.Status,
+                body,
                 excp
                 );
         }
