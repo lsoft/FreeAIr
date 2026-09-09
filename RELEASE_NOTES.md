@@ -23,6 +23,16 @@ My others extensions lives [here](https://marketplace.visualstudio.com/publisher
 
 # FreeAIr Release Notes
 
+## 4.4.1
+
+- Fixed: the chat window would not open at all when a saved chat held an answer naming an image
+  that could not be loaded — a relative link such as `![diagram](diagram.png)`, or a path to a file
+  which is not there. Since chats are restored from `.freeair\chats` when the solution opens, the
+  window then stayed broken on every later start (issue #73). Such an image is now simply not
+  rendered, the rest of the answer is, and the failure goes to the activity log.
+- An answer which fails to render for any other reason no longer costs the whole chat window
+  either: the item is skipped and logged, and the rest of the conversation is shown.
+
 ## 4.4.0
 
 - Anthropic's own API is now spoken natively, alongside the OpenAI compatible one. An agent carries
