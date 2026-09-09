@@ -22,6 +22,7 @@ looking for the user manual, read the [README](README.md) instead.
 | `Voice` (`FreeAIr.Voice`) | .NET Framework 4.8 | Speech to text: the `IRecorder`/`IRecorderFactory` contracts, the four backends, their configuration controls and the recording options page. A MEF component of its own, so the VSIX manifest names it. |
 | `Shared` | .NET Framework 4.8 | The leaf everything may depend on: the CodeLens pipe name and `UnitInfo` DTOs, `SelectedSpan`, the `BackgroundTask` base class, and helpers (`TempFile`, `CallAwaiter`, `ActivityLogHelper`, `MefHelper`) used across the VSIX, `FreeAIr.Voice` and `WpfHelpers`. |
 | `MarkdownParser` | netstandard | ANTLR-based markdown parser used to render LLM answers. |
+| `MarkdownParser.Tests` (`FreeAIr.MarkdownParser.Tests`) | .NET Framework 4.8, WPF (xunit) | Unit tests of `MarkdownParser`: the answer's markdown all the way into a `FlowDocument`. Not shipped. |
 | `MarkdownParserTester` | WPF app | Scratch harness for the markdown parser; not shipped. |
 | `WpfHelpers` | netstandard | View-model / command / collection helpers used by the WPF UI, plus `NestedCheckBox` — the tree-of-checkboxes control the outlines panel, the tool list and the control center all show. |
 | `TestSubject` | — | A sample solution used to try FreeAIr out manually. Not part of the product. |

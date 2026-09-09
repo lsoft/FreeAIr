@@ -61,15 +61,33 @@ namespace MarkdownParser.Antlr.Answer
             
             foreach (var ourCommand in ourCommands)
             {
-                var control = ourCommand.CreateControl(
-                    part
-                    );
+                UIElement? control;
+                try
+                {
+                    control = ourCommand.CreateControl(
+                        part
+                        );
+                }
+                catch (Exception excp)
+                {
+                    //building one button's command parameter may fail on the part's own content;
+                    //that button is then simply not offered, rather than taking the paragraph -
+                    //and with it the whole chat window - down with it (issue #73)
+                    WpfHelpers.CommandDiagnostics.Report(excp);
+                    continue;
+                }
+
                 if (control is null)
                 {
                     continue;
                 }
 
                 sp.Children.Add(control);
+            }
+
+            if (sp.Children.Count <= 0)
+            {
+                return null;
             }
 
             var border = new Border

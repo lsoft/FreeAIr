@@ -62,13 +62,15 @@ namespace MarkdownParser.Antlr.Answer.Parts
             Title = title;
         }
 
-        /// <summary>The parameter passed to an <see cref="AdditionalCommand"/> button for this part — the loaded image bitmap.</summary>
-        public object GetContextForAdditionalCommand()
+        /// <summary>
+        /// The parameter passed to an <see cref="AdditionalCommand"/> button for this part — the
+        /// loaded image bitmap, or null when the link cannot be loaded. Null rather than an
+        /// exception because an answer's markdown routinely names an image which is not there, and
+        /// the copy-to-clipboard button is not worth the whole chat window (issue #73).
+        /// </summary>
+        public object? GetContextForAdditionalCommand()
         {
-            var link = GetLink();
-
-            return new BitmapImage(new Uri(link));
-
+            return TryLoadBitmap();
         }
 
         /// <summary>While streaming, yields placeholder text; otherwise loads the image (async for 1x1 web-placeholder bitmaps) or, on failure, yields nothing.</summary>
@@ -91,8 +93,12 @@ namespace MarkdownParser.Antlr.Answer.Parts
                 {
                 };
 
-                var link = GetLink();
-                var bitmap = new BitmapImage(new Uri(link));
+                var bitmap = TryLoadBitmap();
+                if (bitmap is null)
+                {
+                    return [];
+                }
+
                 if (bitmap.Width == 1 && bitmap.Height == 1) //for web images
                 {
                     bitmap.DownloadCompleted += (sender, e) =>
@@ -116,11 +122,39 @@ namespace MarkdownParser.Antlr.Answer.Parts
             }
             catch (Exception excp)
             {
-                //image can not be found, for example; or other reason
-                //todo log
+                //the bitmap loaded but could not be shown - a broken frame, say
+                WpfHelpers.CommandDiagnostics.Report(excp);
             }
 
             return [];
+        }
+
+        /// <summary>
+        /// Loads the image, answering null instead of throwing for the two things an answer's
+        /// markdown routinely contains: a link which is no absolute uri at all — `![x](diagram.png)`,
+        /// `![x](./img/a.svg)`, `![x](#anchor)` are all accepted by the IMAGE lexer rule — and one
+        /// which is, but names nothing readable. <see cref="BitmapImage"/> opens its source right in
+        /// the constructor, so a missing file throws here rather than at rendering time.
+        /// </summary>
+        private BitmapImage? TryLoadBitmap()
+        {
+            var link = GetLink();
+
+            if (!Uri.TryCreate(link, UriKind.Absolute, out var uri))
+            {
+                return null;
+            }
+
+            try
+            {
+                return new BitmapImage(uri);
+            }
+            catch (Exception excp)
+            {
+                //no such file, unreadable, or not an image format WPF decodes
+                WpfHelpers.CommandDiagnostics.Report(excp);
+                return null;
+            }
         }
 
         /// <summary>Resolves a `/`-rooted link relative to the current directory; leaves absolute/web links untouched.</summary>

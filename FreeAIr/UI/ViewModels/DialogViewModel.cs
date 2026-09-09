@@ -343,12 +343,26 @@ namespace FreeAIr.UI.ViewModels
         /// <summary>
         /// Clears and repopulates the dialog list from every content item currently held by
         /// the selected chat, used when switching the dialog to a different chat.
+        ///
+        /// One item which fails to render is logged and skipped. This runs from the Chat dependency
+        /// property's setter, which is assigned from XAML, so an escaping exception surfaces as a
+        /// XamlParseException out of InitializeComponent and the tool window does not open at all -
+        /// and since chats are restored from disk it would then not open on any later start either
+        /// (issue #73). The streaming path is already protected the same way, in
+        /// <see cref="AddDialogContentSafelyAsync"/>.
         /// </summary>
         private void RewriteDialog()
         {
             foreach (var content in _selectedChat.Contents)
             {
-                AddDialogContent(content);
+                try
+                {
+                    AddDialogContent(content);
+                }
+                catch (Exception excp)
+                {
+                    excp.ActivityLogException();
+                }
             }
         }
 

@@ -45,6 +45,15 @@ argument conversions in `MCP\Dto`, the JSON-RPC channel to `Proxy.exe`, and `Pro
 a live MCP server on an in-process duplex stream — so nothing is spawned and the whole file runs in
 under a second. It is net9.0 rather than net8.0 because it references `MCP\Proxy`, which is net9.0.
 
+`MarkdownParser.Tests\FreeAIr.MarkdownParser.Tests.csproj` (**net48**, `UseWPF`, xunit) covers
+`MarkdownParser\MarkdownParser.csproj` — the answer an LLM wrote, from markdown text through the
+ANTLR grammar into the `FlowDocument` and the action buttons the chat window shows. net48 with WPF
+because that is what `MarkdownParser` is; the WPF objects are built on an STA thread of the test's
+own (`StaTestRunner`), since xunit runs on the MTA thread pool and a `BitmapImage` may then not be
+asked about its size from anywhere else. The renderer runs while the tool window is being
+constructed, so anything it can throw takes the whole chat window with it — that is issue #73, and
+what most of these tests are about.
+
 Use the script; it builds with MSBuild and only then hands over to the SDK:
 
 ```bash
@@ -55,8 +64,9 @@ Anything you add to the command line goes on to `dotnet test`, e.g.
 `run-tests.bat --filter FullyQualifiedName~VectorCodec`. `FREEAIR_CONFIG` picks the configuration
 (`Release` by default), `FREEAIR_MSBUILD` overrides the compiler path.
 
-Only the four test projects and what they reference (`FreeAIr.Search`, `FreeAIr.SetupWizard`,
-`FreeAIr.Llm`, `Dto`, `Proxy`) are built by the script — all SDK style, so it takes a couple of seconds and does
+Only the five test projects and what they reference (`FreeAIr.Search`, `FreeAIr.SetupWizard`,
+`FreeAIr.Llm`, `MarkdownParser`, `WpfHelpers`, `FreeAIr.Shared`, `Dto`, `Proxy`) are built by the
+script — all SDK style, so it takes a couple of seconds and does
 not go near the VSIX. Build the solution yourself when you need the VSIX too; the script will then
 find everything up to date.
 
