@@ -172,6 +172,10 @@ namespace FreeAIr.BLogic.Reader
         /// build the request from the chat, stream the completion, append the text to the answer
         /// as it arrives (so the UI updates live) and register the tool calls the model asked for.
         ///
+        /// The text appended is not the text delta but whatever <see cref="AnswerTextAssembler"/>
+        /// makes of the event, which is how the reasoning of a thinking model reaches the chat: as
+        /// a `think` block the renderer collapses, and only when the agent asks for it.
+        ///
         /// The tools are NOT invoked here. Each <see cref="ToolCallChatContent"/> executes itself
         /// (possibly after asking the user for a permission), and the last one to finish restarts
         /// this reader through <see cref="FreeAIr.Chat.Chat.CreateToolCall"/>.
@@ -184,6 +188,13 @@ namespace FreeAIr.BLogic.Reader
             await TaskScheduler.Default;
 
             AnswerChatContent? chatAnswer = null;
+
+            //outside the try because a turn which fails while the model is still reasoning has to
+            //close the block before the exception is appended, or the message lands inside it and
+            //the user sees an answer which stops mid-thought
+            var answerTextAssembler = new AnswerTextAssembler(
+                _chat.Options.ChosenAgent.Technical.ShowReasoning
+                );
 
             try
             {
@@ -201,14 +212,26 @@ namespace FreeAIr.BLogic.Reader
                 {
                     toolCallAccumulator.Append(streamEvent);
 
+                    //the answer text of this event - the delta itself, plus the think tags opened
+                    //and closed around a run of reasoning - and nothing at all for most events
+                    var answerPart = answerTextAssembler.Append(streamEvent);
+                    if (answerPart.Length > 0)
+                    {
+                        //for updating UI in real time
+                        chatAnswer = await CreateOrAppendAnswerPartAsync(chatAnswer, answerPart);
+                    }
+
                     switch (streamEvent)
                     {
-                        case LlmTextDeltaEvent textDelta:
-                            //for updating UI in real time
-                            chatAnswer = await CreateOrAppendAnswerPartAsync(chatAnswer, textDelta.Text);
-
+                        case LlmTextDeltaEvent:
+                        case LlmReasoningDeltaEvent:
                             if (cancellationToken.IsCancellationRequested)
                             {
+                                //stopped while the model was still thinking: the block has to be
+                                //closed here too, or what is left of it is sent back as history on
+                                //the next turn, where nothing recognises it any more
+                                chatAnswer = await CloseReasoningAsync(chatAnswer, answerTextAssembler);
+
                                 _chat.Status = ChatStatusEnum.Ready;
                                 return;
                             }
@@ -234,6 +257,10 @@ namespace FreeAIr.BLogic.Reader
                     }
                 }
 
+                //a turn which ends in a tool call says nothing after its reasoning, so the end of
+                //the stream is the only thing left to close the block
+                chatAnswer = await CloseReasoningAsync(chatAnswer, answerTextAssembler);
+
                 if (finishReason == LlmFinishReason.ToolCalls)
                 {
                     foreach (var toolCall in toolCallAccumulator.Build())
@@ -249,10 +276,16 @@ namespace FreeAIr.BLogic.Reader
             catch (OperationCanceledException)
             {
                 //this is OK
+                chatAnswer = await CloseReasoningAsync(chatAnswer, answerTextAssembler);
+
                 _chat.Status = ChatStatusEnum.Ready;
             }
             catch (Exception excp)
             {
+                //close whatever the model was still thinking about, so the failure is shown next to
+                //the answer and not folded into the collapsed block above it
+                chatAnswer = await CloseReasoningAsync(chatAnswer, answerTextAssembler);
+
                 chatAnswer = await CreateOrAppendAnswerPartAsync(chatAnswer, excp);
 
                 _chat.Status = ChatStatusEnum.Failed;
@@ -349,6 +382,29 @@ namespace FreeAIr.BLogic.Reader
             }
 
             return null;
+        }
+
+        /// <summary>
+        /// Closes a reasoning block the turn ended in the middle of, and leaves the answer alone
+        /// when there is none.
+        ///
+        /// Every way out of the loop needs this — the end of the stream, a stop, a cancellation, a
+        /// failure — because an answer left holding an unclosed `think` tag hides everything
+        /// appended after it, and is no longer recognised as reasoning when the chat is replayed as
+        /// history.
+        /// </summary>
+        private async Task<AnswerChatContent?> CloseReasoningAsync(
+            AnswerChatContent? chatAnswer,
+            AnswerTextAssembler answerTextAssembler
+            )
+        {
+            var reasoningTail = answerTextAssembler.Flush();
+            if (reasoningTail.Length == 0)
+            {
+                return chatAnswer;
+            }
+
+            return await CreateOrAppendAnswerPartAsync(chatAnswer, reasoningTail);
         }
 
         /// <summary>Appends a piece of streamed text to the chat's answer, creating the answer content on the first call so the UI can update live.</summary>

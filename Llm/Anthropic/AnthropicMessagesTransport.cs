@@ -117,8 +117,7 @@ namespace FreeAIr.Llm.Anthropic
 
         /// <summary>
         /// Translates one server-sent event into what the chat understands. Returns nothing for the
-        /// events which carry no news - `ping`, the block boundaries, the thinking of a model
-        /// reasoning aloud.
+        /// events which carry no news - `ping`, the block boundaries, the id of the message.
         /// </summary>
         private static IReadOnlyList<LlmStreamEvent> ReadEvent(
             string data,
@@ -211,9 +210,11 @@ namespace FreeAIr.Llm.Anthropic
         }
 
         /// <summary>
-        /// A piece of a content block. Answer text and the arguments of a call arrive this way; a
-        /// thinking delta does not become answer text, because that reasoning is not what the chat
-        /// window shows and every caller which parses an answer would have to strip it again.
+        /// A piece of a content block. Answer text, the arguments of a call and the reasoning of an
+        /// extended-thinking model each arrive this way. A thinking delta stays an
+        /// <see cref="LlmReasoningDeltaEvent"/> and never becomes answer text: what the chat window
+        /// makes of it is decided above the transport, and every caller which parses an answer for
+        /// a commit message would otherwise have to strip it out again.
         /// </summary>
         private static IReadOnlyList<LlmStreamEvent> ReadContentBlockDelta(
             JsonElement root
@@ -233,6 +234,15 @@ namespace FreeAIr.Llm.Anthropic
                 return string.IsNullOrEmpty(text)
                     ? Array.Empty<LlmStreamEvent>()
                     : new LlmStreamEvent[] { new LlmTextDeltaEvent(text) };
+            }
+
+            if (deltaType.ValueEquals("thinking_delta"))
+            {
+                var thinking = ReadString(delta, "thinking");
+
+                return string.IsNullOrEmpty(thinking)
+                    ? Array.Empty<LlmStreamEvent>()
+                    : new LlmStreamEvent[] { new LlmReasoningDeltaEvent(thinking) };
             }
 
             if (deltaType.ValueEquals("input_json_delta"))

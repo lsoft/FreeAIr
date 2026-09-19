@@ -202,6 +202,22 @@ Next to the endpoint an agent carries the `Protocol` its endpoint speaks:
 
 Everything else works the same way in both: streaming, tool calls, the model picker and the `test connection` check. The one exception is embeddings — the Anthropic API has none, so the [natural language index](#natural-language-search) needs an agent pointing at an OpenAI compatible embedding model.
 
+### Reasoning
+
+A thinking model works through the question before it answers, and `ShowReasoning` — on by default — puts that reasoning in the chat as a `think` block above the answer. The block is collapsed, so the answer reads as it always did and a click opens the reasoning behind it.
+
+It is worth opening when a model picked the wrong tool, called it with the wrong arguments or ignored a rule of the system prompt: the answer says nothing about why, and the reasoning usually names the sentence it was following. That is what it is for.
+
+What reaches the chat depends on the server rather than on FreeAIr:
+
+- `reasoning_content` — DeepSeek, vLLM, llama.cpp and the local servers built on it.
+- `reasoning` — OpenRouter.
+- `thinking` — the Anthropic API, when the endpoint is serving a model with extended thinking already switched on. FreeAIr does not ask for it, so a plain `api.anthropic.com` agent sends none.
+- OpenAI's own o-series models send no reasoning at all, by design — there is nothing for this setting to show.
+- A model which writes `<think>` into its ordinary answer text is shown that way whatever the setting says, because that text is the answer as far as any server is concerned.
+
+Reasoning is never sent back to the model on the next turn, and the support actions — the commit message writer and the rest — strip it before using an answer, so turning it off only matters for what you are shown and what an endpoint billed per token charges you for.
+
 ## Chat
 
 Chat is the core element of FreeAIr, where communication with LLM and code generation takes place.

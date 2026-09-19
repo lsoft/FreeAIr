@@ -143,6 +143,18 @@ project. Paths in this section are relative to it.
 - `Streaming/ToolCallAccumulator.cs` rebuilds a tool call from the fragments both protocols stream
   it in; `Wire/ToolSchemaNormalizer.cs` repairs the `{}` schemas that LM Studio answers 400 to, and
   both protocols apply it because it is a rule of the wire rather than of MCP.
+- Reasoning is an `LlmReasoningDeltaEvent` and not answer text, because a commit message built from
+  a chat would otherwise carry the deliberation which produced it. `Streaming/AnswerTextAssembler.cs`
+  is the one place which decides what becomes of it: a `<think>` block around each run of reasoning,
+  which the markdown renderer already collapses, or nothing at all when the agent's `ShowReasoning`
+  is off. The same class takes the blocks back out for the history of the next request — neither
+  protocol wants last turn's reasoning returned as text.
+- `OpenAi/OpenAiReasoningCapture.cs` is the ugly half of that. The OpenAI SDK has no property for
+  reasoning and drops what it does not recognise, and there is no release to wait for: the field
+  was never part of the protocol and the servers disagree about its name. So a pipeline policy
+  swaps the response body for a stream which shows the bytes to `ReasoningSseScanner` on their way
+  to the SDK. Rewriting the whole transport by hand was the alternative, and the request the SDK
+  builds is what every `OpenAiRequestFacts` case asserts.
 - `Models/` is the same split for the model list, which the picker and the wizard's `test
   connection` button need: `GET /models` behind a bearer token against `{data:[{id, owned_by}]}` on
   one side, `GET /v1/models` behind `x-api-key` against `{data:[{id, display_name}]}` on the other.

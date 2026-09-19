@@ -34,6 +34,36 @@ namespace FreeAIr.Llm
     }
 
     /// <summary>
+    /// A piece of the model's reasoning - what a thinking model works through before it answers.
+    ///
+    /// It is a separate event rather than answer text because it is not the answer: a commit
+    /// message built from a chat would otherwise carry the deliberation that produced it, and a
+    /// chat window showing reasoning inline would bury the sentence the user asked for. Whether it
+    /// is shown at all, and how, is decided above the transport by
+    /// <see cref="Streaming.AnswerTextAssembler"/>.
+    ///
+    /// Only reasoning the protocol carries in a field of its own arrives this way - Anthropic's
+    /// `thinking_delta`, the `reasoning_content` of the OpenAI compatible servers. A model which
+    /// writes `&lt;think&gt;` into its ordinary answer text is not saying anything the protocol
+    /// understands, and that stays a text delta.
+    /// </summary>
+    public sealed class LlmReasoningDeltaEvent : LlmStreamEvent
+    {
+        /// <summary>The fragment of reasoning. Never null, may be any length.</summary>
+        public string Text
+        {
+            get;
+        }
+
+        public LlmReasoningDeltaEvent(
+            string text
+            )
+        {
+            Text = text ?? throw new ArgumentNullException(nameof(text));
+        }
+    }
+
+    /// <summary>
     /// The model has started asking for a tool: its id and name are known, its arguments are not
     /// yet. Every later fragment of the same call repeats <see cref="Index"/>.
     /// </summary>

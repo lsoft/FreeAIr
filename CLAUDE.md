@@ -215,6 +215,16 @@ The baseline when this section was written was 918 of 4299 nodes (21%).
   `{}`, a dropped tool result — because those never reach the chat and are exactly what a bug report
   of "the tool did nothing" turns out to be. And remember the log is only written under `devenv
   /log`.
+- **The OpenAI SDK silently drops every field it does not model, so a non-standard one has to be
+  read off the wire.** A streamed chunk is deserialized into `StreamingChatCompletionUpdate` in the
+  wire format, which keeps no bag of unknown properties: `reasoning_content` is simply gone by the
+  time the transport sees the update, and no SDK release will add it because the field was never
+  part of the protocol (DeepSeek and vLLM spell it `reasoning_content`, OpenRouter `reasoning`).
+  `OpenAi/OpenAiReasoningCapture.cs` is the pattern to copy — a `PipelinePolicy` which replaces
+  `PipelineResponse.ContentStream` with a pass-through stream that shows the bytes to a scanner —
+  and it is testable through the same `HttpClientPipelineTransport` seam the other OpenAI tests
+  use. Its one limit: the SDK reads ahead, so a field interleaved with answer text may arrive
+  ahead of it.
 - **Nothing above `ILlmTransport` may name a wire protocol.** Two are spoken and they disagree
   about more than names: Anthropic has no system role (the prompt is a field of the request), no
   tool role (a result is a block inside a *user* message), requires `max_tokens`, calls a schema

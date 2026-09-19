@@ -163,6 +163,23 @@ namespace FreeAIr.Options2.Agent
         }
 
         /// <summary>
+        /// Whether the reasoning of a thinking model is shown in the chat, as a `think` block the
+        /// answer can be read without expanding. On by default, and on for a settings file written
+        /// before this existed, because a model which does not reason sends none and nothing
+        /// changes for it.
+        ///
+        /// Worth turning off for an agent answering something other than a person: the commit
+        /// message writer and the other support actions strip the block anyway, and an endpoint
+        /// billed per token is cheaper without it.
+        /// </summary>
+        [Description("Show the reasoning of a thinking model in the chat, as a collapsed `think` block above the answer. Applies to the reasoning a server sends in a field of its own (`reasoning_content`, `reasoning`, Anthropic's `thinking`); a model which writes `<think>` into its answer itself is shown regardless.")]
+        public bool ShowReasoning
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
         /// Defaults aimed at a local model: KoboldCpp on its usual port, no token, 8192 tokens of
         /// context. A new agent is therefore usable without any cloud account at all.
         /// </summary>
@@ -173,6 +190,7 @@ namespace FreeAIr.Options2.Agent
             Token = string.Empty;
             ChosenModel = string.Empty;
             ContextSize = 8192;
+            ShowReasoning = true;
         }
 
         public object Clone()
@@ -183,7 +201,8 @@ namespace FreeAIr.Options2.Agent
                 ApiProtocol = ApiProtocol,
                 Token = Token,
                 ChosenModel = ChosenModel,
-                ContextSize = ContextSize
+                ContextSize = ContextSize,
+                ShowReasoning = ShowReasoning
             };
         }
 

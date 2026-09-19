@@ -87,15 +87,17 @@ public sealed class AnthropicStreamFacts
     }
 
     [Fact]
-    public async Task ThinkingIsNotPartOfTheAnswerText()
+    public async Task ThinkingArrivesAsReasoningAndNotAsAnswerText()
     {
-        //the reasoning of an extended-thinking model is not what the chat window shows, and every
-        //caller which parses an answer would have to strip it again
+        //the reasoning of an extended-thinking model is shown apart from the answer, and a caller
+        //which wants the answer alone - the commit message writer - would otherwise have to strip
+        //it back out of the text
         var result = await ReadAsync(
             Sse(
                 ("message_start", """{"type":"message_start","message":{"id":"msg_1","role":"assistant","content":[]}}"""),
                 ("content_block_start", """{"type":"content_block_start","index":0,"content_block":{"type":"thinking","thinking":"","signature":""}}"""),
-                ("content_block_delta", """{"type":"content_block_delta","index":0,"delta":{"type":"thinking_delta","thinking":"The user wants..."}}"""),
+                ("content_block_delta", """{"type":"content_block_delta","index":0,"delta":{"type":"thinking_delta","thinking":"The user wants "}}"""),
+                ("content_block_delta", """{"type":"content_block_delta","index":0,"delta":{"type":"thinking_delta","thinking":"the answer."}}"""),
                 ("content_block_stop", """{"type":"content_block_stop","index":0}"""),
                 ("content_block_start", """{"type":"content_block_start","index":1,"content_block":{"type":"text","text":""}}"""),
                 ("content_block_delta", """{"type":"content_block_delta","index":1,"delta":{"type":"text_delta","text":"42"}}"""),
@@ -106,6 +108,34 @@ public sealed class AnthropicStreamFacts
             );
 
         Assert.Equal("42", result.Text);
+        Assert.Equal("The user wants the answer.", result.Reasoning);
+
+        //and in the order they were sent, which is what the think block around them depends on
+        Assert.Equal(
+            new[] { typeof(LlmReasoningDeltaEvent), typeof(LlmReasoningDeltaEvent), typeof(LlmTextDeltaEvent) },
+            result.Events.Where(e => e is LlmReasoningDeltaEvent or LlmTextDeltaEvent).Select(e => e.GetType()).ToArray()
+            );
+    }
+
+    [Fact]
+    public async Task AnEmptyThinkingDeltaIsNotAnEvent()
+    {
+        //the block opens with an empty signature and an empty thinking, and a chat which turned
+        //that into a reasoning event would show an empty think block for a model which never
+        //reasoned at all
+        var result = await ReadAsync(
+            Sse(
+                ("message_start", """{"type":"message_start","message":{"id":"msg_1","role":"assistant","content":[]}}"""),
+                ("content_block_start", """{"type":"content_block_start","index":0,"content_block":{"type":"thinking","thinking":"","signature":""}}"""),
+                ("content_block_delta", """{"type":"content_block_delta","index":0,"delta":{"type":"thinking_delta","thinking":""}}"""),
+                ("content_block_delta", """{"type":"content_block_delta","index":0,"delta":{"type":"signature_delta","signature":"Eq0BCkYIAR..."}}"""),
+                ("message_delta", """{"type":"message_delta","delta":{"stop_reason":"end_turn"}}"""),
+                ("message_stop", """{"type":"message_stop"}""")
+                )
+            );
+
+        Assert.Empty(result.Reasoning);
+        Assert.DoesNotContain(result.Events, e => e is LlmReasoningDeltaEvent);
     }
 
     [Fact]

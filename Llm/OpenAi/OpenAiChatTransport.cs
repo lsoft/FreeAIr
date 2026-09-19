@@ -56,7 +56,11 @@ namespace FreeAIr.Llm.OpenAi
                 throw new ArgumentNullException(nameof(request));
             }
 
-            var client = CreateChatClient(request.Model);
+            //the reasoning of a thinking model is not in anything the SDK models, so it is picked
+            //out of the bytes of the response separately; see OpenAiReasoningCapture
+            var reasoningCapture = new OpenAiReasoningCapture();
+
+            var client = CreateChatClient(request.Model, reasoningCapture);
             var messages = OpenAiRequestBuilder.BuildMessages(request);
             var options = OpenAiRequestBuilder.BuildOptions(request);
 
@@ -88,6 +92,13 @@ namespace FreeAIr.Llm.OpenAi
                         //the SDK reports every non-success status this way, and its own message is
                         //only the status line - the body is where the provider says what is wrong
                         throw ToTransportException(excp, request.Model);
+                    }
+
+                    //whatever reasoning the bytes of this chunk carried was seen while the SDK was
+                    //parsing them, and belongs in front of whatever the chunk itself says
+                    while (reasoningCapture.TryRead(out var reasoning))
+                    {
+                        yield return new LlmReasoningDeltaEvent(reasoning);
                     }
 
                     //a chunk without a completion id means the endpoint replied with something
@@ -151,6 +162,13 @@ namespace FreeAIr.Llm.OpenAi
                 await enumerator.DisposeAsync();
             }
 
+            //a model which reasoned and then stopped without saying anything - it happens when the
+            //turn ends in a tool call - leaves its last fragments behind the final chunk
+            while (reasoningCapture.TryRead(out var reasoning))
+            {
+                yield return new LlmReasoningDeltaEvent(reasoning);
+            }
+
             yield return new LlmFinishedEvent(finishReason);
         }
 
@@ -159,7 +177,8 @@ namespace FreeAIr.Llm.OpenAi
         /// between turns, and the model may change from turn to turn when the user switches agent.
         /// </summary>
         private ChatClient CreateChatClient(
-            string model
+            string model,
+            OpenAiReasoningCapture reasoningCapture
             )
         {
             var options = new OpenAIClientOptions
@@ -172,6 +191,10 @@ namespace FreeAIr.Llm.OpenAi
             {
                 options.Transport = _pipelineTransport;
             }
+
+            //per-call rather than per-try: the body to watch is the one the caller is handed, not
+            //the one a retried attempt threw away
+            options.AddPolicy(reasoningCapture.CreatePolicy(), PipelinePosition.PerCall);
 
             return new ChatClient(
                 model: model,

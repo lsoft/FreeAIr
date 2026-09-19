@@ -23,6 +23,21 @@ My others extensions lives [here](https://marketplace.visualstudio.com/publisher
 
 # FreeAIr Release Notes
 
+## 4.5.0
+
+- The reasoning of a thinking model is now shown in the chat, above the answer and collapsed, so a
+  click opens it and nothing else moves (issue #71). It is the fastest way to see why a model
+  picked the tool it picked or ignored a rule in the prompt, which is what most prompt tuning is
+  about. Previously only a model which wrote `<think>` into its own answer text was shown this way;
+  the reasoning a server sends in a field of its own — `reasoning_content` from DeepSeek, vLLM and
+  llama.cpp, `reasoning` from OpenRouter, `thinking` from the Anthropic API — was read off the wire
+  and thrown away.
+- The agent carries a `ShowReasoning` switch next to its endpoint, on by default. A model which
+  does not reason sends nothing and is unaffected either way.
+- Reasoning is no longer sent back to the model as history. Neither protocol wants last turn's
+  deliberation returned as text, and it was context paid for on every later turn of the chat. This
+  applies to the `<think>` blocks a model writes itself as well, which were being replayed in full.
+
 ## 4.4.1
 
 - Fixed: the chat window would not open at all when a saved chat held an answer naming an image
