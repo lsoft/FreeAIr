@@ -383,6 +383,8 @@ There are three categories of MCP servers:
 
 Each MCP server provides its own set of tools. You can edit the set of MCP servers and their tools and commit this file to the repository. When creating a chat, the selected tools are copied to the chat and you can enable/disable tools inside the chat, this does not affect the status of global tools.
 
+A server's name has to be one a tool can be named after: it becomes the prefix of every tool it publishes (`Server.Tool`), and that is the function name the model is offered. So it may not be empty and may not contain spaces — use `_` or `-`. The name field turns red when it cannot be used, and the configuration window says so rather than saving it.
+
 Examples of prompts that LLM can execute if it is provided with the appropriate tools:
 
 - `commit my changes with message "newcommit"`

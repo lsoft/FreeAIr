@@ -1,4 +1,5 @@
-﻿using FreeAIr.Llm;
+﻿using Dto;
+using FreeAIr.Llm;
 using FreeAIr.Llm.Wire;
 using System.Collections.Generic;
 using System.Linq;
@@ -77,8 +78,9 @@ namespace FreeAIr.MCP.McpServerProxy
         }
 
         /// <summary>
-        /// Wraps a tool published by an MCP server proxy, validating that its fully qualified
-        /// name contains no spaces (which some LLM providers reject as a function name).
+        /// Wraps a tool published by an MCP server proxy, validating that the server's name can
+        /// prefix a function name at all - see <see cref="McpServerName"/>, and issue #74 for what
+        /// a server named after a local date and time does to every tool it publishes.
         /// </summary>
         public McpServerTool(
             string mcpServerProxyName,
@@ -112,9 +114,14 @@ namespace FreeAIr.MCP.McpServerProxy
             Description = description;
             Parameters = parameters;
 
-            if (FullName.Contains(' '))
+            //the server's name, and not the tool's: a tool is named by the server which published
+            //it, while the prefix is the one thing the user chose and the one thing they can fix
+            var nameProblem = McpServerName.DescribeProblem(mcpServerProxyName);
+            if (nameProblem is not null)
             {
-                throw new InvalidOperationException($"Function '{FullName}' contain spaces which is not allowed to some LLM providers.");
+                throw new InvalidOperationException(
+                    nameProblem + $" Rename it in the MCP server settings; until then none of its tools (such as '{FullName}') can be offered to the model."
+                    );
             }
         }
 

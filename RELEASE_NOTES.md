@@ -37,6 +37,13 @@ My others extensions lives [here](https://marketplace.visualstudio.com/publisher
 - Reasoning is no longer sent back to the model as history. Neither protocol wants last turn's
   deliberation returned as text, and it was context paid for on every later turn of the chat. This
   applies to the `<think>` blocks a model writes itself as well, which were being replayed in full.
+- Fixed: a newly added MCP server was named after the local date and time, which contains spaces —
+  and a server whose name contains a space has every tool it publishes refused, since the name is
+  the prefix of the function name sent to the model (issue #74). The complaint that came back named
+  a function rather than the server, so there was nothing to connect it to the name field. New
+  servers are now called `McpServer_20260909_234518`, and the configuration window refuses to save
+  a name which cannot be used — naming the server and saying why — instead of only turning the
+  field red. A duplicate name is refused for the same reason: the servers are stored keyed by name.
 
 ## 4.4.1
 
