@@ -7,6 +7,7 @@
     xmlns:dialog="clr-namespace:FreeAIr.UI.Dialog"
     xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
     xmlns:content="clr-namespace:FreeAIr.UI.Dialog.Content"
+    xmlns:resources="clr-namespace:FreeAIr.Resources;assembly=FreeAIr.Resources"
     mc:Ignorable="d" 
     d:DesignHeight="450" d:DesignWidth="800"
     x:Name="DialogControlName"
@@ -40,16 +41,42 @@
                 HorizontalAlignment="Left"
                 >
 
-                <FlowDocumentScrollViewer
-                    HorizontalContentAlignment="Stretch"
-                    VerticalAlignment="Stretch"
-                    VerticalContentAlignment="Stretch"
-                    ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-                    ScrollViewer.VerticalScrollBarVisibility="Disabled"
-                    SizeChanged="FlowDocumentScrollViewer_SizeChanged"
-                    Document="{Binding Document}"
-                    >
-                </FlowDocumentScrollViewer>
+                <StackPanel>
+                    <FlowDocumentScrollViewer
+                        HorizontalContentAlignment="Stretch"
+                        VerticalAlignment="Stretch"
+                        VerticalContentAlignment="Stretch"
+                        ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                        ScrollViewer.VerticalScrollBarVisibility="Disabled"
+                        SizeChanged="FlowDocumentScrollViewer_SizeChanged"
+                        Document="{Binding Document}"
+                        >
+                    </FlowDocumentScrollViewer>
+
+                    <!--  what the whole dialogue can be made to do from this one answer  -->
+                    <StackPanel
+                        Orientation="Horizontal"
+                        Margin="5,0,5,3"
+                        HorizontalAlignment="Right"
+                        Visibility="{Binding TimelineVisibility}"
+                        >
+                        <!--  copies the chat up to this answer into a new one; changes nothing here  -->
+                        <Button
+                            Margin="0,0,10,0"
+                            Style="{DynamicResource TextBlockLikeButtonStyle}"
+                            Content="{x:Static resources:Resources.UI_Fork}"
+                            ToolTip="{x:Static resources:Resources.UI_Fork_tooltip}"
+                            Command="{Binding ForkCommand}"
+                            />
+                        <!--  cuts the chat back to this answer; asks first, because it cannot be undone  -->
+                        <Button
+                            Style="{DynamicResource TextBlockLikeButtonStyle}"
+                            Content="{x:Static resources:Resources.UI_Rewind}"
+                            ToolTip="{x:Static resources:Resources.UI_Rewind_tooltip}"
+                            Command="{Binding RewindCommand}"
+                            />
+                    </StackPanel>
+                </StackPanel>
             </Border>
         </DataTemplate>
         <DataTemplate x:Key="ToolCallContentTemplate">

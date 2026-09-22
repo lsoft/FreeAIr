@@ -249,6 +249,24 @@ For some dialog elements (code chunks, images, etc.) special buttons are added t
 
 The size of these buttons is also adjusted in `Tools` -> `Options` -> `FreeAIr`.
 
+Under every answer there are two links, `Fork` and `Rewind`. Both take the dialogue back to that
+answer; they differ in what happens to what came after it.
+
+`Rewind` deletes it. Everything said after that answer — later prompts, answers and tool calls — is
+removed from the chat and from the chat's file on disk, and you continue from there. This is what to
+use when the model has gone down a wrong path and the whole tail of the dialogue is only leading it
+further astray. It asks for confirmation first, because it cannot be undone. The link is greyed out
+under the newest answer, which nothing follows.
+
+`Fork` keeps it. A new chat is created holding everything up to and including that answer — the
+transcript, the context chips, the tool switches and the agent — and the chat window switches to it,
+while the chat you forked from is left exactly as it was. This is what to use when you want to try a
+second line of questioning without losing the first one. The new chat is named after the old one
+with `(fork)` appended, and gets a file of its own in `.freeair\chats`. Nothing is destroyed, so it
+asks nothing.
+
+Both links are greyed out while the chat is busy answering or running a tool.
+
 ### Prompt input area
 
 This is the area for entering a new prompt. To send the entered prompt, press Ctrl+Enter, after which the LLM will wait for a response. You can interrupt the response by pressing the `Stop` button.

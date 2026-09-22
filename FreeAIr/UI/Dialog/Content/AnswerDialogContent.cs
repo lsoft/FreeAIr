@@ -2,6 +2,8 @@
 using Microsoft.VisualStudio.ComponentModelHost;
 using System.Windows;
 using System.Windows.Documents;
+using System.Windows.Input;
+using WpfHelpers;
 using FreeAIr.Chat.Content;
 
 namespace FreeAIr.UI.Dialog.Content
@@ -16,9 +18,75 @@ namespace FreeAIr.UI.Dialog.Content
         private readonly IMarkdownParser _answerParser;
         /// <summary>Commands (e.g. apply-to-file) that markdown parts such as code blocks can attach themselves to.</summary>
         private readonly AdditionalCommandContainer _additionalCommandContainer;
+        /// <summary>
+        /// The chat this answer sits in, as far as rewinding and forking are concerned. Null when
+        /// the answer is rendered outside a chat window, and then neither link is offered.
+        /// </summary>
+        private readonly IChatTimeline? _timeline;
 
         /// <summary>Answer bubbles are always left-aligned in the chat, unlike the user's own prompts.</summary>
         public HorizontalAlignment HorizontalAlignment => HorizontalAlignment.Left;
+
+        /// <summary>The links under the answer only exist when there is a chat they could act on.</summary>
+        public Visibility TimelineVisibility => _timeline is null ? Visibility.Collapsed : Visibility.Visible;
+
+        /// <summary>
+        /// Drops everything the chat holds after this answer, once the user has confirmed it. The
+        /// link is disabled while a turn is in flight, because the transcript is being written into
+        /// just then; <see cref="IChatTimeline.CanRewindAfter"/> is the rule, and WPF re-asks it on
+        /// its own.
+        /// </summary>
+        public ICommand RewindCommand
+        {
+            get
+            {
+                if (field is null)
+                {
+                    field = new AsyncRelayCommand(
+                        async a =>
+                        {
+                            if (_timeline is null)
+                            {
+                                return;
+                            }
+
+                            await _timeline.RewindAfterAsync(TypedContent);
+                        },
+                        a => _timeline is not null && _timeline.CanRewindAfter(TypedContent)
+                        );
+                }
+
+                return field;
+            }
+        }
+
+        /// <summary>
+        /// Starts a new chat holding the dialogue up to and including this answer and switches to
+        /// it, leaving this chat untouched. Nothing is destroyed, so unlike Rewind it asks nothing.
+        /// </summary>
+        public ICommand ForkCommand
+        {
+            get
+            {
+                if (field is null)
+                {
+                    field = new AsyncRelayCommand(
+                        async a =>
+                        {
+                            if (_timeline is null)
+                            {
+                                return;
+                            }
+
+                            await _timeline.ForkAtAsync(TypedContent);
+                        },
+                        a => _timeline is not null && _timeline.CanForkAt(TypedContent)
+                        );
+                }
+
+                return field;
+            }
+        }
 
         /// <summary>Padding around the answer bubble's border.</summary>
         public Thickness BorderThickness
@@ -36,6 +104,7 @@ namespace FreeAIr.UI.Dialog.Content
         private AnswerDialogContent(
             IMarkdownParser answerParser,
             AdditionalCommandContainer? additionalCommandContainer,
+            IChatTimeline? timeline,
             AnswerChatContent answer,
             bool isInProgress
             ) : base(answer, answer)
@@ -47,6 +116,7 @@ namespace FreeAIr.UI.Dialog.Content
 
             _answerParser = answerParser;
             _additionalCommandContainer = additionalCommandContainer;
+            _timeline = timeline;
 
             UpdateDocument(isInProgress);
             answer.AnswerChangedEvent.Event += AnswerChangedRaisedAsync;
@@ -84,6 +154,7 @@ namespace FreeAIr.UI.Dialog.Content
         public static AnswerDialogContent Create(
             AnswerChatContent answer,
             AdditionalCommandContainer? additionalCommandContainer,
+            IChatTimeline? timeline,
             bool isInProgress
             )
         {
@@ -93,6 +164,7 @@ namespace FreeAIr.UI.Dialog.Content
             return new AnswerDialogContent(
                 answerParser,
                 additionalCommandContainer,
+                timeline,
                 answer,
                 isInProgress
                 );

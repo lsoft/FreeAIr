@@ -25,6 +25,19 @@ My others extensions lives [here](https://marketplace.visualstudio.com/publisher
 
 ## 4.5.0
 
+- A chat can be rewound. Every answer now carries a `Rewind` link which takes the dialogue back to
+  that answer: everything said after it is deleted, from the chat window and from the chat's json
+  file under `.freeair\chats`, and the chat continues from there. It is what to reach for when the
+  model has gone down a wrong path and the tail of the dialogue is only leading it further astray —
+  until now the only way back was to start the chat again and lose the part which had worked. It
+  asks for confirmation first, because it cannot be undone, and the link is disabled under the
+  newest answer and while the chat is answering or running a tool.
+- A chat can be forked. Next to `Rewind` there is now a `Fork` link, which copies the dialogue up to
+  and including that answer into a new chat — transcript, context chips, tool switches and agent —
+  and switches to it, leaving the chat it came from untouched. It is the other half of the same
+  idea: `Rewind` throws the tail away, `Fork` keeps it and tries a second line of questioning beside
+  it. The new chat is named after the old one with `(fork)` appended and gets a file of its own
+  under `.freeair\chats`, so both survive a restart.
 - The reasoning of a thinking model is now shown in the chat, above the answer and collapsed, so a
   click opens it and nothing else moves (issue #71). It is the fastest way to see why a model
   picked the tool it picked or ignored a rule in the prompt, which is what most prompt tuning is

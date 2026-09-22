@@ -3,6 +3,8 @@ using FreeAIr.Shared.Helper;
 using FreeAIr.UI.ContextMenu;
 using FreeAIr.UI.Dialog;
 using FreeAIr.UI.Dialog.Content;
+using FreeAIr.UI.ToolWindows;
+using Microsoft.VisualStudio.ComponentModelHost;
 using MarkdownParser.Antlr.Answer;
 using MarkdownParser.Antlr.Answer.Parts;
 using System.IO;
@@ -24,7 +26,7 @@ namespace FreeAIr.UI.ViewModels
     /// dialog list box binds to, and wires up the per-part context menu actions (copy,
     /// expand, replace selection, create file from code block).
     /// </summary>
-    public class DialogViewModel : BaseViewModel
+    public class DialogViewModel : BaseViewModel, IChatTimeline
     {
         /// <summary>
         /// The chat currently shown in the dialog, or null when no chat is selected.
@@ -328,6 +330,7 @@ namespace FreeAIr.UI.ViewModels
             if (_selectedChat is not null)
             {
                 _selectedChat.ContentAddedEvent -= ContentAddedRaised;
+                _selectedChat.ContentsRemovedEvent -= ContentsRemovedRaised;
             }
 
             _selectedChat = selectedChat;
@@ -335,9 +338,162 @@ namespace FreeAIr.UI.ViewModels
             if (selectedChat is not null)
             {
                 selectedChat.ContentAddedEvent += ContentAddedRaised;
+                selectedChat.ContentsRemovedEvent += ContentsRemovedRaised;
 
                 RewriteDialog();
             }
+        }
+
+        /// <summary>
+        /// Whether the dialogue may be cut back to <paramref name="content"/> right now. Whether
+        /// the transcript is holding still is <see cref="FreeAIr.Chat.Chat.IsTranscriptSettled"/>'s
+        /// business; what this adds is that there has to be a chat at all, and that something has
+        /// to follow the entry — a rewind to the newest answer would remove nothing.
+        /// </summary>
+        public bool CanRewindAfter(
+            IChatContent content
+            )
+        {
+            var chat = _selectedChat;
+            if (chat is null || content is null || chat.Contents.Count == 0)
+            {
+                return false;
+            }
+
+            if (ReferenceEquals(chat.Contents[chat.Contents.Count - 1], content))
+            {
+                return false;
+            }
+
+            return chat.IsTranscriptSettled;
+        }
+
+        /// <summary>
+        /// Whether a fork may be started at <paramref name="content"/>. A fork at the newest answer
+        /// is allowed, unlike a rewind: it copies the whole chat, which is a perfectly good thing
+        /// to want before asking the model something that would send the dialogue elsewhere.
+        /// </summary>
+        public bool CanForkAt(
+            IChatContent content
+            )
+        {
+            var chat = _selectedChat;
+            if (chat is null || content is null)
+            {
+                return false;
+            }
+
+            return chat.IsTranscriptSettled;
+        }
+
+        /// <summary>
+        /// Copies the dialogue up to and including <paramref name="content"/> into a new chat and
+        /// switches the window to it. Nothing is destroyed and the chat being read is not touched,
+        /// so this asks nothing — unlike <see cref="RewindAfterAsync"/>.
+        /// </summary>
+        public async Task ForkAtAsync(
+            IChatContent content
+            )
+        {
+            if (content is null)
+            {
+                throw new ArgumentNullException(nameof(content));
+            }
+
+            var chat = _selectedChat;
+            if (chat is null)
+            {
+                return;
+            }
+
+            if (!chat.IsTranscriptSettled)
+            {
+                await VS.MessageBox.ShowErrorAsync(
+                    FreeAIr.Resources.Resources.Error,
+                    FreeAIr.Resources.Resources.UI_Chat_is_busy
+                    );
+                return;
+            }
+
+            var componentModel = FreeAIrPackage.Instance.GetService<SComponentModel, IComponentModel>();
+            var chatContainer = componentModel.GetService<FreeAIr.Chat.ChatContainer>();
+
+            var fork = await chatContainer.ForkChatAsync(chat, content);
+            if (fork is null)
+            {
+                await VS.MessageBox.ShowErrorAsync(
+                    FreeAIr.Resources.Resources.Error,
+                    FreeAIr.Resources.Resources.UI_Fork_has_failed
+                    );
+                return;
+            }
+
+            //the chat list rebuilds itself from the container's event and lands on the newest chat,
+            //which is the fork; saying so explicitly means the window does not depend on that order
+            var chatList = ChatListToolWindow.ChatListViewModel;
+            if (chatList is null)
+            {
+                //forked from the in situ window while the chat tool window has never been opened:
+                //there would otherwise be nowhere for the new chat to appear
+                _ = await ChatListToolWindow.ShowAsync();
+                chatList = ChatListToolWindow.ChatListViewModel;
+            }
+
+            if (chatList is not null)
+            {
+                await chatList.SelectChatAsync(fork);
+            }
+        }
+
+        /// <summary>
+        /// Asks the user whether the dialogue really should be cut back to <paramref name="content"/>
+        /// and, if it should, drops everything said after it — from this list, from the chat, and
+        /// from the chat's file under `.freeair\chats`.
+        ///
+        /// This is the one action of the chat window which asks first, because it is the one which
+        /// destroys something the user cannot get back.
+        /// </summary>
+        public async Task RewindAfterAsync(
+            IChatContent content
+            )
+        {
+            if (content is null)
+            {
+                throw new ArgumentNullException(nameof(content));
+            }
+
+            var chat = _selectedChat;
+            if (chat is null)
+            {
+                return;
+            }
+
+            //nothing follows the newest answer, so the chat is already where the user is asking to
+            //be; the link is disabled in that case and this only catches the click which raced it
+            if (chat.Contents.Count == 0 || ReferenceEquals(chat.Contents[chat.Contents.Count - 1], content))
+            {
+                return;
+            }
+
+            if (!chat.IsTranscriptSettled)
+            {
+                await VS.MessageBox.ShowErrorAsync(
+                    FreeAIr.Resources.Resources.Error,
+                    FreeAIr.Resources.Resources.UI_Chat_is_busy
+                    );
+                return;
+            }
+
+            if (!await VS.MessageBox.ShowConfirmAsync(
+                    FreeAIr.Resources.Resources.Question,
+                    FreeAIr.Resources.Resources.UI_Rewind_confirmation
+                    )
+                )
+            {
+                return;
+            }
+
+            await chat.RewindAfterAsync(content);
         }
 
         /// <summary>
@@ -380,6 +536,45 @@ namespace FreeAIr.UI.ViewModels
 
             AddDialogContentSafelyAsync(e)
                 .FileAndForget(nameof(AddDialogContentSafelyAsync));
+        }
+
+        /// <summary>
+        /// Handles a rewind of the selected chat by redrawing the whole dialogue. A removal cannot
+        /// be applied by appending, and a full redraw is what switching chats already does, so it
+        /// is the one path which cannot leave the window and the transcript disagreeing.
+        /// </summary>
+        private void ContentsRemovedRaised(object sender, ChatEventArgs e)
+        {
+            if (_selectedChat is null || !ReferenceEquals(_selectedChat, e.Chat))
+            {
+                return;
+            }
+
+            RewriteDialogSafelyAsync()
+                .FileAndForget(nameof(RewriteDialogSafelyAsync));
+        }
+
+        /// <summary>
+        /// Marshals onto the main thread and rebuilds the dialog list from what the chat holds now,
+        /// logging any failure instead of letting it escape a fire-and-forget task.
+        /// </summary>
+        private async Task RewriteDialogSafelyAsync()
+        {
+            try
+            {
+                await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+
+                Dialog.Clear();
+
+                if (_selectedChat is not null)
+                {
+                    RewriteDialog();
+                }
+            }
+            catch (Exception excp)
+            {
+                excp.ActivityLogException();
+            }
         }
 
         /// <summary>
@@ -446,6 +641,7 @@ namespace FreeAIr.UI.ViewModels
             var a = AnswerDialogContent.Create(
                 (AnswerChatContent)content,
                 AdditionalCommandContainer,
+                this,
                 isInProgress
                 );
             Dialog.Add(a);

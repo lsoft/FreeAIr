@@ -1208,4 +1208,25 @@
   <data name="Wizard_infobar_open" xml:space="preserve">
     <value>Открыть список изменений и мастер настройки</value>
   </data>
+  <data name="UI_Rewind" xml:space="preserve">
+    <value>Откатить</value>
+  </data>
+  <data name="UI_Rewind_tooltip" xml:space="preserve">
+    <value>Удалить всё, что было сказано после этого ответа</value>
+  </data>
+  <data name="UI_Rewind_confirmation" xml:space="preserve">
+    <value>Откатить чат к этому ответу? Всё, что было сказано после него, будет удалено — и из чата, и из его файла на диске. Отменить это действие нельзя.</value>
+  </data>
+  <data name="UI_Chat_is_busy" xml:space="preserve">
+    <value>Чат сейчас занят. Дождитесь окончания текущего хода или остановите его и попробуйте снова.</value>
+  </data>
+  <data name="UI_Fork" xml:space="preserve">
+    <value>Форк</value>
+  </data>
+  <data name="UI_Fork_tooltip" xml:space="preserve">
+    <value>Продолжить в новом чате, куда скопировано всё до этого ответа включительно</value>
+  </data>
+  <data name="UI_Fork_has_failed" xml:space="preserve">
+    <value>Не удалось сделать форк чата. Подробности — в журнале активности.</value>
+  </data>
 </root>

@@ -361,6 +361,40 @@ namespace FreeAIr.UI.ViewModels
             UpdateControl();
         }
 
+        /// <summary>
+        /// Shows the given chat in the chat panel, which is how a chat created elsewhere — a fork
+        /// started from an answer, say — becomes the one the user is looking at.
+        ///
+        /// The list is rebuilt from the container's collection-changed event, which is asynchronous
+        /// and may not have run yet, so a chat which is not in the list is a reason to rebuild it
+        /// rather than to give up.
+        /// </summary>
+        public async Task SelectChatAsync(
+            FreeAIr.Chat.Chat chat
+            )
+        {
+            if (chat is null)
+            {
+                throw new ArgumentNullException(nameof(chat));
+            }
+
+            await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+
+            var wrapper = ChatList.FirstOrDefault(w => ReferenceEquals(w.Chat, chat));
+            if (wrapper is null)
+            {
+                UpdateControl();
+                wrapper = ChatList.FirstOrDefault(w => ReferenceEquals(w.Chat, chat));
+            }
+
+            if (wrapper is not null)
+            {
+                SelectedChat = wrapper;
+
+                OnPropertyChanged();
+            }
+        }
+
         /// <summary>Refreshes <see cref="ChatList"/> on the UI thread whenever chats are added to or removed from the container.</summary>
         private async void ChatCollectionChanged(object sender, EventArgs e)
         {
