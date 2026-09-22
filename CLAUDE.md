@@ -254,6 +254,15 @@ The baseline when this section was written was 918 of 4299 nodes (21%).
   expanded during evaluation, before the SDK targets define `$(TargetDir)`, so the command runs
   with an empty path. Use a `<Target AfterTargets="Build">` with `<Exec/>` instead — see
   `ZipWhisperRuntimes` in `Voice\FreeAIr.Voice.csproj`.
+- **A version bump does not reach the `.vsix` on its own**, which is why `FreeAIr.csproj` deletes
+  `obj\<Config>\extension.vsixmanifest` before every build. The `DetokenizeVsixManifestSource` task
+  writes that file — the manifest actually packed — when it is missing, when its *length* differs
+  from the new content, or when the two are *equal*: the last condition is inverted in
+  `Microsoft.VisualStudio.Sdk.BuildTasks.dll` (VSSDK.BuildTools 17.14.2094), so the one case it
+  skips is "same length, different content". `4.5.0` to `4.5.1` changes no length, so the build
+  succeeds and packages the previous version number without a word. `ForceVsixManifestDetokenization`
+  at the bottom of `FreeAIr.csproj` takes the missing-file branch instead. Check the `Identity` line
+  of `extension.vsixmanifest` inside the built package before publishing a release.
 - **F5 is configured through `AdditionalArguments`, and `StartArguments` does nothing.** Now that
   the VSIX project is SDK-style there is no VSIX project flavor (`ProjectTypeGuids`) owning the
   Debug page; the launch comes from Visual Studio's own extensibility project system

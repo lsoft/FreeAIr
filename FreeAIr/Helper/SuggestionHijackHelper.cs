@@ -1,80 +1,76 @@
-﻿using Microsoft.VisualStudio.Language.Proposals;
-using Microsoft.VisualStudio.Language.Suggestions;
+﻿using FreeAIr.Helper.SuggestionHijack;
+using Microsoft.VisualStudio.Language.Proposals;
 using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Editor;
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.Linq;
-using System.Reflection;
-using System.Threading;
+using System.Diagnostics;
 using System.Threading.Tasks;
 
 namespace FreeAIr.Helper
 {
     /// <summary>
     /// Provides methods to display autocomplete suggestions in the Visual Studio text editor.
+    ///
+    /// The suggestion UI being borrowed is not an API and its internals were rearranged in Visual
+    /// Studio 2026, so the reflection lives in an <see cref="ISuggestionHijack"/> per IDE
+    /// generation and this class only decides which one the running IDE gets.
     /// </summary>
     public static class SuggestionHijackHelper
     {
-        /// <summary>Reflected IntelliCode method that displays a suggestion session for a completion.</summary>
-        private static readonly MethodInfo _tryDisplaySuggestionAsyncMethod;
-        /// <summary>Reflected IntelliCode method that caches the accepted proposal on the completions instance.</summary>
-        private static readonly MethodInfo _cacheProposalMethod;
-
-        /// <summary>Reflected field holding IntelliCode's suggestion manager instance.</summary>
-        private static readonly FieldInfo _suggestionManagerField;
-        /// <summary>Reflected field holding the current IntelliCode suggestion session.</summary>
-        private static readonly FieldInfo _sessionField;
-
-        /// <summary>IntelliCode's internal <c>GenerateResult</c> type, located via reflection.</summary>
-        private static readonly Type _generateResultType;
-        /// <summary>IntelliCode's internal <c>InlineCompletionsInstance</c> type, located via reflection.</summary>
-        private static readonly Type _inlineCompletionsType;
-        /// <summary>IntelliCode's internal <c>InlineCompletionSuggestion</c> type, located via reflection.</summary>
-        private static readonly Type _inlineCompletionSuggestion;
+        /// <summary>
+        /// The way this IDE's inline suggestion UI is borrowed, or <c>null</c> when the editor
+        /// internals could not be reached at all and whole line suggestions are unavailable.
+        /// </summary>
+        private static readonly ISuggestionHijack _hijack;
 
         /// <summary>
-        /// Locates the private IntelliCode types and members needed to hijack its inline
-        /// suggestion UI, via reflection over the <c>Microsoft.VisualStudio.IntelliCode</c> assembly.
+        /// Picks the hijack for the running IDE: Visual Studio 2022 keeps the path which has always
+        /// worked there, everything newer goes through the probing one. Nothing here may throw -
+        /// this is a type initializer, and a failure in it surfaces as a
+        /// <c>TypeInitializationException</c> from an unrelated call site, which is exactly how
+        /// issue #75 was reported.
         /// </summary>
         static SuggestionHijackHelper()
         {
-            var assembly = Assembly.Load("Microsoft.VisualStudio.IntelliCode");
-
-            foreach (var type in assembly.GetTypes())
+            try
             {
-                if (type.Name == "GenerateResult")
-                {
-                    _generateResultType = type;
-                }
-                if (type.Name == "InlineCompletionsInstance")
-                {
-                    _inlineCompletionsType = type;
-                }
-                if (type.Name == "InlineCompletionSuggestion")
-                {
-                    _inlineCompletionSuggestion = type;
-                }
+                _hijack = IsVisualStudio2022()
+                    ? IntelliCodeSuggestionHijack.TryCreate()
+                    : (ISuggestionHijack)ProbingSuggestionHijack.TryCreate();
             }
-
-            _cacheProposalMethod = _inlineCompletionsType.GetMethod("CacheProposal", BindingFlags.Instance | BindingFlags.NonPublic);
-            
-            _suggestionManagerField = _inlineCompletionsType.GetField("_suggestionManager", BindingFlags.Instance | BindingFlags.NonPublic);
-            _sessionField = _inlineCompletionsType.GetField("Session", BindingFlags.Instance | BindingFlags.NonPublic);
-
-            if (_suggestionManagerField == null)
+            catch (Exception excp)
             {
-                _suggestionManagerField = _inlineCompletionsType.GetField("SuggestionManager", BindingFlags.Instance | BindingFlags.NonPublic);
-            }
-
-            if (_suggestionManagerField != null)
-            {
-                _tryDisplaySuggestionAsyncMethod = _suggestionManagerField.FieldType.GetMethod("TryDisplaySuggestionAsync");
+                excp.ActivityLogException(
+                    "FreeAIr cannot borrow the editor's inline suggestion UI; whole line suggestions will not be shown."
+                    );
             }
         }
 
         /// <summary>
-        /// Displays a FreeAIr-generated completion in the editor by piggy-backing on IntelliCode's
+        /// Whether the host is Visual Studio 2022. The major version of <c>devenv.exe</c> is the
+        /// cheapest reliable answer and needs neither the UI thread nor a shell service, which a
+        /// type initializer running on an arbitrary thread cannot assume. A version which cannot be
+        /// read counts as "not 2022", because the probing hijack copes with either IDE.
+        /// </summary>
+        private static bool IsVisualStudio2022()
+        {
+            try
+            {
+                using var process = Process.GetCurrentProcess();
+                return process.MainModule?.FileVersionInfo?.FileMajorPart == 17;
+            }
+            catch (Exception excp)
+            {
+                excp.ActivityLogException(
+                    "FreeAIr cannot read the version of the host process; assuming Visual Studio 2026 or newer."
+                    );
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Displays a FreeAIr-generated completion in the editor by piggy-backing on the editor's
         /// inline suggestion UI (ghost text), dismissing any existing session first. This is how
         /// FreeAIr shows AI-generated code completions without shipping its own suggestion adorner.
         /// </summary>
@@ -91,47 +87,18 @@ namespace FreeAIr.Helper
             {
                 return;
             }
-
-            var inlineCompletionsInstance = textView.Properties.PropertyList.FirstOrDefault(x => x.Key is Type && (x.Key as Type).Name == "InlineCompletionsInstance").Value;
-
-            var sessionInstance = _sessionField.GetValue(inlineCompletionsInstance) as SuggestionSessionBase;
-            if (sessionInstance != null)
+            if (_hijack is null)
             {
-                await sessionInstance.DismissAsync(ReasonForDismiss.DismissedDueToInvalidProposal, new CancellationToken());
-            }
-
-            var generateResultInstance = Activator.CreateInstance(_generateResultType, new object[] { proposalCollection, null });
-            try
-            {
-                var ctor = _inlineCompletionSuggestion.GetConstructors(
-                    BindingFlags.Instance | BindingFlags.NonPublic
-                    ).First();
-                var suggestions = ctor.Invoke(
-                    new object[]
-                    {
-                        inlineCompletionsInstance
-                    });
-
-                var suggestionManagerInstance = _suggestionManagerField.GetValue(inlineCompletionsInstance);
-                var newSession = await (Task<SuggestionSessionBase>)_tryDisplaySuggestionAsyncMethod.Invoke(
-                    suggestionManagerInstance,
-                    new object[]
-                    {
-                        suggestions,
-                        null
-                    }
+                ActivityLogHelper.ActivityLogWarning(
+                    "FreeAIr cannot show a whole line suggestion: the editor's inline completion internals were not found."
                     );
-                if (newSession is SuggestionSessionBase suggestionSessionBase)
-                {
-                    _cacheProposalMethod.Invoke(inlineCompletionsInstance, new object[] { proposalCollection.Proposals.First() });
-                    _sessionField.SetValue(inlineCompletionsInstance, newSession);
-                    await suggestionSessionBase.DisplayProposalAsync(proposalCollection.Proposals.First(), new CancellationToken());
-                }
+                return;
             }
-            catch (Exception excp)
-            {
-                excp.ActivityLogException();
-            }
+
+            await _hijack.ShowAutocompleteAsync(
+                textView,
+                proposalCollection
+                );
         }
 
         /// <summary>

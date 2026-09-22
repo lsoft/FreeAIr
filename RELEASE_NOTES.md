@@ -23,6 +23,20 @@ My others extensions lives [here](https://marketplace.visualstudio.com/publisher
 
 # FreeAIr Release Notes
 
+## 4.5.1
+
+- Fixed: `FreeAIr generate whole line suggestion` did nothing in Visual Studio 2026 and left a
+  `TypeInitializationException` in the Output window instead (issue #75). The suggestion is shown by
+  borrowing the editor's own inline completion UI — the grey ghost text — and in VS 2026 everything
+  it is borrowed from moved: the suggestion service left `Microsoft.VisualStudio.IntelliCode` for
+  `Microsoft.VisualStudio.Editor.Implementation`, two of its fields became properties, the editor
+  view now holds a task of the completions instance rather than the instance itself, and one method
+  grew a second parameter. Visual Studio 2022 keeps the code which has always worked there, and
+  VS 2026 and anything newer go through a lookup which searches for each piece rather than naming
+  it, so the next rearrangement can be survived. A piece which is not found now switches whole line
+  completion off and says so in the activity log, instead of taking the command down with an
+  exception nobody can act on.
+
 ## 4.5.0
 
 - A chat can be rewound. Every answer now carries a `Rewind` link which takes the dialogue back to
