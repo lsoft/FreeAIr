@@ -103,8 +103,9 @@ namespace FreeAIr.UI.ViewModels
         }
 
         /// <summary>
-        /// Border color for the server name field, turning red when the name is empty or
-        /// contains a space so the user gets immediate validation feedback.
+        /// Border color for the server name field, turning red when the name is one no tool may be
+        /// prefixed with, so the user gets immediate validation feedback. The same rule refuses the
+        /// `apply` button — a red border alone is easy to scroll past.
         /// </summary>
         public Brush StatusNameBorder
         {
@@ -115,16 +116,9 @@ namespace FreeAIr.UI.ViewModels
                     return Brushes.Green;
                 }
 
-                if (string.IsNullOrEmpty(_selectedServer.Name))
-                {
-                    return Brushes.Red;
-                }
-                if (_selectedServer.Name.Contains(' '))
-                {
-                    return Brushes.Red;
-                }
-
-                return Brushes.Green;
+                return McpServerName.IsValid(_selectedServer.Name)
+                    ? Brushes.Green
+                    : Brushes.Red;
             }
         }
 
@@ -366,6 +360,10 @@ namespace FreeAIr.UI.ViewModels
         /// <summary>
         /// Command that closes the window with a positive dialog result, signalling the
         /// caller to persist the edited MCP server list to the FreeAIr options.
+        ///
+        /// A name which cannot prefix a tool stops it here, with a message naming the server. The
+        /// alternative is what issue #74 describes: the settings are saved, and the mistake
+        /// surfaces later as a refused request complaining about a function nobody has heard of.
         /// </summary>
         public ICommand ApplyAndCloseCommand
         {
@@ -376,6 +374,16 @@ namespace FreeAIr.UI.ViewModels
                     field = new AsyncRelayCommand(
                         async a =>
                         {
+                            var problem = FindNameProblem();
+                            if (problem is not null)
+                            {
+                                await VS.MessageBox.ShowErrorAsync(
+                                    Resources.Resources.Error,
+                                    problem
+                                    );
+                                return;
+                            }
+
                             if (CloseWindow is not null)
                             {
                                 CloseWindow(true);
@@ -479,6 +487,34 @@ namespace FreeAIr.UI.ViewModels
         }
 
         /// <summary>
+        /// The first thing wrong with the names in the list, or null when they are all usable.
+        ///
+        /// Two names are worth refusing: one no tool may be prefixed with, and one used twice -
+        /// the servers are persisted as a dictionary keyed by name, so a duplicate is not a
+        /// configuration which merely misbehaves.
+        /// </summary>
+        private string? FindNameProblem()
+        {
+            foreach (var server in ServerCollection)
+            {
+                var problem = McpServerName.DescribeProblem(server.Name);
+                if (problem is not null)
+                {
+                    return problem;
+                }
+            }
+
+            var duplicate = ServerCollection
+                .GroupBy(s => s.Name, StringComparer.OrdinalIgnoreCase)
+                .FirstOrDefault(g => g.Count() > 1)
+                ;
+
+            return duplicate is null
+                ? null
+                : $"There is more than one MCP server named '{duplicate.Key}'. Every server needs a name of its own, because it is what its tools are addressed by.";
+        }
+
+        /// <summary>
         /// Wraps a server produced elsewhere (e.g. picked from the Docker MCP catalog search)
         /// and adds it to both the working collection and the bound list.
         /// </summary>
@@ -522,7 +558,12 @@ namespace FreeAIr.UI.ViewModels
 
             var newServer = new McpServerWrapper(
                 this,
-                DateTime.Now.ToString(),
+                //not the local date and time: that name holds spaces, and every tool of a server
+                //named that way is refused by the provider (issue #74)
+                McpServerName.CreateDefault(
+                    DateTime.Now,
+                    ServerCollection.Select(s => s.Name)
+                    ),
                 chosenType
                 );
             AddServerToCollections(newServer);

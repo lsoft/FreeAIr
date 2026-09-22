@@ -34,11 +34,25 @@ plus the `Grep\` text matching behind the SearchFileContent MCP tool.
 `SetupWizard\FreeAIr.SetupWizard.csproj` the same way — the first-run setup wizard's step
 navigation, agent-field validation and known-endpoint catalog.
 
+`Llm.Tests\FreeAIr.Llm.Tests.csproj` (net8.0, xunit) covers `Llm\FreeAIr.Llm.csproj` — the two wire
+protocols FreeAIr speaks. Nothing reaches a server: a request is asserted as the JSON it becomes and
+an answer is fed in as the bytes a server would have sent, through a fake `HttpMessageHandler`
+(`Fakes\CannedHttpHandler.cs`). Add a case here before touching either transport.
+
 `MCP\Tests\FreeAIr.Mcp.Tests.csproj` (**net9.0**, xunit) covers the hop to the MCP servers: the
 argument conversions in `MCP\Dto`, the JSON-RPC channel to `Proxy.exe`, and `Proxy`'s own
 `BaseServer2` speaking `tools/list` and `tools/call`. Both ends are real — a live `JsonRpc` pair and
 a live MCP server on an in-process duplex stream — so nothing is spawned and the whole file runs in
 under a second. It is net9.0 rather than net8.0 because it references `MCP\Proxy`, which is net9.0.
+
+`MarkdownParser.Tests\FreeAIr.MarkdownParser.Tests.csproj` (**net48**, `UseWPF`, xunit) covers
+`MarkdownParser\MarkdownParser.csproj` — the answer an LLM wrote, from markdown text through the
+ANTLR grammar into the `FlowDocument` and the action buttons the chat window shows. net48 with WPF
+because that is what `MarkdownParser` is; the WPF objects are built on an STA thread of the test's
+own (`StaTestRunner`), since xunit runs on the MTA thread pool and a `BitmapImage` may then not be
+asked about its size from anywhere else. The renderer runs while the tool window is being
+constructed, so anything it can throw takes the whole chat window with it — that is issue #73, and
+what most of these tests are about.
 
 Use the script; it builds with MSBuild and only then hands over to the SDK:
 
@@ -50,8 +64,9 @@ Anything you add to the command line goes on to `dotnet test`, e.g.
 `run-tests.bat --filter FullyQualifiedName~VectorCodec`. `FREEAIR_CONFIG` picks the configuration
 (`Release` by default), `FREEAIR_MSBUILD` overrides the compiler path.
 
-Only the three test projects and what they reference (`FreeAIr.Search`, `FreeAIr.SetupWizard`,
-`Dto`, `Proxy`) are built by the script — all SDK style, so it takes a couple of seconds and does
+Only the five test projects and what they reference (`FreeAIr.Search`, `FreeAIr.SetupWizard`,
+`FreeAIr.Llm`, `MarkdownParser`, `WpfHelpers`, `FreeAIr.Shared`, `Dto`, `Proxy`) are built by the
+script — all SDK style, so it takes a couple of seconds and does
 not go near the VSIX. Build the solution yourself when you need the VSIX too; the script will then
 find everything up to date.
 
@@ -193,6 +208,38 @@ The baseline when this section was written was 918 of 4299 nodes (21%).
   array of its properties. Nothing throws, the call succeeds, and the server silently receives
   nested empty arrays (issue #70). Carry such payloads as raw JSON text — `ToolArguments` and
   `GetToolReply.Parameters` both do — and pin it with a test in `MCP\Tests`.
+- **A netstandard2.0 assembly reports through a hook, not to the activity log.** `ActivityLogHelper`
+  lives in `Shared`, which is net48. `FreeAIr.Llm` and `WpfHelpers` expose `LlmDiagnostics.Sink` and
+  `CommandDiagnostics.Sink`, attached by `FreeAIrPackage.AttachDiagnosticSinks`. Use them for the
+  things which are recovered from rather than thrown — a replaced tool schema, arguments sent as
+  `{}`, a dropped tool result — because those never reach the chat and are exactly what a bug report
+  of "the tool did nothing" turns out to be. And remember the log is only written under `devenv
+  /log`.
+- **The OpenAI SDK silently drops every field it does not model, so a non-standard one has to be
+  read off the wire.** A streamed chunk is deserialized into `StreamingChatCompletionUpdate` in the
+  wire format, which keeps no bag of unknown properties: `reasoning_content` is simply gone by the
+  time the transport sees the update, and no SDK release will add it because the field was never
+  part of the protocol (DeepSeek and vLLM spell it `reasoning_content`, OpenRouter `reasoning`).
+  `OpenAi/OpenAiReasoningCapture.cs` is the pattern to copy — a `PipelinePolicy` which replaces
+  `PipelineResponse.ContentStream` with a pass-through stream that shows the bytes to a scanner —
+  and it is testable through the same `HttpClientPipelineTransport` seam the other OpenAI tests
+  use. Its one limit: the SDK reads ahead, so a field interleaved with answer text may arrive
+  ahead of it.
+- **Nothing above `ILlmTransport` may name a wire protocol.** Two are spoken and they disagree
+  about more than names: Anthropic has no system role (the prompt is a field of the request), no
+  tool role (a result is a block inside a *user* message), requires `max_tokens`, calls a schema
+  `input_schema`, and wants every tool call of a turn in one assistant message rather than paired
+  with its result. A chat content which built request messages itself could therefore only ever
+  serve one of them. Add to `FreeAIr.Llm`'s neutral model and let the transports differ — and add
+  the case to `Llm.Tests` first, since neither endpoint is reachable from a test run.
+- **`Microsoft.Bcl.AsyncInterfaces` is pinned at the version the VSIX ships, and `FreeAIr.Llm` must
+  not override it.** `FreeAIr.Search` does override it (System.ClientModel wants a newer one on
+  netstandard2.0) and gets away with it because that version never reaches its public API;
+  `FreeAIr.Llm` returns `IAsyncEnumerable`, so a higher version there fails the VSIX build with
+  `CS1705` rather than warning. Referencing `FreeAIr.Llm` from a project which inherits the central
+  pin — the setup wizard's logic assembly, say — fails the *restore* with `NU1109` instead, which is
+  why `KnownEndpointCatalog` recognises the Anthropic endpoint with a string comparison rather than
+  by holding an `LlmProtocol`.
 - **`clr-namespace:` in XAML means the current assembly unless `;assembly=` says otherwise.** Moving
   a type that XAML names into another assembly compiles the C# fine and then fails the markup
   compiler with `MC3050: cannot find type`. Every `xmlns:resources="clr-namespace:FreeAIr.Resources"`
@@ -207,6 +254,15 @@ The baseline when this section was written was 918 of 4299 nodes (21%).
   expanded during evaluation, before the SDK targets define `$(TargetDir)`, so the command runs
   with an empty path. Use a `<Target AfterTargets="Build">` with `<Exec/>` instead — see
   `ZipWhisperRuntimes` in `Voice\FreeAIr.Voice.csproj`.
+- **A version bump does not reach the `.vsix` on its own**, which is why `FreeAIr.csproj` deletes
+  `obj\<Config>\extension.vsixmanifest` before every build. The `DetokenizeVsixManifestSource` task
+  writes that file — the manifest actually packed — when it is missing, when its *length* differs
+  from the new content, or when the two are *equal*: the last condition is inverted in
+  `Microsoft.VisualStudio.Sdk.BuildTasks.dll` (VSSDK.BuildTools 17.14.2094), so the one case it
+  skips is "same length, different content". `4.5.0` to `4.5.1` changes no length, so the build
+  succeeds and packages the previous version number without a word. `ForceVsixManifestDetokenization`
+  at the bottom of `FreeAIr.csproj` takes the missing-file branch instead. Check the `Identity` line
+  of `extension.vsixmanifest` inside the built package before publishing a release.
 - **F5 is configured through `AdditionalArguments`, and `StartArguments` does nothing.** Now that
   the VSIX project is SDK-style there is no VSIX project flavor (`ProjectTypeGuids`) owning the
   Debug page; the launch comes from Visual Studio's own extensibility project system

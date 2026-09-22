@@ -106,6 +106,11 @@ namespace FreeAIr
         {
             try
             {
+                //first of all, so that anything failing below is on the record: the assemblies which
+                //know nothing about Visual Studio report through a hook, and until it is attached
+                //they report into nothing
+                AttachDiagnosticSinks();
+
                 //load dlls manually, for unknown reason these dlls does not loaded automatically
                 LoadDlls(
                     [
@@ -216,6 +221,24 @@ namespace FreeAIr
         }
 
         #endregion
+
+        /// <summary>
+        /// Points the assemblies which cannot reach Visual Studio at the activity log.
+        ///
+        /// <c>FreeAIr.Llm</c> and <c>WpfHelpers</c> are netstandard2.0 and know nothing about the
+        /// IDE, so each reports through a hook of its own which does nothing until it is attached.
+        /// What they report is precisely what is otherwise invisible: a wire protocol quietly
+        /// recovering from a malformed payload, and a command failure the user saw once in a
+        /// message box and then closed.
+        ///
+        /// The activity log itself is only written when Visual Studio was started with `/log`,
+        /// which is worth telling anyone who is asked to reproduce a problem.
+        /// </summary>
+        private static void AttachDiagnosticSinks()
+        {
+            FreeAIr.Llm.LlmDiagnostics.Sink = ActivityLogHelper.ActivityLogWarning;
+            WpfHelpers.CommandDiagnostics.Sink = excp => excp.ActivityLogException("A command has failed.");
+        }
 
         /// <summary>
         /// Explicitly loads the given DLLs from <see cref="WorkingFolder"/> into the app domain,

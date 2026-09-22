@@ -1,0 +1,54 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    Everything FreeAIr knows about talking to a large language model, with no Visual Studio in it:
+    the protocol-neutral request and stream-event model, and one transport per wire protocol
+    (OpenAI chat completions, Anthropic messages).
+
+    It is a separate assembly for the same reason FreeAIr.Search is one - the VSIX project cannot be
+    loaded by a test runner, so a wire protocol which is only spoken from inside the VSIX can never
+    be tested. Everything here is exercised by FreeAIr.Llm.Tests against canned server responses.
+
+    netstandard2.0 on purpose: it has to be consumable both by FreeAIr (net48) and by the test
+    project (net8.0).
+  -->
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <LangVersion>Latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>FreeAIr.Llm</RootNamespace>
+    <AssemblyName>FreeAIr.Llm</AssemblyName>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- the wire-level pieces - schema normalization, the streaming accumulator, the request
+         builders - are steps inside a public operation: worth a test of their own without being
+         worth a place in the API of the assembly -->
+    <InternalsVisibleTo Include="FreeAIr.Llm.Tests" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.Text.Json" />
+    <PackageReference Include="System.ClientModel" />
+    <PackageReference Include="System.Net.ServerSentEvents" />
+    <!-- on netstandard2.0 the async streams this assembly returns need the interfaces backport.
+         Unlike FreeAIr.Search, this one takes the version the solution pins rather than overriding
+         it: IAsyncEnumerable is part of this assembly's own public API, so the VSIX which consumes
+         it has to see the very same Microsoft.Bcl.AsyncInterfaces - a higher version here fails the
+         VSIX build with CS1705 rather than warning. -->
+    <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- the same locally built OpenAI client the VSIX uses, so that the transport under test is
+         the transport which ships -->
+    <Reference Include="OpenAI, Version=2.1.0.0, Culture=neutral, PublicKeyToken=b4187f3e65366280, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\.bin\OpenAI\OpenAI.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+</Project>

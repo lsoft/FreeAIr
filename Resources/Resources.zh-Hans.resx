@@ -632,6 +632,10 @@
     <value>端点:</value>
     <comment>Used in FreeAIr\UI\Windows\AgentConfigureWindow.xaml document</comment>
   </data>
+  <data name="Api_protocol" xml:space="preserve">
+    <value>协议:</value>
+    <comment>Used in FreeAIr\UI\Windows\AgentConfigureWindow.xaml document</comment>
+  </data>
   <data name="Token" xml:space="preserve">
     <value>令牌:</value>
     <comment>Used in FreeAIr\UI\Windows\AgentConfigureWindow.xaml document</comment>
@@ -1358,5 +1362,26 @@
   </data>
   <data name="Wizard_infobar_open" xml:space="preserve">
     <value>打开发行说明和设置向导</value>
+  </data>
+  <data name="UI_Rewind" xml:space="preserve">
+    <value>回退</value>
+  </data>
+  <data name="UI_Rewind_tooltip" xml:space="preserve">
+    <value>删除此回复之后的全部内容</value>
+  </data>
+  <data name="UI_Rewind_confirmation" xml:space="preserve">
+    <value>要将聊天回退到此回复吗？其后的全部内容都将被删除，聊天中和磁盘上的聊天文件中均是如此。此操作无法撤销。</value>
+  </data>
+  <data name="UI_Chat_is_busy" xml:space="preserve">
+    <value>聊天当前正忙。请等待本轮结束，或将其停止后重试。</value>
+  </data>
+  <data name="UI_Fork" xml:space="preserve">
+    <value>分叉</value>
+  </data>
+  <data name="UI_Fork_tooltip" xml:space="preserve">
+    <value>在新聊天中继续，其中包含直到此回复为止的全部内容</value>
+  </data>
+  <data name="UI_Fork_has_failed" xml:space="preserve">
+    <value>无法分叉此聊天。详情请参见活动日志。</value>
   </data>
 </root>

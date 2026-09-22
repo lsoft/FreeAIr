@@ -1,4 +1,4 @@
-﻿using OpenAI.Models;
+﻿using FreeAIr.Llm.Models;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -43,12 +43,12 @@ namespace FreeAIr.UI.ContextMenu
         /// Narrows a provider's model collection down to the ones matching <see cref="ModelNameMask"/>,
         /// falling back to a plain substring match if the mask is not valid as a regex.
         /// </summary>
-        public List<OpenAIModel>? Apply(
-            OpenAIModelCollection models
+        public List<LlmModel>? Apply(
+            IReadOnlyList<LlmModel> models
             )
         {
-            List<OpenAIModel> filteredModels = null;
-            
+            List<LlmModel> filteredModels = null;
+
             var filter = ComposeFilter(ModelNameMask, IsRegex);
             try
             {
@@ -77,12 +77,12 @@ namespace FreeAIr.UI.ContextMenu
         /// Builds the predicate used to test a model's id and owner against the mask: match-all when
         /// the mask is empty, a regex match when requested, otherwise a case-insensitive substring match.
         /// </summary>
-        private static Func<OpenAIModel, bool> ComposeFilter(
+        private static Func<LlmModel, bool> ComposeFilter(
             string modelNameMask,
             bool isRegex
             )
         {
-            Func<OpenAIModel, bool> filter;
+            Func<LlmModel, bool> filter;
             if (string.IsNullOrEmpty(modelNameMask))
             {
                 filter = _ => true;

@@ -177,7 +177,7 @@ namespace FreeAIr.UI.Dialog.Content
                         async a =>
                         {
                             await VS.MessageBox.ShowAsync(
-                                $"{TypedContent.ToolCall.FunctionName} call result:",
+                                $"{TypedContent.ToolCall.Name} call result:",
                                 TypedContent.Result
                                 );
                         },
@@ -220,7 +220,7 @@ namespace FreeAIr.UI.Dialog.Content
             DocumentVisibility = UpdateFlowDocument(content);
 
             var ts = InternalPage.Instance.ReadMCPToolsExecutionStatus();
-            if (ts.IsToolEnabled(content.ToolCall.FunctionName))
+            if (ts.IsToolEnabled(content.ToolCall.Name))
             {
                 ExecuteToolAsync()
                     .FileAndForget(nameof(ExecuteToolAsync));
@@ -234,7 +234,7 @@ namespace FreeAIr.UI.Dialog.Content
         {
             try
             {
-                var json = content.ToolCall.FunctionArgumentsUpdate.ToString();
+                var json = content.ToolCall.ArgumentsJson;
                 var nameValueDict = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, object>>(json);
                 if (nameValueDict.Count <= 0)
                 {
@@ -267,7 +267,7 @@ namespace FreeAIr.UI.Dialog.Content
         private async Task AllowThisToolAllTimeAsync()
         {
             var ts = InternalPage.Instance.ReadMCPToolsExecutionStatus();
-            ts.EnableTool(TypedContent.ToolCall.FunctionName);
+            ts.EnableTool(TypedContent.ToolCall.Name);
 
             await ExecuteToolAsync();
         }
@@ -297,14 +297,14 @@ namespace FreeAIr.UI.Dialog.Content
                 var toolArguments = toolCall.ParseToolInvocationArguments();
 
                 var toolResult = await McpServerProxyCollection.CallToolAsync(
-                    toolCall.FunctionName,
+                    toolCall.Name,
                     toolArguments,
                     cancellationToken: CancellationToken.None
                     );
 
                 if (toolResult is null || toolResult.Result == McpServerProxyToolCallResultEnum.Fail)
                 {
-                    SetFailed($"Failed to execute the tools named {toolCall.FunctionName}");
+                    SetFailed($"Failed to execute the tools named {toolCall.Name}");
                 }
                 else if (toolResult.Result == McpServerProxyToolCallResultEnum.Success)
                 {
@@ -352,7 +352,7 @@ namespace FreeAIr.UI.Dialog.Content
         {
             TypedContent.SetResult(
                 ToolCallStatusEnum.Blocked,
-                $"Invocation of the tool named {TypedContent.ToolCall.FunctionName} has been blocked by the user."
+                $"Invocation of the tool named {TypedContent.ToolCall.Name} has been blocked by the user."
                 );
 
             OnPropertyChanged();

@@ -1,4 +1,4 @@
-﻿using OpenAI.Chat;
+﻿using FreeAIr.Llm;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using FreeAIr.Chat.Context.Item;
@@ -65,7 +65,7 @@ namespace FreeAIr.Chat.Context
         /// Wraps <see cref="AsContextPromptTextAsync"/> into a message ready to be put into the
         /// request. Called every time a request is built, so the content is always up to date.
         /// </summary>
-        Task<UserChatMessage> CreateChatMessageAsync();
+        Task<LlmMessage> CreateChatMessageAsync();
 
         /// <summary>
         /// Returns the items this one depends on — for C# files these are the documents found via

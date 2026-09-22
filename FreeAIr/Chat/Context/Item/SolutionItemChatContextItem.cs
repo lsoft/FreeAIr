@@ -1,6 +1,6 @@
 ﻿using FreeAIr.Helper;
 using FreeAIr.UI.Embedillo.Answer.Parser;
-using OpenAI.Chat;
+using FreeAIr.Llm;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -247,12 +247,10 @@ namespace FreeAIr.Chat.Context.Item
         }
 
         /// <summary>This item as one user message, ready to be put in front of the actual prompt.</summary>
-        public async Task<UserChatMessage> CreateChatMessageAsync()
+        public async Task<LlmMessage> CreateChatMessageAsync()
         {
-            return new UserChatMessage(
-                ChatMessageContentPart.CreateTextPart(
-                    await AsContextPromptTextAsync()
-                    )
+            return LlmMessage.CreateUserMessage(
+                await AsContextPromptTextAsync()
                 );
         }
 

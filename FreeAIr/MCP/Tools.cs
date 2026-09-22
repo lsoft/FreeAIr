@@ -1,9 +1,8 @@
-﻿using OpenAI.Chat;
+﻿using Dto;
+using FreeAIr.Llm;
+using FreeAIr.Llm.Wire;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Text;
-using System.Text.Json;
 
 namespace FreeAIr.MCP.McpServerProxy
 {
@@ -42,17 +41,14 @@ namespace FreeAIr.MCP.McpServerProxy
     public /*sealed*/ class McpServerTool
     {
         /// <summary>
-        /// The schema a tool taking no arguments has to declare. A bare `{}` is not a valid
-        /// function schema: LM Studio validates `function.parameters` and answers the whole
-        /// request with 400 Bad Request when a single offered tool fails that validation.
+        /// The schema a tool taking no arguments has to declare, for the built-in Visual Studio
+        /// tools which take none. A bare `{}` is not a valid function schema: LM Studio validates
+        /// `function.parameters` and answers the whole request with 400 Bad Request when a single
+        /// offered tool fails that validation. The same string as
+        /// <see cref="ToolSchemaNormalizer.NoParameters"/>, named here so a tool does not have to
+        /// reach into the transport layer to declare itself.
         /// </summary>
-        public const string NoParameters =
-            """
-            {
-                "type": "object",
-                "properties": {}
-            }
-            """;
+        public const string NoParameters = ToolSchemaNormalizer.NoParameters;
 
         /// <summary>The name of the MCP server proxy (e.g. "Github", "VS") that publishes this tool.</summary>
         public string McpServerProxyName
@@ -82,8 +78,9 @@ namespace FreeAIr.MCP.McpServerProxy
         }
 
         /// <summary>
-        /// Wraps a tool published by an MCP server proxy, validating that its fully qualified
-        /// name contains no spaces (which some LLM providers reject as a function name).
+        /// Wraps a tool published by an MCP server proxy, validating that the server's name can
+        /// prefix a function name at all - see <see cref="McpServerName"/>, and issue #74 for what
+        /// a server named after a local date and time does to every tool it publishes.
         /// </summary>
         public McpServerTool(
             string mcpServerProxyName,
@@ -117,108 +114,31 @@ namespace FreeAIr.MCP.McpServerProxy
             Description = description;
             Parameters = parameters;
 
-            if (FullName.Contains(' '))
+            //the server's name, and not the tool's: a tool is named by the server which published
+            //it, while the prefix is the one thing the user chose and the one thing they can fix
+            var nameProblem = McpServerName.DescribeProblem(mcpServerProxyName);
+            if (nameProblem is not null)
             {
-                throw new InvalidOperationException($"Function '{FullName}' contain spaces which is not allowed to some LLM providers.");
+                throw new InvalidOperationException(
+                    nameProblem + $" Rename it in the MCP server settings; until then none of its tools (such as '{FullName}') can be offered to the model."
+                    );
             }
         }
 
         /// <summary>
-        /// Builds the OpenAI SDK <see cref="ChatTool"/> for this tool, normalizing its parameter
-        /// schema first so endpoints (e.g. LM Studio) that require a strict object schema accept it.
+        /// Describes this tool to the model in the protocol-neutral shape. The schema is left as it
+        /// was published; the repair every endpoint needs is applied by the transport, because it
+        /// is a rule of the wire rather than of MCP - see <see cref="ToolSchemaNormalizer"/>.
         /// </summary>
-        public ChatTool CreateChatTool()
+        public LlmToolDefinition CreateToolDefinition()
         {
-            return ChatTool.CreateFunctionTool(
-                functionName: FullName,
-                functionDescription: Description,
-                functionParameters: BinaryData.FromString(
-                    NormalizeParameterSchema(Parameters)
-                    ),
-                functionSchemaIsStrict: true
+            return new LlmToolDefinition(
+                FullName,
+                Description,
+                Parameters
                 );
         }
 
-        /// <summary>
-        /// Brings a tool schema to the shape every OpenAI compatible endpoint accepts: an object
-        /// schema carrying a `properties` member.
-        ///
-        /// This is not cosmetic. A tool without arguments is habitually declared as `{}` — both by
-        /// FreeAIr's own Visual Studio tools and by third party MCP servers, whose schemas arrive
-        /// here unseen — and LM Studio rejects the entire completion request with 400 Bad Request
-        /// when one such tool is offered, taking the whole chat down with it.
-        ///
-        /// The schema is repaired rather than replaced, so that a schema which merely forgot its
-        /// `type` keeps the parameters it does declare.
-        /// </summary>
-        private static string NormalizeParameterSchema(
-            string parameters
-            )
-        {
-            try
-            {
-                using var document = JsonDocument.Parse(parameters);
-
-                var root = document.RootElement;
-                if (root.ValueKind != JsonValueKind.Object)
-                {
-                    return NoParameters;
-                }
-
-                var hasObjectType =
-                    root.TryGetProperty("type", out var type)
-                    && type.ValueKind == JsonValueKind.String
-                    && type.ValueEquals("object")
-                    ;
-                var hasProperties =
-                    root.TryGetProperty("properties", out var properties)
-                    && properties.ValueKind == JsonValueKind.Object
-                    ;
-                if (hasObjectType && hasProperties)
-                {
-                    return parameters;
-                }
-
-                using var stream = new MemoryStream();
-                using (var writer = new Utf8JsonWriter(stream))
-                {
-                    writer.WriteStartObject();
-
-                    //the two members the endpoints insist on come first, then everything the
-                    //original schema said which we have not just written ourselves
-                    writer.WriteString("type", "object");
-                    if (!hasProperties)
-                    {
-                        writer.WriteStartObject("properties");
-                        writer.WriteEndObject();
-                    }
-
-                    foreach (var member in root.EnumerateObject())
-                    {
-                        if (member.NameEquals("type"))
-                        {
-                            continue;
-                        }
-                        if (member.NameEquals("properties") && !hasProperties)
-                        {
-                            continue;
-                        }
-
-                        member.WriteTo(writer);
-                    }
-
-                    writer.WriteEndObject();
-                }
-
-                return Encoding.UTF8.GetString(stream.ToArray());
-            }
-            catch (JsonException)
-            {
-                //a schema which is not even json cannot be repaired, only replaced
-            }
-
-            return NoParameters;
-        }
     }
 
     /// <summary>

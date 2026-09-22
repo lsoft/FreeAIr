@@ -23,6 +23,76 @@ My others extensions lives [here](https://marketplace.visualstudio.com/publisher
 
 # FreeAIr Release Notes
 
+## 4.5.1
+
+- Fixed: `FreeAIr generate whole line suggestion` did nothing in Visual Studio 2026 and left a
+  `TypeInitializationException` in the Output window instead (issue #75). The suggestion is shown by
+  borrowing the editor's own inline completion UI — the grey ghost text — and in VS 2026 everything
+  it is borrowed from moved: the suggestion service left `Microsoft.VisualStudio.IntelliCode` for
+  `Microsoft.VisualStudio.Editor.Implementation`, two of its fields became properties, the editor
+  view now holds a task of the completions instance rather than the instance itself, and one method
+  grew a second parameter. Visual Studio 2022 keeps the code which has always worked there, and
+  VS 2026 and anything newer go through a lookup which searches for each piece rather than naming
+  it, so the next rearrangement can be survived. A piece which is not found now switches whole line
+  completion off and says so in the activity log, instead of taking the command down with an
+  exception nobody can act on.
+
+## 4.5.0
+
+- A chat can be rewound. Every answer now carries a `Rewind` link which takes the dialogue back to
+  that answer: everything said after it is deleted, from the chat window and from the chat's json
+  file under `.freeair\chats`, and the chat continues from there. It is what to reach for when the
+  model has gone down a wrong path and the tail of the dialogue is only leading it further astray —
+  until now the only way back was to start the chat again and lose the part which had worked. It
+  asks for confirmation first, because it cannot be undone, and the link is disabled under the
+  newest answer and while the chat is answering or running a tool.
+- A chat can be forked. Next to `Rewind` there is now a `Fork` link, which copies the dialogue up to
+  and including that answer into a new chat — transcript, context chips, tool switches and agent —
+  and switches to it, leaving the chat it came from untouched. It is the other half of the same
+  idea: `Rewind` throws the tail away, `Fork` keeps it and tries a second line of questioning beside
+  it. The new chat is named after the old one with `(fork)` appended and gets a file of its own
+  under `.freeair\chats`, so both survive a restart.
+- The reasoning of a thinking model is now shown in the chat, above the answer and collapsed, so a
+  click opens it and nothing else moves (issue #71). It is the fastest way to see why a model
+  picked the tool it picked or ignored a rule in the prompt, which is what most prompt tuning is
+  about. Previously only a model which wrote `<think>` into its own answer text was shown this way;
+  the reasoning a server sends in a field of its own — `reasoning_content` from DeepSeek, vLLM and
+  llama.cpp, `reasoning` from OpenRouter, `thinking` from the Anthropic API — was read off the wire
+  and thrown away.
+- The agent carries a `ShowReasoning` switch next to its endpoint, on by default. A model which
+  does not reason sends nothing and is unaffected either way.
+- Reasoning is no longer sent back to the model as history. Neither protocol wants last turn's
+  deliberation returned as text, and it was context paid for on every later turn of the chat. This
+  applies to the `<think>` blocks a model writes itself as well, which were being replayed in full.
+- Fixed: a newly added MCP server was named after the local date and time, which contains spaces —
+  and a server whose name contains a space has every tool it publishes refused, since the name is
+  the prefix of the function name sent to the model (issue #74). The complaint that came back named
+  a function rather than the server, so there was nothing to connect it to the name field. New
+  servers are now called `McpServer_20260909_234518`, and the configuration window refuses to save
+  a name which cannot be used — naming the server and saying why — instead of only turning the
+  field red. A duplicate name is refused for the same reason: the servers are stored keyed by name.
+
+## 4.4.1
+
+- Fixed: the chat window would not open at all when a saved chat held an answer naming an image
+  that could not be loaded — a relative link such as `![diagram](diagram.png)`, or a path to a file
+  which is not there. Since chats are restored from `.freeair\chats` when the solution opens, the
+  window then stayed broken on every later start (issue #73). Such an image is now simply not
+  rendered, the rest of the answer is, and the failure goes to the activity log.
+- An answer which fails to render for any other reason no longer costs the whole chat window
+  either: the item is skipped and logged, and the rest of the conversation is shown.
+
+## 4.4.0
+
+- Anthropic's own API is now spoken natively, alongside the OpenAI compatible one. An agent carries
+  a `Protocol` next to its endpoint (`OpenAi` by default, so nothing you have configured changes);
+  set it to `Anthropic` — or pick `Anthropic` in the endpoint list, which sets it for you — and
+  Claude models served by api.anthropic.com work with tools, streaming and the model picker like any
+  other agent. Note that this API has no embeddings, so the natural language index still needs an
+  OpenAI compatible agent.
+- The agent's system prompt is now sent as a system message. It used to travel as something the
+  user had said, which made models treat it as one more request rather than as their instructions.
+
 ## 4.3.1
 
 - Fixed few bugs.

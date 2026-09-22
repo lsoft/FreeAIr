@@ -1,0 +1,37 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    Tests of the answer renderer: the markdown an LLM actually writes, turned into the WPF parts and
+    command buttons the chat window shows. Nothing here opens a window - the parts are asked for
+    their inlines and their command parameters directly.
+
+    net48 with UseWPF, unlike the other four test projects, because MarkdownParser is a WPF assembly
+    and its parts return System.Windows types. The WPF objects are built on an STA thread, see
+    StaTestRunner.
+  -->
+
+  <PropertyGroup>
+    <TargetFramework>net48</TargetFramework>
+    <LangVersion>Latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UseWPF>true</UseWPF>
+    <IsPackable>false</IsPackable>
+    <RootNamespace>MarkdownParser.Tests</RootNamespace>
+    <AssemblyName>FreeAIr.MarkdownParser.Tests</AssemblyName>
+    <!-- the VSIX warns by the hundred and is judged by errors only; the tests are small enough to
+         be kept clean -->
+    <NoWarn>$(NoWarn);CS1591</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" />
+    <PackageReference Include="xunit" />
+    <PackageReference Include="xunit.runner.visualstudio" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\MarkdownParser\MarkdownParser.csproj" />
+  </ItemGroup>
+
+</Project>

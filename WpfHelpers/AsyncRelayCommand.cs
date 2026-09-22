@@ -51,7 +51,7 @@ namespace WpfHelpers
             }
             catch (Exception excp)
             {
-                //todo log
+                CommandDiagnostics.Report(excp);
                 System.Windows.MessageBox.Show(
                     excp.Message
                     + Environment.NewLine
@@ -77,7 +77,7 @@ namespace WpfHelpers
             }
             catch (Exception excp)
             {
-                //todo log
+                CommandDiagnostics.Report(excp);
                 System.Windows.MessageBox.Show(
                     excp.Message
                     + Environment.NewLine
@@ -158,7 +158,7 @@ namespace WpfHelpers
             }
             catch (Exception excp)
             {
-                //todo log
+                CommandDiagnostics.Report(excp);
                 System.Windows.MessageBox.Show(
                     excp.Message
                     + Environment.NewLine
@@ -234,7 +234,7 @@ namespace WpfHelpers
             }
             catch (Exception excp)
             {
-                //todo log
+                CommandDiagnostics.Report(excp);
                 System.Windows.MessageBox.Show(
                     excp.Message
                     + Environment.NewLine

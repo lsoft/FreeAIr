@@ -3,6 +3,7 @@ using EnvDTE80;
 using FreeAIr.Options2.Agent;
 using FreeAIr.Shared.Helper;
 using FreeAIr.Interaction;
+using FreeAIr.Chat.Content;
 using FreeAIr.Chat.Persistence;
 using FreeAIr.Helper;
 using Microsoft.VisualStudio.Threading;
@@ -198,6 +199,132 @@ namespace FreeAIr.Chat
             }
 
             return chat;
+        }
+
+        /// <summary>
+        /// Starts a new chat holding a copy of <paramref name="source"/> up to and including
+        /// <paramref name="upTo"/>, and nothing after it. The source chat is not touched at all:
+        /// this is how the user tries a second line of questioning from a point the dialogue had
+        /// already reached, without losing the first one.
+        ///
+        /// The copy is made through the persisted shape rather than by cloning the live objects.
+        /// That shape is already the complete definition of a chat — transcript, context chips,
+        /// tool switches, agent — and the path which rebuilds a chat from it is the one every
+        /// restart of Visual Studio exercises.
+        ///
+        /// Returns null when the source is not held here, when its transcript is still being
+        /// written into, or when the entry does not belong to it.
+        /// </summary>
+        public async Task<Chat?> ForkChatAsync(
+            Chat source,
+            IChatContent upTo
+            )
+        {
+            if (source is null)
+            {
+                throw new ArgumentNullException(nameof(source));
+            }
+
+            if (upTo is null)
+            {
+                throw new ArgumentNullException(nameof(upTo));
+            }
+
+            if (!CheckIfChatIsInCollection(source) || !source.IsTranscriptSettled)
+            {
+                return null;
+            }
+
+            var contents = source.Contents;
+            var index = -1;
+            for (var i = 0; i < contents.Count; i++)
+            {
+                if (ReferenceEquals(contents[i], upTo))
+                {
+                    index = i;
+                    break;
+                }
+            }
+
+            if (index < 0)
+            {
+                return null;
+            }
+
+            var payload = PersistedChatJson.FromChat(source);
+            if (payload.Contents.Count > index + 1)
+            {
+                payload.Contents.RemoveRange(index + 1, payload.Contents.Count - index - 1);
+            }
+
+            //a fork is a new chat and not a second copy of an old one: its own id (which is its own
+            //file name), its own moment of creation (which is what the chat list sorts by) and a
+            //name which tells the two apart in that list
+            payload.Id = Guid.NewGuid();
+            payload.Started = DateTime.Now;
+            payload.Status = ChatStatusEnum.Ready;
+            payload.Title = BuildForkTitle(payload.Title);
+
+            //a fork is always a chat the user asked for, so it is saved whenever there is a folder
+            //to save it into - even when the chat it was forked from is an automatic one
+            var folder = await ChatPersistence.TryGetChatsFolderPathAsync();
+            var filePath = string.IsNullOrEmpty(folder)
+                ? null
+                : ChatPersistence.GetChatFilePath(folder, payload.Id)
+                ;
+
+            var fork = await Chat.CreateFromPersistedAsync(payload, filePath);
+            if (fork is null)
+            {
+                return null;
+            }
+
+            fork.ChatStatusChangedEvent += ChatStatusChanged;
+
+            lock (_locker)
+            {
+                _chats.Add(fork);
+            }
+
+            LastCreatedChatId = fork.Id;
+
+            fork.PersistNow();
+
+            //as in StartChatAsync: the subscribers come back here for the list, so they are called
+            //once the fork is already in it
+            FireChatCollectionChanged();
+
+            return fork;
+        }
+
+        /// <summary>
+        /// Names a fork after the chat it came from. The number is only added when that name is
+        /// taken, so forking a chat twice gives `Chat (fork)` and `Chat (fork 2)` rather than two
+        /// rows of the chat list which cannot be told apart.
+        /// </summary>
+        private string BuildForkTitle(
+            string? sourceTitle
+            )
+        {
+            var baseTitle = string.IsNullOrWhiteSpace(sourceTitle)
+                ? "Untitled"
+                : sourceTitle
+                ;
+
+            var taken = new HashSet<string>(
+                Chats.Select(c => c.Description.Title ?? string.Empty),
+                StringComparer.OrdinalIgnoreCase
+                );
+
+            var candidate = baseTitle + " (fork)";
+            var ordinal = 2;
+            while (taken.Contains(candidate))
+            {
+                candidate = baseTitle + " (fork " + ordinal.ToString(System.Globalization.CultureInfo.InvariantCulture) + ")";
+                ordinal++;
+            }
+
+            return candidate;
         }
 
         /// <summary>

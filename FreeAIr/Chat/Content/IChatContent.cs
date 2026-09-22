@@ -1,4 +1,4 @@
-﻿using OpenAI.Chat;
+﻿using FreeAIr.Llm;
 using System.Collections.Generic;
 
 namespace FreeAIr.Chat.Content
@@ -36,8 +36,11 @@ namespace FreeAIr.Chat.Content
         void Archive();
 
         /// <summary>
-        /// Renders this content as the message(s) to be sent to the model.
+        /// Renders this content as the message(s) to be sent to the model, in the protocol-neutral
+        /// shape of <see cref="LlmMessage"/>. Which wire format they end up in is the transport's
+        /// business, and the two supported ones disagree about tool calls enough that a content
+        /// which built them itself could only ever serve one.
         /// </summary>
-        IReadOnlyList<ChatMessage> CreateChatMessages();
+        IReadOnlyList<LlmMessage> CreateChatMessages();
     }
 }

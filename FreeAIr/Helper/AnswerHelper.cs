@@ -1,4 +1,5 @@
-﻿using System.Text.RegularExpressions;
+﻿using FreeAIr.Llm.Streaming;
+using System.Text.RegularExpressions;
 
 namespace FreeAIr.Helper
 {
@@ -18,15 +19,6 @@ namespace FreeAIr.Helper
             );
 
         /// <summary>
-        /// The opening tag of a reasoning model's `&lt;think&gt;` block.
-        /// </summary>
-        private const string ThinkStart = "<think>";
-        /// <summary>
-        /// The closing tag of a reasoning model's `&lt;think&gt;` block.
-        /// </summary>
-        private const string ThinkEnd = "</think>";
-
-        /// <summary>
         /// Rewrites every line break in the answer to the given line ending, regardless of what mix
         /// of CR, LF or CRLF the model produced.
         /// </summary>
@@ -43,7 +35,7 @@ namespace FreeAIr.Helper
         }
 
         /// <summary>
-        /// Strips a leading `&lt;think&gt;...&lt;/think&gt;` reasoning block, then repeatedly trims
+        /// Strips every `&lt;think&gt;...&lt;/think&gt;` reasoning block, then repeatedly trims
         /// surrounding quotes, stray line breaks and code fences until nothing more can be removed.
         /// Used to turn a chat model's raw answer into the bare text it was actually asked for, e.g.
         /// a commit message.
@@ -53,15 +45,9 @@ namespace FreeAIr.Helper
             string lineEnding
             )
         {
-            var tsi = answer.IndexOf(ThinkStart);
-            var tei = answer.IndexOf(ThinkEnd);
-            if (tsi >= 0 && tei >= 0 && tei > tsi)
-            {
-                answer = answer.Remove(
-                    tsi,
-                    tei - tsi + ThinkEnd.Length
-                    );
-            }
+            //a thinking model may reason more than once in a turn, and a commit message holding
+            //the second of those blocks is a commit message nobody can read
+            answer = AnswerTextAssembler.WithoutReasoning(answer);
 
             answer = string.Join(
                 Environment.NewLine,

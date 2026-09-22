@@ -1,4 +1,4 @@
-﻿using OpenAI.Chat;
+﻿using FreeAIr.Llm;
 using System.Collections.Generic;
 using FreeAIr.Chat.Content;
 
@@ -39,13 +39,11 @@ namespace FreeAIr.Chat
         }
 
         /// <summary>Wraps the prompt text into a single user chat message ready for the request.</summary>
-        public IReadOnlyList<ChatMessage> CreateChatMessages()
+        public IReadOnlyList<LlmMessage> CreateChatMessages()
         {
             return
                 [
-                    new UserChatMessage(
-                        ChatMessageContentPart.CreateTextPart(PromptBody)
-                        )
+                    LlmMessage.CreateUserMessage(PromptBody)
                 ];
         }
 

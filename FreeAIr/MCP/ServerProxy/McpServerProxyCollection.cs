@@ -3,7 +3,7 @@ using FreeAIr.MCP.McpServerProxy.External;
 using FreeAIr.MCP.McpServerProxy.Github;
 using FreeAIr.MCP.McpServerProxy.VS;
 using FreeAIr.Shared.Helper;
-using OpenAI.Chat;
+using FreeAIr.Llm;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -457,10 +457,10 @@ namespace FreeAIr.MCP.McpServerProxy
             Enabled = enabled;
         }
 
-        /// <summary>Converts this tool's description into the OpenAI SDK's <see cref="ChatTool"/> shape for the chat request.</summary>
-        public ChatTool CreateChatTool()
+        /// <summary>Describes this tool to the model in the protocol-neutral <see cref="LlmToolDefinition"/> shape.</summary>
+        public LlmToolDefinition CreateToolDefinition()
         {
-            return Tool.CreateChatTool();
+            return Tool.CreateToolDefinition();
         }
     }
 

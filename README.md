@@ -8,7 +8,7 @@ Access to AI for free for anyone who is using Visual Studio 2022\2026.
 
 ![logo](https://raw.githubusercontent.com/lsoft/FreeAIr/main/logo.png)
 
-FreeAIr is a Visual Studio extension which allows you to interact with any LLM which have OpenAI-compatible API. Even with local LLM! No artificial || political barrier injected in FreeAIr code.
+FreeAIr is a Visual Studio extension which allows you to interact with any LLM which have OpenAI-compatible API, or Anthropic's own API. Even with local LLM! No artificial || political barrier injected in FreeAIr code.
 
 [Download VSIX](https://marketplace.visualstudio.com/items?itemName=lsoft.FreeAIr)
 
@@ -35,7 +35,7 @@ A: No problem! You can use local LLM, for example via KoboldCpp. Local LLM sends
 
 Main functions:
 
-- Chat with any OpenAI-compatible LLM, in a tool window or in a small floating window right at the caret (`in situ` chat)
+- Chat with any OpenAI-compatible LLM, or with Claude through Anthropic's own API, in a tool window or in a small floating window right at the caret (`in situ` chat)
 - Voice prompting: dictate your prompt instead of typing it (4 speech-to-text backends, including a fully local one)
 - Searching with natural language (with RAG support)
 - Explain the code
@@ -193,6 +193,31 @@ An agent is a specific combination of `endpoint`, `token`, model name and its sy
 
 You can edit existing agents or add your own. If an agent does not have a token, the agent is considered inactive.
 
+### Protocol
+
+Next to the endpoint an agent carries the `Protocol` its endpoint speaks:
+
+- `OpenAi` — chat completions. This is the default and what almost everything implements: OpenRouter, Yandex, and every local server (LM Studio, KoboldCpp, Ollama, text-generation-webui). If you have never heard of this setting, it is the one you want.
+- `Anthropic` — the messages API of `api.anthropic.com`, which Claude models served by Anthropic itself speak and which is not a dialect of the other one. Picking `Anthropic` in the endpoint list sets this for you; a proxy of your own may serve either, so the box stays editable.
+
+Everything else works the same way in both: streaming, tool calls, the model picker and the `test connection` check. The one exception is embeddings — the Anthropic API has none, so the [natural language index](#natural-language-search) needs an agent pointing at an OpenAI compatible embedding model.
+
+### Reasoning
+
+A thinking model works through the question before it answers, and `ShowReasoning` — on by default — puts that reasoning in the chat as a `think` block above the answer. The block is collapsed, so the answer reads as it always did and a click opens the reasoning behind it.
+
+It is worth opening when a model picked the wrong tool, called it with the wrong arguments or ignored a rule of the system prompt: the answer says nothing about why, and the reasoning usually names the sentence it was following. That is what it is for.
+
+What reaches the chat depends on the server rather than on FreeAIr:
+
+- `reasoning_content` — DeepSeek, vLLM, llama.cpp and the local servers built on it.
+- `reasoning` — OpenRouter.
+- `thinking` — the Anthropic API, when the endpoint is serving a model with extended thinking already switched on. FreeAIr does not ask for it, so a plain `api.anthropic.com` agent sends none.
+- OpenAI's own o-series models send no reasoning at all, by design — there is nothing for this setting to show.
+- A model which writes `<think>` into its ordinary answer text is shown that way whatever the setting says, because that text is the answer as far as any server is concerned.
+
+Reasoning is never sent back to the model on the next turn, and the support actions — the commit message writer and the rest — strip it before using an answer, so turning it off only matters for what you are shown and what an endpoint billed per token charges you for.
+
 ## Chat
 
 Chat is the core element of FreeAIr, where communication with LLM and code generation takes place.
@@ -223,6 +248,24 @@ For some dialog elements (code chunks, images, etc.) special buttons are added t
 - Create new file with this
 
 The size of these buttons is also adjusted in `Tools` -> `Options` -> `FreeAIr`.
+
+Under every answer there are two links, `Fork` and `Rewind`. Both take the dialogue back to that
+answer; they differ in what happens to what came after it.
+
+`Rewind` deletes it. Everything said after that answer — later prompts, answers and tool calls — is
+removed from the chat and from the chat's file on disk, and you continue from there. This is what to
+use when the model has gone down a wrong path and the whole tail of the dialogue is only leading it
+further astray. It asks for confirmation first, because it cannot be undone. The link is greyed out
+under the newest answer, which nothing follows.
+
+`Fork` keeps it. A new chat is created holding everything up to and including that answer — the
+transcript, the context chips, the tool switches and the agent — and the chat window switches to it,
+while the chat you forked from is left exactly as it was. This is what to use when you want to try a
+second line of questioning without losing the first one. The new chat is named after the old one
+with `(fork)` appended, and gets a file of its own in `.freeair\chats`. Nothing is destroyed, so it
+asks nothing.
+
+Both links are greyed out while the chat is busy answering or running a tool.
 
 ### Prompt input area
 
@@ -357,6 +400,8 @@ There are three categories of MCP servers:
 - Other MCP servers - they can be "installed" by editing the corresponding section of FreeAIr Json settings. The format is the standard Claude format.
 
 Each MCP server provides its own set of tools. You can edit the set of MCP servers and their tools and commit this file to the repository. When creating a chat, the selected tools are copied to the chat and you can enable/disable tools inside the chat, this does not affect the status of global tools.
+
+A server's name has to be one a tool can be named after: it becomes the prefix of every tool it publishes (`Server.Tool`), and that is the function name the model is offered. So it may not be empty and may not contain spaces — use `_` or `-`. The name field turns red when it cannot be used, and the configuration window says so rather than saving it.
 
 Examples of prompts that LLM can execute if it is provided with the appropriate tools:
 
@@ -535,6 +580,18 @@ This is possible. If you are banned only from Copilot:
 FreeAIr itself has no restrictions, you are able to switch another OpenAI compatible API.
 
 If you are banned from any remote LLM then run LLM locally, which is very easy, for example with KoboldCpp: run KoboldCpp, choose the model, wait for KoboldCpp starts (it opens browser), and then use correct OpenAI compatible endpoint like `http://localhost:5001/v1`.
+
+# Reporting a problem
+
+FreeAIr writes its failures into Visual Studio's own Activity Log, under the source `FreeAIr`. That log is only written when Visual Studio was started with the `/log` switch, so to capture a problem:
+
+1. Close Visual Studio.
+2. Start it again as `devenv /log`, and reproduce what went wrong.
+3. Close Visual Studio and attach `%AppData%\Microsoft\VisualStudio\<version>\ActivityLog.xml` to the issue. Entries whose `source` is `FreeAIr` are the ones that matter.
+
+What lands there is not only exceptions. A chat that stops with no explanation, a tool that runs as if it had been given no arguments, an endpoint answering something that is not a completion at all — all of these are logged with the agent, the protocol, the endpoint and the model of the request, which is normally enough to tell a misconfigured agent from a broken one.
+
+**The log may contain fragments of what you sent and received**, including file contents that were attached as chat context and the sentence an endpoint answered with. Nothing writes your token there on purpose — it travels in a request header, and only endpoints, model names and agent names are logged — but read through the file before attaching it to a public issue.
 
 # Thanks
 

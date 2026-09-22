@@ -1,10 +1,8 @@
 ﻿using FreeAIr.Helper;
+using FreeAIr.Llm;
+using FreeAIr.Llm.Streaming;
 using Microsoft.VisualStudio.Threading;
-using OpenAI.Chat;
-using System.ClientModel;
-using System.Collections.Generic;
 using System.Text;
-using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using FreeAIr.Chat;
@@ -40,12 +38,6 @@ namespace FreeAIr.BLogic.Reader
         /// The read in flight, or null when the reader is idle. Guarded by <see cref="_taskLocker"/>.
         /// </summary>
         private Task? _task;
-
-        /// <summary>
-        /// How much of a non-JSON error page is kept in the chat. The useful sentence is at the
-        /// front; the rest of a gateway HTML dump only buries it.
-        /// </summary>
-        private const int MaxReportedBodyLength = 4000;
 
         /// <summary>Creates a reader bound to the given chat; obtain one through <see cref="LLMReaderPool"/> instead of calling this directly.</summary>
         public LLMReader(
@@ -180,6 +172,10 @@ namespace FreeAIr.BLogic.Reader
         /// build the request from the chat, stream the completion, append the text to the answer
         /// as it arrives (so the UI updates live) and register the tool calls the model asked for.
         ///
+        /// The text appended is not the text delta but whatever <see cref="AnswerTextAssembler"/>
+        /// makes of the event, which is how the reasoning of a thinking model reaches the chat: as
+        /// a `think` block the renderer collapses, and only when the agent asks for it.
+        ///
         /// The tools are NOT invoked here. Each <see cref="ToolCallChatContent"/> executes itself
         /// (possibly after asking the user for a permission), and the last one to finish restarts
         /// this reader through <see cref="FreeAIr.Chat.Chat.CreateToolCall"/>.
@@ -193,245 +189,150 @@ namespace FreeAIr.BLogic.Reader
 
             AnswerChatContent? chatAnswer = null;
 
+            //outside the try because a turn which fails while the model is still reasoning has to
+            //close the block before the exception is appended, or the message lands inside it and
+            //the user sees an answer which stops mid-thought
+            var answerTextAssembler = new AnswerTextAssembler(
+                _chat.Options.ChosenAgent.Technical.ShowReasoning
+                );
+
             try
             {
                 _chat.Status = ChatStatusEnum.WaitingForAnswer;
 
-                var chatClient = _chat.CreateChatClient();
-                var chatCompletionOptions = await _chat.CreateChatCompletionOptionsAsync();
+                var transport = _chat.CreateTransport();
+                var request = await _chat.BuildRequestAsync();
 
-
-
-                var messages = await _chat.GetMessageListAsync();
-
-                var completionUpdates = chatClient.CompleteChatStreaming(
-                    messages: messages,
-                    options: chatCompletionOptions,
-                    cancellationToken: cancellationToken
-                    );
-
-                OpenAI.Chat.ChatFinishReason? chatFinishReason = null;
-                var toolCallAccumulator = new StreamingToolCallAccumulator();
-                //var contentParts = new List<ChatMessageContentPart>();
+                var finishReason = LlmFinishReason.Unknown;
+                var toolCallAccumulator = new ToolCallAccumulator();
 
                 _chat.Status = ChatStatusEnum.ReadingAnswer;
 
-                foreach (StreamingChatCompletionUpdate completionUpdate in completionUpdates)
+                await foreach (var streamEvent in transport.StreamAsync(request, cancellationToken))
                 {
-                    //completionUpdate.Usage.OutputTokenDetails.
+                    toolCallAccumulator.Append(streamEvent);
 
-                    //a chunk without a completion id means the endpoint replied with
-                    //something which is not a completion at all (an error page, a quota
-                    //message, etc.); there is nothing to read further
-                    if (completionUpdate.CompletionId is null)
+                    //the answer text of this event - the delta itself, plus the think tags opened
+                    //and closed around a run of reasoning - and nothing at all for most events
+                    var answerPart = answerTextAssembler.Append(streamEvent);
+                    if (answerPart.Length > 0)
                     {
-                        chatAnswer = await CreateOrAppendAnswerPartAsync(chatAnswer, "Server returns error.");
-                        _chat.Status = ChatStatusEnum.Failed;
-                        return;
+                        //for updating UI in real time
+                        chatAnswer = await CreateOrAppendAnswerPartAsync(chatAnswer, answerPart);
                     }
 
-                    chatFinishReason ??= completionUpdate.FinishReason;
-                    toolCallAccumulator.Append(completionUpdate.ToolCallUpdates);
-
-                    //if (completionUpdate.FinishReason != ChatFinishReason.ToolCalls
-                    //    || completionUpdate.ToolCallUpdates.Count == 0
-                    //    )
-                    //{
-                    //    if (completionUpdate.ContentUpdate.Count > 0)
-                    //    {
-                    //        contentParts.AddRange(completionUpdate.ContentUpdate);
-                    //    }
-                    //}
-
-                    foreach (ChatMessageContentPart contentPart in completionUpdate.ContentUpdate)
+                    switch (streamEvent)
                     {
-                        if (contentPart.Kind != ChatMessageContentPartKind.Text)
-                        {
-                            continue;
-                        }
-                        if (string.IsNullOrEmpty(contentPart.Text))
-                        {
-                            continue;
-                        }
+                        case LlmTextDeltaEvent:
+                        case LlmReasoningDeltaEvent:
+                            if (cancellationToken.IsCancellationRequested)
+                            {
+                                //stopped while the model was still thinking: the block has to be
+                                //closed here too, or what is left of it is sent back as history on
+                                //the next turn, where nothing recognises it any more
+                                chatAnswer = await CloseReasoningAsync(chatAnswer, answerTextAssembler);
 
-                        //for updating UI in real time
-                        chatAnswer = await CreateOrAppendAnswerPartAsync(chatAnswer, contentPart.Text);
+                                _chat.Status = ChatStatusEnum.Ready;
+                                return;
+                            }
+                            break;
 
-                        if (cancellationToken.IsCancellationRequested)
-                        {
-                            _chat.Status = ChatStatusEnum.Ready;
+                        case LlmFinishedEvent finished:
+                            finishReason = finished.Reason;
+                            break;
+
+                        case LlmProtocolFaultEvent fault:
+                            //the endpoint answered with something which is not a completion at all;
+                            //there is nothing to read further and the chat has to fail rather than
+                            //sit waiting. It never becomes an exception, so this is the only place
+                            //it can reach the log - and a chat which "just stopped" is exactly the
+                            //report this has to be diagnosable from
+                            ActivityLogHelper.ActivityLogWarning(
+                                DescribeTurn() + " failed while streaming: " + fault.Message
+                                );
+
+                            chatAnswer = await CreateOrAppendAnswerPartAsync(chatAnswer, fault.Message);
+                            _chat.Status = ChatStatusEnum.Failed;
                             return;
-                        }
                     }
                 }
 
-                if (chatFinishReason == ChatFinishReason.ToolCalls)
+                //a turn which ends in a tool call says nothing after its reasoning, so the end of
+                //the stream is the only thing left to close the block
+                chatAnswer = await CloseReasoningAsync(chatAnswer, answerTextAssembler);
+
+                if (finishReason == LlmFinishReason.ToolCalls)
                 {
                     foreach (var toolCall in toolCallAccumulator.Build())
                     {
-                        var toolCallContent = _chat.CreateToolCall(
+                        _chat.CreateToolCall(
                             toolCall
                             );
-
-
-                        //var toolArguments = ParseToolInvocationArguments(toolCall);
-
-                        //var toolResult = await McpServerProxyCollection.CallToolAsync(
-                        //    toolCall.FunctionName,
-                        //    toolArguments,
-                        //    cancellationToken: CancellationToken.None
-                        //    );
-                        //if (toolResult is null)
-                        //{
-                        //    //dialog.AppendUnsuccessfulToolCall(
-                        //    //    toolCall
-                        //    //    );
-
-                        //    throw new InvalidOperationException($"Tool named {toolCall.FunctionName} failed to run.");
-                        //}
-
-                        ////dialog.AppendToolCallResult(
-                        ////    toolCall,
-                        ////    toolResult
-                        ////    );
                     }
-
                 }
-
-
-
-
 
                 _chat.Status = ChatStatusEnum.Ready;
             }
             catch (OperationCanceledException)
             {
                 //this is OK
+                chatAnswer = await CloseReasoningAsync(chatAnswer, answerTextAssembler);
+
                 _chat.Status = ChatStatusEnum.Ready;
             }
             catch (Exception excp)
             {
+                //close whatever the model was still thinking about, so the failure is shown next to
+                //the answer and not folded into the collapsed block above it
+                chatAnswer = await CloseReasoningAsync(chatAnswer, answerTextAssembler);
+
                 chatAnswer = await CreateOrAppendAnswerPartAsync(chatAnswer, excp);
 
                 _chat.Status = ChatStatusEnum.Failed;
 
-                excp.ActivityLogException();
+                //the exception alone does not say which agent was answering, and a report of "the
+                //chat stopped working" is otherwise indistinguishable between agents
+                excp.ActivityLogException(DescribeTurn() + " failed.");
+
+                //the sentence naming what to fix is a property of the transport's exception rather
+                //than part of its message, so ActivityLogException would not print it
+                var serverMessage = TryReadServerErrorMessage(excp);
+                if (!string.IsNullOrWhiteSpace(serverMessage))
+                {
+                    ActivityLogHelper.ActivityLogError("The endpoint said: " + serverMessage);
+                }
             }
         }
 
         /// <summary>
-        /// Rebuilds whole tool calls out of the fragments a streaming completion delivers.
-        ///
-        /// An endpoint is free to announce the id and the name of a call in one chunk and to send
-        /// its arguments as a series of deltas in the chunks that follow; the protocol only
-        /// promises that the fragments of one call share their index. Taking a single fragment
-        /// therefore yields a call whose arguments are empty or cut in half — the tool then runs
-        /// without arguments, and the broken fragment is carried back to the server with the next
-        /// request, which LM Studio answers with an Internal Server Error.
+        /// Names the agent, the protocol, the endpoint and the model of the turn, for the log line
+        /// that accompanies a failure. This triple being wrong for itself - an agent pointed at
+        /// Anthropic while still set to speak the OpenAI protocol, above all - is the likeliest
+        /// cause of a request being refused, and none of it appears in an HTTP status.
         /// </summary>
-        private sealed class StreamingToolCallAccumulator
+        private string DescribeTurn()
         {
-            /// <summary>The tool call fragments seen so far, keyed by the index the streaming protocol assigns each call.</summary>
-            private readonly Dictionary<int, ToolCallParts> _byIndex = new();
-
-            /// <summary>
-            /// The indices in the order the model opened them, so that the tool calls are offered
-            /// to the user in the order they were asked for rather than in hash order.
-            /// </summary>
-            private readonly List<int> _order = new();
-
-            /// <summary>Merges one streaming update's tool-call fragments into the accumulator, tracking each call by its index.</summary>
-            public void Append(
-                IReadOnlyList<StreamingChatToolCallUpdate> updates
-                )
+            try
             {
-                foreach (var update in updates)
-                {
-                    if (!_byIndex.TryGetValue(update.Index, out var parts))
-                    {
-                        parts = new ToolCallParts();
-                        _byIndex.Add(update.Index, parts);
-                        _order.Add(update.Index);
-                    }
+                var agent = _chat.Options.ChosenAgent;
 
-                    //everything but the arguments is sent once, by whichever chunk opens the call
-                    if (!string.IsNullOrEmpty(update.ToolCallId))
-                    {
-                        parts.ToolCallId = update.ToolCallId;
-                    }
-                    if (!string.IsNullOrEmpty(update.FunctionName))
-                    {
-                        parts.FunctionName = update.FunctionName;
-                        parts.Kind = update.Kind;
-                    }
-
-                    var argumentsUpdate = update.FunctionArgumentsUpdate;
-                    if (argumentsUpdate is not null && argumentsUpdate.Length > 0)
-                    {
-                        parts.Arguments.Append(argumentsUpdate.ToString());
-                    }
-                }
+                return
+                    $"Chat {_chat.Id}, agent '{agent.Name}' ({agent.Technical.ApiProtocol} at "
+                    + $"{agent.Technical.Endpoint}, model '{agent.Technical.ChosenModel}')";
             }
-
-            /// <summary>
-            /// The complete calls, in the order the model opened them. A fragment group which never
-            /// received a name is not a call the chat could execute and is dropped here rather than
-            /// passed on as a tool nobody can find.
-            /// </summary>
-            public IReadOnlyList<StreamingChatToolCallUpdate> Build()
+            catch (Exception)
             {
-                var result = new List<StreamingChatToolCallUpdate>();
-
-                foreach (var index in _order)
-                {
-                    var parts = _byIndex[index];
-                    if (string.IsNullOrEmpty(parts.FunctionName))
-                    {
-                        continue;
-                    }
-
-                    result.Add(
-                        OpenAIChatModelFactory.StreamingChatToolCallUpdate(
-                            index: index,
-                            toolCallId: parts.ToolCallId,
-                            kind: parts.Kind,
-                            functionName: parts.FunctionName,
-                            functionArgumentsUpdate: BinaryData.FromString(
-                                //a call without arguments still has to carry a json object:
-                                //an empty string is not one, and the endpoints reject it
-                                parts.Arguments.Length > 0
-                                    ? parts.Arguments.ToString()
-                                    : "{}"
-                                )
-                            )
-                        );
-                }
-
-                return result;
-            }
-
-            /// <summary>The fragments collected so far for one tool call, before they are merged into a complete <see cref="StreamingChatToolCallUpdate"/>.</summary>
-            private sealed class ToolCallParts
-            {
-                /// <summary>The tool call's id, sent once by the chunk that opens the call.</summary>
-                public string? ToolCallId;
-
-                /// <summary>The name of the tool being called, sent once by the chunk that opens the call.</summary>
-                public string? FunctionName;
-
-                /// <summary>The kind of tool call being made.</summary>
-                public ChatToolCallKind Kind;
-
-                /// <summary>The call's arguments, accumulated across the deltas the endpoint streams for this index.</summary>
-                public readonly StringBuilder Arguments = new();
+                //a description is not worth an exception of its own, least of all inside a catch
+                return $"Chat {_chat.Id}";
             }
         }
 
         /// <summary>
         /// Formats an exception as answer text and appends it to the chat, creating the answer
-        /// content if this is the first piece. OpenAI.dll's message is only the HTTP status —
-        /// vLLM names the actual fault (`max_completion_tokens`, the context window) in the
-        /// body, so that body is shown too when it can still be read.
+        /// content if this is the first piece. An HTTP client's own message is only the status —
+        /// vLLM names the actual fault (`max_completion_tokens`, the context window) in the body
+        /// and Anthropic the missing `max_tokens`, so the transport digs that sentence out and it
+        /// is shown here alongside.
         /// </summary>
         private async Task<AnswerChatContent> CreateOrAppendAnswerPartAsync(
             AnswerChatContent? chatAnswer,
@@ -462,9 +363,10 @@ namespace FreeAIr.BLogic.Reader
         }
 
         /// <summary>
-        /// The complaint the endpoint actually sent. `ClientResultException.Message` is
-        /// `Service request failed. Status: 400`; the JSON underneath it is the only place
-        /// that names the parameter the server did not like.
+        /// The complaint the endpoint actually sent, when the failure came from a transport. The
+        /// exception's own message is the status line - `Service request failed. Status: 400` - and
+        /// the sentence naming what to fix lives in the body, which the transport has already
+        /// unwrapped into <see cref="LlmTransportException.ServerMessage"/>.
         /// </summary>
         private static string? TryReadServerErrorMessage(
             Exception excp
@@ -472,83 +374,38 @@ namespace FreeAIr.BLogic.Reader
         {
             for (var current = excp; current is not null; current = current.InnerException)
             {
-                if (current is not ClientResultException clientException)
+                if (current is LlmTransportException transportException
+                    && !string.IsNullOrWhiteSpace(transportException.ServerMessage))
                 {
-                    continue;
+                    return transportException.ServerMessage;
                 }
-
-                string? body;
-                try
-                {
-                    body = clientException.GetRawResponse()?.Content?.ToString();
-                }
-                catch (Exception)
-                {
-                    //a response which has already been consumed keeps nothing to read
-                    continue;
-                }
-
-                if (string.IsNullOrWhiteSpace(body))
-                {
-                    continue;
-                }
-
-                var trimmed = body.Trim();
-                var fromJson = TryReadJsonErrorMessage(trimmed);
-                if (!string.IsNullOrWhiteSpace(fromJson))
-                {
-                    return fromJson;
-                }
-
-                if (trimmed.Length > MaxReportedBodyLength)
-                {
-                    return trimmed.Substring(0, MaxReportedBodyLength) + "...";
-                }
-
-                return trimmed;
             }
 
             return null;
         }
 
         /// <summary>
-        /// Pulls `error.message` (OpenAI / vLLM) or a top-level `message` out of the response
-        /// body so the chat shows the sentence the user can act on, not the whole JSON envelope.
+        /// Closes a reasoning block the turn ended in the middle of, and leaves the answer alone
+        /// when there is none.
+        ///
+        /// Every way out of the loop needs this — the end of the stream, a stop, a cancellation, a
+        /// failure — because an answer left holding an unclosed `think` tag hides everything
+        /// appended after it, and is no longer recognised as reasoning when the chat is replayed as
+        /// history.
         /// </summary>
-        private static string? TryReadJsonErrorMessage(
-            string body
+        private async Task<AnswerChatContent?> CloseReasoningAsync(
+            AnswerChatContent? chatAnswer,
+            AnswerTextAssembler answerTextAssembler
             )
         {
-            try
+            var reasoningTail = answerTextAssembler.Flush();
+            if (reasoningTail.Length == 0)
             {
-                using var json = JsonDocument.Parse(body);
-                if (json.RootElement.ValueKind != JsonValueKind.Object)
-                {
-                    return null;
-                }
-
-                if (json.RootElement.TryGetProperty("error", out var error)
-                    && error.ValueKind == JsonValueKind.Object
-                    && error.TryGetProperty("message", out var nested)
-                    && nested.ValueKind == JsonValueKind.String)
-                {
-                    return nested.GetString();
-                }
-
-                if (json.RootElement.TryGetProperty("message", out var message)
-                    && message.ValueKind == JsonValueKind.String)
-                {
-                    return message.GetString();
-                }
-
-                return null;
+                return chatAnswer;
             }
-            catch (Exception)
-            {
-                return null;
-            }
+
+            return await CreateOrAppendAnswerPartAsync(chatAnswer, reasoningTail);
         }
-
 
         /// <summary>Appends a piece of streamed text to the chat's answer, creating the answer content on the first call so the UI can update live.</summary>
         private async Task<AnswerChatContent> CreateOrAppendAnswerPartAsync(

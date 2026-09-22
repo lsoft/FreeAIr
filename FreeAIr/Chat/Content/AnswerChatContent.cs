@@ -1,4 +1,5 @@
-﻿using OpenAI.Chat;
+﻿using FreeAIr.Llm;
+using FreeAIr.Llm.Streaming;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
@@ -111,14 +112,21 @@ namespace FreeAIr.Chat.Content
         }
 
         /// <summary>
-        /// This answer as history for the next request: a single assistant message holding the whole
-        /// body.
+        /// This answer as history for the next request: a single assistant message holding the
+        /// body without the reasoning that produced it.
+        ///
+        /// The `think` blocks are dropped because no model wants last turn's deliberation back —
+        /// Anthropic replays a thinking block only as the signed block it sent, and the servers
+        /// which stream `reasoning_content` say plainly not to send it again — and as plain text it
+        /// is context paid for on every later turn of the chat.
         /// </summary>
-        public IReadOnlyList<ChatMessage> CreateChatMessages()
+        public IReadOnlyList<LlmMessage> CreateChatMessages()
         {
             return
                 [
-                    new AssistantChatMessage(AnswerBody)
+                    LlmMessage.CreateAssistantMessage(
+                        AnswerTextAssembler.WithoutReasoning(AnswerBody)
+                        )
                 ];
         }
 

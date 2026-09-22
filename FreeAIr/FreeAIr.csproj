@@ -219,6 +219,7 @@
       puts the assembly and its ru\ and zh-Hans\ satellites into the package - see
       RemoveFlattenedSatellites at the bottom of this file for what it puts there twice.
     -->
+    <ProjectReference Include="..\Llm\FreeAIr.Llm.csproj" />
     <ProjectReference Include="..\Resources\FreeAIr.Resources.csproj" />
     <ProjectReference Include="..\Search\FreeAIr.Search.csproj" />
     <ProjectReference Include="..\SetupWizard\FreeAIr.SetupWizard.csproj" />
@@ -284,5 +285,20 @@
       <_FlattenedSatellite Include="@(_SatelliteVsixItem)" Condition="'%(_SatelliteVsixItem.TargetPath)' == ''" />
       <VSIXSourceItem Remove="@(_FlattenedSatellite)" />
     </ItemGroup>
+  </Target>
+
+  <!--
+    DetokenizeVsixManifestSource writes obj\$(Configuration)\extension.vsixmanifest - the manifest
+    which is actually packed - only when the output is missing, when its LENGTH differs from the new
+    content, or when the two are EQUAL. The last condition is inverted in the task
+    (Microsoft.VisualStudio.Sdk.BuildTasks.dll, VSSDK.BuildTools 17.14.2094), so the single case it
+    skips is "same length, different content" - which is exactly a version bump: 4.5.0 to 4.5.1
+    changes no length. The build then succeeds and packages the previous version number, silently.
+
+    Deleting the intermediate first takes the IsNullOrEmpty branch and makes the task write every
+    time. It is a generated file and the very next task regenerates it, so nothing else notices.
+  -->
+  <Target Name="ForceVsixManifestDetokenization" BeforeTargets="DetokenizeVsixManifestFile">
+    <Delete Files="$(IntermediateVsixManifest)" />
   </Target>
 </Project>

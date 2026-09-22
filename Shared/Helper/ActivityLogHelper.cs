@@ -37,6 +37,21 @@ namespace FreeAIr.Helper
         }
 
         /// <summary>
+        /// Logs an error message under the "FreeAIr" source, for a failure which never becomes an
+        /// exception - a protocol fault reported as a stream event, say, or the sentence an endpoint
+        /// sent alongside a status code.
+        /// </summary>
+        public static void ActivityLogError(
+            string message
+            )
+        {
+            ActivityLog.LogError(
+                "FreeAIr",
+                message
+                );
+        }
+
+        /// <summary>
         /// Logs an exception's type, message and stack trace as errors, and recurses into
         /// <see cref="Exception.InnerException"/>, indenting each nested level so the whole chain is
         /// readable in the Activity Log.

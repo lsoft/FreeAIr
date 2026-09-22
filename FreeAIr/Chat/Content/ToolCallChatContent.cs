@@ -1,7 +1,5 @@
-﻿using FreeAIr.Helper;
-using OpenAI.Chat;
+﻿using FreeAIr.Llm;
 using System.Collections.Generic;
-using System.Text;
 
 namespace FreeAIr.Chat.Content
 {
@@ -41,14 +39,14 @@ namespace FreeAIr.Chat.Content
             private set;
         }
 
-        /// <summary>The raw tool invocation as streamed from the model (name and arguments).</summary>
-        public StreamingChatToolCallUpdate ToolCall
+        /// <summary>The tool invocation the model asked for, already reassembled out of the stream's fragments.</summary>
+        public LlmToolCall ToolCall
         {
             get;
         }
 
         /// <summary>The name of the tool the model asked to run.</summary>
-        public string Name => ToolCall.FunctionName;
+        public string Name => ToolCall.Name;
 
         /// <summary>The tool's output once the call has finished, or null while it is still pending.</summary>
         public string? Result
@@ -61,12 +59,16 @@ namespace FreeAIr.Chat.Content
         /// Rebuilds a tool call from a saved chat file. A call that was still running when Visual
         /// Studio closed cannot be resumed, so it lands as failed; one that was waiting for
         /// permission stays asking, and the user can allow or block it again.
+        ///
+        /// Returns null for a row which names no tool: there is nothing the chat could run, and
+        /// dropping the row is better than failing the whole transcript on one damaged entry. The
+        /// streaming index the file used to carry is not restored - it identifies the fragments of
+        /// a call while it arrives and means nothing once the call is whole.
         /// </summary>
-        public static ToolCallChatContent Restore(
+        public static ToolCallChatContent? Restore(
             string? toolCallId,
             string? functionName,
             string? arguments,
-            int index,
             ToolCallStatusEnum status,
             string? result,
             bool isArchived,
@@ -78,6 +80,11 @@ namespace FreeAIr.Chat.Content
                 throw new ArgumentNullException(nameof(checkForRequestAnswer));
             }
 
+            if (string.IsNullOrEmpty(functionName))
+            {
+                return null;
+            }
+
             var restoredStatus = status;
             var restoredResult = result;
             if (restoredStatus == ToolCallStatusEnum.Executing)
@@ -86,14 +93,10 @@ namespace FreeAIr.Chat.Content
                 restoredResult = "Interrupted when Visual Studio closed.";
             }
 
-            var toolCall = OpenAIChatModelFactory.StreamingChatToolCallUpdate(
-                index: index,
-                toolCallId: toolCallId ?? string.Empty,
-                kind: ChatToolCallKind.Function,
-                functionName: functionName ?? string.Empty,
-                functionArgumentsUpdate: BinaryData.FromString(
-                    string.IsNullOrEmpty(arguments) ? "{}" : arguments
-                    )
+            var toolCall = new LlmToolCall(
+                toolCallId ?? string.Empty,
+                functionName!,
+                arguments
                 );
 
             var content = new ToolCallChatContent(toolCall, checkForRequestAnswer)
@@ -112,7 +115,7 @@ namespace FreeAIr.Chat.Content
 
         /// <summary>Wraps a streamed tool call request in the Asking state, pending user permission.</summary>
         public ToolCallChatContent(
-            StreamingChatToolCallUpdate toolCall,
+            LlmToolCall toolCall,
             Action checkForRequestAnswer
             )
         {
@@ -163,23 +166,30 @@ namespace FreeAIr.Chat.Content
         /// <summary>
         /// Renders this call as the assistant message announcing it, followed by the tool result
         /// message once one is available.
+        ///
+        /// A call which has not finished yet produces the announcement alone. That is a transcript
+        /// the model is not normally shown - the chat waits for every tool of the turn before it
+        /// asks again - and it is the one shape both protocols reject, which is why the pairing
+        /// lives here rather than being reassembled by each transport.
         /// </summary>
-        public IReadOnlyList<ChatMessage> CreateChatMessages()
+        public IReadOnlyList<LlmMessage> CreateChatMessages()
         {
-            var result = new List<ChatMessage>();
-
-            var m1 = new AssistantChatMessage(
-                [ ToolCall.ConvertToChatTool() ]
-                );
-            result.Add(m1);
+            var result = new List<LlmMessage>
+            {
+                LlmMessage.CreateAssistantToolCallMessage([ ToolCall ])
+            };
 
             if (!string.IsNullOrEmpty(Result))
             {
-                var m2 = new ToolChatMessage(
-                    ToolCall.ToolCallId,
-                    Result
+                result.Add(
+                    LlmMessage.CreateToolResultMessage(
+                        new LlmToolResult(
+                            ToolCall.Id,
+                            Result,
+                            Status == ToolCallStatusEnum.Failed || Status == ToolCallStatusEnum.Blocked
+                            )
+                        )
                     );
-                result.Add(m2);
             }
 
             return result;

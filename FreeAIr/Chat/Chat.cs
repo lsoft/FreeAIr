@@ -1,9 +1,7 @@
-﻿using FreeAIr.MCP.McpServerProxy;
+﻿using FreeAIr.Llm;
+using FreeAIr.MCP.McpServerProxy;
 using FreeAIr.Options2;
 using FreeAIr.Shared.Helper;
-using OpenAI;
-using OpenAI.Chat;
-using System.ClientModel;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
@@ -102,6 +100,28 @@ namespace FreeAIr.Chat
         /// instead of rebuilding the whole transcript.
         /// </summary>
         public event ChatContentAddedDelegate ContentAddedEvent;
+
+        /// <summary>
+        /// Raised after a rewind dropped the tail of the transcript. There is no per-entry event:
+        /// a rewind removes a whole run of entries at once, and a window which follows the chat by
+        /// appending cannot follow a removal at all — it has to redraw.
+        /// </summary>
+        public event ChatContentsRemovedDelegate ContentsRemovedEvent;
+
+        /// <summary>
+        /// Whether nothing is writing into <see cref="Contents"/> right now. Both cutting the
+        /// transcript back (<see cref="RewindAfterAsync"/>) and copying part of it into a fork
+        /// (<see cref="ChatContainer.ForkChatAsync"/>) need the list to hold still.
+        ///
+        /// A turn in flight is still appending to it. A tool which is running is worse: it reports
+        /// its result into a transcript which may no longer hold its call, and the chat would then
+        /// start a turn with nothing to answer. A tool call which is merely waiting to be allowed
+        /// is no obstacle — rewinding past one is how the user gets rid of it.
+        /// </summary>
+        public bool IsTranscriptSettled =>
+            Status.In(ChatStatusEnum.NotStarted, ChatStatusEnum.Ready, ChatStatusEnum.Failed)
+            && !_contents.Any(c => c is ToolCallChatContent toolCall && toolCall.Status == ToolCallStatusEnum.Executing)
+            ;
 
         /// <summary>
         /// What the chat is called in the tool window and what it was started from — a document, a
@@ -206,23 +226,21 @@ namespace FreeAIr.Chat
         }
 
         /// <summary>
-        /// Rebuilds a user chat from a json file under `.freeair\chats`. Returns null when the file
-        /// cannot be parsed or there is no agent left to attach. Does not start a reader: the
-        /// transcript is already complete.
+        /// Rebuilds a user chat from the json shape. Returns null when there is no agent left to
+        /// attach. Does not start a reader: the transcript is already complete.
+        ///
+        /// <paramref name="filePath"/> is the file under `.freeair\chats` this chat is to be saved
+        /// to, or null when there is nowhere to save it — which is how a fork made with no solution
+        /// open comes into being, since the payload it is built from need not come from a file.
         /// </summary>
         public static async Task<Chat?> CreateFromPersistedAsync(
             PersistedChatJson payload,
-            string filePath
+            string? filePath
             )
         {
             if (payload is null)
             {
                 throw new ArgumentNullException(nameof(payload));
-            }
-
-            if (filePath is null)
-            {
-                throw new ArgumentNullException(nameof(filePath));
             }
 
             var agent = await FreeAIrOptions.DeserializeAgentByNameAsync(payload.AgentName);
@@ -300,7 +318,11 @@ namespace FreeAIr.Chat
             }
 
             chat._status = restoredStatus;
-            chat.EnablePersistence(filePath);
+            if (filePath is not null)
+            {
+                chat.EnablePersistence(filePath);
+            }
+
             return chat;
         }
 
@@ -391,7 +413,6 @@ namespace FreeAIr.Chat
                         row.ToolCallId,
                         row.Name,
                         row.Arguments,
-                        row.Index,
                         row.Status ?? ToolCallStatusEnum.Failed,
                         row.Result,
                         row.IsArchived,
@@ -446,7 +467,7 @@ namespace FreeAIr.Chat
         /// results — this is what makes the tool-calling loop go round.
         /// </summary>
         public ToolCallChatContent CreateToolCall(
-            StreamingChatToolCallUpdate toolCall
+            LlmToolCall toolCall
             )
         {
             var content = new ToolCallChatContent(
@@ -522,6 +543,58 @@ namespace FreeAIr.Chat
         }
 
         /// <summary>
+        /// Rewinds the dialogue to <paramref name="content"/>: everything said after it is dropped
+        /// from the transcript and from the chat's json file, while the entry itself stays as the
+        /// last thing in the chat. This is how the user returns to the point where the model still
+        /// understood the task, instead of starting the whole chat again.
+        ///
+        /// Returns how many entries were removed. Nothing is removed, and nothing is written, when
+        /// the entry does not belong to this chat, when it is already the last one, or when
+        /// <see cref="IsTranscriptSettled"/> says a turn is still in flight. The cut cannot be
+        /// undone — the caller is the one which asks the user first.
+        /// </summary>
+        public async Task<int> RewindAfterAsync(
+            IChatContent content
+            )
+        {
+            if (content is null)
+            {
+                throw new ArgumentNullException(nameof(content));
+            }
+
+            if (!IsTranscriptSettled)
+            {
+                return 0;
+            }
+
+            var index = _contents.FindIndex(c => ReferenceEquals(c, content));
+            if (index < 0 || index == _contents.Count - 1)
+            {
+                return 0;
+            }
+
+            var removedCount = _contents.Count - index - 1;
+            var removed = _contents.GetRange(index + 1, removedCount);
+            _contents.RemoveRange(index + 1, removedCount);
+
+            //the window is told before anything is disposed, so it drops the controls which render
+            //the removed entries while those entries are still whole
+            ContentsRemovedEvent?.Invoke(this, new ChatEventArgs(this));
+
+            //a failure which has just been cut out of the chat is no longer the state of the chat
+            if (Status == ChatStatusEnum.Failed)
+            {
+                Status = ChatStatusEnum.Ready;
+            }
+
+            PersistNow();
+
+            await DisposeContentsAsync(removed);
+
+            return removedCount;
+        }
+
+        /// <summary>
         /// Releases the description and every content which holds something — the temporary files
         /// behind images, the editor subscriptions behind selections. Called by
         /// <see cref="ChatContainer.RemoveChatAsync"/> after the reader has been stopped.
@@ -533,7 +606,18 @@ namespace FreeAIr.Chat
 
             Description.Dispose();
 
-            foreach (var content in Contents)
+            await DisposeContentsAsync(Contents);
+        }
+
+        /// <summary>
+        /// Releases whatever the given entries hold. Shared by the disposal of the whole chat and
+        /// by a rewind, which throws away the tail of it.
+        /// </summary>
+        private static async ValueTask DisposeContentsAsync(
+            IEnumerable<IChatContent> contents
+            )
+        {
+            foreach (var content in contents)
             {
                 if (content is IAsyncDisposable ad)
                 {
@@ -547,54 +631,58 @@ namespace FreeAIr.Chat
         }
 
         /// <summary>
-        /// Builds the completion options for the next request. Only the tools which are enabled in
-        /// <see cref="ChatTools"/> are offered to the model; if there are none, tool choice is
-        /// forced to `none` because some providers reject an empty tool list.
+        /// Builds the whole next request: the agent's system prompt, the transcript, and the tools
+        /// which are enabled in <see cref="ChatTools"/>. Nothing here is protocol specific - which
+        /// wire format this becomes is settled by <see cref="CreateTransport"/>.
         /// </summary>
-        public async Task<ChatCompletionOptions> CreateChatCompletionOptionsAsync()
+        public async Task<LlmRequest> BuildRequestAsync()
         {
             var toolCollection = McpServerProxyCollection.GetTools(ChatTools);
             var activeTools = toolCollection.GetActiveToolList();
 
-            var cco = new ChatCompletionOptions
-            {
-                ToolChoice =
-                    activeTools.Count > 0
-                    ? Options.ToolChoice
-                    : ChatToolChoice.CreateNoneChoice(),
-                ResponseFormat = Options.ResponseFormat,
-                MaxOutputTokenCount = (await FreeAIrOptions.DeserializeUnsortedAsync()).MaxOutputTokenCount,
-            };
-
+            var tools = new List<LlmToolDefinition>(activeTools.Count);
             foreach (var tool in activeTools)
             {
-                cco.Tools.Add(
-                    tool.CreateChatTool()
-                    );
+                tools.Add(tool.CreateToolDefinition());
             }
 
-            return cco;
+            var unsorted = await FreeAIrOptions.DeserializeUnsortedAsync();
+
+            return new LlmRequest(
+                model: Options.ChosenAgent.Technical.ChosenModel,
+                systemPrompt: await Options.ChosenAgent.GetFormattedSystemPromptAsync(),
+                messages: await GetMessageListAsync(),
+                tools: tools,
+                toolChoice: Options.ToolChoice,
+                //a zero in the settings means "unset", not "answer with nothing"
+                maxOutputTokens: unsorted.MaxOutputTokenCount > 0
+                    ? unsorted.MaxOutputTokenCount
+                    : (int?)null
+                );
         }
 
         /// <summary>
-        /// Creates an OpenAI client configured for the agent chosen for this chat. The network
-        /// timeout is deliberately huge: a local LLM on a slow machine can think for a long time.
+        /// The transport for the agent chosen for this chat, picked by the protocol its endpoint
+        /// speaks. A transport is cheap and holds nothing worth keeping between turns, and the
+        /// agent - therefore possibly the protocol - can change from one turn to the next.
         /// </summary>
-        public ChatClient CreateChatClient()
+        public ILlmTransport CreateTransport()
         {
-            var chosenAgent = this.Options.ChosenAgent;
-            var chatClient = new ChatClient(
-                model: chosenAgent.Technical.ChosenModel,
-                new ApiKeyCredential(
-                    chosenAgent.Technical.GetToken()
-                    ),
-                new OpenAIClientOptions
-                {
-                    NetworkTimeout = TimeSpan.FromHours(1),
-                    Endpoint = chosenAgent.Technical.TryBuildEndpointUri(),
-                }
+            var technical = Options.ChosenAgent.Technical;
+
+            var endpoint = technical.TryBuildEndpointUri();
+            if (endpoint is null)
+            {
+                throw new InvalidOperationException(
+                    $"Agent '{Options.ChosenAgent.Name}' has an endpoint which is not a valid uri: '{technical.Endpoint}'."
+                    );
+            }
+
+            return LlmTransportFactory.Create(
+                technical.ApiProtocol,
+                endpoint,
+                technical.GetToken()
                 );
-            return chatClient;
         }
 
         private async Task WaitForTaskAsync()
@@ -655,20 +743,19 @@ namespace FreeAIr.Chat
         }
 
         /// <summary>
-        /// Flattens the chat into the message list to be sent to the model:
-        /// system prompt, then everything before the last prompt, then the chat context items,
-        /// then the last prompt and everything after it.
+        /// Flattens the chat into the message list to be sent to the model: everything before the
+        /// last prompt, then the chat context items, then the last prompt and everything after it.
         ///
         /// The context is injected right before the last prompt on purpose: models pay much more
         /// attention to what stands close to the instruction they are asked to follow.
         /// Archived contents are skipped entirely.
+        ///
+        /// The system prompt is not part of this list. It is a field of <see cref="LlmRequest"/>,
+        /// because one of the two protocols has no system role at all.
         /// </summary>
-        public async Task<IReadOnlyList<OpenAI.Chat.ChatMessage>> GetMessageListAsync()
+        public async Task<IReadOnlyList<LlmMessage>> GetMessageListAsync()
         {
-            var result = new List<OpenAI.Chat.ChatMessage>();
-
-            var formattedSystemPrompt = await Options.ChosenAgent.GetFormattedSystemPromptAsync();
-            result.Add(formattedSystemPrompt);
+            var result = new List<LlmMessage>();
 
             var nonArchivedContents = Contents.FindAll(p => !p.IsArchived);
 
@@ -699,7 +786,7 @@ namespace FreeAIr.Chat
         /// </summary>
         private static void FillMessageList(
             IChatContent content,
-            List<OpenAI.Chat.ChatMessage> result
+            List<LlmMessage> result
             )
         {
             if (result is null)
@@ -719,6 +806,9 @@ namespace FreeAIr.Chat
 
     /// <summary>Handler shape of <see cref="Chat.ContentAddedEvent"/>.</summary>
     public delegate void ChatContentAddedDelegate(object sender, ChatContentAddedEventArgs e);
+
+    /// <summary>Handler shape of <see cref="Chat.ContentsRemovedEvent"/>.</summary>
+    public delegate void ChatContentsRemovedDelegate(object sender, ChatEventArgs e);
 
     /// <summary>
     /// Says which content was appended and to which chat, so a window bound to one chat can ignore

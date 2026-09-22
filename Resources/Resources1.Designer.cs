@@ -707,6 +707,15 @@ namespace FreeAIr.Resources {
                 return ResourceManager.GetString("Endpoint", resourceCulture);
             }
         }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Protocol:.
+        /// </summary>
+        public static string Api_protocol {
+            get {
+                return ResourceManager.GetString("Api_protocol", resourceCulture);
+            }
+        }
         
         /// <summary>
         ///   Looks up a localized string similar to Enter your prompt here. Press / to open commands. Press # to choose solution item. Press Ctrl + Enter to send your prompt..
@@ -3293,6 +3302,69 @@ namespace FreeAIr.Resources {
                 return ResourceManager.GetString("Wizard_infobar_open", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to Rewind.
+        /// </summary>
+        public static string UI_Rewind {
+            get {
+                return ResourceManager.GetString("UI_Rewind", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Delete everything said after this answer.
+        /// </summary>
+        public static string UI_Rewind_tooltip {
+            get {
+                return ResourceManager.GetString("UI_Rewind_tooltip", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Rewind the chat to this answer? Everything said after it will be deleted, both from the chat and from its file on disk. This cannot be undone..
+        /// </summary>
+        public static string UI_Rewind_confirmation {
+            get {
+                return ResourceManager.GetString("UI_Rewind_confirmation", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to The chat is busy right now. Wait until the current turn is over, or stop it, and try again..
+        /// </summary>
+        public static string UI_Chat_is_busy {
+            get {
+                return ResourceManager.GetString("UI_Chat_is_busy", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Fork.
+        /// </summary>
+        public static string UI_Fork {
+            get {
+                return ResourceManager.GetString("UI_Fork", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Continue in a new chat holding everything up to this answer.
+        /// </summary>
+        public static string UI_Fork_tooltip {
+            get {
+                return ResourceManager.GetString("UI_Fork_tooltip", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to The chat could not be forked. See the activity log for the details..
+        /// </summary>
+        public static string UI_Fork_has_failed {
+            get {
+                return ResourceManager.GetString("UI_Fork_has_failed", resourceCulture);
+            }
+        }
+
     }
 }
