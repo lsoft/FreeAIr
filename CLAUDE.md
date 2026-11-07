@@ -37,7 +37,9 @@ navigation, agent-field validation and known-endpoint catalog.
 `Llm.Tests\FreeAIr.Llm.Tests.csproj` (net8.0, xunit) covers `Llm\FreeAIr.Llm.csproj` — the two wire
 protocols FreeAIr speaks. Nothing reaches a server: a request is asserted as the JSON it becomes and
 an answer is fed in as the bytes a server would have sent, through a fake `HttpMessageHandler`
-(`Fakes\CannedHttpHandler.cs`). Add a case here before touching either transport.
+(`Fakes\CannedHttpHandler.cs`). Add a case here before touching either transport. It also covers
+`Budget\` — the token count calibrated by the server's `usage`, the cut of old turns which fits a
+chat into the agent's `ContextSize`, and the portions the NLO features send files in.
 
 `MCP\Tests\FreeAIr.Mcp.Tests.csproj` (**net9.0**, xunit) covers the hop to the MCP servers: the
 argument conversions in `MCP\Dto`, the JSON-RPC channel to `Proxy.exe`, and `Proxy`'s own

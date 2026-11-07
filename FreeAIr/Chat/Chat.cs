@@ -1,4 +1,5 @@
 ﻿using FreeAIr.Llm;
+using FreeAIr.Llm.Budget;
 using FreeAIr.MCP.McpServerProxy;
 using FreeAIr.Options2;
 using FreeAIr.Shared.Helper;
@@ -49,10 +50,22 @@ namespace FreeAIr.Chat
         private readonly object _persistLock = new();
 
         /// <summary>
-        /// The whole dialogue in chronological order. See <see cref="GetMessageListAsync"/>
+        /// The whole dialogue in chronological order. See <see cref="BuildRequestAsync"/>
         /// for how it is converted into a request.
         /// </summary>
         private readonly List<IChatContent> _contents = new();
+
+        /// <summary>
+        /// Counts the tokens of this chat's requests for its model, calibrated by the `usage` the
+        /// server reports after every answer.
+        /// </summary>
+        private readonly TokenCounter _tokenCounter;
+
+        /// <summary>
+        /// The raw token guess for the request in flight, which the server's count for it is
+        /// divided by once the answer arrives. One reader per chat, so one request at a time.
+        /// </summary>
+        private int _sentRequestRawEstimate;
 
         /// <summary>Backing field for <see cref="Status"/>.</summary>
         private ChatStatusEnum _status;
@@ -138,6 +151,18 @@ namespace FreeAIr.Chat
         /// </summary>
         public bool IsPersistent => _persistenceFilePath is not null;
 
+        /// <summary>
+        /// The token count of this chat's model: what decides how much of the dialogue fits into
+        /// the context window, and what the batch features size their portions of files by.
+        /// </summary>
+        public TokenCounter TokenCounter => _tokenCounter;
+
+        /// <summary>
+        /// Names the model the token calibration belongs to: the endpoint and the model, since the
+        /// same model name may be served by two servers which count differently.
+        /// </summary>
+        public string TokenModelKey => GetTokenModelKey(Options);
+
         /// <summary>When the chat was created. Shown in the chat list to tell several of them apart.</summary>
         public DateTime? Started
         {
@@ -172,7 +197,8 @@ namespace FreeAIr.Chat
             ChatOptions options,
             AvailableToolContainer chatTools,
             Guid? id = null,
-            DateTime? started = null
+            DateTime? started = null,
+            double? tokenRatio = null
             )
         {
             if (chatContext is null)
@@ -198,6 +224,12 @@ namespace FreeAIr.Chat
             _status = ChatStatusEnum.NotStarted;
 
             Started = started ?? DateTime.Now;
+
+            //a saved chat brings its own calibration; a new one starts from whatever the last chat
+            //with this model learned, and from the guess by characters if there was none
+            _tokenCounter = new TokenCounter(
+                tokenRatio ?? TokenCounter.GetLastRatio(GetTokenModelKey(options))
+                );
 
             ChatContext.ChatContextChangedEvent += ChatContextChangedRaised;
             Description.PropertyChanged += DescriptionPropertyChanged;
@@ -274,6 +306,14 @@ namespace FreeAIr.Chat
                 Title = string.IsNullOrEmpty(payload.Title) ? "Untitled" : payload.Title,
             };
 
+            //a file written before the calibration was saved has none, and a calibration of another
+            //model - the agent was renamed or replaced since - is no calibration of this one
+            var tokenCalibration = payload.TokenCalibration;
+            double? tokenRatio = tokenCalibration is not null
+                && string.Equals(tokenCalibration.Model, GetTokenModelKey(options), StringComparison.Ordinal)
+                ? tokenCalibration.Ratio
+                : null;
+
             var chatContext = ChatContext.CreateEmpty();
             var chat = new Chat(
                 chatContext,
@@ -281,7 +321,8 @@ namespace FreeAIr.Chat
                 options,
                 chatTools,
                 payload.Id,
-                payload.Started
+                payload.Started,
+                tokenRatio
                 );
 
             foreach (var contextRow in payload.Context)
@@ -634,8 +675,104 @@ namespace FreeAIr.Chat
         /// Builds the whole next request: the agent's system prompt, the transcript, and the tools
         /// which are enabled in <see cref="ChatTools"/>. Nothing here is protocol specific - which
         /// wire format this becomes is settled by <see cref="CreateTransport"/>.
+        ///
+        /// The transcript is fitted into the agent's context size: the system prompt, the tools
+        /// and the turn being answered always go, and of the turns before it the most recent ones
+        /// which still fit (<see cref="ContextWindowFitter"/>). The older ones stay on screen and
+        /// in the chat file; the model just no longer sees them.
         /// </summary>
         public async Task<LlmRequest> BuildRequestAsync()
+        {
+            var preamble = await GetPreambleAsync();
+            var (historyTurns, currentTurn) = await CollectTurnsAsync();
+
+            var fit = ContextWindowFitter.Fit(
+                preamble.SystemPrompt,
+                preamble.Tools,
+                historyTurns,
+                currentTurn,
+                _tokenCounter.GetInputBudget(Options.ChosenAgent.Technical.ContextSize, preamble.MaxOutputTokens),
+                _tokenCounter
+                );
+
+            _sentRequestRawEstimate = fit.RawEstimate;
+            ReportFit(fit);
+
+            return new LlmRequest(
+                model: Options.ChosenAgent.Technical.ChosenModel,
+                systemPrompt: preamble.SystemPrompt,
+                messages: fit.Messages,
+                tools: preamble.Tools,
+                toolChoice: Options.ToolChoice,
+                maxOutputTokens: preamble.MaxOutputTokens
+                );
+        }
+
+        /// <summary>
+        /// Takes in what the server said the request just sent cost, which calibrates the token
+        /// count of every later request. A count which is missing, zero or plainly not a count of
+        /// that request is ignored, and the count stays what it was - a guess by characters if
+        /// nothing better has been learned yet.
+        /// </summary>
+        public void RecordUsage(
+            LlmUsageEvent usage
+            )
+        {
+            if (usage is null)
+            {
+                throw new ArgumentNullException(nameof(usage));
+            }
+
+            _tokenCounter.TryCalibrate(
+                TokenModelKey,
+                _sentRequestRawEstimate,
+                usage.InputTokens
+                );
+        }
+
+        /// <summary>
+        /// How many tokens are left for context documents in a batch request of this chat - the
+        /// natural language outlines and search, which send a portion of files with one prompt.
+        /// What is taken off the window first: the answer's share, the safety margin, the system
+        /// prompt, the tools, the context already attached and <paramref name="promptText"/>.
+        /// </summary>
+        public async Task<int> GetContextBudgetAsync(
+            string promptText
+            )
+        {
+            if (promptText is null)
+            {
+                throw new ArgumentNullException(nameof(promptText));
+            }
+
+            var preamble = await GetPreambleAsync();
+
+            var rawEstimate =
+                TokenEstimator.EstimatePreamble(preamble.SystemPrompt, preamble.Tools)
+                + TokenEstimator.EstimateMessage(LlmMessage.CreateUserMessage(promptText))
+                ;
+            foreach (var contextItem in ChatContext.Items)
+            {
+                rawEstimate += TokenEstimator.EstimateMessage(await contextItem.CreateChatMessageAsync());
+            }
+
+            var inputBudget = _tokenCounter.GetInputBudget(
+                Options.ChosenAgent.Technical.ContextSize,
+                preamble.MaxOutputTokens
+                );
+            if (inputBudget == int.MaxValue)
+            {
+                return int.MaxValue;
+            }
+
+            return Math.Max(0, inputBudget - _tokenCounter.Scale(rawEstimate));
+        }
+
+        /// <summary>
+        /// The part of a request which does not depend on the dialogue: the system prompt, the
+        /// tools enabled in this chat, and the output limit from the settings.
+        /// </summary>
+        private async Task<(string? SystemPrompt, IReadOnlyList<LlmToolDefinition> Tools, int? MaxOutputTokens)> GetPreambleAsync()
         {
             var toolCollection = McpServerProxyCollection.GetTools(ChatTools);
             var activeTools = toolCollection.GetActiveToolList();
@@ -648,17 +785,53 @@ namespace FreeAIr.Chat
 
             var unsorted = await FreeAIrOptions.DeserializeUnsortedAsync();
 
-            return new LlmRequest(
-                model: Options.ChosenAgent.Technical.ChosenModel,
-                systemPrompt: await Options.ChosenAgent.GetFormattedSystemPromptAsync(),
-                messages: await GetMessageListAsync(),
-                tools: tools,
-                toolChoice: Options.ToolChoice,
+            return (
+                await Options.ChosenAgent.GetFormattedSystemPromptAsync(),
+                tools,
                 //a zero in the settings means "unset", not "answer with nothing"
-                maxOutputTokens: unsorted.MaxOutputTokenCount > 0
+                unsorted.MaxOutputTokenCount > 0
                     ? unsorted.MaxOutputTokenCount
                     : (int?)null
                 );
+        }
+
+        /// <summary>
+        /// Writes to the activity log when old turns were left out of the request, or when the
+        /// request is over the budget anyway. Either is what a report of "the model forgot what we
+        /// discussed" or "the server refused a long chat" turns out to be.
+        /// </summary>
+        private void ReportFit(
+            ContextWindowFit fit
+            )
+        {
+            if (fit.IsOverBudget)
+            {
+                ActivityLogHelper.ActivityLogWarning(
+                    $"Chat {Id}: the system prompt, the tools and the current turn alone take about {fit.EstimatedTokens} tokens, "
+                    + $"more than the context size {Options.ChosenAgent.Technical.ContextSize} of agent '{Options.ChosenAgent.Name}' leaves for them. "
+                    + "The request is sent without history and may be refused."
+                    );
+                return;
+            }
+
+            if (fit.DroppedTurnCount > 0)
+            {
+                ActivityLogHelper.ActivityLogInformation(
+                    $"Chat {Id}: {fit.DroppedTurnCount} oldest turn(s) left out of the request to fit the context size "
+                    + $"{Options.ChosenAgent.Technical.ContextSize}; {fit.KeptTurnCount} kept, about {fit.EstimatedTokens} tokens sent"
+                    + (_tokenCounter.IsCalibrated ? "." : " (estimated by characters, the server has reported no usage yet).")
+                    );
+            }
+        }
+
+        /// <summary>The key a token calibration is stored under: the endpoint and the model of the agent.</summary>
+        private static string GetTokenModelKey(
+            ChatOptions options
+            )
+        {
+            var technical = options.ChosenAgent.Technical;
+
+            return technical.Endpoint + "|" + technical.ChosenModel;
         }
 
         /// <summary>
@@ -743,60 +916,51 @@ namespace FreeAIr.Chat
         }
 
         /// <summary>
-        /// Flattens the chat into the message list to be sent to the model: everything before the
-        /// last prompt, then the chat context items, then the last prompt and everything after it.
+        /// Splits the chat into the messages of the earlier turns, oldest first, and those of the
+        /// turn being answered: the chat context items, then the last prompt and everything after
+        /// it. A turn is a prompt with the answers and tool calls which followed it, the unit the
+        /// history is cut by when it does not fit.
         ///
         /// The context is injected right before the last prompt on purpose: models pay much more
         /// attention to what stands close to the instruction they are asked to follow.
         /// Archived contents are skipped entirely.
         ///
-        /// The system prompt is not part of this list. It is a field of <see cref="LlmRequest"/>,
+        /// The system prompt is not part of these lists. It is a field of <see cref="LlmRequest"/>,
         /// because one of the two protocols has no system role at all.
         /// </summary>
-        public async Task<IReadOnlyList<LlmMessage>> GetMessageListAsync()
+        private async Task<(IReadOnlyList<IReadOnlyList<LlmMessage>> HistoryTurns, IReadOnlyList<LlmMessage> CurrentTurn)> CollectTurnsAsync()
         {
-            var result = new List<LlmMessage>();
-
             var nonArchivedContents = Contents.FindAll(p => !p.IsArchived);
 
             var lastPromptIndex = nonArchivedContents.FindLastIndex(c => c.Type == ChatContentTypeEnum.Prompt);
 
+            //a content may expand into several messages - a tool call becomes the assistant's
+            //request plus the tool's reply - and all of them belong to the turn of the prompt before
+            var historyTurns = new List<IReadOnlyList<LlmMessage>>();
+            List<LlmMessage>? turn = null;
             foreach (var content in nonArchivedContents.Take(lastPromptIndex))
             {
-                FillMessageList(content, result);
+                if (turn is null || content.Type == ChatContentTypeEnum.Prompt)
+                {
+                    turn = new List<LlmMessage>();
+                    historyTurns.Add(turn);
+                }
+
+                turn.AddRange(content.CreateChatMessages());
             }
 
+            var currentTurn = new List<LlmMessage>();
             foreach (var contextItem in ChatContext.Items)
             {
-                result.Add(await contextItem.CreateChatMessageAsync());
+                currentTurn.Add(await contextItem.CreateChatMessageAsync());
             }
 
             foreach (var content in nonArchivedContents.Skip(lastPromptIndex))
             {
-                FillMessageList(content, result);
+                currentTurn.AddRange(content.CreateChatMessages());
             }
 
-            return result;
-        }
-
-        /// <summary>
-        /// Appends one content to the request. A content may expand into several messages — a tool
-        /// call becomes the assistant's request plus the tool's reply — which is why this is not a
-        /// one-to-one mapping.
-        /// </summary>
-        private static void FillMessageList(
-            IChatContent content,
-            List<LlmMessage> result
-            )
-        {
-            if (result is null)
-            {
-                throw new ArgumentNullException(nameof(result));
-            }
-
-            //put prompt
-            var chatMessages = content.CreateChatMessages();
-            result.AddRange(chatMessages);
+            return (historyTurns, currentTurn);
         }
 
     }

@@ -92,13 +92,14 @@ namespace FreeAIr.Llm.Anthropic
 #endif
 
                 var finishReason = LlmFinishReason.Unknown;
+                var usage = new UsageTally();
 
                 await foreach (var item in SseParser.Create(stream).EnumerateAsync(cancellationToken))
                 {
                     //the event name is taken from the payload rather than from the `event:` line:
                     //a proxy in between is free to drop the line, and the payload always says what
                     //it is
-                    foreach (var streamEvent in ReadEvent(item.Data, ref finishReason))
+                    foreach (var streamEvent in ReadEvent(item.Data, ref finishReason, usage))
                     {
                         yield return streamEvent;
 
@@ -111,17 +112,70 @@ namespace FreeAIr.Llm.Anthropic
                     }
                 }
 
+                if (usage.InputTokens.HasValue || usage.OutputTokens.HasValue)
+                {
+                    yield return new LlmUsageEvent(usage.InputTokens, usage.OutputTokens);
+                }
+
                 yield return new LlmFinishedEvent(finishReason);
             }
         }
 
         /// <summary>
+        /// The token counts of one response as they arrive: the input in `message_start`, the
+        /// output - cumulative - in every `message_delta`, which newer API versions also give the
+        /// input again.
+        /// </summary>
+        private sealed class UsageTally
+        {
+            public int? InputTokens;
+            public int? OutputTokens;
+
+            /// <summary>
+            /// Takes what one `usage` object says. The input is the sum of the three fields it is
+            /// split into: with prompt caching `input_tokens` is only the part which was neither
+            /// written to nor read from the cache, and the context window holds all three.
+            /// </summary>
+            public void Read(
+                JsonElement usage
+                )
+            {
+                if (usage.ValueKind != JsonValueKind.Object)
+                {
+                    return;
+                }
+
+                int? input = null;
+                foreach (var name in new[] { "input_tokens", "cache_creation_input_tokens", "cache_read_input_tokens" })
+                {
+                    if (usage.TryGetProperty(name, out var part) && part.TryGetInt32(out var value))
+                    {
+                        input = (input ?? 0) + value;
+                    }
+                }
+
+                if (input.HasValue)
+                {
+                    InputTokens = input;
+                }
+
+                if (usage.TryGetProperty("output_tokens", out var output) && output.TryGetInt32(out var outputValue))
+                {
+                    OutputTokens = outputValue;
+                }
+            }
+        }
+
+        /// <summary>
         /// Translates one server-sent event into what the chat understands. Returns nothing for the
-        /// events which carry no news - `ping`, the block boundaries, the id of the message.
+        /// events which carry no news - `ping`, the block boundaries, the id of the message - and
+        /// collects the token counts into <paramref name="usage"/> rather than reporting them one
+        /// by one.
         /// </summary>
         private static IReadOnlyList<LlmStreamEvent> ReadEvent(
             string data,
-            ref LlmFinishReason finishReason
+            ref LlmFinishReason finishReason,
+            UsageTally usage
             )
         {
             JsonDocument document;
@@ -155,6 +209,15 @@ namespace FreeAIr.Llm.Anthropic
 
                 switch (typeElement.GetString())
                 {
+                    case "message_start":
+                        if (root.TryGetProperty("message", out var message)
+                            && message.ValueKind == JsonValueKind.Object
+                            && message.TryGetProperty("usage", out var startUsage))
+                        {
+                            usage.Read(startUsage);
+                        }
+                        return Array.Empty<LlmStreamEvent>();
+
                     case "content_block_start":
                         return ReadContentBlockStart(root);
 
@@ -168,6 +231,10 @@ namespace FreeAIr.Llm.Anthropic
                             && stopReason.ValueKind == JsonValueKind.String)
                         {
                             finishReason = MapFinishReason(stopReason.GetString());
+                        }
+                        if (root.TryGetProperty("usage", out var deltaUsage))
+                        {
+                            usage.Read(deltaUsage);
                         }
                         return Array.Empty<LlmStreamEvent>();
 

@@ -159,6 +159,58 @@ public sealed class OpenAiStreamFacts
     }
 
     [Fact]
+    public async Task TheUsageChunkBecomesOneUsageEventRightBeforeTheEnd()
+    {
+        //the count arrives in a chunk of its own after the finish reason, with no choices at all;
+        //it is the only exact token count the context budget is ever calibrated against
+        var result = await ReadAsync(
+            Sse(
+                """{"id":"c1","choices":[{"index":0,"delta":{"content":"ok"}}]}""",
+                """{"id":"c1","choices":[{"index":0,"delta":{},"finish_reason":"stop"}]}""",
+                """{"id":"c1","choices":[],"usage":{"prompt_tokens":1234,"completion_tokens":7,"total_tokens":1241}}"""
+                )
+            );
+
+        var usage = Assert.Single(result.Events.OfType<LlmUsageEvent>());
+        Assert.Equal(1234, usage.InputTokens);
+        Assert.Equal(7, usage.OutputTokens);
+
+        Assert.IsType<LlmUsageEvent>(result.Events[^2]);
+        Assert.IsType<LlmFinishedEvent>(result.Events[^1]);
+        Assert.Equal("ok", result.Text);
+    }
+
+    [Fact]
+    public async Task UsageRepeatedOnEveryChunkIsReportedOnceWithTheLastCount()
+    {
+        //vLLM with continuous usage stats counts up chunk by chunk
+        var result = await ReadAsync(
+            Sse(
+                """{"id":"c1","choices":[{"index":0,"delta":{"content":"a"}}],"usage":{"prompt_tokens":50,"completion_tokens":1,"total_tokens":51}}""",
+                """{"id":"c1","choices":[{"index":0,"delta":{"content":"b"}}],"usage":{"prompt_tokens":50,"completion_tokens":2,"total_tokens":52}}""",
+                """{"id":"c1","choices":[{"index":0,"delta":{},"finish_reason":"stop"}],"usage":{"prompt_tokens":50,"completion_tokens":3,"total_tokens":53}}"""
+                )
+            );
+
+        var usage = Assert.Single(result.Events.OfType<LlmUsageEvent>());
+        Assert.Equal(50, usage.InputTokens);
+        Assert.Equal(3, usage.OutputTokens);
+    }
+
+    [Fact]
+    public async Task AServerWhichCountsNothingSendsNoUsageEvent()
+    {
+        var result = await ReadAsync(
+            Sse(
+                """{"id":"c1","choices":[{"index":0,"delta":{"content":"ok"}}]}""",
+                """{"id":"c1","choices":[{"index":0,"delta":{},"finish_reason":"stop"}]}"""
+                )
+            );
+
+        Assert.DoesNotContain(result.Events, e => e is LlmUsageEvent);
+    }
+
+    [Fact]
     public async Task AChunkWhichIsNotACompletionEndsTheReadAsAFault()
     {
         //an error page or a quota message can still arrive shaped like a stream; without an id

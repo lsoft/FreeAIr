@@ -14,8 +14,9 @@ namespace FreeAIr.Chat.Context
     /// reference, so adding the same document twice is a no-op no matter how it was added
     /// (typed as `#name`, dragged from Solution Explorer, pulled in as a C# dependency, ...).
     ///
-    /// See <see cref="FreeAIr.Chat.Chat.GetMessageListAsync"/> for where exactly the context lands in the
-    /// request.
+    /// See <see cref="FreeAIr.Chat.Chat.BuildRequestAsync"/> for where exactly the context lands in the
+    /// request: it belongs to the turn being answered, so it is always sent, however much of the
+    /// older dialogue has to be left out to fit the context window.
     /// </summary>
     public sealed class ChatContext
     {

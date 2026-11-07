@@ -179,6 +179,24 @@ public sealed class OpenAiRequestFacts
         Assert.Equal(4096, body.RootElement.GetProperty("max_completion_tokens").GetInt32());
     }
 
+    [Fact]
+    public async Task AStreamedRequestAsksForTheTokenUsage()
+    {
+        //without include_usage a streaming completion carries no count at all, and the context
+        //budget is left with nothing but its estimate
+        var body = await CaptureAsync(
+            new LlmRequest(
+                model: "gpt-4o",
+                systemPrompt: null,
+                messages: new[] { LlmMessage.CreateUserMessage("hi") }
+                )
+            );
+
+        Assert.True(
+            body.RootElement.GetProperty("stream_options").GetProperty("include_usage").GetBoolean()
+            );
+    }
+
     /// <summary>Runs one request against a handler which answers with an empty stream, and returns the JSON that was sent.</summary>
     private static async Task<JsonDocument> CaptureAsync(
         LlmRequest request

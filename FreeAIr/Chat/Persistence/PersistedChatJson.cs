@@ -87,6 +87,19 @@ namespace FreeAIr.Chat.Persistence
         } = new();
 
         /// <summary>
+        /// What the chat learned about counting tokens for its model, so a reopened chat fits its
+        /// history into the context window as precisely as before the restart. Optional and
+        /// additive, which is why <see cref="Version"/> stays 1: a file written before it existed
+        /// reads as null - the count then starts from the guess by characters - and an older
+        /// FreeAIr reading a newer file skips the member it does not know.
+        /// </summary>
+        public PersistedTokenCalibrationJson? TokenCalibration
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
         /// Snapshots a live chat into the json shape. Call this on a settled turn — a prompt just
         /// added, an answer just finished — not while tokens are still arriving.
         /// </summary>
@@ -121,7 +134,39 @@ namespace FreeAIr.Chat.Persistence
                 Contents = chat.Contents
                     .Select(PersistedContentJson.FromContent)
                     .ToList(),
+                TokenCalibration = chat.TokenCounter.Ratio is double ratio
+                    ? new PersistedTokenCalibrationJson
+                    {
+                        Model = chat.TokenModelKey,
+                        Ratio = ratio,
+                    }
+                    : null,
             };
+        }
+    }
+
+    /// <summary>
+    /// The token calibration of a chat on disk: the ratio of what the server counted to the guess
+    /// by characters, and the endpoint and model it was learned from. A ratio of another model is
+    /// not applied when the chat is reopened with a different agent.
+    /// </summary>
+    public sealed class PersistedTokenCalibrationJson
+    {
+        /// <summary>The endpoint and model the ratio was learned from, as `endpoint|model`.</summary>
+        public string Model
+        {
+            get;
+            set;
+        } = string.Empty;
+
+        /// <summary>
+        /// The ratio of reported to guessed tokens. An implausible value - a hand-edited file, say -
+        /// is ignored on load rather than trusted.
+        /// </summary>
+        public double Ratio
+        {
+            get;
+            set;
         }
     }
 

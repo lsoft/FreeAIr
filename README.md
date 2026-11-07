@@ -36,6 +36,7 @@ A: No problem! You can use local LLM, for example via KoboldCpp. Local LLM sends
 Main functions:
 
 - Chat with any OpenAI-compatible LLM, or with Claude through Anthropic's own API, in a tool window or in a small floating window right at the caret (`in situ` chat)
+- Long chats stay inside the model's context window: the oldest turns are left out, counted in the tokens the server itself reports
 - Voice prompting: dictate your prompt instead of typing it (4 speech-to-text backends, including a fully local one)
 - Searching with natural language (with RAG support)
 - Explain the code
@@ -218,6 +219,16 @@ What reaches the chat depends on the server rather than on FreeAIr:
 
 Reasoning is never sent back to the model on the next turn, and the support actions — the commit message writer and the rest — strip it before using an answer, so turning it off only matters for what you are shown and what an endpoint billed per token charges you for.
 
+### Context size
+
+`ContextSize` is the model's context window in tokens, and FreeAIr keeps every request inside it. Set it to what your server actually loads the model with — for a local server that is the context length it was started with, not the most the model could take.
+
+When a chat grows too long for the window, its oldest turns are left out of the request. The system prompt, the tools, the attached context and the prompt you have just sent always go; of the dialogue before them, as many of the most recent turns as still fit. A turn — a prompt with the answers and tool calls that followed it — is left out whole, never cut in half, and nothing is summarized. The turns left out stay in the chat window and in the chat's file; the model simply no longer sees them. Each time this happens it is noted in the [activity log](#reporting-a-problem).
+
+Room is kept for the answer: `MaxOutputTokenCount` from the settings if you set one, otherwise a quarter of the window, at most 8192 tokens.
+
+The model, and so its tokenizer, is whatever the server says it is, so FreeAIr cannot count tokens exactly in advance. It starts with an estimate by characters, and after every answer compares that estimate with the token count the server reports for the request (`usage`). From then on the estimate is corrected by that ratio, which makes the request just sent count exactly what the server said and leaves only the newly added part to be estimated. A server which reports nothing, zero, or a count that cannot belong to the request is ignored, and the estimate by characters stays in use — with a wider safety margin, 15% of the window instead of 5%. The ratio learned is remembered per endpoint and model, so a new chat with the same agent starts from it.
+
 ## Chat
 
 Chat is the core element of FreeAIr, where communication with LLM and code generation takes place.
@@ -297,6 +308,8 @@ Chats you start yourself (not the automatic ones FreeAIr opens for commit messag
 If no solution is open when the chat is created, there is nowhere to put the file and the chat stays in memory only.
 
 The json is written when a whole message is added (a prompt, a finished answer, a tool call) and when you rename the chat, change its agent or its tools, or attach context — not on every token of a streaming answer. Russian (and any other non-ASCII) is stored as letters, not `\uXXXX` escapes.
+
+Once the server has reported a token count, the file also holds a `TokenCalibration` member — the endpoint and model it was learned from and the ratio described under [Context size](#context-size) — so a reopened chat fits its history into the window as precisely as before. A file written by an earlier version has none and is read as it always was; a calibration learned for another model is not applied.
 
 ## In situ chat
 
@@ -451,6 +464,8 @@ Each text file from the solution (project) is passed to LLM along with a search 
   <img src="https://raw.githubusercontent.com/lsoft/FreeAIr/main/nlos1.png" style="height: 150px; width: auto; object-fit: contain; border: 1px solid #ccc;" alt="Searching with natural language" />
 </a>
 
+The files are sent several at a time, as many as fit into the agent's [context size](#context-size) next to the query, counted in tokens the same way a chat is.
+
 Since all project files are processed, searching can take a considerable amount of time. To speed it up, FreeAIr supports RAG using natural language outlines.
 
 The search needs an agent with a token, because that is what every chat of FreeAIr needs. An agent of a locally running server usually carries no token, and if none of your agents has one the search says so instead of doing nothing.
@@ -478,6 +493,8 @@ Next, you can incrementally add NLOs to only those files that have been modified
 <a href="https://raw.githubusercontent.com/lsoft/FreeAIr/main/commitmessage.png" target="_blank">
   <img src="https://raw.githubusercontent.com/lsoft/FreeAIr/main/commitmessage.png" style="height: 150px; width: auto; object-fit: contain; border: 1px solid #ccc;" alt="Commit message" />
 </a>
+
+The files are sent several at a time, each together with the C# files it refers to, as many as fit into the agent's [context size](#context-size). A file whose references would not fit starts the next batch rather than going without them.
 
 The NLO viewing and saving window itself is designed trivially:
 

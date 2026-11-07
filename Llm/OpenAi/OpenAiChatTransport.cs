@@ -71,6 +71,7 @@ namespace FreeAIr.Llm.OpenAi
                 );
 
             var finishReason = LlmFinishReason.Unknown;
+            ChatTokenUsage? usage = null;
 
             var enumerator = updates.GetAsyncEnumerator(cancellationToken);
             try
@@ -120,6 +121,14 @@ namespace FreeAIr.Llm.OpenAi
                         finishReason = MapFinishReason(update.FinishReason.Value);
                     }
 
+                    //the SDK asks for `stream_options.include_usage`, so the count comes in a last
+                    //chunk with no choices; a server which repeats it on every chunk is cumulative,
+                    //and the last one is the total either way
+                    if (update.Usage is not null)
+                    {
+                        usage = update.Usage;
+                    }
+
                     foreach (var toolCallUpdate in update.ToolCallUpdates)
                     {
                         if (!string.IsNullOrEmpty(toolCallUpdate.ToolCallId)
@@ -167,6 +176,11 @@ namespace FreeAIr.Llm.OpenAi
             while (reasoningCapture.TryRead(out var reasoning))
             {
                 yield return new LlmReasoningDeltaEvent(reasoning);
+            }
+
+            if (usage is not null)
+            {
+                yield return new LlmUsageEvent(usage.InputTokenCount, usage.OutputTokenCount);
             }
 
             yield return new LlmFinishedEvent(finishReason);

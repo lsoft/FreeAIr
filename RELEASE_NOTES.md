@@ -23,6 +23,38 @@ My others extensions lives [here](https://marketplace.visualstudio.com/publisher
 
 # FreeAIr Release Notes
 
+## 4.6.0
+
+- A chat now stays inside the agent's `ContextSize`. Until now the whole dialogue was sent on every
+  turn however long it had grown, and a long chat ended in the server refusing the request — or, on
+  a local server, quietly forgetting its beginning. Now the system prompt, the tools, the attached
+  context and the prompt just sent always go, and of the dialogue before them as many of the most
+  recent turns as still fit. A turn — a prompt with everything that answered it — is left out
+  whole, never cut in half, and nothing is summarized; the turns left out stay in the chat window
+  and in the chat's file. Room is kept for the answer: `MaxOutputTokenCount` if set, otherwise a
+  quarter of the window, at most 8192 tokens.
+- Tokens are counted against what the server reports. The model behind an endpoint — and so its
+  tokenizer — cannot be known in advance, so the count starts as an estimate by characters, which
+  tells Latin, Cyrillic, code punctuation and CJK apart. After every answer the estimate is
+  compared with the `usage` the server reported for that request, and later requests are corrected
+  by the ratio: the request just sent counts exactly what the server said, and only what was added
+  since is estimated. A server which reports nothing, zero, or a number that cannot be a count of
+  the request is ignored, and the estimate by characters stays in use with a wider safety margin.
+  Both protocols are read for it; on the Anthropic API the tokens served from the prompt cache are
+  counted too, since they take up the window like any other.
+- The ratio is remembered per endpoint and model, so a new chat with the same agent starts from it,
+  and it is saved with the chat in `.freeair\chats` as a new optional `TokenCalibration` member. A
+  chat file written by an earlier version has no such member and is read as before; an earlier
+  version reading a new file skips it.
+- Natural language outlines and natural language search size their batches of files in tokens
+  rather than in characters. They used to compare the number of characters of the files with the
+  `ContextSize` in tokens, which made batches several times smaller than the window allowed, and
+  left out everything else the request carries. The files are now counted as they are sent, line
+  numbers included, after what the system prompt and the prompt itself take.
+- Fixed: natural language outlines attached the referenced files of only the last file of each
+  batch — the others were looked up and then thrown away. Every file now brings its references,
+  each shared one is counted once, and a file whose references do not fit starts the next batch.
+
 ## 4.5.1
 
 - Fixed: `FreeAIr generate whole line suggestion` did nothing in Visual Studio 2026 and left a

@@ -159,6 +159,17 @@ project. Paths in this section are relative to it.
   connection` button need: `GET /models` behind a bearer token against `{data:[{id, owned_by}]}` on
   one side, `GET /v1/models` behind `x-api-key` against `{data:[{id, display_name}]}` on the other.
 
+- `Budget/` is how a request is made to fit the agent's `ContextSize` without the model's
+  tokenizer, which is unknowable from here. `TokenEstimator` guesses by character class;
+  `TokenCounter` scales the guess by the ratio of the `usage` the server reported for the last
+  request (`LlmUsageEvent`) to the guess for that same request, so the request just sent counts as
+  exactly what the server said and only what was added since is a guess. A missing, zero or
+  implausible count leaves the ratio alone. `ContextWindowFitter` then always sends the system
+  prompt, the tools and the turn being answered, and of the earlier turns the newest which fit —
+  whole turns, never part of one, and nothing summarized. The ratio is saved with the chat as the
+  optional `TokenCalibration` member. `PortionBudget` sizes the portions of files the natural
+  language outlines and search send, by the same count.
+
 `FreeAIr.Llm.Tests` drives both transports against canned server bytes — the request is asserted as
 the JSON it becomes and the answer is fed in as the bytes a server would have sent — so no model and
 no network are involved. That is the reason the assembly is split out at all: the VSIX cannot be

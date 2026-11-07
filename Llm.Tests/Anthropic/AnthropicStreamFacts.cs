@@ -155,6 +155,45 @@ public sealed class AnthropicStreamFacts
     }
 
     [Fact]
+    public async Task TheInputCountIncludesWhatThePromptCacheServed()
+    {
+        //with prompt caching `input_tokens` is only the uncached remainder; the context window holds
+        //all three parts, and a budget calibrated on the remainder alone would think a long chat
+        //nearly empty
+        var result = await ReadAsync(
+            Sse(
+                ("message_start", """{"type":"message_start","message":{"id":"msg_1","role":"assistant","content":[],"usage":{"input_tokens":10,"cache_creation_input_tokens":200,"cache_read_input_tokens":1000,"output_tokens":1}}}"""),
+                ("content_block_start", """{"type":"content_block_start","index":0,"content_block":{"type":"text","text":""}}"""),
+                ("content_block_delta", """{"type":"content_block_delta","index":0,"delta":{"type":"text_delta","text":"ok"}}"""),
+                ("message_delta", """{"type":"message_delta","delta":{"stop_reason":"end_turn"},"usage":{"output_tokens":15}}"""),
+                ("message_stop", """{"type":"message_stop"}""")
+                )
+            );
+
+        var usage = Assert.Single(result.Events.OfType<LlmUsageEvent>());
+        Assert.Equal(1210, usage.InputTokens);
+        Assert.Equal(15, usage.OutputTokens);
+
+        Assert.IsType<LlmUsageEvent>(result.Events[^2]);
+        Assert.IsType<LlmFinishedEvent>(result.Events[^1]);
+    }
+
+    [Fact]
+    public async Task AStreamWithoutUsageSendsNoUsageEvent()
+    {
+        var result = await ReadAsync(
+            Sse(
+                ("message_start", """{"type":"message_start","message":{"id":"msg_1","role":"assistant","content":[]}}"""),
+                ("content_block_delta", """{"type":"content_block_delta","index":0,"delta":{"type":"text_delta","text":"ok"}}"""),
+                ("message_delta", """{"type":"message_delta","delta":{"stop_reason":"end_turn"}}"""),
+                ("message_stop", """{"type":"message_stop"}""")
+                )
+            );
+
+        Assert.DoesNotContain(result.Events, e => e is LlmUsageEvent);
+    }
+
+    [Fact]
     public async Task PingEventsAreIgnored()
     {
         var result = await ReadAsync(

@@ -237,6 +237,12 @@ namespace FreeAIr.BLogic.Reader
                             }
                             break;
 
+                        case LlmUsageEvent usage:
+                            //what the server counted for the request just sent calibrates the
+                            //token budget of every later one
+                            _chat.RecordUsage(usage);
+                            break;
+
                         case LlmFinishedEvent finished:
                             finishReason = finished.Reason;
                             break;

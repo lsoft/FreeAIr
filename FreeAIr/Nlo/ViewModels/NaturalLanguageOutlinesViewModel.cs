@@ -367,9 +367,16 @@ namespace FreeAIr.UI.ViewModels
             {
                 var processedItemCount = 0;
 
-                foreach (var portionSolutionItems in chosenSolutionItems.SplitByItemsSize(defaultAgent.Technical.ContextSize))
+                //every portion is sized by the files it is about and the files they refer to,
+                //counted in the model's tokens after what the prompt itself takes
+                var contextBudget = await _chat.GetContextBudgetAsync(action.Prompt);
+
+                await foreach (var portion in chosenSolutionItems.SplitIntoPortionsAsync(true, contextBudget, _chat.TokenCounter, cancellationToken))
                 {
                     cancellationToken.ThrowIfCancellationRequested();
+
+                    var portionSolutionItems = portion.Items;
+                    var textContextualItems = portion.RelatedItems;
 
                     Status = string.Format(
                         FreeAIr.Resources.Resources.In_progress___0___1,
@@ -377,20 +384,14 @@ namespace FreeAIr.UI.ViewModels
                         chosenSolutionItems.Count
                         );
 
-                    //add subject items (to use line numbers)
+                    //add subject items first, so that a file which is also a reference of another
+                    //keeps the line numbers the comments are placed by
                     foreach (var portionSolutionItem in portionSolutionItems)
                     {
                         _chat.ChatContext.AddItem(portionSolutionItem);
                     }
 
-                    //then add context items
-                    IReadOnlyList<SolutionItemChatContextItem> textContextualItems = [];
-                    foreach (var portionContextItem in portionSolutionItems)
-                    {
-                        var contextualItems = await portionContextItem.SearchRelatedContextItemsAsync();
-                        textContextualItems = contextualItems
-                            .FindAll(i => FileTypeHelper.GetFileType(i.SelectedIdentifier.FilePath) == FileTypeEnum.Text);
-                    }
+                    //then the files they refer to - of every subject item, not just the last one
                     _chat.ChatContext.AddItems(textContextualItems);
 
                     var supportContext = await SupportContext.WithContextItemAsync(

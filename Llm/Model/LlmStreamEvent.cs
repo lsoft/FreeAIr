@@ -131,6 +131,43 @@ namespace FreeAIr.Llm
         }
     }
 
+    /// <summary>
+    /// How many tokens the server says the request and the answer took - the `usage` of an OpenAI
+    /// compatible completion, the `usage` of Anthropic's `message_start` and `message_delta`.
+    ///
+    /// It is the only exact token count FreeAIr ever gets: the model and therefore its tokenizer
+    /// are unknown on this side, so the context window budget is calibrated against it (see
+    /// <see cref="Budget.TokenCounter"/>). Sent at most once, right before
+    /// <see cref="LlmFinishedEvent"/>, and passed on exactly as the server reported it - a zero or
+    /// an implausible number is the calibration's to reject, not the transport's.
+    /// </summary>
+    public sealed class LlmUsageEvent : LlmStreamEvent
+    {
+        /// <summary>
+        /// The tokens of the whole request - system prompt, tools, transcript - including any part
+        /// the server served from its prompt cache; null when the server did not say.
+        /// </summary>
+        public int? InputTokens
+        {
+            get;
+        }
+
+        /// <summary>The tokens of the answer, reasoning included; null when the server did not say.</summary>
+        public int? OutputTokens
+        {
+            get;
+        }
+
+        public LlmUsageEvent(
+            int? inputTokens,
+            int? outputTokens
+            )
+        {
+            InputTokens = inputTokens;
+            OutputTokens = outputTokens;
+        }
+    }
+
     /// <summary>The turn is over, and this is why. The last event of a healthy stream.</summary>
     public sealed class LlmFinishedEvent : LlmStreamEvent
     {

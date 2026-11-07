@@ -672,12 +672,32 @@ namespace FreeAIr.UI.ViewModels
 
                 var processedItemCount = 0;
 
-                //todo неправильно считается размер порции: не учитываются related context items
-                //которые будут добавлены в контекст чата по референсам для C#
-                //надо добавлять по одному файлу, добавлять все референс-файлы и оценивать размер
-                //если размер стал слишком большим - откатывать последний файл и его референс файлы
-                //и использовать их на следующей итерации
-                foreach (var portion in foundRootItems.SplitByItemsSize(parameters.ChosenAgent.Technical.ContextSize))
+                //the files are sent numbered, which is how the answer names the lines it found
+                var searchItems = foundRootItems.ConvertAll(
+                    solutionItem => new SolutionItemChatContextItem(
+                        SelectedIdentifier.Create(
+                            solutionItem.SolutionItem.FullPath,
+                            null
+                            ),
+                        false,
+                        AddLineNumbersMode.RequiredAllInScope
+                        )
+                    );
+
+                var supportContext = await SupportContext.WithNaturalLanguageSearchQueryAsync(
+                    parameters.SearchText
+                    );
+
+                var promptText = supportContext.ApplyVariablesToPrompt(
+                    parameters.ChosenAction.Prompt
+                    );
+
+                //the prompt is the same for every portion, so what is left of the window for the
+                //files is too; the files are counted as they will be sent, line numbers included.
+                //The search sends the files alone, without the files they refer to
+                var contextBudget = await _chat.GetContextBudgetAsync(promptText);
+
+                await foreach (var portion in searchItems.SplitIntoPortionsAsync(false, contextBudget, _chat.TokenCounter, cancellationToken))
                 {
                     Status = string.Format(
                         Resources.Resources.In_progress___0___1,
@@ -688,31 +708,8 @@ namespace FreeAIr.UI.ViewModels
 
                     cancellationToken.ThrowIfCancellationRequested();
 
-                    var contextItems = new List<IChatContextItem>();
-
-                    foreach (var solutionItem in portion)
-                    {
-                        cancellationToken.ThrowIfCancellationRequested();
-
-                        var contextItem = new SolutionItemChatContextItem(
-                            SelectedIdentifier.Create(
-                                solutionItem.SolutionItem.FullPath,
-                                null
-                                ),
-                            false,
-                            AddLineNumbersMode.RequiredAllInScope
-                            );
-                        contextItems.Add(contextItem);
-                    }
+                    var contextItems = portion.Items;
                     _chat.ChatContext.AddItems(contextItems);
-
-                    var supportContext = await SupportContext.WithNaturalLanguageSearchQueryAsync(
-                        parameters.SearchText
-                        );
-
-                    var promptText = supportContext.ApplyVariablesToPrompt(
-                        parameters.ChosenAction.Prompt
-                        );
 
                     _chat.AddPrompt(
                         UserPrompt.CreateTextBasedPrompt(
@@ -721,7 +718,7 @@ namespace FreeAIr.UI.ViewModels
                         );
 
                     SearchTrace.Step(
-                        $"Asking about {portion.Count} file(s), the prompt is {promptText.Length} char(s) long."
+                        $"Asking about {portion.Items.Count} file(s), the prompt is {promptText.Length} char(s) long."
                         );
 
                     var cleanAnswer = await _chat.WaitForPromptCleanAnswerAsync(
@@ -752,7 +749,7 @@ namespace FreeAIr.UI.ViewModels
                     _chat.ArchiveAllPrompts();
                     _chat.ChatContext.RemoveItems(contextItems);
 
-                    processedItemCount += portion.Count;
+                    processedItemCount += portion.Items.Count;
                 }
 
                 Status = string.Format(
